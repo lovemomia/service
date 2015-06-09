@@ -46,11 +46,11 @@ public class ValidationFilter implements Filter {
     }
 
     private boolean isInvalidProtocol(HttpServletRequest request) {
-        String protocol = request.getProtocol();
+        String schema = request.getScheme();
         String uri = request.getRequestURI();
 
         if (!(uri.startsWith("/callback") || uri.startsWith("/order") || uri.startsWith("/payment"))) return false;
-        if (!protocol.equals("https")) return true;
+        if (!schema.equals("https")) return true;
         return false;
     }
 
