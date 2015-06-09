@@ -14,6 +14,18 @@ public class PaymentController extends AbstractController {
     @Autowired
     private PaymentService paymentService;
 
+    @RequestMapping(value = "/sign/alipay", method = RequestMethod.POST)
+    public ResponseMessage signAlipay()
+    {
+        return new ResponseMessage("TODO");
+    }
+
+    @RequestMapping(value = "/sign/wechatpay", method = RequestMethod.POST)
+    public ResponseMessage signWechatpay()
+    {
+        return new ResponseMessage("TODO");
+    }
+
     @RequestMapping(value = "/check", method = RequestMethod.POST)
     public ResponseMessage checkPayment() {
         return new ResponseMessage("TODO");

@@ -17,9 +17,4 @@ public class CallbackController {
     public ResponseMessage wechatpayCallback() {
         return new ResponseMessage("TODO");
     }
-
-    @RequestMapping(value = "/unionpay", method = RequestMethod.POST)
-    public ResponseMessage unionpayCallback() {
-        return new ResponseMessage("TODO");
-    }
 }
