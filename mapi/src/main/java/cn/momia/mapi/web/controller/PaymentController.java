@@ -11,6 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 public class PaymentController extends AbstractController {
     @RequestMapping(value = "/check", method = RequestMethod.POST)
     public String checkPayment(HttpServletRequest request) {
-        return null;
+        return forward(request, request.getRequestURI());
     }
 }

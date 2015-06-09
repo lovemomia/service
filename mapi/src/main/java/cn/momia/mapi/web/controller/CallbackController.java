@@ -11,16 +11,16 @@ import javax.servlet.http.HttpServletRequest;
 public class CallbackController extends AbstractController {
     @RequestMapping(value = "/alipay", method = RequestMethod.POST)
     public String alipayCallback(HttpServletRequest request) {
-        return null;
+        return forward(request, request.getRequestURI());
     }
 
     @RequestMapping(value = "/wechatpay", method = RequestMethod.POST)
     public String wechatpayCallback(HttpServletRequest request) {
-        return null;
+        return forward(request, request.getRequestURI());
     }
 
     @RequestMapping(value = "/unionpay", method = RequestMethod.POST)
     public String unionpayCallback(HttpServletRequest request) {
-        return null;
+        return forward(request, request.getRequestURI());
     }
 }

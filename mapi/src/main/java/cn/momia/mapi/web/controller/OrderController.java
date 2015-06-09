@@ -11,6 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 public class OrderController extends AbstractController {
     @RequestMapping(method = RequestMethod.POST)
     public String placeOrder(HttpServletRequest request) {
-        return null;
+        return forward(request, request.getRequestURI());
     }
 }

@@ -4,7 +4,7 @@
         <Level>INFO</Level>
     </Logger>
 
-    <Secret>
-        <Key></Key>
-    </Secret>
+    <Server>
+        <Biz>mapi</Biz>
+    </Server>
 </Configuration>

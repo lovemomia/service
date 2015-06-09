@@ -1,6 +1,7 @@
 package cn.momia.mapi.web.filter;
 
 import cn.momia.common.config.Configuration;
+import cn.momia.common.web.secret.SecretKey;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
@@ -40,7 +41,7 @@ public class ValidationFilter implements Filter {
         }
 
         if (System.currentTimeMillis() > Long.valueOf(expired) ||
-                !sign.equals(DigestUtils.md5Hex(StringUtils.join(new String[] { expired, /** other params **/conf.getString("Secret.Key") }, "|")))) {
+                !sign.equals(DigestUtils.md5Hex(StringUtils.join(new String[] { expired, /** other params **/SecretKey.get() }, "|")))) {
             forwardErrorPage(request, response, 403);
             return;
         }

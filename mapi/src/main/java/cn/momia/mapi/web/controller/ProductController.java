@@ -11,11 +11,11 @@ import javax.servlet.http.HttpServletRequest;
 public class ProductController extends AbstractController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public String getProduct(HttpServletRequest request) {
-        return null;
+        return forward(request, request.getRequestURI());
     }
 
     @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
     public String getProductSkus(HttpServletRequest request) {
-        return null;
+        return forward(request, request.getRequestURI());
     }
 }
