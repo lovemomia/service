@@ -17,17 +17,19 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 public class ValidationFilter implements Filter {
-    private Configuration conf;
-
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        WebApplicationContext webApplicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(filterConfig.getServletContext());
-        conf = (Configuration) webApplicationContext.getBean("conf");
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+
+        if (isInvalidProtocol(httpRequest))
+        {
+            forwardErrorPage(request, response, 403);
+            return;
+        }
 
         String userAgent = httpRequest.getHeader("user-agent");
         String expired = httpRequest.getParameter("expired");
@@ -47,6 +49,15 @@ public class ValidationFilter implements Filter {
         }
 
         chain.doFilter(request, response);
+    }
+
+    private boolean isInvalidProtocol(HttpServletRequest request) {
+        String protocol = request.getProtocol();
+        String uri = request.getRequestURI();
+
+        if (!(uri.startsWith("/callback") || uri.startsWith("/order") || uri.startsWith("/payment"))) return false;
+        if (!protocol.equals("https")) return true;
+        return false;
     }
 
     private void forwardErrorPage(ServletRequest request, ServletResponse response, int errorCode) throws ServletException, IOException {
