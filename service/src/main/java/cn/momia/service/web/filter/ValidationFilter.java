@@ -22,30 +22,27 @@ public class ValidationFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-        if (isInvalidProtocol(httpRequest))
+        if (isParamMissing(httpRequest))
+        {
+            forwardErrorPage(request, response, 400);
+            return;
+        }
+
+        if (isInvalidProtocol(httpRequest) || isInvalidSign(httpRequest))
         {
             forwardErrorPage(request, response, 403);
             return;
         }
 
+        chain.doFilter(request, response);
+    }
+
+    private boolean isParamMissing(HttpServletRequest httpRequest) {
         String userAgent = httpRequest.getHeader("user-agent");
         String expired = httpRequest.getParameter("expired");
-        // TODO other required params
         String sign = httpRequest.getParameter("sign");
-        if (StringUtils.isBlank(userAgent) ||
-                StringUtils.isBlank(expired) ||
-                StringUtils.isBlank(sign)) {
-            forwardErrorPage(request, response, 400);
-            return;
-        }
 
-        if (System.currentTimeMillis() > Long.valueOf(expired) ||
-                !sign.equals(DigestUtils.md5Hex(StringUtils.join(new String[] { expired, /** other params **/SecretKey.get() }, "|")))) {
-            forwardErrorPage(request, response, 403);
-            return;
-        }
-
-        chain.doFilter(request, response);
+        return StringUtils.isBlank(userAgent) || StringUtils.isBlank(expired) || StringUtils.isBlank(sign);
     }
 
     private boolean isInvalidProtocol(HttpServletRequest request) {
@@ -55,6 +52,14 @@ public class ValidationFilter implements Filter {
         if (!(uri.startsWith("/callback") || uri.startsWith("/order") || uri.startsWith("/payment"))) return false;
         if (!protocol.equals("https")) return true;
         return false;
+    }
+
+    private boolean isInvalidSign(HttpServletRequest httpRequest) {
+        String expired = httpRequest.getParameter("expired");
+        String sign = httpRequest.getParameter("sign");
+
+        return System.currentTimeMillis() > Long.valueOf(expired) ||
+                !sign.equals(DigestUtils.md5Hex(StringUtils.join(new String[] { expired, SecretKey.get() }, "|")));
     }
 
     private void forwardErrorPage(ServletRequest request, ServletResponse response, int errorCode) throws ServletException, IOException {
