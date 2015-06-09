@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="conf" class="cn.momia.common.config.impl.XmlConfiguration" init-method="init">
+        <property name="fileName" value="conf/configuration.xml" />
+    </bean>
+
+    <bean class="cn.momia.common.web.config.XmlPropertyPlaceholderConfigurer">
+        <property name="conf" ref="conf" />
+    </bean>
+
+    <bean class="cn.momia.common.web.logger.LoggerConfigurer" init-method="init">
+        <property name="conf" ref="conf" />
+    </bean>
+</beans>
