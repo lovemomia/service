@@ -1,11 +1,8 @@
 package cn.momia.service.web.filter;
 
-import cn.momia.common.config.Configuration;
 import cn.momia.common.web.secret.SecretKey;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
