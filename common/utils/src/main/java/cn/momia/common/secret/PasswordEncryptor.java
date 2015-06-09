@@ -15,7 +15,7 @@ public class PasswordEncryptor {
 
             return new String(encryptedBase64);
         } catch (Exception e) {
-            throw new RuntimeException("fail to excrypt password of cn.momia.service.base.user: " + username, e);
+            throw new RuntimeException("fail to excrypt password of user: " + username, e);
         }
     }
 }

@@ -29,7 +29,7 @@ public class ValidationFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-        String userAgent = httpRequest.getHeader("cn.momia.service.base.user-agent");
+        String userAgent = httpRequest.getHeader("user-agent");
         String expired = httpRequest.getParameter("expired");
         // TODO other required params
         String sign = httpRequest.getParameter("sign");
@@ -55,5 +55,10 @@ public class ValidationFilter implements Filter {
 
     @Override
     public void destroy() {
+    }
+
+    public static void main(String[] args)
+    {
+        System.out.println(DigestUtils.md5Hex(StringUtils.join(new String[] { "1500000000000", /** other params **/"578890d82212ae548d883bc7a201cdf4" }, "|")));
     }
 }

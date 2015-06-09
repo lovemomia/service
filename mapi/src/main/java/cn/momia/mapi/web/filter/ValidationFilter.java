@@ -29,7 +29,7 @@ public class ValidationFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-        String userAgent = httpRequest.getHeader("cn.momia.service.base.user-agent");
+        String userAgent = httpRequest.getHeader("user-agent");
         String expired = httpRequest.getParameter("expired");
         // TODO other required params
         String sign = httpRequest.getParameter("sign");
