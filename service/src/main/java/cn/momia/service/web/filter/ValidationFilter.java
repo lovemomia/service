@@ -56,9 +56,4 @@ public class ValidationFilter implements Filter {
     @Override
     public void destroy() {
     }
-
-    public static void main(String[] args)
-    {
-        System.out.println(DigestUtils.md5Hex(StringUtils.join(new String[] { "1500000000000", /** other params **/"578890d82212ae548d883bc7a201cdf4" }, "|")));
-    }
 }
