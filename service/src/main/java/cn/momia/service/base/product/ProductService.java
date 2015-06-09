@@ -1,4 +1,4 @@
-package cn.momia.product;
+package cn.momia.service.base.product;
 
 public interface ProductService {
     long add(Product product);

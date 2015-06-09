@@ -1,4 +1,4 @@
-package cn.momia.sku;
+package cn.momia.service.base.product.sku;
 
 public class SkuPropertyValue {
 }

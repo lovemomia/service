@@ -1,6 +1,6 @@
-package cn.momia.product.concrete;
+package cn.momia.service.base.product.concrete;
 
-import cn.momia.product.Product;
+import cn.momia.service.base.product.Product;
 import com.alibaba.fastjson.JSONObject;
 
 import java.util.Date;

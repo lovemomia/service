@@ -1,8 +1,8 @@
-package cn.momia.sku.impl;
+package cn.momia.service.base.product.sku.impl;
 
 import cn.momia.service.base.DbAccessService;
-import cn.momia.sku.Sku;
-import cn.momia.sku.SkuService;
+import cn.momia.service.base.product.sku.Sku;
+import cn.momia.service.base.product.sku.SkuService;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Splitter;

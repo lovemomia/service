@@ -16,7 +16,8 @@
         <property name="conf" ref="conf" />
     </bean>
 
-    <bean id="smsVerifier" class="cn.momia.service.sms.impl.LuosimiaoSmsVerifier" />
+    <bean id="smsSender" class="cn.momia.service.sms.impl.LuosimiaoSmsSender" />
+    <bean id="smsVerifier" class="cn.momia.service.sms.SmsVerifier" />
 
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
         <property name="driverClass" value="com.mysql.jdbc.Driver" />
@@ -39,20 +40,17 @@
     <bean id="dbAccessService" class="cn.momia.service.base.DbAccessService" abstract="true">
         <property name="jdbcTemplate" ref="jdbcTemplate" />
     </bean>
-    <bean id="commentService" class="cn.momia.comment.impl.CommentServiceImpl" parent="dbAccessService" />
-    <bean id="orderService" class="cn.momia.order.impl.OrderServiceImpl" parent="dbAccessService" />
-    <bean id="placeService" class="cn.momia.place.impl.PlaceServiceImpl" parent="dbAccessService" />
-    <bean id="skuService" class="cn.momia.sku.impl.SkuServiceImpl" parent="dbAccessService" />
-    <bean id="accountService" class="cn.momia.account.impl.AccountServiceImpl" parent="dbAccessService" />
-    <bean id="agendaService" class="cn.momia.agenda.impl.AgendaServiceImpl" parent="dbAccessService" />
-    <bean id="userService" class="cn.momia.user.impl.UserServiceImpl" parent="dbAccessService" />
+    <bean id="commentService" class="cn.momia.service.base.comment.impl.CommentServiceImpl" parent="dbAccessService" />
+    <bean id="orderService" class="cn.momia.service.deal.order.impl.OrderServiceImpl" parent="dbAccessService" />
+    <bean id="paymentService" class="cn.momia.service.deal.payment.impl.PaymentServiceImpl" parent="dbAccessService" />
+    <bean id="placeService" class="cn.momia.service.base.place.impl.PlaceServiceImpl" parent="dbAccessService" />
+    <bean id="userService" class="cn.momia.service.base.user.impl.UserServiceImpl" parent="dbAccessService" />
 
     <bean class="cn.momia.common.web.secret.SecretKey" init-method="init">
         <property name="conf" ref="conf" />
         <property name="jdbcTemplate" ref="jdbcTemplate" />
     </bean>
-
-    <bean id="uploader" class="cn.momia.service.upload.impl.UploaderImpl">
+    <bean id="uploader" class="cn.momia.service.image.upload.impl.OssImageUploaderImpl">
         <property name="conf" ref="conf" />
     </bean>
 </beans>

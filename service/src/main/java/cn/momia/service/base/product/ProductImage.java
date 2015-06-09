@@ -1,4 +1,4 @@
-package cn.momia.product;
+package cn.momia.service.base.product;
 
 import com.alibaba.fastjson.JSONObject;
 

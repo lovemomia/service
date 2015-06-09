@@ -1,7 +1,5 @@
-package cn.momia.sku;
+package cn.momia.service.base.product.sku;
 
-import cn.momia.product.Product;
-import cn.momia.product.factory.ProductFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -16,7 +14,6 @@ public class Sku {
     }
 
     private long id;
-    private Product product;
     private List<Long> propertyValues;
     private float price;
     private int stock;
@@ -27,7 +24,6 @@ public class Sku {
 
     public Sku(JSONObject jsonObject) {
         setId(jsonObject.getInteger("id"));
-        setProduct(ProductFactory.create(jsonObject.getJSONObject("product")));
         List<Long> propertyValues = new ArrayList<Long>();
         JSONArray propertyValuesArray = jsonObject.getJSONArray("propertyValues");
         for (int i = 0; i < propertyValuesArray.size(); i++) {
@@ -44,14 +40,6 @@ public class Sku {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
     }
 
     public List<Long> getPropertyValues() {

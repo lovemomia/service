@@ -1,4 +1,4 @@
-package cn.momia.service.upload;
+package cn.momia.service.image.upload;
 
 import java.io.InputStream;
 

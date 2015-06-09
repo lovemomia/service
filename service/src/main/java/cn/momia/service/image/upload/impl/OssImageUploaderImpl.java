@@ -1,9 +1,9 @@
-package cn.momia.service.upload.impl;
+package cn.momia.service.image.upload.impl;
 
 import cn.momia.common.config.Configuration;
-import cn.momia.service.upload.Image;
-import cn.momia.service.upload.Result;
-import cn.momia.service.upload.Uploader;
+import cn.momia.service.image.upload.Image;
+import cn.momia.service.image.upload.ImageUploadResult;
+import cn.momia.service.image.upload.ImageUploader;
 import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.OSSErrorCode;
@@ -24,10 +24,7 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-/**
- * Created by Administrator on 15-6-2.
- */
-public class UploaderImpl implements Uploader {
+public class OssImageUploaderImpl implements ImageUploader {
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private Configuration conf;
 
@@ -36,13 +33,13 @@ public class UploaderImpl implements Uploader {
     }
 
 
-    public Result upload(Image image) throws IOException {
+    public ImageUploadResult upload(Image image) throws IOException {
         String ACCESS_ID = conf.getString("OSS.AccessId");
         String ACCESS_KEY = conf.getString("OSS.AccessKey");
         String ENDPOINT = conf.getString("OSS.EndPoint");
 
         String bucketName = ACCESS_ID.toLowerCase() + conf.getString("BuildBucketName");//唯一的bucketName
-        Result result = new Result();//返回结果
+        ImageUploadResult result = new ImageUploadResult();//返回结果
         byte[] imageBytes = IOUtils.toByteArray(image.getFileStream());
         int length = imageBytes.length;//文件的长度
 

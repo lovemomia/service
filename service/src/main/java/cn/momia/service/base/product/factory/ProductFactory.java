@@ -1,7 +1,7 @@
-package cn.momia.product.factory;
+package cn.momia.service.base.product.factory;
 
-import cn.momia.product.Product;
-import cn.momia.product.concrete.ActivityProduct;
+import cn.momia.service.base.product.Product;
+import cn.momia.service.base.product.concrete.ActivityProduct;
 import com.alibaba.fastjson.JSONObject;
 
 public class ProductFactory {

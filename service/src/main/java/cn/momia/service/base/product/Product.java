@@ -1,6 +1,6 @@
-package cn.momia.product;
+package cn.momia.service.base.product;
 
-import cn.momia.sku.Sku;
+import cn.momia.service.base.product.sku.Sku;
 import com.alibaba.fastjson.JSONObject;
 
 import java.util.List;

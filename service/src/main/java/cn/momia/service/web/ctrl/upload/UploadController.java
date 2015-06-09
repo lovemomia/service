@@ -2,9 +2,9 @@ package cn.momia.service.web.ctrl.upload;
 
 import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.service.upload.Image;
-import cn.momia.service.upload.Result;
-import cn.momia.service.upload.Uploader;
+import cn.momia.service.image.upload.Image;
+import cn.momia.service.image.upload.ImageUploadResult;
+import cn.momia.service.image.upload.ImageUploader;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -26,13 +26,13 @@ public class UploadController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UploadController.class);
 
     @Autowired
-    private Uploader uploader;
+    private ImageUploader imageUploader;
 
-    @RequestMapping(method = { RequestMethod.POST })
-    public ResponseMessage upload(HttpServletRequest request) {
+    @RequestMapping(value = "/image",method = { RequestMethod.POST })
+    public ResponseMessage uploadImage(HttpServletRequest request) {
         try {
             Image image = parseImage(request);
-            Result result = uploader.upload(image);
+            ImageUploadResult result = imageUploader.upload(image);
 
             return new ResponseMessage(buildResponseData(result));
         } catch (Exception e) {
@@ -59,7 +59,7 @@ public class UploadController {
         return image;
     }
 
-    private JSONObject buildResponseData(Result result) {
+    private JSONObject buildResponseData(ImageUploadResult result) {
         JSONObject data = new JSONObject();
 
         data.put("path", result.getPath());

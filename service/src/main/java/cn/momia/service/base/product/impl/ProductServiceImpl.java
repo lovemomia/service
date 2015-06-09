@@ -1,4 +1,4 @@
-package cn.momia.product.impl;
+package cn.momia.service.base.product.impl;
 
 public class ProductServiceImpl {
 }
