@@ -64,4 +64,17 @@ public class PaymentServiceImpl extends DbAccessService implements PaymentServic
 
         return payment;
     }
+
+    @Override
+    public Payment getByOrder(long orderId) {
+        String sql = "SELECT id, orderId, finishTime, payType, tradeNo, fee FROM t_payment WHERE orderId=?";
+
+        return jdbcTemplate.query(sql, new Object[] { orderId }, new ResultSetExtractor<Payment>() {
+            @Override
+            public Payment extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (rs.next()) return buildPayment(rs);
+                return Payment.NOT_EXIST_PAYMENT;
+            }
+        });
+    }
 }
