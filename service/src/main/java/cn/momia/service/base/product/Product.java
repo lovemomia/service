@@ -24,7 +24,6 @@ public class Product {
     private int category;
     private String title;
     private List<ProductImage> imgs;
-    private JSONObject content;
     private List<Sku> skus;
 
     public long getId() {
@@ -87,7 +86,7 @@ public class Product {
     }
 
     public Product(JSONObject jsonObject) {
-
+        // TODO
     }
 
     public boolean exists() {
