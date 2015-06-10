@@ -12,16 +12,19 @@ import javax.servlet.http.HttpServletRequest;
 public class CallbackApi extends AbstractApi {
     @RequestMapping(value = "/alipay", method = RequestMethod.POST)
     public ResponseMessage alipayCallback(HttpServletRequest request) {
+        // TODO
         return new ResponseMessage("TODO");
     }
 
     @RequestMapping(value = "/wechatpay", method = RequestMethod.POST)
     public ResponseMessage wechatpayCallback(HttpServletRequest request) {
+        // TODO
         return new ResponseMessage("TODO");
     }
 
     @RequestMapping(value = "/unionpay", method = RequestMethod.POST)
     public ResponseMessage unionpayCallback(HttpServletRequest request) {
+        // TODO
         return new ResponseMessage("TODO");
     }
 }

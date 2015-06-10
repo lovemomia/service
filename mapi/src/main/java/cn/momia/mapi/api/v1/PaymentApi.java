@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 public class PaymentApi extends AbstractApi {
     @RequestMapping(value = "/check", method = RequestMethod.POST)
     public ResponseMessage checkPayment(HttpServletRequest request) {
+        // TODO
         return new ResponseMessage("TODO");
     }
 }

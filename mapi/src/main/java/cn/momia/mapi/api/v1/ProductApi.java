@@ -12,11 +12,13 @@ import javax.servlet.http.HttpServletRequest;
 public class ProductApi extends AbstractApi {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseMessage getProduct(HttpServletRequest request) {
+        // TODO
         return new ResponseMessage("TODO");
     }
 
     @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
     public ResponseMessage getProductSkus(HttpServletRequest request) {
+        // TODO
         return new ResponseMessage("TODO");
     }
 }

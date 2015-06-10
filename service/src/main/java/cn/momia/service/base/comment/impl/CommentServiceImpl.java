@@ -56,13 +56,12 @@ public class CommentServiceImpl extends DbAccessService implements CommentServic
         comment.setSkuId(resultSet.getLong("skuId"));
         comment.setStar(resultSet.getInt("star"));
         comment.setContent(resultSet.getString("content"));
-        comment.setAddTime(resultSet.getTimestamp("addTime"));
         return comment;
     }
 
     @Override
     public Comment get(long id) {
-        String sql = "select id, customerId, serverId, skuId, star, content, addTime from t_comment where id=? and status=1";
+        String sql = "select id, customerId, serverId, skuId, star, content from t_comment where id=? and status=1";
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Comment>() {
             @Override
             public Comment extractData(ResultSet resultSet) throws SQLException, DataAccessException {
@@ -82,10 +81,10 @@ public class CommentServiceImpl extends DbAccessService implements CommentServic
             name = "serverId";
         while (start >= 0 && count > 0) {
             if (star == 0) {
-                sql = "select id, customerId, serverId, skuId, star,content, addTime from t_comment where " + name + "=? and status=1 limit ?,?";
+                sql = "select id, customerId, serverId, skuId, star,content from t_comment where " + name + "=? and status=1 limit ?,?";
                 objects = new Object[] { id, start, count };
             } else {
-                sql = "select id, customerId, serverId, skuId, star,content, addTime from t_comment where " + name + "=? and star=? and status=1 limit ?,?";
+                sql = "select id, customerId, serverId, skuId, star,content from t_comment where " + name + "=? and star=? and status=1 limit ?,?";
                 objects = new Object[] { id, star, start, count };
             }
             final List<Comment> comments = new ArrayList<Comment>();
