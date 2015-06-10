@@ -31,6 +31,9 @@ public class Sku {
         setPrice(jsonObject.getFloat("price"));
         setStock(jsonObject.getInteger("stock"));
         // TODO sku values
+        setPropertyValues(jsonObject.getString("propertyValues"));
+        setLockedStock(jsonObject.getInteger("lockedStock"));
+        setUnlockedStock(jsonObject.getInteger("unlockedStock"));
     }
 
     public long getId() {

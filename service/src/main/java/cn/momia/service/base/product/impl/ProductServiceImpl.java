@@ -10,6 +10,7 @@ import cn.momia.service.base.product.sku.SkuPropertyValue;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
@@ -112,11 +113,75 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
         addSku(productId,product);
         return  productId;
     }
+    public boolean update(long id, String sql, Object[] objects){
+        Product product = get(id);
+        if (!product.exists()) return false;
 
+        int affectedRowCount = jdbcTemplate.update(sql, objects);
+        if (affectedRowCount != 1) return false;
+        else return true;
+    }
+
+   public  boolean delete(long id, String sql,Object[] objects){
+       Product product = get(id);
+       if (!product.exists()) return false;
+
+      return jdbcTemplate.query(sql, objects, new ResultSetExtractor<Boolean>() {
+          @Override
+          public Boolean extractData(ResultSet resultSet) throws SQLException, DataAccessException {
+              if(resultSet.next()) return true;
+              return false;
+          }
+      });
+
+   }
+
+    public boolean updateProduct(Product product){
+        String sql = "update t_product set category=?, userId=?, title=?, content=?, sales=? where id=? and status=1";
+        return update(product.getId(),sql,new Object[]{product.getCategory(), product.getUserId(), product.getTitle(),
+        product.getContent(), product.getSales(), product.getId()});
+
+    }
+
+    public boolean updateImg(Product product){
+        if(product.getImgs().size()==0) {
+            String sql = "delete from t_product_img where productId=? and status=1";
+            return delete(product.getId(),sql,new Object[]{product.getId()});
+        }
+        else {
+            for(ProductImage img : product.getImgs()) {
+                String sql = "update t_product_img set url=?, width=?, height=? where productId=? and status=1";
+                int affectedRowCount = jdbcTemplate.update(sql, new Object[]{img.getUrl(), img.getWidth(), img.getHeight(),product.getId()});
+                if (affectedRowCount != 1) return false;
+            }
+            return true;
+
+        }
+    }
+
+    public boolean updateSku(Product product){
+        if(product.getSkus().size()==0) {
+            String sql = "delete from t_sku where productId=?";
+            return delete(product.getId(),sql,new Object[]{product.getId()});
+        }
+        else{
+            for(Sku sku : product.getSkus()){
+                String sql = "update t_sku set propertyValues=?, price=?, stock=?, unlockedStock=?, lockedStock=? where productId=? and status=1";
+                int affectedRowCount = jdbcTemplate.update(sql, new Object[]{sku.getPropertyValues(),sku.getPrice(),
+                        sku.getStock(),sku.getUnlockedStock(),sku.getUnlockedStock(),product.getId()});
+                if (affectedRowCount != 1) return false;
+            }
+            return true;
+        }
+
+
+    }
     @Override
     public boolean update(Product product) {
-
-        return false;
+        if(updateProduct(product)&&updateImg(product)&&updateSku(product))
+            return true;
+        else
+            return false;
     }
 
     public Product buildProduct(ResultSet rs) throws SQLException {
