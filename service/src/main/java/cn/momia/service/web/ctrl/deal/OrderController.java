@@ -5,6 +5,7 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.base.product.sku.SkuService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
+import cn.momia.service.deal.payment.PaymentService;
 import cn.momia.service.web.ctrl.AbstractController;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -12,6 +13,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,6 +29,9 @@ public class OrderController extends AbstractController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private PaymentService paymentService;
 
     @Autowired
     private SkuService skuService;
@@ -77,5 +82,14 @@ public class OrderController extends AbstractController {
 
     private boolean unlockSku(Order order) {
         return skuService.unlock(order.getSkuId(), order.getCount());
+    }
+
+    @RequestMapping(value = "/{id}/pay", method = RequestMethod.PUT)
+    public ResponseMessage payOrder(@PathVariable long id) {
+        if (orderService.pay(id)) return new ResponseMessage(paymentService.getByOrder(id));
+
+        LOGGER.error("fail to finish payment of order: {}", id);
+
+        return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to pay order");
     }
 }
