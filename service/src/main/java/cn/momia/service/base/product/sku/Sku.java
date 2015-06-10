@@ -1,8 +1,10 @@
 package cn.momia.service.base.product.sku;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Sku {
@@ -13,8 +15,11 @@ public class Sku {
     }
 
     private long id;
+    private String propertyValues;
     private float price;
     private int stock;
+    private int lockedStock;
+    private int unlockedStock;
     private List<Pair<SkuProperty, SkuPropertyValue>> properties;
 
     public Sku() {
@@ -36,6 +41,14 @@ public class Sku {
         this.id = id;
     }
 
+    public String getPropertyValues() {
+        return propertyValues;
+    }
+
+    public void setPropertyValues(String propertyValues) {
+        this.propertyValues = propertyValues;
+    }
+
     public float getPrice() {
         return price;
     }
@@ -50,6 +63,22 @@ public class Sku {
 
     public void setStock(int stock) {
         this.stock = stock;
+    }
+
+    public int getLockedStock() {
+        return lockedStock;
+    }
+
+    public void setLockedStock(int lockedStock) {
+        this.lockedStock = lockedStock;
+    }
+
+    public int getUnlockedStock() {
+        return unlockedStock;
+    }
+
+    public void setUnlockedStock(int unlockedStock) {
+        this.unlockedStock = unlockedStock;
     }
 
     public List<Pair<SkuProperty, SkuPropertyValue>> getProperties() {

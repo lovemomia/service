@@ -1,8 +1,10 @@
 package cn.momia.service.base.product;
 
 import cn.momia.service.base.product.sku.Sku;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Product {
@@ -22,7 +24,10 @@ public class Product {
 
     private long id;
     private int category;
+    private long userId;
     private String title;
+    private String content;
+    private int sales;
     private List<ProductImage> imgs;
     private List<Sku> skus;
 
@@ -42,12 +47,35 @@ public class Product {
         this.category = category;
     }
 
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
     public String getTitle() {
         return title;
     }
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public int getSales() {
+        return sales;
+    }
+
+    public void setSales(int sales) {
+        this.sales = sales;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public List<ProductImage> getImgs() {
@@ -87,6 +115,15 @@ public class Product {
 
     public Product(JSONObject jsonObject) {
         // TODO
+        setId(jsonObject.getInteger("id"));
+        List<Sku> skus = new ArrayList<Sku>();
+        JSONArray propertyValuesArray = jsonObject.getJSONArray("skus");
+        for (int i = 0; i < propertyValuesArray.size(); i++) {
+            skus.add(propertyValuesArray.getObject(i,Sku.class));
+        }
+        setSkus(skus);
+        setCategory(jsonObject.getInteger("category"));
+        setTitle(jsonObject.getString("title"));
     }
 
     public boolean exists() {
