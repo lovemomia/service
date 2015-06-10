@@ -1,9 +1,8 @@
 package cn.momia.service.base.product.sku;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Sku {
@@ -14,9 +13,9 @@ public class Sku {
     }
 
     private long id;
-    private List<Long> propertyValues;
     private float price;
     private int stock;
+    private List<Pair<SkuProperty, SkuPropertyValue>> properties;
 
     public Sku() {
 
@@ -24,14 +23,9 @@ public class Sku {
 
     public Sku(JSONObject jsonObject) {
         setId(jsonObject.getInteger("id"));
-        List<Long> propertyValues = new ArrayList<Long>();
-        JSONArray propertyValuesArray = jsonObject.getJSONArray("propertyValues");
-        for (int i = 0; i < propertyValuesArray.size(); i++) {
-            propertyValues.add(propertyValuesArray.getLong(i));
-        }
-        setPropertyValues(propertyValues);
         setPrice(jsonObject.getFloat("price"));
         setStock(jsonObject.getInteger("stock"));
+        // TODO sku values
     }
 
     public long getId() {
@@ -40,14 +34,6 @@ public class Sku {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public List<Long> getPropertyValues() {
-        return propertyValues;
-    }
-
-    public void setPropertyValues(List<Long> propertyValues) {
-        this.propertyValues = propertyValues;
     }
 
     public float getPrice() {
@@ -64,6 +50,14 @@ public class Sku {
 
     public void setStock(int stock) {
         this.stock = stock;
+    }
+
+    public List<Pair<SkuProperty, SkuPropertyValue>> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(List<Pair<SkuProperty, SkuPropertyValue>> properties) {
+        this.properties = properties;
     }
 
     @Override
