@@ -115,6 +115,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
 
     @Override
     public boolean update(Product product) {
+
         return false;
     }
 
