@@ -1,39 +1,76 @@
 package cn.momia.service.deal.order;
 
-import com.alibaba.fastjson.JSONObject;
-
-import java.util.Date;
+import java.util.List;
 
 public class Order {
-    private int id;
-    private int customerId;//用户id
-    private int serverId;//技师id
-    private int status;
-    private Date addTime;
-    private Date updateTime;
+    public static final Order NOT_EXIST_ORDER = new Order();
+    static {
+        NOT_EXIST_ORDER.setId(0);
+    }
 
-    public int getId() {
+    private long id;
+    private long customerId;
+    private long productId;
+    private long skuId;
+    private float price;
+    private int count;
+    private List<Long> participants;
+    private int status;
+
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    public int getCustomerId() {
+    public long getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(int customerId) {
+    public void setCustomerId(long customerId) {
         this.customerId = customerId;
     }
 
-    public int getServerId() {
-        return serverId;
+    public long getProductId() {
+        return productId;
     }
 
-    public void setServerId(int serverId) {
-        this.serverId = serverId;
+    public void setProductId(long productId) {
+        this.productId = productId;
+    }
+
+    public long getSkuId() {
+        return skuId;
+    }
+
+    public void setSkuId(long skuId) {
+        this.skuId = skuId;
+    }
+
+    public float getPrice() {
+        return price;
+    }
+
+    public void setPrice(float price) {
+        this.price = price;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    public List<Long> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(List<Long> participants) {
+        this.participants = participants;
     }
 
     public int getStatus() {
@@ -44,26 +81,22 @@ public class Order {
         this.status = status;
     }
 
-    public Date getAddTime() {
-        return addTime;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Order)) return false;
+
+        Order order = (Order) o;
+
+        return getId() == order.getId();
     }
 
-    public void setAddTime(Date addTime) {
-        this.addTime = addTime;
+    @Override
+    public int hashCode() {
+        return (int) (getId() ^ (getId() >>> 32));
     }
 
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public Order() {
-
-    }
-
-    public Order(JSONObject jsonObject) {
+    public boolean exists() {
+        return !this.equals(NOT_EXIST_ORDER);
     }
 }
