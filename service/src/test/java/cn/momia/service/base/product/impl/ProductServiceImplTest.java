@@ -1,6 +1,7 @@
 package cn.momia.service.base.product.impl;
 
 import cn.momia.service.base.product.Product;
+import cn.momia.service.base.product.ProductImage;
 import cn.momia.service.base.product.sku.Sku;
 import cn.momia.service.base.product.sku.SkuProperty;
 import cn.momia.service.base.product.sku.SkuPropertyValue;
@@ -47,13 +48,16 @@ public class ProductServiceImplTest {
     public void testAdd() throws Exception {
         DB();
 
-        SkuPropertyValue skuPropertyValue = new SkuPropertyValue();
+        SkuPropertyValue skuPropertyValue1 = new SkuPropertyValue();
         SkuProperty skuProperty = new SkuProperty();
 
         skuProperty.setCategoryId(1);
         skuProperty.setName("time address");
 
-        skuPropertyValue.setValue("morning 8:00AM");
+        skuPropertyValue1.setValue("morning 8:00AM");
+
+        SkuPropertyValue skuPropertyValue2 = new SkuPropertyValue();
+        skuPropertyValue2.setValue("morning 10:00AM");
 
         List<Sku> skus = new ArrayList<Sku>();
 
@@ -72,8 +76,8 @@ public class ProductServiceImplTest {
         sku2.setUnlockedStock(sku2.getLockedStock());
 
         List<Pair<SkuProperty, SkuPropertyValue>> properties = new ArrayList<Pair<SkuProperty, SkuPropertyValue>>();
-        Pair<SkuProperty, SkuPropertyValue> pair1 = new ImmutablePair<SkuProperty, SkuPropertyValue>(skuProperty,skuPropertyValue);
-        Pair<SkuProperty, SkuPropertyValue> pair2 = new ImmutablePair<SkuProperty, SkuPropertyValue>(skuProperty,skuPropertyValue);
+        Pair<SkuProperty, SkuPropertyValue> pair1 = new ImmutablePair<SkuProperty, SkuPropertyValue>(skuProperty,skuPropertyValue1);
+        Pair<SkuProperty, SkuPropertyValue> pair2 = new ImmutablePair<SkuProperty, SkuPropertyValue>(skuProperty,skuPropertyValue2);
 
         properties.add(pair1);
         properties.add(pair2);
@@ -84,6 +88,14 @@ public class ProductServiceImplTest {
         skus.add(sku1);
         skus.add(sku2);
 
+        List<ProductImage> imgs = new ArrayList<ProductImage>();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("url", "");
+        jsonObject.put("width",800);
+        jsonObject.put("height",800);
+        ProductImage productImage = new ProductImage(jsonObject);
+        imgs.add(productImage);
+
         Product product = new Product();
         String title = "travelling";
         product.setSkus(skus);
@@ -91,6 +103,7 @@ public class ProductServiceImplTest {
         product.setCategory(1);
         product.setUserId(1);
         product.setContent("gogogogogogo");
+        product.setImgs(imgs);
 
         productService.add(product);
 
@@ -105,6 +118,9 @@ public class ProductServiceImplTest {
 
     @org.testng.annotations.Test
     public void testGet() throws Exception {
-
+        DB();
+        long productId = 1;
+        Product product = productService.get(productId);
+        System.out.println(product.getContent());
     }
 }
