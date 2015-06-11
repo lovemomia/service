@@ -220,6 +220,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
         return sku;
     }
 
+    @Override
     public List<Sku> getSkus(long productId){
         final List<Sku> skus = new ArrayList<Sku>();
         String sql = "select id, productId, propertyValues, price, stock, unlockedStock, lockedStock from t_sku where productId=? and status=1";

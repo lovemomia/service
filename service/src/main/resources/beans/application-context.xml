@@ -47,6 +47,7 @@
     <bean id="skuService" class="cn.momia.service.base.product.sku.impl.SkuServiceImpl" parent="dbAccessService" />
     <bean id="userService" class="cn.momia.service.base.user.impl.UserServiceImpl" parent="dbAccessService" />
     <bean id="participantService" class="cn.momia.service.base.user.participant.impl.ParticipantServiceImpl" parent="dbAccessService" />
+    <bean id="productService" class="cn.momia.service.base.product.impl.ProductServiceImpl" parent="dbAccessService" />
 
     <bean class="cn.momia.common.web.secret.SecretKey" init-method="init">
         <property name="conf" ref="conf" />

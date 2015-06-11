@@ -14,7 +14,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -117,6 +120,33 @@ public class UserController extends AbstractController {
         return new ResponseMessage(participant);
 
 
+    }
+
+    @RequestMapping(value = "/{id}/participant/{participantId}/name", method = RequestMethod.PUT)
+    public ResponseMessage updateParticipantName(@PathVariable long participantId, @RequestParam String name){
+        boolean successful = participantService.updateName(participantId, name);
+
+        if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update participant name");
+        return new ResponseMessage("update participant name successfully");
+    }
+
+    @RequestMapping(value = "/{id}/participant/{participantId}/sex", method = RequestMethod.PUT)
+    public ResponseMessage updateParticipantSex(@PathVariable long participantId, @RequestParam int sex){
+        boolean successful = participantService.updateSex(participantId, sex);
+
+        if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update participant sex");
+        return new ResponseMessage("update participant sex successfully");
+    }
+
+    @RequestMapping(value = "/{id}/participant/{participantId}/birthday", method = RequestMethod.PUT)
+    public ResponseMessage updateParticipantBirthday(@PathVariable long participantId, @RequestParam String birthday) throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat( "yyyy-MM-dd");
+        Date date = formatter.parse(birthday);
+        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+        boolean successful = participantService.updateBirthday(participantId, sqlDate);
+
+        if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update participant name");
+        return new ResponseMessage("update participant name successfully");
     }
 
 }
