@@ -18,11 +18,13 @@ public class PlaceController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseMessage addPlace(@RequestParam String placeJson) {
+        // TODO
         return new ResponseMessage("TODO");
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseMessage getPlace(@PathVariable long id) {
+        // TODO
         return new ResponseMessage("TODO");
     }
 }

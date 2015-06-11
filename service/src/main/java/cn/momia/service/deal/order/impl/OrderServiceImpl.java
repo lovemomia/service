@@ -91,4 +91,12 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
         return orders;
     }
+
+    @Override
+    public boolean pay(long id) {
+        String sql = "UPDATE t_order SET status=? WHERE id=?";
+        int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PAYED, id });
+
+        return updateCount > 0;
+    }
 }

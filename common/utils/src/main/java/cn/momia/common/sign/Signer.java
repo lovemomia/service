@@ -5,6 +5,7 @@ public class Signer {
         if (type.equalsIgnoreCase("RSA")) {
             return RSA.sign(content, key, "utf-8");
         } else {
+            // TODO other types
             throw new RuntimeException("not supported sign type: " + type);
         }
     }

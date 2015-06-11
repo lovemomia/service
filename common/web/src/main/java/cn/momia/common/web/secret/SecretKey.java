@@ -2,9 +2,7 @@ package cn.momia.common.web.secret;
 
 import cn.momia.common.config.Configuration;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;

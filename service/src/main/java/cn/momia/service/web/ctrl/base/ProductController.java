@@ -11,31 +11,37 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseMessage getProduct(@PathVariable long id) {
+        // TODO
         return new ResponseMessage("TODO");
     }
 
     @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
     public ResponseMessage getProductSkus(@PathVariable long id) {
+        // TODO
         return new ResponseMessage("TODO");
     }
 
     @RequestMapping(value = "/{id}/place", method = RequestMethod.GET)
     public ResponseMessage getProductPlace(@PathVariable long id) {
+        // TODO
         return new ResponseMessage("TODO");
     }
 
     @RequestMapping(value = "/{id}/comment", method = RequestMethod.GET)
     public ResponseMessage getProductComments(@PathVariable long id) {
+        // TODO
         return new ResponseMessage("TODO");
     }
 
     @RequestMapping(value = "/{id}/server", method = RequestMethod.GET)
     public ResponseMessage getProductServerInfo(@PathVariable long id) {
+        // TODO
         return new ResponseMessage("TODO");
     }
 
     @RequestMapping(value = "/{id}/customer", method = RequestMethod.GET)
     public ResponseMessage getProductCustomersInfo(@PathVariable long id) {
+        // TODO
         return new ResponseMessage("TODO");
     }
 }

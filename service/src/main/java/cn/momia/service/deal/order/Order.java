@@ -3,6 +3,14 @@ package cn.momia.service.deal.order;
 import java.util.List;
 
 public class Order {
+    public static class Status {
+        public static final int NOT_PAYED = 1; // 已下单未付款
+        public static final int PAYED = 2;     // 已付款
+        public static final int FINISHED = 3;  // 已完成
+        public static final int TO_REFUND = 4; // 申请退款
+        public static final int REFUNDED = 5;  // 已退款
+    }
+
     public static final Order NOT_EXIST_ORDER = new Order();
     static {
         NOT_EXIST_ORDER.setId(0);

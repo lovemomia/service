@@ -1,5 +1,7 @@
 package cn.momia.service.base.comment;
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.util.Date;
 
 public class Comment {
@@ -35,8 +37,6 @@ public class Comment {
     private long skuId;
     private int star;
     private String content;
-    private Date addTime;
-    private Date updateTime;
 
     public long getId() {
         return id;
@@ -86,22 +86,6 @@ public class Comment {
         this.content = content;
     }
 
-    public Date getAddTime() {
-        return addTime;
-    }
-
-    public void setAddTime(Date addTime) {
-        this.addTime = addTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -115,6 +99,14 @@ public class Comment {
     @Override
     public int hashCode() {
         return (int) (getId() ^ (getId() >>> 32));
+    }
+
+    public Comment() {
+
+    }
+
+    public Comment(JSONObject jsonObject) {
+
     }
 
     public boolean exists() {
