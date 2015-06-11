@@ -22,6 +22,8 @@ public class Order {
     private long skuId;
     private float price;
     private int count;
+    private String contacts;
+    private String mobile;
     private List<Long> participants;
     private int status;
 
@@ -71,6 +73,22 @@ public class Order {
 
     public void setCount(int count) {
         this.count = count;
+    }
+
+    public String getContacts() {
+        return contacts;
+    }
+
+    public void setContacts(String contacts) {
+        this.contacts = contacts;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 
     public List<Long> getParticipants() {
