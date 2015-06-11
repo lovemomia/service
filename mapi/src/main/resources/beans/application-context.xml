@@ -37,4 +37,7 @@
         <property name="conf" ref="conf" />
         <property name="jdbcTemplate" ref="jdbcTemplate" />
     </bean>
+
+    <bean id="httpClient" class="cn.momia.common.web.http.MomiaHttpClient" />
+    <bean id="requestExecutor" class="cn.momia.common.web.http.MomiaHttpRequestExecutor" />
 </beans>
