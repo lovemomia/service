@@ -3,7 +3,9 @@ package cn.momia.service.base.user.participant.impl;
 import cn.momia.service.base.DbAccessService;
 import cn.momia.service.base.user.participant.Participant;
 import cn.momia.service.base.user.participant.ParticipantService;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -91,6 +93,19 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
             }
         });
         return participants;
+    }
+
+    @Override
+    public Participant get(long userId, long id) {
+        String sql = "select id,userId,name,sex,birthday from t_user_participant where userId=? AND id=? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[] { userId,id }, new ResultSetExtractor<Participant>() {
+            @Override
+            public Participant extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (rs.next()) return buildParticipant(rs);
+                return Participant.NOT_EXIST_PARTICIPANT;
+            }
+        });
     }
 
     @Override

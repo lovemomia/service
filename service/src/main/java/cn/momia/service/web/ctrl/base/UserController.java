@@ -97,7 +97,7 @@ public class UserController extends AbstractController {
     }
 
     @RequestMapping(value = "/{id}/participant", method = RequestMethod.GET)
-    public ResponseMessage getAllParticipant(@PathVariable long id){
+    public ResponseMessage getAllParticipants(@PathVariable long id){
         List<Participant> participants = participantService.get(id);
         List<ResponseMessage> messages = new ArrayList<ResponseMessage>();
         if(participants.size()==0)
@@ -108,6 +108,15 @@ public class UserController extends AbstractController {
         return new ResponseMessage(messages);
 
     }
-    
+
+    @RequestMapping(value = "/{id}/participant/{participantId}", method = RequestMethod.GET)
+    public ResponseMessage getParticipant(@PathVariable long id, @PathVariable long participantId){
+        Participant participant = participantService.get(id, participantId);
+        if(!participant.exists())
+            return new ResponseMessage(ErrorCode.NOT_FOUND, "participant not exists");
+        return new ResponseMessage(participant);
+
+
+    }
 
 }

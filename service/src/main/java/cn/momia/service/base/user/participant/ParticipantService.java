@@ -9,6 +9,7 @@ public interface ParticipantService {
     boolean updateName(long id, String name);
     boolean updateSex(long id, int sex);
     boolean updateBirthday(long id, Date birthday);
-    List<Participant> get(final long git );
+    List<Participant> get(long userId );
+    Participant get(long userId,long id);
     boolean delete(long id);
 }

@@ -110,6 +110,13 @@ public class ParticipantServiceImplTest {
     }
 
     @Test
+    public void testGetOne() throws Exception {
+        DB();
+        Participant participant = participantService.get(1,1);
+        System.out.println(participant.getName());
+
+    }
+    @Test
     public void testDelete() throws Exception {
 
     }
