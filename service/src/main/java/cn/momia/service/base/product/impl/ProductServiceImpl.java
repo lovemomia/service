@@ -222,7 +222,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
 
     public List<Sku> getSkus(long productId){
         final List<Sku> skus = new ArrayList<Sku>();
-        String sql = "select id, productId, propertyValues, price, stock, unlockedStock, lockedStock from t_sku where productId=?";
+        String sql = "select id, productId, propertyValues, price, stock, unlockedStock, lockedStock from t_sku where productId=? and status=1";
         jdbcTemplate.query(sql, new Object[] { productId }, new RowCallbackHandler() {
 
             @Override
@@ -247,7 +247,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
 
     public List<ProductImage> getProductImgs(long productId){
         final List<ProductImage> imgs = new ArrayList<ProductImage>();
-        String sql = "select id, productId, url, width, height from t_product_img where productId=?";
+        String sql = "select id, productId, url, width, height from t_product_img where productId=? and status=1";
         jdbcTemplate.query(sql, new Object[] { productId }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
