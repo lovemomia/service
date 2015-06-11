@@ -1,13 +1,20 @@
 package cn.momia.common.web.response;
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.io.Serializable;
+import java.util.Date;
 
 public class ResponseMessage implements Serializable
 {
     private int errno;
     private String errmsg;
     private Object data = "";
-    private long time;
+    private long time = new Date().getTime();
+
+    private ResponseMessage() {
+
+    }
 
     public ResponseMessage(int errno, String errmsg)
     {
@@ -59,5 +66,14 @@ public class ResponseMessage implements Serializable
     public void setTime(long time)
     {
         this.time = time;
+    }
+
+    public static ResponseMessage formJson(JSONObject jsonObject) {
+        ResponseMessage responseMessage = new ResponseMessage();
+        responseMessage.errno = jsonObject.getInteger("errno");
+        responseMessage.errmsg = jsonObject.getString("errmsg");
+        responseMessage.data = jsonObject.get("data");
+
+        return responseMessage;
     }
 }
