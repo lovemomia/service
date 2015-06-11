@@ -65,6 +65,8 @@ public class OrderController extends AbstractController {
         order.setSkuId(orderObject.getLong("skuId"));
         order.setPrice(orderObject.getFloat("price"));
         order.setCount(orderObject.getInteger("count"));
+        order.setContacts(orderObject.getString("contacts"));
+        order.setMobile(orderObject.getString("mobile"));
 
         List<Long> participants = new ArrayList<Long>();
         JSONArray participantArray = orderObject.getJSONArray("participants");

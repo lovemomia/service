@@ -28,14 +28,16 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException
             {
-                String sql = "INSERT INTO t_order(customerId, productId, skuId, price, `count`, participants, addTime) VALUES(?, ?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO t_order(customerId, productId, skuId, price, `count`, contacts, mobile, participants, addTime) VALUES(?, ?, ?, ?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setLong(1, order.getCustomerId());
                 ps.setLong(2, order.getProductId());
                 ps.setLong(3, order.getSkuId());
                 ps.setFloat(4, order.getPrice());
                 ps.setInt(5, order.getCount());
-                ps.setString(6, StringUtils.join(order.getParticipants(), ","));
+                ps.setString(6, order.getContacts());
+                ps.setString(7, order.getMobile());
+                ps.setString(8, StringUtils.join(order.getParticipants(), ","));
 
                 return ps;
             }
@@ -46,7 +48,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public Order get(long id) {
-        String sql = "SELECT id, customerId, productId, skuId, price, `count`, participants, status FROM t_order WHERE id=?";
+        String sql = "SELECT id, customerId, productId, skuId, price, `count`, contacts, mobile, participants, status FROM t_order WHERE id=?";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Order>() {
             @Override
@@ -66,6 +68,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         order.setSkuId(rs.getLong("skuId"));
         order.setPrice(rs.getFloat("price"));
         order.setCount(rs.getInt("count"));
+        order.setContacts(rs.getString("contacts"));
+        order.setMobile(rs.getString("mobile"));
         order.setStatus(rs.getInt("status"));
 
         List<Long> participants = new ArrayList<Long>();
@@ -80,7 +84,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public List<Order> queryByProduct(long productId, int start, int count) {
-        String sql = "SELECT id, customerId, productId, skuId, price, `count`, participants, status FROM t_order WHERE productId=? LIMIT ?,?";
+        String sql = "SELECT id, customerId, productId, skuId, price, `count`, contacts, mobile, participants, status FROM t_order WHERE productId=? LIMIT ?,?";
         final List<Order> orders = new ArrayList<Order>();
         jdbcTemplate.query(sql, new Object[] { productId, start, count }, new RowCallbackHandler() {
             @Override
