@@ -19,14 +19,14 @@ import java.util.List;
 
 public class ParticipantServiceImpl extends DbAccessService implements ParticipantService {
 
-    public long addParticipant(final Participant participant) {
+    public long addParticipant(final long userId,final Participant participant) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 String sql = "insert into t_user_participant(userId, name, sex, birthday, addTime) values(?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                ps.setLong(1, participant.getUserId());
+                ps.setLong(1, userId);
                 ps.setString(2, participant.getName());
                 ps.setInt(3, participant.getSex());
                 ps.setDate(4, (Date) participant.getBirthday());
@@ -37,8 +37,8 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
     }
 
     @Override
-    public long add(Participant participant) {
-        return addParticipant(participant);
+    public long add(long userId,Participant participant) {
+        return addParticipant(userId,participant);
     }
 
     public  boolean update( String sql, Object[] args){

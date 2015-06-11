@@ -81,4 +81,9 @@ public class UserController extends AbstractController {
         if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update user id card pic");
         return new ResponseMessage("update user id card pic successfully");
     }
+
+    @RequestMapping(value = "{id}")
+    public ResponseMessage addParticipant(){
+
+    }
 }

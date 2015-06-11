@@ -5,10 +5,10 @@ import java.util.List;
 
 public interface ParticipantService {
 
-    long add(final Participant participant);
+    long add(long userId, final Participant participant);
     boolean updateName(long id, String name);
     boolean updateSex(long id, int sex);
     boolean updateBirthday(long id, Date birthday);
-    List<Participant> get(final long userId);
+    List<Participant> get(final long git );
     boolean delete(long id);
 }
