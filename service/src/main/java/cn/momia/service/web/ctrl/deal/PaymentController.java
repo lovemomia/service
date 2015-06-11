@@ -1,11 +1,14 @@
 package cn.momia.service.web.ctrl.deal;
 
 import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
 import cn.momia.service.deal.payment.PaymentService;
 import cn.momia.service.deal.payment.gateway.PaymentGateway;
+import cn.momia.service.deal.payment.gateway.PrepayParam;
 import cn.momia.service.deal.payment.gateway.SignParam;
 import cn.momia.service.deal.payment.gateway.factory.PaymentGatewayFactory;
+import cn.momia.service.deal.payment.gateway.factory.PrepayParamFactory;
 import cn.momia.service.deal.payment.gateway.factory.SignParamFactory;
 import cn.momia.service.web.ctrl.AbstractController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +43,16 @@ public class PaymentController extends AbstractController {
 
     @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)
     public ResponseMessage prepayWechatpay(HttpServletRequest request) {
+        Order order = getOrder(request);
+        PrepayParam prepayParam = PrepayParamFactory.create(request.getParameterMap(), order, Payment.Type.WECHATPAY);
+        PaymentGateway gateway = PaymentGatewayFactory.create(Payment.Type.WECHATPAY);
+
+        return new ResponseMessage(gateway.prepay(prepayParam));
+    }
+
+    private Order getOrder(HttpServletRequest request) {
         // TODO
-        return new ResponseMessage("TODO");
+        return null;
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.POST)
