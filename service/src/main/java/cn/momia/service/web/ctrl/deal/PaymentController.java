@@ -38,6 +38,12 @@ public class PaymentController extends AbstractController {
         return new ResponseMessage(sign(request, Payment.Type.WECHATPAY));
     }
 
+    @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)
+    public ResponseMessage prepayWechatpay(HttpServletRequest request) {
+        // TODO
+        return new ResponseMessage("TODO");
+    }
+
     @RequestMapping(value = "/check", method = RequestMethod.POST)
     public ResponseMessage checkPayment() {
         // TODO
