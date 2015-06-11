@@ -113,6 +113,13 @@ public class ProductServiceImplTest {
 
     @org.testng.annotations.Test
     public void testUpdate() throws Exception {
+        DB();
+        Product product = productService.get(15);
+        product.setTitle("new title");
+        List<ProductImage> imgs = product.getImgs();
+        ProductImage productImage = imgs.get(0);
+        productImage.setHeight(200);
+         productService.update(product);
 
     }
 

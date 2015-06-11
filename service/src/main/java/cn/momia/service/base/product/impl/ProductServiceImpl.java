@@ -10,6 +10,7 @@ import cn.momia.service.base.product.sku.SkuPropertyValue;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -113,6 +114,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
         addSku(productId,product);
         return  productId;
     }
+
     public boolean update(long id, String sql, Object[] objects){
         Product product = get(id);
         if (!product.exists()) return false;
@@ -161,7 +163,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
 
     public boolean updateSku(Product product){
         if(product.getSkus().size()==0) {
-            String sql = "delete from t_sku where productId=?";
+            String sql = "delete from t_sku where productId=? and status=1";
             return delete(product.getId(),sql,new Object[]{product.getId()});
         }
         else{
@@ -195,8 +197,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
         return product;
     }
 
-    @Override
-    public Product get(long productId) {
+    public Product getProduct(long productId){
         String sql = "select id, category, userId, title, content, sales from t_product where id=? and status=1";
         return jdbcTemplate.query(sql, new Object[] { productId }, new ResultSetExtractor<Product>() {
             @Override
@@ -206,4 +207,66 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
             }
         });
     }
+
+    public Sku buildSku(ResultSet rs) throws SQLException {
+        Sku sku = new Sku();
+        sku.setId(rs.getLong("id"));
+        sku.setProductId(rs.getLong("productId"));
+        sku.setPropertyValues(rs.getString("propertyValues"));
+        sku.setPrice(rs.getFloat("price"));
+        sku.setStock(rs.getInt("stock"));
+        sku.setUnlockedStock(rs.getInt("unlockedStock"));
+        sku.setLockedStock(rs.getInt("lockedStock"));
+        return sku;
+    }
+
+    public List<Sku> getSkus(long productId){
+        final List<Sku> skus = new ArrayList<Sku>();
+        String sql = "select id, productId, propertyValues, price, stock, unlockedStock, lockedStock from t_sku where productId=?";
+        jdbcTemplate.query(sql, new Object[] { productId }, new RowCallbackHandler() {
+
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                skus.add(buildSku(rs));
+            }
+        });
+        return skus;
+
+    }
+
+    public ProductImage buildImage(ResultSet rs) throws SQLException {
+        ProductImage img = new ProductImage();
+        img.setId(rs.getLong("id"));
+        img.setProductId(rs.getLong("productId"));
+        img.setUrl(rs.getString("url"));
+        img.setWidth(rs.getInt("width"));
+        img.setHeight(rs.getInt("height"));
+        return img;
+
+    }
+
+    public List<ProductImage> getProductImgs(long productId){
+        final List<ProductImage> imgs = new ArrayList<ProductImage>();
+        String sql = "select id, productId, url, width, height from t_product_img where productId=?";
+        jdbcTemplate.query(sql, new Object[] { productId }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                imgs.add(buildImage(rs));
+
+            }
+        });
+                return imgs;
+    }
+
+    @Override
+    public Product get(long productId) {
+        Product product = getProduct(productId);
+        if(product.exists()) {
+            product.setImgs(getProductImgs(productId));
+            product.setSkus(getSkus(productId));
+        }
+        return product;
+
+    }
+
 }

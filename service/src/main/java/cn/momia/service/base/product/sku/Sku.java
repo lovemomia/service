@@ -15,6 +15,7 @@ public class Sku {
     }
 
     private long id;
+    private long productId;
     private String propertyValues;
     private float price;
     private int stock;
@@ -31,6 +32,7 @@ public class Sku {
         setPrice(jsonObject.getFloat("price"));
         setStock(jsonObject.getInteger("stock"));
         // TODO sku values
+        setProductId(jsonObject.getInteger("productId"));
         setPropertyValues(jsonObject.getString("propertyValues"));
         setLockedStock(jsonObject.getInteger("lockedStock"));
         setUnlockedStock(jsonObject.getInteger("unlockedStock"));
@@ -42,6 +44,14 @@ public class Sku {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(long productId) {
+        this.productId = productId;
     }
 
     public String getPropertyValues() {
