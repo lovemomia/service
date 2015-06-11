@@ -1,8 +1,5 @@
-package cn.momia.service.user.participant.impl;
+package cn.momia.service.base.user.participant.impl;
 
-import cn.momia.service.base.product.impl.ProductServiceImpl;
-import cn.momia.service.base.user.User;
-import cn.momia.service.base.user.impl.UserServiceImpl;
 import cn.momia.service.base.user.participant.Participant;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -62,7 +59,7 @@ public class ParticipantServiceImplTest {
         Date date = f.parse(f.format(new Date()));
         java.sql.Date sqlDate1 = new java.sql.Date(date.getTime());
         participant1.setBirthday(sqlDate1);
-        participantService.add(participant1);
+        participantService.add(1,participant1);
 
     }
 

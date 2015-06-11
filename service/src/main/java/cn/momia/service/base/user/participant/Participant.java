@@ -52,4 +52,7 @@ public class Participant {
     public void setBirthday(Date birthday) {
         this.birthday = birthday;
     }
+    public boolean exists() {
+        return !this.equals(NOT_EXIST_PARTICIPANT);
+    }
 }
