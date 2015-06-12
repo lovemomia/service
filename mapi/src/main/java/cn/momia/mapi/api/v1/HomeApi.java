@@ -44,7 +44,7 @@ public class HomeApi extends AbstractApi {
     }
 
     private MomiaHttpRequest buildBannersRequest() {
-        return new MomiaHttpGetRequest("banners", true, baseServiceUrl(new Object[] { "banner" }), null);
+        return new MomiaHttpGetRequest("banners", true, baseServiceUrl("banner"), null);
     }
 
     private MomiaHttpRequest buildProductsRequest(int pageIndex) {
@@ -53,7 +53,7 @@ public class HomeApi extends AbstractApi {
         params.put("start", String.valueOf(pageIndex * pageSize));
         params.put("count", String.valueOf(pageSize));
 
-        return new MomiaHttpGetRequest("products", true, baseServiceUrl(new Object[] { "product" }), params);
+        return new MomiaHttpGetRequest("products", true, baseServiceUrl("product"), params);
     }
 
     private JSONObject buildHomeResponse(MomiaHttpResponseCollector collector, int pageIndex) {

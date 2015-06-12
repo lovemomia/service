@@ -27,11 +27,11 @@ public abstract class AbstractApi {
     @Autowired
     protected MomiaHttpRequestExecutor requestExecutor;
 
-    protected String baseServiceUrl(Object[] paths) {
+    protected String baseServiceUrl(Object... paths) {
         return serviceUrl(conf.getString("Service.Base"), paths);
     }
 
-    private String serviceUrl(String service, Object[] paths) {
+    private String serviceUrl(String service, Object... paths) {
         StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.append(service);
         for (Object path : paths) {
@@ -41,7 +41,7 @@ public abstract class AbstractApi {
         return urlBuilder.toString();
     }
 
-    protected String DealServiceUrl(Object[] paths) {
+    protected String DealServiceUrl(Object... paths) {
         return serviceUrl(conf.getString("Service.Deal"), paths);
     }
 

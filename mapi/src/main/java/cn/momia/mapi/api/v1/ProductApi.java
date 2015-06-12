@@ -30,7 +30,7 @@ public class ProductApi extends AbstractApi {
         params.put("start", String.valueOf(start));
         params.put("count", String.valueOf(count));
         params.put("query", queryJson);
-        MomiaHttpRequest request = new MomiaHttpGetRequest("products", true, baseServiceUrl(new Object[] { "product" }), params);
+        MomiaHttpRequest request = new MomiaHttpGetRequest("products", true, baseServiceUrl("product"), params);
 
         return executeRequest(request);
     }
@@ -72,27 +72,27 @@ public class ProductApi extends AbstractApi {
     }
 
     private MomiaHttpRequest buildProductInfoRequest(long productId) {
-        return new MomiaHttpGetRequest("product", true, baseServiceUrl(new Object[] { "product", productId }), null);
+        return new MomiaHttpGetRequest("product", true, baseServiceUrl("product", productId), null);
     }
 
     private MomiaHttpRequest buildProductSkusRequest(long productId) {
-        return new MomiaHttpGetRequest("skus", true, baseServiceUrl(new Object[] { "product", productId, "sku" }), null);
+        return new MomiaHttpGetRequest("skus", true, baseServiceUrl("product", productId, "sku"), null);
     }
 
     private MomiaHttpRequest buildProductPlaceRequest(long productId) {
-        return new MomiaHttpGetRequest("place", true, baseServiceUrl(new Object[] { "product", productId, "place" }), null);
+        return new MomiaHttpGetRequest("place", true, baseServiceUrl("product", productId, "place"), null);
     }
 
     private MomiaHttpRequest buildProductCommentsRequest(long productId) {
-        return new MomiaHttpGetRequest("comments", false, baseServiceUrl(new Object[] { "product", productId, "comment" }), null);
+        return new MomiaHttpGetRequest("comments", false, baseServiceUrl("product", productId, "comment"), null);
     }
 
     private MomiaHttpRequest buildProductServerRequest(long productId) {
-        return new MomiaHttpGetRequest("server", true, baseServiceUrl(new Object[] { "product", productId, "server" }), null);
+        return new MomiaHttpGetRequest("server", true, baseServiceUrl("product", productId, "server"), null);
     }
 
     private MomiaHttpRequest buildProductCustomersRequest(long productId) {
-        return new MomiaHttpGetRequest("customers", false, baseServiceUrl(new Object[] { "product", productId, "customer" }), null);
+        return new MomiaHttpGetRequest("customers", false, baseServiceUrl("product", productId, "customer"), null);
     }
 
     @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
