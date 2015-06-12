@@ -21,10 +21,4 @@ public class CallbackApi extends AbstractApi {
         // TODO
         return new ResponseMessage("TODO");
     }
-
-    @RequestMapping(value = "/unionpay", method = RequestMethod.POST)
-    public ResponseMessage unionpayCallback(HttpServletRequest request) {
-        // TODO
-        return new ResponseMessage("TODO");
-    }
 }

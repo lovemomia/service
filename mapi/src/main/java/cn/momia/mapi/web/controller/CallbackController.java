@@ -18,9 +18,4 @@ public class CallbackController extends AbstractController {
     public String wechatpayCallback(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
-
-    @RequestMapping(value = "/unionpay", method = RequestMethod.POST)
-    public String unionpayCallback(HttpServletRequest request) {
-        return forward(request, request.getRequestURI());
-    }
 }
