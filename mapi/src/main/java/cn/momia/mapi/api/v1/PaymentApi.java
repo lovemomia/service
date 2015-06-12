@@ -10,6 +10,12 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("/v1/payment")
 public class PaymentApi extends AbstractApi {
+    @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)
+    public ResponseMessage prepayWechatpay(HttpServletRequest request) {
+        // TODO
+        return new ResponseMessage("TODO");
+    }
+
     @RequestMapping(value = "/check", method = RequestMethod.POST)
     public ResponseMessage checkPayment(HttpServletRequest request) {
         // TODO
