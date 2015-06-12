@@ -4,12 +4,16 @@ import cn.momia.common.config.Configuration;
 import cn.momia.common.web.http.MomiaHttpClient;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpRequestExecutor;
+import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 public abstract class AbstractApi {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractApi.class);
@@ -49,5 +53,15 @@ public abstract class AbstractApi {
             LOGGER.error("fail to execute request: {}", request, e);
             return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to execute request");
         }
+    }
+
+    protected ResponseMessage executeRequests(List<MomiaHttpRequest> requests, Function<MomiaHttpResponseCollector, JSONObject> buildResponseData) {
+        MomiaHttpResponseCollector collector = requestExecutor.execute(requests);
+        if (!collector.isSuccessful()) {
+            LOGGER.error("fail to execute requests: {}, exceptions: {}", requests, collector.getExceptions());
+            return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to execute requests");
+        }
+
+        return new ResponseMessage(buildResponseData.apply(collector));
     }
 }
