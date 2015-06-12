@@ -18,9 +18,9 @@ public class CommentController extends AbstractController {
     private CommentService commentService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseMessage postComment(@RequestParam String commentJson) {
+    public ResponseMessage postComment(@RequestParam String commentJson,@RequestParam long productId, @RequestParam long skuId) {
         Comment comment = new Comment(JSON.parseObject(commentJson));
-        long commentId = commentService.add(comment);
+        long commentId = commentService.add(comment,productId, skuId);
 
         if (commentId <= 0) return new ResponseMessage("fail to post comment");
 

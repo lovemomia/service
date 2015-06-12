@@ -1,6 +1,7 @@
 package cn.momia.service.base.product;
 
 import cn.momia.service.base.product.sku.Sku;
+import cn.momia.service.base.user.User;
 
 import java.util.List;
 

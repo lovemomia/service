@@ -31,7 +31,8 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
                 ps.setLong(1, userId);
                 ps.setString(2, participant.getName());
                 ps.setInt(3, participant.getSex());
-                ps.setDate(4, (Date) participant.getBirthday());
+                java.sql.Date sqlDate = new java.sql.Date(participant.getBirthday().getTime());
+                ps.setDate(4,  sqlDate);
                 return ps;
             }
         },keyHolder);
