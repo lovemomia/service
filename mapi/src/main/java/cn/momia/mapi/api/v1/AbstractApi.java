@@ -41,7 +41,7 @@ public abstract class AbstractApi {
         return urlBuilder.toString();
     }
 
-    protected String DealServiceUrl(Object... paths) {
+    protected String dealServiceUrl(Object... paths) {
         return serviceUrl(conf.getString("Service.Deal"), paths);
     }
 
