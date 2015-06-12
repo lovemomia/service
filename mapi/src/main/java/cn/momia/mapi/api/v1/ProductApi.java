@@ -79,8 +79,19 @@ public class ProductApi extends AbstractApi {
     }
 
     private JSONObject buildProductResponse(MomiaHttpResponseCollector collector) {
-        // TODO
-        return null;
+        JSONObject productObject = new JSONObject();
+        productObject.put("product", collector.get("product"));
+        productObject.put("sku", collector.get("sku"));
+        productObject.put("place", collector.get("place"));
+        productObject.put("server", collector.get("server"));
+
+        JSONObject comments = collector.get("comment");
+        if (comments != null) productObject.put("comment", comments);
+
+        JSONObject customers = collector.get("customer");
+        if (customers != null) productObject.put("customer", customers);
+
+        return productObject;
     }
 
     @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
