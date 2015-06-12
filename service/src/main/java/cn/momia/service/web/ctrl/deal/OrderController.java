@@ -37,7 +37,7 @@ public class OrderController extends AbstractController {
     private SkuService skuService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseMessage placeOrder(@RequestParam String orderJson) {
+    public ResponseMessage placeOrder(@RequestParam(value = "order") String orderJson) {
         Order order = parseOrder(orderJson);
         if (!lockSku(order)) return new ResponseMessage(ErrorCode.FAILED, "low stocks");
 
