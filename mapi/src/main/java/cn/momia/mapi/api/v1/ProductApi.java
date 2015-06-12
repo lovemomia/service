@@ -3,9 +3,9 @@ package cn.momia.mapi.api.v1;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.http.impl.MomiaHttpGetRequest;
-import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,13 +38,25 @@ public class ProductApi extends AbstractApi {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseMessage getProduct(@PathVariable long id) {
         List<MomiaHttpRequest> requests = buildProductRequests(id);
-        MomiaHttpResponseCollector collector = requestExecutor.execute(requests);
-        if (!collector.isSuccessful()) {
-            LOGGER.error("fail to get product: {}, {}", id, collector.getExceptions());
-            return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to get product");
-        }
 
-        return new ResponseMessage(buildProductResponse(collector));
+        return executeRequests(requests, new Function<MomiaHttpResponseCollector, JSONObject>() {
+            @Override
+            public JSONObject apply(MomiaHttpResponseCollector collector) {
+                JSONObject productObject = new JSONObject();
+                productObject.put("product", collector.getResponse("product"));
+                productObject.put("skus", collector.getResponse("skus"));
+                productObject.put("place", collector.getResponse("place"));
+                productObject.put("server", collector.getResponse("server"));
+
+                JSONObject comments = collector.getResponse("comments");
+                if (comments != null) productObject.put("comments", comments);
+
+                JSONObject customers = collector.getResponse("customers");
+                if (customers != null) productObject.put("customers", customers);
+
+                return productObject;
+            }
+        });
     }
 
     private List<MomiaHttpRequest> buildProductRequests(long productId) {
@@ -82,22 +93,6 @@ public class ProductApi extends AbstractApi {
 
     private MomiaHttpRequest buildProductCustomersRequest(long productId) {
         return new MomiaHttpGetRequest("customers", false, baseServiceUrl(new Object[] { "product", productId, "customer" }), null);
-    }
-
-    private JSONObject buildProductResponse(MomiaHttpResponseCollector collector) {
-        JSONObject productObject = new JSONObject();
-        productObject.put("product", collector.getResponse("product"));
-        productObject.put("skus", collector.getResponse("skus"));
-        productObject.put("place", collector.getResponse("place"));
-        productObject.put("server", collector.getResponse("server"));
-
-        JSONObject comments = collector.getResponse("comments");
-        if (comments != null) productObject.put("comments", comments);
-
-        JSONObject customers = collector.getResponse("customers");
-        if (customers != null) productObject.put("customers", customers);
-
-        return productObject;
     }
 
     @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
