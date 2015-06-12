@@ -3,27 +3,34 @@ package cn.momia.common.web.http.impl;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import org.apache.http.Header;
 import org.apache.http.HeaderIterator;
+import org.apache.http.NameValuePair;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.RequestLine;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpParams;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractMomiaHttpRequest implements MomiaHttpRequest {
     private String name;
     private boolean required;
+    protected Map<String, String> params;
+
     protected HttpRequestBase httpRequestBase;
 
-    public AbstractMomiaHttpRequest(String name, boolean required, String uri, Map<String, String> params) {
+    public AbstractMomiaHttpRequest(String name, boolean required, Map<String, String> params) {
         this.name = name;
         this.required = required;
+        this.params = params;
+    }
 
+    protected String toUrlParams(Map<String, String> params) {
         StringBuilder builder = new StringBuilder();
-        builder.append(uri);
         if (params != null && params.size() > 0) {
-            builder.append("?");
             int i = 0;
             int paramCount = params.size();
             for (Map.Entry<String, String> entry : params.entrySet()) {
@@ -32,10 +39,18 @@ public abstract class AbstractMomiaHttpRequest implements MomiaHttpRequest {
                 if (i < paramCount) builder.append("&");
             }
         }
-        createHttpRequestBase(builder.toString());
+
+        return builder.toString();
     }
 
-    protected abstract void createHttpRequestBase(String url);
+    protected List<NameValuePair> toNameValuePairs(Map<String, String> params) {
+        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            nameValuePairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+        }
+
+        return nameValuePairs;
+    }
 
     @Override
     public String getName() {
