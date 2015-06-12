@@ -7,15 +7,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
-@RequestMapping("/order")
-public class OrderController extends AbstractController {
+@RequestMapping("/favorite")
+public class FavoriteController extends AbstractController {
     @RequestMapping(method = RequestMethod.POST)
-    public String placeOrder(HttpServletRequest request) {
-        return forward(request, request.getRequestURI());
-    }
-
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public String deleteOrder(HttpServletRequest request) {
+    public String addFavorite(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
 }
