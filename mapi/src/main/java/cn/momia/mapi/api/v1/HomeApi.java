@@ -26,11 +26,9 @@ public class HomeApi extends AbstractApi {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage home(@RequestParam(value = "pageindex") int pageIndex) {
         List<MomiaHttpRequest> requests = buildHomeRequests(pageIndex);
-        MomiaHttpResponseCollector collector = new MomiaHttpResponseCollector();
-        List<Throwable> exceptions = new ArrayList<Throwable>();
-        boolean successful = requestExecutor.execute(requests, collector, exceptions, requests.size());
-        if (!successful) {
-            LOGGER.error("fail to get home data, exceptions: {}", exceptions);
+        MomiaHttpResponseCollector collector = requestExecutor.execute(requests);
+        if (!collector.isSuccessful()) {
+            LOGGER.error("fail to get home data, exceptions: {}", collector.getExceptions());
             return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to get home data");
         }
 
@@ -46,27 +44,22 @@ public class HomeApi extends AbstractApi {
     }
 
     private MomiaHttpRequest buildBannersRequest() {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(conf.getString("Service.Base")).append("/banner");
-
-        return new MomiaHttpGetRequest("banners", true, urlBuilder.toString(), null);
+        return new MomiaHttpGetRequest("banners", true, baseServiceUrl(new Object[] { "banner" }), null);
     }
 
     private MomiaHttpRequest buildProductsRequest(int pageIndex) {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(conf.getString("Service.Base")).append("/product");
         int pageSize = conf.getInt("Home.PageSize");
         Map<String, String> params = new HashMap<String, String>();
         params.put("start", String.valueOf(pageIndex * pageSize));
         params.put("count", String.valueOf(pageSize));
 
-        return new MomiaHttpGetRequest("products", true, urlBuilder.toString(), params);
+        return new MomiaHttpGetRequest("products", true, baseServiceUrl(new Object[] { "product" }), params);
     }
 
     private JSONObject buildHomeResponse(MomiaHttpResponseCollector collector, int pageIndex) {
         JSONObject homeData = new JSONObject();
-        if (pageIndex == 0) homeData.put("banners", collector.get("banners"));
-        homeData.put("products", collector.get("products"));
+        if (pageIndex == 0) homeData.put("banners", collector.getResponse("banners"));
+        homeData.put("products", collector.getResponse("products"));
 
         return homeData;
     }
