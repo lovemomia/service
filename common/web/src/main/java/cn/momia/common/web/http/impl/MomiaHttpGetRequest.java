@@ -6,10 +6,8 @@ import java.util.Map;
 
 public class MomiaHttpGetRequest extends AbstractMomiaHttpRequest {
     public MomiaHttpGetRequest(String name, boolean required, String uri, Map<String, String> params) {
-        super(name, required, uri, params);
-    }
+        super(name, required, params);
 
-    protected void createHttpRequestBase(String url) {
-        httpRequestBase = new HttpGet(url);
+        httpRequestBase = new HttpGet(new StringBuilder().append(uri).append("?").append(toUrlParams(params)).toString());
     }
 }

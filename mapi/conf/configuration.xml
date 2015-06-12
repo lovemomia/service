@@ -8,8 +8,20 @@
         <Biz>mapi</Biz>
     </Server>
 
+    <Database>
+        <Tongqu>
+            <JdbcUrl><![CDATA[jdbc:mysql://120.55.102.12:3306/tongqu?characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull]]></JdbcUrl>
+            <Username>tongqu</Username>
+            <Password>Tongqu!@#456</Password>
+        </Tongqu>
+    </Database>
+
     <Service>
         <Base>http://localhost:8080</Base>
         <Deal>https://localhost:8443</Deal>
     </Service>
+
+    <Home>
+        <PageSize>10</PageSize>
+    </Home>
 </Configuration>

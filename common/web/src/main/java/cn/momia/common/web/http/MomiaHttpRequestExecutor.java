@@ -17,7 +17,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MomiaHttpRequestExecutor {
-    public boolean execute(List<MomiaHttpRequest> requests, final MomiaHttpResponseCollector collector, final List<Throwable> exceptions, int threadCount) {
+    public MomiaHttpResponseCollector execute(List<MomiaHttpRequest> requests) {
+        return execute(requests, requests.size());
+    }
+
+    public MomiaHttpResponseCollector execute(List<MomiaHttpRequest> requests, int threadCount) {
+        final MomiaHttpResponseCollector collector = new MomiaHttpResponseCollector();
         final AtomicBoolean successful = new AtomicBoolean(true);
         // TODO more configuration of http client
         final HttpClient httpClient = HttpClients.createDefault();
@@ -40,9 +45,9 @@ public class MomiaHttpRequestExecutor {
                             return;
                         }
 
-                        collector.add(request.getName(), responseJson.getJSONObject("data"));
+                        collector.addResponse(request.getName(), responseJson.getJSONObject("data"));
                     } catch (Throwable t) {
-                        exceptions.add(t);
+                        collector.addException(t);
                         if (request.isRequired()) shutdown(executorService, successful);
                     }
                 }
@@ -57,11 +62,13 @@ public class MomiaHttpRequestExecutor {
             }
         }
         catch (InterruptedException e) {
-            exceptions.add(e);
+            collector.addException(e);
             shutdown(executorService, successful);
         }
 
-        return successful.get();
+        collector.setSuccessful(successful.get());
+
+        return collector;
     }
 
     private void shutdown(ExecutorService executorService, AtomicBoolean successful)

@@ -12,13 +12,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/v1/order")
-public class OrderApi extends AbstractApi {
+@RequestMapping("/feedback")
+public class FeedbackApi extends AbstractApi {
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseMessage placeOrder(@RequestParam(value = "order") String orderJson) {
+    public ResponseMessage addFeedback(@RequestParam String content, @RequestParam String email, @RequestParam(required = false) String utoken) {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("order", orderJson);
-        MomiaHttpRequest request = new MomiaHttpPostRequest("order", true, dealServiceUrl("order"), params);
+        params.put("content", content);
+        params.put("email", email);
+        if (utoken != null) params.put("utoken", utoken);
+        MomiaHttpRequest request = new MomiaHttpPostRequest("feedback", true, baseServiceUrl("feedback"), params);
 
         return executeRequest(request);
     }
