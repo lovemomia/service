@@ -4,6 +4,8 @@ import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.base.user.User;
 import cn.momia.service.base.user.UserService;
+import cn.momia.service.base.user.participant.Participant;
+import cn.momia.service.base.user.participant.ParticipantService;
 import cn.momia.service.web.ctrl.AbstractController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,11 +14,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 @RestController
 @RequestMapping("/user")
 public class UserController extends AbstractController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private ParticipantService participantService;
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseMessage getUser(@PathVariable long id) {
@@ -81,4 +91,62 @@ public class UserController extends AbstractController {
         if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update user id card pic");
         return new ResponseMessage("update user id card pic successfully");
     }
+
+    @RequestMapping(value = "{id}/participant", method = RequestMethod.PUT)
+    public ResponseMessage addParticipant(@PathVariable long userId,@RequestParam Participant participant){
+        long successful = participantService.add(userId,participant);
+
+        return new ResponseMessage("add participant successfully");
+    }
+
+    @RequestMapping(value = "/{id}/participant", method = RequestMethod.GET)
+    public ResponseMessage getAllParticipants(@PathVariable long id){
+        List<Participant> participants = participantService.get(id);
+        List<ResponseMessage> messages = new ArrayList<ResponseMessage>();
+        if(participants.size()==0)
+            return new ResponseMessage(ErrorCode.NOT_FOUND, "participant not exists");
+        for(Participant participant : participants){
+            messages.add(new ResponseMessage(participant));
+        }
+        return new ResponseMessage(messages);
+
+    }
+
+    @RequestMapping(value = "/{id}/participant/{participantId}", method = RequestMethod.GET)
+    public ResponseMessage getParticipant(@PathVariable long id, @PathVariable long participantId){
+        Participant participant = participantService.get(id, participantId);
+        if(!participant.exists())
+            return new ResponseMessage(ErrorCode.NOT_FOUND, "participant not exists");
+        return new ResponseMessage(participant);
+
+
+    }
+
+    @RequestMapping(value = "/{id}/participant/{participantId}/name", method = RequestMethod.PUT)
+    public ResponseMessage updateParticipantName(@PathVariable long participantId, @RequestParam String name){
+        boolean successful = participantService.updateName(participantId, name);
+
+        if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update participant name");
+        return new ResponseMessage("update participant name successfully");
+    }
+
+    @RequestMapping(value = "/{id}/participant/{participantId}/sex", method = RequestMethod.PUT)
+    public ResponseMessage updateParticipantSex(@PathVariable long participantId, @RequestParam int sex){
+        boolean successful = participantService.updateSex(participantId, sex);
+
+        if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update participant sex");
+        return new ResponseMessage("update participant sex successfully");
+    }
+
+    @RequestMapping(value = "/{id}/participant/{participantId}/birthday", method = RequestMethod.PUT)
+    public ResponseMessage updateParticipantBirthday(@PathVariable long participantId, @RequestParam String birthday) throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat( "yyyy-MM-dd");
+        Date date = formatter.parse(birthday);
+        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+        boolean successful = participantService.updateBirthday(participantId, sqlDate);
+
+        if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update participant name");
+        return new ResponseMessage("update participant name successfully");
+    }
+
 }

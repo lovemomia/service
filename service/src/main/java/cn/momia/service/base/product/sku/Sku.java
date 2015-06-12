@@ -1,8 +1,10 @@
 package cn.momia.service.base.product.sku;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Sku {
@@ -13,8 +15,12 @@ public class Sku {
     }
 
     private long id;
+    private long productId;
+    private String propertyValues;
     private float price;
     private int stock;
+    private int lockedStock;
+    private int unlockedStock;
     private List<Pair<SkuProperty, SkuPropertyValue>> properties;
 
     public Sku() {
@@ -26,6 +32,10 @@ public class Sku {
         setPrice(jsonObject.getFloat("price"));
         setStock(jsonObject.getInteger("stock"));
         // TODO sku values
+        setProductId(jsonObject.getInteger("productId"));
+        setPropertyValues(jsonObject.getString("propertyValues"));
+        setLockedStock(jsonObject.getInteger("lockedStock"));
+        setUnlockedStock(jsonObject.getInteger("unlockedStock"));
     }
 
     public long getId() {
@@ -34,6 +44,22 @@ public class Sku {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(long productId) {
+        this.productId = productId;
+    }
+
+    public String getPropertyValues() {
+        return propertyValues;
+    }
+
+    public void setPropertyValues(String propertyValues) {
+        this.propertyValues = propertyValues;
     }
 
     public float getPrice() {
@@ -50,6 +76,22 @@ public class Sku {
 
     public void setStock(int stock) {
         this.stock = stock;
+    }
+
+    public int getLockedStock() {
+        return lockedStock;
+    }
+
+    public void setLockedStock(int lockedStock) {
+        this.lockedStock = lockedStock;
+    }
+
+    public int getUnlockedStock() {
+        return unlockedStock;
+    }
+
+    public void setUnlockedStock(int unlockedStock) {
+        this.unlockedStock = unlockedStock;
     }
 
     public List<Pair<SkuProperty, SkuPropertyValue>> getProperties() {

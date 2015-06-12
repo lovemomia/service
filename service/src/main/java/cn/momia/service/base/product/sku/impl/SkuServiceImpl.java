@@ -1,17 +1,24 @@
 package cn.momia.service.base.product.sku.impl;
 
 import cn.momia.service.base.DbAccessService;
+import cn.momia.service.base.product.Product;
 import cn.momia.service.base.product.sku.Sku;
 import cn.momia.service.base.product.sku.SkuService;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Splitter;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 public class SkuServiceImpl extends DbAccessService implements SkuService {
@@ -30,7 +37,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
     private void addProductImages(Sku sku) {
     }
 
-    private long addProduct(Sku sku) {
+    private long addProduct(final Sku sku) {
         return 0;
     }
 
