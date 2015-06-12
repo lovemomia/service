@@ -9,6 +9,11 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 @RequestMapping("/payment")
 public class PaymentController extends AbstractController {
+    @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)
+    public String prepayWechatpay(HttpServletRequest request) {
+        return forward(request, request.getRequestURI());
+    }
+
     @RequestMapping(value = "/check", method = RequestMethod.POST)
     public String checkPayment(HttpServletRequest request) {
         return forward(request, request.getRequestURI());

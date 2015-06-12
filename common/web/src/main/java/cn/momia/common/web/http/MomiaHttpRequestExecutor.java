@@ -1,6 +1,8 @@
 package cn.momia.common.web.http;
 
+import cn.momia.common.web.response.ErrorCode;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
@@ -32,7 +34,13 @@ public class MomiaHttpRequestExecutor {
                         }
 
                         String entity = EntityUtils.toString(response.getEntity());
-                        collector.add(request.getName(), JSON.parseObject(entity));
+                        JSONObject responseJson = JSON.parseObject(entity);
+                        if (responseJson.getInteger("errno") != ErrorCode.SUCCESS) {
+                            if (request.isRequired()) throw new RuntimeException("fail to execute request: " + request);
+                            return;
+                        }
+
+                        collector.add(request.getName(), responseJson.getJSONObject("data"));
                     } catch (Throwable t) {
                         exceptions.add(t);
                         if (request.isRequired()) shutdown(executorService, successful);

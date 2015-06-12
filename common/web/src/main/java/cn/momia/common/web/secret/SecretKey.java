@@ -7,12 +7,13 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SecretKey
 {
-    private static String key;
-    private static String alipayPrivateKey;
-    private static String alipayPublicKey;
+    private static String biz;
+    private static Map<String, String> keys = new HashMap<String, String>();
 
     private Configuration conf;
     private JdbcTemplate jdbcTemplate;
@@ -29,32 +30,35 @@ public class SecretKey
 
     public void init()
     {
-        String sql = "SELECT `key`, alipayPrivateKey, alipayPublicKey FROM t_secret WHERE biz=? AND status=1 ORDER BY updateTime DESC LIMIT 1";
-        String biz = conf.getString("Server.Biz");
-        jdbcTemplate.query(sql, new Object[] { biz }, new RowCallbackHandler() {
+        biz = conf.getString("Server.Biz");
+
+        String sql = "SELECT biz, `key` FROM t_secret WHERE status=1 ORDER BY updateTime ASC";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
-                key = rs.getString("key");
-                alipayPrivateKey = rs.getString("alipayPrivateKey");
-                alipayPublicKey = rs.getString("alipayPublicKey");
+                keys.put(rs.getString("biz"), rs.getString("key"));
             }
         });
 
-        if (StringUtils.isBlank(key)) throw new RuntimeException("secret key is empty");
-        if (StringUtils.isBlank(alipayPrivateKey)) throw new RuntimeException("alipay private key is empty");
-        if (StringUtils.isBlank(alipayPublicKey)) throw new RuntimeException("alipay public key is empty");
+        if (StringUtils.isBlank(get())) throw new RuntimeException("secret key is empty");
+        if (StringUtils.isBlank(getAlipayPrivateKey())) throw new RuntimeException("alipay private key is empty");
+        if (StringUtils.isBlank(getAlipayPublicKey())) throw new RuntimeException("alipay public key is empty");
     }
 
     public static String get()
     {
-        return key;
+        return keys.get(biz);
+    }
+
+    public static String get(String biz) {
+        return keys.get(biz);
     }
 
     public static String getAlipayPrivateKey() {
-        return alipayPrivateKey;
+        return keys.get("alipayPrivateKey");
     }
 
     public static String getAlipayPublicKey() {
-        return alipayPublicKey;
+        return keys.get("alipayPublicKey");
     }
 }

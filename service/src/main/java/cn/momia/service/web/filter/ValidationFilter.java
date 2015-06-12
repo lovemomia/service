@@ -1,7 +1,7 @@
 package cn.momia.service.web.filter;
 
+import cn.momia.common.web.http.MomiaHttpRequestUtils;
 import cn.momia.common.web.secret.SecretKey;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.Filter;
@@ -28,7 +28,7 @@ public class ValidationFilter implements Filter {
             return;
         }
 
-        if (isInvalidProtocol(httpRequest) || isInvalidSign(httpRequest))
+        if (isInvalidProtocol(httpRequest) || isExpired(httpRequest) || isInvalidSign(httpRequest))
         {
             forwardErrorPage(request, response, 403);
             return;
@@ -38,11 +38,10 @@ public class ValidationFilter implements Filter {
     }
 
     private boolean isParamMissing(HttpServletRequest httpRequest) {
-        String userAgent = httpRequest.getHeader("user-agent");
         String expired = httpRequest.getParameter("expired");
         String sign = httpRequest.getParameter("sign");
 
-        return StringUtils.isBlank(userAgent) || StringUtils.isBlank(expired) || StringUtils.isBlank(sign);
+        return StringUtils.isBlank(expired) || StringUtils.isBlank(sign);
     }
 
     private boolean isInvalidProtocol(HttpServletRequest request) {
@@ -54,12 +53,16 @@ public class ValidationFilter implements Filter {
         return false;
     }
 
-    private boolean isInvalidSign(HttpServletRequest httpRequest) {
+    private boolean isExpired(HttpServletRequest httpRequest) {
         String expired = httpRequest.getParameter("expired");
+
+        return System.currentTimeMillis() > Long.valueOf(expired);
+    }
+
+    private boolean isInvalidSign(HttpServletRequest httpRequest) {
         String sign = httpRequest.getParameter("sign");
 
-        return System.currentTimeMillis() > Long.valueOf(expired) ||
-                !sign.equals(DigestUtils.md5Hex(StringUtils.join(new String[] { expired, SecretKey.get() }, "|")));
+        return !sign.equals(MomiaHttpRequestUtils.sign(MomiaHttpRequestUtils.extractParams(httpRequest), SecretKey.get()));
     }
 
     private void forwardErrorPage(ServletRequest request, ServletResponse response, int errorCode) throws ServletException, IOException {

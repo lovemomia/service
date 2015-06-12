@@ -7,4 +7,9 @@
     <Server>
         <Biz>mapi</Biz>
     </Server>
+
+    <Service>
+        <Base>http://localhost:8080</Base>
+        <Deal>https://localhost:8443</Deal>
+    </Service>
 </Configuration>
