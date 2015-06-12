@@ -2,10 +2,18 @@ package cn.momia.mapi.api.v1;
 
 import cn.momia.common.config.Configuration;
 import cn.momia.common.web.http.MomiaHttpClient;
+import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpRequestExecutor;
+import cn.momia.common.web.response.ErrorCode;
+import cn.momia.common.web.response.ResponseMessage;
+import com.alibaba.fastjson.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractApi {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractApi.class);
+
     @Autowired
     protected Configuration conf;
 
@@ -31,5 +39,15 @@ public abstract class AbstractApi {
 
     protected String DealServiceUrl(Object[] paths) {
         return serviceUrl(conf.getString("Service.Deal"), paths);
+    }
+
+    protected ResponseMessage executeRequest(MomiaHttpRequest request) {
+        try {
+            JSONObject responseJson = httpClient.execute(request);
+            return ResponseMessage.formJson(responseJson);
+        } catch (Exception e) {
+            LOGGER.error("fail to execute request: {}", request, e);
+            return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to execute request");
+        }
     }
 }

@@ -32,13 +32,8 @@ public class ProductApi extends AbstractApi {
         params.put("count", String.valueOf(count));
         params.put("query", queryJson);
         MomiaHttpRequest request = new MomiaHttpGetRequest("products", true, baseServiceUrl(new Object[] { "product" }), params);
-        try {
-            JSONObject responseJson = httpClient.execute(request);
-            return ResponseMessage.formJson(responseJson);
-        } catch (IOException e) {
-            LOGGER.error("fail to get products, {}", params, e);
-            return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to get products");
-        }
+
+        return executeRequest(request);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -107,12 +102,6 @@ public class ProductApi extends AbstractApi {
 
     @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
     public ResponseMessage getProductSkus(@PathVariable long id) {
-        try {
-            JSONObject jsonResponse = httpClient.execute(buildProductSkusRequest(id));
-            return ResponseMessage.formJson(jsonResponse);
-        } catch (Exception e) {
-            LOGGER.error("fail to get skus of product: {}", id, e);
-            return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to get skus of product");
-        }
+        return executeRequest(buildProductSkusRequest(id));
     }
 }
