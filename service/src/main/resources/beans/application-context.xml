@@ -61,4 +61,10 @@
     <bean class="cn.momia.service.deal.payment.gateway.factory.PrepayParamFactory">
         <property name="conf" ref="conf" />
     </bean>
+
+    <bean class="cn.momia.service.deal.payment.gateway.factory.PaymentGatewayFactory">
+        <property name="conf" ref="conf" />
+        <property name="orderService" ref="orderService" />
+        <property name="paymentService" ref="paymentService" />
+    </bean>
 </beans>

@@ -1,23 +1,18 @@
 package cn.momia.service.deal.payment.gateway.wechatpay;
 
 import cn.momia.common.encrypt.MD5Util;
-import cn.momia.common.error.SDKRuntimeException;
 
 /**
  * Created by hoze on 15/6/11.
  */
 public class MD5SignUtil {
 
-    public static String Sign(String content, String key)
-            throws SDKRuntimeException {
+    public static String Sign(String content, String key) {
         String signStr = "";
 
-        if ("" == key) {
-            throw new SDKRuntimeException("财付通签名key不能为空！");
-        }
-        if ("" == content) {
-            throw new SDKRuntimeException("财付通签名内容不能为空");
-        }
+        if ("" == key) throw new RuntimeException("财付通签名key不能为空！");
+        if ("" == content) throw new RuntimeException("财付通签名内容不能为空");
+
         signStr = content + "&key=" + key;
 
         return MD5Util.MD5(signStr).toUpperCase();

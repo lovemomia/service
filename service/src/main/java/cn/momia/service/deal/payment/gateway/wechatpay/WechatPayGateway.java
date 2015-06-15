@@ -1,12 +1,10 @@
 package cn.momia.service.deal.payment.gateway.wechatpay;
 
-import cn.momia.common.config.Configuration;
 import cn.momia.common.encrypt.CommonUtil;
 import cn.momia.common.encrypt.XmlUtil;
-import cn.momia.service.deal.order.OrderService;
+import cn.momia.service.deal.payment.gateway.AbstractPaymentGateway;
 import cn.momia.service.deal.payment.gateway.CallbackParam;
 import cn.momia.service.deal.payment.gateway.CallbackResult;
-import cn.momia.service.deal.payment.gateway.PaymentGateway;
 import cn.momia.service.deal.payment.gateway.PrepayParam;
 import cn.momia.service.deal.payment.gateway.PrepayResult;
 import org.apache.http.HttpResponse;
@@ -17,23 +15,11 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
-
 import java.io.BufferedReader;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WechatPayGateway implements PaymentGateway {
-    private Configuration conf;
-    private OrderService orderService;
-
-    public void setConf(Configuration conf) {
-        this.conf = conf;
-    }
-
-    public void setOrderService(OrderService orderService) {
-        this.orderService = orderService;
-    }
-
+public class WechatPayGateway extends AbstractPaymentGateway {
     @Override
     public PrepayResult prepay(PrepayParam param) {
         String url = conf.getString("Payment.Wechat.PrepayService");
@@ -95,23 +81,22 @@ public class WechatPayGateway implements PaymentGateway {
 
     @Override
     public CallbackResult callback(CallbackParam param) {
-        WechatpayCallbackResult callbackResult = new WechatpayCallbackResult();
-        WechatpayCallbackParam callbackParam = (WechatpayCallbackParam) param;
-
-        if (callbackParam.getResult_code().equals("SUCCESS")) {
-            boolean bl = orderService.pay(new Long(callbackParam.getOut_trade_no()));
-            if (bl) {
-                callbackResult.setReturn_code("SUCCESS");
-                callbackResult.setReturn_msg("OK");
-            } else {
-                callbackResult.setReturn_code("FAIL");
-                callbackResult.setReturn_msg("UPDATE ORDER ERROR");
-            }
-        } else {
-            callbackResult.setReturn_code("FAIL");
-            callbackResult.setReturn_msg("ERROR");
+        if (param.isPayedSuccessfully() && !finishPayment(param)) {
+            return WechatpayCallbackResult.fail("fail to finish payment");
         }
 
-        return callbackResult;
+        return WechatpayCallbackResult.success();
+    }
+
+    private boolean finishPayment(CallbackParam param) {
+        try {
+            WechatpayCallbackParam wechatpayCallbackParam = (WechatpayCallbackParam) param;
+            orderService.pay(Long.valueOf(wechatpayCallbackParam.getOut_trade_no()));
+            // TODO log payment
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

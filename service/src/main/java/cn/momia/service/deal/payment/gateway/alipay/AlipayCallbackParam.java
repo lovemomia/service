@@ -11,6 +11,11 @@ import java.util.Map;
 
 public class AlipayCallbackParam extends MapWrappedParam implements CallbackParam {
     @Override
+    public boolean isPayedSuccessfully() {
+        return false;
+    }
+
+    @Override
     public String toString() {
         List<String> list = new ArrayList<String>();
         for (Map.Entry<String, String> entry : params.entrySet()) {
