@@ -1,7 +1,5 @@
 package cn.momia.service.base.user;
 
-import java.util.Date;
-
 public class User {
     public static final User NOT_EXIST_USER = new User();
     public static final User DUPLICATE_USER = new User() {
@@ -17,16 +15,14 @@ public class User {
 
     private long id;
     private String mobile;
-    private int types;
     private String name;
     private String desc;
     private String token;
     private int sex;
+    private String avatar;
     private String address;
     private String idCardNo;
     private String idCardPic;
-    private Date addTime;
-    private Date updateTime;
 
     public long getId() {
         return id;
@@ -42,14 +38,6 @@ public class User {
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
-    }
-
-    public int getTypes() {
-        return types;
-    }
-
-    public void setTypes(int types) {
-        this.types = types;
     }
 
     public String getName() {
@@ -84,6 +72,14 @@ public class User {
         this.sex = sex;
     }
 
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
     public String getAddress() {
         return address;
     }
@@ -106,22 +102,6 @@ public class User {
 
     public void setIdCardPic(String idCardPic) {
         this.idCardPic = idCardPic;
-    }
-
-    public Date getAddTime() {
-        return addTime;
-    }
-
-    public void setAddTime(Date addTime) {
-        this.addTime = addTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
     }
 
     @Override

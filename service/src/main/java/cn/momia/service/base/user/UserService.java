@@ -5,11 +5,11 @@ public interface UserService {
     User get(long id);
     User getByMobile(String mobile);
     User getByToken(String token);
-    boolean updateName(long userId, String name);
-    boolean updateDesc(long userId, String desc);
-    boolean updateSex(long userId, int sex);
-    boolean updateAvatar(long userId, String avatar);
-    boolean updateAddress(long userId, String address);
-    boolean updateIdCardNo(long userId, String idCardNo);
-    boolean updateIdCardPic(long userId, String idCardPic);
+    boolean updateName(long id, String name);
+    boolean updateDesc(long id, String desc);
+    boolean updateSex(long id, int sex);
+    boolean updateAvatar(long id, String avatar);
+    boolean updateAddress(long id, String address);
+    boolean updateIdCardNo(long id, String idCardNo);
+    boolean updateIdCardPic(long id, String idCardPic);
 }
