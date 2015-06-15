@@ -1,7 +1,9 @@
 package cn.momia.service.web.ctrl.deal;
 
+import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.deal.order.Order;
+import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.deal.payment.Payment;
 import cn.momia.service.deal.payment.PaymentService;
 import cn.momia.service.deal.payment.gateway.PaymentGateway;
@@ -24,6 +26,9 @@ public class PaymentController extends AbstractController {
     @Autowired
     private PaymentService paymentService;
 
+    @Autowired
+    private OrderService orderService;
+
     @RequestMapping(value = "/sign/alipay", method = RequestMethod.POST)
     public ResponseMessage signAlipay(HttpServletRequest request) {
         return new ResponseMessage(sign(request, Payment.Type.ALIPAY));
@@ -44,20 +49,24 @@ public class PaymentController extends AbstractController {
     @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)
     public ResponseMessage prepayWechatpay(HttpServletRequest request) {
         Order order = getOrder(request);
-        PrepayParam prepayParam = PrepayParamFactory.create(request.getParameterMap(), order, Payment.Type.WECHATPAY);
-        PaymentGateway gateway = PaymentGatewayFactory.create(Payment.Type.WECHATPAY);
+        PrepayParam prepayParam ;
+        PaymentGateway gateway;
+        if(order.exists()){
+            prepayParam = PrepayParamFactory.create(request.getParameterMap(), order, Payment.Type.WECHATPAY);
+            gateway = PaymentGatewayFactory.create(Payment.Type.WECHATPAY);
+        }else{
+            return new ResponseMessage(ErrorCode.NOT_FOUND,"错误信息：订单不存在...");
+        }
 
         return new ResponseMessage(gateway.prepay(prepayParam));
     }
 
     private Order getOrder(HttpServletRequest request) {
-        // TODO
-        return null;
+        return orderService.get(new Long(request.getParameter("orderid")));
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.POST)
     public ResponseMessage checkPayment() {
-        // TODO
         return new ResponseMessage("TODO");
     }
 }
