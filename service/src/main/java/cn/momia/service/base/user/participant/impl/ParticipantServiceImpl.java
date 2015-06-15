@@ -72,7 +72,7 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
     public Participant get(long id, long userId) {
         String sql = "SELECT id, userId, name, sex, birthday FROM t_user_participant WHERE id=? AND userId=? AND status=1";
 
-        return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Participant>() {
+        return jdbcTemplate.query(sql, new Object[] { id, userId }, new ResultSetExtractor<Participant>() {
             @Override
             public Participant extractData(ResultSet rs) throws SQLException, DataAccessException {
                 if (rs.next()) return buildParticipant(rs);
