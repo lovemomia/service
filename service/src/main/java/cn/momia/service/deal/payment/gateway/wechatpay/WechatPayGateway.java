@@ -2,6 +2,7 @@ package cn.momia.service.deal.payment.gateway.wechatpay;
 
 import cn.momia.common.encrypt.CommonUtil;
 import cn.momia.common.encrypt.XmlUtil;
+import cn.momia.service.deal.payment.Payment;
 import cn.momia.service.deal.payment.gateway.AbstractPaymentGateway;
 import cn.momia.service.deal.payment.gateway.CallbackParam;
 import cn.momia.service.deal.payment.gateway.CallbackResult;
@@ -16,6 +17,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import java.io.BufferedReader;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -91,12 +93,23 @@ public class WechatPayGateway extends AbstractPaymentGateway {
     private boolean finishPayment(CallbackParam param) {
         try {
             WechatpayCallbackParam wechatpayCallbackParam = (WechatpayCallbackParam) param;
-            orderService.pay(Long.valueOf(wechatpayCallbackParam.getOut_trade_no()));
-            // TODO log payment
+            boolean payed = orderService.pay(Long.valueOf(wechatpayCallbackParam.getOut_trade_no()));
+            long paymentId = paymentService.add(createPayment(wechatpayCallbackParam));
 
-            return true;
+            return payed && paymentId > 0;
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private Payment createPayment(WechatpayCallbackParam wechatpayCallbackParam) {
+        Payment payment = new Payment();
+        payment.setOrderId(Long.valueOf(wechatpayCallbackParam.getOut_trade_no()));
+        payment.setFinishTime(new Date());
+        payment.setPayType(Payment.Type.WECHATPAY);
+        payment.setTradeNo(wechatpayCallbackParam.getTransaction_id());
+        payment.setFee(Long.valueOf(wechatpayCallbackParam.getTotal_fee()) / 100.0F);
+
+        return payment;
     }
 }
