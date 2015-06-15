@@ -4,8 +4,6 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.*;
-
 /**
  * Created by ysm on 15-6-12.
  */
@@ -36,6 +34,5 @@ public class AbstractSmsSenderTest {
     public void testSend() throws Exception {
         DB();
         smsSender.send("333333");
-
     }
 }

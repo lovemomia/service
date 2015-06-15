@@ -1,14 +1,11 @@
 package cn.momia.service.base.comment.impl;
 
 import cn.momia.service.base.comment.Comment;
-import cn.momia.service.base.product.impl.ProductServiceImpl;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.testng.annotations.Test;
 
 import java.util.List;
-
-import static org.testng.Assert.*;
 
 /**
  * Created by ysm on 15-6-12.
@@ -37,16 +34,12 @@ public class CommentServiceImplTest {
         commentService.setJdbcTemplate(jdbcTemplate);
     }
 
-
-
     @Test
     public void testQueryByProduct() throws Exception {
         DB();
-       List<Comment> comments = commentService.queryByProduct(22, 0, 0, 2);
+        List<Comment> comments = commentService.queryByProduct(22, 0, 2);
         for(Comment comment : comments)
         System.out.println(comment.getContent());
-
-            System.out.println(comments==null);
-
+        System.out.println(comments==null);
     }
 }
