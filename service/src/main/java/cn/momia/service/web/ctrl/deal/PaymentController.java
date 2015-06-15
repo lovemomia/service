@@ -2,10 +2,11 @@ package cn.momia.service.web.ctrl.deal;
 
 import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.service.base.product.Product;
+import cn.momia.service.base.product.ProductService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.deal.payment.Payment;
-import cn.momia.service.deal.payment.PaymentService;
 import cn.momia.service.deal.payment.gateway.PaymentGateway;
 import cn.momia.service.deal.payment.gateway.PrepayParam;
 import cn.momia.service.deal.payment.gateway.factory.PaymentGatewayFactory;
@@ -22,29 +23,30 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/payment")
 public class PaymentController extends AbstractController {
     @Autowired
-    private PaymentService paymentService;
+    private ProductService productService;
 
     @Autowired
     private OrderService orderService;
 
     @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)
     public ResponseMessage prepayWechatpay(HttpServletRequest request) {
-        // TODO
+        Product product = getProduct(request);
         Order order = getOrder(request);
-        PrepayParam prepayParam;
-        PaymentGateway gateway;
-        if (order.exists()) {
-            prepayParam = PrepayParamFactory.create(request.getParameterMap(), order, Payment.Type.WECHATPAY);
-            gateway = PaymentGatewayFactory.create(Payment.Type.WECHATPAY);
-        } else {
-            return new ResponseMessage(ErrorCode.NOT_FOUND, "错误信息：订单不存在...");
-        }
+        if (!product.exists() || !order.exists()) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "product or(and) order does not exist");
+        if (!orderService.prepay(order.getId())) return new ResponseMessage(ErrorCode.FAILED, "no need to prepay");
+
+        PrepayParam prepayParam = PrepayParamFactory.create(request.getParameterMap(), product, order, Payment.Type.WECHATPAY);
+        PaymentGateway gateway = PaymentGatewayFactory.create(Payment.Type.WECHATPAY);
 
         return new ResponseMessage(gateway.prepay(prepayParam));
     }
 
+    private Product getProduct(HttpServletRequest request) {
+        return productService.get(Long.valueOf(request.getParameter("productid")));
+    }
+
     private Order getOrder(HttpServletRequest request) {
-        return orderService.get(new Long(request.getParameter("orderid")));
+        return orderService.get(Long.valueOf(request.getParameter("orderid")));
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.POST)

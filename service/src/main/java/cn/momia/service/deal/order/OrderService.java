@@ -7,5 +7,6 @@ public interface OrderService {
     Order get(long id);
     List<Order> queryByProduct(long productId, int start, int count);
     List<Integer> queryCustomerByProduct(long id, int start, int count);
+    boolean prepay(long id);
     boolean pay(long id);
 }

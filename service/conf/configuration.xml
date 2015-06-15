@@ -27,4 +27,13 @@
             </Oss>
         </Upload>
     </Image>
+
+    <Payment>
+        <Wechat>
+            <PrepayService>https://api.mch.weixin.qq.com/pay/unifiedorder</PrepayService>
+            <AppId></AppId>
+            <MchId></MchId>
+            <NotifyUrl></NotifyUrl>
+        </Wechat>
+    </Payment>
 </Configuration>

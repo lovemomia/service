@@ -3,7 +3,6 @@ package cn.momia.service.deal.payment.gateway.wechatpay;
 import cn.momia.service.deal.payment.gateway.PrepayResult;
 
 public class WechatpayPrepayResult implements PrepayResult {
-
     private String appid;
     private String mch_id;
     private String device_info;
