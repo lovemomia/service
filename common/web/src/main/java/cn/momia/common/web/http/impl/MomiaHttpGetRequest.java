@@ -5,6 +5,10 @@ import org.apache.http.client.methods.HttpGet;
 import java.util.Map;
 
 public class MomiaHttpGetRequest extends AbstractMomiaHttpRequest {
+    public MomiaHttpGetRequest(String uri) {
+        this("anonymous", true, uri, null);
+    }
+
     public MomiaHttpGetRequest(String uri, Map<String, String> params) {
         this("anonymous", true, uri, params);
     }
