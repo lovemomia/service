@@ -53,7 +53,8 @@
         <property name="conf" ref="conf" />
         <property name="jdbcTemplate" ref="jdbcTemplate" />
     </bean>
-    <bean id="uploader" class="cn.momia.service.image.upload.impl.OssImageUploaderImpl">
+
+    <bean id="uploader" class="cn.momia.service.image.upload.impl.OssImageUploaderImpl" init-method="init">
         <property name="conf" ref="conf" />
     </bean>
 </beans>
