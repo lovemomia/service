@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/feedback")
+@RequestMapping("/v1/feedback")
 public class FeedbackApi extends AbstractApi {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseMessage addFeedback(@RequestParam String content, @RequestParam String email, @RequestParam(required = false) String utoken) {

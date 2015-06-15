@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/v1/user")
 public class UserApi extends AbstractApi {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseMessage getUser(@PathVariable long id) {
