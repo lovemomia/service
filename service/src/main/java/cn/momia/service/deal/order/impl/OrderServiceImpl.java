@@ -97,6 +97,21 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
+    public List<Integer> queryCustomerByProduct(long id, int start, int count) {
+        final List<Integer> customers = new ArrayList<Integer>();
+
+        String sql = "SELECT customerId FROM t_order WHERE productId=? LIMIT ?,?";
+        jdbcTemplate.query(sql, new Object[] { id, start, count }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                customers.add(rs.getInt("customerId"));
+            }
+        });
+
+        return customers;
+    }
+
+    @Override
     public boolean pay(long id) {
         String sql = "UPDATE t_order SET status=? WHERE id=?";
         int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PAYED, id });
