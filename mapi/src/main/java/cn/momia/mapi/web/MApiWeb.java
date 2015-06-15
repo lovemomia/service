@@ -35,9 +35,9 @@ public class MApiWeb {
     private static int getServerPort(String[] args) {
         if (args.length > 1) {
             try {
-                return Integer.valueOf(args[1]);
+                return Integer.valueOf(args[0]);
             } catch (NumberFormatException e) {
-                LOGGER.error("invalid server port argument: {}", args[1]);
+                LOGGER.error("invalid server port argument: {}", args[0]);
             }
         }
 
