@@ -7,6 +7,10 @@ import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 public class MomiaHttpPutRequest extends AbstractMomiaHttpRequest {
+    public MomiaHttpPutRequest(String uri, Map<String, String> params) {
+        this("anonymous", true, uri, params);
+    }
+
     public MomiaHttpPutRequest(String name, boolean required, String uri, Map<String, String> params) {
         super(name, required, params);
 
