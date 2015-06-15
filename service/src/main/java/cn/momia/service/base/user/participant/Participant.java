@@ -11,15 +11,12 @@ public class Participant {
     static {
         NOT_EXIST_PARTICIPANT.setId(0);
     }
+
     private long id;
     private long userId;
     private String name;
     private int sex;
     private Date birthday;
-
-    public Participant() {
-
-    }
 
     public long getId() {
         return id;
@@ -61,14 +58,18 @@ public class Participant {
         this.birthday = birthday;
     }
 
-    public Participant(JSONObject jsonObject) throws ParseException {
+    public Participant() {
 
+    }
+
+    public Participant(JSONObject jsonObject) throws ParseException {
+        if (jsonObject.containsKey("id")) setId(jsonObject.getLong("id"));
+        setUserId(jsonObject.getLong("userId"));
         setName(jsonObject.getString("name"));
         setSex(jsonObject.getInteger("sex"));
-        SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = f.parse(jsonObject.getString("birthday"));
-        setBirthday(date);
+        setBirthday(new SimpleDateFormat("yyyy-MM-dd").parse(jsonObject.getString("birthday")));
     }
+
     public boolean exists() {
         return !this.equals(NOT_EXIST_PARTICIPANT);
     }

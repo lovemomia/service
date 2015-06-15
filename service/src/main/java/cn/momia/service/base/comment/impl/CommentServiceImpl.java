@@ -33,6 +33,7 @@ public class CommentServiceImpl extends DbAccessService implements CommentServic
                 ps.setLong(4, comment.getSkuId());
                 ps.setInt(5, comment.getStar());
                 ps.setString(6, comment.getContent());
+
                 return ps;
             }
         }, keyHolder);
