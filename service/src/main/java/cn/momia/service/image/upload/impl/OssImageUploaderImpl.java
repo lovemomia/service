@@ -60,7 +60,6 @@ public class OssImageUploaderImpl implements ImageUploader {
         // 可以在metadata中标记文件类型
         objectMeta.setContentType("image/jpeg");
 
-        // TODO successful/failed
         ossClient.putObject(bucketName, fileName, stream, objectMeta);
     }
 }
