@@ -1,5 +1,6 @@
 package cn.momia.service.base.comment;
 
+import cn.momia.service.base.product.Product;
 import com.alibaba.fastjson.JSONObject;
 
 import java.util.Date;
@@ -20,6 +21,7 @@ public class Comment {
     public static class Type {
         public static final int SKU = 0;
         public static final int SERVER = 1;
+        public static final int PRODUCT = 2;
     }
 
     public static class Star {
@@ -35,6 +37,7 @@ public class Comment {
     private long customerId;
     private long serverId;
     private long skuId;
+    private long productId;
     private int star;
     private String content;
 
@@ -68,6 +71,14 @@ public class Comment {
 
     public void setSkuId(long skuId) {
         this.skuId = skuId;
+    }
+
+    public long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(long productId) {
+        this.productId = productId;
     }
 
     public int getStar() {
@@ -105,8 +116,15 @@ public class Comment {
 
     }
 
-    public Comment(JSONObject jsonObject) {
+    public Comment(JSONObject jsonObject){
 
+     //   setId(jsonObject.getInteger("id"));
+        setCustomerId(jsonObject.getInteger("customerId"));
+        setServerId(jsonObject.getInteger("serverId"));
+        setSkuId(jsonObject.getInteger("skuId"));
+        setProductId(jsonObject.getInteger("productId"));
+        setStar(jsonObject.getInteger("star"));
+        setContent(jsonObject.getString("content"));
     }
 
     public boolean exists() {

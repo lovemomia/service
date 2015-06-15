@@ -1,6 +1,7 @@
 package cn.momia.service.deal.order.impl;
 
 import cn.momia.service.base.DbAccessService;
+import cn.momia.service.base.user.User;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
 import com.google.common.base.Splitter;
@@ -94,6 +95,36 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         });
 
         return orders;
+    }
+
+    public User buildUser(ResultSet rs) throws SQLException {
+        User user = new User();
+        user.setId(rs.getLong("id"));
+        user.setMobile(rs.getString("mobile"));
+        user.setTypes(rs.getInt("types"));
+        user.setName(rs.getString("name"));
+        user.setDesc(rs.getString("desc"));
+        user.setToken(rs.getString("token"));
+        user.setSex(rs.getInt("sex"));
+        user.setAddress(rs.getString("address"));
+        user.setIdCardNo(rs.getString("idCardNo"));
+        user.setIdCardPic(rs.getString("idCardPic"));
+        user.setAddTime(rs.getTimestamp("addTime"));
+        user.setUpdateTime(rs.getTimestamp("updateTime"));
+        return user;
+    }
+    @Override
+    public List<User> queryUserByProduct(long productId, int start, int count) {
+        String sql = "select id,mobile,types,name,`desc`,token,sex,address,idCardNo,idCardPic,addTime,updateTime from t_user where id in (" +
+                "select customerId from t_order where productId=?) limit ?,?";
+        final List<User> users = new ArrayList<User>();
+        jdbcTemplate.query(sql, new Object[]{ productId, start, count }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                users.add(buildUser(rs));
+            }
+        });
+        return users;
     }
 
     @Override

@@ -7,6 +7,8 @@ import cn.momia.service.base.user.UserService;
 import cn.momia.service.base.user.participant.Participant;
 import cn.momia.service.base.user.participant.ParticipantService;
 import cn.momia.service.web.ctrl.AbstractController;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -92,11 +94,15 @@ public class UserController extends AbstractController {
         return new ResponseMessage("update user id card pic successfully");
     }
 
-    @RequestMapping(value = "{id}/participant", method = RequestMethod.PUT)
-    public ResponseMessage addParticipant(@PathVariable long userId,@RequestParam Participant participant){
-        long successful = participantService.add(userId,participant);
-
-        return new ResponseMessage("add participant successfully");
+    @RequestMapping(value = "{id}/participant/add", method = RequestMethod.POST)
+    public ResponseMessage addParticipant(@PathVariable long id, @RequestParam String participantJson) throws ParseException {
+        JSONObject jsonObject = JSON.parseObject(participantJson);
+        Participant participant = new Participant(jsonObject);
+        long successful = participantService.add(id,participant);
+        if(successful != 0)
+           return new ResponseMessage(participant);
+        else
+        return new ResponseMessage(ErrorCode.FAILED, "add participant failed");
     }
 
     @RequestMapping(value = "/{id}/participant", method = RequestMethod.GET)
@@ -147,6 +153,13 @@ public class UserController extends AbstractController {
 
         if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update participant name");
         return new ResponseMessage("update participant name successfully");
+    }
+
+    @RequestMapping(value = "/{id}/participant/delete", method = RequestMethod.DELETE)
+    public ResponseMessage deleteParticipant(@RequestParam  long participantId){
+        boolean successful = participantService.delete(participantId);
+        if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to delete participant");
+        return new ResponseMessage("delete participant successfully");
     }
 
 }

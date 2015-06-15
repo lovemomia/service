@@ -22,18 +22,29 @@ public class ValidationFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-        if (isParamMissing(httpRequest))
+    /*    if (isParamMissing(httpRequest))
         {
             forwardErrorPage(request, response, 400);
             return;
         }
 
+<<<<<<< HEAD:mapi/src/main/java/cn/momia/mapi/web/filter/ValidationFilter.java
         if (isInvalidProtocol(httpRequest) || isInvalidSign(httpRequest))
+=======
+        */
+        if (isInvalidProtocol(httpRequest) )
         {
             forwardErrorPage(request, response, 403);
             return;
         }
-
+/*
+        if (isInvalidProtocol(httpRequest) || isExpired(httpRequest) || isInvalidSign(httpRequest))
+>>>>>>> ProductController is completed:service/src/main/java/cn/momia/service/web/filter/ValidationFilter.java
+        {
+            forwardErrorPage(request, response, 403);
+            return;
+        }
+*/
         chain.doFilter(request, response);
     }
 

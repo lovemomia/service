@@ -19,23 +19,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommentServiceImpl extends DbAccessService implements CommentService {
-    public long addComment(final Comment comment) {
+    public long addComment(final Comment comment, final long productId, final long skuId) {
         final long customerId = comment.getCustomerId();
         final long serverId = comment.getServerId();
-        final long skuId = comment.getSkuId();
         final int star = comment.getStar();
         final String content = comment.getContent();
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO t_comment(customerId,  serverId, skuId, star, content, addTime) VALUES (?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO t_comment(customerId,  serverId, skuId, productId, star, content, addTime) VALUES (?, ?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setLong(1, customerId);
                 ps.setLong(2, serverId);
                 ps.setLong(3, skuId);
-                ps.setInt(4, star);
-                ps.setString(5, content);
+                ps.setLong(4, productId);
+                ps.setInt(5, star);
+                ps.setString(6, content);
                 return ps;
             }
         }, keyHolder);
@@ -44,8 +44,8 @@ public class CommentServiceImpl extends DbAccessService implements CommentServic
     }
 
     @Override
-    public long add(Comment comment) {
-        return addComment(comment);
+    public long add(Comment comment,long productId,long skuId) {
+        return addComment(comment,productId,skuId);
     }
 
     public Comment buildComment(ResultSet resultSet) throws SQLException {
@@ -54,6 +54,7 @@ public class CommentServiceImpl extends DbAccessService implements CommentServic
         comment.setCustomerId(resultSet.getLong("customerId"));
         comment.setServerId(resultSet.getLong("serverId"));
         comment.setSkuId(resultSet.getLong("skuId"));
+        comment.setProductId(resultSet.getLong("productId"));
         comment.setStar(resultSet.getInt("star"));
         comment.setContent(resultSet.getString("content"));
         return comment;
@@ -61,7 +62,7 @@ public class CommentServiceImpl extends DbAccessService implements CommentServic
 
     @Override
     public Comment get(long id) {
-        String sql = "select id, customerId, serverId, skuId, star, content from t_comment where id=? and status=1";
+        String sql = "select id, customerId, serverId, skuId, productId, star, content from t_comment where id=? and status=1";
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Comment>() {
             @Override
             public Comment extractData(ResultSet resultSet) throws SQLException, DataAccessException {
@@ -75,16 +76,17 @@ public class CommentServiceImpl extends DbAccessService implements CommentServic
         String name = "";
         String sql = "";
         Object[] objects;
-        if (TYPE == 0)
-            name = "skuId";
-        else
-            name = "serverId";
+        switch (TYPE){
+            case 0: name = "skuId";
+            case 1: name = "serverId";
+            case 2: name = "productId";
+        }
         while (start >= 0 && count > 0) {
             if (star == 0) {
-                sql = "select id, customerId, serverId, skuId, star,content from t_comment where " + name + "=? and status=1 limit ?,?";
+                sql = "select id, customerId, serverId, skuId, productId, star,content from t_comment where " + name + "=? and status=1 limit ?,?";
                 objects = new Object[] { id, start, count };
             } else {
-                sql = "select id, customerId, serverId, skuId, star,content from t_comment where " + name + "=? and star=? and status=1 limit ?,?";
+                sql = "select id, customerId, serverId, skuId, productId, star,content from t_comment where " + name + "=? and star=? and status=1 limit ?,?";
                 objects = new Object[] { id, star, start, count };
             }
             final List<Comment> comments = new ArrayList<Comment>();
@@ -109,5 +111,11 @@ public class CommentServiceImpl extends DbAccessService implements CommentServic
     public List<Comment> queryByServer(long serverId, int star, int start, int count) {
         int TYPE = Comment.Type.SERVER;
         return queryByPage(TYPE, serverId, star, start, count);
+    }
+
+    @Override
+    public List<Comment> queryByProduct(long productId, int star, int start, int count) {
+        int TYPE = Comment.Type.PRODUCT;
+        return queryByPage(TYPE, productId, star, start, count);
     }
 }

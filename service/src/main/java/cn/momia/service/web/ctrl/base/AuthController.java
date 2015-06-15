@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController extends AbstractController {
@@ -29,7 +31,7 @@ public class AuthController extends AbstractController {
     private UserService userService;
 
     @RequestMapping(value = "/send", method = RequestMethod.POST)
-    public ResponseMessage send(@RequestParam String mobile) {
+    public ResponseMessage send(@RequestParam String mobile) throws ParseException {
         boolean successful = smsSender.send(mobile);
 
         if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to send verify code");
