@@ -4,9 +4,12 @@ import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.http.impl.MomiaHttpGetRequest;
+import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,6 +22,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/product")
 public class ProductApi extends AbstractApi {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProductApi.class);
+
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getProducts(@RequestParam int start, @RequestParam int count, @RequestParam(value = "query") String queryJson) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
@@ -38,9 +43,10 @@ public class ProductApi extends AbstractApi {
             @Override
             public JSONObject apply(MomiaHttpResponseCollector collector) {
                 JSONObject productObject = new JSONObject();
-                productObject.put("product", collector.getResponse("product"));
+
+                JSONObject product = collector.getResponse("product");
+                productObject.put("product", product);
                 productObject.put("skus", collector.getResponse("skus"));
-                productObject.put("place", collector.getResponse("place"));
                 productObject.put("server", collector.getResponse("server"));
 
                 JSONObject comments = collector.getResponse("comments");
@@ -48,6 +54,16 @@ public class ProductApi extends AbstractApi {
 
                 JSONObject customers = collector.getResponse("customers");
                 if (customers != null) productObject.put("customers", customers);
+
+                Long placeId = product.getJSONObject("content").getLong("placeId");
+                if (placeId != null) {
+                    ResponseMessage placeResponse = executeRequest(new MomiaHttpGetRequest(baseServiceUrl("place", placeId)));
+                    if (placeResponse.getErrno() == ErrorCode.SUCCESS) {
+                        productObject.put("place", placeResponse.getData());
+                    } else {
+                        LOGGER.error("fail to get place of product: {}", product.getInteger("id"));
+                    }
+                }
 
                 return productObject;
             }
@@ -58,7 +74,6 @@ public class ProductApi extends AbstractApi {
         List<MomiaHttpRequest> requests = new ArrayList<MomiaHttpRequest>();
         requests.add(buildProductInfoRequest(productId));
         requests.add(buildProductSkusRequest(productId));
-        requests.add(buildProductPlaceRequest(productId));
         requests.add(buildProductCommentsRequest(productId));
         requests.add(buildProductServerRequest(productId));
         requests.add(buildProductCustomersRequest(productId));
@@ -72,10 +87,6 @@ public class ProductApi extends AbstractApi {
 
     private MomiaHttpRequest buildProductSkusRequest(long productId) {
         return new MomiaHttpGetRequest("skus", true, baseServiceUrl("product", productId, "sku"));
-    }
-
-    private MomiaHttpRequest buildProductPlaceRequest(long productId) {
-        return new MomiaHttpGetRequest("place", true, baseServiceUrl("product", productId, "place"));
     }
 
     private MomiaHttpRequest buildProductCommentsRequest(long productId) {

@@ -56,12 +56,6 @@ public class ProductController extends AbstractController {
         return new ResponseMessage(skus);
     }
 
-    @RequestMapping(value = "/{id}/place", method = RequestMethod.GET)
-    public ResponseMessage getProductPlace(@PathVariable long id) {
-        // TODO
-        return new ResponseMessage("TODO");
-    }
-
     @RequestMapping(value = "/{id}/comment", method = RequestMethod.GET)
     public ResponseMessage getProductComments(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
         List<Comment> comments = commentService.queryByProduct(id, start, count);
