@@ -42,7 +42,7 @@ public class CommentServiceImpl extends DbAccessService implements CommentServic
 
     @Override
     public Comment get(long id) {
-        String sql = "select id, customerId, serverId, productId, skuId, star, content from t_comment where id=? and status=1";
+        String sql = "SELECT id, customerId, serverId, productId, skuId, star, content FROM t_comment WHERE id=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Comment>() {
             @Override
@@ -70,7 +70,7 @@ public class CommentServiceImpl extends DbAccessService implements CommentServic
     public List<Comment> queryByProduct(long productId, int start, int count) {
         final List<Comment> comments = new ArrayList<Comment>();
 
-        String sql = "select id, customerId, serverId, productId, skuId, star,content from t_comment where productId=? and status=1 limit ?,?";
+        String sql = "SELECT id, customerId, serverId, productId, skuId, star,content FROM t_comment WHERE productId=? AND status=1 LIMIT ?,?";
         jdbcTemplate.query(sql, new Object[] { productId, start, count }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
