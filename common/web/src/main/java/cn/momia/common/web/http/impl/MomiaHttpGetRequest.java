@@ -13,6 +13,10 @@ public class MomiaHttpGetRequest extends AbstractMomiaHttpRequest {
         this("anonymous", true, uri, params);
     }
 
+    public MomiaHttpGetRequest(String name, boolean required, String uri) {
+        this(name, required, uri, null);
+    }
+
     public MomiaHttpGetRequest(String name, boolean required, String uri, Map<String, String> params) {
         super(name, required, params);
 
