@@ -8,7 +8,6 @@ import cn.momia.service.deal.payment.gateway.CallbackResult;
 import cn.momia.service.deal.payment.gateway.PaymentGateway;
 import cn.momia.service.deal.payment.gateway.PrepayParam;
 import cn.momia.service.deal.payment.gateway.PrepayResult;
-import cn.momia.service.deal.payment.gateway.SignParam;
 import cn.momia.common.error.SDKRuntimeException;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -28,12 +27,6 @@ public class WechatPayGateway implements PaymentGateway {
 
     @Autowired
     private OrderService orderService;
-
-    @Override
-    public String sign(SignParam param) {
-        return null;
-    }
-
 
     @Override
     public PrepayResult prepay(PrepayParam param) {
@@ -62,10 +55,10 @@ public class WechatPayGateway implements PaymentGateway {
         return callbackResult;
     }
 
-    public WechatPrepayResult httpClientPostXml(String url,WechatpayPrepayParam payParam){
+    public WechatpayPrepayResult httpClientPostXml(String url,WechatpayPrepayParam payParam){
         BufferedReader in = null;
         HttpClient client = null;
-        WechatPrepayResult prepayResult = null;
+        WechatpayPrepayResult prepayResult = null;
         Integer statusCode = -1;
         if(!url.equals("")){
             if (client == null) {
@@ -90,7 +83,7 @@ public class WechatPayGateway implements PaymentGateway {
                     if(return_code.equals("SUCCESS")){
                         String result_code = m.get("result_code").toString();
                         if(result_code.equals("SUCCESS")){
-                            prepayResult = new WechatPrepayResult();
+                            prepayResult = new WechatpayPrepayResult();
                             prepayResult.setAppid(m.get("appid").toString());
                             prepayResult.setMch_id(m.get("mch_id").toString());
                             prepayResult.setDevice_info(m.get("device_info").toString());
