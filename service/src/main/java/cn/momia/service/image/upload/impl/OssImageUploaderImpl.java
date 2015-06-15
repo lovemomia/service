@@ -4,13 +4,7 @@ import cn.momia.common.config.Configuration;
 import cn.momia.service.image.upload.Image;
 import cn.momia.service.image.upload.ImageUploadResult;
 import cn.momia.service.image.upload.ImageUploader;
-import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSSClient;
-import com.aliyun.oss.OSSErrorCode;
-import com.aliyun.oss.OSSException;
-import com.aliyun.oss.ServiceException;
-import com.aliyun.oss.model.CannedAccessControlList;
-import com.aliyun.oss.model.GetObjectRequest;
 import com.aliyun.oss.model.ObjectMetadata;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
@@ -18,100 +12,55 @@ import org.apache.commons.io.IOUtils;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 public class OssImageUploaderImpl implements ImageUploader {
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private OSSClient ossClient;
+    private String bucketName;
+
     private Configuration conf;
 
     public void setConf(Configuration conf) {
         this.conf = conf;
     }
 
+    public void init() {
+        String AccessId = conf.getString("Oss.AccessId");
+        String AccessKey = conf.getString("Oss.AccessKey");
+        String EndPoint = conf.getString("Oss.EndPoint");
+        ossClient = new OSSClient(EndPoint, AccessId, AccessKey);
+
+        bucketName = conf.getString("Oss.BucketName");
+        if (!ossClient.doesBucketExist(bucketName)) {
+            throw new RuntimeException("bucket: " + bucketName + " does not exist");
+        }
+    }
 
     public ImageUploadResult upload(Image image) throws IOException {
-        String ACCESS_ID = conf.getString("OSS.AccessId");
-        String ACCESS_KEY = conf.getString("OSS.AccessKey");
-        String ENDPOINT = conf.getString("OSS.EndPoint");
-
-        String bucketName = ACCESS_ID.toLowerCase() + conf.getString("BuildBucketName");//唯一的bucketName
-        ImageUploadResult result = new ImageUploadResult();//返回结果
         byte[] imageBytes = IOUtils.toByteArray(image.getFileStream());
-        int length = imageBytes.length;//文件的长度
 
-        //因为文件流指针在末尾，所以当上传时再次读取这个流对象 fileInputStream的时候文件没有读取到内容所以再次获取文件流
-        ByteArrayInputStream imageStream = new ByteArrayInputStream(imageBytes);
+        String fileName = DigestUtils.md5Hex(imageBytes) + ".jpg"; //上传到OSS的文件名
+        uploadFile(fileName, new ByteArrayInputStream(imageBytes), imageBytes.length);
 
-        String key = DigestUtils.md5Hex(imageBytes) + ".jpg";//上传到OSS的文件名
-
-        // 使用默认的OSS服务器地址创建OSSClient对象。
-        OSSClient client = new OSSClient(ENDPOINT, ACCESS_ID, ACCESS_KEY);
-
-
-        ensureBucket(client, bucketName);
-
-        setBucketPublicReadable(client, bucketName);
-        uploadFile(client, bucketName, key, imageStream, length);
-
+        ImageUploadResult result = new ImageUploadResult(); //返回结果
+        result.setPath(fileName);
 
         BufferedImage savedImage = ImageIO.read(new ByteArrayInputStream(imageBytes));
-
-        result.setPath(key);
         result.setWidth(savedImage.getWidth());
         result.setHeight(savedImage.getHeight());
 
         return result;
     }
 
-    // 创建Bucket.
-    private static void ensureBucket(OSSClient client, String bucketName)
-            throws OSSException, ClientException {
-
-        try {
-            // 创建bucket
-            client.createBucket(bucketName);
-        } catch (ServiceException e) {
-            if (!OSSErrorCode.BUCKET_ALREADY_EXISTS.equals(e.getErrorCode())) {
-                // 如果Bucket已经存在，则忽略
-                throw e;
-            }
-        }
-    }
-
-
-    // 把Bucket设置为所有人可读
-    private static void setBucketPublicReadable(OSSClient client, String bucketName)
-            throws OSSException, ClientException {
-        //创建bucket
-        client.createBucket(bucketName);
-
-        //设置bucket的访问权限，public-read-write权限
-        client.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
-    }
-
     // 上传文件
-    private static void uploadFile(OSSClient client, String bucketName, String key, InputStream imageStream, int length)
-            throws OSSException, ClientException, IOException {
-
+    private void uploadFile(String fileName, InputStream stream, int length) {
         ObjectMetadata objectMeta = new ObjectMetadata();
-        // System.out.println(length);
         objectMeta.setContentLength(length);
-
         // 可以在metadata中标记文件类型
-        objectMeta.setContentType("upload/jpeg");
+        objectMeta.setContentType("image/jpeg");
 
-        //   InputStream input = upload.getFileStream();
-        client.putObject(bucketName, key, imageStream, objectMeta);
-    }
-
-    // 下载文件
-    private static void downloadFile(OSSClient client, String bucketName, String key, String filename)
-            throws OSSException, ClientException {
-        client.getObject(new GetObjectRequest(bucketName, key),
-                new File(filename));
+        // TODO successful/failed
+        ossClient.putObject(bucketName, fileName, stream, objectMeta);
     }
 }
