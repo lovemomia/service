@@ -41,10 +41,10 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
     }
 
     @Override
-    public boolean updateName(final long id, final String name) {
-        String sql = "UPDATE t_user_participant SET name=? WHERE id=?";
+    public boolean updateName(long id, long userId, String name) {
+        String sql = "UPDATE t_user_participant SET name=? WHERE id=? AND userId=?";
 
-        return update(sql, new Object[] { name, id });
+        return update(sql, new Object[] { name, id, userId });
     }
 
     public boolean update(String sql, Object[] args) {
@@ -55,22 +55,22 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
     }
 
     @Override
-    public boolean updateSex(long id, int sex) {
-        String sql = "UPDATE t_user_participant SET sex=? WHERE id=?";
+    public boolean updateSex(long id, long userId, int sex) {
+        String sql = "UPDATE t_user_participant SET sex=? WHERE id=? AND userId=?";
 
-        return update(sql, new Object[] { sex, id });
+        return update(sql, new Object[] { sex, id, userId });
     }
 
     @Override
-    public boolean updateBirthday(long id, Date birthday) {
-        String sql = "UPDATE t_user_participant SET birthday=? WHERE id=?";
+    public boolean updateBirthday(long id, long userId, Date birthday) {
+        String sql = "UPDATE t_user_participant SET birthday=? WHERE id=? AND userId=?";
 
-        return update(sql, new Object[] { birthday, id });
+        return update(sql, new Object[] { birthday, id, userId });
     }
 
     @Override
-    public Participant get(long id) {
-        String sql = "SELECT id, userId, name, sex, birthday FROM t_user_participant WHERE id=? AND status=1";
+    public Participant get(long id, long userId) {
+        String sql = "SELECT id, userId, name, sex, birthday FROM t_user_participant WHERE id=? AND userId=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Participant>() {
             @Override
@@ -93,9 +93,9 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
     }
 
     @Override
-    public boolean delete(long id) {
-        String sql = "UPDATE t_user_participant SET status=0 WHERE id=?";
-        int affectedRowCount = jdbcTemplate.update(sql, new Object[] { id });
+    public boolean delete(long id, long userId) {
+        String sql = "UPDATE t_user_participant SET status=0 WHERE id=? AND userId=?";
+        int affectedRowCount = jdbcTemplate.update(sql, new Object[] { id, userId });
         if (affectedRowCount != 1) return false;
 
         return true;
