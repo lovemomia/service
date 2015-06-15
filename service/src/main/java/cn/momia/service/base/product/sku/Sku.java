@@ -1,42 +1,22 @@
 package cn.momia.service.base.product.sku;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Sku {
     public static final Sku NOT_EXIST_SKU = new Sku();
-
     static {
         NOT_EXIST_SKU.setId(0);
     }
 
     private long id;
     private long productId;
-    private String propertyValues;
     private float price;
     private int stock;
     private int lockedStock;
     private int unlockedStock;
     private List<Pair<SkuProperty, SkuPropertyValue>> properties;
-
-    public Sku() {
-
-    }
-
-    public Sku(JSONObject jsonObject) {
-        setId(jsonObject.getInteger("id"));
-        setPrice(jsonObject.getFloat("price"));
-        setStock(jsonObject.getInteger("stock"));
-        // TODO sku values
-        setProductId(jsonObject.getInteger("productId"));
-        setPropertyValues(jsonObject.getString("propertyValues"));
-        setLockedStock(jsonObject.getInteger("lockedStock"));
-        setUnlockedStock(jsonObject.getInteger("unlockedStock"));
-    }
 
     public long getId() {
         return id;
@@ -52,14 +32,6 @@ public class Sku {
 
     public void setProductId(long productId) {
         this.productId = productId;
-    }
-
-    public String getPropertyValues() {
-        return propertyValues;
-    }
-
-    public void setPropertyValues(String propertyValues) {
-        this.propertyValues = propertyValues;
     }
 
     public float getPrice() {

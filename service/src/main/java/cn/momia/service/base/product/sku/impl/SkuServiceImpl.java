@@ -1,146 +1,118 @@
 package cn.momia.service.base.product.sku.impl;
 
 import cn.momia.service.base.DbAccessService;
-import cn.momia.service.base.product.Product;
 import cn.momia.service.base.product.sku.Sku;
+import cn.momia.service.base.product.sku.SkuProperty;
+import cn.momia.service.base.product.sku.SkuPropertyValue;
 import cn.momia.service.base.product.sku.SkuService;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Splitter;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.ResultSetExtractor;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SkuServiceImpl extends DbAccessService implements SkuService {
-    @Override
-    public long add(Sku sku) {
-        long productId = addProduct(sku);
-        addProductImages(sku);
-        return addSku(sku);
+    private Map<Long, SkuProperty> skuPropertyCache = new HashMap<Long, SkuProperty>();
+
+    public void init() {
+        String sql = "SELECT id, categoryId, name FROM t_sku_property WHERE status=1";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                SkuProperty property = buildProperty(rs);
+                skuPropertyCache.put(property.getId(), property);
+            }
+        });
     }
 
-    @Override
-    public boolean update(Sku sku) {
-        return false;
-    }
+    private SkuProperty buildProperty(ResultSet rs) throws SQLException {
+        SkuProperty property = new SkuProperty();
+        property.setId(rs.getLong("id"));
+        property.setCategoryId(rs.getInt("categoryId"));
+        property.setName(rs.getString("name"));
 
-    private void addProductImages(Sku sku) {
-    }
-
-    private long addProduct(final Sku sku) {
-        return 0;
-    }
-
-    private long addSku(Sku sku) {
-        return 0;
-    }
-
-    @Override
-    public Sku get(final long id) {
-        JSONObject skuObject = new JSONObject();
-
-        long productId = querySkuAndProductId(id, skuObject);
-        if (productId == 0) return Sku.NOT_EXIST_SKU.NOT_EXIST_SKU;
-
-        JSONObject productObject = queryProduct(productId);
-        if (productObject == null) return Sku.NOT_EXIST_SKU;
-
-        productObject.put("imgs", queryProductImgs(productId));
-        skuObject.put("product", productObject);
-
-        return new Sku(skuObject);
+        return property;
     }
 
     @Override
     public List<Sku> queryByProduct(long productId) {
-        return null;
-    }
+        final List<Sku> skus = new ArrayList<Sku>();
+        final List<String> skuPropertyValuesList = new ArrayList<String>();
 
-    private long querySkuAndProductId(long id, final JSONObject skuObject) {
-        String skuSql = "SELECT id, productId, propertyValues, price, stock FROM t_sku WHERE id=? AND status=1";
-
-        return jdbcTemplate.query(skuSql, new Object[] { id }, new ResultSetExtractor<Long>() {
-            @Override
-            public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
-                if (!rs.next()) return 0L;
-
-                skuObject.put("id", rs.getLong("id"));
-                Iterable<String> values = Splitter.on(",").omitEmptyStrings().trimResults().split(rs.getString("propertyValues"));
-                JSONArray propertyValues = new JSONArray();
-                for (String value : values) {
-                    propertyValues.add(Long.valueOf(value));
-                }
-                skuObject.put("propertyValues", propertyValues);
-                skuObject.put("price", rs.getFloat("price"));
-                skuObject.put("stock", rs.getInt("stock"));
-
-                return rs.getLong("productId");
-            }
-        });
-    }
-
-    private JSONObject queryProduct(long productId) {
-        String productSql = "SELECT id, category, userId, title, content, sales FROM t_product WHERE id=? AND status=1";
-
-        return jdbcTemplate.query(productSql, new Object[] { productId }, new ResultSetExtractor<JSONObject>() {
-            @Override
-            public JSONObject extractData(ResultSet rs) throws SQLException, DataAccessException {
-                if (!rs.next()) return null;
-
-                JSONObject productObject = JSONObject.parseObject(rs.getString("content"));
-                if (productObject == null) productObject = new JSONObject();
-                productObject.put("id", rs.getLong("id"));
-                productObject.put("category", rs.getInt("category"));
-                productObject.put("userId", rs.getLong("userId"));
-                productObject.put("title", rs.getString("title"));
-                productObject.put("sales", rs.getInt("sales"));
-
-                return productObject;
-            }
-        });
-    }
-
-    private JSONArray queryProductImgs(long productId) {
-        final JSONArray imgs = new JSONArray();
-
-        String imgSql = "SELECT url, width, height FROM t_product_img WHERE productId=? AND status=1";
-        jdbcTemplate.query(imgSql, new Object[] { productId }, new RowCallbackHandler() {
+        String sql = "SELECT id, productId, propertyValues, price, stock, unlockedStock, lockedStock FROM t_sku WHERE productId=? AND status=1";
+        jdbcTemplate.query(sql, new Object[] { productId }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
-                JSONObject image = new JSONObject();
-                image.put("url", rs.getString("url"));
-                image.put("width", rs.getInt("width"));
-                image.put("height", rs.getInt("height"));
-
-                imgs.add(image);
+                skus.add(buildSku(rs));
+                skuPropertyValuesList.add(rs.getString("propertyValues"));
             }
         });
 
-        return imgs;
+        for (int i = 0; i < skus.size(); i++) {
+            skus.get(i).setProperties(getSkuProperties(skuPropertyValuesList.get(i)));
+        }
+
+        return skus;
+    }
+
+    private Sku buildSku(ResultSet rs) throws SQLException {
+        Sku sku = new Sku();
+        sku.setId(rs.getLong("id"));
+        sku.setProductId(rs.getLong("productId"));
+        sku.setPrice(rs.getFloat("price"));
+        sku.setStock(rs.getInt("stock"));
+        sku.setUnlockedStock(rs.getInt("unlockedStock"));
+        sku.setLockedStock(rs.getInt("lockedStock"));
+
+        return sku;
+    }
+
+    private List<Pair<SkuProperty, SkuPropertyValue>> getSkuProperties(String skuPropertyValues) {
+        final List<Pair<SkuProperty, SkuPropertyValue>> properties = new ArrayList<Pair<SkuProperty, SkuPropertyValue>>();
+
+        for (String value : Splitter.on(",").trimResults().omitEmptyStrings().split(skuPropertyValues)) {
+            String sql = "SELECT id, propertyId, value FROM t_sku_property_value WHERE id=? AND status=1";
+            jdbcTemplate.query(sql, new Object[] { Long.valueOf(value) }, new RowCallbackHandler() {
+                @Override
+                public void processRow(ResultSet rs) throws SQLException {
+                    SkuPropertyValue propertyValue = buildPropertyValue(rs);
+                    SkuProperty property = skuPropertyCache.get(propertyValue.getPropertyId());
+                    if (property == null) return;
+                    properties.add(new MutablePair<SkuProperty, SkuPropertyValue>(property, propertyValue));
+                }
+            });
+        }
+
+        return properties;
+    }
+
+    private SkuPropertyValue buildPropertyValue(ResultSet rs) throws SQLException {
+        SkuPropertyValue propertyValue = new SkuPropertyValue();
+        propertyValue.setId(rs.getLong("id"));
+        propertyValue.setPropertyId(rs.getLong("propertyId"));
+        propertyValue.setValue(rs.getString("value"));
+
+        return propertyValue;
     }
 
     @Override
-    public boolean lock(long skuId, int count) {
-        String sql = "UPDATE t_sku SET unlockedStock=unlockedStock-?, lockedStock=lockedStock+? WHERE skuId=? AND unlockedStock>=?";
-        int updateCount = jdbcTemplate.update(sql, new Object[] { count, count, skuId, count });
+    public boolean lock(long id, int count) {
+        String sql = "UPDATE t_sku SET unlockedStock=unlockedStock-?, lockedStock=lockedStock+? WHERE skuId=? AND unlockedStock>=? AND status=1";
+        int updateCount = jdbcTemplate.update(sql, new Object[] { count, count, id, count });
 
         return updateCount > 0;
     }
 
     @Override
-    public boolean unlock(long skuId, int count) {
-        String sql = "UPDATE t_sku SET unlockedStock=unlockedStock+?, lockedStock=lockedStock-? WHERE skuId=? AND lockedStock>=?";
-        int updateCount = jdbcTemplate.update(sql, new Object[] { count, count, skuId, count });
+    public boolean unlock(long id, int count) {
+        String sql = "UPDATE t_sku SET unlockedStock=unlockedStock+?, lockedStock=lockedStock-? WHERE skuId=? AND lockedStock>=? AND status=1";
+        int updateCount = jdbcTemplate.update(sql, new Object[] { count, count, id, count });
 
         return updateCount > 0;
     }
