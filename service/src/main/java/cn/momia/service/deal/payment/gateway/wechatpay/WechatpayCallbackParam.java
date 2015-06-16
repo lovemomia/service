@@ -142,4 +142,9 @@ public class WechatpayCallbackParam extends MapWrappedParam implements CallbackP
     public void setReturn_msg(String return_msg) {
         this.return_msg = return_msg;
     }
+
+    @Override
+    public boolean isPayedSuccessfully() {
+        return "SUCCESS".equalsIgnoreCase(result_code);
+    }
 }

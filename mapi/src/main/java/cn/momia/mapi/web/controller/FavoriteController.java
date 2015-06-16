@@ -13,4 +13,14 @@ public class FavoriteController extends AbstractController {
     public String addFavorite(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    public String deleteFavorite(HttpServletRequest request) {
+        return forward(request, request.getRequestURI());
+    }
+
+    @RequestMapping(method = RequestMethod.GET)
+    public String getFavoritesOfUser(HttpServletRequest request) {
+        return forward(request, request.getRequestURI());
+    }
 }

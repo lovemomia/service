@@ -6,11 +6,15 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class AlipayCallbackParam extends MapWrappedParam implements CallbackParam {
+    @Override
+    public boolean isPayedSuccessfully() {
+        return false;
+    }
+
     @Override
     public String toString() {
         List<String> list = new ArrayList<String>();

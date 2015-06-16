@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.ParseException;
-
 @RestController
 @RequestMapping("/auth")
 public class AuthController extends AbstractController {
@@ -31,7 +29,7 @@ public class AuthController extends AbstractController {
     private UserService userService;
 
     @RequestMapping(value = "/send", method = RequestMethod.POST)
-    public ResponseMessage send(@RequestParam String mobile) throws ParseException {
+    public ResponseMessage send(@RequestParam String mobile) {
         boolean successful = smsSender.send(mobile);
 
         if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to send verify code");
@@ -39,7 +37,7 @@ public class AuthController extends AbstractController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseMessage login(@RequestParam String mobile, @RequestParam String verifyCode) {
+    public ResponseMessage login(@RequestParam String mobile, @RequestParam(value = "code") String verifyCode) {
         if (StringUtils.isBlank(mobile) || StringUtils.isBlank(verifyCode))
             return new ResponseMessage(ErrorCode.BAD_REQUEST, "mobile or(and) verify code is empty");
 

@@ -14,8 +14,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 
 public class UserServiceImpl extends DbAccessService implements UserService {
+    @Override
+    public User add(final String mobile, final String token) {
+        if (!validateMobile(mobile)) return User.DUPLICATE_USER;
+
+        return addUser(mobile, token);
+    }
 
     public boolean validateMobile(String mobile) {
         String sql = "SELECT COUNT(1) FROM t_user WHERE mobile=?";
@@ -26,14 +33,8 @@ public class UserServiceImpl extends DbAccessService implements UserService {
                 return 0;
             }
         });
+
         return count == 0;
-    }
-
-    @Override
-    public User add(final String mobile, final String token) {
-        if (!validateMobile(mobile)) return User.DUPLICATE_USER;
-
-        return addUser(mobile, token);
     }
 
     public User addUser(final String mobile, final String token) {
@@ -41,10 +42,11 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO t_user(mobile,  token, addTime) VALUES (?, ?, NOW())";
+                String sql = "INSERT INTO t_user(mobile, token, addTime) VALUES (?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, mobile);
                 ps.setString(2, token);
+
                 return ps;
             }
         }, keyHolder);
@@ -54,7 +56,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public User get(long id) {
-        String sql = "select id,mobile,types,name,`desc`,token,sex,address,idCardNo,idCardPic,addTime,updateTime from t_user where id=? AND status=1";
+        String sql = "SELECT id, token, mobile, avatar, name, sex, birthday, cityId, address FROM t_user WHERE id=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<User>() {
             @Override
@@ -65,26 +67,37 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         });
     }
 
-    public User buildUser(ResultSet rs) throws SQLException {
+    private User buildUser(ResultSet rs) throws SQLException {
         User user = new User();
         user.setId(rs.getLong("id"));
-        user.setMobile(rs.getString("mobile"));
-        user.setTypes(rs.getInt("types"));
-        user.setName(rs.getString("name"));
-        user.setDesc(rs.getString("desc"));
         user.setToken(rs.getString("token"));
+        user.setMobile(rs.getString("mobile"));
+        user.setAvatar(rs.getString("avatar"));
+        user.setName(rs.getString("name"));
         user.setSex(rs.getInt("sex"));
+        user.setBirthday(rs.getDate("birthday"));
+        user.setCityId(rs.getInt("cityId"));
         user.setAddress(rs.getString("address"));
-        user.setIdCardNo(rs.getString("idCardNo"));
-        user.setIdCardPic(rs.getString("idCardPic"));
-        user.setAddTime(rs.getTimestamp("addTime"));
-        user.setUpdateTime(rs.getTimestamp("updateTime"));
+
         return user;
     }
 
     @Override
+    public User getByToken(String token) {
+        String sql = "SELECT id, token, mobile, avatar, name, sex, birthday, cityId, address FROM t_user WHERE token=? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[] { token }, new ResultSetExtractor<User>() {
+            @Override
+            public User extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (rs.next()) return buildUser(rs);
+                return User.NOT_EXIST_USER;
+            }
+        });
+    }
+
+    @Override
     public User getByMobile(String mobile) {
-        String sql = "select id,mobile,types,name,`desc`,token,sex,address,idCardNo,idCardPic,addTime,updateTime from t_user where mobile=? and status=1";
+        String sql = "SELECT id, token, mobile, avatar, name, sex, birthday, cityId, address FROM t_user WHERE mobile=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<User>() {
             @Override
@@ -96,16 +109,10 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
-    public User getByToken(String token) {
-        String sql = "select id,mobile,types,name,`desc`,token,sex,address,idCardNo,idCardPic,addTime,updateTime from t_user where token=? and status=1";
+    public boolean updateAvatar(long id, String avatar) {
+        String sql = "UPDATE t_user SET avatar=? WHERE id=?";
 
-        return jdbcTemplate.query(sql, new Object[] { token }, new ResultSetExtractor<User>() {
-            @Override
-            public User extractData(ResultSet rs) throws SQLException, DataAccessException {
-                if (rs.next()) return buildUser(rs);
-                return User.NOT_EXIST_USER;
-            }
-        });
+        return update(id, sql, new Object[] { avatar, id });
     }
 
     private boolean update(long id, String sql, Object[] args) {
@@ -114,51 +121,42 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
         int affectedRowCount = jdbcTemplate.update(sql, args);
         if (affectedRowCount != 1) return false;
-        else return true;
+
+        return true;
     }
 
     @Override
-    public boolean updateName(long userId, String name) {
-        String sql = "update t_user set name=? where id=?";
-        return update(userId, sql, new Object[] { name, userId });
-    }
+    public boolean updateName(long id, String name) {
+        String sql = "UPDATE t_user SET name=? WHERE id=?";
 
-
-    @Override
-    public boolean updateDesc(long userId, String desc) {
-
-        String sql = "update t_user set `desc`=? where id=?";
-        return update(userId, sql, new Object[] { desc, userId });
+        return update(id, sql, new Object[] { name, id });
     }
 
     @Override
-    public boolean updateSex(long userId, int sex) {
+    public boolean updateSex(long id, int sex) {
+        String sql = "UPDATE t_user SET sex=? WHERE id=?";
 
-        String sql = "update t_user set sex=? where id=?";
-        return update(userId, sql, new Object[] { sex, userId });
+        return update(id, sql, new Object[] { sex, id });
     }
 
     @Override
-    public boolean updateAvatar(long userId, String avatar) {
-        String sql = "update t_user set avatar=? where id=?";
-        return update(userId, sql, new Object[] { avatar, userId });
+    public boolean updateBirthday(long id, Date birthday) {
+        String sql = "UPDATE t_user SET `desc`=? WHERE id=?";
+
+        return update(id, sql, new Object[] { birthday, id });
     }
 
     @Override
-    public boolean updateAddress(long userId, String address) {
-        String sql = "update t_user set address=? where id=?";
-        return update(userId, sql, new Object[] { address, userId });
+    public boolean updateCityId(long id, int cityId) {
+        String sql = "UPDATE t_user SET `desc`=? WHERE id=?";
+
+        return update(id, sql, new Object[] { cityId, id });
     }
 
     @Override
-    public boolean updateIdCardNo(long userId, String idCardNo) {
-        String sql = "update t_user set idCardNo=? where id=?";
-        return update(userId, sql, new Object[] { idCardNo, userId });
-    }
+    public boolean updateAddress(long id, String address) {
+        String sql = "UPDATE t_user SET address=? WHERE id=?";
 
-    @Override
-    public boolean updateIdCardPic(long userId, String idCardPic) {
-        String sql = "update t_user set idCardPic=? where id=?";
-        return update(userId, sql, new Object[] { idCardPic, userId });
+        return update(id, sql, new Object[] { address, id });
     }
 }

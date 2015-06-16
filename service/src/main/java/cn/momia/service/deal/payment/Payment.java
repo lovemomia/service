@@ -1,7 +1,5 @@
 package cn.momia.service.deal.payment;
 
-import com.alibaba.fastjson.JSONObject;
-
 import java.util.Date;
 
 public class Payment {

@@ -16,17 +16,14 @@ public class User {
     }
 
     private long id;
-    private String mobile;
-    private int types;
-    private String name;
-    private String desc;
     private String token;
+    private String mobile;
+    private String avatar;
+    private String name;
     private int sex;
+    private Date birthday;
+    private int cityId;
     private String address;
-    private String idCardNo;
-    private String idCardPic;
-    private Date addTime;
-    private Date updateTime;
 
     public long getId() {
         return id;
@@ -34,38 +31,6 @@ public class User {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public String getMobile() {
-        return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
-    }
-
-    public int getTypes() {
-        return types;
-    }
-
-    public void setTypes(int types) {
-        this.types = types;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDesc() {
-        return desc;
-    }
-
-    public void setDesc(String desc) {
-        this.desc = desc;
     }
 
     public String getToken() {
@@ -76,6 +41,30 @@ public class User {
         this.token = token;
     }
 
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public int getSex() {
         return sex;
     }
@@ -84,44 +73,28 @@ public class User {
         this.sex = sex;
     }
 
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
+    public int getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(int cityId) {
+        this.cityId = cityId;
+    }
+
     public String getAddress() {
         return address;
     }
 
     public void setAddress(String address) {
         this.address = address;
-    }
-
-    public String getIdCardNo() {
-        return idCardNo;
-    }
-
-    public void setIdCardNo(String idCardNo) {
-        this.idCardNo = idCardNo;
-    }
-
-    public String getIdCardPic() {
-        return idCardPic;
-    }
-
-    public void setIdCardPic(String idCardPic) {
-        this.idCardPic = idCardPic;
-    }
-
-    public Date getAddTime() {
-        return addTime;
-    }
-
-    public void setAddTime(Date addTime) {
-        this.addTime = addTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
     }
 
     @Override

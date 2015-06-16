@@ -2,131 +2,98 @@ package cn.momia.service.sms.impl;
 
 import cn.momia.service.base.DbAccessService;
 import cn.momia.service.sms.SmsSender;
-import com.sun.scenario.animation.shared.CurrentTime;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowCallbackHandler;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Random;
 
 public abstract class AbstractSmsSender extends DbAccessService implements SmsSender {
-
     @Override
-    public boolean send(String phone)  {
-        if(!isPhoneExits(phone))
-            saveVerifyDb(phone,"");
-
-        long generatedTime = getGeneratedTime(phone);
-        long currentTime = new java.util.Date().getTime();
-        String code = "";
-        System.out.println(generatedTime);
-        System.out.println(currentTime);
-
-       if(currentTime-generatedTime <= 1000*60*30) {
-            code = getGeneratedCode(phone);
-            if (StringUtils.isBlank(code)) {
-                code = generateCode();
-                updateVerifyDb(phone, code);
-            }
+    public boolean send(String mobile)  {
+        String code = getGeneratedCode(mobile);
+        if (StringUtils.isBlank(code))
+        {
+            boolean outOfDate = (code != null); // null 表示没有生成过，空表示生成过，但已过期
+            code = generateCode(mobile);
+            updateCode(mobile, code, outOfDate);
         }
-        else {
-           code = generateCode();
-           updateVerifyDb(phone, code);
 
-       }
+        Date lastSendTime = getLastSendTime(mobile);
+        if (lastSendTime != null && new Date().getTime() - lastSendTime.getTime() < 60 * 1000) return true;
+        if (doSend(mobile, code))
+        {
+            return updateSendTime(mobile);
+        }
 
-
-        return doSend(phone, code);
+        return false;
     }
 
+    private String getGeneratedCode(String mobile)
+    {
+        String sql = "SELECT code, status, generateTime FROM t_verify WHERE mobile=?";
 
-    public boolean isPhoneExits(String phone) {
-        String sql = "select id from t_verify where phone=?";
-        return jdbcTemplate.query(sql, new Object[]{phone}, new ResultSetExtractor<Boolean>() {
+        return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<String>()
+        {
             @Override
-            public Boolean extractData(ResultSet resultSet) throws SQLException, DataAccessException {
-                if(resultSet.next()) return true;
-                return false;
+            public String extractData(ResultSet rs) throws SQLException, DataAccessException
+            {
+                if (!rs.next()) return null;
+
+                String code = rs.getString("code");
+                int status = rs.getInt("status");
+                Date generateTime = rs.getTimestamp("generateTime");
+
+                if (status == 0 || generateTime == null || (generateTime != null && new Date().getTime() - generateTime.getTime() > 30 * 60 * 1000)) return "";
+                return code;
             }
         });
-
-
     }
 
-    public Long getGeneratedTime(String phone)  {
-        String sql = "select generateTime from t_verify where phone="+phone;
-        long time;
-        try {
-            time =  jdbcTemplate.queryForObject(sql, Timestamp.class).getTime();
+    private String generateCode(String mobile)
+    {
+        int number = (int) (Math.random() * 1000000);
+
+        return String.format("%06d", number);
+    }
+
+    private void updateCode(String mobile, String code, boolean outOfDate)
+    {
+        if (outOfDate)
+        {
+            String sql = "UPDATE t_verify SET mobile=?, code=?, generateTime=NOW(), sendTime=NULL, status=1 WHERE mobile=?";
+            jdbcTemplate.update(sql, new Object[] { mobile, code, mobile });
         }
-        catch (EmptyResultDataAccessException E) {
-            time = 0L;
-            return time;
+        else
+        {
+            String sql = "INSERT INTO t_verify(mobile, code, generateTime) VALUES (?, ?, NOW())";
+            jdbcTemplate.update(sql, new Object[] { mobile, code });
         }
-        return time;
     }
 
-    public String getGeneratedCode(String phone){
-        String sql = "select code from t_verify where phone=?";
-        String code = jdbcTemplate.query(sql, new Object[]{ phone }, new ResultSetExtractor<String>() {
-           @Override
-           public String extractData(ResultSet resultSet) throws SQLException, DataAccessException {
-               if(resultSet.next()) return resultSet.getString(1);
-               return "";
-           }
-       });
-       return code;
-    }
+    private Date getLastSendTime(String mobile)
+    {
+        String sql = "SELECT sendTime FROM t_verify WHERE mobile=?";
 
-    private String generateCode() {
-        // TODO 生成一个随即6位数
-        Random random = new Random();
-        String result="";
-        for(int i=0;i<6;i++){
-            result+=random.nextInt(10);
-        }
-        return result;
-    }
-
-    protected abstract boolean doSend(String phone, String code);
-
-    private void updateVerifyDb(final String phone, final String code) {
-        jdbcTemplate.update(new PreparedStatementCreator() {
+        return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<Date>()
+        {
             @Override
-            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                String sql = "update t_verify set code=? ,generateTime=NOW() where phone=?";
-                PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                ps.setString(1, code);
-                ps.setString(2, phone);
-
-                return ps;
+            public Date extractData(ResultSet rs) throws SQLException, DataAccessException
+            {
+                if (rs.next()) return rs.getTimestamp("sendTime");
+                return null;
             }
         });
-
     }
-    private void saveVerifyDb(final String phone, final String code){
-        jdbcTemplate.update(new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                String sql = "insert into t_verify(phone, code, generateTime) values(?, ?, NOW())";
-                PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                ps.setString(1, phone);
-                ps.setString(2, code);
-                return ps;
-            }
-        });
+
+    protected abstract boolean doSend(String mobile, String code);
+
+    private boolean updateSendTime(String mobile)
+    {
+        String sql = "UPDATE t_verify SET sendTime=NOW() WHERE mobile=?";
+
+        return jdbcTemplate.update(sql, new Object[] { mobile }) == 1;
     }
 }

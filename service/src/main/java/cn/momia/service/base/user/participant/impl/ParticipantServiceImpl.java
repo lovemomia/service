@@ -11,96 +11,77 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ParticipantServiceImpl extends DbAccessService implements ParticipantService {
-
-    public long addParticipant(final long userId,final Participant participant) {
+    @Override
+    public long add(final Participant participant) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "insert into t_user_participant(userId, name, sex, birthday, addTime) values(?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO t_user_participant(userId, name, sex, birthday, addTime) VALUES(?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                ps.setLong(1, userId);
+                ps.setLong(1, participant.getUserId());
                 ps.setString(2, participant.getName());
                 ps.setInt(3, participant.getSex());
-                java.sql.Date sqlDate = new java.sql.Date(participant.getBirthday().getTime());
-                ps.setDate(4,  sqlDate);
+                ps.setDate(4, new java.sql.Date(participant.getBirthday().getTime()));
+
                 return ps;
             }
-        },keyHolder);
+        }, keyHolder);
+
         return keyHolder.getKey().longValue();
     }
 
     @Override
-    public long add(long userId,Participant participant) {
-        return addParticipant(userId,participant);
+    public boolean updateName(long id, long userId, String name) {
+        String sql = "UPDATE t_user_participant SET name=? WHERE id=? AND userId=?";
+
+        return update(sql, new Object[] { name, id, userId });
     }
 
-    public  boolean update( String sql, Object[] args){
+    public boolean update(String sql, Object[] args) {
         int affectedRowCount = jdbcTemplate.update(sql, args);
         if (affectedRowCount != 1) return false;
-        else return true;
+
+        return true;
     }
 
     @Override
-    public boolean updateName(final long id, final String name) {
-        String sql = "update t_user_participant set name=? where id=?";
-        return update(sql,new Object[]{name,id});
+    public boolean updateSex(long id, long userId, int sex) {
+        String sql = "UPDATE t_user_participant SET sex=? WHERE id=? AND userId=?";
+
+        return update(sql, new Object[] { sex, id, userId });
     }
 
     @Override
-    public boolean updateSex(long id, int sex) {
-        String sql = "update t_user_participant set sex=? where id=?";
-        return update(sql,new Object[]{sex,id});
+    public boolean updateBirthday(long id, long userId, Date birthday) {
+        String sql = "UPDATE t_user_participant SET birthday=? WHERE id=? AND userId=?";
+
+        return update(sql, new Object[] { birthday, id, userId });
     }
 
     @Override
-    public boolean updateBirthday(long id, java.util.Date birthday) {
-       String sql = "update t_user_participant set birthday=? where id=?";
-        return update(sql,new Object[]{birthday,id});
-    }
+    public boolean delete(long id, long userId) {
+        String sql = "UPDATE t_user_participant SET status=0 WHERE id=? AND userId=?";
+        int affectedRowCount = jdbcTemplate.update(sql, new Object[] { id, userId });
+        if (affectedRowCount != 1) return false;
 
-
-    public Participant buildParticipant(ResultSet rs) throws SQLException {
-        Participant participant = new Participant();
-
-        participant.setId(rs.getLong("id"));
-        participant.setUserId(rs.getLong("userId"));
-        participant.setName(rs.getString("name"));
-        participant.setSex(rs.getInt("sex"));
-        participant.setBirthday(rs.getDate("birthday"));
-
-        return participant;
-
+        return true;
     }
 
     @Override
-    public List<Participant> get(long userId) {
-        final List<Participant> participants = new ArrayList<Participant>();
-        String sql = "select id, userId, name, sex, birthday from t_user_participant where userId=?";
-        jdbcTemplate.query(sql, new Object[]{userId}, new RowCallbackHandler() {
+    public Participant get(long id) {
+        String sql = "SELECT id, userId, name, sex, birthday FROM t_user_participant WHERE id=? AND status=1";
 
-            @Override
-            public void processRow(ResultSet resultSet) throws SQLException {
-                participants.add(buildParticipant(resultSet));
-            }
-        });
-        return participants;
-    }
-
-    @Override
-    public Participant get(long userId, long id) {
-        String sql = "select id,userId,name,sex,birthday from t_user_participant where userId=? AND id=? AND status=1";
-
-        return jdbcTemplate.query(sql, new Object[] { userId,id }, new ResultSetExtractor<Participant>() {
+        return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Participant>() {
             @Override
             public Participant extractData(ResultSet rs) throws SQLException, DataAccessException {
                 if (rs.next()) return buildParticipant(rs);
@@ -109,12 +90,30 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
         });
     }
 
-    @Override
-    public boolean delete(long id) {
-        String sql = "delete from t_user_participant where id=?";
-        int affectedRowCount = jdbcTemplate.update(sql,new Object[]{id});
-        if (affectedRowCount != 1) return false;
-        else return true;
+    public Participant buildParticipant(ResultSet rs) throws SQLException {
+        Participant participant = new Participant();
+        participant.setId(rs.getLong("id"));
+        participant.setUserId(rs.getLong("userId"));
+        participant.setName(rs.getString("name"));
+        participant.setSex(rs.getInt("sex"));
+        participant.setBirthday(rs.getDate("birthday"));
 
+        return participant;
+    }
+
+    @Override
+    public List<Participant> getByUser(long userId) {
+        final List<Participant> participants = new ArrayList<Participant>();
+
+        String sql = "SELECT id, userId, name, sex, birthday FROM t_user_participant WHERE userId=? AND status=1";
+        jdbcTemplate.query(sql, new Object[] { userId }, new RowCallbackHandler() {
+
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                participants.add(buildParticipant(rs));
+            }
+        });
+
+        return participants;
     }
 }

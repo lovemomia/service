@@ -3,24 +3,20 @@ package cn.momia.service.web.ctrl.deal;
 import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.base.product.sku.SkuService;
+import cn.momia.service.base.user.User;
+import cn.momia.service.base.user.UserService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
-import cn.momia.service.deal.payment.PaymentService;
 import cn.momia.service.web.ctrl.AbstractController;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("/order")
@@ -31,14 +27,13 @@ public class OrderController extends AbstractController {
     private OrderService orderService;
 
     @Autowired
-    private PaymentService paymentService;
-
-    @Autowired
     private SkuService skuService;
 
-    @RequestMapping(method = RequestMethod.POST)
-    public ResponseMessage placeOrder(@RequestParam(value = "order") String orderJson) {
-        Order order = parseOrder(orderJson);
+    @Autowired
+    private UserService userService;
+
+    @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
+    public ResponseMessage placeOrder(@RequestBody Order order) {
         if (!lockSku(order)) return new ResponseMessage(ErrorCode.FAILED, "low stocks");
 
         try {
@@ -56,28 +51,6 @@ public class OrderController extends AbstractController {
         return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to place order");
     }
 
-    private Order parseOrder(String orderJson) {
-        Order order = new Order();
-
-        JSONObject orderObject = JSON.parseObject(orderJson);
-        order.setCustomerId(orderObject.getLong("customerId"));
-        order.setProductId(orderObject.getLong("productId"));
-        order.setSkuId(orderObject.getLong("skuId"));
-        order.setPrice(orderObject.getFloat("price"));
-        order.setCount(orderObject.getInteger("count"));
-        order.setContacts(orderObject.getString("contacts"));
-        order.setMobile(orderObject.getString("mobile"));
-
-        List<Long> participants = new ArrayList<Long>();
-        JSONArray participantArray = orderObject.getJSONArray("participants");
-        for (int i = 0; i < participantArray.size(); i++) {
-            participants.add(participantArray.getLong(i));
-        }
-        order.setParticipants(participants);
-
-        return order;
-    }
-
     private boolean lockSku(Order order) {
         return skuService.lock(order.getSkuId(), order.getCount());
     }
@@ -86,12 +59,18 @@ public class OrderController extends AbstractController {
         return skuService.unlock(order.getSkuId(), order.getCount());
     }
 
-    @RequestMapping(value = "/{id}/pay", method = RequestMethod.PUT)
-    public ResponseMessage payOrder(@PathVariable long id) {
-        if (orderService.pay(id)) return new ResponseMessage(paymentService.getByOrder(id));
+    @RequestMapping(value = "/{id}", method = RequestMethod.POST)
+    public ResponseMessage deleteOrder(@PathVariable long id, @RequestParam String utoken) {
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return new ResponseMessage(ErrorCode.FORBIDDEN, "user not login");
 
-        LOGGER.error("fail to finish payment of order: {}", id);
+        if (!orderService.delete(id, user.getId())) return new ResponseMessage(ErrorCode.FORBIDDEN, "fail to delete order");
+        return new ResponseMessage("delete order successfully");
+    }
 
-        return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to pay order");
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam String query) {
+        // TODO
+        return new ResponseMessage("TODO");
     }
 }

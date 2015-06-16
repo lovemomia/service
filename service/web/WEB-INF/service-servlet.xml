@@ -23,7 +23,16 @@
                         <value>text/html;charset=UTF-8</value>
                     </list>
                 </property>
+                <property name="features">
+                    <array value-type="com.alibaba.fastjson.serializer.SerializerFeature">
+                        <value>DisableCircularReferenceDetect</value>
+                    </array>
+                </property>
             </bean>
         </mvc:message-converters>
     </mvc:annotation-driven>
+
+    <bean id="DisableCircularReferenceDetect" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
+        <property name="staticField" value="com.alibaba.fastjson.serializer.SerializerFeature.DisableCircularReferenceDetect" />
+    </bean>
 </beans>

@@ -2,7 +2,6 @@ package cn.momia.service.deal.payment.gateway.wechatpay;
 
 import cn.momia.common.encrypt.CommonUtil;
 import cn.momia.common.encrypt.SHA1Util;
-import cn.momia.common.error.SDKRuntimeException;
 import cn.momia.service.deal.payment.gateway.MapWrappedParam;
 import cn.momia.service.deal.payment.gateway.PrepayParam;
 
@@ -27,7 +26,6 @@ public class WechatpayPrepayParam extends MapWrappedParam implements PrepayParam
     private String trade_type;//交易类型 JSAPI:1,APP:2,WAP:3,NATIVE:4
     private String openid;
     private String appKey;
-
 
     public String getAppid() {
         return appid;
@@ -133,7 +131,7 @@ public class WechatpayPrepayParam extends MapWrappedParam implements PrepayParam
         this.openid = openid;
     }
 
-    public Boolean checkParameters(WechatpayPackageParam param) {
+    public boolean checkParameters(WechatpayPackageParam param) {
         if (param.getBank_type() == ""
                 || param.getBody() == ""
                 || param.getPartner() == ""
@@ -145,10 +143,11 @@ public class WechatpayPrepayParam extends MapWrappedParam implements PrepayParam
                 || param.getInput_charset() == "") {
             return false;
         }
+
         return true;
     }
 
-    public String Sing(WechatpayPrepayParam param) throws SDKRuntimeException {
+    public String sign(WechatpayPrepayParam param) {
         HashMap<String, String> bizObj = getHashMapParam(param,1);
         HashMap<String, String> bizParameters = new HashMap<String, String>();
         List<Map.Entry<String, String>> infoIds = new ArrayList<Map.Entry<String, String>>(

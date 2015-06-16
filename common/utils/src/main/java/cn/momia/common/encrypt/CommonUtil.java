@@ -1,9 +1,15 @@
 package cn.momia.common.encrypt;
 
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import cn.momia.common.error.SDKRuntimeException;
+import java.util.Random;
 
 public class CommonUtil {
 
@@ -36,18 +42,17 @@ public class CommonUtil {
 		return res;
 	}
 
-	public static String FormatQueryParaMap(HashMap<String, String> parameters)
-			throws SDKRuntimeException {
+	public static String FormatQueryParaMap(HashMap<String, String> parameters) {
 
 		String buff = "";
 		try {
-			List<Map.Entry<String, String>> infoIds = new ArrayList<Map.Entry<String, String>>(
+			List<Entry<String, String>> infoIds = new ArrayList<Entry<String, String>>(
 					parameters.entrySet());
 
 			Collections.sort(infoIds,
-					new Comparator<Map.Entry<String, String>>() {
+					new Comparator<Entry<String, String>>() {
 						public int compare(Map.Entry<String, String> o1,
-								Map.Entry<String, String> o2) {
+										   Map.Entry<String, String> o2) {
 							return (o1.getKey()).toString().compareTo(
 									o2.getKey());
 						}
@@ -64,14 +69,13 @@ public class CommonUtil {
 				buff = buff.substring(0, buff.length() - 1);
 			}
 		} catch (Exception e) {
-			throw new SDKRuntimeException(e.getMessage());
+			throw new RuntimeException(e.getMessage());
 		}
 
 		return buff;
 	}
 
-	public static String FormatBizQueryParaMap(HashMap<String, String> paraMap,
-			boolean urlencode) throws SDKRuntimeException {
+	public static String FormatBizQueryParaMap(HashMap<String, String> paraMap, boolean urlencode) {
 
 		String buff = "";
 		try {
@@ -107,7 +111,7 @@ public class CommonUtil {
 				buff = buff.substring(0, buff.length() - 1);
 			}
 		} catch (Exception e) {
-			throw new SDKRuntimeException(e.getMessage());
+			throw new RuntimeException(e.getMessage());
 		}
 		return buff;
 	}
