@@ -16,7 +16,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class ParticipantServiceImpl extends DbAccessService implements ParticipantService {
@@ -41,31 +40,11 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
     }
 
     @Override
-    public boolean updateName(long id, long userId, String name) {
-        String sql = "UPDATE t_user_participant SET name=? WHERE id=? AND userId=?";
+    public boolean update(Participant participant) {
+        String sql = "UPDATE t_user_participant SET name=?, sex=?, birthday=? WHERE id=? AND userId=?";
+        int updateCount = jdbcTemplate.update(sql, new Object[] { participant.getName(), participant.getSex(), participant.getBirthday(), participant.getId(), participant.getUserId() });
 
-        return update(sql, new Object[] { name, id, userId });
-    }
-
-    public boolean update(String sql, Object[] args) {
-        int affectedRowCount = jdbcTemplate.update(sql, args);
-        if (affectedRowCount != 1) return false;
-
-        return true;
-    }
-
-    @Override
-    public boolean updateSex(long id, long userId, int sex) {
-        String sql = "UPDATE t_user_participant SET sex=? WHERE id=? AND userId=?";
-
-        return update(sql, new Object[] { sex, id, userId });
-    }
-
-    @Override
-    public boolean updateBirthday(long id, long userId, Date birthday) {
-        String sql = "UPDATE t_user_participant SET birthday=? WHERE id=? AND userId=?";
-
-        return update(sql, new Object[] { birthday, id, userId });
+        return updateCount == 1;
     }
 
     @Override

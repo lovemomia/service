@@ -38,38 +38,6 @@ public class ParticipantServiceImplTest {
     }
 
     @Test
-    public void testUpdateName() throws Exception {
-        DB();
-        List<Participant> participants = participantService.getByUser(1);
-        Participant participant = participants.get(1);
-        participant.setName("modifyName");
-        participantService.updateName(participant.getId(),1,participant.getName());
-    }
-
-    @Test
-    public void testUpdateSex() throws Exception {
-        DB();
-        List<Participant> participants = participantService.getByUser(1);
-        Participant participant = participants.get(1);
-        participant.setSex(1);
-        participantService.updateSex(participant.getId(),1,participant.getSex());
-    }
-
-    @Test
-    public void testUpdateBirthday() throws Exception {
-        DB();
-        List<Participant> participants = participantService.getByUser(1);
-        Participant participant = participants.get(1);
-        SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
-        String dateStringToParse = "1991-7-12";
-        java.util.Date d = f.parse(dateStringToParse);
-        java.sql.Date sqlDate = new java.sql.Date(d.getTime());
-        participant.setBirthday(sqlDate);
-
-        participantService.updateBirthday(participant.getId(),1,participant.getBirthday());
-    }
-
-    @Test
     public void testGet() throws Exception {
         DB();
         List<Participant> participants = participantService.getByUser(1);
