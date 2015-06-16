@@ -13,6 +13,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/v1/payment")
 public class PaymentApi extends AbstractApi {
+    @RequestMapping(value = "/prepay/alipay", method = RequestMethod.POST)
+    public ResponseMessage prepayAlipay(HttpServletRequest request) {
+        // TODO
+        return new ResponseMessage("TODO");
+    }
+
     @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)
     public ResponseMessage prepayWechatpay(HttpServletRequest request) {
         Map<String, String> params = new HashMap<String, String>();

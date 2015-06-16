@@ -25,11 +25,11 @@ public class ProductApi extends AbstractApi {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductApi.class);
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage getProducts(@RequestParam int start, @RequestParam int count, @RequestParam(value = "query") String queryJson) {
+    public ResponseMessage getProducts(@RequestParam int start, @RequestParam int count, @RequestParam String query) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
                 .add("count", count)
-                .add("query", queryJson);
+                .add("query", query);
         MomiaHttpRequest request = new MomiaHttpGetRequest(baseServiceUrl("product"), builder.build());
 
         return executeRequest(request);

@@ -58,44 +58,4 @@ public class UserController extends AbstractController {
     public String updateChildren(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
-
-    @RequestMapping(value = "/participant", method = RequestMethod.GET)
-    public String getParticipants(HttpServletRequest request) {
-        return forward(request, request.getRequestURI());
-    }
-
-    @RequestMapping(value = "/participant", method = RequestMethod.POST)
-    public String addParticipant(HttpServletRequest request) {
-        return forward(request, request.getRequestURI());
-    }
-
-    @RequestMapping(value = "/participant/{pid}", method = RequestMethod.GET)
-    public String getParticipant(HttpServletRequest request) {
-        return forward(request, request.getRequestURI());
-    }
-
-    @RequestMapping(value = "/participant/{pid}", method = RequestMethod.PUT)
-    public String updateParticipant(HttpServletRequest request) {
-        return forward(request, request.getRequestURI());
-    }
-
-    @RequestMapping(value = "/participant/{pid}", method = RequestMethod.DELETE)
-    public String deleteParticipant(HttpServletRequest request) {
-        return forward(request, request.getRequestURI());
-    }
-
-    @RequestMapping(value = "/favorite", method = RequestMethod.GET)
-    public String getFavorites(HttpServletRequest request) {
-        return forward(request, request.getRequestURI());
-    }
-
-    @RequestMapping(value = "/favorite/{fid}", method = RequestMethod.DELETE)
-    public String deleteFavorite(HttpServletRequest request) {
-        return forward(request, request.getRequestURI());
-    }
-
-    @RequestMapping(value = "/order", method = RequestMethod.GET)
-    public String getOrders(HttpServletRequest request) {
-        return forward(request, request.getRequestURI());
-    }
 }
