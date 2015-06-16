@@ -6,6 +6,7 @@ import cn.momia.service.base.product.ProductImage;
 import cn.momia.service.base.product.ProductQuery;
 import cn.momia.service.base.product.ProductService;
 import com.alibaba.fastjson.JSON;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -70,6 +71,21 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
         img.setHeight(rs.getInt("height"));
 
         return img;
+    }
+
+    @Override
+    public List<Product> getByIds(List<Long> ids) {
+        final List<Product> products = new ArrayList<Product>();
+
+        String sql = "SELECT id, categoryId, title, cover, content, sales FROM t_product WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1 ORDER BY addTime DESC";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                products.add(buildProduct(rs));
+            }
+        });
+
+        return products;
     }
 
     @Override

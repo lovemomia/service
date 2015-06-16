@@ -60,11 +60,11 @@ public class FavoriteServiceImpl extends DbAccessService implements FavoriteServ
     }
 
     @Override
-    public List<Long> getFavoritesOfUser(long userId) {
+    public List<Long> getFavoritesOfUser(long userId, int start, int count) {
         final List<Long> productIds = new ArrayList<Long>();
 
-        String sql = "SELECT productId FROM t_favorite WHERE userId=? AND status=1";
-        jdbcTemplate.query(sql, new Object[] { userId }, new RowCallbackHandler() {
+        String sql = "SELECT productId FROM t_favorite WHERE userId=? AND status=1 ORDER BY addTime DESC LIMIT ?,?";
+        jdbcTemplate.query(sql, new Object[] { userId, start, count }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 productIds.add(rs.getLong("productId"));
