@@ -1,7 +1,5 @@
 package cn.momia.service.base.comment;
 
-import com.alibaba.fastjson.JSONObject;
-
 public class Comment {
     public static final Comment NOT_EXIST_COMMENT = new Comment();
     static {
@@ -85,20 +83,6 @@ public class Comment {
     @Override
     public int hashCode() {
         return (int) (getId() ^ (getId() >>> 32));
-    }
-
-    public Comment() {
-
-    }
-
-    public Comment(JSONObject jsonObject){
-        if (jsonObject.containsKey("id")) setId(jsonObject.getInteger("id"));
-        setCustomerId(jsonObject.getInteger("customerId"));
-        setServerId(jsonObject.getInteger("serverId"));
-        setProductId(jsonObject.getInteger("productId"));
-        setSkuId(jsonObject.getInteger("skuId"));
-        setStar(jsonObject.getInteger("star"));
-        setContent(jsonObject.getString("content"));
     }
 
     public boolean exists() {
