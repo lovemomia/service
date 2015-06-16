@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/participant")
+@RequestMapping("/v1/participant")
 public class ParticipantApi extends AbstractApi {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseMessage addParticipant(@RequestParam String utoken, @RequestParam String participant) {
