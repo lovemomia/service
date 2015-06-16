@@ -25,7 +25,7 @@ public class FeedbackController {
         User user = userService.getByToken(utoken);
         long userId = user.exists() ? user.getId() : 0;
 
-        long feedbackId = feedbackService.addFeedback(content, email, userId);
+        long feedbackId = feedbackService.add(content, email, userId);
         if (feedbackId <= 0) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to add feedback");
 
         return new ResponseMessage("add feedback successfully");
