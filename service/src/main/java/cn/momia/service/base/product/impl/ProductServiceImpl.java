@@ -3,6 +3,7 @@ package cn.momia.service.base.product.impl;
 import cn.momia.service.base.DbAccessService;
 import cn.momia.service.base.product.Product;
 import cn.momia.service.base.product.ProductImage;
+import cn.momia.service.base.product.ProductQuery;
 import cn.momia.service.base.product.ProductService;
 import com.alibaba.fastjson.JSON;
 import org.springframework.dao.DataAccessException;
@@ -68,5 +69,11 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
         img.setHeight(rs.getInt("height"));
 
         return img;
+    }
+
+    @Override
+    public List<Product> queryProducts(int start, int count, ProductQuery query) {
+        // TODO use query
+        return null;
     }
 }
