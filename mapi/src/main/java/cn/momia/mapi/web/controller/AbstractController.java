@@ -8,7 +8,6 @@ public abstract class AbstractController {
     }
 
     private String getApiVersion(HttpServletRequest request) {
-        // TODO API 可能会需要支持不同版本
         return "v1";
     }
 }
