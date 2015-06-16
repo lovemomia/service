@@ -12,7 +12,6 @@ import cn.momia.service.base.user.User;
 import cn.momia.service.base.user.UserService;
 import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.web.ctrl.AbstractController;
-import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -78,15 +77,5 @@ public class ProductController extends AbstractController {
         }
 
         return new ResponseMessage(users);
-    }
-
-    @RequestMapping(value = "{id}/comment", method = RequestMethod.POST)
-    public ResponseMessage addComment(@PathVariable long id, @RequestParam String commentJson){
-        Comment comment = new Comment(JSON.parseObject(commentJson));
-        comment.setProductId(id);
-        long commentId = commentService.add(comment);
-
-        if(commentId <= 0) new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to add comment");
-        return new ResponseMessage(comment);
     }
 }
