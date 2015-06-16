@@ -1,7 +1,5 @@
 package cn.momia.service.base.product.sku;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.util.List;
 
 public class Sku {

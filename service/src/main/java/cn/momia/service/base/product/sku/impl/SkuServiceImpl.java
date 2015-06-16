@@ -1,13 +1,12 @@
 package cn.momia.service.base.product.sku.impl;
 
 import cn.momia.service.base.DbAccessService;
+import cn.momia.service.base.product.sku.Pair;
 import cn.momia.service.base.product.sku.Sku;
 import cn.momia.service.base.product.sku.SkuProperty;
 import cn.momia.service.base.product.sku.SkuPropertyValue;
 import cn.momia.service.base.product.sku.SkuService;
 import com.google.common.base.Splitter;
-import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;
@@ -84,7 +83,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
                     SkuPropertyValue propertyValue = buildPropertyValue(rs);
                     SkuProperty property = skuPropertyCache.get(propertyValue.getPropertyId());
                     if (property == null) return;
-                    properties.add(new MutablePair<SkuProperty, SkuPropertyValue>(property, propertyValue));
+                    properties.add(new Pair<SkuProperty, SkuPropertyValue>(property, propertyValue));
                 }
             });
         }
