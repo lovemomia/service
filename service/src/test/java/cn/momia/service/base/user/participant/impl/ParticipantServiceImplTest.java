@@ -37,37 +37,6 @@ public class ParticipantServiceImplTest {
         participantService.setJdbcTemplate(jdbcTemplate);
     }
 
-
-    @Test
-    public void testAdd() throws Exception {
-        DB();
-        String participantJson = "{'userId':1,'name':'yangsiman','sex':1,'birthday':'1999-9-9'}";
-        Participant participant = new Participant(JSON.parseObject(participantJson));
-        participantService.add(participant);
-
-      /*  Participant participant = new Participant();
-        participant.setUserId(1);
-        participant.setName("test1");
-        participant.setSex(1);
-        SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
-        String dateStringToParse = "1991-7-12";
-        java.util.Date d = f.parse(dateStringToParse);
-
-        participant.setBirthday(d);
-        
-
-        Participant participant1 = new Participant();
-        participant1.setUserId(1);
-        participant1.setName("test4");
-        participant1.setSex(1);
-        Date date = f.parse(dateStringToParse);
-       // java.sql.Date sqlDate1 = new java.sql.Date(date.getTime());
-        participant1.setBirthday(date);
-        participantService.add(1,participant1);
-        */
-
-    }
-
     @Test
     public void testUpdateName() throws Exception {
         DB();

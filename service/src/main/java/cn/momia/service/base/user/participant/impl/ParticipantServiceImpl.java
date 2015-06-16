@@ -69,10 +69,19 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
     }
 
     @Override
-    public Participant get(long id, long userId) {
-        String sql = "SELECT id, userId, name, sex, birthday FROM t_user_participant WHERE id=? AND userId=? AND status=1";
+    public boolean delete(long id, long userId) {
+        String sql = "UPDATE t_user_participant SET status=0 WHERE id=? AND userId=?";
+        int affectedRowCount = jdbcTemplate.update(sql, new Object[] { id, userId });
+        if (affectedRowCount != 1) return false;
 
-        return jdbcTemplate.query(sql, new Object[] { id, userId }, new ResultSetExtractor<Participant>() {
+        return true;
+    }
+
+    @Override
+    public Participant get(long id) {
+        String sql = "SELECT id, userId, name, sex, birthday FROM t_user_participant WHERE id=? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Participant>() {
             @Override
             public Participant extractData(ResultSet rs) throws SQLException, DataAccessException {
                 if (rs.next()) return buildParticipant(rs);
@@ -90,15 +99,6 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
         participant.setBirthday(rs.getDate("birthday"));
 
         return participant;
-    }
-
-    @Override
-    public boolean delete(long id, long userId) {
-        String sql = "UPDATE t_user_participant SET status=0 WHERE id=? AND userId=?";
-        int affectedRowCount = jdbcTemplate.update(sql, new Object[] { id, userId });
-        if (affectedRowCount != 1) return false;
-
-        return true;
     }
 
     @Override
