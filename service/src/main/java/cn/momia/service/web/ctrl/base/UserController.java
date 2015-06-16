@@ -36,7 +36,7 @@ public class UserController extends AbstractController {
         return new ResponseMessage(user);
     }
 
-    @RequestMapping(value = "/{id}/avatar", method = RequestMethod.PUT)
+    @RequestMapping(value = "/avatar", method = RequestMethod.PUT)
     public ResponseMessage updateAvatar(@RequestParam String utoken, @RequestParam String avatar) {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "user not exists");
@@ -47,7 +47,7 @@ public class UserController extends AbstractController {
         return new ResponseMessage("update user avatar successfully");
     }
 
-    @RequestMapping(value = "/{id}/name", method = RequestMethod.PUT)
+    @RequestMapping(value = "/name", method = RequestMethod.PUT)
     public ResponseMessage updateName(@RequestParam String utoken, @RequestParam String name) {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "user not exists");
@@ -58,7 +58,7 @@ public class UserController extends AbstractController {
         return new ResponseMessage("update user name successfully");
     }
 
-    @RequestMapping(value = "/{id}/sex", method = RequestMethod.PUT)
+    @RequestMapping(value = "/sex", method = RequestMethod.PUT)
     public ResponseMessage updateSex(@RequestParam String utoken, @RequestParam int sex) {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "user not exists");
@@ -69,7 +69,7 @@ public class UserController extends AbstractController {
         return new ResponseMessage("update user sex successfully");
     }
 
-    @RequestMapping(value = "/{id}/birthday", method = RequestMethod.PUT)
+    @RequestMapping(value = "/birthday", method = RequestMethod.PUT)
     public ResponseMessage updateDesc(@RequestParam String utoken, @RequestParam Date birthday) {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "user not exists");
@@ -80,7 +80,7 @@ public class UserController extends AbstractController {
         return new ResponseMessage("update user birthday successfully");
     }
 
-    @RequestMapping(value = "/{id}/city", method = RequestMethod.PUT)
+    @RequestMapping(value = "/city", method = RequestMethod.PUT)
     public ResponseMessage updateDesc(@RequestParam String utoken, @RequestParam int city) {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "user not exists");
@@ -91,7 +91,7 @@ public class UserController extends AbstractController {
         return new ResponseMessage("update user city successfully");
     }
 
-    @RequestMapping(value = "/{id}/address", method = RequestMethod.PUT)
+    @RequestMapping(value = "/address", method = RequestMethod.PUT)
     public ResponseMessage updateAddress(@RequestParam String utoken, @RequestParam String address) {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "user not exists");
