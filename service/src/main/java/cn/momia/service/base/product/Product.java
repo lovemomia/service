@@ -11,7 +11,7 @@ public class Product {
     }
 
     private long id;
-    private int category;
+    private int categoryId;
     private String title;
     private JSONObject content;
     private int sales;
@@ -25,12 +25,12 @@ public class Product {
         this.id = id;
     }
 
-    public int getCategory() {
-        return category;
+    public int getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategory(int category) {
-        this.category = category;
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
     }
 
     public String getTitle() {

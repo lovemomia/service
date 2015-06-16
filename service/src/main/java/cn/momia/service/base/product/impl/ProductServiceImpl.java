@@ -24,7 +24,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     }
 
     public Product getProduct(long id){
-        String sql = "SELECT id, category, title, content, sales FROM t_product WHERE id=? AND status=1";
+        String sql = "SELECT id, categoryId, title, content, sales FROM t_product WHERE id=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Product>() {
             @Override
@@ -38,7 +38,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     public Product buildProduct(ResultSet rs) throws SQLException {
         Product product = new Product();
         product.setId(rs.getLong("id"));
-        product.setCategory(rs.getInt("category"));
+        product.setCategoryId(rs.getInt("categoryId"));
         product.setTitle(rs.getString("title"));
         product.setContent(JSON.parseObject(rs.getString("content")));
         product.setSales(rs.getInt("sales"));
