@@ -53,9 +53,4 @@ public class UserController extends AbstractController {
     public String updateAddress(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
-
-    @RequestMapping(value = "/children", method = RequestMethod.PUT)
-    public String updateChildren(HttpServletRequest request) {
-        return forward(request, request.getRequestURI());
-    }
 }

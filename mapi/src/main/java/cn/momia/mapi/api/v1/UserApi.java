@@ -97,14 +97,4 @@ public class UserApi extends AbstractApi {
 
         return executeRequest(request);
     }
-
-    @RequestMapping(value = "/children", method = RequestMethod.PUT)
-    public ResponseMessage updateChildren(@RequestParam String utoken, @RequestParam int children) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("utoken", utoken)
-                .add("children", children);
-        MomiaHttpRequest request = new MomiaHttpPutRequest(baseServiceUrl("user/children"), builder.build());
-
-        return executeRequest(request);
-    }
 }
