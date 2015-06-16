@@ -13,7 +13,7 @@ import java.sql.Statement;
 
 public class FeedbackServiceImpl extends DbAccessService implements FeedbackService {
     @Override
-    public long addFeedback(final String content, final String email, final long userId) {
+    public long add(final String content, final String email, final long userId) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
