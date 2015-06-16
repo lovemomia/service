@@ -6,6 +6,7 @@ import cn.momia.service.base.user.User;
 import cn.momia.service.base.user.UserService;
 import cn.momia.service.web.ctrl.AbstractController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -70,7 +71,7 @@ public class UserController extends AbstractController {
     }
 
     @RequestMapping(value = "/birthday", method = RequestMethod.PUT)
-    public ResponseMessage updateDesc(@RequestParam String utoken, @RequestParam Date birthday) {
+    public ResponseMessage updateDesc(@RequestParam String utoken, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date birthday) {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "user not exists");
 

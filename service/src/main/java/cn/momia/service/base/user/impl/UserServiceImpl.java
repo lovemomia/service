@@ -141,14 +141,14 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public boolean updateBirthday(long id, Date birthday) {
-        String sql = "UPDATE t_user SET `desc`=? WHERE id=?";
+        String sql = "UPDATE t_user SET `birthday`=? WHERE id=?";
 
         return update(id, sql, new Object[] { birthday, id });
     }
 
     @Override
     public boolean updateCityId(long id, int cityId) {
-        String sql = "UPDATE t_user SET `desc`=? WHERE id=?";
+        String sql = "UPDATE t_user SET `cityId`=? WHERE id=?";
 
         return update(id, sql, new Object[] { cityId, id });
     }
