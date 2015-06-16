@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WechatPayGateway extends AbstractPaymentGateway {
+public class WechatpayGateway extends AbstractPaymentGateway {
     @Override
     public PrepayResult prepay(PrepayParam param) {
         String url = conf.getString("Payment.Wechat.PrepayService");

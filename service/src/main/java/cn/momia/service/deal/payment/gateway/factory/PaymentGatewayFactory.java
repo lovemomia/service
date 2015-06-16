@@ -6,7 +6,7 @@ import cn.momia.service.deal.payment.Payment;
 import cn.momia.service.deal.payment.PaymentService;
 import cn.momia.service.deal.payment.gateway.PaymentGateway;
 import cn.momia.service.deal.payment.gateway.alipay.AlipayGateway;
-import cn.momia.service.deal.payment.gateway.wechatpay.WechatPayGateway;
+import cn.momia.service.deal.payment.gateway.wechatpay.WechatpayGateway;
 
 public class PaymentGatewayFactory {
     private static Configuration conf;
@@ -32,7 +32,7 @@ public class PaymentGatewayFactory {
                 paymentGateway = new AlipayGateway();
                 break;
             case Payment.Type.WECHATPAY:
-                paymentGateway = new WechatPayGateway();
+                paymentGateway = new WechatpayGateway();
                 break;
             default:
                 throw new RuntimeException("invalid pay type: " + payType);
