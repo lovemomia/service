@@ -1,5 +1,7 @@
 package cn.momia.service.base.user;
 
+import java.util.Date;
+
 public class User {
     public static final User NOT_EXIST_USER = new User();
     public static final User DUPLICATE_USER = new User() {
@@ -14,15 +16,14 @@ public class User {
     }
 
     private long id;
-    private String mobile;
-    private String name;
-    private String desc;
     private String token;
-    private int sex;
+    private String mobile;
     private String avatar;
+    private String name;
+    private int sex;
+    private Date birthday;
+    private int cityId;
     private String address;
-    private String idCardNo;
-    private String idCardPic;
 
     public long getId() {
         return id;
@@ -30,30 +31,6 @@ public class User {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public String getMobile() {
-        return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDesc() {
-        return desc;
-    }
-
-    public void setDesc(String desc) {
-        this.desc = desc;
     }
 
     public String getToken() {
@@ -64,12 +41,12 @@ public class User {
         this.token = token;
     }
 
-    public int getSex() {
-        return sex;
+    public String getMobile() {
+        return mobile;
     }
 
-    public void setSex(int sex) {
-        this.sex = sex;
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 
     public String getAvatar() {
@@ -80,28 +57,44 @@ public class User {
         this.avatar = avatar;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getSex() {
+        return sex;
+    }
+
+    public void setSex(int sex) {
+        this.sex = sex;
+    }
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
+    public int getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(int cityId) {
+        this.cityId = cityId;
+    }
+
     public String getAddress() {
         return address;
     }
 
     public void setAddress(String address) {
         this.address = address;
-    }
-
-    public String getIdCardNo() {
-        return idCardNo;
-    }
-
-    public void setIdCardNo(String idCardNo) {
-        this.idCardNo = idCardNo;
-    }
-
-    public String getIdCardPic() {
-        return idCardPic;
-    }
-
-    public void setIdCardPic(String idCardPic) {
-        this.idCardPic = idCardPic;
     }
 
     @Override
