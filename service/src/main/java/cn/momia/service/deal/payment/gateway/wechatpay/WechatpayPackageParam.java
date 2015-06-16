@@ -1,7 +1,6 @@
 package cn.momia.service.deal.payment.gateway.wechatpay;
 
 import cn.momia.common.encrypt.CommonUtil;
-import cn.momia.common.error.SDKRuntimeException;
 
 import java.util.HashMap;
 
@@ -116,10 +115,10 @@ public class WechatpayPackageParam {
         return true;
     }
 
-    public String getPackage(WechatpayPackageParam param) throws SDKRuntimeException {
+    public String getPackage(WechatpayPackageParam param) {
         HashMap<String,String> obj = getHashMapParam(param);
         if ("" == param.getPartnerKey()) {
-            throw new SDKRuntimeException("密钥不能为空！");
+            throw new RuntimeException("密钥不能为空！");
         }
         String unSignParaString = CommonUtil.FormatBizQueryParaMap(obj, false);
         String paraString = CommonUtil.FormatBizQueryParaMap(obj, true);
