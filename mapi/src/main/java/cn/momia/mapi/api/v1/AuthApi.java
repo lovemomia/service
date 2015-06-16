@@ -20,10 +20,10 @@ public class AuthApi extends AbstractApi {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseMessage login(@RequestParam String mobile, @RequestParam(value = "code") String verifyCode) {
+    public ResponseMessage login(@RequestParam String mobile, @RequestParam String code) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("mobile", mobile)
-                .add("code", verifyCode);
+                .add("code", code);
         MomiaHttpPostRequest request = new MomiaHttpPostRequest(baseServiceUrl("auth/login"), builder.build());
 
         return executeRequest(request);
