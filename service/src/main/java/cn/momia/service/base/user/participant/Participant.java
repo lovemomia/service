@@ -1,9 +1,5 @@
 package cn.momia.service.base.user.participant;
 
-import com.alibaba.fastjson.JSONObject;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Participant {
@@ -56,18 +52,6 @@ public class Participant {
 
     public void setBirthday(Date birthday) {
         this.birthday = birthday;
-    }
-
-    public Participant() {
-
-    }
-
-    public Participant(JSONObject jsonObject) throws ParseException {
-        if (jsonObject.containsKey("id")) setId(jsonObject.getLong("id"));
-        setUserId(jsonObject.getLong("userId"));
-        setName(jsonObject.getString("name"));
-        setSex(jsonObject.getInteger("sex"));
-        setBirthday(new SimpleDateFormat("yyyy-MM-dd").parse(jsonObject.getString("birthday")));
     }
 
     public boolean exists() {
