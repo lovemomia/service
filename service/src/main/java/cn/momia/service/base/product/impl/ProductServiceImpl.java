@@ -74,6 +74,20 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     @Override
     public List<Product> queryProducts(int start, int count, ProductQuery query) {
         // TODO use query
-        return null;
+        String sql = "SELECT id FROM t_product WHERE status=1 ORDER BY addTime DESC LIMIT ?,?";
+        final List<Long> productIds = new ArrayList<Long>();
+        jdbcTemplate.query(sql, new Object[] { start, count }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                productIds.add(rs.getLong("id"));
+            }
+        });
+
+        List<Product> products = new ArrayList<Product>();
+        for (long productId : productIds) {
+            products.add(get(productId));
+        }
+
+        return products;
     }
 }
