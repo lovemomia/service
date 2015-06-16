@@ -3,15 +3,19 @@ package cn.momia.service.web.ctrl.deal;
 import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.base.product.sku.SkuService;
+import cn.momia.service.base.user.User;
+import cn.momia.service.base.user.UserService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.web.ctrl.AbstractController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -24,6 +28,9 @@ public class OrderController extends AbstractController {
 
     @Autowired
     private SkuService skuService;
+
+    @Autowired
+    private UserService userService;
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage placeOrder(@RequestBody Order order) {
@@ -50,5 +57,20 @@ public class OrderController extends AbstractController {
 
     private boolean unlockSku(Order order) {
         return skuService.unlock(order.getSkuId(), order.getCount());
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.POST)
+    public ResponseMessage deleteOrder(@PathVariable long id, @RequestParam String utoken) {
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return new ResponseMessage(ErrorCode.FORBIDDEN, "user not login");
+
+        if (!orderService.delete(id, user.getId())) return new ResponseMessage(ErrorCode.FORBIDDEN, "fail to delete order");
+        return new ResponseMessage("delete order successfully");
+    }
+
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam String query) {
+        // TODO
+        return new ResponseMessage("TODO");
     }
 }
