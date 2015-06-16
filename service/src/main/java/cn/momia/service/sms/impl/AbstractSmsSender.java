@@ -46,7 +46,7 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
                 int status = rs.getInt("status");
                 Date generateTime = rs.getTimestamp("generateTime");
 
-                if (status == 0 || generateTime == null || (generateTime != null && new Date().getTime() - generateTime.getTime() > 30 * 60 * 1000)) return "";
+                if (status == 0 || generateTime == null || new Date().getTime() - generateTime.getTime() > 30 * 60 * 1000) return "";
                 return code;
             }
         });
