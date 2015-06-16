@@ -2,7 +2,7 @@ package cn.momia.service.base.product.sku;
 
 public class SkuPropertyValue {
     private long id;
-    private long propertyId;
+    private long nameId;
     private String value;
 
     public long getId() {
@@ -13,12 +13,12 @@ public class SkuPropertyValue {
         this.id = id;
     }
 
-    public long getPropertyId() {
-        return propertyId;
+    public long getNameId() {
+        return nameId;
     }
 
-    public void setPropertyId(long propertyId) {
-        this.propertyId = propertyId;
+    public void setNameId(long nameId) {
+        this.nameId = nameId;
     }
 
     public String getValue() {
