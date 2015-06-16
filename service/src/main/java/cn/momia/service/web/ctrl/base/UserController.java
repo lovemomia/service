@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
+
 @RestController
 @RequestMapping("/user")
 public class UserController extends AbstractController {
@@ -34,6 +36,17 @@ public class UserController extends AbstractController {
         return new ResponseMessage(user);
     }
 
+    @RequestMapping(value = "/{id}/avatar", method = RequestMethod.PUT)
+    public ResponseMessage updateAvatar(@RequestParam String utoken, @RequestParam String avatar) {
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "user not exists");
+
+        boolean successful = userService.updateAvatar(user.getId(), avatar);
+
+        if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update user avatar");
+        return new ResponseMessage("update user avatar successfully");
+    }
+
     @RequestMapping(value = "/{id}/name", method = RequestMethod.PUT)
     public ResponseMessage updateName(@RequestParam String utoken, @RequestParam String name) {
         User user = userService.getByToken(utoken);
@@ -43,17 +56,6 @@ public class UserController extends AbstractController {
 
         if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update user name");
         return new ResponseMessage("update user name successfully");
-    }
-
-    @RequestMapping(value = "/{id}/desc", method = RequestMethod.PUT)
-    public ResponseMessage updateDesc(@RequestParam String utoken, @RequestParam String desc) {
-        User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "user not exists");
-
-        boolean successful = userService.updateDesc(user.getId(), desc);
-
-        if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update user desc");
-        return new ResponseMessage("update user desc successfully");
     }
 
     @RequestMapping(value = "/{id}/sex", method = RequestMethod.PUT)
@@ -67,15 +69,26 @@ public class UserController extends AbstractController {
         return new ResponseMessage("update user sex successfully");
     }
 
-    @RequestMapping(value = "/{id}/avatar", method = RequestMethod.PUT)
-    public ResponseMessage updateAvatar(@RequestParam String utoken, @RequestParam String avatar) {
+    @RequestMapping(value = "/{id}/birthday", method = RequestMethod.PUT)
+    public ResponseMessage updateDesc(@RequestParam String utoken, @RequestParam Date birthday) {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "user not exists");
 
-        boolean successful = userService.updateAvatar(user.getId(), avatar);
+        boolean successful = userService.updateBirthday(user.getId(), birthday);
 
-        if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update user avatar");
-        return new ResponseMessage("update user avatar successfully");
+        if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update user birthday");
+        return new ResponseMessage("update user birthday successfully");
+    }
+
+    @RequestMapping(value = "/{id}/city", method = RequestMethod.PUT)
+    public ResponseMessage updateDesc(@RequestParam String utoken, @RequestParam int city) {
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "user not exists");
+
+        boolean successful = userService.updateCityId(user.getId(), city);
+
+        if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update user city");
+        return new ResponseMessage("update user city successfully");
     }
 
     @RequestMapping(value = "/{id}/address", method = RequestMethod.PUT)
@@ -87,27 +100,5 @@ public class UserController extends AbstractController {
 
         if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update user address");
         return new ResponseMessage("update user address successfully");
-    }
-
-    @RequestMapping(value = "/{id}/idcardno", method = RequestMethod.PUT)
-    public ResponseMessage updateIdCardNo(@RequestParam String utoken, @RequestParam String idCardNo) {
-        User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "user not exists");
-
-        boolean successful = userService.updateIdCardNo(user.getId(), idCardNo);
-
-        if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update user id card number");
-        return new ResponseMessage("update user id card number successfully");
-    }
-
-    @RequestMapping(value = "/{id}/idcardpic", method = RequestMethod.PUT)
-    public ResponseMessage updateIdCardPic(@RequestParam String utoken, @RequestParam String idCardPic) {
-        User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "user not exists");
-
-        boolean successful = userService.updateIdCardPic(user.getId(), idCardPic);
-
-        if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update user id card pic");
-        return new ResponseMessage("update user id card pic successfully");
     }
 }
