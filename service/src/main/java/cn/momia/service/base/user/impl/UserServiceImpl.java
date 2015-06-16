@@ -15,6 +15,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class UserServiceImpl extends DbAccessService implements UserService {
     @Override
@@ -80,6 +82,12 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         user.setAddress(rs.getString("address"));
 
         return user;
+    }
+
+    @Override
+    public Map<Long, User> get(List<Long> ids) {
+        // TODO
+        return null;
     }
 
     @Override
