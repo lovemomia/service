@@ -112,11 +112,19 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
+    public boolean delete(long id, long userId) {
+        String sql = "UPDATE t_order SET status=0 WHERE id=? AND userId=? AND status=?";
+        int updateCount = jdbcTemplate.update(sql, new Object[] { id, userId, Order.Status.NOT_PAYED });
+
+        return updateCount == 1;
+    }
+
+    @Override
     public boolean prepay(long id) {
         String sql = "UPDATE t_order SET status=? WHERE id=? AND status=?";
         int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PRE_PAYED, id, Order.Status.NOT_PAYED });
 
-        return updateCount > 0;
+        return updateCount == 1;
     }
 
     @Override
@@ -124,6 +132,6 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         String sql = "UPDATE t_order SET status=? WHERE id=? AND status=?";
         int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PAYED, id, Order.Status.PRE_PAYED });
 
-        return updateCount > 0;
+        return updateCount == 1;
     }
 }
