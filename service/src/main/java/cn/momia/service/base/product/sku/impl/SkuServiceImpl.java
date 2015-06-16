@@ -7,6 +7,7 @@ import cn.momia.service.base.product.sku.SkuProperty;
 import cn.momia.service.base.product.sku.SkuPropertyValue;
 import cn.momia.service.base.product.sku.SkuService;
 import com.google.common.base.Splitter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;
@@ -98,6 +99,27 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
         propertyValue.setValue(rs.getString("value"));
 
         return propertyValue;
+    }
+
+    @Override
+    public Map<Long, List<Sku>> queryByProducts(List<Long> productIds) {
+        final Map<Long, List<Sku>> skusOfProducts = new HashMap<Long, List<Sku>>();
+
+        String sql = "SELECT id, productId, propertyValues, price, stock, unlockedStock, lockedStock FROM t_sku WHERE productId IN (" + StringUtils.join(productIds, ",") + ") AND status=1";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                Sku sku = buildSku(rs);
+                List<Sku> skus = skusOfProducts.get(sku.getProductId());
+                if (skus == null) {
+                    skus = new ArrayList<Sku>();
+                    skusOfProducts.put(sku.getProductId(), skus);
+                }
+                skus.add(sku);
+            }
+        });
+
+        return skusOfProducts;
     }
 
     @Override

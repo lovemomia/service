@@ -23,7 +23,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/product")
@@ -47,20 +49,19 @@ public class ProductController extends AbstractController {
     public ResponseMessage getProducts(@RequestParam int start, @RequestParam int count, @RequestParam(required = false) String query) {
         // TODO validate limit
         List<Product> products = productService.queryProducts(start, count, new ProductQuery(query));
-        List<List<Sku>> skusOfProducts = new ArrayList<List<Sku>>();
-        for (Product product : products) {
-            skusOfProducts.add(skuService.queryByProduct(product.getId()));
-        }
+        List<Long> productIds = new ArrayList<Long>();
+        for (Product product : products) productIds.add(product.getId());
+        Map<Long, List<Sku>> skusOfProducts = skuService.queryByProducts(productIds);
 
         return new ResponseMessage(buildProductsResponse(products, skusOfProducts));
     }
 
-    private JSONArray buildProductsResponse(List<Product> products, List<List<Sku>> skusOfProducts) {
+    private JSONArray buildProductsResponse(List<Product> products, Map<Long, List<Sku>> skusOfProducts) {
         JSONArray data = new JSONArray();
-        for (int i = 0; i < products.size(); i++) {
+        for (Product product : products) {
             JSONObject productData = new JSONObject();
-            productData.put("product", products.get(i));
-            productData.put("skus", skusOfProducts.get(i));
+            productData.put("product", product);
+            productData.put("skus", skusOfProducts.get(product.getId()));
 
             data.add(productData);
         }
