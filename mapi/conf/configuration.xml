@@ -22,6 +22,7 @@
     </Service>
 
     <Home>
+        <BannerCount>3</BannerCount>
         <PageSize>10</PageSize>
     </Home>
 </Configuration>
