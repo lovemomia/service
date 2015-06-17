@@ -1,7 +1,5 @@
 package cn.momia.common.web.http;
 
-import com.alibaba.fastjson.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +8,7 @@ import java.util.Map;
 public class MomiaHttpResponseCollector {
     private boolean successful;
     private List<Throwable> exceptions = new ArrayList<Throwable>();
-    private Map<String, JSONObject> responses = new HashMap<String, JSONObject>();
+    private Map<String, Object> responses = new HashMap<String, Object>();
 
     public boolean isSuccessful() {
         return successful;
@@ -28,11 +26,11 @@ public class MomiaHttpResponseCollector {
         return exceptions;
     }
 
-    public void addResponse(String name, JSONObject jsonObject) {
-        responses.put(name, jsonObject);
+    public void addResponse(String name, Object object) {
+        responses.put(name, object);
     }
 
-    public JSONObject getResponse(String name) {
+    public Object getResponse(String name) {
         return responses.get(name);
     }
 

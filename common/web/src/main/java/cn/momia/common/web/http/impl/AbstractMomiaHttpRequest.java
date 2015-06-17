@@ -171,4 +171,13 @@ public abstract class AbstractMomiaHttpRequest implements MomiaHttpRequest {
     public void setParams(HttpParams params) {
         httpRequestBase.setParams(params);
     }
+
+    @Override
+    public String toString() {
+        return "AbstractMomiaHttpRequest{" +
+                "name='" + name + '\'' +
+                ", required=" + required +
+                ", params=" + params +
+                '}';
+    }
 }

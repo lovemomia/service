@@ -44,15 +44,15 @@ public class ProductApi extends AbstractApi {
             public JSONObject apply(MomiaHttpResponseCollector collector) {
                 JSONObject productObject = new JSONObject();
 
-                JSONObject product = collector.getResponse("product");
+                JSONObject product = (JSONObject) collector.getResponse("product");
                 productObject.put("product", product);
                 productObject.put("skus", collector.getResponse("skus"));
                 productObject.put("server", collector.getResponse("server"));
 
-                JSONObject comments = collector.getResponse("comments");
+                Object comments = collector.getResponse("comments");
                 if (comments != null) productObject.put("comments", comments);
 
-                JSONObject customers = collector.getResponse("customers");
+                Object customers = collector.getResponse("customers");
                 if (customers != null) productObject.put("customers", customers);
 
                 Long placeId = product.getJSONObject("content").getLong("placeId");
@@ -90,7 +90,10 @@ public class ProductApi extends AbstractApi {
     }
 
     private MomiaHttpRequest buildProductCommentsRequest(long productId) {
-        return new MomiaHttpGetRequest("comments", false, baseServiceUrl("product", productId, "comment"));
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("start", 0)
+                .add("count", 10); // TODO comment count
+        return new MomiaHttpGetRequest("comments", false, baseServiceUrl("product", productId, "comment"), builder.build());
     }
 
     private MomiaHttpRequest buildProductServerRequest(long productId) {
@@ -98,7 +101,10 @@ public class ProductApi extends AbstractApi {
     }
 
     private MomiaHttpRequest buildProductCustomersRequest(long productId) {
-        return new MomiaHttpGetRequest("customers", false, baseServiceUrl("product", productId, "customer"));
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("start", 0)
+                .add("count", 10); // TODO customer count
+        return new MomiaHttpGetRequest("customers", false, baseServiceUrl("product", productId, "customer"), builder.build());
     }
 
     @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)

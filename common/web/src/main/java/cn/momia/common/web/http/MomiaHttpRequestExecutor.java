@@ -45,7 +45,7 @@ public class MomiaHttpRequestExecutor {
                             return;
                         }
 
-                        collector.addResponse(request.getName(), responseJson.getJSONObject("data"));
+                        collector.addResponse(request.getName(), responseJson.get("data"));
                     } catch (Throwable t) {
                         collector.addException(t);
                         if (request.isRequired()) shutdown(executorService, successful);
