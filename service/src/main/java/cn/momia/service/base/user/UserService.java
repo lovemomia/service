@@ -12,7 +12,7 @@ public interface UserService {
     User getByMobile(String mobile);
     boolean updateAvatar(long id, String avatar);
     boolean updateName(long id, String name);
-    boolean updateSex(long id, int sex);
+    boolean updateSex(long id, String sex);
     boolean updateBirthday(long id, Date birthday);
     boolean updateCityId(long id, int cityId);
     boolean updateAddress(long id, String address);

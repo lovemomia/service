@@ -59,7 +59,7 @@ public class UserApi extends AbstractApi {
     }
 
     @RequestMapping(value = "/sex", method = RequestMethod.PUT)
-    public ResponseMessage updateSex(@RequestParam String utoken, @RequestParam int sex) {
+    public ResponseMessage updateSex(@RequestParam String utoken, @RequestParam String sex) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("sex", sex);

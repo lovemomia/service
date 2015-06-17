@@ -60,7 +60,7 @@ public class UserController extends AbstractController {
     }
 
     @RequestMapping(value = "/sex", method = RequestMethod.PUT)
-    public ResponseMessage updateSex(@RequestParam String utoken, @RequestParam int sex) {
+    public ResponseMessage updateSex(@RequestParam String utoken, @RequestParam String sex) {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "user not exists");
 

@@ -20,7 +20,7 @@ public class User {
     private String mobile;
     private String avatar;
     private String name;
-    private int sex;
+    private String sex;
     private Date birthday;
     private int cityId;
     private String address;
@@ -65,11 +65,11 @@ public class User {
         this.name = name;
     }
 
-    public int getSex() {
+    public String getSex() {
         return sex;
     }
 
-    public void setSex(int sex) {
+    public void setSex(String sex) {
         this.sex = sex;
     }
 
