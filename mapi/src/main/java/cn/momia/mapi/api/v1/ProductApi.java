@@ -55,6 +55,8 @@ public class ProductApi extends AbstractApi {
                 productObject.put("cover", baseProduct.get("cover"));
                 productObject.put("title", baseProduct.get("title"));
                 productObject.put("joined", baseProduct.get("sales"));
+                productObject.put("imgs", baseProduct.getJSONArray("imgs"));
+                productObject.put("content", baseProduct.getJSONObject("content"));
 
                 processPlace(productObject, collector);
                 processSkus(productObject, collector);
@@ -175,7 +177,7 @@ public class ProductApi extends AbstractApi {
             formattedSku.put("id", sku.get("id"));
             formattedSku.put("price", sku.getFloat("price"));
             formattedSku.put("stock", sku.getInteger("unlockedStock"));
-            formattedSku.put("propertied", sku.getJSONArray("properties"));
+            formattedSku.put("properties", sku.getJSONArray("properties"));
 
             formattedSkus.add(formattedSku);
         }
