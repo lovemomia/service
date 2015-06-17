@@ -38,7 +38,9 @@ public class HomeApi extends AbstractApi {
             public JSONObject apply(MomiaHttpResponseCollector collector) {
                 JSONObject homeData = new JSONObject();
                 if (pageIndex == 0) homeData.put("banners", collector.getResponse("banners"));
-                homeData.put("products", extractProductsData((JSONArray) collector.getResponse("products")));
+                JSONArray products = extractProductsData((JSONArray) collector.getResponse("products"));
+                homeData.put("products", products);
+                if (products.size() == conf.getInt("Home.PageSize")) homeData.put("nextpage", pageIndex + 1);
 
                 return homeData;
             }
