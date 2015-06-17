@@ -78,6 +78,7 @@ public class HomeApi extends AbstractApi {
 
             JSONObject rawBaseProduct = rawProduct.getJSONObject("product");
             JSONObject product = new JSONObject();
+            product.put("id", rawBaseProduct.get("id"));
             product.put("cover", rawBaseProduct.get("cover"));
             product.put("title", rawBaseProduct.get("title"));
             product.put("joined", rawBaseProduct.get("sales"));
