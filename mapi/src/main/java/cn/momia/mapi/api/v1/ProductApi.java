@@ -136,12 +136,12 @@ public class ProductApi extends AbstractApi {
         Collections.sort(times);
 
         if (!prices.isEmpty()) productObject.put("price", prices.get(0));
-        productObject.put("time", buildTimeString(times));
+        productObject.put("scheduler", buildScheduler(times));
 
         productObject.put("skus", formatSkus(skus));
     }
 
-    private String buildTimeString(List<Date> times) {
+    private String buildScheduler(List<Date> times) {
 
         if (times.isEmpty()) return "";
         if (times.size() == 1) {

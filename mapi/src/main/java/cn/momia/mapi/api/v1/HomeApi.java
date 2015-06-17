@@ -108,14 +108,14 @@ public class HomeApi extends AbstractApi {
             Collections.sort(times);
 
             if (!prices.isEmpty()) product.put("price", prices.get(0));
-            product.put("time", buildTimeString(times));
+            product.put("scheduler", buildScheduler(times));
 
             products.add(product);
         }
         return products;
     }
 
-    private String buildTimeString(List<Date> times) {
+    private String buildScheduler(List<Date> times) {
 
         if (times.isEmpty()) return "";
         if (times.size() == 1) {
