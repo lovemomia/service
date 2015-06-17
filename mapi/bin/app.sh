@@ -3,8 +3,12 @@
 source "/etc/profile"
 
 if [ $# -lt 1 ]; then
-    echo "usage: $0 start|stop" >&2
+    echo "usage: $0 start|stop [port]" >&2
     exit 1
+fi
+
+if [ $# -eq 2 ]; then
+    PORT=$2
 fi
 
 cd `dirname $0`/..
@@ -37,7 +41,7 @@ start)
       fi
     fi
 
-    nohup java $JAVA_OPTS -cp $CLASSPATH cn.momia.mapi.web.MApiWeb >> $GCLOGPATH 2>&1 &
+    nohup java $JAVA_OPTS -cp $CLASSPATH cn.momia.mapi.web.MApiWeb $PORT >> $GCLOGPATH 2>&1 &
     pid=$!
     sleep 3
     kill -0 $pid
@@ -87,5 +91,5 @@ restart)
     ;;
 
 *)
-    echo "usage: $0 start|stop" >&2
+    echo "usage: $0 start|stop [port]" >&2
 esac
