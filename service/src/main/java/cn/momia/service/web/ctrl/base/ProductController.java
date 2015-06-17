@@ -5,6 +5,8 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.base.comment.Comment;
 import cn.momia.service.base.comment.CommentService;
 import cn.momia.service.base.customer.Customer;
+import cn.momia.service.base.place.Place;
+import cn.momia.service.base.place.PlaceService;
 import cn.momia.service.base.product.Product;
 import cn.momia.service.base.product.ProductQuery;
 import cn.momia.service.base.product.ProductService;
@@ -44,6 +46,9 @@ public class ProductController extends AbstractController {
     private ParticipantService participantService;
 
     @Autowired
+    private PlaceService placeService;
+
+    @Autowired
     private ProductService productService;
 
     @Autowired
@@ -58,16 +63,18 @@ public class ProductController extends AbstractController {
         List<Long> productIds = new ArrayList<Long>();
         for (Product product : products) productIds.add(product.getId());
         Map<Long, List<Sku>> skusOfProducts = skuService.queryByProducts(productIds);
+        Map<Long, Place> placesOfProducts = placeService.getByProduct(productIds);
 
-        return new ResponseMessage(buildProductsResponse(products, skusOfProducts));
+        return new ResponseMessage(buildProductsResponse(products, skusOfProducts, placesOfProducts));
     }
 
-    private JSONArray buildProductsResponse(List<Product> products, Map<Long, List<Sku>> skusOfProducts) {
+    private JSONArray buildProductsResponse(List<Product> products, Map<Long, List<Sku>> skusOfProducts, Map<Long, Place> placesOfProducts) {
         JSONArray data = new JSONArray();
         for (Product product : products) {
             JSONObject productData = new JSONObject();
             productData.put("product", product);
             productData.put("skus", skusOfProducts.get(product.getId()));
+            productData.put("place", placesOfProducts.get(product.getId()));
 
             data.add(productData);
         }

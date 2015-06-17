@@ -4,6 +4,7 @@ import cn.momia.service.base.DbAccessService;
 import cn.momia.service.base.place.Place;
 import cn.momia.service.base.place.PlaceImage;
 import cn.momia.service.base.place.PlaceService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -11,12 +12,14 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     @Override
     public Place get(long id) {
-        String sql = "SELECT id, name, address, `desc`, lng, lat FROM t_place WHERE id=?";
+        String sql = "SELECT id, name, address, `desc`, lng, lat FROM t_place WHERE id=? AND status=1";
 
         Place place = jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Place>() {
             @Override
@@ -63,5 +66,23 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
         img.setHeight(rs.getInt("height"));
 
         return img;
+    }
+
+    @Override
+    public Map<Long, Place> getByProduct(List<Long> productIds) {
+        final Map<Long, Place> places = new HashMap<Long, Place>();
+        if (productIds.isEmpty()) return places;
+
+        String sql = "SELECT A.id, A.name, A.address, A.`desc`, A.lng, A.lat, B.id AS productId FROM t_place A INNER JOIN t_product_place B WHERE B.productId IN (" + StringUtils.join(productIds, ",") + ") AND A.status=1 AND B.status=1";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                long productId = rs.getLong("productId");
+                Place place = buildPlace(rs);
+                places.put(productId, place);
+            }
+        });
+
+        return places;
     }
 }
