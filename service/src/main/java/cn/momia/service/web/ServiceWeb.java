@@ -33,7 +33,7 @@ public class ServiceWeb {
     }
 
     private static int getServerPort(String[] args) {
-        if (args.length > 1) {
+        if (args.length > 0) {
             try {
                 return Integer.valueOf(args[0]);
             } catch (NumberFormatException e) {
