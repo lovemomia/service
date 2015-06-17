@@ -76,6 +76,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     @Override
     public List<Product> getByIds(List<Long> ids) {
         final List<Product> products = new ArrayList<Product>();
+        if (ids.size() <= 0) return products;
 
         String sql = "SELECT id, categoryId, title, cover, content, sales FROM t_product WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1 ORDER BY addTime DESC";
         jdbcTemplate.query(sql, new RowCallbackHandler() {

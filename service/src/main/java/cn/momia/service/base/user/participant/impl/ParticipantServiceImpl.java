@@ -3,6 +3,7 @@ package cn.momia.service.base.user.participant.impl;
 import cn.momia.service.base.DbAccessService;
 import cn.momia.service.base.user.participant.Participant;
 import cn.momia.service.base.user.participant.ParticipantService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -16,7 +17,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ParticipantServiceImpl extends DbAccessService implements ParticipantService {
     @Override
@@ -78,6 +81,23 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
         participant.setBirthday(rs.getDate("birthday"));
 
         return participant;
+    }
+
+    @Override
+    public Map<Long, Participant> get(List<Long> ids) {
+        final Map<Long, Participant> participants = new HashMap<Long, Participant>();
+        if (ids.size() <= 0) return participants;
+
+        String sql = "SELECT id, userId, name, sex, birthday FROM t_user_participant WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                Participant participant = buildParticipant(rs);
+                participants.put(participant.getId(), participant);
+            }
+        });
+
+        return participants;
     }
 
     @Override

@@ -104,9 +104,17 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
-    public List<Order> queryDistinctCustomerOrderByProduct(long id, int start, int count) {
-        // TODO
-        return null;
+    public List<Order> queryDistinctCustomerOrderByProduct(long productId, int start, int count) {
+        String sql = "SELECT id, customerId, productId, skuId, price, `count`, contacts, mobile, participants, status, addTime FROM t_order WHERE productId=? GROUP BY customerId LIMIT ?,?";
+        final List<Order> orders = new ArrayList<Order>();
+        jdbcTemplate.query(sql, new Object[] { productId, start, count }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                orders.add(buildOrder(rs));
+            }
+        });
+
+        return orders;
     }
 
     @Override

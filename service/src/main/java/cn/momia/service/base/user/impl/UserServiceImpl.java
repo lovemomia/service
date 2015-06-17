@@ -1,9 +1,11 @@
 package cn.momia.service.base.user.impl;
 
 import cn.momia.service.base.DbAccessService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import cn.momia.service.base.user.User;
@@ -15,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -86,8 +89,19 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public Map<Long, User> get(List<Long> ids) {
-        // TODO
-        return null;
+        final Map<Long, User> users = new HashMap<Long, User>();
+        if (ids.size() <= 0) return users;
+
+        String sql = "SELECT id, token, mobile, avatar, name, sex, birthday, cityId, address FROM t_user WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                User user = buildUser(rs);
+                users.put(user.getId(), user);
+            }
+        });
+
+        return users;
     }
 
     @Override
