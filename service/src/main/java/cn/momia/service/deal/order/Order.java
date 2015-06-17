@@ -1,5 +1,6 @@
 package cn.momia.service.deal.order;
 
+import java.util.Date;
 import java.util.List;
 
 public class Order {
@@ -27,6 +28,7 @@ public class Order {
     private String mobile;
     private List<Long> participants;
     private int status;
+    private Date addTime;
 
     public long getId() {
         return id;
@@ -106,6 +108,14 @@ public class Order {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public Date getAddTime() {
+        return addTime;
+    }
+
+    public void setAddTime(Date addTime) {
+        this.addTime = addTime;
     }
 
     @Override

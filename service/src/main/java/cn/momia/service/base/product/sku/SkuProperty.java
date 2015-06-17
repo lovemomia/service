@@ -1,31 +1,24 @@
 package cn.momia.service.base.product.sku;
 
 public class SkuProperty {
-    private long id;
-    private int categoryId;
+    public static class Type {
+        public static final int VALUE = 0;
+        public static final int REF = 1;
+    }
+
     private String name;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public int getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
-    }
+    private String value;
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public String getValue() {
+        return value;
+    }
+
+    public SkuProperty(String name, String value) {
         this.name = name;
+        this.value = value;
     }
 }

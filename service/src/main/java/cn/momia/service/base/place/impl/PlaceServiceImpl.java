@@ -45,7 +45,7 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     private List<PlaceImage> getImgUrls(long placeId) {
         final List<PlaceImage> imgs = new ArrayList<PlaceImage>();
 
-        String sql = "SELECT url, width, height ROM t_place_img WHERE placeId = ?  ";
+        String sql = "SELECT url, width, height FROM t_place_img WHERE placeId = ?  ";
         jdbcTemplate.query(sql, new Object[] { placeId }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {

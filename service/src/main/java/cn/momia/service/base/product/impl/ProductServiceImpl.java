@@ -6,6 +6,7 @@ import cn.momia.service.base.product.ProductImage;
 import cn.momia.service.base.product.ProductQuery;
 import cn.momia.service.base.product.ProductService;
 import com.alibaba.fastjson.JSON;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -25,7 +26,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     }
 
     public Product getProduct(long id){
-        String sql = "SELECT id, categoryId, title, content, sales FROM t_product WHERE id=? AND status=1";
+        String sql = "SELECT id, categoryId, title, cover, content, sales FROM t_product WHERE id=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Product>() {
             @Override
@@ -41,6 +42,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
         product.setId(rs.getLong("id"));
         product.setCategoryId(rs.getInt("categoryId"));
         product.setTitle(rs.getString("title"));
+        product.setCover(rs.getString("cover"));
         product.setContent(JSON.parseObject(rs.getString("content")));
         product.setSales(rs.getInt("sales"));
 
@@ -72,21 +74,33 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     }
 
     @Override
-    public List<Product> queryProducts(int start, int count, ProductQuery query) {
-        // TODO use query
-        String sql = "SELECT id FROM t_product WHERE status=1 ORDER BY addTime DESC LIMIT ?,?";
-        final List<Long> productIds = new ArrayList<Long>();
-        jdbcTemplate.query(sql, new Object[] { start, count }, new RowCallbackHandler() {
+    public List<Product> getByIds(List<Long> ids) {
+        final List<Product> products = new ArrayList<Product>();
+        if (ids.size() <= 0) return products;
+
+        String sql = "SELECT id, categoryId, title, cover, content, sales FROM t_product WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1 ORDER BY addTime DESC";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
-                productIds.add(rs.getLong("id"));
+                products.add(buildProduct(rs));
             }
         });
 
-        List<Product> products = new ArrayList<Product>();
-        for (long productId : productIds) {
-            products.add(get(productId));
-        }
+        return products;
+    }
+
+    @Override
+    public List<Product> queryProducts(int start, int count, ProductQuery query) {
+        // TODO use query
+        final List<Product> products = new ArrayList<Product>();
+
+        String sql = "SELECT id, categoryId, title, cover, content, sales FROM t_product WHERE status=1 ORDER BY addTime DESC LIMIT ?,?";
+        jdbcTemplate.query(sql, new Object[] { start, count }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                products.add(buildProduct(rs));
+            }
+        });
 
         return products;
     }

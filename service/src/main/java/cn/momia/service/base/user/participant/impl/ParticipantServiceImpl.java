@@ -3,6 +3,7 @@ package cn.momia.service.base.user.participant.impl;
 import cn.momia.service.base.DbAccessService;
 import cn.momia.service.base.user.participant.Participant;
 import cn.momia.service.base.user.participant.ParticipantService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -16,8 +17,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ParticipantServiceImpl extends DbAccessService implements ParticipantService {
     @Override
@@ -41,31 +43,11 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
     }
 
     @Override
-    public boolean updateName(long id, long userId, String name) {
-        String sql = "UPDATE t_user_participant SET name=? WHERE id=? AND userId=?";
+    public boolean update(Participant participant) {
+        String sql = "UPDATE t_user_participant SET name=?, sex=?, birthday=? WHERE id=? AND userId=?";
+        int updateCount = jdbcTemplate.update(sql, new Object[] { participant.getName(), participant.getSex(), participant.getBirthday(), participant.getId(), participant.getUserId() });
 
-        return update(sql, new Object[] { name, id, userId });
-    }
-
-    public boolean update(String sql, Object[] args) {
-        int affectedRowCount = jdbcTemplate.update(sql, args);
-        if (affectedRowCount != 1) return false;
-
-        return true;
-    }
-
-    @Override
-    public boolean updateSex(long id, long userId, int sex) {
-        String sql = "UPDATE t_user_participant SET sex=? WHERE id=? AND userId=?";
-
-        return update(sql, new Object[] { sex, id, userId });
-    }
-
-    @Override
-    public boolean updateBirthday(long id, long userId, Date birthday) {
-        String sql = "UPDATE t_user_participant SET birthday=? WHERE id=? AND userId=?";
-
-        return update(sql, new Object[] { birthday, id, userId });
+        return updateCount == 1;
     }
 
     @Override
@@ -99,6 +81,23 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
         participant.setBirthday(rs.getDate("birthday"));
 
         return participant;
+    }
+
+    @Override
+    public Map<Long, Participant> get(List<Long> ids) {
+        final Map<Long, Participant> participants = new HashMap<Long, Participant>();
+        if (ids.size() <= 0) return participants;
+
+        String sql = "SELECT id, userId, name, sex, birthday FROM t_user_participant WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                Participant participant = buildParticipant(rs);
+                participants.put(participant.getId(), participant);
+            }
+        });
+
+        return participants;
     }
 
     @Override

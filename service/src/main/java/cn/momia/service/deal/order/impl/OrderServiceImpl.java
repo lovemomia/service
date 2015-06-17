@@ -48,7 +48,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public Order get(long id) {
-        String sql = "SELECT id, customerId, productId, skuId, price, `count`, contacts, mobile, participants, status FROM t_order WHERE id=?";
+        String sql = "SELECT id, customerId, productId, skuId, price, `count`, contacts, mobile, participants, status, addTime FROM t_order WHERE id=?";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Order>() {
             @Override
@@ -71,6 +71,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         order.setContacts(rs.getString("contacts"));
         order.setMobile(rs.getString("mobile"));
         order.setStatus(rs.getInt("status"));
+        order.setAddTime(rs.getTimestamp("addTime"));
 
         List<Long> participants = new ArrayList<Long>();
         for (String participant : Splitter.on(",").omitEmptyStrings().trimResults().split(rs.getString("participants")))
@@ -84,7 +85,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public List<Order> queryByProduct(long productId, int start, int count) {
-        String sql = "SELECT id, customerId, productId, skuId, price, `count`, contacts, mobile, participants, status FROM t_order WHERE productId=? LIMIT ?,?";
+        String sql = "SELECT id, customerId, productId, skuId, price, `count`, contacts, mobile, participants, status, addTime FROM t_order WHERE productId=? LIMIT ?,?";
         final List<Order> orders = new ArrayList<Order>();
         jdbcTemplate.query(sql, new Object[] { productId, start, count }, new RowCallbackHandler() {
             @Override
@@ -97,18 +98,23 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
-    public List<Integer> queryCustomerByProduct(long id, int start, int count) {
-        final List<Integer> customers = new ArrayList<Integer>();
+    public List<Order> queryByUser(long userId, int start, int count) {
+        // TODO
+        return null;
+    }
 
-        String sql = "SELECT customerId FROM t_order WHERE productId=? LIMIT ?,?";
-        jdbcTemplate.query(sql, new Object[] { id, start, count }, new RowCallbackHandler() {
+    @Override
+    public List<Order> queryDistinctCustomerOrderByProduct(long productId, int start, int count) {
+        String sql = "SELECT id, customerId, productId, skuId, price, `count`, contacts, mobile, participants, status, addTime FROM t_order WHERE productId=? GROUP BY customerId LIMIT ?,?";
+        final List<Order> orders = new ArrayList<Order>();
+        jdbcTemplate.query(sql, new Object[] { productId, start, count }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
-                customers.add(rs.getInt("customerId"));
+                orders.add(buildOrder(rs));
             }
         });
 
-        return customers;
+        return orders;
     }
 
     @Override

@@ -14,7 +14,7 @@ public class Sku {
     private int stock;
     private int lockedStock;
     private int unlockedStock;
-    private List<Pair<SkuProperty, SkuPropertyValue>> properties;
+    private List<SkuProperty> properties;
 
     public long getId() {
         return id;
@@ -64,11 +64,11 @@ public class Sku {
         this.unlockedStock = unlockedStock;
     }
 
-    public List<Pair<SkuProperty, SkuPropertyValue>> getProperties() {
+    public List<SkuProperty> getProperties() {
         return properties;
     }
 
-    public void setProperties(List<Pair<SkuProperty, SkuPropertyValue>> properties) {
+    public void setProperties(List<SkuProperty> properties) {
         this.properties = properties;
     }
 

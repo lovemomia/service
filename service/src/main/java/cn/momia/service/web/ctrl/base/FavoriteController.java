@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/favorite")
@@ -57,27 +57,23 @@ public class FavoriteController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage getFavoritesOfUser(@RequestParam String utoken) {
+    public ResponseMessage getFavoritesOfUser(@RequestParam String utoken, @RequestParam int start, @RequestParam int count) {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return new ResponseMessage(ErrorCode.FORBIDDEN, "user not login");
 
-        List<Product> products = new ArrayList<Product>();
-        List<List<Sku>> skusOfProducts = new ArrayList<List<Sku>>();
-        List<Long> productIds = favoriteService.getFavoritesOfUser(user.getId());
-        for (long productId : productIds) {
-            products.add(productService.get(productId));
-            skusOfProducts.add(skuService.queryByProduct(productId));
-        }
+        List<Long> productIds = favoriteService.getFavoritesOfUser(user.getId(), start, count);
+        List<Product> products = productService.getByIds(productIds);
+        Map<Long, List<Sku>> skusOfProducts = skuService.queryByProducts(productIds);
 
         return new ResponseMessage(buildProductsResponse(products, skusOfProducts));
     }
 
-    private JSONArray buildProductsResponse(List<Product> products, List<List<Sku>> skusOfProducts) {
+    private JSONArray buildProductsResponse(List<Product> products, Map<Long, List<Sku>> skusOfProducts) {
         JSONArray data = new JSONArray();
-        for (int i = 0; i < products.size(); i++) {
+        for (Product product : products) {
             JSONObject productData = new JSONObject();
-            productData.put("product", products.get(i));
-            productData.put("skus", skusOfProducts.get(i));
+            productData.put("product", product);
+            productData.put("skus", skusOfProducts.get(product.getId()));
 
             data.add(productData);
         }

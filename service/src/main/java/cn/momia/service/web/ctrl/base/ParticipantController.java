@@ -35,16 +35,6 @@ public class ParticipantController {
         return new ResponseMessage(participant);
     }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage getAllParticipants(@RequestParam String utoken){
-        User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "user not exists");
-
-        List<Participant> participants = participantService.getByUser(user.getId());
-
-        return new ResponseMessage(participants);
-    }
-
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseMessage getParticipant(@PathVariable long id){
         Participant participant = participantService.get(id);
@@ -53,37 +43,12 @@ public class ParticipantController {
         return new ResponseMessage(participant);
     }
 
-    @RequestMapping(value = "/{id}/name", method = RequestMethod.PUT)
-    public ResponseMessage updateParticipantName(@PathVariable long id, @RequestParam String utoken, @RequestParam String name) {
-        User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "user not exists");
-
-        boolean successful = participantService.updateName(id, user.getId(), name);
+    @RequestMapping(method = RequestMethod.PUT)
+    public ResponseMessage updateParticipantName(@RequestBody Participant participant) {
+        boolean successful = participantService.update(participant);
 
         if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update participant name");
         return new ResponseMessage("update participant name successfully");
-    }
-
-    @RequestMapping(value = "/{id}/sex", method = RequestMethod.PUT)
-    public ResponseMessage updateParticipantSex(@PathVariable long id, @RequestParam String utoken, @RequestParam int sex) {
-        User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "user not exists");
-
-        boolean successful = participantService.updateSex(id, user.getId(), sex);
-
-        if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update participant sex");
-        return new ResponseMessage("update participant sex successfully");
-    }
-
-    @RequestMapping(value = "/{id}/birthday", method = RequestMethod.PUT)
-    public ResponseMessage updateParticipantBirthday(@PathVariable long id, @RequestParam String utoken, @RequestParam Date birthday) {
-        User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "user not exists");
-
-        boolean successful = participantService.updateBirthday(id, user.getId(), birthday);
-
-        if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update participant birthday");
-        return new ResponseMessage("update participant birthday successfully");
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -95,5 +60,15 @@ public class ParticipantController {
         if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to delete participant");
 
         return new ResponseMessage("delete participant successfully");
+    }
+
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseMessage getParticipantsOfUser(@RequestParam String utoken){
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "user not exists");
+
+        List<Participant> participants = participantService.getByUser(user.getId());
+
+        return new ResponseMessage(participants);
     }
 }

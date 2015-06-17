@@ -13,6 +13,7 @@ public class Product {
     private long id;
     private int categoryId;
     private String title;
+    private String cover;
     private JSONObject content;
     private int sales;
     private List<ProductImage> imgs;
@@ -39,6 +40,14 @@ public class Product {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
     }
 
     public int getSales() {

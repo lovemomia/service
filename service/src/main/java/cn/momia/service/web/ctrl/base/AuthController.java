@@ -37,11 +37,11 @@ public class AuthController extends AbstractController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseMessage login(@RequestParam String mobile, @RequestParam(value = "code") String verifyCode) {
-        if (StringUtils.isBlank(mobile) || StringUtils.isBlank(verifyCode))
+    public ResponseMessage login(@RequestParam String mobile, @RequestParam String code) {
+        if (StringUtils.isBlank(mobile) || StringUtils.isBlank(code))
             return new ResponseMessage(ErrorCode.BAD_REQUEST, "mobile or(and) verify code is empty");
 
-        if (!smsVerifier.verify(mobile, verifyCode)) return new ResponseMessage(ErrorCode.FORBIDDEN, "fail to verify");
+        if (!smsVerifier.verify(mobile, code)) return new ResponseMessage(ErrorCode.FORBIDDEN, "fail to verify");
 
         User user = userService.getByMobile(mobile);
         if (!user.exists()) user = userService.add(mobile, generateToken(mobile));

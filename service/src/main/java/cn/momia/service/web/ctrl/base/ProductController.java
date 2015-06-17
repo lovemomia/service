@@ -4,6 +4,7 @@ import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.base.comment.Comment;
 import cn.momia.service.base.comment.CommentService;
+import cn.momia.service.base.customer.Customer;
 import cn.momia.service.base.product.Product;
 import cn.momia.service.base.product.ProductQuery;
 import cn.momia.service.base.product.ProductService;
@@ -11,6 +12,9 @@ import cn.momia.service.base.product.sku.Sku;
 import cn.momia.service.base.product.sku.SkuService;
 import cn.momia.service.base.user.User;
 import cn.momia.service.base.user.UserService;
+import cn.momia.service.base.user.participant.Participant;
+import cn.momia.service.base.user.participant.ParticipantService;
+import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.web.ctrl.AbstractController;
 import com.alibaba.fastjson.JSONArray;
@@ -23,7 +27,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/product")
@@ -33,6 +39,9 @@ public class ProductController extends AbstractController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private ParticipantService participantService;
 
     @Autowired
     private ProductService productService;
@@ -45,22 +54,20 @@ public class ProductController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getProducts(@RequestParam int start, @RequestParam int count, @RequestParam(required = false) String query) {
-        // TODO validate limit
         List<Product> products = productService.queryProducts(start, count, new ProductQuery(query));
-        List<List<Sku>> skusOfProducts = new ArrayList<List<Sku>>();
-        for (Product product : products) {
-            skusOfProducts.add(skuService.queryByProduct(product.getId()));
-        }
+        List<Long> productIds = new ArrayList<Long>();
+        for (Product product : products) productIds.add(product.getId());
+        Map<Long, List<Sku>> skusOfProducts = skuService.queryByProducts(productIds);
 
         return new ResponseMessage(buildProductsResponse(products, skusOfProducts));
     }
 
-    private JSONArray buildProductsResponse(List<Product> products, List<List<Sku>> skusOfProducts) {
+    private JSONArray buildProductsResponse(List<Product> products, Map<Long, List<Sku>> skusOfProducts) {
         JSONArray data = new JSONArray();
-        for (int i = 0; i < products.size(); i++) {
+        for (Product product : products) {
             JSONObject productData = new JSONObject();
-            productData.put("product", products.get(i));
-            productData.put("skus", skusOfProducts.get(i));
+            productData.put("product", product);
+            productData.put("skus", skusOfProducts.get(product.getId()));
 
             data.add(productData);
         }
@@ -98,12 +105,42 @@ public class ProductController extends AbstractController {
 
     @RequestMapping(value = "/{id}/customer", method = RequestMethod.GET)
     public ResponseMessage getProductCustomersInfo(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
-        List<Integer> customers = orderService.queryCustomerByProduct(id, start, count);
-        List<User> users = new ArrayList<User>();
-        for (int customerId : customers) {
-            users.add(userService.get(customerId));
+        List<Order> orders = orderService.queryDistinctCustomerOrderByProduct(id, start, count);
+        List<Customer> customers = new ArrayList<Customer>();
+        List<Long> customerIds = new ArrayList<Long>();
+        List<Long> participantIds = new ArrayList<Long>();
+        Map<Long, List<Long>> participantsMap = new HashMap<Long, List<Long>>();
+        for (Order order : orders) {
+            Customer customer = new Customer();
+            customer.setUserId(order.getCustomerId());
+            customer.setOrderDate(order.getAddTime());
+            customer.setOrderStatus(order.getStatus());
+            customers.add(customer);
+            customerIds.add(order.getCustomerId());
+            participantIds.addAll(order.getParticipants());
+            participantsMap.put(order.getCustomerId(), order.getParticipants());
         }
 
-        return new ResponseMessage(users);
+        Map<Long, User> users = userService.get(customerIds);
+        Map<Long, Participant> participants = participantService.get(participantIds);
+
+        List<Customer> validCustomers = new ArrayList<Customer>();
+        for (int i = 0; i < customers.size(); i++) {
+            Customer customer = customers.get(i);
+            User user = users.get(customer.getUserId());
+            if (user == null || !user.exists()) continue;
+            customer.setAvatar(user.getAvatar());
+            customer.setName(user.getName());
+
+            List<Participant> participantList = new ArrayList<Participant>();
+            for (long participantId : participantsMap.get(customer.getUserId())) {
+                participantList.add(participants.get(participantId));
+            }
+            customer.setParticipants(participantList);
+
+            validCustomers.add(customer);
+        }
+
+        return new ResponseMessage(validCustomers);
     }
 }
