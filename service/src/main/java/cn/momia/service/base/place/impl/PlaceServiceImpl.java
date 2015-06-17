@@ -69,6 +69,19 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     }
 
     @Override
+    public Place getByProduct(long productId) {
+        String sql = "SELECT placeId FROM t_product_place WHERE productId=? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[] { productId }, new ResultSetExtractor<Place>() {
+            @Override
+            public Place extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (rs.next()) return get(rs.getLong("placeId"));
+                return Place.NOT_EXIST_PLACE;
+            }
+        });
+    }
+
+    @Override
     public Map<Long, Place> getByProduct(List<Long> productIds) {
         final Map<Long, Place> places = new HashMap<Long, Place>();
         if (productIds.isEmpty()) return places;

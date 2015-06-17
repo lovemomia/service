@@ -90,6 +90,14 @@ public class ProductController extends AbstractController {
         return new ResponseMessage(product);
     }
 
+    @RequestMapping(value = "/{id}/place", method = RequestMethod.GET)
+    public ResponseMessage getProductPlace(@PathVariable long id) {
+        Place place = placeService.getByProduct(id);
+        if (!place.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "place not found");
+
+        return new ResponseMessage(place);
+    }
+
     @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
     public ResponseMessage getProductSkus(@PathVariable long id) {
         List<Sku> skus = skuService.queryByProduct(id);
@@ -102,12 +110,6 @@ public class ProductController extends AbstractController {
         List<Comment> comments = commentService.queryByProduct(id, start, count);
 
         return new ResponseMessage(comments);
-    }
-
-    @RequestMapping(value = "/{id}/server", method = RequestMethod.GET)
-    public ResponseMessage getProductServerInfo(@PathVariable long id) {
-        // TODO
-        return new ResponseMessage("TODO");
     }
 
     @RequestMapping(value = "/{id}/customer", method = RequestMethod.GET)
