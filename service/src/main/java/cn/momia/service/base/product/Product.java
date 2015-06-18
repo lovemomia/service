@@ -15,6 +15,7 @@ public class Product {
     private int categoryId;
     private String title;
     private String cover;
+    private String crowd;
     private JSONArray content;
     private int sales;
     private List<ProductImage> imgs;
@@ -51,12 +52,12 @@ public class Product {
         this.cover = cover;
     }
 
-    public int getSales() {
-        return sales;
+    public String getCrowd() {
+        return crowd;
     }
 
-    public void setSales(int sales) {
-        this.sales = sales;
+    public void setCrowd(String crowd) {
+        this.crowd = crowd;
     }
 
     public JSONArray getContent() {
@@ -65,6 +66,14 @@ public class Product {
 
     public void setContent(JSONArray content) {
         this.content = content;
+    }
+
+    public int getSales() {
+        return sales;
+    }
+
+    public void setSales(int sales) {
+        this.sales = sales;
     }
 
     public List<ProductImage> getImgs() {
