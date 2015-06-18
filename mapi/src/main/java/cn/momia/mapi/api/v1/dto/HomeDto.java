@@ -1,6 +1,5 @@
 package cn.momia.mapi.api.v1.dto;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class HomeDto implements Dto {
@@ -23,9 +22,4 @@ public class HomeDto implements Dto {
     public List<Banner> banners;
     public List<Product> products;
     public Integer nextpage = null;
-
-    public HomeDto() {
-        banners = new ArrayList<Banner>();
-        products = new ArrayList<Product>();
-    }
 }

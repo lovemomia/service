@@ -34,7 +34,12 @@ public class HomeApi extends AbstractApi {
             public Dto apply(MomiaHttpResponseCollector collector) {
                 HomeDto homeDto = new HomeDto();
 
-                if (pageIndex == 0) homeDto.banners = extractBannerData((JSONArray) collector.getResponse("banners"));
+                if (pageIndex == 0) {
+                    homeDto.banners = new ArrayList<HomeDto.Banner>();
+                    homeDto.banners = extractBannerData((JSONArray) collector.getResponse("banners"));
+                }
+
+                homeDto.products = new ArrayList<HomeDto.Product>();
                 homeDto.products = extractProductsData((JSONArray) collector.getResponse("products"));
                 if (homeDto.products.size() == conf.getInt("Home.PageSize")) homeDto.nextpage = pageIndex + 1;
 
