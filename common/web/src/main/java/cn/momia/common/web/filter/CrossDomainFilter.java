@@ -1,4 +1,4 @@
-package cn.momia.mapi.web.filter;
+package cn.momia.common.web.filter;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
