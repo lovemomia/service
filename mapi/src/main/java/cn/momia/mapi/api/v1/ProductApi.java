@@ -56,7 +56,7 @@ public class ProductApi extends AbstractApi {
                 productObject.put("title", baseProduct.get("title"));
                 productObject.put("joined", baseProduct.get("sales"));
                 productObject.put("imgs", baseProduct.getJSONArray("imgs"));
-                productObject.put("content", baseProduct.getJSONObject("content"));
+                productObject.put("content", baseProduct.getJSONArray("content"));
 
                 processPlace(productObject, collector);
                 processSkus(productObject, collector);

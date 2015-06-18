@@ -43,7 +43,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
         product.setCategoryId(rs.getInt("categoryId"));
         product.setTitle(rs.getString("title"));
         product.setCover(rs.getString("cover"));
-        product.setContent(JSON.parseObject(rs.getString("content")));
+        product.setContent(JSON.parseArray(rs.getString("content")));
         product.setSales(rs.getInt("sales"));
 
         return product;

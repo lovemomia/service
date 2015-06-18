@@ -1,5 +1,6 @@
 package cn.momia.service.base.product;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import java.util.List;
@@ -14,7 +15,7 @@ public class Product {
     private int categoryId;
     private String title;
     private String cover;
-    private JSONObject content;
+    private JSONArray content;
     private int sales;
     private List<ProductImage> imgs;
 
@@ -58,11 +59,11 @@ public class Product {
         this.sales = sales;
     }
 
-    public JSONObject getContent() {
+    public JSONArray getContent() {
         return content;
     }
 
-    public void setContent(JSONObject content) {
+    public void setContent(JSONArray content) {
         this.content = content;
     }
 
