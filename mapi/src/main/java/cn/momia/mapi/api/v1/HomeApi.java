@@ -5,6 +5,8 @@ import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.http.impl.MomiaHttpGetRequest;
 import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.mapi.api.v1.dto.Dto;
+import cn.momia.mapi.api.v1.dto.HomeDto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
@@ -33,16 +35,16 @@ public class HomeApi extends AbstractApi {
     public ResponseMessage home(@RequestParam(value = "pageindex") final int pageIndex) {
         List<MomiaHttpRequest> requests = buildHomeRequests(pageIndex);
 
-        return executeRequests(requests, new Function<MomiaHttpResponseCollector, JSONObject>() {
+        return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {
             @Override
-            public JSONObject apply(MomiaHttpResponseCollector collector) {
-                JSONObject homeData = new JSONObject();
-                if (pageIndex == 0) homeData.put("banners", collector.getResponse("banners"));
-                JSONArray products = extractProductsData((JSONArray) collector.getResponse("products"));
-                homeData.put("products", products);
-                if (products.size() == conf.getInt("Home.PageSize")) homeData.put("nextpage", pageIndex + 1);
+            public Dto apply(MomiaHttpResponseCollector collector) {
+                HomeDto homeDto = new HomeDto();
 
-                return homeData;
+                if (pageIndex == 0) homeDto.banners = extractBannerData((JSONArray) collector.getResponse("banners"));
+                homeDto.products = extractProductsData((JSONArray) collector.getResponse("products"));
+                if (homeDto.products.size() == conf.getInt("Home.PageSize")) homeDto.nextpage = pageIndex + 1;
+
+                return homeDto;
             }
         });
     }
@@ -70,53 +72,64 @@ public class HomeApi extends AbstractApi {
         return new MomiaHttpGetRequest("products", true, baseServiceUrl("product"), builder.build());
     }
 
-    private JSONArray extractProductsData(JSONArray rawProducts) {
-        JSONArray products = new JSONArray();
+    private List<HomeDto.Banner> extractBannerData(JSONArray bannerArray) {
+        List<HomeDto.Banner> banners = new ArrayList<HomeDto.Banner>();
 
-        for (int i = 0; i < rawProducts.size(); i++) {
-            JSONObject rawProduct = rawProducts.getJSONObject(i);
+        for (int i = 0; i < bannerArray.size(); i++) {
+            JSONObject bannerObject = bannerArray.getJSONObject(i);
+            HomeDto.Banner banner = new HomeDto.Banner();
+            banner.cover = bannerObject.getString("cover");
+            banner.action = bannerObject.getString("action");
 
-            JSONObject rawBaseProduct = rawProduct.getJSONObject("product");
-            JSONObject product = new JSONObject();
-            product.put("id", rawBaseProduct.get("id"));
-            product.put("cover", rawBaseProduct.get("cover"));
-            product.put("title", rawBaseProduct.get("title"));
-            product.put("joined", rawBaseProduct.get("sales"));
+            banners.add(banner);
+        }
 
-            JSONObject place = rawProduct.getJSONObject("place");
-            if (place != null) {
-                product.put("address", place.get("address"));
-                product.put("poi", StringUtils.join(new Object[] { place.getFloat("lng"), place.getFloat("lat") }, ":"));
-            }
+        return banners;
+    }
 
-            JSONArray skus = rawProduct.getJSONArray("skus");
-            List<Float> prices = new ArrayList<Float>();
-            List<Date> times = new ArrayList<Date>();
-            for (int j = 0; j < skus.size(); j++) {
-                JSONObject sku = skus.getJSONObject(j);
-                prices.add(sku.getFloat("price"));
-                JSONArray proterties = sku.getJSONArray("properties");
-                for (int k = 0; k < proterties.size(); k++) {
-                    JSONObject property = proterties.getJSONObject(k);
-                    if (property.getString("name").equals("时间")) {
-                        times.add(property.getDate("value"));
-                    }
-                }
-            }
+    private List<HomeDto.Product> extractProductsData(JSONArray productArray) {
+        List<HomeDto.Product> products = new ArrayList<HomeDto.Product>();
 
-            Collections.sort(prices);
-            Collections.sort(times);
+        for (int i = 0; i < productArray.size(); i++) {
+            HomeDto.Product product = new HomeDto.Product();
 
-            if (!prices.isEmpty()) product.put("price", prices.get(0));
-            product.put("scheduler", buildScheduler(times));
+            JSONObject productObject = productArray.getJSONObject(i);
+            JSONObject baseProduct = productObject.getJSONObject("product");
+            JSONObject place = productObject.getJSONObject("place");
+            JSONArray skus = productObject.getJSONArray("skus");
+
+            product.id = baseProduct.getLong("id");
+            product.cover = baseProduct.getString("cover");
+            product.title = baseProduct.getString("title");
+            product.address = place.getString("address");
+            product.poi = StringUtils.join(new Object[] { place.getFloat("lng"), place.getFloat("lat") }, ":");
+            product.scheduler = getScheduler(skus);
+            product.joined = baseProduct.getInteger("sales");
+            product.price = getPrice(skus);
 
             products.add(product);
         }
+
         return products;
     }
 
-    private String buildScheduler(List<Date> times) {
+    private String getScheduler(JSONArray skus) {
+        List<Date> times = new ArrayList<Date>();
+        for (int i = 0; i < skus.size(); i++) {
+            JSONObject sku = skus.getJSONObject(i);
+            JSONArray proterties = sku.getJSONArray("properties");
+            for (int j = 0; j < proterties.size(); j++) {
+                JSONObject property = proterties.getJSONObject(j);
+                if (property.getString("name").equals("时间")) {
+                    times.add(property.getDate("value"));
+                }
+            }
+        }
 
+        return buildSchedulerString(times);
+    }
+
+    private String buildSchedulerString(List<Date> times) {
         if (times.isEmpty()) return "";
         if (times.size() == 1) {
             Date start = times.get(0);
@@ -141,5 +154,16 @@ public class HomeApi extends AbstractApi {
 
     private boolean isSameDay(Date start, Date end) {
         return YEAR_DATE_FORMATTER.format(start).equals(YEAR_DATE_FORMATTER.format(end));
+    }
+
+    private float getPrice(JSONArray skus) {
+        List<Float> prices = new ArrayList<Float>();
+        for (int i = 0; i < skus.size(); i++) {
+            JSONObject sku = skus.getJSONObject(i);
+            prices.add(sku.getFloat("price"));
+        }
+        Collections.sort(prices);
+
+        return prices.isEmpty() ? 0 : prices.get(0);
     }
 }

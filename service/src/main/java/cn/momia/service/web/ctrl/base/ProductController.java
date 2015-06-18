@@ -62,19 +62,19 @@ public class ProductController extends AbstractController {
         List<Product> products = productService.queryProducts(start, count, new ProductQuery(query));
         List<Long> productIds = new ArrayList<Long>();
         for (Product product : products) productIds.add(product.getId());
-        Map<Long, List<Sku>> skusOfProducts = skuService.queryByProducts(productIds);
         Map<Long, Place> placesOfProducts = placeService.queryByProducts(productIds);
+        Map<Long, List<Sku>> skusOfProducts = skuService.queryByProducts(productIds);
 
-        return new ResponseMessage(buildProductsResponse(products, skusOfProducts, placesOfProducts));
+        return new ResponseMessage(buildProductsResponse(products, placesOfProducts, skusOfProducts));
     }
 
-    private JSONArray buildProductsResponse(List<Product> products, Map<Long, List<Sku>> skusOfProducts, Map<Long, Place> placesOfProducts) {
+    private JSONArray buildProductsResponse(List<Product> products, Map<Long, Place> placesOfProducts, Map<Long, List<Sku>> skusOfProducts) {
         JSONArray data = new JSONArray();
         for (Product product : products) {
             JSONObject productData = new JSONObject();
             productData.put("product", product);
-            productData.put("skus", skusOfProducts.get(product.getId()));
             productData.put("place", placesOfProducts.get(product.getId()));
+            productData.put("skus", skusOfProducts.get(product.getId()));
 
             data.add(productData);
         }
