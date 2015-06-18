@@ -27,7 +27,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/product")
 public class ProductApi extends AbstractApi {
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
     public ResponseMessage getProducts(@RequestParam int start, @RequestParam int count, @RequestParam String query) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
@@ -38,8 +38,8 @@ public class ProductApi extends AbstractApi {
         return executeRequest(request);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseMessage getProduct(@PathVariable long id) {
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseMessage getProduct(@RequestParam long id) {
         List<MomiaHttpRequest> requests = buildProductRequests(id);
 
         return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {
@@ -173,8 +173,8 @@ public class ProductApi extends AbstractApi {
         return customers;
     }
 
-    @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
-    public ResponseMessage getProductSkus(@PathVariable long id) {
+    @RequestMapping(value = "/sku", method = RequestMethod.GET)
+    public ResponseMessage getProductSkus(@RequestParam long id) {
         return executeRequest(buildProductSkusRequest(id));
     }
 }
