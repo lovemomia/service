@@ -1,8 +1,9 @@
 package cn.momia.service.base.place;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Place {
+public class Place implements Serializable {
     public static final Place NOT_EXIST_PLACE = new Place();
     static {
         NOT_EXIST_PLACE.setId(0);

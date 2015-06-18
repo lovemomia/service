@@ -1,6 +1,8 @@
 package cn.momia.service.base.banner;
 
-public class Banner {
+import java.io.Serializable;
+
+public class Banner implements Serializable {
     private String cover;
     private String action;
 

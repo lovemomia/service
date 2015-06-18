@@ -2,10 +2,11 @@ package cn.momia.service.base.customer;
 
 import cn.momia.service.base.user.participant.Participant;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class Customer {
+public class Customer implements Serializable {
     private long userId;
     private String avatar;
     private String name;

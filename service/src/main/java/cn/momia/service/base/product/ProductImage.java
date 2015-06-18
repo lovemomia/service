@@ -1,6 +1,8 @@
 package cn.momia.service.base.product;
 
-public class ProductImage {
+import java.io.Serializable;
+
+public class ProductImage implements Serializable {
     private String url;
     private int width;
     private int height;

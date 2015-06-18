@@ -1,6 +1,8 @@
 package cn.momia.service.base.product.sku;
 
-public class SkuPropertyName {
+import java.io.Serializable;
+
+public class SkuPropertyName implements Serializable {
     private long id;
     private int categoryId;
     private String name;

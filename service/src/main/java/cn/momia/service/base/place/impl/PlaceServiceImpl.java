@@ -35,6 +35,7 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
 
     private Place buildPlace(ResultSet rs) throws SQLException {
         Place place = new Place();
+
         place.setId(rs.getLong("id"));
         place.setName(rs.getString("name"));
         place.setAddress(rs.getString("address"));
@@ -48,7 +49,7 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     private List<PlaceImage> getImgUrls(long placeId) {
         final List<PlaceImage> imgs = new ArrayList<PlaceImage>();
 
-        String sql = "SELECT url, width, height FROM t_place_img WHERE placeId = ?  ";
+        String sql = "SELECT url, width, height FROM t_place_img WHERE placeId=? AND status=1";
         jdbcTemplate.query(sql, new Object[] { placeId }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -69,7 +70,7 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     }
 
     @Override
-    public Place getByProduct(long productId) {
+    public Place queryByProduct(long productId) {
         String sql = "SELECT placeId FROM t_product_place WHERE productId=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { productId }, new ResultSetExtractor<Place>() {
@@ -82,11 +83,11 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     }
 
     @Override
-    public Map<Long, Place> getByProduct(List<Long> productIds) {
+    public Map<Long, Place> queryByProducts(List<Long> productIds) {
         final Map<Long, Place> places = new HashMap<Long, Place>();
         if (productIds.isEmpty()) return places;
 
-        String sql = "SELECT A.id, A.name, A.address, A.`desc`, A.lng, A.lat, B.id AS productId FROM t_place A INNER JOIN t_product_place B WHERE B.productId IN (" + StringUtils.join(productIds, ",") + ") AND A.status=1 AND B.status=1";
+        String sql = "SELECT A.id, A.name, A.address, A.`desc`, A.lng, A.lat, B.productId FROM t_place A INNER JOIN t_product_place B WHERE B.productId IN (" + StringUtils.join(productIds, ",") + ") AND A.status=1 AND B.status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {

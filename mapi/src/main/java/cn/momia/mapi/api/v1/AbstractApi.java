@@ -7,6 +7,7 @@ import cn.momia.common.web.http.MomiaHttpRequestExecutor;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.mapi.api.v1.dto.Dto;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
 import org.slf4j.Logger;
@@ -55,7 +56,7 @@ public abstract class AbstractApi {
         }
     }
 
-    protected ResponseMessage executeRequests(List<MomiaHttpRequest> requests, Function<MomiaHttpResponseCollector, JSONObject> buildResponseData) {
+    protected ResponseMessage executeRequests(List<MomiaHttpRequest> requests, Function<MomiaHttpResponseCollector, Dto> buildResponseData) {
         MomiaHttpResponseCollector collector = requestExecutor.execute(requests);
         if (!collector.isSuccessful()) {
             LOGGER.error("fail to execute requests: {}, exceptions: {}", requests, collector.getExceptions());

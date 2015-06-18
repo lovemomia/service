@@ -1,6 +1,8 @@
 package cn.momia.service.base.product.sku;
 
-public class SkuProperty {
+import java.io.Serializable;
+
+public class SkuProperty implements Serializable {
     public static class Type {
         public static final int VALUE = 0;
         public static final int REF = 1;

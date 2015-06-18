@@ -26,7 +26,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     }
 
     public Product getProduct(long id){
-        String sql = "SELECT id, categoryId, title, cover, content, sales FROM t_product WHERE id=? AND status=1";
+        String sql = "SELECT id, categoryId, title, cover, crowd, content, sales FROM t_product WHERE id=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Product>() {
             @Override
@@ -43,7 +43,8 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
         product.setCategoryId(rs.getInt("categoryId"));
         product.setTitle(rs.getString("title"));
         product.setCover(rs.getString("cover"));
-        product.setContent(JSON.parseObject(rs.getString("content")));
+        product.setCrowd(rs.getString("crowd"));
+        product.setContent(JSON.parseArray(rs.getString("content")));
         product.setSales(rs.getInt("sales"));
 
         return product;
@@ -57,7 +58,6 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 imgs.add(buildImage(rs));
-
             }
         });
 
@@ -74,11 +74,11 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     }
 
     @Override
-    public List<Product> getByIds(List<Long> ids) {
+    public List<Product> get(List<Long> ids) {
         final List<Product> products = new ArrayList<Product>();
         if (ids.size() <= 0) return products;
 
-        String sql = "SELECT id, categoryId, title, cover, content, sales FROM t_product WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1 ORDER BY addTime DESC";
+        String sql = "SELECT id, categoryId, title, cover, crowd, content, sales FROM t_product WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1 ORDER BY addTime DESC";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -90,11 +90,11 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     }
 
     @Override
-    public List<Product> queryProducts(int start, int count, ProductQuery query) {
+    public List<Product> query(int start, int count, ProductQuery query) {
         // TODO use query
         final List<Product> products = new ArrayList<Product>();
 
-        String sql = "SELECT id, categoryId, title, cover, content, sales FROM t_product WHERE status=1 ORDER BY addTime DESC LIMIT ?,?";
+        String sql = "SELECT id, categoryId, title, cover, crowd, content, sales FROM t_product WHERE status=1 ORDER BY addTime DESC LIMIT ?,?";
         jdbcTemplate.query(sql, new Object[] { start, count }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {

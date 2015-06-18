@@ -2,8 +2,6 @@ package cn.momia.service.web.ctrl.base;
 
 import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.service.base.comment.Comment;
-import cn.momia.service.base.comment.CommentService;
 import cn.momia.service.base.customer.Customer;
 import cn.momia.service.base.place.Place;
 import cn.momia.service.base.place.PlaceService;
@@ -37,9 +35,6 @@ import java.util.Map;
 @RequestMapping("/product")
 public class ProductController extends AbstractController {
     @Autowired
-    private CommentService commentService;
-
-    @Autowired
     private OrderService orderService;
 
     @Autowired
@@ -59,22 +54,22 @@ public class ProductController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getProducts(@RequestParam int start, @RequestParam int count, @RequestParam(required = false) String query) {
-        List<Product> products = productService.queryProducts(start, count, new ProductQuery(query));
+        List<Product> products = productService.query(start, count, new ProductQuery(query));
         List<Long> productIds = new ArrayList<Long>();
         for (Product product : products) productIds.add(product.getId());
+        Map<Long, Place> placesOfProducts = placeService.queryByProducts(productIds);
         Map<Long, List<Sku>> skusOfProducts = skuService.queryByProducts(productIds);
-        Map<Long, Place> placesOfProducts = placeService.getByProduct(productIds);
 
-        return new ResponseMessage(buildProductsResponse(products, skusOfProducts, placesOfProducts));
+        return new ResponseMessage(buildProductsResponse(products, placesOfProducts, skusOfProducts));
     }
 
-    private JSONArray buildProductsResponse(List<Product> products, Map<Long, List<Sku>> skusOfProducts, Map<Long, Place> placesOfProducts) {
+    private JSONArray buildProductsResponse(List<Product> products, Map<Long, Place> placesOfProducts, Map<Long, List<Sku>> skusOfProducts) {
         JSONArray data = new JSONArray();
         for (Product product : products) {
             JSONObject productData = new JSONObject();
             productData.put("product", product);
-            productData.put("skus", skusOfProducts.get(product.getId()));
             productData.put("place", placesOfProducts.get(product.getId()));
+            productData.put("skus", skusOfProducts.get(product.getId()));
 
             data.add(productData);
         }
@@ -92,7 +87,7 @@ public class ProductController extends AbstractController {
 
     @RequestMapping(value = "/{id}/place", method = RequestMethod.GET)
     public ResponseMessage getProductPlace(@PathVariable long id) {
-        Place place = placeService.getByProduct(id);
+        Place place = placeService.queryByProduct(id);
         if (!place.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "place not found");
 
         return new ResponseMessage(place);
@@ -103,13 +98,6 @@ public class ProductController extends AbstractController {
         List<Sku> skus = skuService.queryByProduct(id);
 
         return new ResponseMessage(skus);
-    }
-
-    @RequestMapping(value = "/{id}/comment", method = RequestMethod.GET)
-    public ResponseMessage getProductComments(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
-        List<Comment> comments = commentService.queryByProduct(id, start, count);
-
-        return new ResponseMessage(comments);
     }
 
     @RequestMapping(value = "/{id}/customer", method = RequestMethod.GET)

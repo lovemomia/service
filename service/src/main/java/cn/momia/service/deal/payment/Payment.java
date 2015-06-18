@@ -1,8 +1,9 @@
 package cn.momia.service.deal.payment;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Payment {
+public class Payment implements Serializable {
     public static class Type {
         public static final int ALIPAY = 0;
         public static final int WECHATPAY = 1;

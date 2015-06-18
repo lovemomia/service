@@ -27,7 +27,6 @@
     </Home>
 
     <Product>
-        <CommentPageSize>5</CommentPageSize>
-        <CustomerPageSize>10</CustomerPageSize>
+        <CustomerPageSize>6</CustomerPageSize>
     </Product>
 </Configuration>

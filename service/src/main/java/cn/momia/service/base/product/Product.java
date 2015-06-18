@@ -1,10 +1,12 @@
 package cn.momia.service.base.product;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Product {
+public class Product implements Serializable {
     public static final Product NOT_EXIST_PRODUCT = new Product();
     static {
         NOT_EXIST_PRODUCT.setId(0);
@@ -14,7 +16,8 @@ public class Product {
     private int categoryId;
     private String title;
     private String cover;
-    private JSONObject content;
+    private String crowd;
+    private JSONArray content;
     private int sales;
     private List<ProductImage> imgs;
 
@@ -50,20 +53,28 @@ public class Product {
         this.cover = cover;
     }
 
+    public String getCrowd() {
+        return crowd;
+    }
+
+    public void setCrowd(String crowd) {
+        this.crowd = crowd;
+    }
+
+    public JSONArray getContent() {
+        return content;
+    }
+
+    public void setContent(JSONArray content) {
+        this.content = content;
+    }
+
     public int getSales() {
         return sales;
     }
 
     public void setSales(int sales) {
         this.sales = sales;
-    }
-
-    public JSONObject getContent() {
-        return content;
-    }
-
-    public void setContent(JSONObject content) {
-        this.content = content;
     }
 
     public List<ProductImage> getImgs() {

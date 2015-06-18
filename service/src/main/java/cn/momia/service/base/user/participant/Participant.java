@@ -1,8 +1,9 @@
 package cn.momia.service.base.user.participant;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Participant {
+public class Participant implements Serializable {
     public static final Participant NOT_EXIST_PARTICIPANT = new Participant();
     static {
         NOT_EXIST_PARTICIPANT.setId(0);

@@ -1,9 +1,10 @@
 package cn.momia.service.deal.order;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class Order {
+public class Order implements Serializable {
     public static class Status {
         public static final int NOT_PAYED = 1; // 已下单未付款
         public static final int PRE_PAYED = 2; // 准备付款
