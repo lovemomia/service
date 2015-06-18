@@ -61,8 +61,8 @@ public class FavoriteController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return new ResponseMessage(ErrorCode.FORBIDDEN, "user not login");
 
-        List<Long> productIds = favoriteService.getFavoritesOfUser(user.getId(), start, count);
-        List<Product> products = productService.getByIds(productIds);
+        List<Long> productIds = favoriteService.queryFavoredProductsByUser(user.getId(), start, count);
+        List<Product> products = productService.get(productIds);
         Map<Long, List<Sku>> skusOfProducts = skuService.queryByProducts(productIds);
 
         return new ResponseMessage(buildProductsResponse(products, skusOfProducts));

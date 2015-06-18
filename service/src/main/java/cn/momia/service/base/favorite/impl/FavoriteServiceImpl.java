@@ -60,7 +60,7 @@ public class FavoriteServiceImpl extends DbAccessService implements FavoriteServ
     }
 
     @Override
-    public List<Long> getFavoritesOfUser(long userId, int start, int count) {
+    public List<Long> queryFavoredProductsByUser(long userId, int start, int count) {
         final List<Long> productIds = new ArrayList<Long>();
 
         String sql = "SELECT productId FROM t_favorite WHERE userId=? AND status=1 ORDER BY addTime DESC LIMIT ?,?";

@@ -43,7 +43,6 @@
         <property name="jdbcTemplate" ref="jdbcTemplate" />
     </bean>
     <bean id="bannerService" class="cn.momia.service.base.banner.impl.BannerServiceImpl" parent="dbAccessService" />
-    <bean id="commentService" class="cn.momia.service.base.comment.impl.CommentServiceImpl" parent="dbAccessService" />
     <bean id="favoriteService" class="cn.momia.service.base.favorite.impl.FavoriteServiceImpl" parent="dbAccessService" />
     <bean id="feedbackService" class="cn.momia.service.base.feedback.impl.FeedbackServiceImpl" parent="dbAccessService" />
     <bean id="orderService" class="cn.momia.service.deal.order.impl.OrderServiceImpl" parent="dbAccessService" />

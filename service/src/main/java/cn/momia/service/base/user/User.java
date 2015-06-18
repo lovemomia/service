@@ -1,8 +1,9 @@
 package cn.momia.service.base.user;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class User {
+public class User implements Serializable {
     public static final User NOT_EXIST_USER = new User();
     public static final User DUPLICATE_USER = new User() {
         public boolean isDuplicated() {

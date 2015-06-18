@@ -58,7 +58,6 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 imgs.add(buildImage(rs));
-
             }
         });
 
@@ -75,7 +74,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     }
 
     @Override
-    public List<Product> getByIds(List<Long> ids) {
+    public List<Product> get(List<Long> ids) {
         final List<Product> products = new ArrayList<Product>();
         if (ids.size() <= 0) return products;
 
@@ -91,7 +90,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     }
 
     @Override
-    public List<Product> queryProducts(int start, int count, ProductQuery query) {
+    public List<Product> query(int start, int count, ProductQuery query) {
         // TODO use query
         final List<Product> products = new ArrayList<Product>();
 

@@ -3,9 +3,10 @@ package cn.momia.service.base.product;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Product {
+public class Product implements Serializable {
     public static final Product NOT_EXIST_PRODUCT = new Product();
     static {
         NOT_EXIST_PRODUCT.setId(0);

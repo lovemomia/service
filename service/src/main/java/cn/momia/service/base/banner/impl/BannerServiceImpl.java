@@ -22,6 +22,7 @@ public class BannerServiceImpl extends DbAccessService implements BannerService 
                 Banner banner = new Banner();
                 banner.setCover(rs.getString("cover"));
                 banner.setAction(rs.getString("action"));
+
                 banners.add(banner);
             }
         });

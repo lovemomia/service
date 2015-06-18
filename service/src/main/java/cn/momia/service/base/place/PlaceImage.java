@@ -1,6 +1,8 @@
 package cn.momia.service.base.place;
 
-public class PlaceImage {
+import java.io.Serializable;
+
+public class PlaceImage implements Serializable {
     private String url;
     private int width;
     private int height;

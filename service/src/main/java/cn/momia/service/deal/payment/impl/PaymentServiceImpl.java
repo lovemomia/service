@@ -41,7 +41,7 @@ public class PaymentServiceImpl extends DbAccessService implements PaymentServic
 
     @Override
     public Payment get(long id) {
-        String sql = "SELECT id, orderId, finishTime, payType, tradeNo, fee FROM t_payment WHERE id=?";
+        String sql = "SELECT id, orderId, finishTime, payType, tradeNo, fee FROM t_payment WHERE id=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Payment>() {
             @Override
@@ -67,7 +67,7 @@ public class PaymentServiceImpl extends DbAccessService implements PaymentServic
 
     @Override
     public Payment getByOrder(long orderId) {
-        String sql = "SELECT id, orderId, finishTime, payType, tradeNo, fee FROM t_payment WHERE orderId=?";
+        String sql = "SELECT id, orderId, finishTime, payType, tradeNo, fee FROM t_payment WHERE orderId=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { orderId }, new ResultSetExtractor<Payment>() {
             @Override

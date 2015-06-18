@@ -2,8 +2,6 @@ package cn.momia.service.web.ctrl.base;
 
 import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.service.base.comment.Comment;
-import cn.momia.service.base.comment.CommentService;
 import cn.momia.service.base.customer.Customer;
 import cn.momia.service.base.place.Place;
 import cn.momia.service.base.place.PlaceService;
@@ -37,9 +35,6 @@ import java.util.Map;
 @RequestMapping("/product")
 public class ProductController extends AbstractController {
     @Autowired
-    private CommentService commentService;
-
-    @Autowired
     private OrderService orderService;
 
     @Autowired
@@ -59,7 +54,7 @@ public class ProductController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getProducts(@RequestParam int start, @RequestParam int count, @RequestParam(required = false) String query) {
-        List<Product> products = productService.queryProducts(start, count, new ProductQuery(query));
+        List<Product> products = productService.query(start, count, new ProductQuery(query));
         List<Long> productIds = new ArrayList<Long>();
         for (Product product : products) productIds.add(product.getId());
         Map<Long, Place> placesOfProducts = placeService.queryByProducts(productIds);
@@ -92,7 +87,7 @@ public class ProductController extends AbstractController {
 
     @RequestMapping(value = "/{id}/place", method = RequestMethod.GET)
     public ResponseMessage getProductPlace(@PathVariable long id) {
-        Place place = placeService.getByProduct(id);
+        Place place = placeService.queryByProduct(id);
         if (!place.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "place not found");
 
         return new ResponseMessage(place);
@@ -103,13 +98,6 @@ public class ProductController extends AbstractController {
         List<Sku> skus = skuService.queryByProduct(id);
 
         return new ResponseMessage(skus);
-    }
-
-    @RequestMapping(value = "/{id}/comment", method = RequestMethod.GET)
-    public ResponseMessage getProductComments(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
-        List<Comment> comments = commentService.queryByProduct(id, start, count);
-
-        return new ResponseMessage(comments);
     }
 
     @RequestMapping(value = "/{id}/customer", method = RequestMethod.GET)

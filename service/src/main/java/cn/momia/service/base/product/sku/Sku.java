@@ -1,8 +1,9 @@
 package cn.momia.service.base.product.sku;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Sku {
+public class Sku implements Serializable {
     public static final Sku NOT_EXIST_SKU = new Sku();
     static {
         NOT_EXIST_SKU.setId(0);
