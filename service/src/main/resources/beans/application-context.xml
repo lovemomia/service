@@ -33,6 +33,11 @@
         <property name="dataSource" ref="dataSource" />
     </bean>
 
+    <bean class="cn.momia.common.web.secret.SecretKey" init-method="init">
+        <property name="conf" ref="conf" />
+        <property name="jdbcTemplate" ref="jdbcTemplate" />
+    </bean>
+
     <!-- Service -->
     <bean id="dbAccessService" class="cn.momia.service.base.DbAccessService" abstract="true">
         <property name="jdbcTemplate" ref="jdbcTemplate" />
@@ -51,11 +56,6 @@
 
     <bean id="smsSender" class="cn.momia.service.sms.impl.LuosimiaoSmsSender" parent="dbAccessService" />
     <bean id="smsVerifier" class="cn.momia.service.sms.SmsVerifier" parent="dbAccessService" />
-
-    <bean class="cn.momia.common.web.secret.SecretKey" init-method="init">
-        <property name="conf" ref="conf" />
-        <property name="jdbcTemplate" ref="jdbcTemplate" />
-    </bean>
 
     <bean id="uploader" class="cn.momia.service.image.upload.impl.OssImageUploaderImpl" init-method="init">
         <property name="conf" ref="conf" />

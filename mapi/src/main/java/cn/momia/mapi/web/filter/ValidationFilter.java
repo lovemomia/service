@@ -15,45 +15,47 @@ import java.io.IOException;
 
 public class ValidationFilter implements Filter {
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-    }
+    public void init(FilterConfig filterConfig) throws ServletException {}
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-    /*    if (isParamMissing(httpRequest))
+        if (isParamMissing(httpRequest))
         {
             forwardErrorPage(request, response, 400);
             return;
         }
 
-<<<<<<< HEAD:mapi/src/main/java/cn/momia/mapi/web/filter/ValidationFilter.java
-        if (isInvalidProtocol(httpRequest) || isInvalidSign(httpRequest))
-=======
-        */
-        if (isInvalidProtocol(httpRequest) )
-        {
-            forwardErrorPage(request, response, 403);
-            return;
-        }
-/*
         if (isInvalidProtocol(httpRequest) || isExpired(httpRequest) || isInvalidSign(httpRequest))
->>>>>>> ProductController is completed:service/src/main/java/cn/momia/service/web/filter/ValidationFilter.java
         {
             forwardErrorPage(request, response, 403);
             return;
         }
-*/
+
         chain.doFilter(request, response);
     }
 
     private boolean isParamMissing(HttpServletRequest httpRequest) {
         String userAgent = httpRequest.getHeader("user-agent");
+        String version = httpRequest.getParameter("v");
+        String teminal = httpRequest.getParameter("teminal");
+        String os = httpRequest.getParameter("os");
+        String device = httpRequest.getParameter("device");
+        String channel = httpRequest.getParameter("channel");
+        String net = httpRequest.getParameter("net");
         String expired = httpRequest.getParameter("expired");
         String sign = httpRequest.getParameter("sign");
 
-        return StringUtils.isBlank(userAgent) || StringUtils.isBlank(expired) || StringUtils.isBlank(sign);
+        return (StringUtils.isBlank(userAgent) ||
+                StringUtils.isBlank(version) ||
+                StringUtils.isBlank(teminal) ||
+                StringUtils.isBlank(os) ||
+                StringUtils.isBlank(device) ||
+                StringUtils.isBlank(channel) ||
+                StringUtils.isBlank(net) ||
+                StringUtils.isBlank(expired) ||
+                StringUtils.isBlank(sign));
     }
 
     private boolean isInvalidProtocol(HttpServletRequest request) {
@@ -65,12 +67,26 @@ public class ValidationFilter implements Filter {
         return false;
     }
 
-    private boolean isInvalidSign(HttpServletRequest httpRequest) {
+    private boolean isExpired(HttpServletRequest httpRequest) {
         String expired = httpRequest.getParameter("expired");
+
+        return System.currentTimeMillis() > Long.valueOf(expired);
+    }
+
+    private boolean isInvalidSign(HttpServletRequest httpRequest) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("channel=").append(httpRequest.getParameter("channel")).append("&")
+                .append("device=").append(httpRequest.getParameter("device")).append("&")
+                .append("expired=").append(httpRequest.getParameter("expired")).append("&")
+                .append("net=").append(httpRequest.getParameter("net")).append("&")
+                .append("os=").append(httpRequest.getParameter("os")).append("&")
+                .append("teminal=").append(httpRequest.getParameter("teminal")).append("&")
+                .append("v=").append(httpRequest.getParameter("v")).append("&")
+                .append("key=").append(SecretKey.get());
+
         String sign = httpRequest.getParameter("sign");
 
-        return System.currentTimeMillis() > Long.valueOf(expired) ||
-                !sign.equals(DigestUtils.md5Hex(StringUtils.join(new String[] { expired, SecretKey.get() }, "|")));
+        return !sign.equals(DigestUtils.md5Hex(builder.toString()));
     }
 
     private void forwardErrorPage(ServletRequest request, ServletResponse response, int errorCode) throws ServletException, IOException {
@@ -78,6 +94,5 @@ public class ValidationFilter implements Filter {
     }
 
     @Override
-    public void destroy() {
-    }
+    public void destroy() {}
 }
