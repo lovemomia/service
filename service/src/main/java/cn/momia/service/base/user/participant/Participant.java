@@ -11,7 +11,7 @@ public class Participant {
     private long id;
     private long userId;
     private String name;
-    private int sex;
+    private String sex;
     private Date birthday;
 
     public long getId() {
@@ -38,11 +38,11 @@ public class Participant {
         this.name = name;
     }
 
-    public int getSex() {
+    public String getSex() {
         return sex;
     }
 
-    public void setSex(int sex) {
+    public void setSex(String sex) {
         this.sex = sex;
     }
 

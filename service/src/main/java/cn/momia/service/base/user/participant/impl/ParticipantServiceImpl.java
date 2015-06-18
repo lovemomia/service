@@ -32,7 +32,7 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setLong(1, participant.getUserId());
                 ps.setString(2, participant.getName());
-                ps.setInt(3, participant.getSex());
+                ps.setString(3, participant.getSex());
                 ps.setDate(4, new java.sql.Date(participant.getBirthday().getTime()));
 
                 return ps;
@@ -77,7 +77,7 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
         participant.setId(rs.getLong("id"));
         participant.setUserId(rs.getLong("userId"));
         participant.setName(rs.getString("name"));
-        participant.setSex(rs.getInt("sex"));
+        participant.setSex(rs.getString("sex"));
         participant.setBirthday(rs.getDate("birthday"));
 
         return participant;

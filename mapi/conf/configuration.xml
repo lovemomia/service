@@ -22,6 +22,12 @@
     </Service>
 
     <Home>
+        <BannerCount>3</BannerCount>
         <PageSize>10</PageSize>
     </Home>
+
+    <Product>
+        <CommentPageSize>5</CommentPageSize>
+        <CustomerPageSize>10</CustomerPageSize>
+    </Product>
 </Configuration>

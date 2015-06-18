@@ -79,7 +79,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         user.setMobile(rs.getString("mobile"));
         user.setAvatar(rs.getString("avatar"));
         user.setName(rs.getString("name"));
-        user.setSex(rs.getInt("sex"));
+        user.setSex(rs.getString("sex"));
         user.setBirthday(rs.getDate("birthday"));
         user.setCityId(rs.getInt("cityId"));
         user.setAddress(rs.getString("address"));
@@ -155,7 +155,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
-    public boolean updateSex(long id, int sex) {
+    public boolean updateSex(long id, String sex) {
         String sql = "UPDATE t_user SET sex=? WHERE id=?";
 
         return update(id, sql, new Object[] { sex, id });
