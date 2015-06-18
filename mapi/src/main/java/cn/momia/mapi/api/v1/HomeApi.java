@@ -5,6 +5,7 @@ import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.http.impl.MomiaHttpGetRequest;
 import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.mapi.api.misc.SchedulerFormatter;
 import cn.momia.mapi.api.v1.dto.Dto;
 import cn.momia.mapi.api.v1.dto.HomeDto;
 import com.alibaba.fastjson.JSONArray;
@@ -16,10 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -27,10 +25,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/home")
 public class HomeApi extends AbstractApi {
-    private static final DateFormat YEAR_DATE_FORMATTER = new SimpleDateFormat("yyyyMMdd");
-    private static final DateFormat DATE_FORMATTER = new SimpleDateFormat("M月d日");
-    private static final String[] WEEK_DAYS = { "周日", "周一", "周二", "周三", "周四", "周五", "周六" };
-    
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage home(@RequestParam(value = "pageindex") final int pageIndex) {
         List<MomiaHttpRequest> requests = buildHomeRequests(pageIndex);
@@ -126,34 +120,7 @@ public class HomeApi extends AbstractApi {
             }
         }
 
-        return buildSchedulerString(times);
-    }
-
-    private String buildSchedulerString(List<Date> times) {
-        if (times.isEmpty()) return "";
-        if (times.size() == 1) {
-            Date start = times.get(0);
-            return DATE_FORMATTER.format(start) + " " + getWeekDay(start) + " 共1场";
-        } else {
-            Date start = times.get(0);
-            Date end = times.get(times.size() - 1);
-            if (isSameDay(start, end)) {
-                return DATE_FORMATTER.format(start) + " " + getWeekDay(start) + " 共" + times.size() + "场";
-            } else {
-                return DATE_FORMATTER.format(start) + "-" + DATE_FORMATTER.format(end) + " " + getWeekDay(start) + "-" + getWeekDay(end) + " 共" + times.size() + "场";
-            }
-        }
-    }
-
-    private String getWeekDay(Date date) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-
-        return WEEK_DAYS[calendar.get(Calendar.DAY_OF_WEEK) - 1];
-    }
-
-    private boolean isSameDay(Date start, Date end) {
-        return YEAR_DATE_FORMATTER.format(start).equals(YEAR_DATE_FORMATTER.format(end));
+        return SchedulerFormatter.format(times);
     }
 
     private float getPrice(JSONArray skus) {
