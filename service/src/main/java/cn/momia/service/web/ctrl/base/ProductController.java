@@ -63,7 +63,7 @@ public class ProductController extends AbstractController {
         List<Long> productIds = new ArrayList<Long>();
         for (Product product : products) productIds.add(product.getId());
         Map<Long, List<Sku>> skusOfProducts = skuService.queryByProducts(productIds);
-        Map<Long, Place> placesOfProducts = placeService.getByProduct(productIds);
+        Map<Long, Place> placesOfProducts = placeService.queryByProducts(productIds);
 
         return new ResponseMessage(buildProductsResponse(products, skusOfProducts, placesOfProducts));
     }
