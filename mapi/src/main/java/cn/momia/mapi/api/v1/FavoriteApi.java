@@ -6,7 +6,6 @@ import cn.momia.common.web.http.impl.MomiaHttpDeleteRequest;
 import cn.momia.common.web.http.impl.MomiaHttpGetRequest;
 import cn.momia.common.web.http.impl.MomiaHttpPostRequest;
 import cn.momia.common.web.response.ResponseMessage;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,8 +23,8 @@ public class FavoriteApi extends AbstractApi {
         return executeRequest(new MomiaHttpPostRequest(baseServiceUrl("favorite"), builder.build()));
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseMessage deleteFavorite(@PathVariable long id, @RequestParam String utoken) {
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    public ResponseMessage deleteFavorite(@RequestParam long id, @RequestParam String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         MomiaHttpRequest request = new MomiaHttpDeleteRequest(baseServiceUrl("favorite", id), builder.build());
 

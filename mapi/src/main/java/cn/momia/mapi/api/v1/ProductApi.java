@@ -12,7 +12,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -164,7 +163,6 @@ public class ProductApi extends AbstractApi {
             }
         }
 
-        StringBuilder builder = new StringBuilder();
         if (childCount == 0 && adultCount == 0) customers.text = "目前还没有人参加";
         else if (childCount > 0 && adultCount == 0) customers.text = childCount + "个孩子参加";
         else if (childCount == 0 && adultCount > 0) customers.text = adultCount + "个大人参加";

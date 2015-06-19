@@ -5,7 +5,6 @@ import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.impl.MomiaHttpGetRequest;
 import cn.momia.common.web.http.impl.MomiaHttpPutRequest;
 import cn.momia.common.web.response.ResponseMessage;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,15 +15,15 @@ import java.util.Date;
 @RestController
 @RequestMapping("/v1/user")
 public class UserApi extends AbstractApi {
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseMessage viewUser(@PathVariable long id) {
+    @RequestMapping(value = "/view", method = RequestMethod.GET)
+    public ResponseMessage viewUser(@RequestParam long id) {
         MomiaHttpRequest request = new MomiaHttpGetRequest(baseServiceUrl("user", id));
 
         return executeRequest(request);
     }
 
-    @RequestMapping(value = "/{id}/order", method = RequestMethod.GET)
-    public ResponseMessage viewOrders(@PathVariable long id) {
+    @RequestMapping(value = "/view/order", method = RequestMethod.GET)
+    public ResponseMessage viewOrders(@RequestParam long id) {
         MomiaHttpRequest request = new MomiaHttpGetRequest(baseServiceUrl("user", id, "order"));
 
         return executeRequest(request);
@@ -38,7 +37,7 @@ public class UserApi extends AbstractApi {
         return executeRequest(request);
     }
 
-    @RequestMapping(value = "/avatar", method = RequestMethod.PUT)
+    @RequestMapping(value = "/avatar", method = RequestMethod.POST)
     public ResponseMessage updateAvatar(@RequestParam String utoken, @RequestParam String avatar) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -48,7 +47,7 @@ public class UserApi extends AbstractApi {
         return executeRequest(request);
     }
 
-    @RequestMapping(value = "/name", method = RequestMethod.PUT)
+    @RequestMapping(value = "/name", method = RequestMethod.POST)
     public ResponseMessage updateName(@RequestParam String utoken, @RequestParam String name) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -58,7 +57,7 @@ public class UserApi extends AbstractApi {
         return executeRequest(request);
     }
 
-    @RequestMapping(value = "/sex", method = RequestMethod.PUT)
+    @RequestMapping(value = "/sex", method = RequestMethod.POST)
     public ResponseMessage updateSex(@RequestParam String utoken, @RequestParam String sex) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -68,7 +67,7 @@ public class UserApi extends AbstractApi {
         return executeRequest(request);
     }
 
-    @RequestMapping(value = "/birthday", method = RequestMethod.PUT)
+    @RequestMapping(value = "/birthday", method = RequestMethod.POST)
     public ResponseMessage updateBirthday(@RequestParam String utoken, @RequestParam Date birthday) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -78,7 +77,7 @@ public class UserApi extends AbstractApi {
         return executeRequest(request);
     }
 
-    @RequestMapping(value = "/city", method = RequestMethod.PUT)
+    @RequestMapping(value = "/city", method = RequestMethod.POST)
     public ResponseMessage updateCity(@RequestParam String utoken, @RequestParam int city) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -88,7 +87,7 @@ public class UserApi extends AbstractApi {
         return executeRequest(request);
     }
 
-    @RequestMapping(value = "/address", method = RequestMethod.PUT)
+    @RequestMapping(value = "/address", method = RequestMethod.POST)
     public ResponseMessage updateAddress(@RequestParam String utoken, @RequestParam String address) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
