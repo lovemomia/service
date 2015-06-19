@@ -16,18 +16,6 @@
         </Tongqu>
     </Database>
 
-    <Image>
-        <Upload>
-            <Dir>/data/appdatas/imgs</Dir>
-            <Oss>
-                <AccessId>JsG07PUh4wXM4GLE</AccessId>
-                <AccessKey>pNigQyHbnvnpV0tREoYw7Kk2gy2tzk</AccessKey>
-                <EndPoint>http://oss-cn-beijing.aliyuncs.com</EndPoint>
-                <BucketName>-object-test</BucketName>
-            </Oss>
-        </Upload>
-    </Image>
-
     <Payment>
         <Wechat>
             <PrepayService>https://api.mch.weixin.qq.com/pay/unifiedorder</PrepayService>

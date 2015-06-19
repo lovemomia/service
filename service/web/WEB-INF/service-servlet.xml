@@ -12,7 +12,6 @@
     <context:component-scan base-package="cn.momia.service.web.ctrl" />
     <context:component-scan base-package="cn.momia.service.web.ctrl.base" />
     <context:component-scan base-package="cn.momia.service.web.ctrl.deal" />
-    <context:component-scan base-package="cn.momia.service.web.ctrl.upload" />
 
     <mvc:annotation-driven>
         <mvc:message-converters register-defaults="true">
