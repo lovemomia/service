@@ -6,7 +6,6 @@ import cn.momia.common.web.http.impl.MomiaHttpDeleteRequest;
 import cn.momia.common.web.http.impl.MomiaHttpGetRequest;
 import cn.momia.common.web.http.impl.MomiaHttpPostRequest;
 import cn.momia.common.web.response.ResponseMessage;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,8 +22,8 @@ public class OrderApi extends AbstractApi {
         return executeRequest(request);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.POST)
-    public ResponseMessage deleteOrder(@PathVariable long id, @RequestParam String utoken) {
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    public ResponseMessage deleteOrder(@RequestParam long id, @RequestParam String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         MomiaHttpRequest request = new MomiaHttpDeleteRequest(dealServiceUrl("order", id), builder.build());
 
