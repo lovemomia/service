@@ -14,22 +14,22 @@ public class ParticipantController extends AbstractController {
         return forward(request, request.getRequestURI());
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public String getParticipant(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     public String updateParticipant(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     public String deleteParticipant(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
     public String getParticipantsOfUser(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }

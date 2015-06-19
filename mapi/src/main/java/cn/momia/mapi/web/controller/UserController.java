@@ -9,12 +9,12 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 @RequestMapping("/user")
 public class UserController extends AbstractController {
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/view", method = RequestMethod.GET)
     public String viewUser(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
 
-    @RequestMapping(value = "/{id}/order", method = RequestMethod.GET)
+    @RequestMapping(value = "/view/order", method = RequestMethod.GET)
     public String viewOrders(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
@@ -24,32 +24,32 @@ public class UserController extends AbstractController {
         return forward(request, request.getRequestURI());
     }
 
-    @RequestMapping(value = "/avatar", method = RequestMethod.PUT)
+    @RequestMapping(value = "/avatar", method = RequestMethod.POST)
     public String updateAvatar(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
 
-    @RequestMapping(value = "/name", method = RequestMethod.PUT)
+    @RequestMapping(value = "/name", method = RequestMethod.POST)
     public String updateName(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
 
-    @RequestMapping(value = "/sex", method = RequestMethod.PUT)
+    @RequestMapping(value = "/sex", method = RequestMethod.POST)
     public String updateSex(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
 
-    @RequestMapping(value = "/birthday", method = RequestMethod.PUT)
+    @RequestMapping(value = "/birthday", method = RequestMethod.POST)
     public String updateBirthday(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
 
-    @RequestMapping(value = "/city", method = RequestMethod.PUT)
+    @RequestMapping(value = "/city", method = RequestMethod.POST)
     public String updateCity(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
 
-    @RequestMapping(value = "/address", method = RequestMethod.PUT)
+    @RequestMapping(value = "/address", method = RequestMethod.POST)
     public String updateAddress(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
