@@ -14,7 +14,7 @@ public class FavoriteController extends AbstractController {
         return forward(request, request.getRequestURI());
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     public String deleteFavorite(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }

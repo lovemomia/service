@@ -9,17 +9,17 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 @RequestMapping("/product")
 public class ProductController extends AbstractController {
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
     public String getProducts(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public String getProduct(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
 
-    @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
+    @RequestMapping(value = "/sku", method = RequestMethod.GET)
     public String getProductSkus(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
