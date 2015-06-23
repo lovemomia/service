@@ -87,7 +87,7 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
         final Map<Long, Place> places = new HashMap<Long, Place>();
         if (productIds.isEmpty()) return places;
 
-        String sql = "SELECT A.id, A.name, A.address, A.`desc`, A.lng, A.lat, B.id AS productId FROM t_place A INNER JOIN t_product B WHERE B.productId IN (" + StringUtils.join(productIds, ",") + ") AND A.status=1 AND B.status=1";
+        String sql = "SELECT A.id, A.name, A.address, A.`desc`, A.lng, A.lat, B.id AS productId FROM t_place A INNER JOIN t_product B WHERE B.id IN (" + StringUtils.join(productIds, ",") + ") AND A.status=1 AND B.status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
