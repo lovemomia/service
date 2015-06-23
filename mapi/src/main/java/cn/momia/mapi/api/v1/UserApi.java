@@ -5,6 +5,10 @@ import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.impl.MomiaHttpGetRequest;
 import cn.momia.common.web.http.impl.MomiaHttpPutRequest;
 import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.mapi.api.v1.dto.Dto;
+import cn.momia.mapi.api.v1.dto.UserDto;
+import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Function;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,7 +23,22 @@ public class UserApi extends AbstractApi {
     public ResponseMessage viewUser(@RequestParam long id) {
         MomiaHttpRequest request = new MomiaHttpGetRequest(baseServiceUrl("user", id));
 
-        return executeRequest(request);
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                JSONObject userJson = (JSONObject) data;
+                UserDto.Other other = new UserDto.Other();
+                other.setMobile(userJson.getString("mobile"));
+                other.setAvatar(userJson.getString("avatar"));
+                other.setName(userJson.getString("name"));
+                other.setSex(userJson.getString("sex"));
+                other.setBirthday(userJson.getDate("birthday"));
+                other.setCityId(userJson.getInteger("cityId"));
+                other.setAddress(userJson.getString("address"));
+
+                return other;
+            }
+        });
     }
 
     @RequestMapping(value = "/view/order", method = RequestMethod.GET)
@@ -34,7 +53,23 @@ public class UserApi extends AbstractApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         MomiaHttpRequest request = new MomiaHttpGetRequest(baseServiceUrl("user"), builder.build());
 
-        return executeRequest(request);
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                JSONObject userJson = (JSONObject) data;
+                UserDto.Own own = new UserDto.Own();
+                own.setToken(userJson.getString("token"));
+                own.setMobile(userJson.getString("mobile"));
+                own.setAvatar(userJson.getString("avatar"));
+                own.setName(userJson.getString("name"));
+                own.setSex(userJson.getString("sex"));
+                own.setBirthday(userJson.getDate("birthday"));
+                own.setCityId(userJson.getInteger("cityId"));
+                own.setAddress(userJson.getString("address"));
+
+                return own;
+            }
+        });
     }
 
     @RequestMapping(value = "/avatar", method = RequestMethod.POST)
