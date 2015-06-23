@@ -2,7 +2,7 @@ package cn.momia.mapi.api.v1.dto;
 
 import java.util.Date;
 
-public class UserDto {
+public class UserDto implements Dto {
     public static class Own extends UserDto {}
 
     public static class Other extends UserDto {
