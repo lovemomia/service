@@ -42,31 +42,13 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-    <filter>
-        <filter-name>validationFilter</filter-name>
-        <filter-class>cn.momia.mapi.web.filter.ValidationFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>validationFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-
-    <filter>
-        <filter-name>crossDomainFilter</filter-name>
-        <filter-class>cn.momia.common.web.filter.CrossDomainFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>crossDomainFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-
     <servlet>
-        <servlet-name>mapi</servlet-name>
+        <servlet-name>image</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
-        <servlet-name>mapi</servlet-name>
+        <servlet-name>image</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
 

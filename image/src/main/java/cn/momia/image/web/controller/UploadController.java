@@ -1,10 +1,10 @@
-package cn.momia.service.web.ctrl.upload;
+package cn.momia.image.web.controller;
 
 import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.service.image.upload.Image;
-import cn.momia.service.image.upload.ImageUploadResult;
-import cn.momia.service.image.upload.ImageUploader;
+import cn.momia.image.upload.Image;
+import cn.momia.image.upload.ImageUploadResult;
+import cn.momia.image.upload.ImageUploader;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;

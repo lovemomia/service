@@ -18,7 +18,7 @@ public class FeedbackApi extends AbstractApi {
                 .add("content", content)
                 .add("email", email);
         if (utoken != null) builder.add("utoken", utoken);
-        MomiaHttpRequest request = new MomiaHttpPostRequest("feedback", true, baseServiceUrl("feedback"), builder.build());
+        MomiaHttpRequest request = new MomiaHttpPostRequest(baseServiceUrl("feedback"), builder.build());
 
         return executeRequest(request);
     }

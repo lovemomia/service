@@ -1,9 +1,7 @@
-package cn.momia.service.image.upload.impl;
+package cn.momia.image.upload.impl;
 
-import cn.momia.common.config.Configuration;
-import cn.momia.service.image.upload.Image;
-import cn.momia.service.image.upload.ImageUploadResult;
-import cn.momia.service.image.upload.ImageUploader;
+import cn.momia.image.upload.Image;
+import cn.momia.image.upload.ImageUploadResult;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.model.ObjectMetadata;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -15,15 +13,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class OssImageUploaderImpl implements ImageUploader {
+public class OssImageUploaderImpl extends AbstractImageUploader {
     private OSSClient ossClient;
     private String bucketName;
-
-    private Configuration conf;
-
-    public void setConf(Configuration conf) {
-        this.conf = conf;
-    }
 
     public void init() {
         String AccessId = conf.getString("Oss.AccessId");

@@ -28,6 +28,6 @@ public class FeedbackController {
         long feedbackId = feedbackService.add(content, email, userId);
         if (feedbackId <= 0) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to add feedback");
 
-        return new ResponseMessage("add feedback successfully");
+        return ResponseMessage.SUCCESS;
     }
 }

@@ -131,6 +131,13 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
+    public boolean updateToken(long id, String token) {
+        String sql = "UPDATE t_user SET token=? WHERE id=?";
+
+        return update(id, sql, new Object[] { token, id });
+    }
+
+    @Override
     public boolean updateAvatar(long id, String avatar) {
         String sql = "UPDATE t_user SET avatar=? WHERE id=?";
 

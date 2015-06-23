@@ -6,6 +6,12 @@ import cn.momia.common.web.http.impl.MomiaHttpDeleteRequest;
 import cn.momia.common.web.http.impl.MomiaHttpGetRequest;
 import cn.momia.common.web.http.impl.MomiaHttpPostRequest;
 import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.mapi.api.misc.ProductUtil;
+import cn.momia.mapi.api.v1.dto.Dto;
+import cn.momia.mapi.api.v1.dto.FavoriteDto;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Function;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,10 +38,38 @@ public class FavoriteApi extends AbstractApi {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage getFavoritesOfUser(@RequestParam String utoken) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+    public ResponseMessage getFavoritesOfUser(@RequestParam String utoken, @RequestParam int start, @RequestParam int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("start", start)
+                .add("count", count);
         MomiaHttpRequest request = new MomiaHttpGetRequest(baseServiceUrl("favorite"), builder.build());
 
-        return executeRequest(request);
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                FavoriteDto favoriteDto = new FavoriteDto();
+
+                JSONArray productArray = (JSONArray) data;
+                for (int i = 0; i < productArray.size(); i++) {
+                    FavoriteDto.Product product = new FavoriteDto.Product();
+
+                    JSONObject productObject = productArray.getJSONObject(i);
+                    JSONObject baseProduct = productObject.getJSONObject("product");
+                    JSONArray skus = productObject.getJSONArray("skus");
+
+                    product.setId(baseProduct.getLong("id"));
+                    product.setCover(baseProduct.getString("cover"));
+                    product.setTitle(baseProduct.getString("title"));
+                    product.setScheduler(ProductUtil.getScheduler(skus));
+                    product.setJoined(baseProduct.getInteger("sales"));
+                    product.setPrice(ProductUtil.getPrice(skus));
+
+                    favoriteDto.add(product);
+                }
+
+                return favoriteDto;
+            }
+        });
     }
 }

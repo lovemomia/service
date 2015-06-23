@@ -1,4 +1,4 @@
-package cn.momia.service.image.upload;
+package cn.momia.image.upload;
 
 public class ImageUploadResult {
     private String path;

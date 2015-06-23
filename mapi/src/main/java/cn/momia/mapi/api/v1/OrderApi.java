@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/order")
 public class OrderApi extends AbstractApi {
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseMessage placeOrder(@RequestParam String order) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("order", order);
+    public ResponseMessage placeOrder(@RequestParam String utoken, @RequestParam String order) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("order", order);
         MomiaHttpRequest request = new MomiaHttpPostRequest(dealServiceUrl("order"), builder.build());
 
         return executeRequest(request);
@@ -35,7 +37,7 @@ public class OrderApi extends AbstractApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("query", query);
-        MomiaHttpRequest request = new MomiaHttpGetRequest(baseServiceUrl("user/order"), builder.build());
+        MomiaHttpRequest request = new MomiaHttpGetRequest(baseServiceUrl("order"), builder.build());
 
         return executeRequest(request);
     }

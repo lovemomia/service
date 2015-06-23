@@ -44,7 +44,7 @@ public class FavoriteController {
         long favoriteId = favoriteService.add(user.getId(), productId);
         if (favoriteId <= 0) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to add favorite");
 
-        return new ResponseMessage("add favorite successfully");
+        return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -53,7 +53,7 @@ public class FavoriteController {
         if (!user.exists()) return new ResponseMessage(ErrorCode.FORBIDDEN, "user not login");
 
         if (!favoriteService.delete(user.getId(), id)) return new ResponseMessage(ErrorCode.FORBIDDEN, "fail to delete favorite");
-        return new ResponseMessage("delete favorite successfully");
+        return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(method = RequestMethod.GET)

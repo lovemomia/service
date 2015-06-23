@@ -47,9 +47,14 @@ public abstract class AbstractApi {
     }
 
     protected ResponseMessage executeRequest(MomiaHttpRequest request) {
+        return executeRequest(request, null);
+    }
+
+    protected ResponseMessage executeRequest(MomiaHttpRequest request, Function<Object, Dto> buildResponseData) {
         try {
             JSONObject responseJson = httpClient.execute(request);
-            return ResponseMessage.formJson(responseJson);
+            if (buildResponseData == null || responseJson.getInteger("errno") != ErrorCode.SUCCESS) return ResponseMessage.formJson(responseJson);
+            return new ResponseMessage(buildResponseData.apply(responseJson.get("data")));
         } catch (Exception e) {
             LOGGER.error("fail to execute request: {}", request, e);
             return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to execute request");

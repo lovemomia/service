@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -48,7 +47,7 @@ public class ParticipantController {
         boolean successful = participantService.update(participant);
 
         if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update participant name");
-        return new ResponseMessage("update participant name successfully");
+        return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -59,7 +58,7 @@ public class ParticipantController {
         boolean successful = participantService.delete(id, user.getId());
         if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to delete participant");
 
-        return new ResponseMessage("delete participant successfully");
+        return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(method = RequestMethod.GET)

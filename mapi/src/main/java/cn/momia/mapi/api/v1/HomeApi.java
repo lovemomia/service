@@ -5,7 +5,7 @@ import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.http.impl.MomiaHttpGetRequest;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.misc.SchedulerFormatter;
+import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.Dto;
 import cn.momia.mapi.api.v1.dto.HomeDto;
 import com.alibaba.fastjson.JSONArray;
@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -34,14 +32,11 @@ public class HomeApi extends AbstractApi {
             public Dto apply(MomiaHttpResponseCollector collector) {
                 HomeDto homeDto = new HomeDto();
 
-                if (pageIndex == 0) {
-                    homeDto.banners = new ArrayList<HomeDto.Banner>();
-                    homeDto.banners = extractBannerData((JSONArray) collector.getResponse("banners"));
-                }
+                if (pageIndex == 0) homeDto.setBanners(extractBannerData((JSONArray) collector.getResponse("banners")));
 
-                homeDto.products = new ArrayList<HomeDto.Product>();
-                homeDto.products = extractProductsData((JSONArray) collector.getResponse("products"));
-                if (homeDto.products.size() == conf.getInt("Home.PageSize")) homeDto.nextpage = pageIndex + 1;
+                List<HomeDto.Product> products = extractProductsData((JSONArray) collector.getResponse("products"));
+                homeDto.setProducts(products);
+                if (products.size() == conf.getInt("Home.PageSize")) homeDto.setNextpage(pageIndex + 1);
 
                 return homeDto;
             }
@@ -77,8 +72,8 @@ public class HomeApi extends AbstractApi {
         for (int i = 0; i < bannerArray.size(); i++) {
             JSONObject bannerObject = bannerArray.getJSONObject(i);
             HomeDto.Banner banner = new HomeDto.Banner();
-            banner.cover = bannerObject.getString("cover");
-            banner.action = bannerObject.getString("action");
+            banner.setCover(bannerObject.getString("cover"));
+            banner.setAction(bannerObject.getString("action"));
 
             banners.add(banner);
         }
@@ -97,45 +92,18 @@ public class HomeApi extends AbstractApi {
             JSONObject place = productObject.getJSONObject("place");
             JSONArray skus = productObject.getJSONArray("skus");
 
-            product.id = baseProduct.getLong("id");
-            product.cover = baseProduct.getString("cover");
-            product.title = baseProduct.getString("title");
-            product.address = place.getString("address");
-            product.poi = StringUtils.join(new Object[] { place.getFloat("lng"), place.getFloat("lat") }, ":");
-            product.scheduler = getScheduler(skus);
-            product.joined = baseProduct.getInteger("sales");
-            product.price = getPrice(skus);
+            product.setId(baseProduct.getLong("id"));
+            product.setCover(baseProduct.getString("cover"));
+            product.setTitle(baseProduct.getString("title"));
+            product.setAddress(place.getString("address"));
+            product.setPoi(StringUtils.join(new Object[] { place.getFloat("lng"), place.getFloat("lat") }, ":"));
+            product.setScheduler(ProductUtil.getScheduler(skus));
+            product.setJoined(baseProduct.getInteger("sales"));
+            product.setPrice(ProductUtil.getPrice(skus));
 
             products.add(product);
         }
 
         return products;
-    }
-
-    private String getScheduler(JSONArray skus) {
-        List<Date> times = new ArrayList<Date>();
-        for (int i = 0; i < skus.size(); i++) {
-            JSONObject sku = skus.getJSONObject(i);
-            JSONArray proterties = sku.getJSONArray("properties");
-            for (int j = 0; j < proterties.size(); j++) {
-                JSONObject property = proterties.getJSONObject(j);
-                if (property.getString("name").equals("时间")) {
-                    times.add(property.getDate("value"));
-                }
-            }
-        }
-
-        return SchedulerFormatter.format(times);
-    }
-
-    private float getPrice(JSONArray skus) {
-        List<Float> prices = new ArrayList<Float>();
-        for (int i = 0; i < skus.size(); i++) {
-            JSONObject sku = skus.getJSONObject(i);
-            prices.add(sku.getFloat("price"));
-        }
-        Collections.sort(prices);
-
-        return prices.isEmpty() ? 0 : prices.get(0);
     }
 }

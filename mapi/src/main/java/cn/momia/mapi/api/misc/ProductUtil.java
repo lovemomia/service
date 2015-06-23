@@ -1,17 +1,49 @@
 package cn.momia.mapi.api.misc;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-public class SchedulerFormatter {
+public class ProductUtil {
     private static final DateFormat YEAR_DATE_FORMATTER = new SimpleDateFormat("yyyyMMdd");
     private static final DateFormat DATE_FORMATTER = new SimpleDateFormat("M月d日");
     private static final String[] WEEK_DAYS = { "周日", "周一", "周二", "周三", "周四", "周五", "周六" };
 
-    public static String format(List<Date> times) {
+    public static float getPrice(JSONArray skus) {
+        List<Float> prices = new ArrayList<Float>();
+        for (int i = 0; i < skus.size(); i++) {
+            JSONObject sku = skus.getJSONObject(i);
+            prices.add(sku.getFloat("price"));
+        }
+        Collections.sort(prices);
+
+        return prices.isEmpty() ? 0 : prices.get(0);
+    }
+
+    public static String getScheduler(JSONArray skus) {
+        List<Date> times = new ArrayList<Date>();
+        for (int i = 0; i < skus.size(); i++) {
+            JSONObject sku = skus.getJSONObject(i);
+            JSONArray proterties = sku.getJSONArray("properties");
+            for (int j = 0; j < proterties.size(); j++) {
+                JSONObject property = proterties.getJSONObject(j);
+                if (property.getString("name").equals("时间")) {
+                    times.add(property.getDate("value"));
+                }
+            }
+        }
+
+        return ProductUtil.format(times);
+    }
+
+    private static String format(List<Date> times) {
         if (times.isEmpty()) return "";
         if (times.size() == 1) {
             Date start = times.get(0);
