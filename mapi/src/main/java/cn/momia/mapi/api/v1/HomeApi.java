@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -34,14 +32,11 @@ public class HomeApi extends AbstractApi {
             public Dto apply(MomiaHttpResponseCollector collector) {
                 HomeDto homeDto = new HomeDto();
 
-                if (pageIndex == 0) {
-                    homeDto.banners = new ArrayList<HomeDto.Banner>();
-                    homeDto.banners = extractBannerData((JSONArray) collector.getResponse("banners"));
-                }
+                if (pageIndex == 0) homeDto.setBanners(extractBannerData((JSONArray) collector.getResponse("banners")));
 
-                homeDto.products = new ArrayList<HomeDto.Product>();
-                homeDto.products = extractProductsData((JSONArray) collector.getResponse("products"));
-                if (homeDto.products.size() == conf.getInt("Home.PageSize")) homeDto.nextpage = pageIndex + 1;
+                List<HomeDto.Product> products = extractProductsData((JSONArray) collector.getResponse("products"));
+                homeDto.setProducts(products);
+                if (products.size() == conf.getInt("Home.PageSize")) homeDto.setNextpage(pageIndex + 1);
 
                 return homeDto;
             }
@@ -77,8 +72,8 @@ public class HomeApi extends AbstractApi {
         for (int i = 0; i < bannerArray.size(); i++) {
             JSONObject bannerObject = bannerArray.getJSONObject(i);
             HomeDto.Banner banner = new HomeDto.Banner();
-            banner.cover = bannerObject.getString("cover");
-            banner.action = bannerObject.getString("action");
+            banner.setCover(bannerObject.getString("cover"));
+            banner.setAction(bannerObject.getString("action"));
 
             banners.add(banner);
         }
@@ -97,14 +92,14 @@ public class HomeApi extends AbstractApi {
             JSONObject place = productObject.getJSONObject("place");
             JSONArray skus = productObject.getJSONArray("skus");
 
-            product.id = baseProduct.getLong("id");
-            product.cover = baseProduct.getString("cover");
-            product.title = baseProduct.getString("title");
-            product.address = place.getString("address");
-            product.poi = StringUtils.join(new Object[] { place.getFloat("lng"), place.getFloat("lat") }, ":");
-            product.scheduler = ProductUtil.getScheduler(skus);
-            product.joined = baseProduct.getInteger("sales");
-            product.price = ProductUtil.getPrice(skus);
+            product.setId(baseProduct.getLong("id"));
+            product.setCover(baseProduct.getString("cover"));
+            product.setTitle(baseProduct.getString("title"));
+            product.setAddress(place.getString("address"));
+            product.setPoi(StringUtils.join(new Object[] { place.getFloat("lng"), place.getFloat("lat") }, ":"));
+            product.setScheduler(ProductUtil.getScheduler(skus));
+            product.setJoined(baseProduct.getInteger("sales"));
+            product.setPrice(ProductUtil.getPrice(skus));
 
             products.add(product);
         }
