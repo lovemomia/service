@@ -9,7 +9,7 @@ public abstract class AbstractController {
 
     protected boolean isInvalidLimit(int start, int count) {
         int maxPage = conf.getInt("Limit.MaxPage");
-        int maxPageSize = conf.getInt("Limit, MaxPageSize");
+        int maxPageSize = conf.getInt("Limit.MaxPageSize");
 
         return start <= maxPage * maxPageSize && count <= maxPageSize;
     }
