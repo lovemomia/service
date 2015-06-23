@@ -16,6 +16,10 @@
         <property name="conf" ref="conf" />
     </bean>
 
+    <bean class="cn.momia.mapi.img.ImageFile">
+        <property name="domain" value="${Image.Domain}" />
+    </bean>
+
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
         <property name="driverClass" value="com.mysql.jdbc.Driver" />
         <property name="jdbcUrl" value="${Database.Tongqu.JdbcUrl}" />

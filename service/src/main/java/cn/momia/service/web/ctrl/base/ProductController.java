@@ -53,8 +53,10 @@ public class ProductController extends AbstractController {
     private UserService userService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage getProducts(@RequestParam int start, @RequestParam int count, @RequestParam(required = false) String query) {
-        List<Product> products = productService.query(start, count, new ProductQuery(query));
+    public ResponseMessage getProducts(@RequestParam(value = "city") int cityId, @RequestParam int start, @RequestParam int count, @RequestParam(required = false) String query) {
+        if (isInvalidLimit(start, count)) return new ResponseMessage(ErrorCode.FORBIDDEN, "forbidden");
+
+        List<Product> products = productService.query(start, count, new ProductQuery(cityId, query));
         List<Long> productIds = new ArrayList<Long>();
         for (Product product : products) productIds.add(product.getId());
         Map<Long, Place> placesOfProducts = placeService.queryByProducts(productIds);
@@ -102,6 +104,8 @@ public class ProductController extends AbstractController {
 
     @RequestMapping(value = "/{id}/customer", method = RequestMethod.GET)
     public ResponseMessage getProductCustomersInfo(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return new ResponseMessage(ErrorCode.FORBIDDEN, "forbidden");
+
         List<Order> orders = orderService.queryDistinctCustomerOrderByProduct(id, start, count);
         List<Customer> customers = new ArrayList<Customer>();
         List<Long> customerIds = new ArrayList<Long>();

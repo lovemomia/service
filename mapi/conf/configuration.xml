@@ -16,6 +16,10 @@
         </Tongqu>
     </Database>
 
+    <Image>
+        <Domain>http://s.momia.cn</Domain>
+    </Image>
+
     <Service>
         <Base>http://localhost:8080</Base>
         <Deal>https://localhost:8443</Deal>

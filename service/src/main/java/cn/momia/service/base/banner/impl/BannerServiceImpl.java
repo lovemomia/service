@@ -12,11 +12,11 @@ import java.util.List;
 
 public class BannerServiceImpl extends DbAccessService implements BannerService {
     @Override
-    public List<Banner> getBanners(int count) {
+    public List<Banner> getBanners(int cityId, int count) {
         final List<Banner> banners = new ArrayList<Banner>();
 
-        String sql = "SELECT cover, action FROM t_banner WHERE status=1 ORDER BY addTime DESC LIMIT ?";
-        jdbcTemplate.query(sql, new Object[] { count }, new RowCallbackHandler() {
+        String sql = "SELECT cover, action FROM t_banner WHERE status=1 AND (cityId=? OR cityId=0) ORDER BY addTime DESC LIMIT ?";
+        jdbcTemplate.query(sql, new Object[] { cityId, count }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 Banner banner = new Banner();

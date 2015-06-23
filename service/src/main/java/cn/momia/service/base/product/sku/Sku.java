@@ -11,11 +11,11 @@ public class Sku implements Serializable {
 
     private long id;
     private long productId;
-    private float price;
+    private List<SkuProperty> properties;
+    private List<SkuPrice> prices;
     private int stock;
     private int lockedStock;
     private int unlockedStock;
-    private List<SkuProperty> properties;
 
     public long getId() {
         return id;
@@ -33,12 +33,20 @@ public class Sku implements Serializable {
         this.productId = productId;
     }
 
-    public float getPrice() {
-        return price;
+    public List<SkuProperty> getProperties() {
+        return properties;
     }
 
-    public void setPrice(float price) {
-        this.price = price;
+    public void setProperties(List<SkuProperty> properties) {
+        this.properties = properties;
+    }
+
+    public List<SkuPrice> getPrices() {
+        return prices;
+    }
+
+    public void setPrices(List<SkuPrice> prices) {
+        this.prices = prices;
     }
 
     public int getStock() {
@@ -63,14 +71,6 @@ public class Sku implements Serializable {
 
     public void setUnlockedStock(int unlockedStock) {
         this.unlockedStock = unlockedStock;
-    }
-
-    public List<SkuProperty> getProperties() {
-        return properties;
-    }
-
-    public void setProperties(List<SkuProperty> properties) {
-        this.properties = properties;
     }
 
     @Override

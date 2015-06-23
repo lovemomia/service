@@ -8,6 +8,7 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.Dto;
 import cn.momia.mapi.api.v1.dto.ProductDto;
+import cn.momia.mapi.img.ImageFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -27,8 +27,9 @@ import java.util.List;
 @RequestMapping("/v1/product")
 public class ProductApi extends AbstractApi {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public ResponseMessage getProducts(@RequestParam int start, @RequestParam int count, @RequestParam String query) {
+    public ResponseMessage getProducts(@RequestParam(value = "city") int cityId, @RequestParam int start, @RequestParam int count, @RequestParam String query) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("city", cityId)
                 .add("start", start)
                 .add("count", count)
                 .add("query", query);
@@ -62,7 +63,7 @@ public class ProductApi extends AbstractApi {
                 productDto.setPoi(StringUtils.join(new Object[] { place.getFloat("lng"), place.getFloat("lat") }, ":"));
                 productDto.setImgs(getImgs(baseProduct));
                 productDto.setCustomers(getCustomers(customers));
-                productDto.setContent(baseProduct.getJSONArray("content"));
+                productDto.setContent(processImages(baseProduct.getJSONArray("content")));
 
                 return productDto;
             }
@@ -103,7 +104,7 @@ public class ProductApi extends AbstractApi {
 
         JSONArray imgArray = baseProduct.getJSONArray("imgs");
         for (int i = 0; i < imgArray.size(); i++) {
-            imgs.add(imgArray.getJSONObject(i).getString("url"));
+            imgs.add(ImageFile.url(imgArray.getJSONObject(i).getString("url")));
         }
 
         return imgs;
@@ -120,7 +121,7 @@ public class ProductApi extends AbstractApi {
         for (int i = 0; i < customerArray.size(); i++) {
             JSONObject customer = customerArray.getJSONObject(i);
             if (customers.avatars == null) customers.avatars = new ArrayList<String>();
-            customers.avatars.add(customer.getString("avatar"));
+            customers.avatars.add(ImageFile.url(customer.getString("avatar")));
             JSONArray participants = customer.getJSONArray("participants");
             for (int j = 0; j < participants.size(); j++) {
                 Date birthday = participants.getJSONObject(j).getDate("birthday");
@@ -137,6 +138,20 @@ public class ProductApi extends AbstractApi {
         else customers.text = childCount + "个孩子，" + adultCount + "个大人参加";
 
         return customers;
+    }
+
+    private JSONArray processImages(JSONArray content) {
+        for (int i = 0; i < content.size(); i++) {
+            JSONObject contentBlock = content.getJSONObject(i);
+            JSONArray body = contentBlock.getJSONArray("body");
+            for (int j = 0; j < body.size(); j++) {
+                JSONObject bodyBlock = body.getJSONObject(j);
+                String img = bodyBlock.getString("img");
+                if (!StringUtils.isBlank(img)) bodyBlock.put("img", ImageFile.url(img));
+            }
+        }
+
+        return content;
     }
 
     @RequestMapping(value = "/sku", method = RequestMethod.GET)
