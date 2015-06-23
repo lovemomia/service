@@ -5,7 +5,7 @@ import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.http.impl.MomiaHttpGetRequest;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.misc.SchedulerFormatter;
+import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.Dto;
 import cn.momia.mapi.api.v1.dto.HomeDto;
 import com.alibaba.fastjson.JSONArray;
@@ -102,40 +102,13 @@ public class HomeApi extends AbstractApi {
             product.title = baseProduct.getString("title");
             product.address = place.getString("address");
             product.poi = StringUtils.join(new Object[] { place.getFloat("lng"), place.getFloat("lat") }, ":");
-            product.scheduler = getScheduler(skus);
+            product.scheduler = ProductUtil.getScheduler(skus);
             product.joined = baseProduct.getInteger("sales");
-            product.price = getPrice(skus);
+            product.price = ProductUtil.getPrice(skus);
 
             products.add(product);
         }
 
         return products;
-    }
-
-    private String getScheduler(JSONArray skus) {
-        List<Date> times = new ArrayList<Date>();
-        for (int i = 0; i < skus.size(); i++) {
-            JSONObject sku = skus.getJSONObject(i);
-            JSONArray proterties = sku.getJSONArray("properties");
-            for (int j = 0; j < proterties.size(); j++) {
-                JSONObject property = proterties.getJSONObject(j);
-                if (property.getString("name").equals("时间")) {
-                    times.add(property.getDate("value"));
-                }
-            }
-        }
-
-        return SchedulerFormatter.format(times);
-    }
-
-    private float getPrice(JSONArray skus) {
-        List<Float> prices = new ArrayList<Float>();
-        for (int i = 0; i < skus.size(); i++) {
-            JSONObject sku = skus.getJSONObject(i);
-            prices.add(sku.getFloat("price"));
-        }
-        Collections.sort(prices);
-
-        return prices.isEmpty() ? 0 : prices.get(0);
     }
 }

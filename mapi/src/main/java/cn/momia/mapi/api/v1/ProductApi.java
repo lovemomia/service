@@ -5,7 +5,7 @@ import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.http.impl.MomiaHttpGetRequest;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.misc.SchedulerFormatter;
+import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.Dto;
 import cn.momia.mapi.api.v1.dto.ProductDto;
 import com.alibaba.fastjson.JSONArray;
@@ -55,9 +55,9 @@ public class ProductApi extends AbstractApi {
                 productDto.cover = baseProduct.getString("cover");
                 productDto.title = baseProduct.getString("title");
                 productDto.joined = baseProduct.getInteger("sales");
-                productDto.price = getPrice(skus);
+                productDto.price = ProductUtil.getPrice(skus);
                 productDto.crowd = baseProduct.getString("crowd");
-                productDto.scheduler = getScheduler(skus);
+                productDto.scheduler = ProductUtil.getScheduler(skus);
                 productDto.address = place.getString("address");
                 productDto.poi = StringUtils.join(new Object[] { place.getFloat("lng"), place.getFloat("lat") }, ":");
                 productDto.imgs = getImgs(baseProduct);
@@ -96,38 +96,6 @@ public class ProductApi extends AbstractApi {
                 .add("start", 0)
                 .add("count", conf.getInt("Product.CustomerPageSize"));
         return new MomiaHttpGetRequest("customers", false, baseServiceUrl("product", productId, "customer"), builder.build());
-    }
-
-    private void processCustomers(JSONObject productObject, MomiaHttpResponseCollector collector ) {
-        Object customers = collector.getResponse("customers");
-        if (customers != null) productObject.put("customers", customers);
-    }
-
-    private float getPrice(JSONArray skus) {
-        List<Float> prices = new ArrayList<Float>();
-        for (int i = 0; i < skus.size(); i++) {
-            JSONObject sku = skus.getJSONObject(i);
-            prices.add(sku.getFloat("price"));
-        }
-        Collections.sort(prices);
-
-        return prices.isEmpty() ? 0 : prices.get(0);
-    }
-
-    private String getScheduler(JSONArray skus) {
-        List<Date> times = new ArrayList<Date>();
-        for (int i = 0; i < skus.size(); i++) {
-            JSONObject sku = skus.getJSONObject(i);
-            JSONArray proterties = sku.getJSONArray("properties");
-            for (int j = 0; j < proterties.size(); j++) {
-                JSONObject property = proterties.getJSONObject(j);
-                if (property.getString("name").equals("时间")) {
-                    times.add(property.getDate("value"));
-                }
-            }
-        }
-
-        return SchedulerFormatter.format(times);
     }
 
     private List<String> getImgs(JSONObject baseProduct) {
