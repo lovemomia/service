@@ -1,5 +1,6 @@
 package cn.momia.mapi.api.v1.dto;
 
+import cn.momia.mapi.img.ImageFile;
 import com.alibaba.fastjson.JSONObject;
 
 import java.util.Date;
@@ -73,7 +74,7 @@ public class UserDto implements Dto {
     protected UserDto(JSONObject userJson) {
         this.token = userJson.getString("token");
         this.mobile = userJson.getString("mobile");
-        this.avatar = userJson.getString("avatar");
+        this.avatar = ImageFile.url(userJson.getString("avatar"));
         this.name = userJson.getString("name");
         this.sex = userJson.getString("sex");
         this.birthday = userJson.getDate("birthday");

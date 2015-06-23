@@ -8,6 +8,7 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.Dto;
 import cn.momia.mapi.api.v1.dto.HomeDto;
+import cn.momia.mapi.img.ImageFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
@@ -72,7 +73,7 @@ public class HomeApi extends AbstractApi {
         for (int i = 0; i < bannerArray.size(); i++) {
             JSONObject bannerObject = bannerArray.getJSONObject(i);
             HomeDto.Banner banner = new HomeDto.Banner();
-            banner.setCover(bannerObject.getString("cover"));
+            banner.setCover(ImageFile.url(bannerObject.getString("cover")));
             banner.setAction(bannerObject.getString("action"));
 
             banners.add(banner);
@@ -93,7 +94,7 @@ public class HomeApi extends AbstractApi {
             JSONArray skus = productObject.getJSONArray("skus");
 
             product.setId(baseProduct.getLong("id"));
-            product.setCover(baseProduct.getString("cover"));
+            product.setCover(ImageFile.url(baseProduct.getString("cover")));
             product.setTitle(baseProduct.getString("title"));
             product.setAddress(place.getString("address"));
             product.setPoi(StringUtils.join(new Object[] { place.getFloat("lng"), place.getFloat("lat") }, ":"));

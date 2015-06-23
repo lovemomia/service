@@ -8,6 +8,7 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.Dto;
 import cn.momia.mapi.api.v1.dto.ProductDto;
+import cn.momia.mapi.img.ImageFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
@@ -103,7 +104,7 @@ public class ProductApi extends AbstractApi {
 
         JSONArray imgArray = baseProduct.getJSONArray("imgs");
         for (int i = 0; i < imgArray.size(); i++) {
-            imgs.add(imgArray.getJSONObject(i).getString("url"));
+            imgs.add(ImageFile.url(imgArray.getJSONObject(i).getString("url")));
         }
 
         return imgs;
@@ -120,7 +121,7 @@ public class ProductApi extends AbstractApi {
         for (int i = 0; i < customerArray.size(); i++) {
             JSONObject customer = customerArray.getJSONObject(i);
             if (customers.avatars == null) customers.avatars = new ArrayList<String>();
-            customers.avatars.add(customer.getString("avatar"));
+            customers.avatars.add(ImageFile.url(customer.getString("avatar")));
             JSONArray participants = customer.getJSONArray("participants");
             for (int j = 0; j < participants.size(); j++) {
                 Date birthday = participants.getJSONObject(j).getDate("birthday");
