@@ -17,9 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @RestController
 @RequestMapping("/v1/favorite")
 public class FavoriteApi extends AbstractApi {
@@ -51,8 +48,9 @@ public class FavoriteApi extends AbstractApi {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
+                FavoriteDto favoriteDto = new FavoriteDto();
+
                 JSONArray productArray = (JSONArray) data;
-                List<FavoriteDto.Product> products = new ArrayList<FavoriteDto.Product>();
                 for (int i = 0; i < productArray.size(); i++) {
                     FavoriteDto.Product product = new FavoriteDto.Product();
 
@@ -67,11 +65,8 @@ public class FavoriteApi extends AbstractApi {
                     product.joined = baseProduct.getInteger("sales");
                     product.price = ProductUtil.getPrice(skus);
 
-                    products.add(product);
+                    favoriteDto.add(product);
                 }
-
-                FavoriteDto favoriteDto = new FavoriteDto();
-                favoriteDto.products = products;
 
                 return favoriteDto;
             }
