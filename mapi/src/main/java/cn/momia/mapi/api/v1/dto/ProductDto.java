@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import java.util.List;
 
 public class ProductDto implements Dto {
-    public static class Customers {
+    public static class Customers implements Dto {
         public String text;
         public List<String> avatars;
     }

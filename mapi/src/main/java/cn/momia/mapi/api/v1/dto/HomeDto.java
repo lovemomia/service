@@ -3,7 +3,7 @@ package cn.momia.mapi.api.v1.dto;
 import java.util.List;
 
 public class HomeDto implements Dto {
-    public static class Banner {
+    public static class Banner implements Dto {
         private String cover;
         private String action;
 
@@ -24,7 +24,7 @@ public class HomeDto implements Dto {
         }
     }
 
-    public static class Product {
+    public static class Product implements Dto {
         private long id;
         private String cover;
         private String title;
