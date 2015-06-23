@@ -51,18 +51,18 @@ public class ProductApi extends AbstractApi {
                 JSONArray skus = (JSONArray) collector.getResponse("skus");
                 JSONArray customers = (JSONArray) collector.getResponse("customers");
 
-                productDto.id = baseProduct.getLong("id");
-                productDto.cover = baseProduct.getString("cover");
-                productDto.title = baseProduct.getString("title");
-                productDto.joined = baseProduct.getInteger("sales");
-                productDto.price = ProductUtil.getPrice(skus);
-                productDto.crowd = baseProduct.getString("crowd");
-                productDto.scheduler = ProductUtil.getScheduler(skus);
-                productDto.address = place.getString("address");
-                productDto.poi = StringUtils.join(new Object[] { place.getFloat("lng"), place.getFloat("lat") }, ":");
-                productDto.imgs = getImgs(baseProduct);
-                productDto.customers = getCustomers(customers);
-                productDto.content = baseProduct.getJSONArray("content");
+                productDto.setId(baseProduct.getLong("id"));
+                productDto.setCover(baseProduct.getString("cover"));
+                productDto.setTitle(baseProduct.getString("title"));
+                productDto.setJoined(baseProduct.getInteger("sales"));
+                productDto.setPrice(ProductUtil.getPrice(skus));
+                productDto.setCrowd(baseProduct.getString("crowd"));
+                productDto.setScheduler(ProductUtil.getScheduler(skus));
+                productDto.setAddress(place.getString("address"));
+                productDto.setPoi(StringUtils.join(new Object[] { place.getFloat("lng"), place.getFloat("lat") }, ":"));
+                productDto.setImgs(getImgs(baseProduct));
+                productDto.setCustomers(getCustomers(customers));
+                productDto.setContent(baseProduct.getJSONArray("content"));
 
                 return productDto;
             }
