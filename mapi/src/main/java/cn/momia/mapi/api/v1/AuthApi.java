@@ -33,18 +33,7 @@ public class AuthApi extends AbstractApi {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                JSONObject userJson = (JSONObject) data;
-                UserDto.Own own = new UserDto.Own();
-                own.setToken(userJson.getString("token"));
-                own.setMobile(userJson.getString("mobile"));
-                own.setAvatar(userJson.getString("avatar"));
-                own.setName(userJson.getString("name"));
-                own.setSex(userJson.getString("sex"));
-                own.setBirthday(userJson.getDate("birthday"));
-                own.setCityId(userJson.getInteger("cityId"));
-                own.setAddress(userJson.getString("address"));
-
-                return own;
+                return new UserDto.Own((JSONObject) data);
             }
         });
     }

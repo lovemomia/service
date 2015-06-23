@@ -1,17 +1,27 @@
 package cn.momia.mapi.api.v1.dto;
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.util.Date;
 
 public class UserDto implements Dto {
-    public static class Own extends UserDto {}
+    public static class Own extends UserDto {
+        public Own(JSONObject userJson) {
+            super(userJson);
+        }
+    }
 
     public static class Other extends UserDto {
+        public Other(JSONObject userJson) {
+            super(userJson);
+        }
+
         public String getToken() {
             return "";
         }
 
         public String getMobile() {
-            return mobile.substring(0, 3) + "******" + mobile.substring(9);
+            return getMobile().substring(0, 3) + "******" + getMobile().substring(9);
         }
 
         public String getAddress() {
@@ -19,14 +29,14 @@ public class UserDto implements Dto {
         }
     }
 
-    protected String token;
-    protected String mobile;
-    protected String avatar;
-    protected String name;
-    protected String sex;
-    protected Date birthday;
-    protected int cityId;
-    protected String address;
+    private String token;
+    private String mobile;
+    private String avatar;
+    private String name;
+    private String sex;
+    private Date birthday;
+    private int cityId;
+    private String address;
 
     public String getToken() {
         return token;
@@ -92,5 +102,14 @@ public class UserDto implements Dto {
         this.address = address;
     }
 
-    protected UserDto() {}
+    protected UserDto(JSONObject userJson) {
+        this.token = userJson.getString("token");
+        this.mobile = userJson.getString("mobile");
+        this.avatar = userJson.getString("avatar");
+        this.name = userJson.getString("name");
+        this.sex = userJson.getString("sex");
+        this.birthday = userJson.getDate("birthday");
+        this.cityId = userJson.getInteger("cityId");
+        this.address = userJson.getString("address");
+    }
 }
