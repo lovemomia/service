@@ -11,6 +11,6 @@ public abstract class AbstractController {
         int maxPage = conf.getInt("Limit.MaxPage");
         int maxPageSize = conf.getInt("Limit.MaxPageSize");
 
-        return start <= maxPage * maxPageSize && count <= maxPageSize;
+        return start > maxPage * maxPageSize || count > maxPageSize;
     }
 }
