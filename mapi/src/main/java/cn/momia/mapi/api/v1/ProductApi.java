@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -28,8 +27,9 @@ import java.util.List;
 @RequestMapping("/v1/product")
 public class ProductApi extends AbstractApi {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public ResponseMessage getProducts(@RequestParam int start, @RequestParam int count, @RequestParam String query) {
+    public ResponseMessage getProducts(@RequestParam(value = "city") int cityId, @RequestParam int start, @RequestParam int count, @RequestParam String query) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("city", cityId)
                 .add("start", start)
                 .add("count", count)
                 .add("query", query);
