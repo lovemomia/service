@@ -63,7 +63,7 @@ public class ProductApi extends AbstractApi {
                 productDto.setPoi(StringUtils.join(new Object[] { place.getFloat("lng"), place.getFloat("lat") }, ":"));
                 productDto.setImgs(getImgs(baseProduct));
                 productDto.setCustomers(getCustomers(customers));
-                productDto.setContent(baseProduct.getJSONArray("content"));
+                productDto.setContent(processImages(baseProduct.getJSONArray("content")));
 
                 return productDto;
             }
@@ -138,6 +138,20 @@ public class ProductApi extends AbstractApi {
         else customers.text = childCount + "个孩子，" + adultCount + "个大人参加";
 
         return customers;
+    }
+
+    private JSONArray processImages(JSONArray content) {
+        for (int i = 0; i < content.size(); i++) {
+            JSONObject contentBlock = content.getJSONObject(i);
+            JSONArray body = contentBlock.getJSONArray("body");
+            for (int j = 0; j < body.size(); j++) {
+                JSONObject bodyBlock = body.getJSONObject(j);
+                String img = bodyBlock.getString("img");
+                if (!StringUtils.isBlank(img)) bodyBlock.put("img", ImageFile.url(img));
+            }
+        }
+
+        return content;
     }
 
     @RequestMapping(value = "/sku", method = RequestMethod.GET)
