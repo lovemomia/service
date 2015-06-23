@@ -8,6 +8,7 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.Dto;
 import cn.momia.mapi.api.v1.dto.ProductDto;
+import cn.momia.mapi.api.v1.dto.SkuDto;
 import cn.momia.mapi.img.ImageFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -156,6 +157,26 @@ public class ProductApi extends AbstractApi {
 
     @RequestMapping(value = "/sku", method = RequestMethod.GET)
     public ResponseMessage getProductSkus(@RequestParam long id) {
-        return executeRequest(buildProductSkusRequest(id));
+        return executeRequest(buildProductSkusRequest(id), new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                SkuDto.Skus skus = new SkuDto.Skus();
+
+                JSONArray skusArray = (JSONArray) data;
+                for (int i = 0; i < skusArray.size(); i++) {
+                    JSONObject skuObject = skusArray.getJSONObject(i);
+                    SkuDto sku = new SkuDto();
+                    sku.setProductId(skuObject.getLong("productId"));
+                    sku.setSkuId(skuObject.getLong("id"));
+                    sku.setStock(skuObject.getInteger("unlockedStock"));
+                    sku.setTime(ProductUtil.getTime(skuObject.getJSONArray("properties")));
+                    sku.setPrices(skuObject.getJSONArray("prices"));
+
+                    skus.add(sku);
+                }
+
+                return skus;
+            }
+        });
     }
 }

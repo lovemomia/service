@@ -35,16 +35,23 @@ public class ProductUtil {
         List<Date> times = new ArrayList<Date>();
         for (int i = 0; i < skus.size(); i++) {
             JSONObject sku = skus.getJSONObject(i);
-            JSONArray proterties = sku.getJSONArray("properties");
-            for (int j = 0; j < proterties.size(); j++) {
-                JSONObject property = proterties.getJSONObject(j);
-                if (property.getString("name").equals("时间")) {
-                    times.add(property.getDate("value"));
-                }
-            }
+            JSONArray properties = sku.getJSONArray("properties");
+            Date time = getTime(properties);
+            if (time != null) times.add(time);
         }
 
         return ProductUtil.format(times);
+    }
+
+    public static Date getTime(JSONArray properties) {
+        for (int i = 0; i < properties.size(); i++) {
+            JSONObject property = properties.getJSONObject(i);
+            if (property.getString("name").equals("时间")) {
+                return property.getDate("value");
+            }
+        }
+
+        return null;
     }
 
     private static String format(List<Date> times) {

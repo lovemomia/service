@@ -1,45 +1,58 @@
 package cn.momia.mapi.api.v1.dto;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class SkuDto implements Dto {
     public static class Skus extends ArrayList<SkuDto> implements Dto {}
 
-    public static class SkuPrice implements Dto {
-        private String name;
-        private float price;
+    private long productId;
+    private long skuId;
+    private int stock;
+    private Date time;
+    private JSONArray prices;
 
-        public SkuPrice(String name, float price) {
-            this.name = name;
-            this.price = price;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public float getPrice() {
-            return price;
-        }
+    public long getProductId() {
+        return productId;
     }
 
-    private String time;
-    private List<SkuPrice> prices;
+    public void setProductId(long productId) {
+        this.productId = productId;
+    }
 
-    public String getTime() {
+    public long getSkuId() {
+        return skuId;
+    }
+
+    public void setSkuId(long skuId) {
+        this.skuId = skuId;
+    }
+
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
+    }
+
+    public Date getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(Date time) {
         this.time = time;
     }
 
-    public List<SkuPrice> getPrices() {
+    public JSONArray getPrices() {
         return prices;
     }
 
-    public void setPrices(List<SkuPrice> prices) {
+    public void setPrices(JSONArray prices) {
         this.prices = prices;
     }
 }
