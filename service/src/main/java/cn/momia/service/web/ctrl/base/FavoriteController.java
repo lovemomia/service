@@ -9,6 +9,7 @@ import cn.momia.service.base.product.sku.Sku;
 import cn.momia.service.base.product.sku.SkuService;
 import cn.momia.service.base.user.User;
 import cn.momia.service.base.user.UserService;
+import cn.momia.service.web.ctrl.AbstractController;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/favorite")
-public class FavoriteController {
+public class FavoriteController extends AbstractController {
     @Autowired
     private FavoriteService favoriteService;
 
@@ -58,6 +59,8 @@ public class FavoriteController {
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getFavoritesOfUser(@RequestParam String utoken, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return new ResponseMessage(ErrorCode.FORBIDDEN, "forbidden");
+
         User user = userService.getByToken(utoken);
         if (!user.exists()) return new ResponseMessage(ErrorCode.FORBIDDEN, "user not login");
 
