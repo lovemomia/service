@@ -18,8 +18,8 @@ public class BannerController {
     private BannerService bannerService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage getBanners(@RequestParam int count) {
-        List<Banner> banners = bannerService.getBanners(count);
+    public ResponseMessage getBanners(@RequestParam(value = "city") int cityId, @RequestParam int count) {
+        List<Banner> banners = bannerService.getBanners(cityId, count);
 
         return new ResponseMessage(banners);
     }
