@@ -58,12 +58,12 @@ public class FavoriteApi extends AbstractApi {
                     JSONObject baseProduct = productObject.getJSONObject("product");
                     JSONArray skus = productObject.getJSONArray("skus");
 
-                    product.id = baseProduct.getLong("id");
-                    product.cover = baseProduct.getString("cover");
-                    product.title = baseProduct.getString("title");
-                    product.scheduler = ProductUtil.getScheduler(skus);
-                    product.joined = baseProduct.getInteger("sales");
-                    product.price = ProductUtil.getPrice(skus);
+                    product.setId(baseProduct.getLong("id"));
+                    product.setCover(baseProduct.getString("cover"));
+                    product.setTitle(baseProduct.getString("title"));
+                    product.setScheduler(ProductUtil.getScheduler(skus));
+                    product.setJoined(baseProduct.getInteger("sales"));
+                    product.setPrice(ProductUtil.getPrice(skus));
 
                     favoriteDto.add(product);
                 }
