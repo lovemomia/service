@@ -19,4 +19,20 @@ public class ParticipantDto implements Dto {
         this.sex = participantJson.getString("sex");
         this.birthday = participantJson.getDate("birthday");
     }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public Date getBirthday() {
+        return birthday;
+    }
 }
