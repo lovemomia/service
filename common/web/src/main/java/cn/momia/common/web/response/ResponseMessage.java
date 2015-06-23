@@ -7,6 +7,8 @@ import java.util.Date;
 
 public class ResponseMessage implements Serializable
 {
+    public static final ResponseMessage SUCCESS = new ResponseMessage("success");
+
     private int errno;
     private String errmsg;
     private Object data = "";
