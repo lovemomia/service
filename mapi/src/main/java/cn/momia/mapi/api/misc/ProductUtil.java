@@ -20,7 +20,11 @@ public class ProductUtil {
         List<Float> prices = new ArrayList<Float>();
         for (int i = 0; i < skus.size(); i++) {
             JSONObject sku = skus.getJSONObject(i);
-            prices.add(sku.getFloat("price"));
+            JSONArray pricesOfSku = sku.getJSONArray("prices");
+            for (int j = 0; j < pricesOfSku.size(); j++) {
+                JSONObject priceObject = pricesOfSku.getJSONObject(j);
+                prices.add(priceObject.getFloat("price"));
+            }
         }
         Collections.sort(prices);
 
