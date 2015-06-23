@@ -26,7 +26,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     }
 
     public Product getProduct(long id){
-        String sql = "SELECT id, categoryId, title, cover, crowd, content, sales FROM t_product WHERE id=? AND status=1";
+        String sql = "SELECT id, cityId, categoryId, title, cover, crowd, content, sales FROM t_product WHERE id=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Product>() {
             @Override
@@ -40,6 +40,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     public Product buildProduct(ResultSet rs) throws SQLException {
         Product product = new Product();
         product.setId(rs.getLong("id"));
+        product.setCityId(rs.getInt("cityId"));
         product.setCategoryId(rs.getInt("categoryId"));
         product.setTitle(rs.getString("title"));
         product.setCover(rs.getString("cover"));
@@ -78,7 +79,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
         final List<Product> products = new ArrayList<Product>();
         if (ids.size() <= 0) return products;
 
-        String sql = "SELECT id, categoryId, title, cover, crowd, content, sales FROM t_product WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1 ORDER BY addTime DESC";
+        String sql = "SELECT id, cityId, categoryId, title, cover, crowd, content, sales FROM t_product WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1 ORDER BY addTime DESC";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -91,10 +92,9 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
 
     @Override
     public List<Product> query(int start, int count, ProductQuery query) {
-        // TODO use query
         final List<Product> products = new ArrayList<Product>();
 
-        String sql = "SELECT id, categoryId, title, cover, crowd, content, sales FROM t_product WHERE status=1 ORDER BY addTime DESC LIMIT ?,?";
+        String sql = "SELECT id, cityId, categoryId, title, cover, crowd, content, sales FROM t_product WHERE status=1 AND " + query.toString() + " ORDER BY addTime DESC LIMIT ?,?";
         jdbcTemplate.query(sql, new Object[] { start, count }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {

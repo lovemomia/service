@@ -13,6 +13,7 @@ public class Product implements Serializable {
     }
 
     private long id;
+    private int cityId;
     private int categoryId;
     private String title;
     private String cover;
@@ -35,6 +36,14 @@ public class Product implements Serializable {
 
     public void setCategoryId(int categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public int getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(int cityId) {
+        this.cityId = cityId;
     }
 
     public String getTitle() {
