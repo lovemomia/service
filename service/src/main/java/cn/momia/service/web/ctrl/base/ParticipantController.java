@@ -42,7 +42,7 @@ public class ParticipantController {
         return new ResponseMessage(participant);
     }
 
-    @RequestMapping(method = RequestMethod.PUT)
+    @RequestMapping(method = RequestMethod.PUT, consumes = "application/json")
     public ResponseMessage updateParticipantName(@RequestBody Participant participant) {
         boolean successful = participantService.update(participant);
 
