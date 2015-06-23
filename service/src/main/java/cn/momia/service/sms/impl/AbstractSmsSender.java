@@ -12,7 +12,7 @@ import java.util.Date;
 
 public abstract class AbstractSmsSender extends DbAccessService implements SmsSender {
     @Override
-    public boolean send(String mobile)  {
+    public void send(String mobile)  {
         String code = getGeneratedCode(mobile);
         if (StringUtils.isBlank(code))
         {
@@ -22,13 +22,11 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
         }
 
         Date lastSendTime = getLastSendTime(mobile);
-        if (lastSendTime != null && new Date().getTime() - lastSendTime.getTime() < 60 * 1000) return true;
+        if (lastSendTime != null && new Date().getTime() - lastSendTime.getTime() < 60 * 1000) return;
         if (doSend(mobile, code))
         {
-            return updateSendTime(mobile);
+            updateSendTime(mobile);
         }
-
-        return false;
     }
 
     private String getGeneratedCode(String mobile)
