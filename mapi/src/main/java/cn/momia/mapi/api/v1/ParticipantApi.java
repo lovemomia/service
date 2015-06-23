@@ -30,21 +30,10 @@ public class ParticipantApi extends AbstractApi {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                return buildParticipantDto((JSONObject) data);
+                return new ParticipantDto((JSONObject) data);
             }
         });
     }
-
-    private ParticipantDto buildParticipantDto(JSONObject data) {
-        ParticipantDto participant = new ParticipantDto();
-        participant.id = data.getLong("id");
-        participant.name = data.getString("name");
-        participant.sex = data.getString("sex");
-        participant.birthday = data.getDate("birthday");
-
-        return participant;
-    }
-
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getParticipant(@RequestParam long id, @RequestParam String utoken) {
@@ -54,7 +43,7 @@ public class ParticipantApi extends AbstractApi {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                return buildParticipantDto((JSONObject) data);
+                return new ParticipantDto((JSONObject) data);
             }
         });
     }
@@ -88,8 +77,8 @@ public class ParticipantApi extends AbstractApi {
                 ParticipantDto.Participants participants = new ParticipantDto.Participants();
                 JSONArray participantsArray = (JSONArray) data;
                 for (int i = 0; i < participantsArray.size(); i++) {
-                    JSONObject participantObject = participantsArray.getJSONObject(i);
-                    participants.add(buildParticipantDto(participantObject));
+                    JSONObject participantJson = participantsArray.getJSONObject(i);
+                    participants.add(new ParticipantDto(participantJson));
                 }
 
                 return participants;
