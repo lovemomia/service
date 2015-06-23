@@ -40,4 +40,8 @@
 
     <bean id="httpClient" class="cn.momia.common.web.http.MomiaHttpClient" />
     <bean id="requestExecutor" class="cn.momia.common.web.http.MomiaHttpRequestExecutor" />
+    
+    <bean class="cn.momia.mapi.img.ImageFile">
+        <property name="domain" value="${Image.Domain}" />
+    </bean>
 </beans>
