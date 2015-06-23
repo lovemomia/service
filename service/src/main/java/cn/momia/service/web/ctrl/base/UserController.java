@@ -45,7 +45,7 @@ public class UserController extends AbstractController {
         boolean successful = userService.updateAvatar(user.getId(), avatar);
 
         if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update user avatar");
-        return new ResponseMessage("update user avatar successfully");
+        return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/name", method = RequestMethod.PUT)
@@ -56,7 +56,7 @@ public class UserController extends AbstractController {
         boolean successful = userService.updateName(user.getId(), name);
 
         if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update user name");
-        return new ResponseMessage("update user name successfully");
+        return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/sex", method = RequestMethod.PUT)
@@ -67,7 +67,7 @@ public class UserController extends AbstractController {
         boolean successful = userService.updateSex(user.getId(), sex);
 
         if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update user sex");
-        return new ResponseMessage("update user sex successfully");
+        return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/birthday", method = RequestMethod.PUT)
@@ -78,7 +78,7 @@ public class UserController extends AbstractController {
         boolean successful = userService.updateBirthday(user.getId(), birthday);
 
         if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update user birthday");
-        return new ResponseMessage("update user birthday successfully");
+        return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/city", method = RequestMethod.PUT)
@@ -89,7 +89,7 @@ public class UserController extends AbstractController {
         boolean successful = userService.updateCityId(user.getId(), city);
 
         if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update user city");
-        return new ResponseMessage("update user city successfully");
+        return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/address", method = RequestMethod.PUT)
@@ -100,6 +100,6 @@ public class UserController extends AbstractController {
         boolean successful = userService.updateAddress(user.getId(), address);
 
         if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update user address");
-        return new ResponseMessage("update user address successfully");
+        return ResponseMessage.SUCCESS;
     }
 }
