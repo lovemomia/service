@@ -2,6 +2,7 @@ package cn.momia.service.base.product.sku.impl;
 
 import cn.momia.service.base.DbAccessService;
 import cn.momia.service.base.product.sku.Sku;
+import cn.momia.service.base.product.sku.SkuPrice;
 import cn.momia.service.base.product.sku.SkuProperty;
 import cn.momia.service.base.product.sku.SkuPropertyName;
 import cn.momia.service.base.product.sku.SkuPropertyValue;
@@ -88,7 +89,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
         sku.setId(rs.getLong("id"));
         sku.setProductId(rs.getLong("productId"));
         sku.setProperties(parseProperties(rs.getString("propertyValues")));
-        sku.setPrice(rs.getFloat("price"));
+        sku.setPrices(parsePrices(rs.getString("price")));
         sku.setStock(rs.getInt("stock"));
         sku.setUnlockedStock(rs.getInt("unlockedStock"));
         sku.setLockedStock(rs.getInt("lockedStock"));
@@ -117,6 +118,18 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
         }
 
         return properties;
+    }
+
+    private List<SkuPrice> parsePrices(String price) {
+        List<SkuPrice> prices = new ArrayList<SkuPrice>();
+
+        JSONArray pricesArray = JSON.parseArray(price);
+        for (int i = 0; i < pricesArray.size(); i++) {
+            JSONObject priceObject = pricesArray.getJSONObject(i);
+            prices.add(new SkuPrice(priceObject.getString("name"), priceObject.getFloat("price")));
+        }
+
+        return prices;
     }
 
     @Override
