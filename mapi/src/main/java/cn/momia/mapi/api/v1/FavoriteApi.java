@@ -32,8 +32,11 @@ public class FavoriteApi extends AbstractApi {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage getFavoritesOfUser(@RequestParam String utoken) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+    public ResponseMessage getFavoritesOfUser(@RequestParam String utoken, @RequestParam int start, @RequestParam int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("start", start)
+                .add("count", count);
         MomiaHttpRequest request = new MomiaHttpGetRequest(baseServiceUrl("favorite"), builder.build());
 
         return executeRequest(request);
