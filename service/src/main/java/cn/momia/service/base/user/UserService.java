@@ -10,6 +10,7 @@ public interface UserService {
     Map<Long, User> get(List<Long> ids);
     User getByToken(String token);
     User getByMobile(String mobile);
+    boolean updateToken(long id, String token);
     boolean updateAvatar(long id, String avatar);
     boolean updateName(long id, String name);
     boolean updateSex(long id, String sex);
