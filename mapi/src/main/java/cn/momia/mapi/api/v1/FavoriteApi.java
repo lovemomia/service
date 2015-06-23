@@ -6,10 +6,19 @@ import cn.momia.common.web.http.impl.MomiaHttpDeleteRequest;
 import cn.momia.common.web.http.impl.MomiaHttpGetRequest;
 import cn.momia.common.web.http.impl.MomiaHttpPostRequest;
 import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.mapi.api.misc.ProductUtil;
+import cn.momia.mapi.api.v1.dto.Dto;
+import cn.momia.mapi.api.v1.dto.FavoriteDto;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Function;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/v1/favorite")
@@ -39,6 +48,33 @@ public class FavoriteApi extends AbstractApi {
                 .add("count", count);
         MomiaHttpRequest request = new MomiaHttpGetRequest(baseServiceUrl("favorite"), builder.build());
 
-        return executeRequest(request);
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                JSONArray productArray = (JSONArray) data;
+                List<FavoriteDto.Product> products = new ArrayList<FavoriteDto.Product>();
+                for (int i = 0; i < productArray.size(); i++) {
+                    FavoriteDto.Product product = new FavoriteDto.Product();
+
+                    JSONObject productObject = productArray.getJSONObject(i);
+                    JSONObject baseProduct = productObject.getJSONObject("product");
+                    JSONArray skus = productObject.getJSONArray("skus");
+
+                    product.id = baseProduct.getLong("id");
+                    product.cover = baseProduct.getString("cover");
+                    product.title = baseProduct.getString("title");
+                    product.scheduler = ProductUtil.getScheduler(skus);
+                    product.joined = baseProduct.getInteger("sales");
+                    product.price = ProductUtil.getPrice(skus);
+
+                    products.add(product);
+                }
+
+                FavoriteDto favoriteDto = new FavoriteDto();
+                favoriteDto.products = products;
+
+                return favoriteDto;
+            }
+        });
     }
 }
