@@ -36,8 +36,9 @@ public class OrderController extends AbstractController {
     public ResponseMessage placeOrder(@RequestBody Order order) {
         if (!lockSku(order)) return new ResponseMessage(ErrorCode.FAILED, "low stocks");
 
+        long orderId = 0;
         try {
-            long orderId = orderService.add(order);
+            orderId = orderService.add(order);
             if (orderId > 0) {
                 order.setId(orderId);
                 return new ResponseMessage(order);
@@ -47,9 +48,9 @@ public class OrderController extends AbstractController {
         }
 
         // TODO 需要告警
-        if (!unlockSku(order)) LOGGER.error("fail to unlock sku, skuId: {}, count: {}", new Object[] { order.getSkuId(), order.getCount() });
+        if (orderId <= 0 && !unlockSku(order)) LOGGER.error("fail to unlock sku, skuId: {}, count: {}", new Object[] { order.getSkuId(), order.getCount() });
 
-        return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to place order");
+        return new ResponseMessage(ErrorCode.FAILED, "fail to place order");
     }
 
     private boolean lockSku(Order order) {
