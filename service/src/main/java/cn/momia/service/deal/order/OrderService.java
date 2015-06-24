@@ -11,7 +11,7 @@ public interface OrderService {
     boolean delete(long id, long userId);
     boolean prepay(long id, long userId);
     boolean unPrepay(long id, long userId);
-    boolean pay(long id, long userId);
+    boolean pay(long id);
     boolean check(long userId, long productId, long skuId);
 
 }
