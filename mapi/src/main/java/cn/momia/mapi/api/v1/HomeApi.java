@@ -102,7 +102,7 @@ public class HomeApi extends AbstractApi {
             product.setPoi(StringUtils.join(new Object[] { place.getFloat("lng"), place.getFloat("lat") }, ":"));
             product.setScheduler(ProductUtil.getScheduler(skus));
             product.setJoined(baseProduct.getInteger("sales"));
-            product.setPrice(ProductUtil.getPrice(skus));
+            product.setPrice(ProductUtil.getMiniPrice(skus));
 
             products.add(product);
         }

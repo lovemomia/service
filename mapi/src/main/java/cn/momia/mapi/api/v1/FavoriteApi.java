@@ -60,7 +60,7 @@ public class FavoriteApi extends AbstractApi {
                     product.setTitle(baseProduct.getString("title"));
                     product.setScheduler(ProductUtil.getScheduler(skus));
                     product.setJoined(baseProduct.getInteger("sales"));
-                    product.setPrice(ProductUtil.getPrice(skus));
+                    product.setPrice(ProductUtil.getMiniPrice(skus));
 
                     favoriteDto.add(product);
                 }

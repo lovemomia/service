@@ -56,7 +56,7 @@ public class ProductApi extends AbstractApi {
                 productDto.setCover(baseProduct.getString("cover"));
                 productDto.setTitle(baseProduct.getString("title"));
                 productDto.setJoined(baseProduct.getInteger("sales"));
-                productDto.setPrice(ProductUtil.getPrice(skus));
+                productDto.setPrice(ProductUtil.getMiniPrice(skus));
                 productDto.setCrowd(baseProduct.getString("crowd"));
                 productDto.setScheduler(ProductUtil.getScheduler(skus));
                 productDto.setAddress(place.getString("address"));
@@ -168,7 +168,8 @@ public class ProductApi extends AbstractApi {
                     sku.setProductId(skuObject.getLong("productId"));
                     sku.setSkuId(skuObject.getLong("id"));
                     sku.setStock(skuObject.getInteger("unlockedStock"));
-                    sku.setTime(ProductUtil.getTime(skuObject.getJSONArray("properties")));
+                    sku.setMinPrice(ProductUtil.getSkuMiniPrice(skuObject.getJSONArray("prices")));
+                    sku.setTime(ProductUtil.getSkuTime(skuObject.getJSONArray("properties")));
                     sku.setPrices(skuObject.getJSONArray("prices"));
 
                     skus.add(sku);

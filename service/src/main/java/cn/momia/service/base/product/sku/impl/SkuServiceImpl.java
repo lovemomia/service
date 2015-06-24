@@ -126,7 +126,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
         JSONArray pricesArray = JSON.parseArray(price);
         for (int i = 0; i < pricesArray.size(); i++) {
             JSONObject priceObject = pricesArray.getJSONObject(i);
-            prices.add(new SkuPrice(priceObject.getString("name"), priceObject.getFloat("price")));
+            prices.add(new SkuPrice(priceObject));
         }
 
         return prices;
