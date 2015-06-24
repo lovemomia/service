@@ -65,7 +65,12 @@ public abstract class MomiaHttpRequest implements HttpUriRequest, HttpEntityEncl
             protected HttpRequestBase createHttpMethod(String uri, Map<String, String> params) {
                 try {
                     HttpPost httpPost = new HttpPost(uri);
-                    if (params != null && !params.isEmpty()) httpPost.setEntity(new UrlEncodedFormEntity(toNameValuePairs(params), "utf-8"));
+                    if (params != null && !params.isEmpty()) {
+                        HttpEntity entity = new UrlEncodedFormEntity(toNameValuePairs(params), "utf-8");
+                        httpPost.setEntity(entity);
+                        setEntity(entity);
+
+                    }
 
                     return httpPost;
                 } catch (UnsupportedEncodingException e) {
@@ -110,7 +115,11 @@ public abstract class MomiaHttpRequest implements HttpUriRequest, HttpEntityEncl
             protected HttpRequestBase createHttpMethod(String uri, Map<String, String> params) {
                 try {
                     HttpPut httpPut = new HttpPut(uri);
-                    if (params != null && !params.isEmpty()) httpPut.setEntity(new UrlEncodedFormEntity(toNameValuePairs(params), "utf-8"));
+                    if (params != null && !params.isEmpty()) {
+                        HttpEntity entity = new UrlEncodedFormEntity(toNameValuePairs(params), "utf-8");
+                        httpPut.setEntity(entity);
+                        setEntity(entity);
+                    }
 
                     return httpPut;
                 } catch (UnsupportedEncodingException e) {
