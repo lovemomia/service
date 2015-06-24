@@ -10,7 +10,7 @@ import java.util.Date;
 
 public class SmsVerifier extends DbAccessService {
     public boolean verify(String mobile, String code) {
-        String sql = "SELECT generateTime FROM t_verify WHERE phone=? AND code=? AND status=1 AND ";
+        String sql = "SELECT generateTime FROM t_verify WHERE mobile=? AND code=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { mobile, code }, new ResultSetExtractor<Boolean>()
         {

@@ -178,6 +178,7 @@ public abstract class AbstractMomiaHttpRequest implements MomiaHttpRequest {
                 "name='" + name + '\'' +
                 ", required=" + required +
                 ", params=" + params +
+                ", httpRequestBase=" + httpRequestBase +
                 '}';
     }
 }

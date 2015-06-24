@@ -3,7 +3,7 @@ package cn.momia.mapi.api.v1.dto;
 import java.util.ArrayList;
 
 public class FavoriteDto extends ArrayList<FavoriteDto.Product> implements Dto {
-    public static class Product {
+    public static class Product implements Dto {
         private long id;
         private String cover;
         private String title;
