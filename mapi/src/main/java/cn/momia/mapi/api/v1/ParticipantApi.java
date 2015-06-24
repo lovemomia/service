@@ -37,13 +37,6 @@ public class ParticipantApi extends AbstractApi {
         });
     }
 
-    private ResponseMessage getUser(String utoken) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user"), builder.build());
-
-        return executeRequest(request);
-    }
-
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getParticipant(@RequestParam long id, @RequestParam String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);

@@ -2,6 +2,7 @@ package cn.momia.mapi.api.v1;
 
 import cn.momia.common.config.Configuration;
 import cn.momia.common.web.http.MomiaHttpClient;
+import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpRequestExecutor;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
@@ -69,5 +70,12 @@ public abstract class AbstractApi {
         }
 
         return new ResponseMessage(buildResponseData.apply(collector));
+    }
+
+    protected ResponseMessage getUser(String utoken) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user"), builder.build());
+
+        return executeRequest(request);
     }
 }
