@@ -2,9 +2,6 @@ package cn.momia.mapi.api.v1;
 
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
-import cn.momia.common.web.http.impl.MomiaHttpDeleteRequest;
-import cn.momia.common.web.http.impl.MomiaHttpGetRequest;
-import cn.momia.common.web.http.impl.MomiaHttpPostRequest;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.Dto;
@@ -26,13 +23,13 @@ public class FavoriteApi extends AbstractApi {
                 .add("utoken", utoken)
                 .add("pid", productId);
 
-        return executeRequest(new MomiaHttpPostRequest(baseServiceUrl("favorite"), builder.build()));
+        return executeRequest(MomiaHttpRequest.POST(baseServiceUrl("favorite"), builder.build()));
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     public ResponseMessage deleteFavorite(@RequestParam long id, @RequestParam String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        MomiaHttpRequest request = new MomiaHttpDeleteRequest(baseServiceUrl("favorite", id), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.DELETE(baseServiceUrl("favorite", id), builder.build());
 
         return executeRequest(request);
     }
@@ -43,7 +40,7 @@ public class FavoriteApi extends AbstractApi {
                 .add("utoken", utoken)
                 .add("start", start)
                 .add("count", count);
-        MomiaHttpRequest request = new MomiaHttpGetRequest(baseServiceUrl("favorite"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("favorite"), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
