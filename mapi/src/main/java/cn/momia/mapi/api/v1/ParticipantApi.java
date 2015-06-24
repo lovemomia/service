@@ -62,12 +62,15 @@ public class ParticipantApi extends AbstractApi {
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public ResponseMessage updateParticipant(@RequestParam long id, @RequestParam String utoken, @RequestParam String participant) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("utoken", utoken)
-                .add("participant", participant);
-        // TODO JSON
-        MomiaHttpRequest request = new MomiaHttpPutRequest(baseServiceUrl("participant", id), builder.build());
+    public ResponseMessage updateParticipant(@RequestParam String utoken, @RequestParam String participant) {
+        ResponseMessage userResponse = getUser(utoken);
+        if (userResponse.getErrno() != ErrorCode.SUCCESS) return new ResponseMessage(ErrorCode.FORBIDDEN, userResponse.getErrmsg());
+
+        long userId = ((JSONObject) userResponse.getData()).getLong("id");
+        JSONObject paticipantJson = JSON.parseObject(participant);
+        paticipantJson.put("userId", userId);
+
+        MomiaHttpRequest request = new MomiaHttpPutRequest(baseServiceUrl("participant"), paticipantJson.toString());
 
         return executeRequest(request);
     }
