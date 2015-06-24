@@ -64,10 +64,10 @@ public class OrderController extends AbstractController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseMessage deleteOrder(@PathVariable long id, @RequestParam String utoken) {
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FORBIDDEN, "user not exists");
+        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
 
         Order order = orderService.get(id);
-        if (!order.exists()) return new ResponseMessage(ErrorCode.FORBIDDEN, "order not exists");
+        if (!order.exists()) return new ResponseMessage(ErrorCode.FAILED, "order not exists");
 
         if (!orderService.delete(id, user.getId())) return new ResponseMessage(ErrorCode.FAILED, "fail to delete order");
 
