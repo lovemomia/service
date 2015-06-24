@@ -168,7 +168,7 @@ public class ProductApi extends AbstractApi {
                     sku.setProductId(skuObject.getLong("productId"));
                     sku.setSkuId(skuObject.getLong("id"));
                     sku.setStock(skuObject.getInteger("unlockedStock"));
-                    sku.setMinPrice(ProductUtil.getMiniPrice(skuObject.getJSONArray("prices")));
+                    sku.setMinPrice(ProductUtil.getSkuMiniPrice(skuObject.getJSONArray("prices")));
                     sku.setTime(ProductUtil.getSkuTime(skuObject.getJSONArray("properties")));
                     sku.setPrices(skuObject.getJSONArray("prices"));
 
