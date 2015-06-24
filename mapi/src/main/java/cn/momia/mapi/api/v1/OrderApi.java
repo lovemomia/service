@@ -19,13 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderApi extends AbstractApi {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseMessage placeOrder(@RequestParam String utoken, @RequestParam final String order) {
-        ResponseMessage userResponse = getUser(utoken);
-        if (userResponse.getErrno() != ErrorCode.SUCCESS) return new ResponseMessage(ErrorCode.FORBIDDEN, userResponse.getErrmsg());
-
-        long userId = ((JSONObject) userResponse.getData()).getLong("id");
         JSONObject orderJson = JSON.parseObject(order);
-        orderJson.put("customerId", userId);
-
+        orderJson.put("customerId", getUserId(utoken));
         MomiaHttpRequest request = MomiaHttpRequest.POST(dealServiceUrl("order"), orderJson.toString());
 
         return executeRequest(request, new Function<Object, Dto>() {
