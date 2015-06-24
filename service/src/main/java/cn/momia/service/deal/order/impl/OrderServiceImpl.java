@@ -2,7 +2,11 @@ package cn.momia.service.deal.order.impl;
 
 import cn.momia.service.base.DbAccessService;
 import cn.momia.service.deal.order.Order;
+import cn.momia.service.deal.order.OrderPrice;
 import cn.momia.service.deal.order.OrderService;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
@@ -28,16 +32,15 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException
             {
-                String sql = "INSERT INTO t_order(customerId, productId, skuId, price, `count`, contacts, mobile, participants, addTime) VALUES(?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO t_order(customerId, productId, skuId, price, contacts, mobile, participants, addTime) VALUES(?, ?, ?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setLong(1, order.getCustomerId());
                 ps.setLong(2, order.getProductId());
                 ps.setLong(3, order.getSkuId());
-                ps.setFloat(4, order.getPrice());
-                ps.setInt(5, order.getCount());
-                ps.setString(6, order.getContacts());
-                ps.setString(7, order.getMobile());
-                ps.setString(8, StringUtils.join(order.getParticipants(), ","));
+                ps.setString(4, JSON.toJSONString(order.getPrices()));
+                ps.setString(5, order.getContacts());
+                ps.setString(6, order.getMobile());
+                ps.setString(7, StringUtils.join(order.getParticipants(), ","));
 
                 return ps;
             }
@@ -48,7 +51,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public Order get(long id) {
-        String sql = "SELECT id, customerId, productId, skuId, price, `count`, contacts, mobile, participants, status, addTime FROM t_order WHERE id=? AND status>0";
+        String sql = "SELECT id, customerId, productId, skuId, price, contacts, mobile, participants, status, addTime FROM t_order WHERE id=? AND status>0";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Order>() {
             @Override
@@ -66,8 +69,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         order.setCustomerId(rs.getLong("customerId"));
         order.setProductId(rs.getLong("productId"));
         order.setSkuId(rs.getLong("skuId"));
-        order.setPrice(rs.getFloat("price"));
-        order.setCount(rs.getInt("count"));
+        order.setPrices(parseOrderPrices(rs.getString("price")));
         order.setContacts(rs.getString("contacts"));
         order.setMobile(rs.getString("mobile"));
         order.setStatus(rs.getInt("status"));
@@ -83,9 +85,21 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         return order;
     }
 
+    private List<OrderPrice> parseOrderPrices(String priceJson) {
+        List<OrderPrice> prices = new ArrayList<OrderPrice>();
+
+        JSONArray pricesArray = JSON.parseArray(priceJson);
+        for (int i = 0; i < pricesArray.size(); i++) {
+            JSONObject priceObject = pricesArray.getJSONObject(i);
+            prices.add(new OrderPrice(priceObject.getFloat("price"), priceObject.getInteger("count")));
+        }
+
+        return prices;
+    }
+
     @Override
     public List<Order> queryByProduct(long productId, int start, int count) {
-        String sql = "SELECT id, customerId, productId, skuId, price, `count`, contacts, mobile, participants, status, addTime FROM t_order WHERE productId=? AND status>0 LIMIT ?,?";
+        String sql = "SELECT id, customerId, productId, skuId, price, contacts, mobile, participants, status, addTime FROM t_order WHERE productId=? AND status>0 LIMIT ?,?";
         final List<Order> orders = new ArrayList<Order>();
         jdbcTemplate.query(sql, new Object[] { productId, start, count }, new RowCallbackHandler() {
             @Override
@@ -105,7 +119,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public List<Order> queryDistinctCustomerOrderByProduct(long productId, int start, int count) {
-        String sql = "SELECT id, customerId, productId, skuId, price, `count`, contacts, mobile, participants, status, addTime FROM t_order WHERE productId=? AND status>0 GROUP BY customerId LIMIT ?,?";
+        String sql = "SELECT id, customerId, productId, skuId, price, contacts, mobile, participants, status, addTime FROM t_order WHERE productId=? AND status>0 GROUP BY customerId LIMIT ?,?";
         final List<Order> orders = new ArrayList<Order>();
         jdbcTemplate.query(sql, new Object[] { productId, start, count }, new RowCallbackHandler() {
             @Override
@@ -119,7 +133,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public boolean delete(long id, long userId) {
-        String sql = "UPDATE t_order SET status=0 WHERE id=? AND userId=? AND status=?";
+        String sql = "UPDATE t_order SET status=0 WHERE id=? AND customerId=? AND status=?";
         int updateCount = jdbcTemplate.update(sql, new Object[] { id, userId, Order.Status.NOT_PAYED });
 
         return updateCount == 1;
