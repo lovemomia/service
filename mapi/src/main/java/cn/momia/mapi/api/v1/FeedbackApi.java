@@ -2,7 +2,6 @@ package cn.momia.mapi.api.v1;
 
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
-import cn.momia.common.web.http.impl.MomiaHttpPostRequest;
 import cn.momia.common.web.response.ResponseMessage;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,7 +17,7 @@ public class FeedbackApi extends AbstractApi {
                 .add("content", content)
                 .add("email", email);
         if (utoken != null) builder.add("utoken", utoken);
-        MomiaHttpRequest request = new MomiaHttpPostRequest(baseServiceUrl("feedback"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("feedback"), builder.build());
 
         return executeRequest(request);
     }

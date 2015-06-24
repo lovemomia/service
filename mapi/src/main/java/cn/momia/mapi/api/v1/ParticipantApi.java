@@ -2,10 +2,6 @@ package cn.momia.mapi.api.v1;
 
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
-import cn.momia.common.web.http.impl.MomiaHttpDeleteRequest;
-import cn.momia.common.web.http.impl.MomiaHttpGetRequest;
-import cn.momia.common.web.http.impl.MomiaHttpPostRequest;
-import cn.momia.common.web.http.impl.MomiaHttpPutRequest;
 import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.v1.dto.Dto;
@@ -31,7 +27,7 @@ public class ParticipantApi extends AbstractApi {
         JSONObject paticipantJson = JSON.parseObject(participant);
         paticipantJson.put("userId", userId);
 
-        MomiaHttpRequest request = new MomiaHttpPostRequest(baseServiceUrl("participant"), paticipantJson.toString());
+        MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("participant"), paticipantJson.toString());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
@@ -43,7 +39,7 @@ public class ParticipantApi extends AbstractApi {
 
     private ResponseMessage getUser(String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        MomiaHttpRequest request = new MomiaHttpGetRequest(baseServiceUrl("user"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user"), builder.build());
 
         return executeRequest(request);
     }
@@ -51,7 +47,7 @@ public class ParticipantApi extends AbstractApi {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getParticipant(@RequestParam long id, @RequestParam String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        MomiaHttpRequest request = new MomiaHttpGetRequest(baseServiceUrl("participant", id), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("participant", id), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
@@ -70,7 +66,7 @@ public class ParticipantApi extends AbstractApi {
         JSONObject paticipantJson = JSON.parseObject(participant);
         paticipantJson.put("userId", userId);
 
-        MomiaHttpRequest request = new MomiaHttpPutRequest(baseServiceUrl("participant"), paticipantJson.toString());
+        MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("participant"), paticipantJson.toString());
 
         return executeRequest(request);
     }
@@ -78,7 +74,7 @@ public class ParticipantApi extends AbstractApi {
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     public ResponseMessage deleteParticipant(@RequestParam long id, @RequestParam String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        MomiaHttpRequest request = new MomiaHttpDeleteRequest(baseServiceUrl("participant", id), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.DELETE(baseServiceUrl("participant", id), builder.build());
 
         return executeRequest(request);
     }
@@ -86,7 +82,7 @@ public class ParticipantApi extends AbstractApi {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public ResponseMessage getParticipantsOfUser(@RequestParam String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        MomiaHttpRequest request = new MomiaHttpGetRequest(baseServiceUrl("participant"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("participant"), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override

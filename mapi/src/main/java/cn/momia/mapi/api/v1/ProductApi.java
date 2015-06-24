@@ -3,7 +3,6 @@ package cn.momia.mapi.api.v1;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
-import cn.momia.common.web.http.impl.MomiaHttpGetRequest;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.Dto;
@@ -34,7 +33,7 @@ public class ProductApi extends AbstractApi {
                 .add("start", start)
                 .add("count", count)
                 .add("query", query);
-        MomiaHttpRequest request = new MomiaHttpGetRequest(baseServiceUrl("product"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("product"), builder.build());
 
         return executeRequest(request);
     }
@@ -82,22 +81,22 @@ public class ProductApi extends AbstractApi {
     }
 
     private MomiaHttpRequest buildProductInfoRequest(long productId) {
-        return new MomiaHttpGetRequest("product", true, baseServiceUrl("product", productId));
+        return MomiaHttpRequest.GET("product", true, baseServiceUrl("product", productId));
     }
 
     private MomiaHttpRequest buildProductPlaceRequest(long productId) {
-        return new MomiaHttpGetRequest("place", true, baseServiceUrl("product", productId, "place"));
+        return MomiaHttpRequest.GET("place", true, baseServiceUrl("product", productId, "place"));
     }
 
     private MomiaHttpRequest buildProductSkusRequest(long productId) {
-        return new MomiaHttpGetRequest("skus", true, baseServiceUrl("product", productId, "sku"));
+        return MomiaHttpRequest.GET("skus", true, baseServiceUrl("product", productId, "sku"));
     }
 
     private MomiaHttpRequest buildProductCustomersRequest(long productId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", 0)
                 .add("count", conf.getInt("Product.CustomerPageSize"));
-        return new MomiaHttpGetRequest("customers", false, baseServiceUrl("product", productId, "customer"), builder.build());
+        return MomiaHttpRequest.GET("customers", false, baseServiceUrl("product", productId, "customer"), builder.build());
     }
 
     private List<String> getImgs(JSONObject baseProduct) {

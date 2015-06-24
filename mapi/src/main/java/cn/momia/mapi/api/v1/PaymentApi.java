@@ -1,6 +1,6 @@
 package cn.momia.mapi.api.v1;
 
-import cn.momia.common.web.http.impl.MomiaHttpPostRequest;
+import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,7 +26,7 @@ public class PaymentApi extends AbstractApi {
             params.put(entry.getKey(), entry.getValue()[0]);
         }
 
-        return executeRequest(new MomiaHttpPostRequest(dealServiceUrl("payment/prepay/wechatpay"), params));
+        return executeRequest(MomiaHttpRequest.POST(dealServiceUrl("payment/prepay/wechatpay"), params));
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.POST)

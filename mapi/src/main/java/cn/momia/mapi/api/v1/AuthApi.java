@@ -1,7 +1,7 @@
 package cn.momia.mapi.api.v1;
 
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
-import cn.momia.common.web.http.impl.MomiaHttpPostRequest;
+import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.v1.dto.Dto;
 import cn.momia.mapi.api.v1.dto.UserDto;
@@ -18,7 +18,7 @@ public class AuthApi extends AbstractApi {
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     public ResponseMessage send(@RequestParam String mobile)  {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("mobile", mobile);
-        MomiaHttpPostRequest request = new MomiaHttpPostRequest(baseServiceUrl("auth/send"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("auth/send"), builder.build());
 
         return executeRequest(request);
     }
@@ -28,7 +28,7 @@ public class AuthApi extends AbstractApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("mobile", mobile)
                 .add("code", code);
-        MomiaHttpPostRequest request = new MomiaHttpPostRequest(baseServiceUrl("auth/login"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("auth/login"), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override

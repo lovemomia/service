@@ -2,8 +2,6 @@ package cn.momia.mapi.api.v1;
 
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
-import cn.momia.common.web.http.impl.MomiaHttpGetRequest;
-import cn.momia.common.web.http.impl.MomiaHttpPutRequest;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.v1.dto.Dto;
 import cn.momia.mapi.api.v1.dto.UserDto;
@@ -21,7 +19,7 @@ import java.util.Date;
 public class UserApi extends AbstractApi {
     @RequestMapping(value = "/view", method = RequestMethod.GET)
     public ResponseMessage viewUser(@RequestParam long id) {
-        MomiaHttpRequest request = new MomiaHttpGetRequest(baseServiceUrl("user", id));
+        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user", id));
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
@@ -33,7 +31,7 @@ public class UserApi extends AbstractApi {
 
     @RequestMapping(value = "/view/order", method = RequestMethod.GET)
     public ResponseMessage viewOrders(@RequestParam long id) {
-        MomiaHttpRequest request = new MomiaHttpGetRequest(baseServiceUrl("user", id, "order"));
+        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user", id, "order"));
 
         return executeRequest(request);
     }
@@ -41,7 +39,7 @@ public class UserApi extends AbstractApi {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getUser(@RequestParam String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        MomiaHttpRequest request = new MomiaHttpGetRequest(baseServiceUrl("user"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user"), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
@@ -56,7 +54,7 @@ public class UserApi extends AbstractApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("avatar", avatar);
-        MomiaHttpRequest request = new MomiaHttpPutRequest(baseServiceUrl("user/avatar"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("user/avatar"), builder.build());
 
         return executeRequest(request);
     }
@@ -66,7 +64,7 @@ public class UserApi extends AbstractApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("name", name);
-        MomiaHttpRequest request = new MomiaHttpPutRequest(baseServiceUrl("user/name"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("user/name"), builder.build());
 
         return executeRequest(request);
     }
@@ -76,7 +74,7 @@ public class UserApi extends AbstractApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("sex", sex);
-        MomiaHttpRequest request = new MomiaHttpPutRequest(baseServiceUrl("user/sex"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("user/sex"), builder.build());
 
         return executeRequest(request);
     }
@@ -86,7 +84,7 @@ public class UserApi extends AbstractApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("birthday", birthday);
-        MomiaHttpRequest request = new MomiaHttpPutRequest(baseServiceUrl("user/birthday"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("user/birthday"), builder.build());
 
         return executeRequest(request);
     }
@@ -96,7 +94,7 @@ public class UserApi extends AbstractApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("city", city);
-        MomiaHttpRequest request = new MomiaHttpPutRequest(baseServiceUrl("user/city"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("user/city"), builder.build());
 
         return executeRequest(request);
     }
@@ -106,7 +104,7 @@ public class UserApi extends AbstractApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("address", address);
-        MomiaHttpRequest request = new MomiaHttpPutRequest(baseServiceUrl("user/address"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("user/address"), builder.build());
 
         return executeRequest(request);
     }

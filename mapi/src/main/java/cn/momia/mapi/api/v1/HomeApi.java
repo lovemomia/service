@@ -3,7 +3,6 @@ package cn.momia.mapi.api.v1;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
-import cn.momia.common.web.http.impl.MomiaHttpGetRequest;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.Dto;
@@ -57,7 +56,7 @@ public class HomeApi extends AbstractApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
                 .add("count", count);
-        return new MomiaHttpGetRequest("banners", true, baseServiceUrl("banner"), builder.build());
+        return MomiaHttpRequest.GET("banners", true, baseServiceUrl("banner"), builder.build());
     }
 
     private MomiaHttpRequest buildProductsRequest(int pageIndex, int cityId) {
@@ -67,7 +66,7 @@ public class HomeApi extends AbstractApi {
                 .add("start", String.valueOf(pageIndex * pageSize))
                 .add("count", String.valueOf(pageSize));
 
-        return new MomiaHttpGetRequest("products", true, baseServiceUrl("product"), builder.build());
+        return MomiaHttpRequest.GET("products", true, baseServiceUrl("product"), builder.build());
     }
 
     private List<HomeDto.Banner> extractBannerData(JSONArray bannerArray) {
