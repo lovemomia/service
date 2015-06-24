@@ -1,11 +1,8 @@
 package cn.momia.mapi.api.v1.dto;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 public class SkuDto implements Dto {
     public static class Skus extends ArrayList<SkuDto> implements Dto {}
@@ -13,7 +10,8 @@ public class SkuDto implements Dto {
     private long productId;
     private long skuId;
     private int stock;
-    private Date time;
+    private float minPrice;
+    private String time;
     private JSONArray prices;
 
     public long getProductId() {
@@ -40,11 +38,19 @@ public class SkuDto implements Dto {
         this.stock = stock;
     }
 
-    public Date getTime() {
+    public float getMinPrice() {
+        return minPrice;
+    }
+
+    public void setMinPrice(float minPrice) {
+        this.minPrice = minPrice;
+    }
+
+    public String getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(String time) {
         this.time = time;
     }
 

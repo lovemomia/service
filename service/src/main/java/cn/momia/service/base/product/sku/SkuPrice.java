@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import java.io.Serializable;
 
 public class SkuPrice implements Serializable {
-    private static final String[] UNIT = new String[] { "人", "组" };
+    private static final String[] UNIT = { "人", "组" };
 
     private int adult;
     private int child;
