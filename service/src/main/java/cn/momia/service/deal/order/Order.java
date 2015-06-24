@@ -23,8 +23,7 @@ public class Order implements Serializable {
     private long customerId;
     private long productId;
     private long skuId;
-    private float price;
-    private int count;
+    List<OrderPrice> prices;
     private String contacts;
     private String mobile;
     private List<Long> participants;
@@ -63,20 +62,12 @@ public class Order implements Serializable {
         this.skuId = skuId;
     }
 
-    public float getPrice() {
-        return price;
+    public List<OrderPrice> getPrices() {
+        return prices;
     }
 
-    public void setPrice(float price) {
-        this.price = price;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
+    public void setPrices(List<OrderPrice> prices) {
+        this.prices = prices;
     }
 
     public String getContacts() {
@@ -136,5 +127,23 @@ public class Order implements Serializable {
 
     public boolean exists() {
         return !this.equals(NOT_EXIST_ORDER);
+    }
+
+    public float getTotalFee() {
+        float totalFee = 0;
+        for (OrderPrice price : prices) {
+            totalFee += price.getPrice() * price.getCount();
+        }
+
+        return totalFee;
+    }
+
+    public int getCount() {
+        int count = 0;
+        for (OrderPrice price : prices) {
+            count += price.getCount();
+        }
+
+        return count;
     }
 }
