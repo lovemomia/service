@@ -5,7 +5,6 @@ import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
-import cn.momia.mapi.api.misc.TimeUtil;
 import cn.momia.mapi.api.v1.dto.Dto;
 import cn.momia.mapi.api.v1.dto.ProductDto;
 import cn.momia.mapi.api.v1.dto.SkuDto;
@@ -19,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -29,9 +26,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/product")
 public class ProductApi extends AbstractApi {
-    private static final DateFormat DATE_FORMATTER = new SimpleDateFormat("M月d日");
-    private static final DateFormat TIME_FORMATTER = new SimpleDateFormat("h:mm");
-
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public ResponseMessage getProducts(@RequestParam(value = "city") int cityId, @RequestParam int start, @RequestParam int count, @RequestParam String query) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
@@ -62,7 +56,7 @@ public class ProductApi extends AbstractApi {
                 productDto.setCover(baseProduct.getString("cover"));
                 productDto.setTitle(baseProduct.getString("title"));
                 productDto.setJoined(baseProduct.getInteger("sales"));
-                productDto.setPrice(ProductUtil.getPrice(skus));
+                productDto.setPrice(ProductUtil.getMiniPrice(skus));
                 productDto.setCrowd(baseProduct.getString("crowd"));
                 productDto.setScheduler(ProductUtil.getScheduler(skus));
                 productDto.setAddress(place.getString("address"));
@@ -174,8 +168,8 @@ public class ProductApi extends AbstractApi {
                     sku.setProductId(skuObject.getLong("productId"));
                     sku.setSkuId(skuObject.getLong("id"));
                     sku.setStock(skuObject.getInteger("unlockedStock"));
-                    sku.setMinPrice(getMiniPrice(skuObject.getJSONArray("prices")));
-                    sku.setTime(formatTime(ProductUtil.getTime(skuObject.getJSONArray("properties"))));
+                    sku.setMinPrice(ProductUtil.getMiniPrice(skuObject.getJSONArray("prices")));
+                    sku.setTime(ProductUtil.getSkuTime(skuObject.getJSONArray("properties")));
                     sku.setPrices(skuObject.getJSONArray("prices"));
 
                     skus.add(sku);
@@ -184,29 +178,5 @@ public class ProductApi extends AbstractApi {
                 return skus;
             }
         });
-    }
-
-    private float getMiniPrice(JSONArray prices) {
-        float miniPrice = Float.MAX_VALUE;
-
-        for (int i = 0; i < prices.size(); i++) {
-            JSONObject priceObject = prices.getJSONObject(i);
-            float price = priceObject.getFloat("price");
-            if (price < miniPrice) miniPrice = price;
-        }
-
-        return miniPrice;
-    }
-
-    private String formatTime(Date time) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(DATE_FORMATTER.format(time))
-                .append("(")
-                .append(TimeUtil.getWeekDay(time))
-                .append(")")
-                .append(TimeUtil.getAmPm(time))
-                .append(TIME_FORMATTER.format(time));
-
-        return builder.toString();
     }
 }
