@@ -46,6 +46,7 @@ public class OrderController extends AbstractController {
             LOGGER.error("fail to place order, customerId: {}, productId: {}, skuId: {}", new Object[] { order.getCustomerId(), order.getProductId(), order.getSkuId(), e });
         }
 
+        // TODO 需要告警
         if (!unlockSku(order)) LOGGER.error("fail to unlock sku, skuId: {}, count: {}", new Object[] { order.getSkuId(), order.getCount() });
 
         return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to place order");
@@ -62,13 +63,14 @@ public class OrderController extends AbstractController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseMessage deleteOrder(@PathVariable long id, @RequestParam String utoken) {
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FORBIDDEN, "user not login");
+        if (!user.exists()) return new ResponseMessage(ErrorCode.FORBIDDEN, "user not exists");
 
         Order order = orderService.get(id);
         if (!order.exists()) return new ResponseMessage(ErrorCode.FORBIDDEN, "order not exists");
 
-        if (!orderService.delete(id, user.getId())) return new ResponseMessage(ErrorCode.FORBIDDEN, "fail to delete order");
+        if (!orderService.delete(id, user.getId())) return new ResponseMessage(ErrorCode.FAILED, "fail to delete order");
 
+        // TODO 需要告警
         if (!unlockSku(order)) LOGGER.error("fail to unlock sku, skuId: {}, count: {}", new Object[] { order.getSkuId(), order.getCount() });
 
         return ResponseMessage.SUCCESS;
