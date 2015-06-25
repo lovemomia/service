@@ -10,6 +10,10 @@ public class UserDto implements Dto {
         public Own(JSONObject userJson) {
             super(userJson);
         }
+
+        public String getMobile() {
+            return getMobile().substring(0, 3) + "****" + getMobile().substring(7);
+        }
     }
 
     public static class Other extends UserDto {
@@ -22,7 +26,7 @@ public class UserDto implements Dto {
         }
 
         public String getMobile() {
-            return getMobile().substring(0, 3) + "******" + getMobile().substring(9);
+            return getMobile().substring(0, 3) + "****" + getMobile().substring(7);
         }
 
         public String getAddress() {
