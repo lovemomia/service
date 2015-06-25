@@ -35,9 +35,12 @@ public class ParticipantController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseMessage getParticipant(@PathVariable long id){
+    public ResponseMessage getParticipant(@PathVariable long id, @RequestParam String utoken){
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
+
         Participant participant = participantService.get(id);
-        if (!participant.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "participant not exists");
+        if (!participant.exists() || participant.getUserId() != user.getId()) return new ResponseMessage(ErrorCode.NOT_FOUND, "participant not exists");
 
         return new ResponseMessage(participant);
     }
