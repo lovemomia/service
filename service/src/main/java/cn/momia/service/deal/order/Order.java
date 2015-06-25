@@ -25,7 +25,7 @@ public class Order implements Serializable {
     private long customerId;
     private long productId;
     private long skuId;
-    List<OrderPrice> prices;
+    private List<OrderPrice> prices;
     private String contacts;
     private String mobile;
     private List<Long> participants;

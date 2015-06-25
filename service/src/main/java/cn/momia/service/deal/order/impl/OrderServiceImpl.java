@@ -91,7 +91,10 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         JSONArray pricesArray = JSON.parseArray(priceJson);
         for (int i = 0; i < pricesArray.size(); i++) {
             JSONObject priceObject = pricesArray.getJSONObject(i);
-            prices.add(new OrderPrice(priceObject.getFloat("price"), priceObject.getInteger("count")));
+            prices.add(new OrderPrice(priceObject.getFloat("price"),
+                    priceObject.getInteger("count"),
+                    priceObject.getInteger("adult"),
+                    priceObject.getInteger("child")));
         }
 
         return prices;
