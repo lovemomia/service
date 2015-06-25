@@ -7,7 +7,7 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.Dto;
 import cn.momia.mapi.api.v1.dto.ProductDto;
-import cn.momia.mapi.api.v1.dto.ProductOrderDto;
+import cn.momia.mapi.api.v1.dto.PlaceOrderDto;
 import cn.momia.mapi.api.v1.dto.SkuDto;
 import cn.momia.mapi.img.ImageFile;
 import com.alibaba.fastjson.JSONArray;
@@ -162,11 +162,11 @@ public class ProductApi extends AbstractApi {
         return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {
             @Override
             public Dto apply(MomiaHttpResponseCollector collector) {
-                ProductOrderDto productOrderDto = new ProductOrderDto();
-                productOrderDto.setContacts(getContacts((JSONObject) collector.getResponse("contacts")));
-                productOrderDto.setSkus(getSkus((JSONArray) collector.getResponse("skus")));
+                PlaceOrderDto placeOrderDto = new PlaceOrderDto();
+                placeOrderDto.setContacts(getContacts((JSONObject) collector.getResponse("contacts")));
+                placeOrderDto.setSkus(getSkus((JSONArray) collector.getResponse("skus")));
 
-                return productOrderDto;
+                return placeOrderDto;
             }
         });
     }
@@ -186,10 +186,10 @@ public class ProductApi extends AbstractApi {
         return request;
     }
 
-    private ProductOrderDto.Contacts getContacts(JSONObject userJson) {
+    private PlaceOrderDto.Contacts getContacts(JSONObject userJson) {
         if (userJson == null) return null;
 
-        ProductOrderDto.Contacts contacts = new ProductOrderDto.Contacts();
+        PlaceOrderDto.Contacts contacts = new PlaceOrderDto.Contacts();
         contacts.setName(userJson.getString("name"));
         contacts.setMobile(userJson.getString("mobile"));
 
