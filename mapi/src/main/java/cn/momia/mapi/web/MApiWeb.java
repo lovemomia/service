@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 public class MApiWeb {
     private static final Logger LOGGER = LoggerFactory.getLogger(MApiWeb.class);
 
-    private static final int DEFAULT_SERVER_PORT = 9090;
+    private static final int DEFAULT_SERVER_PORT = 8080;
 
     public static void main(String[] args) {
         int port = getServerPort(args);
