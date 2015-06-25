@@ -45,27 +45,27 @@ public class FavoriteApi extends AbstractApi {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                FavoriteDto favoriteDto = new FavoriteDto();
+                FavoriteDto.Favorites favorites = new FavoriteDto.Favorites();
 
                 JSONArray productArray = (JSONArray) data;
                 for (int i = 0; i < productArray.size(); i++) {
-                    FavoriteDto.Product product = new FavoriteDto.Product();
+                    FavoriteDto favorite = new FavoriteDto();
 
                     JSONObject productObject = productArray.getJSONObject(i);
                     JSONObject baseProduct = productObject.getJSONObject("product");
                     JSONArray skus = productObject.getJSONArray("skus");
 
-                    product.setId(baseProduct.getLong("id"));
-                    product.setCover(baseProduct.getString("cover"));
-                    product.setTitle(baseProduct.getString("title"));
-                    product.setScheduler(ProductUtil.getScheduler(skus));
-                    product.setJoined(baseProduct.getInteger("sales"));
-                    product.setPrice(ProductUtil.getMiniPrice(skus));
+                    favorite.setId(baseProduct.getLong("id"));
+                    favorite.setCover(baseProduct.getString("cover"));
+                    favorite.setTitle(baseProduct.getString("title"));
+                    favorite.setScheduler(ProductUtil.getScheduler(skus));
+                    favorite.setJoined(baseProduct.getInteger("sales"));
+                    favorite.setPrice(ProductUtil.getMiniPrice(skus));
 
-                    favoriteDto.add(product);
+                    favorites.add(favorite);
                 }
 
-                return favoriteDto;
+                return favorites;
             }
         });
     }
