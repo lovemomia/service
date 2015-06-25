@@ -12,6 +12,8 @@ public class ParticipantDto implements Dto {
     private String name;
     private String sex;
     private Date birthday;
+    private int idType;
+    private String idNo;
 
     public ParticipantDto(JSONObject participantJson) {
         this.id = participantJson.getLong("id");
@@ -34,5 +36,21 @@ public class ParticipantDto implements Dto {
 
     public Date getBirthday() {
         return birthday;
+    }
+
+    public int getIdType() {
+        return idType;
+    }
+
+    public void setIdType(int idType) {
+        this.idType = idType;
+    }
+
+    public String getIdNo() {
+        return idNo;
+    }
+
+    public void setIdNo(String idNo) {
+        this.idNo = idNo;
     }
 }

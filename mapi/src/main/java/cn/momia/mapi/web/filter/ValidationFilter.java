@@ -21,7 +21,7 @@ public class ValidationFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-        if (isParamMissing(httpRequest))
+      /*  if (isParamMissing(httpRequest))
         {
             forwardErrorPage(request, response, 400);
             return;
@@ -32,6 +32,7 @@ public class ValidationFilter implements Filter {
             forwardErrorPage(request, response, 403);
             return;
         }
+        */
 
         chain.doFilter(request, response);
     }
