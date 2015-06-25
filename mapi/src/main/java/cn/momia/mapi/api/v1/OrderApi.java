@@ -40,14 +40,4 @@ public class OrderApi extends AbstractApi {
 
         return executeRequest(request);
     }
-
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam String query) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("utoken", utoken)
-                .add("query", query);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("order"), builder.build());
-
-        return executeRequest(request);
-    }
 }

@@ -49,6 +49,18 @@ public class UserApi extends AbstractApi {
         });
     }
 
+    @RequestMapping(value = "/order", method = RequestMethod.GET)
+    public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam int start, @RequestParam int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("status", status)
+                .add("start", start)
+                .add("count", count);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user/order"), builder.build());
+
+        return executeRequest(request);
+    }
+
     @RequestMapping(value = "/avatar", method = RequestMethod.POST)
     public ResponseMessage updateAvatar(@RequestParam String utoken, @RequestParam String avatar) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
