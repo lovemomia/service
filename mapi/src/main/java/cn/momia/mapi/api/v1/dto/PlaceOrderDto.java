@@ -1,6 +1,6 @@
 package cn.momia.mapi.api.v1.dto;
 
-public class ProductOrderDto implements Dto {
+public class PlaceOrderDto implements Dto {
     public static class Contacts implements Dto {
         private String name;
         private String mobile;
