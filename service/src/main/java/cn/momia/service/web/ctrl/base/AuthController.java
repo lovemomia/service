@@ -41,16 +41,16 @@ public class AuthController extends AbstractController {
             return ResponseMessage.SUCCESS;
         } catch (Exception e) {
             LOGGER.error("fail to send verify code for {}", mobile, e);
-            return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to send verify code");
+            return new ResponseMessage(ErrorCode.FAILED, "fail to send verify code");
         }
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseMessage login(@RequestParam String mobile, @RequestParam String code) {
         if (StringUtils.isBlank(mobile) || StringUtils.isBlank(code))
-            return new ResponseMessage(ErrorCode.BAD_REQUEST, "mobile or(and) verify code is empty");
+            return new ResponseMessage(ErrorCode.FAILED, "mobile or(and) verify code is empty");
 
-        if (!smsVerifier.verify(mobile, code)) return new ResponseMessage(ErrorCode.FORBIDDEN, "fail to verify code");
+        if (!smsVerifier.verify(mobile, code)) return new ResponseMessage(ErrorCode.FAILED, "fail to verify code");
 
         User user = userService.getByMobile(mobile);
         String token = generateToken(mobile);
@@ -58,7 +58,7 @@ public class AuthController extends AbstractController {
             user = userService.add(mobile, token);
             if (!user.exists()) {
                 LOGGER.error("fail to add user for {}", mobile);
-                return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to login");
+                return new ResponseMessage(ErrorCode.FAILED, "fail to login");
             }
         } else {
             if (!userService.updateToken(user.getId(), token)) {

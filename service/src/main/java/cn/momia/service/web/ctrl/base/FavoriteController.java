@@ -40,10 +40,10 @@ public class FavoriteController extends AbstractController {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseMessage addFavorite(@RequestParam String utoken, @RequestParam(value = "pid") long productId) {
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FORBIDDEN, "user not login");
+        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not login");
 
         long favoriteId = favoriteService.add(user.getId(), productId);
-        if (favoriteId <= 0) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to add favorite");
+        if (favoriteId <= 0) return new ResponseMessage(ErrorCode.FAILED, "fail to add favorite");
 
         return ResponseMessage.SUCCESS;
     }
@@ -51,18 +51,18 @@ public class FavoriteController extends AbstractController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseMessage deleteFavorite(@PathVariable long id, @RequestParam String utoken) {
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FORBIDDEN, "user not login");
+        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not login");
 
-        if (!favoriteService.delete(user.getId(), id)) return new ResponseMessage(ErrorCode.FORBIDDEN, "fail to delete favorite");
+        if (!favoriteService.delete(user.getId(), id)) return new ResponseMessage(ErrorCode.FAILED, "fail to delete favorite");
         return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getFavoritesOfUser(@RequestParam String utoken, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return new ResponseMessage(ErrorCode.FORBIDDEN, "forbidden");
+        if (isInvalidLimit(start, count)) return new ResponseMessage(ErrorCode.FAILED, "invalid limit params");
 
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FORBIDDEN, "user not login");
+        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not login");
 
         List<Long> productIds = favoriteService.queryFavoredProductsByUser(user.getId(), start, count);
         List<Product> products = productService.get(productIds);

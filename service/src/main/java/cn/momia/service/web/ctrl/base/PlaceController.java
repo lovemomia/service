@@ -20,7 +20,7 @@ public class PlaceController {
     public ResponseMessage getPlace(@PathVariable long id) {
         Place place = placeService.get(id);
 
-        if (!place.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "place not exists");
+        if (!place.exists()) return new ResponseMessage(ErrorCode.FAILED, "place not exists");
         return new ResponseMessage(place);
     }
 }

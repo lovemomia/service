@@ -12,7 +12,7 @@ public class UserDto implements Dto {
         }
 
         public String getMobile() {
-            return getMobile().substring(0, 3) + "****" + getMobile().substring(7);
+            return super.getMobile().substring(0, 3) + "****" + super.getMobile().substring(7);
         }
     }
 
@@ -26,7 +26,7 @@ public class UserDto implements Dto {
         }
 
         public String getMobile() {
-            return getMobile().substring(0, 3) + "****" + getMobile().substring(7);
+            return super.getMobile().substring(0, 3) + "****" + super.getMobile().substring(7);
         }
 
         public String getAddress() {

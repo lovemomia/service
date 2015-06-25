@@ -28,16 +28,19 @@ public class ParticipantController {
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage addParticipant(@RequestBody Participant participant) {
         long participantId = participantService.add(participant);
-        if(participantId <= 0) new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to add participant");
+        if(participantId <= 0) new ResponseMessage(ErrorCode.FAILED, "fail to add participant");
 
         participant.setId(participantId);
         return new ResponseMessage(participant);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseMessage getParticipant(@PathVariable long id){
+    public ResponseMessage getParticipant(@PathVariable long id, @RequestParam String utoken){
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
+
         Participant participant = participantService.get(id);
-        if (!participant.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "participant not exists");
+        if (!participant.exists() || participant.getUserId() != user.getId()) return new ResponseMessage(ErrorCode.FAILED, "participant not exists");
 
         return new ResponseMessage(participant);
     }
@@ -46,17 +49,17 @@ public class ParticipantController {
     public ResponseMessage updateParticipantName(@RequestBody Participant participant) {
         boolean successful = participantService.update(participant);
 
-        if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to update participant name");
+        if (!successful) return new ResponseMessage(ErrorCode.FAILED, "fail to update participant name");
         return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseMessage deleteParticipant(@PathVariable long id, @RequestParam String utoken){
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "user not exists");
+        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
 
         boolean successful = participantService.delete(id, user.getId());
-        if (!successful) return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to delete participant");
+        if (!successful) return new ResponseMessage(ErrorCode.FAILED, "fail to delete participant");
 
         return ResponseMessage.SUCCESS;
     }
@@ -64,7 +67,7 @@ public class ParticipantController {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getParticipantsOfUser(@RequestParam String utoken){
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.NOT_FOUND, "user not exists");
+        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
 
         List<Participant> participants = participantService.getByUser(user.getId());
 
