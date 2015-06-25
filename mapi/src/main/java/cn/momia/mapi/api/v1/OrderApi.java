@@ -28,7 +28,7 @@ public class OrderApi extends AbstractApi {
             public Dto apply(Object data) {
                 JSONObject orderJson = (JSONObject) data;
 
-                return new OrderDto(orderJson.getInteger("count"), orderJson.getFloat("totalFee"));
+                return new OrderDto(orderJson.getLong("id"), orderJson.getInteger("count"), orderJson.getFloat("totalFee"));
             }
         });
     }
