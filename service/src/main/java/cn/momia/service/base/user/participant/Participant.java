@@ -14,6 +14,8 @@ public class Participant implements Serializable {
     private String name;
     private String sex;
     private Date birthday;
+    private int idType;
+    private String idNo;
 
     public long getId() {
         return id;
@@ -53,6 +55,22 @@ public class Participant implements Serializable {
 
     public void setBirthday(Date birthday) {
         this.birthday = birthday;
+    }
+
+    public int getIdType() {
+        return idType;
+    }
+
+    public void setIdType(int idType) {
+        this.idType = idType;
+    }
+
+    public String getIdNo() {
+        return idNo;
+    }
+
+    public void setIdNo(String idNo) {
+        this.idNo = idNo;
     }
 
     public boolean exists() {

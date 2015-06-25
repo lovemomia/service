@@ -10,9 +10,9 @@
 
     <Database>
         <Tongqu>
-            <JdbcUrl><![CDATA[jdbc:mysql://120.55.102.12:3306/tongqu?characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull]]></JdbcUrl>
-            <Username>tongqu</Username>
-            <Password>Tongqu!@#456</Password>
+            <JdbcUrl><![CDATA[jdbc:mysql://120.55.102.12:3306/duola_it?characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull]]></JdbcUrl>
+            <Username>duola_it</Username>
+            <Password>duola_it</Password>
         </Tongqu>
     </Database>
 
@@ -22,7 +22,7 @@
 
     <Service>
         <Base>http://localhost:8080</Base>
-        <Deal>https://localhost:8443</Deal>
+        <Deal>http://localhost:8080</Deal>
     </Service>
 
     <Home>
