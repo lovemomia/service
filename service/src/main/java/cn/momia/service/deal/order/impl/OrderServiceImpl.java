@@ -98,23 +98,53 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
-    public List<Order> queryByProduct(long productId, int start, int count) {
-        String sql = "SELECT id, customerId, productId, skuId, price, contacts, mobile, participants, status, addTime FROM t_order WHERE productId=? AND status>0 LIMIT ?,?";
+    public List<Order> queryByProduct(long productId, int status, int start, int count) {
         final List<Order> orders = new ArrayList<Order>();
-        jdbcTemplate.query(sql, new Object[] { productId, start, count }, new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                orders.add(buildOrder(rs));
-            }
-        });
+
+        if (status == Order.Status.ALL) {
+            String sql = "SELECT id, customerId, productId, skuId, price, contacts, mobile, participants, status, addTime FROM t_order WHERE productId=? AND status>0 LIMIT ?,?";
+            jdbcTemplate.query(sql, new Object[] { productId, start, count }, new RowCallbackHandler() {
+                @Override
+                public void processRow(ResultSet rs) throws SQLException {
+                    orders.add(buildOrder(rs));
+                }
+            });
+        } else {
+            String sql = "SELECT id, customerId, productId, skuId, price, contacts, mobile, participants, status, addTime FROM t_order WHERE productId=? AND status=? LIMIT ?,?";
+            jdbcTemplate.query(sql, new Object[] { productId, status, start, count }, new RowCallbackHandler() {
+                @Override
+                public void processRow(ResultSet rs) throws SQLException {
+                    orders.add(buildOrder(rs));
+                }
+            });
+        }
 
         return orders;
     }
 
     @Override
-    public List<Order> queryByUser(long userId, int start, int count) {
-        // TODO
-        return null;
+    public List<Order> queryByUser(long userId, int status, int start, int count) {
+        final List<Order> orders = new ArrayList<Order>();
+
+        if (status == Order.Status.ALL) {
+            String sql = "SELECT id, customerId, productId, skuId, price, contacts, mobile, participants, status, addTime FROM t_order WHERE customerId=? AND status>0 LIMIT ?,?";
+            jdbcTemplate.query(sql, new Object[] { userId, start, count }, new RowCallbackHandler() {
+                @Override
+                public void processRow(ResultSet rs) throws SQLException {
+                    orders.add(buildOrder(rs));
+                }
+            });
+        } else {
+            String sql = "SELECT id, customerId, productId, skuId, price, contacts, mobile, participants, status, addTime FROM t_order WHERE customerId=? AND status=? LIMIT ?,?";
+            jdbcTemplate.query(sql, new Object[] { userId, status, start, count }, new RowCallbackHandler() {
+                @Override
+                public void processRow(ResultSet rs) throws SQLException {
+                    orders.add(buildOrder(rs));
+                }
+            });
+        }
+
+        return orders;
     }
 
     @Override
