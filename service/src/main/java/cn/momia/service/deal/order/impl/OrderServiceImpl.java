@@ -9,6 +9,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -25,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OrderServiceImpl extends DbAccessService implements OrderService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
+
     @Override
     public long add(final Order order) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -69,7 +73,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         order.setCustomerId(rs.getLong("customerId"));
         order.setProductId(rs.getLong("productId"));
         order.setSkuId(rs.getLong("skuId"));
-        order.setPrices(parseOrderPrices(rs.getString("price")));
+        order.setPrices(parseOrderPrices(order.getId(), rs.getString("price")));
         order.setContacts(rs.getString("contacts"));
         order.setMobile(rs.getString("mobile"));
         order.setStatus(rs.getInt("status"));
@@ -85,13 +89,17 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         return order;
     }
 
-    private List<OrderPrice> parseOrderPrices(String priceJson) {
+    private List<OrderPrice> parseOrderPrices(long id, String priceJson) {
         List<OrderPrice> prices = new ArrayList<OrderPrice>();
 
-        JSONArray pricesArray = JSON.parseArray(priceJson);
-        for (int i = 0; i < pricesArray.size(); i++) {
-            JSONObject priceObject = pricesArray.getJSONObject(i);
-            prices.add(new OrderPrice(priceObject));
+        try {
+            JSONArray pricesArray = JSON.parseArray(priceJson);
+            for (int i = 0; i < pricesArray.size(); i++) {
+                JSONObject priceObject = pricesArray.getJSONObject(i);
+                prices.add(new OrderPrice(priceObject));
+            }
+        } catch (Exception e) {
+            LOGGER.error("fail to parse order prices, order id: {}", id);
         }
 
         return prices;

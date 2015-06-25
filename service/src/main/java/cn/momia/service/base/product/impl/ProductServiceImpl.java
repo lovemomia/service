@@ -6,7 +6,10 @@ import cn.momia.service.base.product.ProductImage;
 import cn.momia.service.base.product.ProductQuery;
 import cn.momia.service.base.product.ProductService;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -17,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProductServiceImpl extends DbAccessService implements ProductService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProductServiceImpl.class);
+
     @Override
     public Product get(long id) {
         Product product = getProduct(id);
@@ -45,10 +50,19 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
         product.setTitle(rs.getString("title"));
         product.setCover(rs.getString("cover"));
         product.setCrowd(rs.getString("crowd"));
-        product.setContent(JSON.parseArray(rs.getString("content")));
+        product.setContent(parseContent(product.getId(), rs.getString("content")));
         product.setSales(rs.getInt("sales"));
 
         return product;
+    }
+
+    private JSONArray parseContent(long id, String content) throws SQLException {
+        try {
+            return JSON.parseArray(content);
+        } catch (Exception e) {
+            LOGGER.error("fail to parse product content, product id: {}", id);
+            return new JSONArray();
+        }
     }
 
     public List<ProductImage> getProductImgs(long id){

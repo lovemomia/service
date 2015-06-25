@@ -11,6 +11,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;
@@ -21,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 public class SkuServiceImpl extends DbAccessService implements SkuService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SkuServiceImpl.class);
+
     private Map<Long, SkuPropertyName> skuPropertyNameCache = new HashMap<Long, SkuPropertyName>();
     private Map<Long, SkuPropertyValue> skuPropertyValueCache = new HashMap<Long, SkuPropertyValue>();
 
@@ -104,8 +108,8 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
         Sku sku = new Sku();
         sku.setId(rs.getLong("id"));
         sku.setProductId(rs.getLong("productId"));
-        sku.setProperties(parseProperties(rs.getString("propertyValues")));
-        sku.setPrices(parsePrices(rs.getString("price")));
+        sku.setProperties(parseProperties(sku.getId(), rs.getString("propertyValues")));
+        sku.setPrices(parsePrices(sku.getId(), rs.getString("price")));
         sku.setStock(rs.getInt("stock"));
         sku.setUnlockedStock(rs.getInt("unlockedStock"));
         sku.setLockedStock(rs.getInt("lockedStock"));
@@ -113,36 +117,44 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
         return sku;
     }
 
-    private List<SkuProperty> parseProperties(String propertyValues) {
+    private List<SkuProperty> parseProperties(long id, String propertyValues) {
         List<SkuProperty> properties = new ArrayList<SkuProperty>();
 
-        JSONArray propertiesJson = JSON.parseArray(propertyValues);
-        for (int i = 0; i < propertiesJson.size(); i++) {
-            JSONObject propertyObject = propertiesJson.getJSONObject(i);
-            int type = propertyObject.getInteger("type");
-            switch (type) {
-                case SkuProperty.Type.REF:
-                    SkuPropertyValue propertyValue = skuPropertyValueCache.get(propertyObject.getLong("valueid"));
-                    properties.add(new SkuProperty(skuPropertyNameCache.get(propertyValue.getNameId()).getName(), propertyValue.getValue()));
-                    break;
-                case SkuProperty.Type.VALUE:
-                    properties.add(new SkuProperty(skuPropertyNameCache.get(propertyObject.getLong("nameid")).getName(), propertyObject.getString("value")));
-                    break;
-                default:
-                    break;
+        try {
+            JSONArray propertiesJson = JSON.parseArray(propertyValues);
+            for (int i = 0; i < propertiesJson.size(); i++) {
+                JSONObject propertyObject = propertiesJson.getJSONObject(i);
+                int type = propertyObject.getInteger("type");
+                switch (type) {
+                    case SkuProperty.Type.REF:
+                        SkuPropertyValue propertyValue = skuPropertyValueCache.get(propertyObject.getLong("valueid"));
+                        properties.add(new SkuProperty(skuPropertyNameCache.get(propertyValue.getNameId()).getName(), propertyValue.getValue()));
+                        break;
+                    case SkuProperty.Type.VALUE:
+                        properties.add(new SkuProperty(skuPropertyNameCache.get(propertyObject.getLong("nameid")).getName(), propertyObject.getString("value")));
+                        break;
+                    default:
+                        break;
+                }
             }
+        } catch (Exception e) {
+            LOGGER.error("fail to parse sku properties, sku id: {}", id);
         }
 
         return properties;
     }
 
-    private List<SkuPrice> parsePrices(String price) {
+    private List<SkuPrice> parsePrices(long id, String price) {
         List<SkuPrice> prices = new ArrayList<SkuPrice>();
 
-        JSONArray pricesArray = JSON.parseArray(price);
-        for (int i = 0; i < pricesArray.size(); i++) {
-            JSONObject priceObject = pricesArray.getJSONObject(i);
-            prices.add(new SkuPrice(priceObject));
+        try {
+            JSONArray pricesArray = JSON.parseArray(price);
+            for (int i = 0; i < pricesArray.size(); i++) {
+                JSONObject priceObject = pricesArray.getJSONObject(i);
+                prices.add(new SkuPrice(priceObject));
+            }
+        } catch (Exception e) {
+            LOGGER.error("fail to parse sku prices, sku id: {}", id);
         }
 
         return prices;
