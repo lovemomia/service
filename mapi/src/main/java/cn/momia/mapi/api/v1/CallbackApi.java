@@ -1,10 +1,10 @@
 package cn.momia.mapi.api.v1;
 
-import cn.momia.common.encrypt.XmlUtil;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.Xml;
+import cn.momia.common.misc.XmlUtil;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ public class CallbackApi extends AbstractApi {
     @RequestMapping(value = "/wechatpay", method = RequestMethod.POST, produces = "application/xml")
     public Xml wechatpayCallback(HttpServletRequest request) {
         try {
-            Map<String, String> params = XmlUtil.doXmlParse(IOUtils.toString(request.getInputStream()));
+            Map<String, String> params = XmlUtil.xmlToParams(IOUtils.toString(request.getInputStream()));
             ResponseMessage response = executeRequest(MomiaHttpRequest.POST(dealServiceUrl("callback/wechatpay"), params));
             if (response.getErrno() == ErrorCode.SUCCESS) return new Xml("SUCCESS", "OK");
         } catch (Exception e) {
