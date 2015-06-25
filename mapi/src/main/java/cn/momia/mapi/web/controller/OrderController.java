@@ -18,9 +18,4 @@ public class OrderController extends AbstractController {
     public String deleteOrder(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
-
-    @RequestMapping(method = RequestMethod.GET)
-    public String getOrdersOfUser(HttpServletRequest request) {
-        return forward(request, request.getRequestURI());
-    }
 }

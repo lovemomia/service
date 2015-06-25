@@ -70,6 +70,22 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
     }
 
     @Override
+    public List<Sku> get(List<Long> ids) {
+        final List<Sku> skus = new ArrayList<Sku>();
+        if (ids.isEmpty()) return skus;
+
+        String sql = "SELECT id, productId, propertyValues, price, stock, unlockedStock, lockedStock FROM t_sku WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                skus.add(buildSku(rs));
+            }
+        });
+
+        return skus;
+    }
+
+    @Override
     public List<Sku> queryByProduct(long productId) {
         final List<Sku> skus = new ArrayList<Sku>();
 

@@ -29,8 +29,8 @@ public class SkuPrice implements Serializable {
     }
 
     public SkuPrice(JSONObject priceJson) {
-        this.adult = priceJson.getInteger("adult");
-        this.child = priceJson.getInteger("child");
+        this.adult = priceJson.containsKey("adult") ? priceJson.getInteger("adult") : 0;
+        this.child = priceJson.containsKey("child") ? priceJson.getInteger("child") : 0;
         this.price = priceJson.getFloat("price");
         this.unit = UNIT[priceJson.getInteger("unit")];
     }

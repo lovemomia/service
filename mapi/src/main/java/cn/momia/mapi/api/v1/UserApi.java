@@ -3,8 +3,11 @@ package cn.momia.mapi.api.v1;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.Dto;
+import cn.momia.mapi.api.v1.dto.OrderDto;
 import cn.momia.mapi.api.v1.dto.UserDto;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,6 +50,62 @@ public class UserApi extends AbstractApi {
                 return new UserDto.Own((JSONObject) data);
             }
         });
+    }
+
+    @RequestMapping(value = "/order", method = RequestMethod.GET)
+    public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam int start, @RequestParam final int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("status", status)
+                .add("start", start)
+                .add("count", count);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user/order"), builder.build());
+
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                OrderDto.Orders orders = new OrderDto.Orders();
+
+                JSONArray jsonArray = (JSONArray) data;
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    JSONObject order = jsonObject.getJSONObject("order");
+                    JSONObject product = jsonObject.getJSONObject("product");
+                    JSONObject sku = jsonObject.getJSONObject("sku");
+
+                    if (product == null || sku == null) continue;
+
+                    OrderDto orderDto = new OrderDto(order.getLong("id"), order.getInteger("count"), order.getFloat("totalFee"));
+                    OrderDto.Product orderProduct = new OrderDto.Product();
+                    orderProduct.setProductId(product.getLong("id"));
+                    orderProduct.setSkuId(sku.getLong("id"));
+                    orderProduct.setTitle(product.getString("title"));
+                    orderProduct.setTime(ProductUtil.getSkuTime(sku.getJSONArray("properties")));
+                    orderProduct.setParticipants(buildParticipantsInfo(order.getJSONArray("prices")));
+                    orderDto.setProduct(orderProduct);
+
+                    orders.add(orderDto);
+                }
+
+                return orders;
+            }
+        });
+    }
+
+    private String buildParticipantsInfo(JSONArray prices) {
+        int adult = 0;
+        int child = 0;
+        for (int i = 0; i < prices.size(); i++) {
+            JSONObject price = prices.getJSONObject(i);
+            int count = price.getInteger("count");
+            adult += price.getInteger("adult") * count;
+            child += price.getInteger("child") * count;
+        }
+
+        if (adult > 0 && child > 0) return adult + "成人, " + child + "儿童";
+        else if (adult <= 0 && child > 0) return child + "儿童";
+        else if (adult > 0 && child <= 0) return adult + "成人";
+        return "";
     }
 
     @RequestMapping(value = "/avatar", method = RequestMethod.POST)

@@ -24,6 +24,11 @@ public class UserController extends AbstractController {
         return forward(request, request.getRequestURI());
     }
 
+    @RequestMapping(value = "/order", method = RequestMethod.GET)
+    public String getOrdersOfUser(HttpServletRequest request) {
+        return forward(request, request.getRequestURI());
+    }
+
     @RequestMapping(value = "/avatar", method = RequestMethod.POST)
     public String updateAvatar(HttpServletRequest request) {
         return forward(request, request.getRequestURI());

@@ -6,6 +6,8 @@ import java.util.List;
 
 public class Order implements Serializable {
     public static class Status {
+        public static final int ALL = -1;
+        public static final int DELETED = 0;
         public static final int NOT_PAYED = 1; // 已下单未付款
         public static final int PRE_PAYED = 2; // 准备付款
         public static final int PAYED = 3;     // 已付款
@@ -23,7 +25,7 @@ public class Order implements Serializable {
     private long customerId;
     private long productId;
     private long skuId;
-    List<OrderPrice> prices;
+    private List<OrderPrice> prices;
     private String contacts;
     private String mobile;
     private List<Long> participants;

@@ -28,7 +28,7 @@ public class OrderApi extends AbstractApi {
             public Dto apply(Object data) {
                 JSONObject orderJson = (JSONObject) data;
 
-                return new OrderDto(orderJson.getInteger("count"), orderJson.getFloat("totalFee"));
+                return new OrderDto(orderJson.getLong("id"), orderJson.getInteger("count"), orderJson.getFloat("totalFee"));
             }
         });
     }
@@ -37,16 +37,6 @@ public class OrderApi extends AbstractApi {
     public ResponseMessage deleteOrder(@RequestParam long id, @RequestParam String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         MomiaHttpRequest request = MomiaHttpRequest.DELETE(dealServiceUrl("order", id), builder.build());
-
-        return executeRequest(request);
-    }
-
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam String query) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("utoken", utoken)
-                .add("query", query);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("order"), builder.build());
 
         return executeRequest(request);
     }

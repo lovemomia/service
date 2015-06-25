@@ -76,10 +76,4 @@ public class OrderController extends AbstractController {
 
         return ResponseMessage.SUCCESS;
     }
-
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam String query) {
-        // TODO
-        return new ResponseMessage("TODO");
-    }
 }
