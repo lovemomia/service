@@ -79,6 +79,8 @@ public class OrderController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return new ResponseMessage(ErrorCode.FORBIDDEN, "forbidden");
+
         User user = userService.getByToken(utoken);
         if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
 
