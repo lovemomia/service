@@ -1,4 +1,4 @@
 package cn.momia.service.deal.payment.gateway;
 
-public interface PrepayParam extends Param {
+public class PrepayParam extends MapWrapper {
 }

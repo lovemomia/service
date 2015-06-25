@@ -69,7 +69,6 @@ public abstract class MomiaHttpRequest implements HttpUriRequest, HttpEntityEncl
                         HttpEntity entity = new UrlEncodedFormEntity(toNameValuePairs(params), "utf-8");
                         httpPost.setEntity(entity);
                         setEntity(entity);
-
                     }
 
                     return httpPost;

@@ -60,9 +60,30 @@
         <property name="conf" ref="conf" />
     </bean>
 
-    <bean class="cn.momia.service.deal.payment.gateway.factory.PaymentGatewayFactory">
+    <bean id="alipay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
+        <property name="staticField" value="cn.momia.service.deal.payment.Payment.Type.ALIPAY" />
+    </bean>
+    <bean id="alipayGateway" class="cn.momia.service.deal.payment.gateway.alipay.AlipayGateway" />
+
+    <bean id="wechatpay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
+        <property name="staticField" value="cn.momia.service.deal.payment.Payment.Type.WECHATPAY" />
+    </bean>
+    <bean id="wechatpayGateway" class="cn.momia.service.deal.payment.gateway.wechatpay.WechatpayGateway">
         <property name="conf" ref="conf" />
         <property name="orderService" ref="orderService" />
         <property name="paymentService" ref="paymentService" />
+    </bean>
+
+    <bean class="cn.momia.service.deal.payment.gateway.factory.PaymentGatewayFactory">
+        <property name="prototypes">
+            <map value-type="cn.momia.service.deal.payment.gateway.PaymentGateway">
+                <entry key-ref="alipay">
+                    <ref bean="alipayGateway" />
+                </entry>
+                <entry key-ref="wechatpay">
+                    <ref bean="wechatpayGateway" />
+                </entry>
+            </map>
+        </property>
     </bean>
 </beans>
