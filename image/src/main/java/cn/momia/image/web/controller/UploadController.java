@@ -37,7 +37,7 @@ public class UploadController {
             return new ResponseMessage(buildResponseData(result));
         } catch (Exception e) {
             LOGGER.error("fail to upload upload file", e);
-            return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to upload upload file");
+            return new ResponseMessage(ErrorCode.FAILED, "fail to upload upload file");
         }
     }
 

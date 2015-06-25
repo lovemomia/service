@@ -58,7 +58,7 @@ public abstract class AbstractApi {
             return new ResponseMessage(buildResponseData.apply(responseJson.get("data")));
         } catch (Exception e) {
             LOGGER.error("fail to execute request: {}", request, e);
-            return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to execute request");
+            return new ResponseMessage(ErrorCode.FAILED, "fail to execute request");
         }
     }
 
@@ -66,7 +66,7 @@ public abstract class AbstractApi {
         MomiaHttpResponseCollector collector = requestExecutor.execute(requests);
         if (!collector.isSuccessful()) {
             LOGGER.error("fail to execute requests: {}, exceptions: {}", requests, collector.getExceptions());
-            return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "fail to execute requests");
+            return new ResponseMessage(ErrorCode.FAILED, "fail to execute requests");
         }
 
         return new ResponseMessage(buildResponseData.apply(collector));
