@@ -11,6 +11,7 @@ import cn.momia.service.base.user.UserService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.web.ctrl.AbstractController;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -22,7 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -76,13 +79,24 @@ public class UserController extends AbstractController {
         return new ResponseMessage(buildUserOrders(orders, products, skus));
     }
 
-    private JSONObject buildUserOrders(List<Order> orders, List<Product> products, List<Sku> skus) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("orders", orders);
-        jsonObject.put("products", products);
-        jsonObject.put("skus", skus);
+    private JSONArray buildUserOrders(List<Order> orders, List<Product> products, List<Sku> skus) {
+        Map<Long, Product> productMap = new HashMap<Long, Product>();
+        for (Product product : products) productMap.put(product.getId(), product);
 
-        return jsonObject;
+        Map<Long, Sku> skuMap = new HashMap<Long, Sku>();
+        for (Sku sku : skus) skuMap.put(sku.getId(), sku);
+
+        JSONArray jsonArray = new JSONArray();
+        for (Order order : orders) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("order", order);
+            jsonObject.put("product", productMap.get(order.getProductId()));
+            jsonObject.put("sku", skuMap.get(order.getSkuId()));
+
+            jsonArray.add(jsonObject);
+        }
+
+        return jsonArray;
     }
 
     @RequestMapping(value = "/avatar", method = RequestMethod.PUT)
