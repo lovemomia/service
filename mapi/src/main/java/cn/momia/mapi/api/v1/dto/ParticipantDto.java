@@ -20,8 +20,6 @@ public class ParticipantDto implements Dto {
         this.name = participantJson.getString("name");
         this.sex = participantJson.getString("sex");
         this.birthday = participantJson.getDate("birthday");
-        this.idType = participantJson.getInteger("idType");
-        this.idNo = participantJson.getString("idNo");
     }
 
     public long getId() {

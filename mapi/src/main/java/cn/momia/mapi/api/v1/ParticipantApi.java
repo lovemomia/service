@@ -39,7 +39,12 @@ public class ParticipantApi extends AbstractApi {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                return new ParticipantDto((JSONObject) data);
+               ParticipantDto participantDto = new ParticipantDto((JSONObject) data);
+                participantDto.setIdType(((JSONObject) data).getInteger("idType"));
+                participantDto.setIdNo(((JSONObject) data).getString("idNo"));
+                return participantDto;
+
+
             }
         });
     }
