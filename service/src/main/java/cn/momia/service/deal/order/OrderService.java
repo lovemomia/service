@@ -9,6 +9,9 @@ public interface OrderService {
     List<Order> queryByUser(long userId, int start, int count);
     List<Order> queryDistinctCustomerOrderByProduct(long productId, int start, int count);
     boolean delete(long id, long userId);
-    boolean prepay(long id);
+    boolean prepay(long id, long userId);
+    boolean unPrepay(long id, long userId);
     boolean pay(long id);
+    boolean check(long userId, long productId, long skuId);
+
 }

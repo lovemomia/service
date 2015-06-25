@@ -18,18 +18,20 @@ import javax.servlet.http.HttpServletRequest;
 public class CallbackController {
     @RequestMapping(value = "/alipay", method = RequestMethod.POST)
     public ResponseMessage alipayCallback(HttpServletRequest request) {
-        return new ResponseMessage(callback(request, Payment.Type.ALIPAY));
+        return callback(request, Payment.Type.ALIPAY);
     }
 
-    private CallbackResult callback(HttpServletRequest request, int payType) {
+    private ResponseMessage callback(HttpServletRequest request, int payType) {
         CallbackParam callbackParam = CallbackParamFactory.create(request.getParameterMap(), payType);
         PaymentGateway gateway = PaymentGatewayFactory.create(payType);
+        CallbackResult callbackResult = gateway.callback(callbackParam);
 
-        return gateway.callback(callbackParam);
+        if (callbackResult.isSuccessful()) return ResponseMessage.SUCCESS;
+        return ResponseMessage.FAILED;
     }
 
     @RequestMapping(value = "/wechatpay", method = RequestMethod.POST)
     public ResponseMessage wechatpayCallback(HttpServletRequest request) {
-        return new ResponseMessage(callback(request, Payment.Type.WECHATPAY));
+        return callback(request, Payment.Type.WECHATPAY);
     }
 }

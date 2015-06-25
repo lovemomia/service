@@ -20,13 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ParticipantApi extends AbstractApi {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseMessage addParticipant(@RequestParam String utoken, @RequestParam String participant) {
-        ResponseMessage userResponse = getUser(utoken);
-        if (userResponse.getErrno() != ErrorCode.SUCCESS) return new ResponseMessage(ErrorCode.FORBIDDEN, userResponse.getErrmsg());
-
-        long userId = ((JSONObject) userResponse.getData()).getLong("id");
         JSONObject paticipantJson = JSON.parseObject(participant);
-        paticipantJson.put("userId", userId);
-
+        paticipantJson.put("userId", getUserId(utoken));
         MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("participant"), paticipantJson.toString());
 
         return executeRequest(request, new Function<Object, Dto>() {
@@ -52,13 +47,8 @@ public class ParticipantApi extends AbstractApi {
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public ResponseMessage updateParticipant(@RequestParam String utoken, @RequestParam String participant) {
-        ResponseMessage userResponse = getUser(utoken);
-        if (userResponse.getErrno() != ErrorCode.SUCCESS) return new ResponseMessage(ErrorCode.FORBIDDEN, userResponse.getErrmsg());
-
-        long userId = ((JSONObject) userResponse.getData()).getLong("id");
         JSONObject paticipantJson = JSON.parseObject(participant);
-        paticipantJson.put("userId", userId);
-
+        paticipantJson.put("userId", getUserId(utoken));
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("participant"), paticipantJson.toString());
 
         return executeRequest(request);

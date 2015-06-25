@@ -3,6 +3,8 @@ package cn.momia.service.deal.payment.gateway.wechatpay;
 import cn.momia.service.deal.payment.gateway.PrepayResult;
 
 public class WechatpayPrepayResult implements PrepayResult {
+    private boolean successful;
+
     private String appid;
     private String mch_id;
     private String device_info;
@@ -11,6 +13,10 @@ public class WechatpayPrepayResult implements PrepayResult {
     private String trade_type;
     private String prepay_id;
     private String code_url;
+
+    public void setSuccessful(boolean successful) {
+        this.successful = successful;
+    }
 
     public String getAppid() {
         return appid;
@@ -74,5 +80,10 @@ public class WechatpayPrepayResult implements PrepayResult {
 
     public void setCode_url(String code_url) {
         this.code_url = code_url;
+    }
+
+    @Override
+    public boolean isSuccessful() {
+        return successful;
     }
 }

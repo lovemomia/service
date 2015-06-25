@@ -15,6 +15,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.util.Date;
@@ -22,6 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class WechatpayGateway extends AbstractPaymentGateway {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WechatpayGateway.class);
+
     @Override
     public PrepayResult prepay(PrepayParam param) {
         String url = conf.getString("Payment.Wechat.PrepayService");
@@ -92,23 +96,31 @@ public class WechatpayGateway extends AbstractPaymentGateway {
 
     private boolean finishPayment(CallbackParam param) {
         try {
-            WechatpayCallbackParam wechatpayCallbackParam = (WechatpayCallbackParam) param;
-            boolean payed = orderService.pay(Long.valueOf(wechatpayCallbackParam.getOut_trade_no()));
-            long paymentId = paymentService.add(createPayment(wechatpayCallbackParam));
-
-            return payed && paymentId > 0;
+            if (!orderService.pay(Long.valueOf(param.get("out_trade_no")))) return false;
+            logPayment(param);
         } catch (Exception e) {
             return false;
         }
+
+        return true;
     }
 
-    private Payment createPayment(WechatpayCallbackParam wechatpayCallbackParam) {
+    private void logPayment(CallbackParam param) {
+        try {
+            long paymentId = paymentService.add(createPayment(param));
+            if (paymentId <= 0) LOGGER.error("fail to log payment: {}", param);
+        } catch (Exception e) {
+            LOGGER.error("fail to log payment: {}", param, e);
+        }
+    }
+
+    private Payment createPayment(CallbackParam param) {
         Payment payment = new Payment();
-        payment.setOrderId(Long.valueOf(wechatpayCallbackParam.getOut_trade_no()));
+        payment.setOrderId(Long.valueOf(param.get("out_trade_no")));
         payment.setFinishTime(new Date());
         payment.setPayType(Payment.Type.WECHATPAY);
-        payment.setTradeNo(wechatpayCallbackParam.getTransaction_id());
-        payment.setFee(Long.valueOf(wechatpayCallbackParam.getTotal_fee()) / 100.0F);
+        payment.setTradeNo(param.get("transaction_id"));
+        payment.setFee(Long.valueOf(param.get("total_fee")) / 100.0F);
 
         return payment;
     }

@@ -140,9 +140,17 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
-    public boolean prepay(long id) {
-        String sql = "UPDATE t_order SET status=? WHERE id=? AND status=?";
-        int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PRE_PAYED, id, Order.Status.NOT_PAYED });
+    public boolean prepay(long id, long userId) {
+        String sql = "UPDATE t_order SET status=? WHERE id=? AND customerId=? AND status=?";
+        int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PRE_PAYED, id, userId, Order.Status.NOT_PAYED });
+
+        return updateCount == 1;
+    }
+
+    @Override
+    public boolean unPrepay(long id, long userId) {
+        String sql = "UPDATE t_order SET status=? WHERE id=? AND customerId=? AND status=?";
+        int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.NOT_PAYED, id, userId, Order.Status.PRE_PAYED });
 
         return updateCount == 1;
     }
@@ -153,5 +161,19 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PAYED, id, Order.Status.PRE_PAYED });
 
         return updateCount == 1;
+    }
+
+    @Override
+    public boolean check(long userId, long productId, long skuId) {
+        String sql = "SELECT status FROM t_order WHERE customerId=? AND productId=? AND skuId=?";
+        int status = jdbcTemplate.query(sql, new Object[] { userId, productId, skuId }, new ResultSetExtractor<Integer>() {
+            @Override
+            public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (rs.next()) return rs.getInt("status");
+                return 0;
+            }
+        });
+
+        return status >= Order.Status.PAYED;
     }
 }

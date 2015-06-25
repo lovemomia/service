@@ -72,10 +72,13 @@ public abstract class AbstractApi {
         return new ResponseMessage(buildResponseData.apply(collector));
     }
 
-    protected ResponseMessage getUser(String utoken) {
+    protected long getUserId(String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user"), builder.build());
 
-        return executeRequest(request);
+        ResponseMessage responseMessage = executeRequest(request);
+        if (responseMessage.getErrno() == ErrorCode.SUCCESS) return ((JSONObject) responseMessage.getData()).getLong("id");
+
+        throw new RuntimeException("fail to get user id");
     }
 }

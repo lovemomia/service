@@ -8,6 +8,7 @@ import java.util.Date;
 public class ResponseMessage implements Serializable
 {
     public static final ResponseMessage SUCCESS = new ResponseMessage("success");
+    public static final ResponseMessage FAILED = new ResponseMessage(ErrorCode.FAILED, "failed");
 
     private int errno;
     private String errmsg;

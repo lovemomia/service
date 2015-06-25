@@ -80,14 +80,18 @@ public abstract class MomiaHttpRequest implements HttpUriRequest, HttpEntityEncl
         };
     }
 
-    public static MomiaHttpRequest POST(String uri, final String json) {
+    public static MomiaHttpRequest POST(String uri, String content) {
+        return POST(uri, content, "application/json");
+    }
+
+    public static MomiaHttpRequest POST(String uri, final String content, final String contentType) {
         return new MomiaHttpRequest("anonymous", true, uri, null) {
             @Override
             protected HttpRequestBase createHttpMethod(String uri, Map<String, String> params) {
-                HttpEntity entity = toEntity(json);
+                HttpEntity entity = toEntity(content, contentType);
 
                 HttpPost httpPost = new HttpPost(uri);
-                httpPost.addHeader(HTTP.CONTENT_TYPE, "application/json");
+                httpPost.addHeader(HTTP.CONTENT_TYPE, contentType);
                 httpPost.setEntity(entity);
                 setEntity(entity);
 
@@ -95,7 +99,6 @@ public abstract class MomiaHttpRequest implements HttpUriRequest, HttpEntityEncl
             }
         };
     }
-
 
     public static MomiaHttpRequest PUT(String uri) {
         return PUT("anonymous", true, uri, null);
@@ -129,14 +132,18 @@ public abstract class MomiaHttpRequest implements HttpUriRequest, HttpEntityEncl
         };
     }
 
-    public static MomiaHttpRequest PUT(String uri, final String json) {
+    public static MomiaHttpRequest PUT(String uri, String content) {
+        return PUT(uri, content, "application/json");
+    }
+
+    public static MomiaHttpRequest PUT(String uri, final String content, final String contentType) {
         return new MomiaHttpRequest("anonymous", true, uri, null) {
             @Override
             protected HttpRequestBase createHttpMethod(String uri, Map<String, String> params) {
-                HttpEntity entity = toEntity(json);
+                HttpEntity entity = toEntity(content, contentType);
 
                 HttpPut httpPut = new HttpPut(uri);
-                httpPut.addHeader(HTTP.CONTENT_TYPE, "application/json");
+                httpPut.addHeader(HTTP.CONTENT_TYPE, contentType);
                 httpPut.setEntity(entity);
                 setEntity(entity);
 
@@ -217,9 +224,9 @@ public abstract class MomiaHttpRequest implements HttpUriRequest, HttpEntityEncl
         return nameValuePairs;
     }
 
-    protected static StringEntity toEntity(String json) {
-        StringEntity entity = new StringEntity(json, "utf-8");
-        entity.setContentType("application/json");
+    protected static StringEntity toEntity(String content, String contentType) {
+        StringEntity entity = new StringEntity(content, "utf-8");
+        entity.setContentType(contentType);
         entity.setContentEncoding("utf-8");
 
         return entity;
