@@ -2,61 +2,61 @@ package cn.momia.mapi.api.v1.dto;
 
 import java.util.ArrayList;
 
-public class FavoriteDto extends ArrayList<FavoriteDto.Product> implements Dto {
-    public static class Product implements Dto {
-        private long id;
-        private String cover;
-        private String title;
-        private String scheduler;
-        private int joined;
-        private float price;
+public class FavoriteDto implements Dto {
+    public static class Favorites extends ArrayList<FavoriteDto> implements Dto {}
 
-        public long getId() {
-            return id;
-        }
+    private long id;
+    private String cover;
+    private String title;
+    private String scheduler;
+    private int joined;
+    private float price;
 
-        public void setId(long id) {
-            this.id = id;
-        }
+    public long getId() {
+        return id;
+    }
 
-        public String getCover() {
-            return cover;
-        }
+    public void setId(long id) {
+        this.id = id;
+    }
 
-        public void setCover(String cover) {
-            this.cover = cover;
-        }
+    public String getCover() {
+        return cover;
+    }
 
-        public String getTitle() {
-            return title;
-        }
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
 
-        public void setTitle(String title) {
-            this.title = title;
-        }
+    public String getTitle() {
+        return title;
+    }
 
-        public String getScheduler() {
-            return scheduler;
-        }
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-        public void setScheduler(String scheduler) {
-            this.scheduler = scheduler;
-        }
+    public String getScheduler() {
+        return scheduler;
+    }
 
-        public int getJoined() {
-            return joined;
-        }
+    public void setScheduler(String scheduler) {
+        this.scheduler = scheduler;
+    }
 
-        public void setJoined(int joined) {
-            this.joined = joined;
-        }
+    public int getJoined() {
+        return joined;
+    }
 
-        public float getPrice() {
-            return price;
-        }
+    public void setJoined(int joined) {
+        this.joined = joined;
+    }
 
-        public void setPrice(float price) {
-            this.price = price;
-        }
+    public float getPrice() {
+        return price;
+    }
+
+    public void setPrice(float price) {
+        this.price = price;
     }
 }
