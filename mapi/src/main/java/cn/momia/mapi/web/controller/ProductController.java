@@ -19,8 +19,8 @@ public class ProductController extends AbstractController {
         return forward(request, request.getRequestURI());
     }
 
-    @RequestMapping(value = "/sku", method = RequestMethod.GET)
-    public String getProductSkus(HttpServletRequest request) {
+    @RequestMapping(value = "/order", method = RequestMethod.GET)
+    public String getProductOrder(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
 }
