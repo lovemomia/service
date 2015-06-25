@@ -7,6 +7,7 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.Dto;
 import cn.momia.mapi.api.v1.dto.ProductDto;
+import cn.momia.mapi.api.v1.dto.ProductOrderDto;
 import cn.momia.mapi.api.v1.dto.SkuDto;
 import cn.momia.mapi.img.ImageFile;
 import com.alibaba.fastjson.JSONArray;
@@ -154,29 +155,63 @@ public class ProductApi extends AbstractApi {
         return content;
     }
 
-    @RequestMapping(value = "/sku", method = RequestMethod.GET)
-    public ResponseMessage getProductSkus(@RequestParam long id) {
-        return executeRequest(buildProductSkusRequest(id), new Function<Object, Dto>() {
+    @RequestMapping(value = "/order", method = RequestMethod.GET)
+    public ResponseMessage getProductOrder(@RequestParam long id, @RequestParam String utoken) {
+        List<MomiaHttpRequest> requests = buildProductOrderRequests(id, utoken);
+
+        return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {
             @Override
-            public Dto apply(Object data) {
-                SkuDto.Skus skus = new SkuDto.Skus();
+            public Dto apply(MomiaHttpResponseCollector collector) {
+                ProductOrderDto productOrderDto = new ProductOrderDto();
+                productOrderDto.setContacts(getContacts((JSONObject) collector.getResponse("contacts")));
+                productOrderDto.setSkus(getSkus((JSONArray) collector.getResponse("skus")));
 
-                JSONArray skusArray = (JSONArray) data;
-                for (int i = 0; i < skusArray.size(); i++) {
-                    JSONObject skuObject = skusArray.getJSONObject(i);
-                    SkuDto sku = new SkuDto();
-                    sku.setProductId(skuObject.getLong("productId"));
-                    sku.setSkuId(skuObject.getLong("id"));
-                    sku.setStock(skuObject.getInteger("unlockedStock"));
-                    sku.setMinPrice(ProductUtil.getSkuMiniPrice(skuObject.getJSONArray("prices")));
-                    sku.setTime(ProductUtil.getSkuTime(skuObject.getJSONArray("properties")));
-                    sku.setPrices(skuObject.getJSONArray("prices"));
-
-                    skus.add(sku);
-                }
-
-                return skus;
+                return productOrderDto;
             }
         });
+    }
+
+    private List<MomiaHttpRequest> buildProductOrderRequests(long productId, String utoken) {
+        List<MomiaHttpRequest> requests = new ArrayList<MomiaHttpRequest>();
+        requests.add(buildProductSkusRequest(productId));
+        requests.add(buildUserRequest(utoken));
+
+        return requests;
+    }
+
+    private MomiaHttpRequest buildUserRequest(String utoken) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        MomiaHttpRequest request = MomiaHttpRequest.GET("contacts", false, baseServiceUrl("user"), builder.build());
+
+        return request;
+    }
+
+    private ProductOrderDto.Contacts getContacts(JSONObject userJson) {
+        if (userJson == null) return null;
+
+        ProductOrderDto.Contacts contacts = new ProductOrderDto.Contacts();
+        contacts.setName(userJson.getString("name"));
+        contacts.setMobile(userJson.getString("mobile"));
+
+        return contacts;
+    }
+
+    private SkuDto.Skus getSkus(JSONArray skusArray) {
+        SkuDto.Skus skus = new SkuDto.Skus();
+
+        for (int i = 0; i < skusArray.size(); i++) {
+            JSONObject skuObject = skusArray.getJSONObject(i);
+            SkuDto sku = new SkuDto();
+            sku.setProductId(skuObject.getLong("productId"));
+            sku.setSkuId(skuObject.getLong("id"));
+            sku.setStock(skuObject.getInteger("unlockedStock"));
+            sku.setMinPrice(ProductUtil.getSkuMiniPrice(skuObject.getJSONArray("prices")));
+            sku.setTime(ProductUtil.getSkuTime(skuObject.getJSONArray("properties")));
+            sku.setPrices(skuObject.getJSONArray("prices"));
+
+            skus.add(sku);
+        }
+
+        return skus;
     }
 }
