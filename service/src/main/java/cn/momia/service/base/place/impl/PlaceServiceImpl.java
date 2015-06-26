@@ -40,8 +40,8 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
         place.setName(rs.getString("name"));
         place.setAddress(rs.getString("address"));
         place.setDesc(rs.getString("desc"));
-        place.setLng(rs.getFloat("lng"));
-        place.setLat(rs.getFloat("lat"));
+        place.setLng(rs.getDouble("lng"));
+        place.setLat(rs.getDouble("lat"));
 
         return place;
     }

@@ -107,7 +107,7 @@ public class HomeApi extends AbstractApi {
                 product.setCover(ImageFile.url(baseProductJson.getString("cover")));
                 product.setTitle(baseProductJson.getString("title"));
                 product.setAddress(placeJson.getString("address"));
-                product.setPoi(StringUtils.join(new Object[] { placeJson.getFloat("lng"), placeJson.getFloat("lat") }, ":"));
+                product.setPoi(StringUtils.join(new Object[] { placeJson.getDouble("lng"), placeJson.getDouble("lat") }, ":"));
                 product.setScheduler(ProductUtil.getScheduler(skusJson));
                 product.setJoined(baseProductJson.getInteger("sales"));
                 product.setPrice(ProductUtil.getMiniPrice(skusJson));
