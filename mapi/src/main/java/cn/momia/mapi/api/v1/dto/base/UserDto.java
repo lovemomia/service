@@ -1,6 +1,5 @@
-package cn.momia.mapi.api.v1.dto.composite;
+package cn.momia.mapi.api.v1.dto.base;
 
-import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.img.ImageFile;
 import com.alibaba.fastjson.JSONObject;
 
@@ -17,17 +16,13 @@ public class UserDto implements Dto {
         }
     }
 
-    public static class Other extends UserDto {
+    public static class Other extends Own {
         public Other(JSONObject userJson) {
             super(userJson);
         }
 
         public String getToken() {
             return "";
-        }
-
-        public String getMobile() {
-            return super.getMobile().substring(0, 3) + "****" + super.getMobile().substring(7);
         }
 
         public String getAddress() {

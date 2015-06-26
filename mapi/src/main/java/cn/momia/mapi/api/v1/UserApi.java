@@ -6,7 +6,7 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.composite.OrderDto;
-import cn.momia.mapi.api.v1.dto.composite.UserDto;
+import cn.momia.mapi.api.v1.dto.base.UserDto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
