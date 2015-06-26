@@ -129,7 +129,7 @@ public class UserApi extends AbstractApi {
     }
 
     @RequestMapping(value = "/birthday", method = RequestMethod.POST)
-    public ResponseMessage updateBirthday(@RequestParam String utoken, @RequestParam Date birthday) {
+    public ResponseMessage updateBirthday(@RequestParam String utoken, @RequestParam String birthday) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("birthday", birthday);
