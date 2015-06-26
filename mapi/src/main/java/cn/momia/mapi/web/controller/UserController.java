@@ -29,6 +29,11 @@ public class UserController extends AbstractController {
         return forward(request, request.getRequestURI());
     }
 
+    @RequestMapping(value = "/nickname", method = RequestMethod.POST)
+    public String updateNickName(HttpServletRequest request) {
+        return forward(request, request.getRequestURI());
+    }
+
     @RequestMapping(value = "/avatar", method = RequestMethod.POST)
     public String updateAvatar(HttpServletRequest request) {
         return forward(request, request.getRequestURI());

@@ -11,6 +11,7 @@ public interface UserService {
     User getByToken(String token);
     User getByMobile(String mobile);
     boolean updateToken(long id, String token);
+    boolean updateNickName(long id, String nickName);
     boolean updateAvatar(long id, String avatar);
     boolean updateName(long id, String name);
     boolean updateSex(long id, String sex);

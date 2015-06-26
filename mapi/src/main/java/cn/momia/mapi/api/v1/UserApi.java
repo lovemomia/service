@@ -88,6 +88,16 @@ public class UserApi extends AbstractApi {
         });
     }
 
+    @RequestMapping(value = "/nickname", method = RequestMethod.POST)
+    public ResponseMessage updateNickName(@RequestParam String utoken, @RequestParam(value = "nickname") String nickName) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("nickname", nickName);
+        MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("user/nickname"), builder.build());
+
+        return executeRequest(request);
+    }
+
     @RequestMapping(value = "/avatar", method = RequestMethod.POST)
     public ResponseMessage updateAvatar(@RequestParam String utoken, @RequestParam String avatar) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
