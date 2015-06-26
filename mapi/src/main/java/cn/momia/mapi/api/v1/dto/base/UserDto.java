@@ -31,6 +31,7 @@ public class UserDto implements Dto {
     }
 
     private String token;
+    private String nickName;
     private String mobile;
     private String avatar;
     private String name;
@@ -38,10 +39,13 @@ public class UserDto implements Dto {
     private Date birthday;
     private int cityId;
     private String address;
-    private String nickName;
 
     public String getToken() {
         return token;
+    }
+
+    public String getNickName() {
+        return nickName;
     }
 
     public String getMobile() {
@@ -71,10 +75,10 @@ public class UserDto implements Dto {
     public String getAddress() {
         return address;
     }
-    public String getNickName() { return nickName; }
 
     protected UserDto(JSONObject userJson) {
         this.token = userJson.getString("token");
+        this.nickName = userJson.getString("nickName");
         this.mobile = userJson.getString("mobile");
         this.avatar = ImageFile.url(userJson.getString("avatar"));
         this.name = userJson.getString("name");
@@ -82,6 +86,5 @@ public class UserDto implements Dto {
         this.birthday = userJson.getDate("birthday");
         this.cityId = userJson.getInteger("cityId");
         this.address = userJson.getString("address");
-        this.nickName = userJson.getString("nickName");
     }
 }

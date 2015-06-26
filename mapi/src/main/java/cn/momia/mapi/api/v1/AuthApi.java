@@ -47,7 +47,5 @@ public class AuthApi extends AbstractApi {
         MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("auth/register"), builder.build());
 
         return executeRequest(request);
-
     }
-
 }
