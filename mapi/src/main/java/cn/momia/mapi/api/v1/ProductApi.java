@@ -5,6 +5,7 @@ import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
+import cn.momia.mapi.api.v1.dto.base.ContactsDto;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.SkuDto;
 import cn.momia.mapi.api.v1.dto.composite.ProductDetailDto;
@@ -186,10 +187,10 @@ public class ProductApi extends AbstractApi {
         return request;
     }
 
-    private PlaceOrderDto.Contacts getContacts(JSONObject userJson) {
+    private ContactsDto getContacts(JSONObject userJson) {
         if (userJson == null) return null;
 
-        PlaceOrderDto.Contacts contacts = new PlaceOrderDto.Contacts();
+        ContactsDto contacts = new ContactsDto();
         contacts.setName(userJson.getString("name"));
         contacts.setMobile(userJson.getString("mobile"));
 

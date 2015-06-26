@@ -1,40 +1,20 @@
 package cn.momia.mapi.api.v1.dto.composite;
 
+import cn.momia.mapi.api.v1.dto.base.ContactsDto;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.SkuDto;
 
 import java.util.List;
 
 public class PlaceOrderDto implements Dto {
-    public static class Contacts implements Dto {
-        private String name;
-        private String mobile;
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getMobile() {
-            return mobile;
-        }
-
-        public void setMobile(String mobile) {
-            this.mobile = mobile;
-        }
-    }
-
-    private Contacts contacts;
+    private ContactsDto contacts;
     private List<SkuDto> skus;
 
-    public Contacts getContacts() {
+    public ContactsDto getContacts() {
         return contacts;
     }
 
-    public void setContacts(Contacts contacts) {
+    public void setContacts(ContactsDto contacts) {
         this.contacts = contacts;
     }
 
