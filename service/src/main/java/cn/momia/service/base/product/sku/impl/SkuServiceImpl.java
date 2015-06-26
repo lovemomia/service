@@ -89,21 +89,6 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
         return skus;
     }
 
-    @Override
-    public List<Sku> queryByProduct(long productId) {
-        final List<Sku> skus = new ArrayList<Sku>();
-
-        String sql = "SELECT id, productId, propertyValues, price, stock, unlockedStock, lockedStock FROM t_sku WHERE productId=? AND status=1";
-        jdbcTemplate.query(sql, new Object[] { productId }, new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                skus.add(buildSku(rs));
-            }
-        });
-
-        return skus;
-    }
-
     private Sku buildSku(ResultSet rs) throws SQLException {
         Sku sku = new Sku();
         sku.setId(rs.getLong("id"));
@@ -158,6 +143,21 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
         }
 
         return prices;
+    }
+
+    @Override
+    public List<Sku> queryByProduct(long productId) {
+        final List<Sku> skus = new ArrayList<Sku>();
+
+        String sql = "SELECT id, productId, propertyValues, price, stock, unlockedStock, lockedStock FROM t_sku WHERE productId=? AND status=1";
+        jdbcTemplate.query(sql, new Object[] { productId }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                skus.add(buildSku(rs));
+            }
+        });
+
+        return skus;
     }
 
     @Override
