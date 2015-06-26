@@ -5,7 +5,8 @@ import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.Dto;
-import cn.momia.mapi.api.v1.dto.composite.OrderDto;
+import cn.momia.mapi.api.v1.dto.base.OrderDto;
+import cn.momia.mapi.api.v1.dto.composite.OrderListDto;
 import cn.momia.mapi.api.v1.dto.base.UserDto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -64,7 +65,7 @@ public class UserApi extends AbstractApi {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                OrderDto.Orders orders = new OrderDto.Orders();
+                OrderListDto orders = new OrderListDto();
 
                 JSONArray jsonArray = (JSONArray) data;
                 for (int i = 0; i < jsonArray.size(); i++) {
@@ -75,14 +76,9 @@ public class UserApi extends AbstractApi {
 
                     if (product == null || sku == null) continue;
 
-                    OrderDto orderDto = new OrderDto(order.getLong("id"), order.getInteger("count"), order.getFloat("totalFee"));
-                    OrderDto.Product orderProduct = new OrderDto.Product();
-                    orderProduct.setProductId(product.getLong("id"));
-                    orderProduct.setSkuId(sku.getLong("id"));
-                    orderProduct.setTitle(product.getString("title"));
-                    orderProduct.setTime(ProductUtil.getSkuTime(sku.getJSONArray("properties")));
-                    orderProduct.setParticipants(buildParticipantsInfo(order.getJSONArray("prices")));
-                    orderDto.setProduct(orderProduct);
+                    OrderDto orderDto = new OrderDto(order);
+                    orderDto.setTitle(product.getString("title"));
+                    orderDto.setTime(ProductUtil.getSkuTime(sku.getJSONArray("properties")));
 
                     orders.add(orderDto);
                 }
@@ -90,22 +86,6 @@ public class UserApi extends AbstractApi {
                 return orders;
             }
         });
-    }
-
-    private String buildParticipantsInfo(JSONArray prices) {
-        int adult = 0;
-        int child = 0;
-        for (int i = 0; i < prices.size(); i++) {
-            JSONObject price = prices.getJSONObject(i);
-            int count = price.getInteger("count");
-            adult += price.getInteger("adult") * count;
-            child += price.getInteger("child") * count;
-        }
-
-        if (adult > 0 && child > 0) return adult + "成人, " + child + "儿童";
-        else if (adult <= 0 && child > 0) return child + "儿童";
-        else if (adult > 0 && child <= 0) return adult + "成人";
-        return "";
     }
 
     @RequestMapping(value = "/avatar", method = RequestMethod.POST)

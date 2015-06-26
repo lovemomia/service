@@ -4,7 +4,7 @@ import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.v1.dto.base.Dto;
-import cn.momia.mapi.api.v1.dto.composite.OrderDto;
+import cn.momia.mapi.api.v1.dto.base.OrderDto;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
@@ -25,9 +25,7 @@ public class OrderApi extends AbstractApi {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                JSONObject orderJson = (JSONObject) data;
-
-                return new OrderDto(orderJson.getLong("id"), orderJson.getInteger("count"), orderJson.getFloat("totalFee"));
+                return new OrderDto((JSONObject) data);
             }
         });
     }
