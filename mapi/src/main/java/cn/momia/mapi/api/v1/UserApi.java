@@ -6,7 +6,7 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.OrderDto;
-import cn.momia.mapi.api.v1.dto.composite.OrderListDto;
+import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import cn.momia.mapi.api.v1.dto.base.UserDto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -65,7 +65,7 @@ public class UserApi extends AbstractApi {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                OrderListDto orders = new OrderListDto();
+                ListDto orders = new ListDto();
 
                 JSONArray jsonArray = (JSONArray) data;
                 for (int i = 0; i < jsonArray.size(); i++) {

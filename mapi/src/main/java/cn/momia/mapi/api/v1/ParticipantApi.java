@@ -5,7 +5,7 @@ import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.ParticipantDto;
-import cn.momia.mapi.api.v1.dto.composite.ParticipantListDto;
+import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -70,7 +70,7 @@ public class ParticipantApi extends AbstractApi {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                ParticipantListDto participants = new ParticipantListDto();
+                ListDto participants = new ListDto();
                 JSONArray participantsArray = (JSONArray) data;
                 for (int i = 0; i < participantsArray.size(); i++) {
                     JSONObject participantJson = participantsArray.getJSONObject(i);

@@ -5,8 +5,8 @@ import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.Dto;
-import cn.momia.mapi.api.v1.dto.composite.FavoriteListDto;
 import cn.momia.mapi.api.v1.dto.base.ProductDto;
+import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
@@ -46,7 +46,7 @@ public class FavoriteApi extends AbstractApi {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                FavoriteListDto favorites = new FavoriteListDto();
+                ListDto favorites = new ListDto();
 
                 JSONArray productArray = (JSONArray) data;
                 for (int i = 0; i < productArray.size(); i++) {
