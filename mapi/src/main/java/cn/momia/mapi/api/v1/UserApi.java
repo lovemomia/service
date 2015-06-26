@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
-
 @RestController
 @RequestMapping("/v1/user")
 public class UserApi extends AbstractApi {
@@ -84,7 +82,7 @@ public class UserApi extends AbstractApi {
 
                         OrderDto orderDto = new OrderDto(orderJson);
                         orderDto.setTitle(productJson.getString("title"));
-                        orderDto.setTime(ProductUtil.getSkuTime(skuJson.getJSONArray("properties")));
+                        orderDto.setTime(ProductUtil.getSkuScheduler(skuJson.getJSONArray("properties")));
 
                         orders.add(orderDto);
                     } catch (Exception e) {
