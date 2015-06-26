@@ -91,30 +91,30 @@ public class HomeApi extends AbstractApi {
         return banners;
     }
 
-    private List<ProductDto> extractProductsData(JSONArray productArray) {
+    private List<ProductDto> extractProductsData(JSONArray productsJson) {
         List<ProductDto> products = new ArrayList<ProductDto>();
 
-        for (int i = 0; i < productArray.size(); i++) {
+        for (int i = 0; i < productsJson.size(); i++) {
             try {
                 ProductDto product = new ProductDto();
 
-                JSONObject productObject = productArray.getJSONObject(i);
-                JSONObject baseProduct = productObject.getJSONObject("product");
-                JSONObject place = productObject.getJSONObject("place");
-                JSONArray skus = productObject.getJSONArray("skus");
+                JSONObject productJson = productsJson.getJSONObject(i);
+                JSONObject baseProductJson = productJson.getJSONObject("product");
+                JSONObject placeJson = productJson.getJSONObject("place");
+                JSONArray skusJson = productJson.getJSONArray("skus");
 
-                product.setId(baseProduct.getLong("id"));
-                product.setCover(ImageFile.url(baseProduct.getString("cover")));
-                product.setTitle(baseProduct.getString("title"));
-                product.setAddress(place.getString("address"));
-                product.setPoi(StringUtils.join(new Object[] { place.getFloat("lng"), place.getFloat("lat") }, ":"));
-                product.setScheduler(ProductUtil.getScheduler(skus));
-                product.setJoined(baseProduct.getInteger("sales"));
-                product.setPrice(ProductUtil.getMiniPrice(skus));
+                product.setId(baseProductJson.getLong("id"));
+                product.setCover(ImageFile.url(baseProductJson.getString("cover")));
+                product.setTitle(baseProductJson.getString("title"));
+                product.setAddress(placeJson.getString("address"));
+                product.setPoi(StringUtils.join(new Object[] { placeJson.getFloat("lng"), placeJson.getFloat("lat") }, ":"));
+                product.setScheduler(ProductUtil.getScheduler(skusJson));
+                product.setJoined(baseProductJson.getInteger("sales"));
+                product.setPrice(ProductUtil.getMiniPrice(skusJson));
 
                 products.add(product);
             } catch (Exception e) {
-                LOGGER.error("fail to parse product, index: {}", i, e);
+                LOGGER.error("fail to parse product: ", productsJson.getJSONObject(i), e);
             }
         }
 
