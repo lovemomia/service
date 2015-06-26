@@ -5,10 +5,11 @@ import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
-import cn.momia.mapi.api.v1.dto.Dto;
-import cn.momia.mapi.api.v1.dto.ProductDto;
-import cn.momia.mapi.api.v1.dto.PlaceOrderDto;
-import cn.momia.mapi.api.v1.dto.SkuDto;
+import cn.momia.mapi.api.v1.dto.base.ContactsDto;
+import cn.momia.mapi.api.v1.dto.base.Dto;
+import cn.momia.mapi.api.v1.dto.base.SkuDto;
+import cn.momia.mapi.api.v1.dto.composite.ProductDetailDto;
+import cn.momia.mapi.api.v1.dto.composite.PlaceOrderDto;
 import cn.momia.mapi.img.ImageFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -46,27 +47,27 @@ public class ProductApi extends AbstractApi {
         return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {
             @Override
             public Dto apply(MomiaHttpResponseCollector collector) {
-                ProductDto productDto = new ProductDto();
+                ProductDetailDto product = new ProductDetailDto();
 
-                JSONObject baseProduct = (JSONObject) collector.getResponse("product");
-                JSONObject place = (JSONObject) collector.getResponse("place");
-                JSONArray skus = (JSONArray) collector.getResponse("skus");
-                JSONArray customers = (JSONArray) collector.getResponse("customers");
+                JSONObject productJson = (JSONObject) collector.getResponse("product");
+                JSONObject placeJson = (JSONObject) collector.getResponse("place");
+                JSONArray skusJson = (JSONArray) collector.getResponse("skus");
+                JSONArray customersJson = (JSONArray) collector.getResponse("customers");
 
-                productDto.setId(baseProduct.getLong("id"));
-                productDto.setCover(baseProduct.getString("cover"));
-                productDto.setTitle(baseProduct.getString("title"));
-                productDto.setJoined(baseProduct.getInteger("sales"));
-                productDto.setPrice(ProductUtil.getMiniPrice(skus));
-                productDto.setCrowd(baseProduct.getString("crowd"));
-                productDto.setScheduler(ProductUtil.getScheduler(skus));
-                productDto.setAddress(place.getString("address"));
-                productDto.setPoi(StringUtils.join(new Object[] { place.getFloat("lng"), place.getFloat("lat") }, ":"));
-                productDto.setImgs(getImgs(baseProduct));
-                productDto.setCustomers(getCustomers(customers));
-                productDto.setContent(processImages(baseProduct.getJSONArray("content")));
+                product.setId(productJson.getLong("id"));
+                product.setCover(productJson.getString("cover"));
+                product.setTitle(productJson.getString("title"));
+                product.setJoined(productJson.getInteger("sales"));
+                product.setPrice(ProductUtil.getMiniPrice(skusJson));
+                product.setCrowd(productJson.getString("crowd"));
+                product.setScheduler(ProductUtil.getScheduler(skusJson));
+                product.setAddress(placeJson.getString("address"));
+                product.setPoi(StringUtils.join(new Object[] { placeJson.getFloat("lng"), placeJson.getFloat("lat") }, ":"));
+                product.setImgs(getImgs(productJson));
+                product.setCustomers(getCustomers(customersJson));
+                product.setContent(processImages(productJson.getJSONArray("content")));
 
-                return productDto;
+                return product;
             }
         });
     }
@@ -100,32 +101,32 @@ public class ProductApi extends AbstractApi {
         return MomiaHttpRequest.GET("customers", false, baseServiceUrl("product", productId, "customer"), builder.build());
     }
 
-    private List<String> getImgs(JSONObject baseProduct) {
+    private List<String> getImgs(JSONObject productJson) {
         List<String> imgs = new ArrayList<String>();
 
-        JSONArray imgArray = baseProduct.getJSONArray("imgs");
-        for (int i = 0; i < imgArray.size(); i++) {
-            imgs.add(ImageFile.url(imgArray.getJSONObject(i).getString("url")));
+        JSONArray imgJson = productJson.getJSONArray("imgs");
+        for (int i = 0; i < imgJson.size(); i++) {
+            imgs.add(ImageFile.url(imgJson.getJSONObject(i).getString("url")));
         }
 
         return imgs;
     }
 
-    private ProductDto.Customers getCustomers(JSONArray customerArray) {
-        ProductDto.Customers customers = new ProductDto.Customers();
+    private ProductDetailDto.Customers getCustomers(JSONArray customersJson) {
+        ProductDetailDto.Customers customers = new ProductDetailDto.Customers();
 
         int childCount = 0;
         int adultCount = 0;
 
         Calendar calendar = Calendar.getInstance();
         int yearNow = calendar.get(Calendar.YEAR);
-        for (int i = 0; i < customerArray.size(); i++) {
-            JSONObject customer = customerArray.getJSONObject(i);
+        for (int i = 0; i < customersJson.size(); i++) {
+            JSONObject customerJson = customersJson.getJSONObject(i);
             if (customers.avatars == null) customers.avatars = new ArrayList<String>();
-            customers.avatars.add(ImageFile.url(customer.getString("avatar")));
-            JSONArray participants = customer.getJSONArray("participants");
-            for (int j = 0; j < participants.size(); j++) {
-                Date birthday = participants.getJSONObject(j).getDate("birthday");
+            customers.avatars.add(ImageFile.url(customerJson.getString("avatar")));
+            JSONArray participantsJson = customerJson.getJSONArray("participants");
+            for (int j = 0; j < participantsJson.size(); j++) {
+                Date birthday = participantsJson.getJSONObject(j).getDate("birthday");
                 calendar.setTime(birthday);
                 int yearBorn = calendar.get(Calendar.YEAR);
                 if (yearNow - yearBorn > 15) adultCount++;
@@ -141,18 +142,18 @@ public class ProductApi extends AbstractApi {
         return customers;
     }
 
-    private JSONArray processImages(JSONArray content) {
-        for (int i = 0; i < content.size(); i++) {
-            JSONObject contentBlock = content.getJSONObject(i);
-            JSONArray body = contentBlock.getJSONArray("body");
-            for (int j = 0; j < body.size(); j++) {
-                JSONObject bodyBlock = body.getJSONObject(j);
-                String img = bodyBlock.getString("img");
-                if (!StringUtils.isBlank(img)) bodyBlock.put("img", ImageFile.url(img));
+    private JSONArray processImages(JSONArray contentJson) {
+        for (int i = 0; i < contentJson.size(); i++) {
+            JSONObject contentBlockJson = contentJson.getJSONObject(i);
+            JSONArray bodyJson = contentBlockJson.getJSONArray("body");
+            for (int j = 0; j < bodyJson.size(); j++) {
+                JSONObject bodyBlockJson = bodyJson.getJSONObject(j);
+                String img = bodyBlockJson.getString("img");
+                if (!StringUtils.isBlank(img)) bodyBlockJson.put("img", ImageFile.url(img));
             }
         }
 
-        return content;
+        return contentJson;
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
@@ -186,28 +187,28 @@ public class ProductApi extends AbstractApi {
         return request;
     }
 
-    private PlaceOrderDto.Contacts getContacts(JSONObject userJson) {
+    private ContactsDto getContacts(JSONObject userJson) {
         if (userJson == null) return null;
 
-        PlaceOrderDto.Contacts contacts = new PlaceOrderDto.Contacts();
+        ContactsDto contacts = new ContactsDto();
         contacts.setName(userJson.getString("name"));
         contacts.setMobile(userJson.getString("mobile"));
 
         return contacts;
     }
 
-    private SkuDto.Skus getSkus(JSONArray skusArray) {
-        SkuDto.Skus skus = new SkuDto.Skus();
+    private List<SkuDto> getSkus(JSONArray skusJson) {
+        List<SkuDto> skus = new ArrayList<SkuDto>();
 
-        for (int i = 0; i < skusArray.size(); i++) {
-            JSONObject skuObject = skusArray.getJSONObject(i);
+        for (int i = 0; i < skusJson.size(); i++) {
+            JSONObject skuJson = skusJson.getJSONObject(i);
             SkuDto sku = new SkuDto();
-            sku.setProductId(skuObject.getLong("productId"));
-            sku.setSkuId(skuObject.getLong("id"));
-            sku.setStock(skuObject.getInteger("unlockedStock"));
-            sku.setMinPrice(ProductUtil.getSkuMiniPrice(skuObject.getJSONArray("prices")));
-            sku.setTime(ProductUtil.getSkuTime(skuObject.getJSONArray("properties")));
-            sku.setPrices(skuObject.getJSONArray("prices"));
+            sku.setProductId(skuJson.getLong("productId"));
+            sku.setSkuId(skuJson.getLong("id"));
+            sku.setStock(skuJson.getInteger("unlockedStock"));
+            sku.setMinPrice(ProductUtil.getSkuMiniPrice(skuJson.getJSONArray("prices")));
+            sku.setTime(ProductUtil.getSkuTime(skuJson.getJSONArray("properties")));
+            sku.setPrices(skuJson.getJSONArray("prices"));
 
             skus.add(sku);
         }

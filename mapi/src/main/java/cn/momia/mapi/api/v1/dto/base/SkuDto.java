@@ -1,12 +1,8 @@
-package cn.momia.mapi.api.v1.dto;
+package cn.momia.mapi.api.v1.dto.base;
 
 import com.alibaba.fastjson.JSONArray;
 
-import java.util.ArrayList;
-
 public class SkuDto implements Dto {
-    public static class Skus extends ArrayList<SkuDto> implements Dto {}
-
     private long productId;
     private long skuId;
     private int stock;

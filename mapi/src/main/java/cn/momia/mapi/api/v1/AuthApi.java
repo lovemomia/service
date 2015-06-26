@@ -3,8 +3,8 @@ package cn.momia.mapi.api.v1;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.v1.dto.Dto;
-import cn.momia.mapi.api.v1.dto.UserDto;
+import cn.momia.mapi.api.v1.dto.base.Dto;
+import cn.momia.mapi.api.v1.dto.base.UserDto;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,7 +47,5 @@ public class AuthApi extends AbstractApi {
         MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("auth/register"), builder.build());
 
         return executeRequest(request);
-
     }
-
 }

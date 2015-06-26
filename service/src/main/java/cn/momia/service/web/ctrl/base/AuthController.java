@@ -50,6 +50,8 @@ public class AuthController extends AbstractController {
         if (StringUtils.isBlank(mobile) || StringUtils.isBlank(code))
             return new ResponseMessage(ErrorCode.FAILED, "mobile or(and) verify code is empty");
 
+        if (!smsVerifier.verify(mobile, code)) return new ResponseMessage(ErrorCode.FAILED, "fail to verify code");
+
         User user = userService.getByMobile(mobile);
         String token = generateToken(mobile);
         if (!user.exists()) {
@@ -61,37 +63,34 @@ public class AuthController extends AbstractController {
             } else {
                 user.setToken(token);
             }
-            if (!smsVerifier.verify(mobile, code)) return new ResponseMessage(ErrorCode.FAILED, "fail to verify code");
         }
 
         return new ResponseMessage(user);
     }
 
+    private String generateToken(String mobile) {
+        return DigestUtils.md5Hex(StringUtils.join(new String[] { mobile, new Date().toString(), SecretKey.get() }, "|"));
+    }
+
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseMessage register(@RequestParam String nickName, @RequestParam String mobile, @RequestParam String code){
-        if (StringUtils.isBlank(mobile) || StringUtils.isBlank(code))
-            return new ResponseMessage(ErrorCode.FAILED, "mobile or(and) verify code is empty");
+        if (StringUtils.isBlank(nickName) || StringUtils.isBlank(mobile) || StringUtils.isBlank(code))
+            return new ResponseMessage(ErrorCode.FAILED, "one or more of nickName, mobile and verify code is empty");
 
         if (!smsVerifier.verify(mobile, code)) return new ResponseMessage(ErrorCode.FAILED, "fail to verify code");
 
         User user = userService.getByMobile(mobile);
-       String token = generateToken(mobile);
+        String token = generateToken(mobile);
         if (!user.exists()) {
             user = userService.add(nickName, mobile, token);
             if (!user.exists()) {
                 LOGGER.error("fail to register user for {}", mobile);
-                return new ResponseMessage(ErrorCode.FAILED, "fail to register.");
+                return new ResponseMessage(ErrorCode.FAILED, "fail to register");
             }
         } else {
-            LOGGER.error("fail to register user for {}", mobile);
-            return new ResponseMessage(ErrorCode.FAILED, "fail to register,user already exists.");
-              }
+            return new ResponseMessage(ErrorCode.FAILED, "fail to register, user already exists");
+        }
 
-            return new ResponseMessage(user);
-
-    }
-
-    private String generateToken(String mobile) {
-        return DigestUtils.md5Hex(StringUtils.join(new String[] { mobile, new Date().toString(), SecretKey.get() }, "|"));
+        return new ResponseMessage(user);
     }
 }

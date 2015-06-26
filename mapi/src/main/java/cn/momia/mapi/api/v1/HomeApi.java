@@ -5,8 +5,10 @@ import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
-import cn.momia.mapi.api.v1.dto.Dto;
-import cn.momia.mapi.api.v1.dto.HomeDto;
+import cn.momia.mapi.api.v1.dto.base.BannerDto;
+import cn.momia.mapi.api.v1.dto.base.Dto;
+import cn.momia.mapi.api.v1.dto.composite.HomeDto;
+import cn.momia.mapi.api.v1.dto.base.ProductDto;
 import cn.momia.mapi.img.ImageFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -34,7 +36,7 @@ public class HomeApi extends AbstractApi {
 
                 if (pageIndex == 0) homeDto.setBanners(extractBannerData((JSONArray) collector.getResponse("banners")));
 
-                List<HomeDto.Product> products = extractProductsData((JSONArray) collector.getResponse("products"));
+                List<ProductDto> products = extractProductsData((JSONArray) collector.getResponse("products"));
                 homeDto.setProducts(products);
                 if (products.size() == conf.getInt("Home.PageSize")) homeDto.setNextpage(pageIndex + 1);
 
@@ -69,14 +71,14 @@ public class HomeApi extends AbstractApi {
         return MomiaHttpRequest.GET("products", true, baseServiceUrl("product"), builder.build());
     }
 
-    private List<HomeDto.Banner> extractBannerData(JSONArray bannerArray) {
-        List<HomeDto.Banner> banners = new ArrayList<HomeDto.Banner>();
+    private List<BannerDto> extractBannerData(JSONArray bannersJson) {
+        List<BannerDto> banners = new ArrayList<BannerDto>();
 
-        for (int i = 0; i < bannerArray.size(); i++) {
-            JSONObject bannerObject = bannerArray.getJSONObject(i);
-            HomeDto.Banner banner = new HomeDto.Banner();
-            banner.setCover(ImageFile.url(bannerObject.getString("cover")));
-            banner.setAction(bannerObject.getString("action"));
+        for (int i = 0; i < bannersJson.size(); i++) {
+            JSONObject bannerJson = bannersJson.getJSONObject(i);
+            BannerDto banner = new BannerDto();
+            banner.setCover(ImageFile.url(bannerJson.getString("cover")));
+            banner.setAction(bannerJson.getString("action"));
 
             banners.add(banner);
         }
@@ -84,11 +86,11 @@ public class HomeApi extends AbstractApi {
         return banners;
     }
 
-    private List<HomeDto.Product> extractProductsData(JSONArray productArray) {
-        List<HomeDto.Product> products = new ArrayList<HomeDto.Product>();
+    private List<ProductDto> extractProductsData(JSONArray productArray) {
+        List<ProductDto> products = new ArrayList<ProductDto>();
 
         for (int i = 0; i < productArray.size(); i++) {
-            HomeDto.Product product = new HomeDto.Product();
+            ProductDto product = new ProductDto();
 
             JSONObject productObject = productArray.getJSONObject(i);
             JSONObject baseProduct = productObject.getJSONObject("product");

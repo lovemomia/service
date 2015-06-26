@@ -4,8 +4,9 @@ import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
-import cn.momia.mapi.api.v1.dto.Dto;
-import cn.momia.mapi.api.v1.dto.FavoriteDto;
+import cn.momia.mapi.api.v1.dto.base.Dto;
+import cn.momia.mapi.api.v1.dto.base.ProductDto;
+import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
@@ -45,24 +46,24 @@ public class FavoriteApi extends AbstractApi {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                FavoriteDto.Favorites favorites = new FavoriteDto.Favorites();
+                ListDto favorites = new ListDto();
 
-                JSONArray productArray = (JSONArray) data;
-                for (int i = 0; i < productArray.size(); i++) {
-                    FavoriteDto favorite = new FavoriteDto();
+                JSONArray productsJson = (JSONArray) data;
+                for (int i = 0; i < productsJson.size(); i++) {
+                    ProductDto product = new ProductDto();
 
-                    JSONObject productObject = productArray.getJSONObject(i);
-                    JSONObject baseProduct = productObject.getJSONObject("product");
-                    JSONArray skus = productObject.getJSONArray("skus");
+                    JSONObject productJson = productsJson.getJSONObject(i);
+                    JSONObject baseProductJson = productJson.getJSONObject("product");
+                    JSONArray skusJson = productJson.getJSONArray("skus");
 
-                    favorite.setId(baseProduct.getLong("id"));
-                    favorite.setCover(baseProduct.getString("cover"));
-                    favorite.setTitle(baseProduct.getString("title"));
-                    favorite.setScheduler(ProductUtil.getScheduler(skus));
-                    favorite.setJoined(baseProduct.getInteger("sales"));
-                    favorite.setPrice(ProductUtil.getMiniPrice(skus));
+                    product.setId(baseProductJson.getLong("id"));
+                    product.setCover(baseProductJson.getString("cover"));
+                    product.setTitle(baseProductJson.getString("title"));
+                    product.setScheduler(ProductUtil.getScheduler(skusJson));
+                    product.setJoined(baseProductJson.getInteger("sales"));
+                    product.setPrice(ProductUtil.getMiniPrice(skusJson));
 
-                    favorites.add(favorite);
+                    favorites.add(product);
                 }
 
                 return favorites;

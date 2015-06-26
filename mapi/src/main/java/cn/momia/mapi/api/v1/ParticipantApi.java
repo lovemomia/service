@@ -3,8 +3,9 @@ package cn.momia.mapi.api.v1;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.v1.dto.Dto;
-import cn.momia.mapi.api.v1.dto.ParticipantDto;
+import cn.momia.mapi.api.v1.dto.base.Dto;
+import cn.momia.mapi.api.v1.dto.base.ParticipantDto;
+import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -39,11 +40,7 @@ public class ParticipantApi extends AbstractApi {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                ParticipantDto participantDto = new ParticipantDto((JSONObject) data);
-                participantDto.setIdType(((JSONObject) data).getInteger("idType"));
-                participantDto.setIdNo(((JSONObject) data).getString("idNo"));
-
-                return participantDto;
+                return new ParticipantDto((JSONObject) data, true);
             }
         });
     }
@@ -73,10 +70,10 @@ public class ParticipantApi extends AbstractApi {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                ParticipantDto.Participants participants = new ParticipantDto.Participants();
-                JSONArray participantsArray = (JSONArray) data;
-                for (int i = 0; i < participantsArray.size(); i++) {
-                    JSONObject participantJson = participantsArray.getJSONObject(i);
+                ListDto participants = new ListDto();
+                JSONArray participantsJson = (JSONArray) data;
+                for (int i = 0; i < participantsJson.size(); i++) {
+                    JSONObject participantJson = participantsJson.getJSONObject(i);
                     participants.add(new ParticipantDto(participantJson));
                 }
 

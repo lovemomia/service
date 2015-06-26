@@ -18,6 +18,7 @@ public class User implements Serializable {
 
     private long id;
     private String token;
+    private String nickName;
     private String mobile;
     private String avatar;
     private String name;
@@ -25,7 +26,6 @@ public class User implements Serializable {
     private Date birthday;
     private int cityId;
     private String address;
-    private String nickName;
 
     public long getId() {
         return id;
@@ -41,6 +41,14 @@ public class User implements Serializable {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 
     public String getMobile() {
@@ -97,14 +105,6 @@ public class User implements Serializable {
 
     public void setAddress(String address) {
         this.address = address;
-    }
-
-    public String getNickName() {
-        return nickName;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
     }
 
     @Override

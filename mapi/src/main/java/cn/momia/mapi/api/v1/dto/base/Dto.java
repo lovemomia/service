@@ -1,4 +1,4 @@
-package cn.momia.mapi.api.v1.dto;
+package cn.momia.mapi.api.v1.dto.base;
 
 import java.io.Serializable;
 
