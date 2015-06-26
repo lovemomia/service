@@ -111,10 +111,7 @@ public class ProductUtil {
             String timeStr = timeStrs.get(0);
             Date time = castToDate(timeStr);
             if (time != null) {
-                builder.append(DATE_FORMATTER.format(time))
-                        .append("(")
-                        .append(TimeUtil.getWeekDay(time))
-                        .append(")");
+                builder.append(buildDateWithWeekDay(time));
                 if (timeStr.contains(":"))
                     builder.append(TimeUtil.getAmPm(time))
                             .append(TIME_FORMATTER.format(time));
@@ -125,23 +122,24 @@ public class ProductUtil {
                 Collections.sort(times);
                 Date start = times.get(0);
                 Date end = times.get(timeStrs.size() - 1);
-                builder.append(DATE_FORMATTER.format(start))
-                        .append("(")
-                        .append(TimeUtil.getWeekDay(start))
-                        .append(")")
+                builder.append(buildDateWithWeekDay(start))
                         .append("~")
-                        .append(DATE_FORMATTER.format(end))
-                        .append("(")
-                        .append(TimeUtil.getWeekDay(end))
-                        .append(")");
+                        .append(buildDateWithWeekDay(end));
             } else {
                 Date time = times.get(0);
-                builder.append(DATE_FORMATTER.format(time))
-                        .append("(")
-                        .append(TimeUtil.getWeekDay(time))
-                        .append(")");
+                builder.append(buildDateWithWeekDay(time));
             }
         }
+
+        return builder.toString();
+    }
+
+    private static String buildDateWithWeekDay(Date time) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(DATE_FORMATTER.format(time))
+                .append("(")
+                .append(TimeUtil.getWeekDay(time))
+                .append(")");
 
         return builder.toString();
     }
