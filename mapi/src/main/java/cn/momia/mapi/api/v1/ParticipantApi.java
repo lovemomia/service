@@ -10,6 +10,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/v1/participant")
 public class ParticipantApi extends AbstractApi {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParticipantApi.class);
+
     @RequestMapping(method = RequestMethod.POST)
     public ResponseMessage addParticipant(@RequestParam String utoken, @RequestParam String participant) {
         JSONObject paticipantJson = JSON.parseObject(participant);
@@ -73,8 +77,12 @@ public class ParticipantApi extends AbstractApi {
                 ListDto participants = new ListDto();
                 JSONArray participantsJson = (JSONArray) data;
                 for (int i = 0; i < participantsJson.size(); i++) {
-                    JSONObject participantJson = participantsJson.getJSONObject(i);
-                    participants.add(new ParticipantDto(participantJson));
+                    try {
+                        JSONObject participantJson = participantsJson.getJSONObject(i);
+                        participants.add(new ParticipantDto(participantJson));
+                    } catch (Exception e) {
+                        LOGGER.error("invalid participant: {}", participantsJson);
+                    }
                 }
 
                 return participants;
