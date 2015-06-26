@@ -25,6 +25,7 @@ public class User implements Serializable {
     private Date birthday;
     private int cityId;
     private String address;
+    private String nickName;
 
     public long getId() {
         return id;
@@ -96,6 +97,14 @@ public class User implements Serializable {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 
     @Override

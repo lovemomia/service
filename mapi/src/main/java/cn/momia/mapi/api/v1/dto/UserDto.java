@@ -42,6 +42,7 @@ public class UserDto implements Dto {
     private Date birthday;
     private int cityId;
     private String address;
+    private String nickName;
 
     public String getToken() {
         return token;
@@ -74,6 +75,7 @@ public class UserDto implements Dto {
     public String getAddress() {
         return address;
     }
+    public String getNickName() { return nickName; }
 
     protected UserDto(JSONObject userJson) {
         this.token = userJson.getString("token");
@@ -84,5 +86,6 @@ public class UserDto implements Dto {
         this.birthday = userJson.getDate("birthday");
         this.cityId = userJson.getInteger("cityId");
         this.address = userJson.getString("address");
+        this.nickName = userJson.getString("nickName");
     }
 }

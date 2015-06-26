@@ -23,10 +23,10 @@ import java.util.Map;
 
 public class UserServiceImpl extends DbAccessService implements UserService {
     @Override
-    public User add(final String mobile, final String token) {
+    public User add(String nickName, final String mobile,  final String token) {
         if (!validateMobile(mobile)) return User.DUPLICATE_USER;
 
-        return addUser(mobile, token);
+        return addUser(nickName, mobile,  token);
     }
 
     public boolean validateMobile(String mobile) {
@@ -42,15 +42,16 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         return count == 0;
     }
 
-    public User addUser(final String mobile, final String token) {
+    public User addUser(final String nickName, final String mobile,  final String token) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO t_user(mobile, token, addTime) VALUES (?, ?, NOW())";
+                String sql = "INSERT INTO t_user(nickName, mobile, token, addTime) VALUES (?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                ps.setString(1, mobile);
-                ps.setString(2, token);
+                ps.setString(1, nickName);
+                ps.setString(2, mobile);
+                ps.setString(3, token);
 
                 return ps;
             }
@@ -61,7 +62,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public User get(long id) {
-        String sql = "SELECT id, token, mobile, avatar, name, sex, birthday, cityId, address FROM t_user WHERE id=? AND status=1";
+        String sql = "SELECT id, token, mobile, avatar, name, sex, birthday, cityId, address, nickName FROM t_user WHERE id=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<User>() {
             @Override
@@ -83,6 +84,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         user.setBirthday(rs.getDate("birthday"));
         user.setCityId(rs.getInt("cityId"));
         user.setAddress(rs.getString("address"));
+        user.setNickName(rs.getString("nickName"));
 
         return user;
     }
@@ -92,7 +94,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         final Map<Long, User> users = new HashMap<Long, User>();
         if (ids.size() <= 0) return users;
 
-        String sql = "SELECT id, token, mobile, avatar, name, sex, birthday, cityId, address FROM t_user WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
+        String sql = "SELECT id, token, mobile, avatar, name, sex, birthday, cityId, address, nickName FROM t_user WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -106,7 +108,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public User getByToken(String token) {
-        String sql = "SELECT id, token, mobile, avatar, name, sex, birthday, cityId, address FROM t_user WHERE token=? AND status=1";
+        String sql = "SELECT id, token, mobile, avatar, name, sex, birthday, cityId, address, nickName FROM t_user WHERE token=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { token }, new ResultSetExtractor<User>() {
             @Override
@@ -119,7 +121,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public User getByMobile(String mobile) {
-        String sql = "SELECT id, token, mobile, avatar, name, sex, birthday, cityId, address FROM t_user WHERE mobile=? AND status=1";
+        String sql = "SELECT id, token, mobile, avatar, name, sex, birthday, cityId, address, nickName FROM t_user WHERE mobile=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<User>() {
             @Override
