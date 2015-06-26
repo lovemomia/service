@@ -6,7 +6,7 @@ import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.Dto;
-import cn.momia.mapi.api.v1.dto.ProductDto;
+import cn.momia.mapi.api.v1.dto.ProductDetailDto;
 import cn.momia.mapi.api.v1.dto.PlaceOrderDto;
 import cn.momia.mapi.api.v1.dto.SkuDto;
 import cn.momia.mapi.img.ImageFile;
@@ -46,27 +46,27 @@ public class ProductApi extends AbstractApi {
         return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {
             @Override
             public Dto apply(MomiaHttpResponseCollector collector) {
-                ProductDto productDto = new ProductDto();
+                ProductDetailDto productDetailDto = new ProductDetailDto();
 
                 JSONObject baseProduct = (JSONObject) collector.getResponse("product");
                 JSONObject place = (JSONObject) collector.getResponse("place");
                 JSONArray skus = (JSONArray) collector.getResponse("skus");
                 JSONArray customers = (JSONArray) collector.getResponse("customers");
 
-                productDto.setId(baseProduct.getLong("id"));
-                productDto.setCover(baseProduct.getString("cover"));
-                productDto.setTitle(baseProduct.getString("title"));
-                productDto.setJoined(baseProduct.getInteger("sales"));
-                productDto.setPrice(ProductUtil.getMiniPrice(skus));
-                productDto.setCrowd(baseProduct.getString("crowd"));
-                productDto.setScheduler(ProductUtil.getScheduler(skus));
-                productDto.setAddress(place.getString("address"));
-                productDto.setPoi(StringUtils.join(new Object[] { place.getFloat("lng"), place.getFloat("lat") }, ":"));
-                productDto.setImgs(getImgs(baseProduct));
-                productDto.setCustomers(getCustomers(customers));
-                productDto.setContent(processImages(baseProduct.getJSONArray("content")));
+                productDetailDto.setId(baseProduct.getLong("id"));
+                productDetailDto.setCover(baseProduct.getString("cover"));
+                productDetailDto.setTitle(baseProduct.getString("title"));
+                productDetailDto.setJoined(baseProduct.getInteger("sales"));
+                productDetailDto.setPrice(ProductUtil.getMiniPrice(skus));
+                productDetailDto.setCrowd(baseProduct.getString("crowd"));
+                productDetailDto.setScheduler(ProductUtil.getScheduler(skus));
+                productDetailDto.setAddress(place.getString("address"));
+                productDetailDto.setPoi(StringUtils.join(new Object[] { place.getFloat("lng"), place.getFloat("lat") }, ":"));
+                productDetailDto.setImgs(getImgs(baseProduct));
+                productDetailDto.setCustomers(getCustomers(customers));
+                productDetailDto.setContent(processImages(baseProduct.getJSONArray("content")));
 
-                return productDto;
+                return productDetailDto;
             }
         });
     }
@@ -111,8 +111,8 @@ public class ProductApi extends AbstractApi {
         return imgs;
     }
 
-    private ProductDto.Customers getCustomers(JSONArray customerArray) {
-        ProductDto.Customers customers = new ProductDto.Customers();
+    private ProductDetailDto.Customers getCustomers(JSONArray customerArray) {
+        ProductDetailDto.Customers customers = new ProductDetailDto.Customers();
 
         int childCount = 0;
         int adultCount = 0;

@@ -1,15 +1,12 @@
-package cn.momia.mapi.api.v1.dto;
+package cn.momia.mapi.api.v1.dto.base;
 
+import cn.momia.mapi.api.v1.dto.Dto;
 import com.alibaba.fastjson.JSONArray;
 
 import java.util.List;
 
 public class ProductDto implements Dto {
-    public static class Customers implements Dto {
-        public String text;
-        public List<String> avatars;
-    }
-
+    // base info
     private long id;
     private String cover;
     private String title;
@@ -19,8 +16,9 @@ public class ProductDto implements Dto {
     private String scheduler;
     private String address;
     private String poi;
+
+    // extra info
     private List<String> imgs;
-    private Customers customers;
     private JSONArray content;
 
     public long getId() {
@@ -101,14 +99,6 @@ public class ProductDto implements Dto {
 
     public void setImgs(List<String> imgs) {
         this.imgs = imgs;
-    }
-
-    public Customers getCustomers() {
-        return customers;
-    }
-
-    public void setCustomers(Customers customers) {
-        this.customers = customers;
     }
 
     public JSONArray getContent() {
