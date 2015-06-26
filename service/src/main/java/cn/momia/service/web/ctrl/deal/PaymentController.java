@@ -48,18 +48,10 @@ public class PaymentController extends AbstractController {
         Product product = getProduct(request);
         Order order = getOrder(request);
         if (!product.exists() || !order.exists()) return new ResponseMessage(ErrorCode.FAILED, "product or(and) order does not exist");
-        if (!orderService.prepay(order.getId(), user.getId())) return new ResponseMessage(ErrorCode.FAILED, "fail to prepay");
 
         PrepayParam prepayParam = PrepayParamFactory.create(request.getParameterMap(), product, order, Payment.Type.WECHATPAY);
         PaymentGateway gateway = PaymentGatewayFactory.create(Payment.Type.WECHATPAY);
         PrepayResult prepayResult = gateway.prepay(prepayParam);
-
-        if (!prepayResult.isSuccessful()) {
-            if (!orderService.unPrepay(order.getId(), user.getId())) {
-                // TODO 需要告警
-                LOGGER.error("fail to unprepay, order id: {}", order.getId());
-            }
-        }
 
         return new ResponseMessage(prepayResult);
     }
