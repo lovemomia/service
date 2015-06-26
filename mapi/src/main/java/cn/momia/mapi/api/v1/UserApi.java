@@ -67,18 +67,18 @@ public class UserApi extends AbstractApi {
             public Dto apply(Object data) {
                 ListDto orders = new ListDto();
 
-                JSONArray jsonArray = (JSONArray) data;
-                for (int i = 0; i < jsonArray.size(); i++) {
-                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    JSONObject order = jsonObject.getJSONObject("order");
-                    JSONObject product = jsonObject.getJSONObject("product");
-                    JSONObject sku = jsonObject.getJSONObject("sku");
+                JSONArray ordersPackJson = (JSONArray) data;
+                for (int i = 0; i < ordersPackJson.size(); i++) {
+                    JSONObject orderPackJson = ordersPackJson.getJSONObject(i);
+                    JSONObject orderJson = orderPackJson.getJSONObject("order");
+                    JSONObject productJson = orderPackJson.getJSONObject("product");
+                    JSONObject skuJson = orderPackJson.getJSONObject("sku");
 
-                    if (product == null || sku == null) continue;
+                    if (productJson == null || skuJson == null) continue;
 
-                    OrderDto orderDto = new OrderDto(order);
-                    orderDto.setTitle(product.getString("title"));
-                    orderDto.setTime(ProductUtil.getSkuTime(sku.getJSONArray("properties")));
+                    OrderDto orderDto = new OrderDto(orderJson);
+                    orderDto.setTitle(productJson.getString("title"));
+                    orderDto.setTime(ProductUtil.getSkuTime(skuJson.getJSONArray("properties")));
 
                     orders.add(orderDto);
                 }

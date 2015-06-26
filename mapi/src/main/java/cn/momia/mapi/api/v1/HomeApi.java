@@ -71,14 +71,14 @@ public class HomeApi extends AbstractApi {
         return MomiaHttpRequest.GET("products", true, baseServiceUrl("product"), builder.build());
     }
 
-    private List<BannerDto> extractBannerData(JSONArray bannerArray) {
+    private List<BannerDto> extractBannerData(JSONArray bannersJson) {
         List<BannerDto> banners = new ArrayList<BannerDto>();
 
-        for (int i = 0; i < bannerArray.size(); i++) {
-            JSONObject bannerObject = bannerArray.getJSONObject(i);
+        for (int i = 0; i < bannersJson.size(); i++) {
+            JSONObject bannerJson = bannersJson.getJSONObject(i);
             BannerDto banner = new BannerDto();
-            banner.setCover(ImageFile.url(bannerObject.getString("cover")));
-            banner.setAction(bannerObject.getString("action"));
+            banner.setCover(ImageFile.url(bannerJson.getString("cover")));
+            banner.setAction(bannerJson.getString("action"));
 
             banners.add(banner);
         }

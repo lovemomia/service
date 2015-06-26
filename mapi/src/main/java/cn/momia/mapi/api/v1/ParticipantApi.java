@@ -71,9 +71,9 @@ public class ParticipantApi extends AbstractApi {
             @Override
             public Dto apply(Object data) {
                 ListDto participants = new ListDto();
-                JSONArray participantsArray = (JSONArray) data;
-                for (int i = 0; i < participantsArray.size(); i++) {
-                    JSONObject participantJson = participantsArray.getJSONObject(i);
+                JSONArray participantsJson = (JSONArray) data;
+                for (int i = 0; i < participantsJson.size(); i++) {
+                    JSONObject participantJson = participantsJson.getJSONObject(i);
                     participants.add(new ParticipantDto(participantJson));
                 }
 

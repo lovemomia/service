@@ -48,20 +48,20 @@ public class FavoriteApi extends AbstractApi {
             public Dto apply(Object data) {
                 ListDto favorites = new ListDto();
 
-                JSONArray productArray = (JSONArray) data;
-                for (int i = 0; i < productArray.size(); i++) {
+                JSONArray productsJson = (JSONArray) data;
+                for (int i = 0; i < productsJson.size(); i++) {
                     ProductDto product = new ProductDto();
 
-                    JSONObject productObject = productArray.getJSONObject(i);
-                    JSONObject baseProduct = productObject.getJSONObject("product");
-                    JSONArray skus = productObject.getJSONArray("skus");
+                    JSONObject productJson = productsJson.getJSONObject(i);
+                    JSONObject baseProductJson = productJson.getJSONObject("product");
+                    JSONArray skusJson = productJson.getJSONArray("skus");
 
-                    product.setId(baseProduct.getLong("id"));
-                    product.setCover(baseProduct.getString("cover"));
-                    product.setTitle(baseProduct.getString("title"));
-                    product.setScheduler(ProductUtil.getScheduler(skus));
-                    product.setJoined(baseProduct.getInteger("sales"));
-                    product.setPrice(ProductUtil.getMiniPrice(skus));
+                    product.setId(baseProductJson.getLong("id"));
+                    product.setCover(baseProductJson.getString("cover"));
+                    product.setTitle(baseProductJson.getString("title"));
+                    product.setScheduler(ProductUtil.getScheduler(skusJson));
+                    product.setJoined(baseProductJson.getInteger("sales"));
+                    product.setPrice(ProductUtil.getMiniPrice(skusJson));
 
                     favorites.add(product);
                 }
