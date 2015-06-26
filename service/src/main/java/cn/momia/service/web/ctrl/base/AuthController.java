@@ -50,25 +50,45 @@ public class AuthController extends AbstractController {
         if (StringUtils.isBlank(mobile) || StringUtils.isBlank(code))
             return new ResponseMessage(ErrorCode.FAILED, "mobile or(and) verify code is empty");
 
-        if (!smsVerifier.verify(mobile, code)) return new ResponseMessage(ErrorCode.FAILED, "fail to verify code");
-
         User user = userService.getByMobile(mobile);
         String token = generateToken(mobile);
         if (!user.exists()) {
-            user = userService.add(mobile, token);
-            if (!user.exists()) {
-                LOGGER.error("fail to add user for {}", mobile);
-                return new ResponseMessage(ErrorCode.FAILED, "fail to login");
-            }
+                LOGGER.error("fail to login user for {}", mobile);
+                return new ResponseMessage(ErrorCode.FAILED, "fail to login, mobile does not exist, please register first.");
         } else {
             if (!userService.updateToken(user.getId(), token)) {
                 LOGGER.warn("fail to update token for {}, will use old token", mobile);
             } else {
                 user.setToken(token);
             }
+            if (!smsVerifier.verify(mobile, code)) return new ResponseMessage(ErrorCode.FAILED, "fail to verify code");
         }
 
         return new ResponseMessage(user);
+    }
+
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public ResponseMessage register(@RequestParam String nickName, @RequestParam String mobile, @RequestParam String code){
+        if (StringUtils.isBlank(mobile) || StringUtils.isBlank(code))
+            return new ResponseMessage(ErrorCode.FAILED, "mobile or(and) verify code is empty");
+
+        if (!smsVerifier.verify(mobile, code)) return new ResponseMessage(ErrorCode.FAILED, "fail to verify code");
+
+        User user = userService.getByMobile(mobile);
+       String token = generateToken(mobile);
+        if (!user.exists()) {
+            user = userService.add(nickName, mobile, token);
+            if (!user.exists()) {
+                LOGGER.error("fail to register user for {}", mobile);
+                return new ResponseMessage(ErrorCode.FAILED, "fail to register.");
+            }
+        } else {
+            LOGGER.error("fail to register user for {}", mobile);
+            return new ResponseMessage(ErrorCode.FAILED, "fail to register,user already exists.");
+              }
+
+            return new ResponseMessage(user);
+
     }
 
     private String generateToken(String mobile) {

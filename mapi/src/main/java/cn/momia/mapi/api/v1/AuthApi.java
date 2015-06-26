@@ -37,4 +37,17 @@ public class AuthApi extends AbstractApi {
             }
         });
     }
+
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public ResponseMessage register(@RequestParam String nickName, @RequestParam String mobile, @RequestParam String code) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("nickName", nickName)
+                .add("mobile", mobile)
+                .add("code", code);
+        MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("auth/register"), builder.build());
+
+        return executeRequest(request);
+
+    }
+
 }

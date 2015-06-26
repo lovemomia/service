@@ -18,4 +18,9 @@ public class AuthController extends AbstractController {
     public String login(HttpServletRequest request) {
         return forward(request, request.getRequestURI());
     }
+
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public String register(HttpServletRequest request) {
+        return forward(request, request.getRequestURI());
+    }
 }
