@@ -22,7 +22,7 @@
 
     <Service>
         <Base>http://localhost:8080</Base>
-        <Deal>https://localhost:8443</Deal>
+        <Deal>http://localhost:8080</Deal>
     </Service>
 
     <Home>

@@ -54,10 +54,11 @@ public class UserApi extends AbstractApi {
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
-    public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam int start, @RequestParam final int count) {
+    public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam String type, @RequestParam int start, @RequestParam final int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("status", status)
+                .add("type", type)
                 .add("start", start)
                 .add("count", count);
         MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user/order"), builder.build());

@@ -24,9 +24,22 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class OrderServiceImpl extends DbAccessService implements OrderService {
+    private static final Map<String, String> STATUS_QUERY_TYPE = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
+    static {
+        STATUS_QUERY_TYPE.put("lt", "<");
+        STATUS_QUERY_TYPE.put("le", "<=");
+        STATUS_QUERY_TYPE.put("eq", "=");
+        STATUS_QUERY_TYPE.put("ne", "<>");
+        STATUS_QUERY_TYPE.put("ge", ">=");
+        STATUS_QUERY_TYPE.put("gt", ">");
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @Override
@@ -106,7 +119,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
-    public List<Order> queryByProduct(long productId, int status, int start, int count) {
+    public List<Order> queryByProduct(long productId, int status, String type, int start, int count) {
         final List<Order> orders = new ArrayList<Order>();
 
         if (status == Order.Status.ALL) {
@@ -118,7 +131,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
                 }
             });
         } else {
-            String sql = "SELECT id, customerId, productId, skuId, price, contacts, mobile, participants, status, addTime FROM t_order WHERE productId=? AND status=? LIMIT ?,?";
+            String sql = "SELECT id, customerId, productId, skuId, price, contacts, mobile, participants, status, addTime FROM t_order WHERE productId=? AND status>0 AND status" + STATUS_QUERY_TYPE.get(type) + "? LIMIT ?,?";
             jdbcTemplate.query(sql, new Object[] { productId, status, start, count }, new RowCallbackHandler() {
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
@@ -131,7 +144,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
-    public List<Order> queryByUser(long userId, int status, int start, int count) {
+    public List<Order> queryByUser(long userId, int status, String type, int start, int count) {
         final List<Order> orders = new ArrayList<Order>();
 
         if (status == Order.Status.ALL) {
@@ -143,7 +156,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
                 }
             });
         } else {
-            String sql = "SELECT id, customerId, productId, skuId, price, contacts, mobile, participants, status, addTime FROM t_order WHERE customerId=? AND status=? LIMIT ?,?";
+            String sql = "SELECT id, customerId, productId, skuId, price, contacts, mobile, participants, status, addTime FROM t_order WHERE customerId=? AND status>0 AND status" + STATUS_QUERY_TYPE.get(type) + "? LIMIT ?,?";
             jdbcTemplate.query(sql, new Object[] { userId, status, start, count }, new RowCallbackHandler() {
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
