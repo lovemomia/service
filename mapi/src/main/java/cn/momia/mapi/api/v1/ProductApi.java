@@ -5,10 +5,10 @@ import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
-import cn.momia.mapi.api.v1.dto.Dto;
-import cn.momia.mapi.api.v1.dto.ProductDetailDto;
-import cn.momia.mapi.api.v1.dto.PlaceOrderDto;
-import cn.momia.mapi.api.v1.dto.SkuDto;
+import cn.momia.mapi.api.v1.dto.base.Dto;
+import cn.momia.mapi.api.v1.dto.base.SkuDto;
+import cn.momia.mapi.api.v1.dto.composite.ProductDetailDto;
+import cn.momia.mapi.api.v1.dto.composite.PlaceOrderDto;
 import cn.momia.mapi.img.ImageFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -196,8 +196,8 @@ public class ProductApi extends AbstractApi {
         return contacts;
     }
 
-    private SkuDto.Skus getSkus(JSONArray skusArray) {
-        SkuDto.Skus skus = new SkuDto.Skus();
+    private List<SkuDto> getSkus(JSONArray skusArray) {
+        List<SkuDto> skus = new ArrayList<SkuDto>();
 
         for (int i = 0; i < skusArray.size(); i++) {
             JSONObject skuObject = skusArray.getJSONObject(i);

@@ -1,7 +1,5 @@
 package cn.momia.mapi.api.v1.dto.base;
 
-import cn.momia.mapi.api.v1.dto.Dto;
-
 public class BannerDto implements Dto {
     private String cover;
     private String action;

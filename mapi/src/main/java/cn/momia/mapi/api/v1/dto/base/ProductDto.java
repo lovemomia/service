@@ -1,6 +1,5 @@
 package cn.momia.mapi.api.v1.dto.base;
 
-import cn.momia.mapi.api.v1.dto.Dto;
 import com.alibaba.fastjson.JSONArray;
 
 import java.util.List;

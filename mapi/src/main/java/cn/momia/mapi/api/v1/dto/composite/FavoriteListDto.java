@@ -1,5 +1,6 @@
-package cn.momia.mapi.api.v1.dto;
+package cn.momia.mapi.api.v1.dto.composite;
 
+import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.ProductDto;
 
 import java.util.ArrayList;

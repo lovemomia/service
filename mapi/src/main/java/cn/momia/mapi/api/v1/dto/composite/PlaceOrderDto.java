@@ -1,4 +1,9 @@
-package cn.momia.mapi.api.v1.dto;
+package cn.momia.mapi.api.v1.dto.composite;
+
+import cn.momia.mapi.api.v1.dto.base.Dto;
+import cn.momia.mapi.api.v1.dto.base.SkuDto;
+
+import java.util.List;
 
 public class PlaceOrderDto implements Dto {
     public static class Contacts implements Dto {
@@ -23,7 +28,7 @@ public class PlaceOrderDto implements Dto {
     }
 
     private Contacts contacts;
-    private SkuDto.Skus skus;
+    private List<SkuDto> skus;
 
     public Contacts getContacts() {
         return contacts;
@@ -33,11 +38,11 @@ public class PlaceOrderDto implements Dto {
         this.contacts = contacts;
     }
 
-    public SkuDto.Skus getSkus() {
+    public List<SkuDto> getSkus() {
         return skus;
     }
 
-    public void setSkus(SkuDto.Skus skus) {
+    public void setSkus(List<SkuDto> skus) {
         this.skus = skus;
     }
 }
