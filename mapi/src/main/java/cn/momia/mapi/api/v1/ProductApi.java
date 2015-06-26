@@ -62,7 +62,7 @@ public class ProductApi extends AbstractApi {
                 product.setCrowd(productJson.getString("crowd"));
                 product.setScheduler(ProductUtil.getScheduler(skusJson));
                 product.setAddress(placeJson.getString("address"));
-                product.setPoi(StringUtils.join(new Object[] { placeJson.getFloat("lng"), placeJson.getFloat("lat") }, ":"));
+                product.setPoi(StringUtils.join(new Object[] { placeJson.getDouble("lng"), placeJson.getDouble("lat") }, ":"));
                 product.setImgs(getImgs(productJson));
                 product.setCustomers(getCustomers(customersJson));
                 product.setContent(processImages(productJson.getJSONArray("content")));

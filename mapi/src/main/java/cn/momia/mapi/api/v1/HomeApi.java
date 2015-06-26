@@ -14,6 +14,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,6 +27,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/home")
 public class HomeApi extends AbstractApi {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HomeApi.class);
+
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage home(@RequestParam(value = "pageindex") final int pageIndex, @RequestParam(value = "city") int cityId) {
         List<MomiaHttpRequest> requests = buildHomeRequests(pageIndex, cityId);
@@ -36,9 +40,10 @@ public class HomeApi extends AbstractApi {
 
                 if (pageIndex == 0) homeDto.setBanners(extractBannerData((JSONArray) collector.getResponse("banners")));
 
-                List<ProductDto> products = extractProductsData((JSONArray) collector.getResponse("products"));
+                JSONArray productsJson = (JSONArray) collector.getResponse("products");
+                List<ProductDto> products = extractProductsData(productsJson);
                 homeDto.setProducts(products);
-                if (products.size() == conf.getInt("Home.PageSize")) homeDto.setNextpage(pageIndex + 1);
+                if (productsJson.size() == conf.getInt("Home.PageSize")) homeDto.setNextpage(pageIndex + 1);
 
                 return homeDto;
             }
@@ -86,27 +91,31 @@ public class HomeApi extends AbstractApi {
         return banners;
     }
 
-    private List<ProductDto> extractProductsData(JSONArray productArray) {
+    private List<ProductDto> extractProductsData(JSONArray productsJson) {
         List<ProductDto> products = new ArrayList<ProductDto>();
 
-        for (int i = 0; i < productArray.size(); i++) {
-            ProductDto product = new ProductDto();
+        for (int i = 0; i < productsJson.size(); i++) {
+            try {
+                ProductDto product = new ProductDto();
 
-            JSONObject productObject = productArray.getJSONObject(i);
-            JSONObject baseProduct = productObject.getJSONObject("product");
-            JSONObject place = productObject.getJSONObject("place");
-            JSONArray skus = productObject.getJSONArray("skus");
+                JSONObject productJson = productsJson.getJSONObject(i);
+                JSONObject baseProductJson = productJson.getJSONObject("product");
+                JSONObject placeJson = productJson.getJSONObject("place");
+                JSONArray skusJson = productJson.getJSONArray("skus");
 
-            product.setId(baseProduct.getLong("id"));
-            product.setCover(ImageFile.url(baseProduct.getString("cover")));
-            product.setTitle(baseProduct.getString("title"));
-            product.setAddress(place.getString("address"));
-            product.setPoi(StringUtils.join(new Object[] { place.getFloat("lng"), place.getFloat("lat") }, ":"));
-            product.setScheduler(ProductUtil.getScheduler(skus));
-            product.setJoined(baseProduct.getInteger("sales"));
-            product.setPrice(ProductUtil.getMiniPrice(skus));
+                product.setId(baseProductJson.getLong("id"));
+                product.setCover(ImageFile.url(baseProductJson.getString("cover")));
+                product.setTitle(baseProductJson.getString("title"));
+                product.setAddress(placeJson.getString("address"));
+                product.setPoi(StringUtils.join(new Object[] { placeJson.getDouble("lng"), placeJson.getDouble("lat") }, ":"));
+                product.setScheduler(ProductUtil.getScheduler(skusJson));
+                product.setJoined(baseProductJson.getInteger("sales"));
+                product.setPrice(ProductUtil.getMiniPrice(skusJson));
 
-            products.add(product);
+                products.add(product);
+            } catch (Exception e) {
+                LOGGER.error("fail to parse product: ", productsJson.getJSONObject(i), e);
+            }
         }
 
         return products;

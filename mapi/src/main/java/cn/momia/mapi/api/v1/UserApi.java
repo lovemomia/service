@@ -11,6 +11,8 @@ import cn.momia.mapi.api.v1.dto.base.UserDto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,6 +23,8 @@ import java.util.Date;
 @RestController
 @RequestMapping("/v1/user")
 public class UserApi extends AbstractApi {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserApi.class);
+
     @RequestMapping(value = "/view", method = RequestMethod.GET)
     public ResponseMessage viewUser(@RequestParam long id) {
         MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user", id));
@@ -70,18 +74,22 @@ public class UserApi extends AbstractApi {
 
                 JSONArray ordersPackJson = (JSONArray) data;
                 for (int i = 0; i < ordersPackJson.size(); i++) {
-                    JSONObject orderPackJson = ordersPackJson.getJSONObject(i);
-                    JSONObject orderJson = orderPackJson.getJSONObject("order");
-                    JSONObject productJson = orderPackJson.getJSONObject("product");
-                    JSONObject skuJson = orderPackJson.getJSONObject("sku");
+                    try {
+                        JSONObject orderPackJson = ordersPackJson.getJSONObject(i);
+                        JSONObject orderJson = orderPackJson.getJSONObject("order");
+                        JSONObject productJson = orderPackJson.getJSONObject("product");
+                        JSONObject skuJson = orderPackJson.getJSONObject("sku");
 
-                    if (productJson == null || skuJson == null) continue;
+                        if (productJson == null || skuJson == null) continue;
 
-                    OrderDto orderDto = new OrderDto(orderJson);
-                    orderDto.setTitle(productJson.getString("title"));
-                    orderDto.setTime(ProductUtil.getSkuTime(skuJson.getJSONArray("properties")));
+                        OrderDto orderDto = new OrderDto(orderJson);
+                        orderDto.setTitle(productJson.getString("title"));
+                        orderDto.setTime(ProductUtil.getSkuTime(skuJson.getJSONArray("properties")));
 
-                    orders.add(orderDto);
+                        orders.add(orderDto);
+                    } catch (Exception e) {
+                        LOGGER.error("fail to parse order: {}", ordersPackJson.getJSONObject(i), e);
+                    }
                 }
 
                 return orders;

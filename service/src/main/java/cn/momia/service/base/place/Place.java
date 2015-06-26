@@ -13,8 +13,8 @@ public class Place implements Serializable {
     private String name;
     private String address;
     private String desc;
-    private float lng;
-    private float lat;
+    private double lng;
+    private double lat;
     private List<PlaceImage> imgs;
 
     public long getId() {
@@ -49,19 +49,19 @@ public class Place implements Serializable {
         this.desc = desc;
     }
 
-    public float getLng() {
+    public double getLng() {
         return lng;
     }
 
-    public void setLng(float lng) {
+    public void setLng(double lng) {
         this.lng = lng;
     }
 
-    public float getLat() {
+    public double getLat() {
         return lat;
     }
 
-    public void setLat(float lat) {
+    public void setLat(double lat) {
         this.lat = lat;
     }
 
