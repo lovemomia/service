@@ -139,13 +139,6 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         return update(id, sql, new Object[] { token, id });
     }
 
-    @Override
-    public boolean updateAvatar(long id, String avatar) {
-        String sql = "UPDATE t_user SET avatar=? WHERE id=?";
-
-        return update(id, sql, new Object[] { avatar, id });
-    }
-
     private boolean update(long id, String sql, Object[] args) {
         User user = get(id);
         if (!user.exists()) return false;
@@ -154,6 +147,20 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         if (affectedRowCount != 1) return false;
 
         return true;
+    }
+
+    @Override
+    public boolean updateNickName(long id, String nickName) {
+        String sql = "UPDATE t_user SET nickName=? WHERE id=?";
+
+        return update(id, sql, new Object[] { nickName, id });
+    }
+
+    @Override
+    public boolean updateAvatar(long id, String avatar) {
+        String sql = "UPDATE t_user SET avatar=? WHERE id=?";
+
+        return update(id, sql, new Object[] { avatar, id });
     }
 
     @Override

@@ -99,6 +99,17 @@ public class UserController extends AbstractController {
         return jsonArray;
     }
 
+    @RequestMapping(value = "/nickname", method = RequestMethod.PUT)
+    public ResponseMessage updateNickName(@RequestParam String utoken, @RequestParam(value = "nickname") String nickName) {
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
+
+        boolean successful = userService.updateNickName(user.getId(), nickName);
+
+        if (!successful) return new ResponseMessage(ErrorCode.FAILED, "fail to update user nick name");
+        return ResponseMessage.SUCCESS;
+    }
+
     @RequestMapping(value = "/avatar", method = RequestMethod.PUT)
     public ResponseMessage updateAvatar(@RequestParam String utoken, @RequestParam String avatar) {
         User user = userService.getByToken(utoken);
