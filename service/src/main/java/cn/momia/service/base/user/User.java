@@ -2,6 +2,7 @@ package cn.momia.service.base.user;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 public class User implements Serializable {
     public static final User NOT_EXIST_USER = new User();
@@ -26,6 +27,7 @@ public class User implements Serializable {
     private Date birthday;
     private int cityId;
     private String address;
+    private List<Long> children;
 
     public long getId() {
         return id;
@@ -105,6 +107,14 @@ public class User implements Serializable {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public List<Long> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<Long> children) {
+        this.children = children;
     }
 
     @Override
