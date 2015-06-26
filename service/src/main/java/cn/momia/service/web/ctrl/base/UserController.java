@@ -59,13 +59,13 @@ public class UserController extends AbstractController {
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
-    public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam int start, @RequestParam int count) {
+    public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam String type, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return new ResponseMessage(ErrorCode.FAILED, "invalid limit params");
 
         User user = userService.getByToken(utoken);
         if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
 
-        List<Order> orders = orderService.queryByUser(user.getId(), status, start, count);
+        List<Order> orders = orderService.queryByUser(user.getId(), status, type, start, count);
         List<Long> productIds = new ArrayList<Long>();
         List<Long> skuIds = new ArrayList<Long>();
         for (Order order : orders) {
