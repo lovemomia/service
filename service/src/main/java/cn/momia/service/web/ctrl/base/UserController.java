@@ -13,7 +13,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -75,8 +74,10 @@ public class UserController extends AbstractController {
         for (Order order : orders) {
             JSONObject orderJson = new JSONObject();
             orderJson.put("order", order);
-            orderJson.put("product", productMap.get(order.getProductId()));
-            orderJson.put("sku", skuMap.get(order.getSkuId()));
+            Product product = productMap.get(order.getProductId());
+            if (product != null) orderJson.put("product", product.getTitle());
+            Sku sku = skuMap.get(order.getSkuId());
+            if (sku != null) orderJson.put("sku", sku.getProperties());
 
             ordersJson.add(orderJson);
         }

@@ -53,7 +53,10 @@
         <property name="skuService" ref="skuService" />
     </bean>
 
-    <bean id="userService" class="cn.momia.service.base.user.impl.UserServiceImpl" parent="dbAccessService" />
+    <bean id="cityService" class="cn.momia.service.base.city.impl.CityServiceImpl" parent="dbAccessService" init-method="init" />
+    <bean id="userService" class="cn.momia.service.base.user.impl.UserServiceImpl" parent="dbAccessService">
+        <property name="cityService" ref="cityService" />
+    </bean>
     <bean id="participantService" class="cn.momia.service.base.user.participant.impl.ParticipantServiceImpl" parent="dbAccessService" />
 
     <bean id="orderService" class="cn.momia.service.deal.order.impl.OrderServiceImpl" parent="dbAccessService" />

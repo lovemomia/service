@@ -1,5 +1,6 @@
 package cn.momia.service.base.user.impl;
 
+import cn.momia.service.base.city.CityService;
 import cn.momia.service.common.DbAccessService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
@@ -22,6 +23,12 @@ import java.util.List;
 import java.util.Map;
 
 public class UserServiceImpl extends DbAccessService implements UserService {
+    private CityService cityService;
+
+    public void setCityService(CityService cityService) {
+        this.cityService = cityService;
+    }
+
     @Override
     public User add(String nickName, String mobile, String token) {
         if (!validateMobile(mobile)) return User.DUPLICATE_USER;
@@ -83,7 +90,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         user.setName(rs.getString("name"));
         user.setSex(rs.getString("sex"));
         user.setBirthday(rs.getDate("birthday"));
-        user.setCityId(rs.getInt("cityId"));
+        user.setCity(cityService.get(rs.getInt("cityId")).getName());
         user.setAddress(rs.getString("address"));
 
         return user;
