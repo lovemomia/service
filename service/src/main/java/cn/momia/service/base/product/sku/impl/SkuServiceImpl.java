@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class SkuServiceImpl extends DbAccessService implements SkuService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SkuServiceImpl.class);
-    private static final String[] SKU_FIELDS = {"id", "productId", "propertyValues", "price", "stock", "unlockedStock", "lockedStock"};
+    private static final String[] SKU_FIELDS = {"id", "productId", "properties", "prices", "stock", "unlockedStock", "lockedStock"};
 
     @Override
     public List<Sku> queryByProduct(long productId) {
@@ -31,7 +31,8 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
         jdbcTemplate.query(sql, new Object[]{productId}, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
-                skus.add(buildSku(rs));
+                Sku sku = buildSku(rs);
+                if (sku.exists()) skus.add(sku);
             }
         });
 
@@ -93,6 +94,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 Sku sku = buildSku(rs);
+                if (!sku.exists()) return;
                 List<Sku> skus = skusOfProducts.get(sku.getProductId());
                 if (skus == null) {
                     skus = new ArrayList<Sku>();

@@ -66,7 +66,8 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
-                baseProducts.add(buildBaseProduct(rs));
+                BaseProduct baseProduct = buildBaseProduct(rs);
+                if (baseProduct.exists()) baseProducts.add(baseProduct);
             }
         });
 
@@ -81,7 +82,8 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
         jdbcTemplate.query(sql, new Object[]{start, count}, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
-                baseProducts.add(buildBaseProduct(rs));
+                BaseProduct baseProduct = buildBaseProduct(rs);
+                if (baseProduct.exists()) baseProducts.add(baseProduct);
             }
         });
 

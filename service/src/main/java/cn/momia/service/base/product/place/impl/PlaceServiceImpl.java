@@ -66,7 +66,7 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 Place place = buildPlace(rs);
-                places.put(place.getId(), place);
+                if (place.exists()) places.put(place.getId(), place);
             }
         });
 

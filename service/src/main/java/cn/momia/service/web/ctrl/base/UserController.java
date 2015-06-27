@@ -33,14 +33,6 @@ public class UserController extends AbstractController {
     @Autowired private OrderService orderService;
     @Autowired private ProductService productService;
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseMessage getUser(@PathVariable long id) {
-        User user = userService.get(id);
-
-        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
-        return new ResponseMessage(user);
-    }
-
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getUser(@RequestParam String utoken) {
         User user = userService.getByToken(utoken);
