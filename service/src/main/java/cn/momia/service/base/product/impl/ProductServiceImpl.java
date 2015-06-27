@@ -5,76 +5,71 @@ import cn.momia.service.base.product.Product;
 import cn.momia.service.base.product.ProductImage;
 import cn.momia.service.base.product.ProductQuery;
 import cn.momia.service.base.product.ProductService;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
+import cn.momia.service.base.product.base.BaseProduct;
+import cn.momia.service.base.product.base.BaseProductService;
+import cn.momia.service.base.product.place.Place;
+import cn.momia.service.base.product.place.PlaceService;
+import cn.momia.service.base.product.sku.Sku;
+import cn.momia.service.base.product.sku.SkuService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ProductServiceImpl extends DbAccessService implements ProductService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductServiceImpl.class);
 
+    private BaseProductService baseProductService;
+    private PlaceService placeService;
+    private SkuService skuService;
+
+    public void setBaseProductService(BaseProductService baseProductService) {
+        this.baseProductService = baseProductService;
+    }
+
+    public void setPlaceService(PlaceService placeService) {
+        this.placeService = placeService;
+    }
+
+    public void setSkuService(SkuService skuService) {
+        this.skuService = skuService;
+    }
+
     @Override
     public Product get(long id) {
-        Product product = getProduct(id);
-        if (product.exists()) product.setImgs(getProductImgs(id));
+        BaseProduct baseProduct = baseProductService.get(id);
+        if (!baseProduct.exists()) return Product.NOT_EXIST_PRODUCT;
 
-        return product;
-    }
-
-    public Product getProduct(long id){
-        String sql = "SELECT id, cityId, categoryId, title, cover, crowd, content, sales FROM t_product WHERE id=? AND status=1";
-
-        return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Product>() {
-            @Override
-            public Product extractData(ResultSet rs) throws SQLException, DataAccessException {
-                if (rs.next()) return buildProduct(rs);
-                return Product.NOT_EXIST_PRODUCT;
-            }
-        });
-    }
-
-    public Product buildProduct(ResultSet rs) throws SQLException {
         Product product = new Product();
-        product.setId(rs.getLong("id"));
-        product.setCityId(rs.getInt("cityId"));
-        product.setCategoryId(rs.getInt("categoryId"));
-        product.setTitle(rs.getString("title"));
-        product.setCover(rs.getString("cover"));
-        product.setCrowd(rs.getString("crowd"));
-        product.setContent(parseContent(product.getId(), rs.getString("content")));
-        product.setSales(rs.getInt("sales"));
+        product.setBaseProduct(baseProduct);
+        product.setImgs(getProductImgs(baseProduct.getId()));
+        product.setPlace(placeService.get(baseProduct.getPlaceId()));
+        product.setSkus(skuService.queryByProduct(baseProduct.getId()));
 
         return product;
     }
 
-    private JSONArray parseContent(long id, String content) throws SQLException {
-        try {
-            return JSON.parseArray(content);
-        } catch (Exception e) {
-            LOGGER.error("fail to parse product content, product id: {}", id);
-            return new JSONArray();
-        }
-    }
-
-    public List<ProductImage> getProductImgs(long id){
+    public List<ProductImage> getProductImgs(long productId) {
         final List<ProductImage> imgs = new ArrayList<ProductImage>();
 
-        String sql = "SELECT url, width, height FROM t_product_img WHERE productId=? AND status=1";
-        jdbcTemplate.query(sql, new Object[] { id }, new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                imgs.add(buildImage(rs));
-            }
-        });
+        try {
+            String sql = "SELECT url, width, height FROM t_product_img WHERE productId=? AND status=1";
+            jdbcTemplate.query(sql, new Object[]{productId}, new RowCallbackHandler() {
+                @Override
+                public void processRow(ResultSet rs) throws SQLException {
+                    imgs.add(buildImage(rs));
+                }
+            });
+        } catch (Exception e) {
+            LOGGER.error("fail to get images of product: {}", productId, e);
+        }
 
         return imgs;
     }
@@ -90,32 +85,87 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
 
     @Override
     public List<Product> get(List<Long> ids) {
-        final List<Product> products = new ArrayList<Product>();
-        if (ids.size() <= 0) return products;
+        List<BaseProduct> baseProducts = baseProductService.get(ids);
 
-        String sql = "SELECT id, cityId, categoryId, title, cover, crowd, content, sales FROM t_product WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1 ORDER BY addTime DESC";
-        jdbcTemplate.query(sql, new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                products.add(buildProduct(rs));
-            }
-        });
+        return buildProducts(baseProducts);
+    }
+
+    private List<Product> buildProducts(List<BaseProduct> baseProducts) {
+        List<Product> products = new ArrayList<Product>();
+
+        if (baseProducts.isEmpty()) return products;
+
+        List<Long> productIds = new ArrayList<Long>();
+        List<Long> placeIds = new ArrayList<Long>();
+        for (BaseProduct baseProduct : baseProducts) {
+            if (!baseProduct.exists()) continue;
+            productIds.add(baseProduct.getId());
+            placeIds.add(baseProduct.getPlaceId());
+        }
+
+        Map<Long, List<ProductImage>> imgsOfProducts = getProductsImgs(productIds);
+        Map<Long, Place> placeOfProducts = placeService.get(placeIds);
+        Map<Long, List<Sku>> skusOfProducts = skuService.queryByProducts(productIds);
+
+        for (BaseProduct baseProduct : baseProducts) {
+            if (!baseProduct.exists()) continue;
+            Product product = new Product();
+            product.setBaseProduct(baseProduct);
+            product.setImgs(imgsOfProducts.get(baseProduct.getId()));
+            product.setPlace(placeOfProducts.get(baseProduct.getPlaceId()));
+            product.setSkus(skusOfProducts.get(baseProduct.getId()));
+
+            products.add(product);
+        }
 
         return products;
     }
 
+    private Map<Long, List<ProductImage>> getProductsImgs(List<Long> productIds) {
+        final Map<Long, List<ProductImage>> imgsOfProducts = new HashMap<Long, List<ProductImage>>();
+        if (productIds.isEmpty()) return imgsOfProducts;
+
+        try {
+            String sql = "SELECT productId, url, width, height FROM t_product_img WHERE productId IN (" + StringUtils.join(productIds, ",") + ") AND status=1";
+            jdbcTemplate.query(sql, new RowCallbackHandler() {
+                @Override
+                public void processRow(ResultSet rs) throws SQLException {
+                    long productId = rs.getLong("productId");
+                    ProductImage img = buildImage(rs);
+                    List<ProductImage> imgs = imgsOfProducts.get(productId);
+                    if (imgs == null) {
+                        imgs = new ArrayList<ProductImage>();
+                        imgsOfProducts.put(productId, imgs);
+                    }
+                    imgs.add(img);
+                }
+            });
+        } catch (Exception e) {
+            LOGGER.error("fail to get imgs of products: {}", productIds, e);
+        }
+
+        return imgsOfProducts;
+    }
+
     @Override
     public List<Product> query(int start, int count, ProductQuery query) {
-        final List<Product> products = new ArrayList<Product>();
+        List<BaseProduct> baseProducts = baseProductService.query(start, count, query.toString());
 
-        String sql = "SELECT id, cityId, categoryId, title, cover, crowd, content, sales FROM t_product WHERE status=1 AND " + query.toString() + " ORDER BY addTime DESC LIMIT ?,?";
-        jdbcTemplate.query(sql, new Object[] { start, count }, new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                products.add(buildProduct(rs));
-            }
-        });
+        return buildProducts(baseProducts);
+    }
 
-        return products;
+    @Override
+    public List<Sku> getSkus(long id) {
+        return skuService.queryByProduct(id);
+    }
+
+    @Override
+    public boolean lockStock(long skuId, int count) {
+        return skuService.lock(skuId, count);
+    }
+
+    @Override
+    public boolean unlockStock(long skuId, int count) {
+        return skuService.unlock(skuId, count);
     }
 }

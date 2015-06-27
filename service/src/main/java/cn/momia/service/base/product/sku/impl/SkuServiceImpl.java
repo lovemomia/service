@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class SkuServiceImpl extends DbAccessService implements SkuService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SkuServiceImpl.class);
-    private static final String[] SKU_FIELDS = { "id", "productId", "propertyValues", "price", "stock", "unlockedStock", "lockedStock" };
+    private static final String[] SKU_FIELDS = {"id", "productId", "propertyValues", "price", "stock", "unlockedStock", "lockedStock"};
 
     @Override
     public List<Sku> get(List<Long> ids) {
@@ -45,16 +45,22 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
     }
 
     private Sku buildSku(ResultSet rs) throws SQLException {
-        Sku sku = new Sku();
-        sku.setId(rs.getLong("id"));
-        sku.setProductId(rs.getLong("productId"));
-        sku.setProperties(parseProperties(sku.getId(), rs.getString("properties")));
-        sku.setPrices(parsePrices(sku.getId(), rs.getString("prices")));
-        sku.setStock(rs.getInt("stock"));
-        sku.setUnlockedStock(rs.getInt("unlockedStock"));
-        sku.setLockedStock(rs.getInt("lockedStock"));
+        try {
+            Sku sku = new Sku();
+            sku.setId(rs.getLong("id"));
+            sku.setProductId(rs.getLong("productId"));
+            sku.setProperties(parseProperties(sku.getId(), rs.getString("properties")));
+            sku.setPrices(parsePrices(sku.getId(), rs.getString("prices")));
+            sku.setStock(rs.getInt("stock"));
+            sku.setUnlockedStock(rs.getInt("unlockedStock"));
+            sku.setLockedStock(rs.getInt("lockedStock"));
 
-        return sku;
+            return sku;
+        }
+        catch (Exception e) {
+            LOGGER.error("fail to build sku", e);
+            return Sku.INVALID_SKU;
+        }
     }
 
     private List<SkuProperty> parseProperties(long id, String propertiesJsonStr) {
@@ -66,7 +72,8 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
                 JSONObject propertyJson = propertiesJson.getJSONObject(i);
                 properties.add(new SkuProperty(propertyJson));
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             LOGGER.error("fail to parse sku properties, sku id: {}", id);
         }
 
@@ -82,7 +89,8 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
                 JSONObject priceJson = pricesJson.getJSONObject(i);
                 prices.add(new SkuPrice(priceJson));
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             LOGGER.error("fail to parse sku prices, sku id: {}", id);
         }
 
@@ -94,7 +102,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
         final List<Sku> skus = new ArrayList<Sku>();
 
         String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId=? AND status=1";
-        jdbcTemplate.query(sql, new Object[] { productId }, new RowCallbackHandler() {
+        jdbcTemplate.query(sql, new Object[]{productId}, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 skus.add(buildSku(rs));
@@ -129,7 +137,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
     @Override
     public boolean lock(long id, int count) {
         String sql = "UPDATE t_sku SET unlockedStock=unlockedStock-?, lockedStock=lockedStock+? WHERE id=? AND unlockedStock>=? AND status=1";
-        int updateCount = jdbcTemplate.update(sql, new Object[] { count, count, id, count });
+        int updateCount = jdbcTemplate.update(sql, new Object[]{count, count, id, count});
 
         return updateCount == 1;
     }
@@ -137,7 +145,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
     @Override
     public boolean unlock(long id, int count) {
         String sql = "UPDATE t_sku SET unlockedStock=unlockedStock+?, lockedStock=lockedStock-? WHERE id=? AND lockedStock>=? AND status=1";
-        int updateCount = jdbcTemplate.update(sql, new Object[] { count, count, id, count });
+        int updateCount = jdbcTemplate.update(sql, new Object[]{count, count, id, count});
 
         return updateCount == 1;
     }
