@@ -1,6 +1,6 @@
 package cn.momia.service.base.product.base.impl;
 
-import cn.momia.service.base.DbAccessService;
+import cn.momia.service.common.DbAccessService;
 import cn.momia.service.base.product.base.BaseProduct;
 import cn.momia.service.base.product.base.BaseProductService;
 import com.alibaba.fastjson.JSON;

@@ -1,6 +1,6 @@
 package cn.momia.service.base.user.impl;
 
-import cn.momia.service.base.DbAccessService;
+import cn.momia.service.common.DbAccessService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;

@@ -1,6 +1,6 @@
 package cn.momia.service.base.product.sku.impl;
 
-import cn.momia.service.base.DbAccessService;
+import cn.momia.service.common.DbAccessService;
 import cn.momia.service.base.product.sku.Sku;
 import cn.momia.service.base.product.sku.SkuPrice;
 import cn.momia.service.base.product.sku.SkuProperty;

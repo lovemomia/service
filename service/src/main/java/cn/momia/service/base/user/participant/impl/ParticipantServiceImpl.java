@@ -1,6 +1,6 @@
 package cn.momia.service.base.user.participant.impl;
 
-import cn.momia.service.base.DbAccessService;
+import cn.momia.service.common.DbAccessService;
 import cn.momia.service.base.user.participant.Participant;
 import cn.momia.service.base.user.participant.ParticipantService;
 import org.apache.commons.lang3.StringUtils;

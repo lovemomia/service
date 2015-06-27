@@ -1,6 +1,6 @@
 package cn.momia.service.base.product.place.impl;
 
-import cn.momia.service.base.DbAccessService;
+import cn.momia.service.common.DbAccessService;
 import cn.momia.service.base.product.place.Place;
 import cn.momia.service.base.product.place.PlaceService;
 import org.apache.commons.lang3.StringUtils;

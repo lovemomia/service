@@ -2,7 +2,7 @@ package cn.momia.service.web.ctrl.base;
 
 import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.service.base.customer.Customer;
+import cn.momia.service.base.product.customer.Customer;
 import cn.momia.service.base.product.Product;
 import cn.momia.service.base.product.ProductQuery;
 import cn.momia.service.base.product.ProductService;

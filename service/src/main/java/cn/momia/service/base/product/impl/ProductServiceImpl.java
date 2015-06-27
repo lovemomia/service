@@ -1,6 +1,6 @@
 package cn.momia.service.base.product.impl;
 
-import cn.momia.service.base.DbAccessService;
+import cn.momia.service.common.DbAccessService;
 import cn.momia.service.base.product.Product;
 import cn.momia.service.base.product.ProductImage;
 import cn.momia.service.base.product.ProductQuery;
