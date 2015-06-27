@@ -16,6 +16,11 @@ public class Product implements Serializable {
     private Place place;
     private List<Sku> skus;
 
+    public long getId() {
+        if (baseProduct == null || !baseProduct.exists()) return 0;
+        return baseProduct.getId();
+    }
+
     public BaseProduct getBaseProduct() {
         return baseProduct;
     }
@@ -48,7 +53,22 @@ public class Product implements Serializable {
         this.skus = skus;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Product)) return false;
+
+        Product product = (Product) o;
+
+        return getId() == product.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (getId() ^ (getId() >>> 32));
+    }
+
     public boolean exists() {
-        return this != NOT_EXIST_PRODUCT && this != INVALID_PRODUCT;
+        return !this.equals(NOT_EXIST_PRODUCT);
     }
 }

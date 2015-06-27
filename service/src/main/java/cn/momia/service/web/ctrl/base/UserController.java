@@ -30,17 +30,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/user")
 public class UserController extends AbstractController {
-    @Autowired
-    private OrderService orderService;
+    @Autowired private UserService userService;
 
-    @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private SkuService skuService;
-
-    @Autowired
-    private UserService userService;
+    @Autowired private OrderService orderService;
+    @Autowired private ProductService productService;
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseMessage getUser(@PathVariable long id) {
@@ -67,36 +60,38 @@ public class UserController extends AbstractController {
 
         List<Order> orders = orderService.queryByUser(user.getId(), status, type, start, count);
         List<Long> productIds = new ArrayList<Long>();
-        List<Long> skuIds = new ArrayList<Long>();
         for (Order order : orders) {
             productIds.add(order.getProductId());
-            skuIds.add(order.getSkuId());
         }
 
         List<Product> products = productService.get(productIds);
-        List<Sku> skus = skuService.get(skuIds);
 
-        return new ResponseMessage(buildUserOrders(orders, products, skus));
+        return new ResponseMessage(buildUserOrders(orders, products));
     }
 
-    private JSONArray buildUserOrders(List<Order> orders, List<Product> products, List<Sku> skus) {
+    private JSONArray buildUserOrders(List<Order> orders, List<Product> products) {
         Map<Long, Product> productMap = new HashMap<Long, Product>();
-        for (Product product : products) productMap.put(product.getId(), product);
-
         Map<Long, Sku> skuMap = new HashMap<Long, Sku>();
-        for (Sku sku : skus) skuMap.put(sku.getId(), sku);
-
-        JSONArray jsonArray = new JSONArray();
-        for (Order order : orders) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("order", order);
-            jsonObject.put("product", productMap.get(order.getProductId()));
-            jsonObject.put("sku", skuMap.get(order.getSkuId()));
-
-            jsonArray.add(jsonObject);
+        for (Product product : products) {
+            if (product.exists()) {
+                productMap.put(product.getId(), product);
+                for (Sku sku : product.getSkus()) {
+                    if (sku.exists()) skuMap.put(sku.getId(), sku);
+                }
+            }
         }
 
-        return jsonArray;
+        JSONArray ordersJson = new JSONArray();
+        for (Order order : orders) {
+            JSONObject orderJson = new JSONObject();
+            orderJson.put("order", order);
+            orderJson.put("product", productMap.get(order.getProductId()));
+            orderJson.put("sku", skuMap.get(order.getSkuId()));
+
+            ordersJson.add(orderJson);
+        }
+
+        return ordersJson;
     }
 
     @RequestMapping(value = "/nickname", method = RequestMethod.PUT)
