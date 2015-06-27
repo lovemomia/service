@@ -23,14 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController extends AbstractController {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
 
-    @Autowired
-    private OrderService orderService;
-
-    @Autowired
-    private SkuService skuService;
-
-    @Autowired
-    private UserService userService;
+    @Autowired private OrderService orderService;
+    @Autowired private SkuService skuService;
+    @Autowired private UserService userService;
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage placeOrder(@RequestBody Order order) {
