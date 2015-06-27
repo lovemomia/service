@@ -33,7 +33,7 @@ public class AuthApi extends AbstractApi {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                return new UserDto.Own((JSONObject) data);
+                return new UserDto((JSONObject) data);
             }
         });
     }
@@ -49,7 +49,7 @@ public class AuthApi extends AbstractApi {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                return new UserDto.Own((JSONObject) data);
+                return new UserDto((JSONObject) data);
             }
         });
     }
