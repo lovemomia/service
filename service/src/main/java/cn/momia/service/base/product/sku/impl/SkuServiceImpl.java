@@ -27,18 +27,13 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
     @Override
     public List<Sku> queryByProduct(long productId) {
         final List<Sku> skus = new ArrayList<Sku>();
-
-        try {
-            String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId=? AND status=1";
-            jdbcTemplate.query(sql, new Object[]{productId}, new RowCallbackHandler() {
-                @Override
-                public void processRow(ResultSet rs) throws SQLException {
-                    skus.add(buildSku(rs));
-                }
-            });
-        } catch (Exception e) {
-            LOGGER.error("fail to query skud of product: {}", productId, e);
-        }
+        String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId=? AND status=1";
+        jdbcTemplate.query(sql, new Object[]{productId}, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                skus.add(buildSku(rs));
+            }
+        });
 
         return skus;
     }
@@ -61,23 +56,17 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
             return sku;
         }
         catch (Exception e) {
-            LOGGER.error("fail to build sku", e);
+            LOGGER.error("fail to build sku: {}", rs.getLong("id"), e);
             return Sku.INVALID_SKU;
         }
     }
 
     private List<SkuProperty> parseProperties(long id, String propertiesJsonStr) {
         List<SkuProperty> properties = new ArrayList<SkuProperty>();
-
-        try {
-            JSONArray propertiesJson = JSON.parseArray(propertiesJsonStr);
-            for (int i = 0; i < propertiesJson.size(); i++) {
-                JSONObject propertyJson = propertiesJson.getJSONObject(i);
-                properties.add(new SkuProperty(propertyJson));
-            }
-        }
-        catch (Exception e) {
-            LOGGER.error("fail to parse sku properties, sku id: {}", id);
+        JSONArray propertiesJson = JSON.parseArray(propertiesJsonStr);
+        for (int i = 0; i < propertiesJson.size(); i++) {
+            JSONObject propertyJson = propertiesJson.getJSONObject(i);
+            properties.add(new SkuProperty(propertyJson));
         }
 
         return properties;
@@ -85,16 +74,10 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
 
     private List<SkuPrice> parsePrices(long id, String pricesJsonStr) {
         List<SkuPrice> prices = new ArrayList<SkuPrice>();
-
-        try {
-            JSONArray pricesJson = JSON.parseArray(pricesJsonStr);
-            for (int i = 0; i < pricesJson.size(); i++) {
-                JSONObject priceJson = pricesJson.getJSONObject(i);
-                prices.add(new SkuPrice(priceJson));
-            }
-        }
-        catch (Exception e) {
-            LOGGER.error("fail to parse sku prices, sku id: {}", id);
+        JSONArray pricesJson = JSON.parseArray(pricesJsonStr);
+        for (int i = 0; i < pricesJson.size(); i++) {
+            JSONObject priceJson = pricesJson.getJSONObject(i);
+            prices.add(new SkuPrice(priceJson));
         }
 
         return prices;
@@ -105,23 +88,19 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
         final Map<Long, List<Sku>> skusOfProducts = new HashMap<Long, List<Sku>>();
         if (productIds.isEmpty()) return skusOfProducts;
 
-        try {
-            String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId IN (" + StringUtils.join(productIds, ",") + ") AND status=1";
-            jdbcTemplate.query(sql, new RowCallbackHandler() {
-                @Override
-                public void processRow(ResultSet rs) throws SQLException {
-                    Sku sku = buildSku(rs);
-                    List<Sku> skus = skusOfProducts.get(sku.getProductId());
-                    if (skus == null) {
-                        skus = new ArrayList<Sku>();
-                        skusOfProducts.put(sku.getProductId(), skus);
-                    }
-                    skus.add(sku);
+        String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId IN (" + StringUtils.join(productIds, ",") + ") AND status=1";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                Sku sku = buildSku(rs);
+                List<Sku> skus = skusOfProducts.get(sku.getProductId());
+                if (skus == null) {
+                    skus = new ArrayList<Sku>();
+                    skusOfProducts.put(sku.getProductId(), skus);
                 }
-            });
-        } catch (Exception e) {
-            LOGGER.error("fail to query skus of products: {}", productIds, e);
-        }
+                skus.add(sku);
+            }
+        });
 
         return skusOfProducts;
     }

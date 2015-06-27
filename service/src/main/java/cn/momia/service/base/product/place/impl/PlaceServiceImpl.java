@@ -22,20 +22,15 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
 
     @Override
     public Place get(long id) {
-        try {
-            String sql = "SELECT " + joinFields() + " FROM t_place WHERE id=? AND status=1";
+        String sql = "SELECT " + joinFields() + " FROM t_place WHERE id=? AND status=1";
 
-            return jdbcTemplate.query(sql, new Object[]{id}, new ResultSetExtractor<Place>() {
-                @Override
-                public Place extractData(ResultSet rs) throws SQLException, DataAccessException {
-                    if (rs.next()) return buildPlace(rs);
-                    return Place.NOT_EXIST_PLACE;
-                }
-            });
-        } catch (Exception e) {
-            LOGGER.error("fail to get place: {}", id, e);
-            return Place.INVALID_PLACE;
-        }
+        return jdbcTemplate.query(sql, new Object[]{id}, new ResultSetExtractor<Place>() {
+            @Override
+            public Place extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (rs.next()) return buildPlace(rs);
+                return Place.NOT_EXIST_PLACE;
+            }
+        });
     }
 
     private String joinFields() {
@@ -56,7 +51,7 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
             return place;
         }
         catch (Exception e) {
-            LOGGER.error("fail to build place", e);
+            LOGGER.error("fail to build place: {}", rs.getLong("id"), e);
             return Place.INVALID_PLACE;
         }
     }
@@ -66,18 +61,14 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
         final Map<Long, Place> places = new HashMap<Long, Place>();
         if (ids.isEmpty()) return places;
 
-        try {
-            String sql = "SELECT " + joinFields() + " FROM t_place WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
-            jdbcTemplate.query(sql, new RowCallbackHandler() {
-                @Override
-                public void processRow(ResultSet rs) throws SQLException {
-                    Place place = buildPlace(rs);
-                    places.put(place.getId(), place);
-                }
-            });
-        } catch (Exception e) {
-            LOGGER.error("fail to get places: {}", ids, e);
-        }
+        String sql = "SELECT " + joinFields() + " FROM t_place WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                Place place = buildPlace(rs);
+                places.put(place.getId(), place);
+            }
+        });
 
         return places;
     }
