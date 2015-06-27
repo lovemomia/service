@@ -34,7 +34,7 @@ public class OrderController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage placeOrder(@RequestBody Order order) {
-        if (!lockSku(order)) return new ResponseMessage(ErrorCode.FAILED, "low stocks");
+        if (!lockSku(order)) return ResponseMessage.FAILED("low stocks");
 
         long orderId = 0;
         try {
@@ -50,7 +50,7 @@ public class OrderController extends AbstractController {
         // TODO 需要告警
         if (orderId <= 0 && !unlockSku(order)) LOGGER.error("fail to unlock sku, skuId: {}, count: {}", new Object[] { order.getSkuId(), order.getCount() });
 
-        return new ResponseMessage(ErrorCode.FAILED, "fail to place order");
+        return ResponseMessage.FAILED("fail to place order");
     }
 
     private boolean lockSku(Order order) {
@@ -64,12 +64,12 @@ public class OrderController extends AbstractController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseMessage deleteOrder(@PathVariable long id, @RequestParam String utoken) {
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
+        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
         Order order = orderService.get(id);
-        if (!order.exists()) return new ResponseMessage(ErrorCode.FAILED, "order not exists");
+        if (!order.exists()) return ResponseMessage.FAILED("order not exists");
 
-        if (!orderService.delete(id, user.getId())) return new ResponseMessage(ErrorCode.FAILED, "fail to delete order");
+        if (!orderService.delete(id, user.getId())) return ResponseMessage.FAILED("fail to delete order");
 
         // TODO 需要告警
         if (!unlockSku(order)) LOGGER.error("fail to unlock sku, skuId: {}, count: {}", new Object[] { order.getSkuId(), order.getCount() });

@@ -14,8 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/banner")
 public class BannerController {
-    @Autowired
-    private BannerService bannerService;
+    @Autowired private BannerService bannerService;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getBanners(@RequestParam(value = "city") int cityId, @RequestParam int count) {

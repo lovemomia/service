@@ -1,6 +1,5 @@
 package cn.momia.service.web.ctrl.base;
 
-import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.base.product.customer.Customer;
 import cn.momia.service.base.product.Product;
@@ -29,19 +28,15 @@ import java.util.Map;
 @RestController
 @RequestMapping("/product")
 public class ProductController extends AbstractController {
-    @Autowired
-    private ProductService productService;
+    @Autowired private ProductService productService;
 
-    @Autowired
-    private OrderService orderService;
-    @Autowired
-    private ParticipantService participantService;
-    @Autowired
-    private UserService userService;
+    @Autowired private OrderService orderService;
+    @Autowired private UserService userService;
+    @Autowired private ParticipantService participantService;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getProducts(@RequestParam(value = "city") int cityId, @RequestParam int start, @RequestParam int count, @RequestParam(required = false) String query) {
-        if (isInvalidLimit(start, count)) return new ResponseMessage(ErrorCode.FAILED, "invalid limit params");
+        if (isInvalidLimit(start, count)) return ResponseMessage.FAILED("invalid limit params");
 
         List<Product> products = productService.query(start, count, new ProductQuery(cityId, query));
 
@@ -51,7 +46,7 @@ public class ProductController extends AbstractController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseMessage getProduct(@PathVariable long id) {
         Product product = productService.get(id);
-        if (!product.exists()) return new ResponseMessage(ErrorCode.FAILED, "product not exists");
+        if (!product.exists()) return ResponseMessage.FAILED("product not exists");
 
         return new ResponseMessage(product);
     }
@@ -65,7 +60,7 @@ public class ProductController extends AbstractController {
 
     @RequestMapping(value = "/{id}/customer", method = RequestMethod.GET)
     public ResponseMessage getProductCustomersInfo(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return new ResponseMessage(ErrorCode.FAILED, "invalid limit params");
+        if (isInvalidLimit(start, count)) return ResponseMessage.FAILED("invalid limit params");
 
         List<Order> orders = orderService.queryDistinctCustomerOrderByProduct(id, start, count);
         List<Customer> customers = new ArrayList<Customer>();

@@ -1,11 +1,9 @@
 package cn.momia.service.web.ctrl.base;
 
-import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.base.product.Product;
 import cn.momia.service.base.product.ProductService;
 import cn.momia.service.base.product.sku.Sku;
-import cn.momia.service.base.product.sku.SkuService;
 import cn.momia.service.base.user.User;
 import cn.momia.service.base.user.UserService;
 import cn.momia.service.deal.order.Order;
@@ -39,7 +37,7 @@ public class UserController extends AbstractController {
     public ResponseMessage getUser(@PathVariable long id) {
         User user = userService.get(id);
 
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
+        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
         return new ResponseMessage(user);
     }
 
@@ -47,16 +45,16 @@ public class UserController extends AbstractController {
     public ResponseMessage getUser(@RequestParam String utoken) {
         User user = userService.getByToken(utoken);
 
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
+        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
         return new ResponseMessage(user);
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
     public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam String type, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return new ResponseMessage(ErrorCode.FAILED, "invalid limit params");
+        if (isInvalidLimit(start, count)) return ResponseMessage.FAILED("invalid limit params");
 
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
+        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
         List<Order> orders = orderService.queryByUser(user.getId(), status, type, start, count);
         List<Long> productIds = new ArrayList<Long>();
@@ -97,77 +95,77 @@ public class UserController extends AbstractController {
     @RequestMapping(value = "/nickname", method = RequestMethod.PUT)
     public ResponseMessage updateNickName(@RequestParam String utoken, @RequestParam(value = "nickname") String nickName) {
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
+        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
         boolean successful = userService.updateNickName(user.getId(), nickName);
 
-        if (!successful) return new ResponseMessage(ErrorCode.FAILED, "fail to update user nick name");
+        if (!successful) return ResponseMessage.FAILED("fail to update user nick name");
         return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/avatar", method = RequestMethod.PUT)
     public ResponseMessage updateAvatar(@RequestParam String utoken, @RequestParam String avatar) {
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
+        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
         boolean successful = userService.updateAvatar(user.getId(), avatar);
 
-        if (!successful) return new ResponseMessage(ErrorCode.FAILED, "fail to update user avatar");
+        if (!successful) return ResponseMessage.FAILED("fail to update user avatar");
         return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/name", method = RequestMethod.PUT)
     public ResponseMessage updateName(@RequestParam String utoken, @RequestParam String name) {
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
+        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
         boolean successful = userService.updateName(user.getId(), name);
 
-        if (!successful) return new ResponseMessage(ErrorCode.FAILED, "fail to update user name");
+        if (!successful) return ResponseMessage.FAILED("fail to update user name");
         return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/sex", method = RequestMethod.PUT)
     public ResponseMessage updateSex(@RequestParam String utoken, @RequestParam String sex) {
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
+        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
         boolean successful = userService.updateSex(user.getId(), sex);
 
-        if (!successful) return new ResponseMessage(ErrorCode.FAILED, "fail to update user sex");
+        if (!successful) return ResponseMessage.FAILED("fail to update user sex");
         return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/birthday", method = RequestMethod.PUT)
     public ResponseMessage updateDesc(@RequestParam String utoken, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date birthday) {
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
+        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
         boolean successful = userService.updateBirthday(user.getId(), birthday);
 
-        if (!successful) return new ResponseMessage(ErrorCode.FAILED, "fail to update user birthday");
+        if (!successful) return ResponseMessage.FAILED("fail to update user birthday");
         return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/city", method = RequestMethod.PUT)
     public ResponseMessage updateDesc(@RequestParam String utoken, @RequestParam int city) {
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
+        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
         boolean successful = userService.updateCityId(user.getId(), city);
 
-        if (!successful) return new ResponseMessage(ErrorCode.FAILED, "fail to update user city");
+        if (!successful) return ResponseMessage.FAILED("fail to update user city");
         return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/address", method = RequestMethod.PUT)
     public ResponseMessage updateAddress(@RequestParam String utoken, @RequestParam String address) {
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
+        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
         boolean successful = userService.updateAddress(user.getId(), address);
 
-        if (!successful) return new ResponseMessage(ErrorCode.FAILED, "fail to update user address");
+        if (!successful) return ResponseMessage.FAILED("fail to update user address");
         return ResponseMessage.SUCCESS;
     }
 }

@@ -43,11 +43,11 @@ public class PaymentController extends AbstractController {
     public ResponseMessage prepayWechatpay(HttpServletRequest request) {
         String utoken = request.getParameter("utoken");
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
+        if (!user.exists()) ResponseMessage.FAILED("user not exists");
 
         Product product = getProduct(request);
         Order order = getOrder(request);
-        if (!product.exists() || !order.exists()) return new ResponseMessage(ErrorCode.FAILED, "product or(and) order does not exist");
+        if (!product.exists() || !order.exists()) return ResponseMessage.FAILED("product or(and) order does not exist");
 
         PrepayParam prepayParam = PrepayParamFactory.create(request.getParameterMap(), product, order, Payment.Type.WECHATPAY);
         PaymentGateway gateway = PaymentGatewayFactory.create(Payment.Type.WECHATPAY);
@@ -67,7 +67,7 @@ public class PaymentController extends AbstractController {
     @RequestMapping(value = "/check", method = RequestMethod.GET)
     public ResponseMessage checkPayment(@RequestParam String utoken, @RequestParam(value = "pid") long productId, @RequestParam(value = "sid") long skuId) {
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
+        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
         long userId = user.getId();
         if (!orderService.check(userId, productId, skuId)) return new ResponseMessage("FAIL");
