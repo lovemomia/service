@@ -23,25 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserApi extends AbstractApi {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserApi.class);
 
-    @RequestMapping(value = "/view", method = RequestMethod.GET)
-    public ResponseMessage viewUser(@RequestParam long id) {
-        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user", id));
-
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return new UserDto.Other((JSONObject) data);
-            }
-        });
-    }
-
-    @RequestMapping(value = "/view/order", method = RequestMethod.GET)
-    public ResponseMessage viewOrders(@RequestParam long id) {
-        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user", id, "order"));
-
-        return executeRequest(request);
-    }
-
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getUser(@RequestParam String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
@@ -75,14 +56,10 @@ public class UserApi extends AbstractApi {
                     try {
                         JSONObject orderPackJson = ordersPackJson.getJSONObject(i);
                         JSONObject orderJson = orderPackJson.getJSONObject("order");
-                        JSONObject productJson = orderPackJson.getJSONObject("product");
-                        JSONObject skuJson = orderPackJson.getJSONObject("sku");
-
-                        if (productJson == null || skuJson == null) continue;
 
                         OrderDto orderDto = new OrderDto(orderJson);
-                        orderDto.setTitle(productJson.getString("title"));
-                        orderDto.setTime(ProductUtil.getSkuScheduler(skuJson.getJSONArray("properties")));
+                        orderDto.setTitle(orderPackJson.getString("product"));
+                        orderDto.setTime(ProductUtil.getSkuScheduler(orderPackJson.getJSONArray("sku")));
 
                         orders.add(orderDto);
                     } catch (Exception e) {
