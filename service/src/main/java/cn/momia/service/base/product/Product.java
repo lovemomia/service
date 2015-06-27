@@ -3,13 +3,13 @@ package cn.momia.service.base.product;
 import cn.momia.service.base.product.base.BaseProduct;
 import cn.momia.service.base.product.place.Place;
 import cn.momia.service.base.product.sku.Sku;
+import com.alibaba.fastjson.JSONArray;
 
 import java.io.Serializable;
 import java.util.List;
 
 public class Product implements Serializable {
     public static final Product NOT_EXIST_PRODUCT = new Product();
-    public static final Product INVALID_PRODUCT = new Product();
 
     private BaseProduct baseProduct;
     private List<ProductImage> imgs;
@@ -21,8 +21,28 @@ public class Product implements Serializable {
         return baseProduct.getId();
     }
 
-    public BaseProduct getBaseProduct() {
-        return baseProduct;
+    public int getCityId() {
+        return baseProduct.getCityId();
+    }
+
+    public String getTitle() {
+        return baseProduct.getTitle();
+    }
+
+    public String getCover() {
+        return baseProduct.getCover();
+    }
+
+    public String getCrowd() {
+        return baseProduct.getCrowd();
+    }
+
+    public JSONArray getContent() {
+        return baseProduct.getContent();
+    }
+
+    public int getSales() {
+        return baseProduct.getSales();
     }
 
     public void setBaseProduct(BaseProduct baseProduct) {
