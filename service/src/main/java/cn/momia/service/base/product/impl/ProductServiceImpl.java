@@ -14,6 +14,7 @@ import cn.momia.service.base.product.sku.SkuService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;
@@ -26,21 +27,9 @@ import java.util.Map;
 public class ProductServiceImpl extends DbAccessService implements ProductService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductServiceImpl.class);
 
-    private BaseProductService baseProductService;
-    private PlaceService placeService;
-    private SkuService skuService;
-
-    public void setBaseProductService(BaseProductService baseProductService) {
-        this.baseProductService = baseProductService;
-    }
-
-    public void setPlaceService(PlaceService placeService) {
-        this.placeService = placeService;
-    }
-
-    public void setSkuService(SkuService skuService) {
-        this.skuService = skuService;
-    }
+    @Autowired private BaseProductService baseProductService;
+    @Autowired private PlaceService placeService;
+    @Autowired private SkuService skuService;
 
     @Override
     public Product get(long id) {
