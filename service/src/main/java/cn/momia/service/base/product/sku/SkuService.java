@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 public interface SkuService {
-    List<Sku> get(List<Long> ids);
     List<Sku> queryByProduct(long productId);
     Map<Long, List<Sku>> queryByProducts(List<Long> productIds);
     boolean lock(long id, int count);

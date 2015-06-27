@@ -25,20 +25,19 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
     private static final String[] SKU_FIELDS = {"id", "productId", "propertyValues", "price", "stock", "unlockedStock", "lockedStock"};
 
     @Override
-    public List<Sku> get(List<Long> ids) {
+    public List<Sku> queryByProduct(long productId) {
         final List<Sku> skus = new ArrayList<Sku>();
-        if (ids.isEmpty()) return skus;
 
         try {
-            String sql = "SELECT " + joinFields() + " FROM t_sku WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
-            jdbcTemplate.query(sql, new RowCallbackHandler() {
+            String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId=? AND status=1";
+            jdbcTemplate.query(sql, new Object[]{productId}, new RowCallbackHandler() {
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
                     skus.add(buildSku(rs));
                 }
             });
         } catch (Exception e) {
-            LOGGER.error("fail to get skus: {}", ids, e);
+            LOGGER.error("fail to query skud of product: {}", productId, e);
         }
 
         return skus;
@@ -99,25 +98,6 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
         }
 
         return prices;
-    }
-
-    @Override
-    public List<Sku> queryByProduct(long productId) {
-        final List<Sku> skus = new ArrayList<Sku>();
-
-        try {
-            String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId=? AND status=1";
-            jdbcTemplate.query(sql, new Object[]{productId}, new RowCallbackHandler() {
-                @Override
-                public void processRow(ResultSet rs) throws SQLException {
-                    skus.add(buildSku(rs));
-                }
-            });
-        } catch (Exception e) {
-            LOGGER.error("fail to query skud of product: {}", productId, e);
-        }
-
-        return skus;
     }
 
     @Override
