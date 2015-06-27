@@ -50,7 +50,7 @@
     <bean id="paymentService" class="cn.momia.service.deal.payment.impl.PaymentServiceImpl" parent="dbAccessService" />
     <bean id="placeService" class="cn.momia.service.base.place.impl.PlaceServiceImpl" parent="dbAccessService" />
     <bean id="productService" class="cn.momia.service.base.product.impl.ProductServiceImpl" parent="dbAccessService" />
-    <bean id="skuService" class="cn.momia.service.base.product.sku.impl.SkuServiceImpl" parent="dbAccessService" init-method="init" />
+    <bean id="skuService" class="cn.momia.service.base.product.sku.impl.SkuServiceImpl" parent="dbAccessService" />
     <bean id="userService" class="cn.momia.service.base.user.impl.UserServiceImpl" parent="dbAccessService" />
 
     <bean id="smsSender" class="cn.momia.service.sms.impl.LuosimiaoSmsSender" parent="dbAccessService" />
