@@ -23,15 +23,20 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
 
     @Override
     public BaseProduct get(long id) {
-        String sql = "SELECT " + joinFields() + " FROM t_product WHERE id=? AND status=1";
+        try {
+            String sql = "SELECT " + joinFields() + " FROM t_product WHERE id=? AND status=1";
 
-        return jdbcTemplate.query(sql, new Object[]{id}, new ResultSetExtractor<BaseProduct>() {
-            @Override
-            public BaseProduct extractData(ResultSet rs) throws SQLException, DataAccessException {
-                if (rs.next()) return buildBaseProduct(rs);
-                return BaseProduct.NOT_EXIST_BASEPRODUCT;
-            }
-        });
+            return jdbcTemplate.query(sql, new Object[]{id}, new ResultSetExtractor<BaseProduct>() {
+                @Override
+                public BaseProduct extractData(ResultSet rs) throws SQLException, DataAccessException {
+                    if (rs.next()) return buildBaseProduct(rs);
+                    return BaseProduct.NOT_EXIST_BASEPRODUCT;
+                }
+            });
+        } catch (Exception e) {
+            LOGGER.error("fail to get base product: {}", id, e);
+            return BaseProduct.INVALID_BASEPRODUCT;
+        }
     }
 
     private String joinFields() {
@@ -73,13 +78,17 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
         final List<BaseProduct> baseProducts = new ArrayList<BaseProduct>();
         if (ids.isEmpty()) return baseProducts;
 
-        String sql = "SELECT " + joinFields() + " FROM t_product WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1 ORDER BY addTime DESC";
-        jdbcTemplate.query(sql, new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                baseProducts.add(buildBaseProduct(rs));
-            }
-        });
+        try {
+            String sql = "SELECT " + joinFields() + " FROM t_product WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1 ORDER BY addTime DESC";
+            jdbcTemplate.query(sql, new RowCallbackHandler() {
+                @Override
+                public void processRow(ResultSet rs) throws SQLException {
+                    baseProducts.add(buildBaseProduct(rs));
+                }
+            });
+        } catch (Exception e) {
+            LOGGER.error("fail to get base products: {}", ids, e);
+        }
 
         return baseProducts;
     }
@@ -87,13 +96,18 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     @Override
     public List<BaseProduct> query(int start, int count, String query) {
         final List<BaseProduct> baseProducts = new ArrayList<BaseProduct>();
-        String sql = "SELECT " + joinFields() + " FROM t_product WHERE status=1 AND " + query + " ORDER BY addTime DESC LIMIT ?,?";
-        jdbcTemplate.query(sql, new Object[]{start, count}, new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                baseProducts.add(buildBaseProduct(rs));
-            }
-        });
+
+        try {
+            String sql = "SELECT " + joinFields() + " FROM t_product WHERE status=1 AND " + query + " ORDER BY addTime DESC LIMIT ?,?";
+            jdbcTemplate.query(sql, new Object[]{start, count}, new RowCallbackHandler() {
+                @Override
+                public void processRow(ResultSet rs) throws SQLException {
+                    baseProducts.add(buildBaseProduct(rs));
+                }
+            });
+        } catch (Exception e) {
+            LOGGER.error("fail to query base products: {}", query, e);
+        }
 
         return baseProducts;
     }

@@ -29,13 +29,17 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
         final List<Sku> skus = new ArrayList<Sku>();
         if (ids.isEmpty()) return skus;
 
-        String sql = "SELECT " + joinFields() + " FROM t_sku WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
-        jdbcTemplate.query(sql, new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                skus.add(buildSku(rs));
-            }
-        });
+        try {
+            String sql = "SELECT " + joinFields() + " FROM t_sku WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
+            jdbcTemplate.query(sql, new RowCallbackHandler() {
+                @Override
+                public void processRow(ResultSet rs) throws SQLException {
+                    skus.add(buildSku(rs));
+                }
+            });
+        } catch (Exception e) {
+            LOGGER.error("fail to get skus: {}", ids, e);
+        }
 
         return skus;
     }
@@ -101,13 +105,17 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
     public List<Sku> queryByProduct(long productId) {
         final List<Sku> skus = new ArrayList<Sku>();
 
-        String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId=? AND status=1";
-        jdbcTemplate.query(sql, new Object[]{productId}, new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                skus.add(buildSku(rs));
-            }
-        });
+        try {
+            String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId=? AND status=1";
+            jdbcTemplate.query(sql, new Object[]{productId}, new RowCallbackHandler() {
+                @Override
+                public void processRow(ResultSet rs) throws SQLException {
+                    skus.add(buildSku(rs));
+                }
+            });
+        } catch (Exception e) {
+            LOGGER.error("fail to query skud of product: {}", productId, e);
+        }
 
         return skus;
     }
@@ -117,19 +125,23 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
         final Map<Long, List<Sku>> skusOfProducts = new HashMap<Long, List<Sku>>();
         if (productIds.isEmpty()) return skusOfProducts;
 
-        String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId IN (" + StringUtils.join(productIds, ",") + ") AND status=1";
-        jdbcTemplate.query(sql, new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                Sku sku = buildSku(rs);
-                List<Sku> skus = skusOfProducts.get(sku.getProductId());
-                if (skus == null) {
-                    skus = new ArrayList<Sku>();
-                    skusOfProducts.put(sku.getProductId(), skus);
+        try {
+            String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId IN (" + StringUtils.join(productIds, ",") + ") AND status=1";
+            jdbcTemplate.query(sql, new RowCallbackHandler() {
+                @Override
+                public void processRow(ResultSet rs) throws SQLException {
+                    Sku sku = buildSku(rs);
+                    List<Sku> skus = skusOfProducts.get(sku.getProductId());
+                    if (skus == null) {
+                        skus = new ArrayList<Sku>();
+                        skusOfProducts.put(sku.getProductId(), skus);
+                    }
+                    skus.add(sku);
                 }
-                skus.add(sku);
-            }
-        });
+            });
+        } catch (Exception e) {
+            LOGGER.error("fail to query skus of products: {}", productIds, e);
+        }
 
         return skusOfProducts;
     }
