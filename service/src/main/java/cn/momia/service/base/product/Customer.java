@@ -1,4 +1,4 @@
-package cn.momia.service.base.product.customer;
+package cn.momia.service.base.product;
 
 import cn.momia.service.base.user.participant.Participant;
 
