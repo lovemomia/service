@@ -64,7 +64,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     public User get(long id) {
         String sql = "SELECT id, token, nickName, mobile, avatar, name, sex, birthday, cityId, address FROM t_user WHERE id=? AND status=1";
 
-        return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<User>() {
+        return jdbcTemplate.query(sql, new Object[]{id}, new ResultSetExtractor<User>() {
             @Override
             public User extractData(ResultSet rs) throws SQLException, DataAccessException {
                 if (rs.next()) return buildUser(rs);
@@ -78,7 +78,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         user.setId(rs.getLong("id"));
         user.setToken(rs.getString("token"));
         user.setNickName(rs.getString("nickName"));
-        user.setMobile(rs.getString("mobile"));
+        user.setMobile(encryptMobile(rs.getString("mobile")));
         user.setAvatar(rs.getString("avatar"));
         user.setName(rs.getString("name"));
         user.setSex(rs.getString("sex"));
@@ -87,6 +87,10 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         user.setAddress(rs.getString("address"));
 
         return user;
+    }
+
+    private String encryptMobile(String mobile) {
+        return mobile.substring(0, 3) + "****" + mobile.substring(7);
     }
 
     @Override

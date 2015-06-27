@@ -7,7 +7,7 @@ import java.util.List;
 public class User implements Serializable {
     public static final User NOT_EXIST_USER = new User();
     public static final User DUPLICATE_USER = new User() {
-        public boolean isDuplicated() {
+        public boolean duplicated() {
             return true;
         }
     };
@@ -136,7 +136,7 @@ public class User implements Serializable {
         return !this.equals(NOT_EXIST_USER);
     }
 
-    public boolean isDuplicated() {
+    public boolean duplicated() {
         return false;
     }
 }
