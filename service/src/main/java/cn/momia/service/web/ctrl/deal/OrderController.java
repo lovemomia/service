@@ -1,8 +1,7 @@
 package cn.momia.service.web.ctrl.deal;
 
-import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.service.base.product.sku.SkuService;
+import cn.momia.service.base.product.ProductService;
 import cn.momia.service.base.user.User;
 import cn.momia.service.base.user.UserService;
 import cn.momia.service.deal.order.Order;
@@ -24,7 +23,7 @@ public class OrderController extends AbstractController {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
 
     @Autowired private OrderService orderService;
-    @Autowired private SkuService skuService;
+    @Autowired private ProductService productService;
     @Autowired private UserService userService;
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
@@ -49,11 +48,11 @@ public class OrderController extends AbstractController {
     }
 
     private boolean lockSku(Order order) {
-        return skuService.lock(order.getSkuId(), order.getCount());
+        return productService.lockStock(order.getSkuId(), order.getCount());
     }
 
     private boolean unlockSku(Order order) {
-        return skuService.unlock(order.getSkuId(), order.getCount());
+        return productService.unlockStock(order.getSkuId(), order.getCount());
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)

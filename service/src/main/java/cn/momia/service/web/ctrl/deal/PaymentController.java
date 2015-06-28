@@ -29,9 +29,9 @@ import javax.servlet.http.HttpServletRequest;
 public class PaymentController extends AbstractController {
     private static final Logger LOGGER = LoggerFactory.getLogger(PaymentController.class);
 
+    @Autowired private UserService userService;
     @Autowired private ProductService productService;
     @Autowired private OrderService orderService;
-    @Autowired private UserService userService;
 
     @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)
     public ResponseMessage prepayWechatpay(HttpServletRequest request) {
