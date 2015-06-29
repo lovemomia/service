@@ -8,6 +8,11 @@ import javax.servlet.http.HttpServletRequest;
 
 @Controller
 public class MApiController extends AbstractController {
+    @RequestMapping(value = "/m/**", method = { RequestMethod.GET, RequestMethod.POST })
+    public String processMRequest(HttpServletRequest request) {
+        return forward(request, request.getRequestURI().substring(2));
+    }
+
     @RequestMapping(value = "/**", method = { RequestMethod.GET, RequestMethod.POST })
     public String processRequest(HttpServletRequest request) {
         return forward(request);

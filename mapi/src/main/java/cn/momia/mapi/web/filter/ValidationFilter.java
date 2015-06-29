@@ -21,20 +21,45 @@ public class ValidationFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-      /*  if (isParamMissing(httpRequest))
-        {
-            forwardErrorPage(request, response, 400);
-            return;
-        }
-
-        if (isInvalidProtocol(httpRequest) || isInvalidUri(httpRequest) || isExpired(httpRequest) || isInvalidSign(httpRequest))
-        {
+        if (isInvalidProtocol(httpRequest)) {
             forwardErrorPage(request, response, 403);
             return;
         }
-        */
+
+        if (!isMWeb(httpRequest)) {
+            if (isParamMissing(httpRequest))
+            {
+                forwardErrorPage(request, response, 400);
+                return;
+            }
+
+            if (isInvalidUri(httpRequest) || isExpired(httpRequest) || isInvalidSign(httpRequest))
+            {
+                forwardErrorPage(request, response, 403);
+                return;
+            }
+        }
 
         chain.doFilter(request, response);
+    }
+
+    private boolean isInvalidProtocol(HttpServletRequest request) {
+        String schema = request.getScheme();
+        String uri = request.getRequestURI();
+
+        if (!(uri.startsWith("/callback") ||
+                uri.startsWith("/order") ||
+                uri.startsWith("/m/order") ||
+                uri.startsWith("/payment") ||
+                uri.startsWith("/m/payment"))) return false;
+        if (!schema.equals("https")) return true;
+        return false;
+    }
+
+    private boolean isMWeb(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+
+        return uri.startsWith("/m/");
     }
 
     private boolean isParamMissing(HttpServletRequest httpRequest) {
@@ -57,15 +82,6 @@ public class ValidationFilter implements Filter {
                 StringUtils.isBlank(net) ||
                 StringUtils.isBlank(expired) ||
                 StringUtils.isBlank(sign));
-    }
-
-    private boolean isInvalidProtocol(HttpServletRequest request) {
-        String schema = request.getScheme();
-        String uri = request.getRequestURI();
-
-        if (!(uri.startsWith("/callback") || uri.startsWith("/order") || uri.startsWith("/payment"))) return false;
-        if (!schema.equals("https")) return true;
-        return false;
     }
 
     private boolean isInvalidUri(HttpServletRequest request) {
