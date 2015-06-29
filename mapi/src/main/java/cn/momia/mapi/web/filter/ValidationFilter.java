@@ -27,7 +27,7 @@ public class ValidationFilter implements Filter {
             return;
         }
 
-        if (isInvalidProtocol(httpRequest) || isExpired(httpRequest) || isInvalidSign(httpRequest))
+        if (isInvalidProtocol(httpRequest) || isInvalidUri(httpRequest) || isExpired(httpRequest) || isInvalidSign(httpRequest))
         {
             forwardErrorPage(request, response, 403);
             return;
@@ -65,6 +65,13 @@ public class ValidationFilter implements Filter {
 
         if (!(uri.startsWith("/callback") || uri.startsWith("/order") || uri.startsWith("/payment"))) return false;
         if (!schema.equals("https")) return true;
+        return false;
+    }
+
+    private boolean isInvalidUri(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+
+        if (uri.startsWith("/v")) return true;
         return false;
     }
 
