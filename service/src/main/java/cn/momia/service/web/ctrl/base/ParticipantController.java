@@ -1,6 +1,5 @@
 package cn.momia.service.web.ctrl.base;
 
-import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.base.user.User;
 import cn.momia.service.base.user.UserService;
@@ -19,16 +18,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/participant")
 public class ParticipantController {
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private ParticipantService participantService;
+    @Autowired private ParticipantService participantService;
+    @Autowired private UserService userService;
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage addParticipant(@RequestBody Participant participant) {
         long participantId = participantService.add(participant);
-        if(participantId <= 0) new ResponseMessage(ErrorCode.FAILED, "fail to add participant");
+        if(participantId <= 0) return ResponseMessage.FAILED("fail to add participant");
 
         participant.setId(participantId);
         return new ResponseMessage(participant);
@@ -37,10 +33,10 @@ public class ParticipantController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseMessage getParticipant(@PathVariable long id, @RequestParam String utoken){
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
+        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
         Participant participant = participantService.get(id);
-        if (!participant.exists() || participant.getUserId() != user.getId()) return new ResponseMessage(ErrorCode.FAILED, "participant not exists");
+        if (!participant.exists() || participant.getUserId() != user.getId()) return ResponseMessage.FAILED("participant not exists");
 
         return new ResponseMessage(participant);
     }
@@ -49,17 +45,17 @@ public class ParticipantController {
     public ResponseMessage updateParticipantName(@RequestBody Participant participant) {
         boolean successful = participantService.update(participant);
 
-        if (!successful) return new ResponseMessage(ErrorCode.FAILED, "fail to update participant name");
+        if (!successful) return ResponseMessage.FAILED("fail to update participant");
         return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseMessage deleteParticipant(@PathVariable long id, @RequestParam String utoken){
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
+        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
         boolean successful = participantService.delete(id, user.getId());
-        if (!successful) return new ResponseMessage(ErrorCode.FAILED, "fail to delete participant");
+        if (!successful) return ResponseMessage.FAILED("fail to delete participant");
 
         return ResponseMessage.SUCCESS;
     }
@@ -67,7 +63,7 @@ public class ParticipantController {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getParticipantsOfUser(@RequestParam String utoken){
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
+        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
         List<Participant> participants = participantService.getByUser(user.getId());
 

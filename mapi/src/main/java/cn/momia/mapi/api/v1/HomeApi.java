@@ -99,17 +99,16 @@ public class HomeApi extends AbstractApi {
                 ProductDto product = new ProductDto();
 
                 JSONObject productJson = productsJson.getJSONObject(i);
-                JSONObject baseProductJson = productJson.getJSONObject("product");
                 JSONObject placeJson = productJson.getJSONObject("place");
                 JSONArray skusJson = productJson.getJSONArray("skus");
 
-                product.setId(baseProductJson.getLong("id"));
-                product.setCover(ImageFile.url(baseProductJson.getString("cover")));
-                product.setTitle(baseProductJson.getString("title"));
+                product.setId(productJson.getLong("id"));
+                product.setCover(ImageFile.url(productJson.getString("cover")));
+                product.setTitle(productJson.getString("title"));
                 product.setAddress(placeJson.getString("address"));
                 product.setPoi(StringUtils.join(new Object[] { placeJson.getDouble("lng"), placeJson.getDouble("lat") }, ":"));
                 product.setScheduler(ProductUtil.getScheduler(skusJson));
-                product.setJoined(baseProductJson.getInteger("sales"));
+                product.setJoined(productJson.getInteger("sales"));
                 product.setPrice(ProductUtil.getMiniPrice(skusJson));
 
                 products.add(product);

@@ -1,6 +1,6 @@
 package cn.momia.service.sms.impl;
 
-import cn.momia.service.base.DbAccessService;
+import cn.momia.service.common.DbAccessService;
 import cn.momia.service.sms.SmsSender;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;

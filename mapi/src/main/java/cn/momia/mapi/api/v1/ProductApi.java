@@ -29,7 +29,7 @@ import java.util.List;
 @RequestMapping("/v1/product")
 public class ProductApi extends AbstractApi {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public ResponseMessage getProducts(@RequestParam(value = "city") int cityId, @RequestParam int start, @RequestParam int count, @RequestParam String query) {
+    public ResponseMessage getProducts(@RequestParam(value = "city") int cityId, @RequestParam int start, @RequestParam int count, @RequestParam(required = false) String query) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
                 .add("start", start)
@@ -50,8 +50,8 @@ public class ProductApi extends AbstractApi {
                 ProductDetailDto product = new ProductDetailDto();
 
                 JSONObject productJson = (JSONObject) collector.getResponse("product");
-                JSONObject placeJson = (JSONObject) collector.getResponse("place");
-                JSONArray skusJson = (JSONArray) collector.getResponse("skus");
+                JSONObject placeJson = productJson.getJSONObject("place");
+                JSONArray skusJson = productJson.getJSONArray("skus");
                 JSONArray customersJson = (JSONArray) collector.getResponse("customers");
 
                 product.setId(productJson.getLong("id"));
@@ -62,7 +62,7 @@ public class ProductApi extends AbstractApi {
                 product.setCrowd(productJson.getString("crowd"));
                 product.setScheduler(ProductUtil.getScheduler(skusJson));
                 product.setAddress(placeJson.getString("address"));
-                product.setPoi(StringUtils.join(new Object[] { placeJson.getDouble("lng"), placeJson.getDouble("lat") }, ":"));
+                product.setPoi(StringUtils.join(new Object[]{placeJson.getDouble("lng"), placeJson.getDouble("lat")}, ":"));
                 product.setImgs(getImgs(productJson));
                 product.setCustomers(getCustomers(customersJson));
                 product.setContent(processImages(productJson.getJSONArray("content")));
@@ -74,24 +74,14 @@ public class ProductApi extends AbstractApi {
 
     private List<MomiaHttpRequest> buildProductRequests(long productId) {
         List<MomiaHttpRequest> requests = new ArrayList<MomiaHttpRequest>();
-        requests.add(buildProductInfoRequest(productId));
-        requests.add(buildProductPlaceRequest(productId));
-        requests.add(buildProductSkusRequest(productId));
+        requests.add(buildProductRequest(productId));
         requests.add(buildProductCustomersRequest(productId));
 
         return requests;
     }
 
-    private MomiaHttpRequest buildProductInfoRequest(long productId) {
+    private MomiaHttpRequest buildProductRequest(long productId) {
         return MomiaHttpRequest.GET("product", true, baseServiceUrl("product", productId));
-    }
-
-    private MomiaHttpRequest buildProductPlaceRequest(long productId) {
-        return MomiaHttpRequest.GET("place", true, baseServiceUrl("product", productId, "place"));
-    }
-
-    private MomiaHttpRequest buildProductSkusRequest(long productId) {
-        return MomiaHttpRequest.GET("skus", true, baseServiceUrl("product", productId, "sku"));
     }
 
     private MomiaHttpRequest buildProductCustomersRequest(long productId) {
@@ -178,6 +168,10 @@ public class ProductApi extends AbstractApi {
         requests.add(buildUserRequest(utoken));
 
         return requests;
+    }
+
+    private MomiaHttpRequest buildProductSkusRequest(long productId) {
+        return MomiaHttpRequest.GET("skus", true, baseServiceUrl("product", productId, "sku"));
     }
 
     private MomiaHttpRequest buildUserRequest(String utoken) {

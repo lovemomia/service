@@ -1,8 +1,7 @@
 package cn.momia.service.web.ctrl.deal;
 
-import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.service.base.product.sku.SkuService;
+import cn.momia.service.base.product.ProductService;
 import cn.momia.service.base.user.User;
 import cn.momia.service.base.user.UserService;
 import cn.momia.service.deal.order.Order;
@@ -23,18 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController extends AbstractController {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
 
-    @Autowired
-    private OrderService orderService;
-
-    @Autowired
-    private SkuService skuService;
-
-    @Autowired
-    private UserService userService;
+    @Autowired private OrderService orderService;
+    @Autowired private ProductService productService;
+    @Autowired private UserService userService;
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage placeOrder(@RequestBody Order order) {
-        if (!lockSku(order)) return new ResponseMessage(ErrorCode.FAILED, "low stocks");
+        if (!lockSku(order)) return ResponseMessage.FAILED("low stocks");
 
         long orderId = 0;
         try {
@@ -50,26 +44,26 @@ public class OrderController extends AbstractController {
         // TODO 需要告警
         if (orderId <= 0 && !unlockSku(order)) LOGGER.error("fail to unlock sku, skuId: {}, count: {}", new Object[] { order.getSkuId(), order.getCount() });
 
-        return new ResponseMessage(ErrorCode.FAILED, "fail to place order");
+        return ResponseMessage.FAILED("fail to place order");
     }
 
     private boolean lockSku(Order order) {
-        return skuService.lock(order.getSkuId(), order.getCount());
+        return productService.lockStock(order.getSkuId(), order.getCount());
     }
 
     private boolean unlockSku(Order order) {
-        return skuService.unlock(order.getSkuId(), order.getCount());
+        return productService.unlockStock(order.getSkuId(), order.getCount());
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseMessage deleteOrder(@PathVariable long id, @RequestParam String utoken) {
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return new ResponseMessage(ErrorCode.FAILED, "user not exists");
+        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
         Order order = orderService.get(id);
-        if (!order.exists()) return new ResponseMessage(ErrorCode.FAILED, "order not exists");
+        if (!order.exists()) return ResponseMessage.FAILED("order not exists");
 
-        if (!orderService.delete(id, user.getId())) return new ResponseMessage(ErrorCode.FAILED, "fail to delete order");
+        if (!orderService.delete(id, user.getId())) return ResponseMessage.FAILED("fail to delete order");
 
         // TODO 需要告警
         if (!unlockSku(order)) LOGGER.error("fail to unlock sku, skuId: {}, count: {}", new Object[] { order.getSkuId(), order.getCount() });

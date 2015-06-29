@@ -6,17 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import java.util.Date;
 
 public class UserDto implements Dto {
-    public static class Own extends UserDto {
-        public Own(JSONObject userJson) {
-            super(userJson);
-        }
-
-        public String getMobile() {
-            return super.getMobile().substring(0, 3) + "****" + super.getMobile().substring(7);
-        }
-    }
-
-    public static class Other extends Own {
+    public static class Other extends UserDto {
         public Other(JSONObject userJson) {
             super(userJson);
         }
@@ -37,7 +27,7 @@ public class UserDto implements Dto {
     private String name;
     private String sex;
     private Date birthday;
-    private int cityId;
+    private String city;
     private String address;
 
     public String getToken() {
@@ -68,15 +58,15 @@ public class UserDto implements Dto {
         return birthday;
     }
 
-    public int getCityId() {
-        return cityId;
+    public String getCity() {
+        return city;
     }
 
     public String getAddress() {
         return address;
     }
 
-    protected UserDto(JSONObject userJson) {
+    public UserDto(JSONObject userJson) {
         this.token = userJson.getString("token");
         this.nickName = userJson.getString("nickName");
         this.mobile = userJson.getString("mobile");
@@ -84,7 +74,7 @@ public class UserDto implements Dto {
         this.name = userJson.getString("name");
         this.sex = userJson.getString("sex");
         this.birthday = userJson.getDate("birthday");
-        this.cityId = userJson.getInteger("cityId");
+        this.city = userJson.getString("city");
         this.address = userJson.getString("address");
     }
 }

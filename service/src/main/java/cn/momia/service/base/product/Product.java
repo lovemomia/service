@@ -1,5 +1,8 @@
 package cn.momia.service.base.product;
 
+import cn.momia.service.base.product.base.BaseProduct;
+import cn.momia.service.base.product.place.Place;
+import cn.momia.service.base.product.sku.Sku;
 import com.alibaba.fastjson.JSONArray;
 
 import java.io.Serializable;
@@ -7,82 +10,43 @@ import java.util.List;
 
 public class Product implements Serializable {
     public static final Product NOT_EXIST_PRODUCT = new Product();
-    static {
-        NOT_EXIST_PRODUCT.setId(0);
-    }
 
-    private long id;
-    private int cityId;
-    private int categoryId;
-    private String title;
-    private String cover;
-    private String crowd;
-    private JSONArray content;
-    private int sales;
+    private BaseProduct baseProduct;
     private List<ProductImage> imgs;
+    private Place place;
+    private List<Sku> skus;
 
     public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public int getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
+        if (baseProduct == null || !baseProduct.exists()) return 0;
+        return baseProduct.getId();
     }
 
     public int getCityId() {
-        return cityId;
-    }
-
-    public void setCityId(int cityId) {
-        this.cityId = cityId;
+        return baseProduct.getCityId();
     }
 
     public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
+        return baseProduct.getTitle();
     }
 
     public String getCover() {
-        return cover;
-    }
-
-    public void setCover(String cover) {
-        this.cover = cover;
+        return baseProduct.getCover();
     }
 
     public String getCrowd() {
-        return crowd;
-    }
-
-    public void setCrowd(String crowd) {
-        this.crowd = crowd;
+        return baseProduct.getCrowd();
     }
 
     public JSONArray getContent() {
-        return content;
-    }
-
-    public void setContent(JSONArray content) {
-        this.content = content;
+        return baseProduct.getContent();
     }
 
     public int getSales() {
-        return sales;
+        return baseProduct.getSales();
     }
 
-    public void setSales(int sales) {
-        this.sales = sales;
+    public void setBaseProduct(BaseProduct baseProduct) {
+        this.baseProduct = baseProduct;
     }
 
     public List<ProductImage> getImgs() {
@@ -91,6 +55,22 @@ public class Product implements Serializable {
 
     public void setImgs(List<ProductImage> imgs) {
         this.imgs = imgs;
+    }
+
+    public Place getPlace() {
+        return place;
+    }
+
+    public void setPlace(Place place) {
+        this.place = place;
+    }
+
+    public List<Sku> getSkus() {
+        return skus;
+    }
+
+    public void setSkus(List<Sku> skus) {
+        this.skus = skus;
     }
 
     @Override

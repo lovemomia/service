@@ -1,15 +1,11 @@
 package cn.momia.service.web.ctrl.base;
 
-import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.service.base.customer.Customer;
-import cn.momia.service.base.place.Place;
-import cn.momia.service.base.place.PlaceService;
+import cn.momia.service.base.product.Customer;
 import cn.momia.service.base.product.Product;
 import cn.momia.service.base.product.ProductQuery;
 import cn.momia.service.base.product.ProductService;
 import cn.momia.service.base.product.sku.Sku;
-import cn.momia.service.base.product.sku.SkuService;
 import cn.momia.service.base.user.User;
 import cn.momia.service.base.user.UserService;
 import cn.momia.service.base.user.participant.Participant;
@@ -17,8 +13,6 @@ import cn.momia.service.base.user.participant.ParticipantService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.web.ctrl.AbstractController;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,77 +28,39 @@ import java.util.Map;
 @RestController
 @RequestMapping("/product")
 public class ProductController extends AbstractController {
-    @Autowired
-    private OrderService orderService;
+    @Autowired private ProductService productService;
 
-    @Autowired
-    private ParticipantService participantService;
-
-    @Autowired
-    private PlaceService placeService;
-
-    @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private SkuService skuService;
-
-    @Autowired
-    private UserService userService;
+    @Autowired private OrderService orderService;
+    @Autowired private UserService userService;
+    @Autowired private ParticipantService participantService;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getProducts(@RequestParam(value = "city") int cityId, @RequestParam int start, @RequestParam int count, @RequestParam(required = false) String query) {
-        if (isInvalidLimit(start, count)) return new ResponseMessage(ErrorCode.FAILED, "invalid limit params");
+        if (isInvalidLimit(start, count)) return ResponseMessage.FAILED("invalid limit params");
 
         List<Product> products = productService.query(start, count, new ProductQuery(cityId, query));
-        List<Long> productIds = new ArrayList<Long>();
-        for (Product product : products) productIds.add(product.getId());
-        Map<Long, Place> placesOfProducts = placeService.queryByProducts(productIds);
-        Map<Long, List<Sku>> skusOfProducts = skuService.queryByProducts(productIds);
 
-        return new ResponseMessage(buildProductsResponse(products, placesOfProducts, skusOfProducts));
-    }
-
-    private JSONArray buildProductsResponse(List<Product> products, Map<Long, Place> placesOfProducts, Map<Long, List<Sku>> skusOfProducts) {
-        JSONArray data = new JSONArray();
-        for (Product product : products) {
-            JSONObject productData = new JSONObject();
-            productData.put("product", product);
-            productData.put("place", placesOfProducts.get(product.getId()));
-            productData.put("skus", skusOfProducts.get(product.getId()));
-
-            data.add(productData);
-        }
-
-        return data;
+        return new ResponseMessage(products);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseMessage getProduct(@PathVariable long id) {
         Product product = productService.get(id);
-        if (!product.exists()) return new ResponseMessage(ErrorCode.FAILED, "product not exists");
+        if (!product.exists()) return ResponseMessage.FAILED("product not exists");
 
         return new ResponseMessage(product);
     }
 
-    @RequestMapping(value = "/{id}/place", method = RequestMethod.GET)
-    public ResponseMessage getProductPlace(@PathVariable long id) {
-        Place place = placeService.queryByProduct(id);
-        if (!place.exists()) return new ResponseMessage(ErrorCode.FAILED, "place not found");
-
-        return new ResponseMessage(place);
-    }
-
     @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
     public ResponseMessage getProductSkus(@PathVariable long id) {
-        List<Sku> skus = skuService.queryByProduct(id);
+        List<Sku> skus = productService.getSkus(id);
 
         return new ResponseMessage(skus);
     }
 
     @RequestMapping(value = "/{id}/customer", method = RequestMethod.GET)
     public ResponseMessage getProductCustomersInfo(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return new ResponseMessage(ErrorCode.FAILED, "invalid limit params");
+        if (isInvalidLimit(start, count)) return ResponseMessage.FAILED("invalid limit params");
 
         List<Order> orders = orderService.queryDistinctCustomerOrderByProduct(id, start, count);
         List<Customer> customers = new ArrayList<Customer>();

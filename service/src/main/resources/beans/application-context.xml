@@ -39,19 +39,28 @@
     </bean>
 
     <!-- Service -->
-    <bean id="dbAccessService" class="cn.momia.service.base.DbAccessService" abstract="true">
+    <bean id="dbAccessService" class="cn.momia.service.common.DbAccessService" abstract="true">
         <property name="jdbcTemplate" ref="jdbcTemplate" />
     </bean>
     <bean id="bannerService" class="cn.momia.service.base.banner.impl.BannerServiceImpl" parent="dbAccessService" />
-    <bean id="favoriteService" class="cn.momia.service.base.favorite.impl.FavoriteServiceImpl" parent="dbAccessService" />
-    <bean id="feedbackService" class="cn.momia.service.base.feedback.impl.FeedbackServiceImpl" parent="dbAccessService" />
-    <bean id="orderService" class="cn.momia.service.deal.order.impl.OrderServiceImpl" parent="dbAccessService" />
+
+    <bean id="baseProductService" class="cn.momia.service.base.product.base.impl.BaseProductServiceImpl" parent="dbAccessService" />
+    <bean id="placeService" class="cn.momia.service.base.product.place.impl.PlaceServiceImpl" parent="dbAccessService" />
+    <bean id="skuService" class="cn.momia.service.base.product.sku.impl.SkuServiceImpl" parent="dbAccessService" />
+    <bean id="productService" class="cn.momia.service.base.product.impl.ProductServiceImpl" parent="dbAccessService">
+        <property name="baseProductService" ref="baseProductService" />
+        <property name="placeService" ref="placeService" />
+        <property name="skuService" ref="skuService" />
+    </bean>
+
+    <bean id="cityService" class="cn.momia.service.base.city.impl.CityServiceImpl" parent="dbAccessService" init-method="init" />
+    <bean id="userService" class="cn.momia.service.base.user.impl.UserServiceImpl" parent="dbAccessService">
+        <property name="cityService" ref="cityService" />
+    </bean>
     <bean id="participantService" class="cn.momia.service.base.user.participant.impl.ParticipantServiceImpl" parent="dbAccessService" />
+
+    <bean id="orderService" class="cn.momia.service.deal.order.impl.OrderServiceImpl" parent="dbAccessService" />
     <bean id="paymentService" class="cn.momia.service.deal.payment.impl.PaymentServiceImpl" parent="dbAccessService" />
-    <bean id="placeService" class="cn.momia.service.base.place.impl.PlaceServiceImpl" parent="dbAccessService" />
-    <bean id="productService" class="cn.momia.service.base.product.impl.ProductServiceImpl" parent="dbAccessService" />
-    <bean id="skuService" class="cn.momia.service.base.product.sku.impl.SkuServiceImpl" parent="dbAccessService" init-method="init" />
-    <bean id="userService" class="cn.momia.service.base.user.impl.UserServiceImpl" parent="dbAccessService" />
 
     <bean id="smsSender" class="cn.momia.service.sms.impl.LuosimiaoSmsSender" parent="dbAccessService" />
     <bean id="smsVerifier" class="cn.momia.service.sms.SmsVerifier" parent="dbAccessService" />

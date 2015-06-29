@@ -1,12 +1,14 @@
-package cn.momia.service.base.place;
+package cn.momia.service.base.product.place;
 
 import java.io.Serializable;
-import java.util.List;
 
 public class Place implements Serializable {
     public static final Place NOT_EXIST_PLACE = new Place();
+    public static final Place INVALID_PLACE = new Place();
+
     static {
         NOT_EXIST_PLACE.setId(0);
+        INVALID_PLACE.setId(0);
     }
 
     private long id;
@@ -15,7 +17,7 @@ public class Place implements Serializable {
     private String desc;
     private double lng;
     private double lat;
-    private List<PlaceImage> imgs;
+    private String image;
 
     public long getId() {
         return id;
@@ -65,12 +67,12 @@ public class Place implements Serializable {
         this.lat = lat;
     }
 
-    public List<PlaceImage> getImgs() {
-        return imgs;
+    public String getImage() {
+        return image;
     }
 
-    public void setImgs(List<PlaceImage> imgs) {
-        this.imgs = imgs;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     @Override

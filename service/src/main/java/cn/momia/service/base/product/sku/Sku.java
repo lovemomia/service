@@ -5,8 +5,11 @@ import java.util.List;
 
 public class Sku implements Serializable {
     public static final Sku NOT_EXIST_SKU = new Sku();
+    public static final Sku INVALID_SKU = new Sku();
+
     static {
         NOT_EXIST_SKU.setId(0);
+        INVALID_SKU.setId(0);
     }
 
     private long id;

@@ -1,6 +1,5 @@
 package cn.momia.service.web.ctrl.base;
 
-import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.common.web.secret.SecretKey;
 import cn.momia.service.base.user.User;
@@ -25,14 +24,10 @@ import java.util.Date;
 public class AuthController extends AbstractController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthController.class);
 
-    @Autowired
-    private SmsSender smsSender;
+    @Autowired private SmsSender smsSender;
+    @Autowired private SmsVerifier smsVerifier;
 
-    @Autowired
-    private SmsVerifier smsVerifier;
-
-    @Autowired
-    private UserService userService;
+    @Autowired private UserService userService;
 
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     public ResponseMessage send(@RequestParam String mobile) {
@@ -41,22 +36,22 @@ public class AuthController extends AbstractController {
             return ResponseMessage.SUCCESS;
         } catch (Exception e) {
             LOGGER.error("fail to send verify code for {}", mobile, e);
-            return new ResponseMessage(ErrorCode.FAILED, "fail to send verify code");
+            return ResponseMessage.FAILED;
         }
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseMessage login(@RequestParam String mobile, @RequestParam String code) {
         if (StringUtils.isBlank(mobile) || StringUtils.isBlank(code))
-            return new ResponseMessage(ErrorCode.FAILED, "mobile or(and) verify code is empty");
+            return ResponseMessage.FAILED("mobile or(and) verify code is empty");
 
-        if (!smsVerifier.verify(mobile, code)) return new ResponseMessage(ErrorCode.FAILED, "fail to verify code");
+        if (!smsVerifier.verify(mobile, code)) return ResponseMessage.FAILED("fail to verify code");
 
         User user = userService.getByMobile(mobile);
         String token = generateToken(mobile);
         if (!user.exists()) {
                 LOGGER.error("fail to login user for {}", mobile);
-                return new ResponseMessage(ErrorCode.FAILED, "fail to login, mobile does not exist, please register first.");
+                return ResponseMessage.FAILED("fail to login, mobile does not exist, please register first.");
         } else {
             if (!userService.updateToken(user.getId(), token)) {
                 LOGGER.warn("fail to update token for {}, will use old token", mobile);
@@ -75,9 +70,9 @@ public class AuthController extends AbstractController {
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseMessage register(@RequestParam String nickName, @RequestParam String mobile, @RequestParam String code){
         if (StringUtils.isBlank(nickName) || StringUtils.isBlank(mobile) || StringUtils.isBlank(code))
-            return new ResponseMessage(ErrorCode.FAILED, "one or more of nickName, mobile and verify code is empty");
+            return ResponseMessage.FAILED("one or more of nickName, mobile and verify code is empty");
 
-        if (!smsVerifier.verify(mobile, code)) return new ResponseMessage(ErrorCode.FAILED, "fail to verify code");
+        if (!smsVerifier.verify(mobile, code)) return ResponseMessage.FAILED("fail to verify code");
 
         User user = userService.getByMobile(mobile);
         String token = generateToken(mobile);
@@ -85,10 +80,10 @@ public class AuthController extends AbstractController {
             user = userService.add(nickName, mobile, token);
             if (!user.exists()) {
                 LOGGER.error("fail to register user for {}", mobile);
-                return new ResponseMessage(ErrorCode.FAILED, "fail to register");
+                return ResponseMessage.FAILED("fail to register");
             }
         } else {
-            return new ResponseMessage(ErrorCode.FAILED, "fail to register, user already exists");
+            return ResponseMessage.FAILED("fail to register, user already exists");
         }
 
         return new ResponseMessage(user);

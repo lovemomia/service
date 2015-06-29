@@ -78,7 +78,7 @@ public class ProductUtil {
 
         for (int i = 0; i < propertiesJson.size(); i++) {
             JSONObject propertyJson = propertiesJson.getJSONObject(i);
-            if (propertyJson.getString("name").equals("时间")) {
+            if (propertyJson.getString("name").equals("time")) {
                 for (String timeStr : Splitter.on("~").trimResults().omitEmptyStrings().split(propertyJson.getString("value"))) {
                     timeStrs.add(timeStr);
                 }

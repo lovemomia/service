@@ -1,13 +1,10 @@
 package cn.momia.service.base.product.sku;
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.io.Serializable;
 
 public class SkuProperty implements Serializable {
-    public static class Type {
-        public static final int VALUE = 0;
-        public static final int REF = 1;
-    }
-
     private String name;
     private String value;
 
@@ -19,8 +16,8 @@ public class SkuProperty implements Serializable {
         return value;
     }
 
-    public SkuProperty(String name, String value) {
-        this.name = name;
-        this.value = value;
+    public SkuProperty(JSONObject propertyJson) {
+        this.name = propertyJson.getString("name");
+        this.value = propertyJson.getString("value");
     }
 }
