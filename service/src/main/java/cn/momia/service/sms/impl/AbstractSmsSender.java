@@ -10,8 +10,11 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 public abstract class AbstractSmsSender extends DbAccessService implements SmsSender {
+    private static final Pattern MOBILE_PATTERN = Pattern.compile("^1[0-9]{10}$");
+
     protected Configuration conf;
 
     public void setConf(Configuration conf) {
@@ -20,6 +23,8 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
 
     @Override
     public void send(String mobile)  {
+        if (!MOBILE_PATTERN.matcher(mobile).find()) throw new RuntimeException("invalid mobile: " + mobile);
+
         String code = getGeneratedCode(mobile);
         if (StringUtils.isBlank(code))
         {
