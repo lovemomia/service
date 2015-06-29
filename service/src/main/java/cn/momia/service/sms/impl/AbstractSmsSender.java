@@ -1,5 +1,6 @@
 package cn.momia.service.sms.impl;
 
+import cn.momia.common.config.Configuration;
 import cn.momia.service.common.DbAccessService;
 import cn.momia.service.sms.SmsSender;
 import org.apache.commons.lang3.StringUtils;
@@ -9,10 +10,21 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 public abstract class AbstractSmsSender extends DbAccessService implements SmsSender {
+    private static final Pattern MOBILE_PATTERN = Pattern.compile("^1[0-9]{10}$");
+
+    protected Configuration conf;
+
+    public void setConf(Configuration conf) {
+        this.conf = conf;
+    }
+
     @Override
     public void send(String mobile)  {
+        if (!MOBILE_PATTERN.matcher(mobile).find()) throw new RuntimeException("invalid mobile: " + mobile);
+
         String code = getGeneratedCode(mobile);
         if (StringUtils.isBlank(code))
         {
@@ -23,10 +35,20 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
 
         Date lastSendTime = getLastSendTime(mobile);
         if (lastSendTime != null && new Date().getTime() - lastSendTime.getTime() < 60 * 1000) return;
-        if (doSend(mobile, code))
-        {
-            updateSendTime(mobile);
-        }
+
+        sendAsync(mobile, code);
+    }
+
+    private void sendAsync(final String mobile, final String code) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (doSend(mobile, code))
+                {
+                    updateSendTime(mobile);
+                }
+            }
+        }).start();
     }
 
     private String getGeneratedCode(String mobile)

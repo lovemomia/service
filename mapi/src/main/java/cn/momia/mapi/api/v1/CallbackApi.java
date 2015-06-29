@@ -20,12 +20,6 @@ import java.util.Map;
 public class CallbackApi extends AbstractApi {
     private static final Logger LOGGER = LoggerFactory.getLogger(CallbackApi.class);
 
-    @RequestMapping(value = "/alipay", method = RequestMethod.POST)
-    public ResponseMessage alipayCallback(HttpServletRequest request) {
-        // TODO
-        return new ResponseMessage("TODO");
-    }
-
     @RequestMapping(value = "/wechatpay", method = RequestMethod.POST, produces = "application/xml")
     public Xml wechatpayCallback(HttpServletRequest request) {
         try {
