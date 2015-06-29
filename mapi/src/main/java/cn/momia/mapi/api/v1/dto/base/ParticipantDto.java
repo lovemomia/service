@@ -2,6 +2,8 @@ package cn.momia.mapi.api.v1.dto.base;
 
 import com.alibaba.fastjson.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class ParticipantDto implements Dto {
@@ -11,6 +13,7 @@ public class ParticipantDto implements Dto {
     private Date birthday;
     private int idType;
     private String idNo;
+    private String type;
 
     public long getId() {
         return id;
@@ -35,6 +38,7 @@ public class ParticipantDto implements Dto {
     public String getIdNo() {
         return idNo;
     }
+    public String getType() { return type; }
 
     public ParticipantDto(JSONObject participantJson) {
         this(participantJson, false);
@@ -45,6 +49,17 @@ public class ParticipantDto implements Dto {
         this.name = participantJson.getString("name");
         this.sex = participantJson.getString("sex");
         this.birthday = participantJson.getDate("birthday");
+
+        Calendar calendar = Calendar.getInstance();
+        int yearNow = calendar.get(Calendar.YEAR);
+        calendar.setTime(this.birthday);
+        int yearBorn = calendar.get(Calendar.YEAR);
+
+        if (yearNow - yearBorn > 15)
+            this.type = "成人";
+        else
+            this.type = "儿童";
+
 
         if (showIdNo) {
             this.idType = participantJson.getInteger("idType");
