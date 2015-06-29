@@ -8,6 +8,12 @@
         <Biz>service</Biz>
     </Server>
 
+    <Sms>
+        <Luosimao>
+            <Service>http://sms-api.luosimao.com/v1/send.json</Service>
+        </Luosimao>
+    </Sms>
+
     <Limit>
         <MaxPage>50</MaxPage>
         <MaxPageSize>50</MaxPageSize>
