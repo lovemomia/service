@@ -16,6 +16,7 @@
         <module>common</module>
         <module>image</module>
         <module>mapi</module>
+        <module>mweb</module>
         <module>service</module>
     </modules>
 </project>
