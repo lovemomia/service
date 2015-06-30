@@ -1,5 +1,6 @@
 package cn.momia.common.web.filter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,11 +28,30 @@ public class LoggingFilter implements Filter
         long end = System.currentTimeMillis();
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-        REQUEST_LOGGER.info("{}\t{}\t{}ms\t{}", new Object[] { httpRequest.getMethod(),
+        REQUEST_LOGGER.info("{}\t{}\t{}ms\t{}\t{}", new Object[] { httpRequest.getMethod(),
                 httpRequest.getRequestURI(),
                 end - start,
-                request.getParameterMap()
+                request.getParameterMap(),
+                getRemoteIp(httpRequest)
         });
+    }
+
+    private String getRemoteIp(HttpServletRequest request) {
+        String ip = request.getHeader("x-forwarded-for");
+        if (isInvalidIp(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (isInvalidIp(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (isInvalidIp(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        return ip;
+    }
+
+    private boolean isInvalidIp(String ip) {
+        return StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip);
     }
 
     @Override
