@@ -37,16 +37,23 @@ public class LoggingFilter implements Filter
     }
 
     private String getRemoteIp(HttpServletRequest request) {
-        String ip = request.getHeader("x-forwarded-for");
+        String ip = request.getHeader("X-Real-IP");
+        if (isInvalidIp(ip)) {
+            ip = request.getHeader("X-Forwarded-For");
+        }
+
         if (isInvalidIp(ip)) {
             ip = request.getHeader("Proxy-Client-IP");
         }
+
         if (isInvalidIp(ip)) {
             ip = request.getHeader("WL-Proxy-Client-IP");
         }
+
         if (isInvalidIp(ip)) {
             ip = request.getRemoteAddr();
         }
+
         return ip;
     }
 
