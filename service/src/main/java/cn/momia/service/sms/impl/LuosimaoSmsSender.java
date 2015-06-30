@@ -24,7 +24,7 @@ public class LuosimaoSmsSender extends AbstractSmsSender {
             WebResource webResource = client.resource(conf.getString("Sms.Luosimao.Service"));
             MultivaluedMapImpl formData = new MultivaluedMapImpl();
             formData.add("mobile", mobile);
-            formData.add("message", "验证码：" + code + "，30分钟内有效【多啦亲子】");
+            formData.add("message", "验证码：" + code + "，30分钟内有效【哆啦亲子】");
             ClientResponse response =  webResource.type(MediaType.APPLICATION_FORM_URLENCODED).post(ClientResponse.class, formData);
             int status = response.getStatus();
             if (status != 200) {

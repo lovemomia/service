@@ -10,15 +10,28 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 public abstract class AbstractSmsSender extends DbAccessService implements SmsSender {
     private static final Pattern MOBILE_PATTERN = Pattern.compile("^1[0-9]{10}$");
 
+    private ExecutorService executorService;
+
     protected Configuration conf;
 
     public void setConf(Configuration conf) {
         this.conf = conf;
+    }
+
+    public void init() {
+        int corePoolSize = conf.getInt("Sms.CorePoolSize");
+        int maxPoolSize = conf.getInt("Sms.MaxPoolSize");
+        int queueSize = conf.getInt("Sms.QueueSize");
+        executorService = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 5, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(queueSize));
     }
 
     @Override
@@ -40,15 +53,14 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
     }
 
     private void sendAsync(final String mobile, final String code) {
-        new Thread(new Runnable() {
+        executorService.execute(new Runnable() {
             @Override
             public void run() {
-                if (doSend(mobile, code))
-                {
+                if (doSend(mobile, code)) {
                     updateSendTime(mobile);
                 }
             }
-        }).start();
+        });
     }
 
     private String getGeneratedCode(String mobile)

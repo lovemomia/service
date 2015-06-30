@@ -7,7 +7,9 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.ContactsDto;
 import cn.momia.mapi.api.v1.dto.base.Dto;
+import cn.momia.mapi.api.v1.dto.base.ProductDto;
 import cn.momia.mapi.api.v1.dto.base.SkuDto;
+import cn.momia.mapi.api.v1.dto.composite.PagedListDto;
 import cn.momia.mapi.api.v1.dto.composite.ProductDetailDto;
 import cn.momia.mapi.api.v1.dto.composite.PlaceOrderDto;
 import cn.momia.mapi.img.ImageFile;
@@ -29,7 +31,11 @@ import java.util.List;
 @RequestMapping("/v1/product")
 public class ProductApi extends AbstractApi {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public ResponseMessage getProducts(@RequestParam(value = "city") int cityId, @RequestParam int start, @RequestParam int count, @RequestParam(required = false) String query) {
+    public ResponseMessage getProducts(@RequestParam(value = "city") final int cityId, @RequestParam final int start, @RequestParam final int count, @RequestParam(required = false) String query) {
+        final int maxPageCount = conf.getInt("Product.MaxPageCount");
+        final int pageSize = conf.getInt("Product.PageSize");
+        if (start > maxPageCount * pageSize) return ResponseMessage.FAILED;
+
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
                 .add("start", start)
@@ -37,7 +43,21 @@ public class ProductApi extends AbstractApi {
                 .add("query", query);
         MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("product"), builder.build());
 
-        return executeRequest(request);
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                PagedListDto<ProductDto> products = new PagedListDto<ProductDto>();
+
+                JSONObject productsPackJson = (JSONObject) data;
+                long totalCount = productsPackJson.getLong("totalCount");
+                products.setTotalCount(totalCount);
+                JSONArray productsJson = productsPackJson.getJSONArray("products");
+                products.addAll(ProductUtil.extractProductsData(productsJson));
+                if (start + count < totalCount) products.setNextIndex(start + count);
+
+                return products;
+            }
+        });
     }
 
     @RequestMapping(method = RequestMethod.GET)

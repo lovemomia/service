@@ -75,6 +75,18 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     }
 
     @Override
+    public long queryCount(String query) {
+        String sql = "SELECT COUNT(1) FROM t_product WHERE status=1 AND " + query;
+
+        return jdbcTemplate.query(sql, new ResultSetExtractor<Long>() {
+            @Override
+            public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getLong(1) : 0;
+            }
+        });
+    }
+
+    @Override
     public List<BaseProduct> query(int start, int count, String query) {
         final List<BaseProduct> baseProducts = new ArrayList<BaseProduct>();
 

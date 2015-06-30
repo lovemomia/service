@@ -7,6 +7,7 @@ import cn.momia.service.base.user.UserService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.web.ctrl.AbstractController;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ public class OrderController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage placeOrder(@RequestBody Order order) {
+        processContacts(order.getCustomerId(), order.getContacts(), order.getMobile());
         if (!lockSku(order)) return ResponseMessage.FAILED("low stocks");
 
         long orderId = 0;
@@ -45,6 +47,18 @@ public class OrderController extends AbstractController {
         if (orderId <= 0 && !unlockSku(order)) LOGGER.error("fail to unlock sku, skuId: {}, count: {}", new Object[] { order.getSkuId(), order.getCount() });
 
         return ResponseMessage.FAILED("fail to place order");
+    }
+
+    private void processContacts(long customerId, String contacts, String mobile) {
+        try {
+            if (StringUtils.isBlank(contacts)) return;
+            User user = userService.get(customerId);
+            if (!user.exists()) throw new RuntimeException("user not exists");
+
+            if (user.getMobile().equals(mobile) && StringUtils.isBlank(user.getName())) userService.updateName(user.getId(), contacts);
+        } catch (Exception e) {
+            LOGGER.warn("fail to process contacts, {}/{}", contacts, mobile);
+        }
     }
 
     private boolean lockSku(Order order) {

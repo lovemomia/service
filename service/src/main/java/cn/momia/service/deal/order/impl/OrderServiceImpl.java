@@ -143,6 +143,27 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
+    public long queryCountByUser(long userId, int status, String type) {
+        if (status == Order.Status.ALL) {
+            String sql = "SELECT COUNT(1) FROM t_order WHERE customerId=? AND status>0";
+            return jdbcTemplate.query(sql, new Object[] { userId }, new ResultSetExtractor<Long>() {
+                @Override
+                public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
+                    return rs.next() ? rs.getLong(1) : 0;
+                }
+            });
+        } else {
+            String sql = "SELECT COUNT(1) FROM t_order WHERE customerId=? AND status>0 AND status" + STATUS_QUERY_TYPE.get(type) + "?";
+            return jdbcTemplate.query(sql, new Object[] { userId, status }, new ResultSetExtractor<Long>() {
+                @Override
+                public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
+                    return rs.next() ? rs.getLong(1) : 0;
+                }
+            });
+        }
+    }
+
+    @Override
     public List<Order> queryByUser(long userId, int status, String type, int start, int count) {
         final List<Order> orders = new ArrayList<Order>();
 

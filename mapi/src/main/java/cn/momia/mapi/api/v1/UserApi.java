@@ -6,7 +6,7 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.OrderDto;
-import cn.momia.mapi.api.v1.dto.composite.ListDto;
+import cn.momia.mapi.api.v1.dto.composite.PagedListDto;
 import cn.momia.mapi.api.v1.dto.base.UserDto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -22,22 +22,27 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/user")
 public class UserApi extends AbstractApi {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserApi.class);
+    private static final Function<Object, Dto> userFunc = new Function<Object, Dto>() {
+        @Override
+        public Dto apply(Object data) {
+            return new UserDto((JSONObject) data);
+        }
+    };
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getUser(@RequestParam String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user"), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return new UserDto((JSONObject) data);
-            }
-        });
+        return executeRequest(request, userFunc);
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
-    public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam String type, @RequestParam int start, @RequestParam final int count) {
+    public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam(defaultValue = "eq") String type, @RequestParam final int start, @RequestParam final int count) {
+        final int maxPageCount = conf.getInt("Order.MaxPageCount");
+        final int pageSize = conf.getInt("Order.PageSize");
+        if (start > maxPageCount * pageSize) return ResponseMessage.FAILED;
+
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("status", status)
@@ -49,12 +54,15 @@ public class UserApi extends AbstractApi {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                ListDto orders = new ListDto();
+                PagedListDto<OrderDto> orders = new PagedListDto<OrderDto>();
 
-                JSONArray ordersPackJson = (JSONArray) data;
-                for (int i = 0; i < ordersPackJson.size(); i++) {
+                JSONObject ordersPackJson = (JSONObject) data;
+                final long totalCount = ordersPackJson.getLong("totalCount");
+                orders.setTotalCount(totalCount);
+                JSONArray ordersJson = ordersPackJson.getJSONArray("orders");
+                for (int i = 0; i < ordersJson.size(); i++) {
                     try {
-                        JSONObject orderPackJson = ordersPackJson.getJSONObject(i);
+                        JSONObject orderPackJson = ordersJson.getJSONObject(i);
                         JSONObject orderJson = orderPackJson.getJSONObject("order");
 
                         OrderDto orderDto = new OrderDto(orderJson);
@@ -63,9 +71,10 @@ public class UserApi extends AbstractApi {
 
                         orders.add(orderDto);
                     } catch (Exception e) {
-                        LOGGER.error("fail to parse order: {}", ordersPackJson.getJSONObject(i), e);
+                        LOGGER.error("fail to parse order: {}", ordersJson.getJSONObject(i), e);
                     }
                 }
+                if (start + count < totalCount) orders.setNextIndex(start + count);
 
                 return orders;
             }
@@ -79,12 +88,7 @@ public class UserApi extends AbstractApi {
                 .add("nickname", nickName);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("user/nickname"), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return new UserDto((JSONObject) data);
-            }
-        });
+        return executeRequest(request, userFunc);
     }
 
     @RequestMapping(value = "/avatar", method = RequestMethod.POST)
@@ -94,12 +98,7 @@ public class UserApi extends AbstractApi {
                 .add("avatar", avatar);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("user/avatar"), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return new UserDto((JSONObject) data);
-            }
-        });
+        return executeRequest(request, userFunc);
     }
 
     @RequestMapping(value = "/name", method = RequestMethod.POST)
@@ -109,12 +108,7 @@ public class UserApi extends AbstractApi {
                 .add("name", name);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("user/name"), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return new UserDto((JSONObject) data);
-            }
-        });
+        return executeRequest(request, userFunc);
     }
 
     @RequestMapping(value = "/sex", method = RequestMethod.POST)
@@ -124,12 +118,7 @@ public class UserApi extends AbstractApi {
                 .add("sex", sex);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("user/sex"), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return new UserDto((JSONObject) data);
-            }
-        });
+        return executeRequest(request, userFunc);
     }
 
     @RequestMapping(value = "/birthday", method = RequestMethod.POST)
@@ -139,12 +128,7 @@ public class UserApi extends AbstractApi {
                 .add("birthday", birthday);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("user/birthday"), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return new UserDto((JSONObject) data);
-            }
-        });
+        return executeRequest(request, userFunc);
     }
 
     @RequestMapping(value = "/city", method = RequestMethod.POST)
@@ -154,12 +138,7 @@ public class UserApi extends AbstractApi {
                 .add("city", city);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("user/city"), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return new UserDto((JSONObject) data);
-            }
-        });
+        return executeRequest(request, userFunc);
     }
 
     @RequestMapping(value = "/address", method = RequestMethod.POST)
@@ -169,11 +148,6 @@ public class UserApi extends AbstractApi {
                 .add("address", address);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("user/address"), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return new UserDto((JSONObject) data);
-            }
-        });
+        return executeRequest(request, userFunc);
     }
 }

@@ -9,6 +9,9 @@
     </Server>
 
     <Sms>
+        <CorePoolSize>5</CorePoolSize>
+        <MaxPoolSize>20</MaxPoolSize>
+        <QueueSize>1000</QueueSize>
         <Luosimao>
             <Service>http://sms-api.luosimao.com/v1/send.json</Service>
         </Luosimao>

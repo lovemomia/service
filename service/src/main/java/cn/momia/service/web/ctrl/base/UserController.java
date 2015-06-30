@@ -47,6 +47,7 @@ public class UserController extends AbstractController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
+        long totalCount = orderService.queryCountByUser(user.getId(), status, type);
         List<Order> orders = orderService.queryByUser(user.getId(), status, type, start, count);
         List<Long> productIds = new ArrayList<Long>();
         for (Order order : orders) {
@@ -55,10 +56,10 @@ public class UserController extends AbstractController {
 
         List<Product> products = productService.get(productIds);
 
-        return new ResponseMessage(buildUserOrders(orders, products));
+        return new ResponseMessage(buildUserOrders(totalCount, orders, products));
     }
 
-    private JSONArray buildUserOrders(List<Order> orders, List<Product> products) {
+    private JSONObject buildUserOrders(long totalCount, List<Order> orders, List<Product> products) {
         Map<Long, Product> productMap = new HashMap<Long, Product>();
         Map<Long, Sku> skuMap = new HashMap<Long, Sku>();
         for (Product product : products) {
@@ -69,6 +70,9 @@ public class UserController extends AbstractController {
                 }
             }
         }
+
+        JSONObject ordersPackJson = new JSONObject();
+        ordersPackJson.put("totalCount", totalCount);
 
         JSONArray ordersJson = new JSONArray();
         for (Order order : orders) {
@@ -81,8 +85,9 @@ public class UserController extends AbstractController {
 
             ordersJson.add(orderJson);
         }
+        ordersPackJson.put("orders", ordersJson);
 
-        return ordersJson;
+        return ordersPackJson;
     }
 
     @RequestMapping(value = "/nickname", method = RequestMethod.PUT)
@@ -93,7 +98,7 @@ public class UserController extends AbstractController {
         boolean successful = userService.updateNickName(user.getId(), nickName);
 
         if (!successful) return ResponseMessage.FAILED("fail to update user nick name");
-        return new ResponseMessage(user);
+        return new ResponseMessage(userService.get(user.getId()));
     }
 
     @RequestMapping(value = "/avatar", method = RequestMethod.PUT)
@@ -104,7 +109,7 @@ public class UserController extends AbstractController {
         boolean successful = userService.updateAvatar(user.getId(), avatar);
 
         if (!successful) return ResponseMessage.FAILED("fail to update user avatar");
-        return new ResponseMessage(user);
+        return new ResponseMessage(userService.get(user.getId()));
     }
 
     @RequestMapping(value = "/name", method = RequestMethod.PUT)
@@ -115,7 +120,7 @@ public class UserController extends AbstractController {
         boolean successful = userService.updateName(user.getId(), name);
 
         if (!successful) return ResponseMessage.FAILED("fail to update user name");
-        return new ResponseMessage(user);
+        return new ResponseMessage(userService.get(user.getId()));
     }
 
     @RequestMapping(value = "/sex", method = RequestMethod.PUT)
@@ -126,7 +131,7 @@ public class UserController extends AbstractController {
         boolean successful = userService.updateSex(user.getId(), sex);
 
         if (!successful) return ResponseMessage.FAILED("fail to update user sex");
-        return new ResponseMessage(user);
+        return new ResponseMessage(userService.get(user.getId()));
     }
 
     @RequestMapping(value = "/birthday", method = RequestMethod.PUT)
@@ -137,7 +142,7 @@ public class UserController extends AbstractController {
         boolean successful = userService.updateBirthday(user.getId(), birthday);
 
         if (!successful) return ResponseMessage.FAILED("fail to update user birthday");
-        return new ResponseMessage(user);
+        return new ResponseMessage(userService.get(user.getId()));
     }
 
     @RequestMapping(value = "/city", method = RequestMethod.PUT)
@@ -148,7 +153,7 @@ public class UserController extends AbstractController {
         boolean successful = userService.updateCityId(user.getId(), city);
 
         if (!successful) return ResponseMessage.FAILED("fail to update user city");
-        return new ResponseMessage(user);
+        return new ResponseMessage(userService.get(user.getId()));
     }
 
     @RequestMapping(value = "/address", method = RequestMethod.PUT)
@@ -159,6 +164,6 @@ public class UserController extends AbstractController {
         boolean successful = userService.updateAddress(user.getId(), address);
 
         if (!successful) return ResponseMessage.FAILED("fail to update user address");
-        return new ResponseMessage(user);
+        return new ResponseMessage(userService.get(user.getId()));
     }
 }

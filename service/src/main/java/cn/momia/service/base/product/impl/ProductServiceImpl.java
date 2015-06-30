@@ -62,7 +62,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     public List<ProductImage> getProductImgs(long productId) {
         final List<ProductImage> imgs = new ArrayList<ProductImage>();
         String sql = "SELECT url, width, height FROM t_product_img WHERE productId=? AND status=1";
-        jdbcTemplate.query(sql, new Object[]{productId}, new RowCallbackHandler() {
+        jdbcTemplate.query(sql, new Object[] { productId }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 imgs.add(buildImage(rs));
@@ -142,6 +142,11 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
         }
 
         return imgsOfProducts;
+    }
+
+    @Override
+    public long queryCount(ProductQuery query) {
+        return baseProductService.queryCount(query.toString());
     }
 
     @Override
