@@ -27,7 +27,7 @@ public class ParticipantController {
         if(participantId <= 0) return ResponseMessage.FAILED("fail to add participant");
 
         participant.setId(participantId);
-        return new ResponseMessage(participant);
+        return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
