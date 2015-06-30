@@ -57,7 +57,7 @@ public class UserApi extends AbstractApi {
 
                 JSONObject ordersPackJson = (JSONObject) data;
                 final long totalCount = ordersPackJson.getLong("totalCount");
-                orders.setTotalcount(totalCount);
+                orders.setTotalCount(totalCount);
                 JSONArray ordersJson = ordersPackJson.getJSONArray("orders");
                 for (int i = 0; i < ordersJson.size(); i++) {
                     try {
@@ -73,7 +73,7 @@ public class UserApi extends AbstractApi {
                         LOGGER.error("fail to parse order: {}", ordersJson.getJSONObject(i), e);
                     }
                 }
-                if (start + count < totalCount) orders.setNextindex(start + count);
+                if (start + count < totalCount) orders.setNextIndex(start + count);
 
                 return orders;
             }

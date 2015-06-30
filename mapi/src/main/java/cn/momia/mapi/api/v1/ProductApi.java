@@ -50,10 +50,10 @@ public class ProductApi extends AbstractApi {
 
                 JSONObject productsPackJson = (JSONObject) data;
                 long totalCount = productsPackJson.getLong("totalCount");
-                products.setTotalcount(totalCount);
+                products.setTotalCount(totalCount);
                 JSONArray productsJson = productsPackJson.getJSONArray("products");
                 products.addAll(ProductUtil.extractProductsData(productsJson));
-                if (start + count < totalCount) products.setNextindex(start + count);
+                if (start + count < totalCount) products.setNextIndex(start + count);
 
                 return products;
             }

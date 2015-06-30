@@ -6,24 +6,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PagedListDto<T extends Dto> implements Dto {
-    private long totalcount;
-    private Integer nextindex;
+    private long totalCount;
+    private Integer nextIndex;
     private List<T> list = new ArrayList<T>();
 
-    public long getTotalcount() {
-        return totalcount;
+    public long getTotalCount() {
+        return totalCount;
     }
 
-    public void setTotalcount(long totalcount) {
-        this.totalcount = totalcount;
+    public void setTotalCount(long totalCount) {
+        this.totalCount = totalCount;
     }
 
-    public Integer getNextindex() {
-        return nextindex;
+    public Integer getNextIndex() {
+        return nextIndex;
     }
 
-    public void setNextindex(Integer nextindex) {
-        this.nextindex = nextindex;
+    public void setNextIndex(Integer nextIndex) {
+        this.nextIndex = nextIndex;
     }
 
     public List<T> getList() {
