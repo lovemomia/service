@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/auth")
 public class AuthApi extends AbstractApi {
     @RequestMapping(value = "/send", method = RequestMethod.POST)
-    public ResponseMessage send(@RequestParam String mobile)  {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("mobile", mobile);
+    public ResponseMessage send(@RequestParam String mobile, @RequestParam String type)  {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("mobile", mobile)
+                .add("type", type);
         MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("auth/send"), builder.build());
 
         return executeRequest(request);

@@ -19,6 +19,10 @@ public class OrderApi extends AbstractApi {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseMessage placeOrder(@RequestParam String utoken, @RequestParam final String order) {
         JSONObject orderJson = JSON.parseObject(order);
+
+        if(!orderJson.containsKey("productId"))
+            return  ResponseMessage.FAILED("fail to placeOrder, productId is empty");
+
         orderJson.put("customerId", getUserId(utoken));
         MomiaHttpRequest request = MomiaHttpRequest.POST(dealServiceUrl("order"), orderJson.toString());
 
