@@ -79,7 +79,12 @@ public class UserApi extends AbstractApi {
                 .add("nickname", nickName);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("user/nickname"), builder.build());
 
-        return executeRequest(request);
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                return new UserDto((JSONObject) data);
+            }
+        });
     }
 
     @RequestMapping(value = "/avatar", method = RequestMethod.POST)
@@ -89,7 +94,12 @@ public class UserApi extends AbstractApi {
                 .add("avatar", avatar);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("user/avatar"), builder.build());
 
-        return executeRequest(request);
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                return new UserDto((JSONObject) data);
+            }
+        });
     }
 
     @RequestMapping(value = "/name", method = RequestMethod.POST)
@@ -99,7 +109,12 @@ public class UserApi extends AbstractApi {
                 .add("name", name);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("user/name"), builder.build());
 
-        return executeRequest(request);
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                return new UserDto((JSONObject) data);
+            }
+        });
     }
 
     @RequestMapping(value = "/sex", method = RequestMethod.POST)
@@ -109,7 +124,12 @@ public class UserApi extends AbstractApi {
                 .add("sex", sex);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("user/sex"), builder.build());
 
-        return executeRequest(request);
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                return new UserDto((JSONObject) data);
+            }
+        });
     }
 
     @RequestMapping(value = "/birthday", method = RequestMethod.POST)
@@ -119,7 +139,12 @@ public class UserApi extends AbstractApi {
                 .add("birthday", birthday);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("user/birthday"), builder.build());
 
-        return executeRequest(request);
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                return new UserDto((JSONObject) data);
+            }
+        });
     }
 
     @RequestMapping(value = "/city", method = RequestMethod.POST)
@@ -129,7 +154,12 @@ public class UserApi extends AbstractApi {
                 .add("city", city);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("user/city"), builder.build());
 
-        return executeRequest(request);
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                return new UserDto((JSONObject) data);
+            }
+        });
     }
 
     @RequestMapping(value = "/address", method = RequestMethod.POST)
@@ -139,6 +169,11 @@ public class UserApi extends AbstractApi {
                 .add("address", address);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("user/address"), builder.build());
 
-        return executeRequest(request);
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                return new UserDto((JSONObject) data);
+            }
+        });
     }
 }
