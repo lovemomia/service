@@ -2,6 +2,7 @@ package cn.momia.mapi.api.v1.dto.base;
 
 import cn.momia.mapi.img.ImageFile;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
 
@@ -26,7 +27,7 @@ public class UserDto implements Dto {
     private String avatar;
     private String name;
     private String sex;
-    private Date birthday;
+    @JSONField(format = "yyyy-MM-dd") private Date birthday;
     private String city;
     private String address;
 

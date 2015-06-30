@@ -1,6 +1,7 @@
 package cn.momia.mapi.api.v1.dto.base;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -9,7 +10,7 @@ public class ParticipantDto implements Dto {
     private long id;
     private String name;
     private String sex;
-    private Date birthday;
+    @JSONField(format = "yyyy-MM-dd") private Date birthday;
     private String type;
     private int idType;
     private String idNo;
