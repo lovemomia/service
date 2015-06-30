@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+    <!-- Spring MVC配置 -->
+    <context:annotation-config />
+    <!--扫描注解 -->
+    <context:component-scan base-package="cn.momia.admin.web.controller" />
+    <!--默认的mvc注解映射的支持 -->
+    <mvc:annotation-driven/>
+    <!-- 支持异步方法执行 -->
+    <task:annotation-driven />
+
+    <!-- 视图解析器和json解析器 -->
+    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <property name="mediaTypes">
+            <map>
+                <entry key="html" value="text/html"/>
+                <entry key="json" value="application/json"/>
+            </map>
+        </property>
+        <property name="viewResolvers">
+            <list>
+                <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+                    <!--可为空,方便实现自已的依据扩展名来选择视图解释类的逻辑 -->
+                    <property name="prefix" value="/admin/" />
+                    <property name="suffix" value=".jsp"/>
+                </bean>
+            </list>
+        </property>
+        <property name="defaultViews">
+            <list>
+                <bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView" />
+            </list>
+        </property>
+    </bean>
+
+    <!-- 文件上传解析器 -->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- one of the properties available; the maximum file size in bytes -->
+        <property name="maxUploadSize" value="-1"/>
+    </bean>
+
+    <!-- 对静态资源文件的访问 -->
+    <mvc:interceptors>
+        <!-- session超时 -->
+        <mvc:interceptor>
+            <mvc:mapping path="/*/*"/>
+            <bean class="cn.momia.admin.web.error.SessionTimeoutInterceptor">
+                <property name="allowUrls">
+                    <list>
+                        <!-- 如果请求中包含以下路径，则不进行拦截 -->
+                        <value>/login</value>
+                        <value>/user</value>
+                        <value>/category</value>
+                        <value>/place</value>
+                        <value>/product</value>
+                        <value>/property</value>
+                        <value>/sku</value>
+                        <value>/js</value>
+                        <value>/css</value>
+                        <value>/upload</value>
+                        <value>/image</value>
+                        <value>/images</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+    <!-- 总错误处理 -->
+    <bean id="exceptionResolver"
+          class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <!--<property name="defaultErrorView">-->
+        <!--<value>/error</value>-->
+        <!--</property>-->
+        <!--<property name="defaultStatusCode">-->
+        <!--<value>500</value>-->
+        <!--</property>-->
+        <!--<property name="warnLogCategory">-->
+        <!--<-->
+        <!--<value></value>-->
+        <!--&lt;!&ndash; <value>org.springframework.web.servlet.handler.SimpleMappingExceptionResolver</value> &ndash;&gt;-->
+        <!--<props>-->
+        <!--<prop key="com.momia.until.SessionTimeoutException">redirect:/user/login.do</prop>-->
+        <!--</props>-->
+        <!--</property>-->
+    </bean>
+
+</beans>
