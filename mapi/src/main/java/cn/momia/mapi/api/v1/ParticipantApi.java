@@ -28,12 +28,7 @@ public class ParticipantApi extends AbstractApi {
         paticipantJson.put("userId", getUserId(utoken));
         MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("participant"), paticipantJson.toString());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return new ParticipantDto((JSONObject) data);
-            }
-        });
+        return executeRequest(request);
     }
 
     @RequestMapping(method = RequestMethod.GET)

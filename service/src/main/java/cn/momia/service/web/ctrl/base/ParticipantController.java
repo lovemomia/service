@@ -25,9 +25,7 @@ public class ParticipantController {
     public ResponseMessage addParticipant(@RequestBody Participant participant) {
         long participantId = participantService.add(participant);
         if(participantId <= 0) return ResponseMessage.FAILED("fail to add participant");
-
-        participant.setId(participantId);
-        return new ResponseMessage(participant);
+        return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
