@@ -1,9 +1,14 @@
 package cn.momia.mapi.api.misc;
 
+import cn.momia.mapi.api.v1.dto.base.ProductDto;
+import cn.momia.mapi.img.ImageFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.util.TypeUtils;
 import com.google.common.base.Splitter;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -13,8 +18,39 @@ import java.util.Date;
 import java.util.List;
 
 public class ProductUtil {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProductUtil.class);
+
     private static final DateFormat DATE_FORMATTER = new SimpleDateFormat("M月d日");
     private static final DateFormat TIME_FORMATTER = new SimpleDateFormat("h:mm");
+
+    public static List<ProductDto> extractProductsData(JSONArray productsJson) {
+        List<ProductDto> products = new ArrayList<ProductDto>();
+
+        for (int i = 0; i < productsJson.size(); i++) {
+            try {
+                ProductDto product = new ProductDto();
+
+                JSONObject productJson = productsJson.getJSONObject(i);
+                JSONObject placeJson = productJson.getJSONObject("place");
+                JSONArray skusJson = productJson.getJSONArray("skus");
+
+                product.setId(productJson.getLong("id"));
+                product.setCover(ImageFile.url(productJson.getString("cover")));
+                product.setTitle(productJson.getString("title"));
+                product.setAddress(placeJson.getString("address"));
+                product.setPoi(StringUtils.join(new Object[] { placeJson.getDouble("lng"), placeJson.getDouble("lat") }, ":"));
+                product.setScheduler(ProductUtil.getScheduler(skusJson));
+                product.setJoined(productJson.getInteger("sales"));
+                product.setPrice(ProductUtil.getMiniPrice(skusJson));
+
+                products.add(product);
+            } catch (Exception e) {
+                LOGGER.error("fail to parse product: ", productsJson.getJSONObject(i), e);
+            }
+        }
+
+        return products;
+    }
 
     public static float getMiniPrice(JSONArray skusJson) {
         float miniPrice = Float.MAX_VALUE;

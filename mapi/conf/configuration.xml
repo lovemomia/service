@@ -32,6 +32,8 @@
     </Home>
 
     <Product>
+        <PageSize>25</PageSize>
+        <MaxPageCount>50</MaxPageCount>
         <CustomerPageSize>6</CustomerPageSize>
     </Product>
 </Configuration>
