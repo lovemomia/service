@@ -37,7 +37,11 @@ public class UserApi extends AbstractApi {
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
-    public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam String type, @RequestParam int start, @RequestParam final int count) {
+    public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam String type, @RequestParam final int start, @RequestParam final int count) {
+        final int maxPageCount = conf.getInt("Order.MaxPageCount");
+        final int pageSize = conf.getInt("Order.PageSize");
+        if (start > maxPageCount * pageSize) return ResponseMessage.FAILED;
+
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("status", status)
@@ -51,10 +55,13 @@ public class UserApi extends AbstractApi {
             public Dto apply(Object data) {
                 PagedListDto<OrderDto> orders = new PagedListDto<OrderDto>();
 
-                JSONArray ordersPackJson = (JSONArray) data;
-                for (int i = 0; i < ordersPackJson.size(); i++) {
+                JSONObject ordersPackJson = (JSONObject) data;
+                final long totalCount = ordersPackJson.getLong("totalCount");
+                orders.setTotalcount(totalCount);
+                JSONArray ordersJson = ordersPackJson.getJSONArray("orders");
+                for (int i = 0; i < ordersJson.size(); i++) {
                     try {
-                        JSONObject orderPackJson = ordersPackJson.getJSONObject(i);
+                        JSONObject orderPackJson = ordersJson.getJSONObject(i);
                         JSONObject orderJson = orderPackJson.getJSONObject("order");
 
                         OrderDto orderDto = new OrderDto(orderJson);
@@ -63,9 +70,10 @@ public class UserApi extends AbstractApi {
 
                         orders.add(orderDto);
                     } catch (Exception e) {
-                        LOGGER.error("fail to parse order: {}", ordersPackJson.getJSONObject(i), e);
+                        LOGGER.error("fail to parse order: {}", ordersJson.getJSONObject(i), e);
                     }
                 }
+                if (start + count < totalCount) orders.setNextindex(start + count);
 
                 return orders;
             }

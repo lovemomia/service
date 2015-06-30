@@ -39,7 +39,7 @@ public class ProductController extends AbstractController {
     public ResponseMessage getProducts(@RequestParam(value = "city") int cityId, @RequestParam int start, @RequestParam int count, @RequestParam(required = false) String query) {
         if (isInvalidLimit(start, count)) return ResponseMessage.FAILED("invalid limit params");
 
-        long totalCount = productService.queryCount(start, count, new ProductQuery(cityId, query));
+        long totalCount = productService.queryCount(new ProductQuery(cityId, query));
         List<Product> products = productService.query(start, count, new ProductQuery(cityId, query));
 
         JSONObject productsPackJson = new JSONObject();

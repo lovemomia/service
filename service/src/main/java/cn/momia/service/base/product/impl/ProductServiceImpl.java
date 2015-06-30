@@ -145,8 +145,8 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     }
 
     @Override
-    public long queryCount(int start, int count, ProductQuery query) {
-        return baseProductService.queryCount(start, count, query.toString());
+    public long queryCount(ProductQuery query) {
+        return baseProductService.queryCount(query.toString());
     }
 
     @Override

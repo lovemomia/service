@@ -36,4 +36,9 @@
         <MaxPageCount>50</MaxPageCount>
         <CustomerPageSize>6</CustomerPageSize>
     </Product>
+
+    <Order>
+        <PageSize>20</PageSize>
+        <MaxPageCount>50</MaxPageCount>
+    </Order>
 </Configuration>
