@@ -14,8 +14,6 @@ import cn.momia.service.deal.payment.gateway.PrepayResult;
 import cn.momia.service.deal.payment.gateway.factory.PaymentGatewayFactory;
 import cn.momia.service.deal.payment.gateway.factory.PrepayParamFactory;
 import cn.momia.service.web.ctrl.AbstractController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,8 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("/payment")
 public class PaymentController extends AbstractController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PaymentController.class);
-
     @Autowired private UserService userService;
     @Autowired private ProductService productService;
     @Autowired private OrderService orderService;
