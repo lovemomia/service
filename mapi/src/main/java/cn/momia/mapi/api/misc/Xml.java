@@ -1,5 +1,6 @@
 package cn.momia.mapi.api.misc;
 
+// only used by wechat pay callback
 public class Xml {
     private String return_code;
     private String return_msg;
