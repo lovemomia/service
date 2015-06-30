@@ -52,10 +52,10 @@ public class OrderController extends AbstractController {
     private void processContacts(long customerId, String contacts, String mobile) {
         try {
             if (StringUtils.isBlank(contacts)) return;
-            User user = userService.get(customerId);
-            if (!user.exists()) throw new RuntimeException("user not exists");
+            User user = userService.getByMobile(mobile);
+            if (!user.exists()) return;
 
-            if (user.getMobile().equals(mobile) && StringUtils.isBlank(user.getName())) userService.updateName(user.getId(), contacts);
+            if (user.getId() == customerId && StringUtils.isBlank(user.getName())) userService.updateName(user.getId(), contacts);
         } catch (Exception e) {
             LOGGER.warn("fail to process contacts, {}/{}", contacts, mobile);
         }
