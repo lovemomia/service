@@ -37,7 +37,7 @@ public class UserApi extends AbstractApi {
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
-    public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam String type, @RequestParam final int start, @RequestParam final int count) {
+    public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam(defaultValue = "eq") String type, @RequestParam final int start, @RequestParam final int count) {
         final int maxPageCount = conf.getInt("Order.MaxPageCount");
         final int pageSize = conf.getInt("Order.PageSize");
         if (start > maxPageCount * pageSize) return ResponseMessage.FAILED;
