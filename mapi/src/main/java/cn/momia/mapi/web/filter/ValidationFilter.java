@@ -12,8 +12,11 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 public class ValidationFilter implements Filter {
+    private static final Pattern VERSION_PATTERN = Pattern.compile("^/v\\d+/");
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {}
 
@@ -21,12 +24,12 @@ public class ValidationFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-        if (isInvalidProtocol(httpRequest)) {
+        if (isUserAgentMissing(httpRequest) || isInvalidScheme(httpRequest)) {
             forwardErrorPage(request, response, 403);
             return;
         }
 
-        if (!isMWeb(httpRequest)) {
+        if (!needParamsValidation(httpRequest)) {
             if (isParamMissing(httpRequest))
             {
                 forwardErrorPage(request, response, 400);
@@ -44,8 +47,14 @@ public class ValidationFilter implements Filter {
         chain.doFilter(request, response);
     }
 
-    private boolean isInvalidProtocol(HttpServletRequest request) {
-        String schema = request.getScheme();
+    private boolean isUserAgentMissing(HttpServletRequest httpRequest) {
+        String userAgent = httpRequest.getHeader("user-agent");
+
+        return StringUtils.isBlank(userAgent);
+    }
+
+    private boolean isInvalidScheme(HttpServletRequest request) {
+        String scheme = request.getScheme();
         String uri = request.getRequestURI();
 
         if (!(uri.startsWith("/callback") ||
@@ -53,18 +62,17 @@ public class ValidationFilter implements Filter {
                 uri.startsWith("/m/order") ||
                 uri.startsWith("/payment") ||
                 uri.startsWith("/m/payment"))) return false;
-        if (!schema.equals("https")) return true;
+        if (!scheme.equals("https")) return true;
         return false;
     }
 
-    private boolean isMWeb(HttpServletRequest request) {
+    private boolean needParamsValidation(HttpServletRequest request) {
         String uri = request.getRequestURI();
 
-        return uri.startsWith("/m/");
+        return !(uri.startsWith("/callback") || uri.startsWith("/m/"));
     }
 
     private boolean isParamMissing(HttpServletRequest httpRequest) {
-        String userAgent = httpRequest.getHeader("user-agent");
         String version = httpRequest.getParameter("v");
         String teminal = httpRequest.getParameter("teminal");
         String os = httpRequest.getParameter("os");
@@ -74,8 +82,7 @@ public class ValidationFilter implements Filter {
         String expired = httpRequest.getParameter("expired");
         String sign = httpRequest.getParameter("sign");
 
-        return (StringUtils.isBlank(userAgent) ||
-                StringUtils.isBlank(version) ||
+        return (StringUtils.isBlank(version) ||
                 StringUtils.isBlank(teminal) ||
                 StringUtils.isBlank(os) ||
                 StringUtils.isBlank(device) ||
@@ -88,7 +95,7 @@ public class ValidationFilter implements Filter {
     private boolean isInvalidUri(HttpServletRequest request) {
         String uri = request.getRequestURI();
 
-        if (uri.startsWith("/v")) return true;
+        if (VERSION_PATTERN.matcher(uri).find()) return true;
         return false;
     }
 
