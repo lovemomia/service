@@ -6,6 +6,8 @@ import cn.momia.service.base.user.User;
 import cn.momia.service.base.user.UserService;
 import cn.momia.service.sms.SmsSender;
 import cn.momia.service.sms.SmsVerifier;
+import cn.momia.service.sms.impl.AbstractSmsSender;
+import cn.momia.service.sms.impl.MyException;
 import cn.momia.service.web.ctrl.AbstractController;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -30,11 +32,16 @@ public class AuthController extends AbstractController {
     @Autowired private UserService userService;
 
     @RequestMapping(value = "/send", method = RequestMethod.POST)
-    public ResponseMessage send(@RequestParam String mobile) {
+    public ResponseMessage send(@RequestParam String mobile, @RequestParam String type) {
         try {
-            smsSender.send(mobile);
+            smsSender.send(mobile,type);
             return ResponseMessage.SUCCESS;
-        } catch (Exception e) {
+        }
+        catch (MyException e) {
+           return ResponseMessage.FAILED(e.getMessage());
+
+        }
+        catch (Exception e) {
             LOGGER.error("fail to send verify code for {}", mobile, e);
             return ResponseMessage.FAILED;
         }
