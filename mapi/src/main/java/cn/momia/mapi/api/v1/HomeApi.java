@@ -31,6 +31,10 @@ public class HomeApi extends AbstractApi {
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage home(@RequestParam(value = "pageindex") final int pageIndex, @RequestParam(value = "city") int cityId) {
+        final int maxPageCount = conf.getInt("Home.MaxPageCount");
+        final int pageSize = conf.getInt("Home.PageSize");
+        if (pageIndex >= maxPageCount) return ResponseMessage.FAILED;
+
         List<MomiaHttpRequest> requests = buildHomeRequests(pageIndex, cityId);
 
         return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {
@@ -40,10 +44,13 @@ public class HomeApi extends AbstractApi {
 
                 if (pageIndex == 0) homeDto.setBanners(extractBannerData((JSONArray) collector.getResponse("banners")));
 
-                JSONArray productsJson = (JSONArray) collector.getResponse("products");
+                JSONObject productsPackJson = (JSONObject) collector.getResponse("products");
+                long totalCount = productsPackJson.getLong("totalCount");
+                JSONArray productsJson = productsPackJson.getJSONArray("products");
                 List<ProductDto> products = extractProductsData(productsJson);
                 homeDto.setProducts(products);
-                if (productsJson.size() == conf.getInt("Home.PageSize")) homeDto.setNextpage(pageIndex + 1);
+                if (pageIndex < maxPageCount - 1 &&
+                        (pageIndex + 1) * pageSize < totalCount) homeDto.setNextpage(pageIndex + 1);
 
                 return homeDto;
             }

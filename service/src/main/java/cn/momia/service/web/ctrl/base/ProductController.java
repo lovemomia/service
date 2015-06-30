@@ -13,6 +13,7 @@ import cn.momia.service.base.user.participant.ParticipantService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.web.ctrl.AbstractController;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,9 +39,14 @@ public class ProductController extends AbstractController {
     public ResponseMessage getProducts(@RequestParam(value = "city") int cityId, @RequestParam int start, @RequestParam int count, @RequestParam(required = false) String query) {
         if (isInvalidLimit(start, count)) return ResponseMessage.FAILED("invalid limit params");
 
+        long totalCount = productService.queryCount(start, count, new ProductQuery(cityId, query));
         List<Product> products = productService.query(start, count, new ProductQuery(cityId, query));
 
-        return new ResponseMessage(products);
+        JSONObject productsPackJson = new JSONObject();
+        productsPackJson.put("totalCount", totalCount);
+        productsPackJson.put("products", products);
+
+        return new ResponseMessage(productsPackJson);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)

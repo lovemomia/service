@@ -28,6 +28,7 @@
     <Home>
         <BannerCount>3</BannerCount>
         <PageSize>10</PageSize>
+        <MaxPageCount>50</MaxPageCount>
     </Home>
 
     <Product>
