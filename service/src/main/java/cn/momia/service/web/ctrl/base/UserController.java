@@ -6,6 +6,8 @@ import cn.momia.service.base.product.ProductService;
 import cn.momia.service.base.product.sku.Sku;
 import cn.momia.service.base.user.User;
 import cn.momia.service.base.user.UserService;
+import cn.momia.service.base.user.participant.Participant;
+import cn.momia.service.base.user.participant.ParticipantService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.web.ctrl.AbstractController;
@@ -13,6 +15,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,11 +27,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/user")
 public class UserController extends AbstractController {
     @Autowired private UserService userService;
+    @Autowired private ParticipantService participantService;
 
     @Autowired private OrderService orderService;
     @Autowired private ProductService productService;
@@ -165,5 +171,53 @@ public class UserController extends AbstractController {
 
         if (!successful) return ResponseMessage.FAILED("fail to update user address");
         return new ResponseMessage(userService.get(user.getId()));
+    }
+
+    @RequestMapping(value = "/child", method = RequestMethod.POST, consumes = "application/json")
+    public ResponseMessage addChild(@RequestBody Participant child) {
+        User user = userService.get(child.getUserId());
+        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+
+        long participantId = participantService.add(child);
+        if (participantId <= 0) return ResponseMessage.FAILED("fail to add child");
+
+        Set<Long> children = user.getChildren();
+        children.add(participantId);
+        if (!userService.updateChild(user.getId(), children)) return ResponseMessage.FAILED("fail to add child");
+
+        return ResponseMessage.SUCCESS;
+    }
+
+    @RequestMapping(value = "/child/{cid}", method = RequestMethod.DELETE)
+    public ResponseMessage deleteChild(@PathVariable(value = "cid") long participantId, @RequestParam String utoken) {
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+
+        Set<Long> children = user.getChildren();
+        children.remove(participantId);
+        if (!userService.updateChild(user.getId(), children)) return ResponseMessage.FAILED("fail to delete child");
+
+        return ResponseMessage.SUCCESS;
+    }
+
+    @RequestMapping(value = "/child/{cid}", method = RequestMethod.GET)
+    public ResponseMessage getChild(@PathVariable(value = "cid") long childId, @RequestParam String utoken) {
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+
+        Set<Long> children = user.getChildren();
+        if (!children.contains(childId)) return ResponseMessage.FAILED("child not exists");
+
+        return new ResponseMessage(participantService.get(childId));
+    }
+
+    @RequestMapping(value = "/child", method = RequestMethod.GET)
+    public ResponseMessage getChildren(@RequestParam String utoken) {
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+
+        Set<Long> children = user.getChildren();
+
+        return new ResponseMessage(participantService.get(children).values());
     }
 }

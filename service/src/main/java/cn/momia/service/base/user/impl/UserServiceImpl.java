@@ -2,6 +2,7 @@ package cn.momia.service.base.user.impl;
 
 import cn.momia.service.base.city.CityService;
 import cn.momia.service.common.DbAccessService;
+import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -19,11 +20,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class UserServiceImpl extends DbAccessService implements UserService {
-    private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "avatar", "name", "sex", "birthday", "cityId", "address" };
+    private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "avatar", "name", "sex", "birthday", "cityId", "address", "children" };
     private CityService cityService;
 
     public void setCityService(CityService cityService) {
@@ -97,10 +100,20 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         user.setBirthday(rs.getDate("birthday"));
         user.setCity(cityService.get(rs.getInt("cityId")).getName());
         user.setAddress(rs.getString("address"));
+        user.setChildren(parseChildren(rs.getString("children")));
 
         return user;
     }
 
+
+    private Set<Long> parseChildren(String children) {
+        Set<Long> childList = new HashSet<Long>();
+        for (String child : Splitter.on(",").trimResults().omitEmptyStrings().split(children)) {
+            childList.add(Long.valueOf(child));
+        }
+
+        return childList;
+    }
 
     @Override
     public Map<Long, User> get(List<Long> ids) {
@@ -209,5 +222,12 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         String sql = "UPDATE t_user SET address=? WHERE id=?";
 
         return update(id, sql, new Object[] { address, id });
+    }
+
+    @Override
+    public boolean updateChild(long id, Set<Long> children) {
+        String sql = "UPDATE t_user SET children=? WHERE id=?";
+
+        return update(id, sql, new Object[] { StringUtils.join(children, ","), id });
     }
 }

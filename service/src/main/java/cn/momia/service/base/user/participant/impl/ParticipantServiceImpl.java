@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +94,7 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
     }
 
     @Override
-    public Map<Long, Participant> get(List<Long> ids) {
+    public Map<Long, Participant> get(Collection<Long> ids) {
         final Map<Long, Participant> participants = new HashMap<Long, Participant>();
         if (ids.size() <= 0) return participants;
 

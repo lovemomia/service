@@ -3,6 +3,7 @@ package cn.momia.service.base.user;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface UserService {
     User add(String nickName, String mobile, String token);
@@ -18,4 +19,5 @@ public interface UserService {
     boolean updateBirthday(long id, Date birthday);
     boolean updateCityId(long id, int cityId);
     boolean updateAddress(long id, String address);
+    boolean updateChild(long id, Set<Long> children);
 }
