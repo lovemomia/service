@@ -2,11 +2,13 @@ package cn.momia.mapi.api.v1.dto.base;
 
 import com.alibaba.fastjson.JSONArray;
 
+import java.math.BigDecimal;
+
 public class SkuDto implements Dto {
     private long productId;
     private long skuId;
     private int stock;
-    private float minPrice;
+    private BigDecimal minPrice;
     private String time;
     private JSONArray prices;
 
@@ -34,11 +36,11 @@ public class SkuDto implements Dto {
         this.stock = stock;
     }
 
-    public float getMinPrice() {
+    public BigDecimal getMinPrice() {
         return minPrice;
     }
 
-    public void setMinPrice(float minPrice) {
+    public void setMinPrice(BigDecimal minPrice) {
         this.minPrice = minPrice;
     }
 

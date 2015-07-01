@@ -1,6 +1,7 @@
 package cn.momia.service.deal.payment;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class Payment implements Serializable {
@@ -20,7 +21,7 @@ public class Payment implements Serializable {
     private Date finishTime;
     private int payType;
     private String tradeNo;
-    private float fee;
+    private BigDecimal fee;
 
     public long getId() {
         return id;
@@ -70,11 +71,11 @@ public class Payment implements Serializable {
         this.tradeNo = tradeNo;
     }
 
-    public float getFee() {
+    public BigDecimal getFee() {
         return fee;
     }
 
-    public void setFee(float fee) {
+    public void setFee(BigDecimal fee) {
         this.fee = fee;
     }
 

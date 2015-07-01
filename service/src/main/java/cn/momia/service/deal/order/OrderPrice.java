@@ -2,17 +2,19 @@ package cn.momia.service.deal.order;
 
 import com.alibaba.fastjson.JSONObject;
 
+import java.math.BigDecimal;
+
 public class OrderPrice {
-    private float price;
+    private BigDecimal price;
     private int count;
     private int adult;
     private int child;
 
-    public float getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
@@ -43,7 +45,7 @@ public class OrderPrice {
     public OrderPrice() {}
 
     public OrderPrice(JSONObject priceJson) {
-        this.price = priceJson.getFloat("price");
+        this.price = priceJson.getBigDecimal("price");
         this.count = priceJson.getInteger("count");
         this.adult = priceJson.containsKey("adult") ? priceJson.getInteger("adult") : 0;
         this.child = priceJson.containsKey("child") ? priceJson.getInteger("child") : 0;

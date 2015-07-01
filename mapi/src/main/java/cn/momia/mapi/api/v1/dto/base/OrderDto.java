@@ -3,12 +3,14 @@ package cn.momia.mapi.api.v1.dto.base;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import java.math.BigDecimal;
+
 public class OrderDto implements Dto {
     private long id;
     private long productId;
     private long skuId;
     private int count;
-    private float totalFee;
+    private BigDecimal totalFee;
     private String participants;
 
     private String title;
@@ -30,7 +32,7 @@ public class OrderDto implements Dto {
         return count;
     }
 
-    public float getTotalFee() {
+    public BigDecimal getTotalFee() {
         return totalFee;
     }
 
@@ -59,7 +61,7 @@ public class OrderDto implements Dto {
         this.productId = orderJson.getLong("productId");
         this.skuId = orderJson.getLong("skuId");
         this.count = orderJson.getInteger("count");
-        this.totalFee = orderJson.getFloat("totalFee");
+        this.totalFee = orderJson.getBigDecimal("totalFee");
         this.participants = buildParticipants(orderJson.getJSONArray("prices"));
     }
 

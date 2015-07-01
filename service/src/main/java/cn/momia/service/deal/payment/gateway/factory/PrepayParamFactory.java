@@ -36,7 +36,7 @@ public class PrepayParamFactory {
         prepayParam.add(WechatpayPrepayFields.NONCE_STR, WechatpayUtil.createNoncestr(32));
         prepayParam.add(WechatpayPrepayFields.BODY, product.getTitle());
         prepayParam.add(WechatpayPrepayFields.OUT_TRADE_NO, String.valueOf(order.getId()));
-        prepayParam.add(WechatpayPrepayFields.TOTAL_FEE, String.valueOf(order.getTotalFee() * 100));
+        prepayParam.add(WechatpayPrepayFields.TOTAL_FEE, String.valueOf(order.getTotalFee().floatValue() * 100));
         prepayParam.add(WechatpayPrepayFields.SPBILL_CREATE_IP, httpParams.get(WechatpayPrepayFields.SPBILL_CREATE_IP)[0]);
         prepayParam.add(WechatpayPrepayFields.NOTIFY_URL, conf.getString("Payment.Wechat.NotifyUrl"));
         String tradeType = httpParams.get(WechatpayPrepayFields.TRADE_TYPE)[0];
