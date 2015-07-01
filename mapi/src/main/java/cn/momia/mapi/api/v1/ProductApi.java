@@ -168,6 +168,9 @@ public class ProductApi extends AbstractApi {
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
     public ResponseMessage getProductOrder(@RequestParam long id, @RequestParam String utoken) {
+        if(utoken == null || utoken == "")
+            return ResponseMessage.FAILED("please login in first");
+        
         List<MomiaHttpRequest> requests = buildProductOrderRequests(id, utoken);
 
         return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {

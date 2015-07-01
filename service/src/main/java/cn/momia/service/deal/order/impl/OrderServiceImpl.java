@@ -168,7 +168,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         final List<Order> orders = new ArrayList<Order>();
 
         if (status == Order.Status.ALL) {
-            String sql = "SELECT id, customerId, productId, skuId, price, contacts, mobile, participants, status, addTime FROM t_order WHERE customerId=? AND status>0 LIMIT ?,?";
+            String sql = "SELECT id, customerId, productId, skuId, price, contacts, mobile, participants, status, addTime FROM t_order WHERE customerId=? AND status>0 ORDER BY addTime DESC LIMIT ?,?";
             jdbcTemplate.query(sql, new Object[] { userId, start, count }, new RowCallbackHandler() {
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
@@ -176,7 +176,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
                 }
             });
         } else {
-            String sql = "SELECT id, customerId, productId, skuId, price, contacts, mobile, participants, status, addTime FROM t_order WHERE customerId=? AND status>0 AND status" + STATUS_QUERY_TYPE.get(type) + "? LIMIT ?,?";
+            String sql = "SELECT id, customerId, productId, skuId, price, contacts, mobile, participants, status, addTime FROM t_order WHERE customerId=? AND status>0 AND status" + STATUS_QUERY_TYPE.get(type) + "? ORDER BY addTime DESC LIMIT ?,?";
             jdbcTemplate.query(sql, new Object[] { userId, status, start, count }, new RowCallbackHandler() {
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
