@@ -2,6 +2,7 @@ package cn.momia.mapi.api.v1.dto.base;
 
 import com.alibaba.fastjson.JSONArray;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class ProductDto implements Dto {
@@ -10,7 +11,7 @@ public class ProductDto implements Dto {
     private String cover;
     private String title;
     private int joined;
-    private float price;
+    private BigDecimal price;
     private String crowd;
     private String scheduler;
     private String address;
@@ -52,11 +53,11 @@ public class ProductDto implements Dto {
         this.joined = joined;
     }
 
-    public float getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

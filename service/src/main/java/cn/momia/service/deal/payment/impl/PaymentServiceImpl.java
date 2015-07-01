@@ -32,7 +32,7 @@ public class PaymentServiceImpl extends DbAccessService implements PaymentServic
                 ps.setDate(2, new Date(payment.getFinishTime().getTime()));
                 ps.setInt(3, payment.getPayType());
                 ps.setString(4, payment.getTradeNo());
-                ps.setFloat(5, payment.getFee());
+                ps.setBigDecimal(5, payment.getFee());
 
                 return ps;
             }
@@ -66,7 +66,7 @@ public class PaymentServiceImpl extends DbAccessService implements PaymentServic
         payment.setFinishTime(rs.getTimestamp("finishTime"));
         payment.setPayType(rs.getInt("payType"));
         payment.setTradeNo(rs.getString("tradeNo"));
-        payment.setFee(rs.getFloat("fee"));
+        payment.setFee(rs.getBigDecimal("fee"));
 
         return payment;
     }

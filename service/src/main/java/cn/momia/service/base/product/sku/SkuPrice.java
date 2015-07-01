@@ -3,13 +3,14 @@ package cn.momia.service.base.product.sku;
 import com.alibaba.fastjson.JSONObject;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 public class SkuPrice implements Serializable {
     private static final String[] UNIT = { "人", "组" };
 
     private int adult;
     private int child;
-    private float price;
+    private BigDecimal price;
     private String unit;
 
     public int getAdult() {
@@ -20,7 +21,7 @@ public class SkuPrice implements Serializable {
         return child;
     }
 
-    public float getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
@@ -31,7 +32,7 @@ public class SkuPrice implements Serializable {
     public SkuPrice(JSONObject priceJson) {
         this.adult = priceJson.containsKey("adult") ? priceJson.getInteger("adult") : 0;
         this.child = priceJson.containsKey("child") ? priceJson.getInteger("child") : 0;
-        this.price = priceJson.getFloat("price");
+        this.price = priceJson.getBigDecimal("price");
         this.unit = UNIT[priceJson.getInteger("unit")];
     }
 }

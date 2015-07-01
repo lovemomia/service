@@ -21,6 +21,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -154,7 +155,7 @@ public class WechatpayGateway implements PaymentGateway {
         payment.setFinishTime(DATE_FORMATTER.parse(param.get(WechatpayCallbackFields.TIME_END)));
         payment.setPayType(Payment.Type.WECHATPAY);
         payment.setTradeNo(param.get(WechatpayCallbackFields.TRANSACTION_ID));
-        payment.setFee(Integer.valueOf(param.get(WechatpayCallbackFields.TOTAL_FEE)) / 100.0F);
+        payment.setFee(new BigDecimal(param.get(WechatpayCallbackFields.TOTAL_FEE)).divide(new BigDecimal(100)));
 
         return payment;
     }

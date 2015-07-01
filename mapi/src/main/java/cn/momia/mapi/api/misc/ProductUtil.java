@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -52,26 +53,26 @@ public class ProductUtil {
         return products;
     }
 
-    public static float getMiniPrice(JSONArray skusJson) {
-        float miniPrice = Float.MAX_VALUE;
+    public static BigDecimal getMiniPrice(JSONArray skusJson) {
+        BigDecimal miniPrice = new BigDecimal(Float.MAX_VALUE);
 
         for (int i = 0; i < skusJson.size(); i++) {
             JSONObject skuJson = skusJson.getJSONObject(i);
             JSONArray pricesJson = skuJson.getJSONArray("prices");
-            float price = getSkuMiniPrice(pricesJson);
-            if (price < miniPrice) miniPrice = price;
+            BigDecimal price = getSkuMiniPrice(pricesJson);
+            if (price.compareTo(miniPrice) <= 0) miniPrice = price;
         }
 
         return miniPrice;
     }
 
-    public static float getSkuMiniPrice(JSONArray pricesJson) {
-        float miniPrice = Float.MAX_VALUE;
+    public static BigDecimal getSkuMiniPrice(JSONArray pricesJson) {
+        BigDecimal miniPrice = new BigDecimal(Float.MAX_VALUE);
 
         for (int i = 0; i < pricesJson.size(); i++) {
             JSONObject priceJson = pricesJson.getJSONObject(i);
-            float price = priceJson.getFloat("price");
-            if (price < miniPrice) miniPrice = price;
+            BigDecimal price = priceJson.getBigDecimal("price");
+            if (price.compareTo(miniPrice) <= 0) miniPrice = price;
         }
 
         return miniPrice;
