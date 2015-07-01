@@ -54,16 +54,14 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
 
     private boolean userExists(String mobile) {
         String sql = "select id from t_user where mobile=?";
-        int id = jdbcTemplate.query(sql, new Object[]{ mobile }, new ResultSetExtractor<Integer>() {
 
-                    @Override
-                    public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
-                        if (rs.next()) return rs.getInt(1);
-                        return 0;
-                    }
-                });
-        return id != 0;
-
+        return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<Integer>() {
+            @Override
+            public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (rs.next()) return rs.getInt(1);
+                return 0;
+            }
+        }) > 0;
     }
 
     private void sendAsync(final String mobile, final String code) {
@@ -142,6 +140,4 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
 
         return jdbcTemplate.update(sql, new Object[] { mobile }) == 1;
     }
-
-
 }
