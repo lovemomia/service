@@ -168,7 +168,7 @@ public class ProductApi extends AbstractApi {
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
     public ResponseMessage getProductOrder(@RequestParam long id, @RequestParam String utoken) {
-        if(utoken == null || utoken.equals(""))
+        if( StringUtils.isBlank(utoken) )
             return ResponseMessage.FAILED("please login in first");
         
         List<MomiaHttpRequest> requests = buildProductOrderRequests(id, utoken);
@@ -199,7 +199,7 @@ public class ProductApi extends AbstractApi {
 
     private MomiaHttpRequest buildUserRequest(String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        MomiaHttpRequest request = MomiaHttpRequest.GET("contacts", false, baseServiceUrl("user"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET("contacts", true, baseServiceUrl("user"), builder.build());
 
         return request;
     }
