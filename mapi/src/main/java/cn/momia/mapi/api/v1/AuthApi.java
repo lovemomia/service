@@ -7,6 +7,7 @@ import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.UserDto;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,6 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthApi extends AbstractApi {
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     public ResponseMessage send(@RequestParam String mobile, @RequestParam String type)  {
+        if(StringUtils.isBlank(type)||!(StringUtils.equals(type,"login")||StringUtils.equals(type,"register")))
+            return ResponseMessage.FAILED("send code failed, please make sure your type is correct.");
+
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("mobile", mobile)
                 .add("type", type);
