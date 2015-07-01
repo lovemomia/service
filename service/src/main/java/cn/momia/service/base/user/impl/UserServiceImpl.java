@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 public class UserServiceImpl extends DbAccessService implements UserService {
+    private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "avatar", "name", "sex", "birthday", "cityId", "address" };
     private CityService cityService;
 
     public void setCityService(CityService cityService) {
@@ -69,15 +70,19 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public User get(long id) {
-        String sql = "SELECT id, token, nickName, mobile, avatar, name, sex, birthday, cityId, address FROM t_user WHERE id=? AND status=1";
+        String sql = "SELECT " + joinFields() + " FROM t_user WHERE id=? AND status=1";
 
-        return jdbcTemplate.query(sql, new Object[]{id}, new ResultSetExtractor<User>() {
+        return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<User>() {
             @Override
             public User extractData(ResultSet rs) throws SQLException, DataAccessException {
                 if (rs.next()) return buildUser(rs);
                 return User.NOT_EXIST_USER;
             }
         });
+    }
+
+    private String joinFields() {
+        return StringUtils.join(USER_FIELDS, ",");
     }
 
     private User buildUser(ResultSet rs) throws SQLException {
@@ -102,7 +107,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         final Map<Long, User> users = new HashMap<Long, User>();
         if (ids.size() <= 0) return users;
 
-        String sql = "SELECT id, token, nickName, mobile, avatar, name, sex, birthday, cityId, address FROM t_user WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
+        String sql = "SELECT " + joinFields() + " FROM t_user WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -116,7 +121,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public User getByToken(String token) {
-        String sql = "SELECT id, token, nickName, mobile, avatar, name, sex, birthday, cityId, address FROM t_user WHERE token=? AND status=1";
+        String sql = "SELECT " + joinFields() + " FROM t_user WHERE token=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { token }, new ResultSetExtractor<User>() {
             @Override
@@ -129,7 +134,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public User getByMobile(String mobile) {
-        String sql = "SELECT id, token, nickName, mobile, avatar, name, sex, birthday, cityId, address FROM t_user WHERE mobile=? AND status=1";
+        String sql = "SELECT " + joinFields() + " FROM t_user WHERE mobile=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<User>() {
             @Override

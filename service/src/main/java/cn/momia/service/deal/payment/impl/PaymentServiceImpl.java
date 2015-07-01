@@ -3,6 +3,7 @@ package cn.momia.service.deal.payment.impl;
 import cn.momia.service.common.DbAccessService;
 import cn.momia.service.deal.payment.Payment;
 import cn.momia.service.deal.payment.PaymentService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -17,6 +18,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class PaymentServiceImpl extends DbAccessService implements PaymentService {
+    private static final String[] PAYMENT_FIELDS = { "id", "orderId", "finishTime", "payType", "tradeNo", "fee" };
     @Override
     public long add(final Payment payment) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -41,7 +43,7 @@ public class PaymentServiceImpl extends DbAccessService implements PaymentServic
 
     @Override
     public Payment get(long id) {
-        String sql = "SELECT id, orderId, finishTime, payType, tradeNo, fee FROM t_payment WHERE id=? AND status=1";
+        String sql = "SELECT " + joinFields() + " FROM t_payment WHERE id=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Payment>() {
             @Override
@@ -50,6 +52,10 @@ public class PaymentServiceImpl extends DbAccessService implements PaymentServic
                 return Payment.NOT_EXIST_PAYMENT;
             }
         });
+    }
+
+    private String joinFields() {
+        return StringUtils.join(PAYMENT_FIELDS, ",");
     }
 
     private Payment buildPayment(ResultSet rs) throws SQLException {
@@ -67,7 +73,7 @@ public class PaymentServiceImpl extends DbAccessService implements PaymentServic
 
     @Override
     public Payment getByOrder(long orderId) {
-        String sql = "SELECT id, orderId, finishTime, payType, tradeNo, fee FROM t_payment WHERE orderId=? AND status=1";
+        String sql = "SELECT " + joinFields() + " FROM t_payment WHERE orderId=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { orderId }, new ResultSetExtractor<Payment>() {
             @Override
