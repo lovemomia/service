@@ -24,7 +24,7 @@ public class ValidationFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-        if (isUserAgentMissing(httpRequest) || isInvalidScheme(httpRequest)) {
+        /*if (isUserAgentMissing(httpRequest) || isInvalidScheme(httpRequest)) {
             forwardErrorPage(request, response, 403);
             return;
         }
@@ -42,7 +42,7 @@ public class ValidationFilter implements Filter {
                 return;
             }
         }
-       
+       */
 
         chain.doFilter(request, response);
     }
