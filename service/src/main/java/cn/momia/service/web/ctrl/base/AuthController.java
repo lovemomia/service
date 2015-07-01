@@ -6,8 +6,7 @@ import cn.momia.service.base.user.User;
 import cn.momia.service.base.user.UserService;
 import cn.momia.service.sms.SmsSender;
 import cn.momia.service.sms.SmsVerifier;
-import cn.momia.service.sms.impl.AbstractSmsSender;
-import cn.momia.service.sms.impl.MyException;
+import cn.momia.service.sms.impl.SmsLoginException;
 import cn.momia.service.web.ctrl.AbstractController;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,7 +36,7 @@ public class AuthController extends AbstractController {
             smsSender.send(mobile,type);
             return ResponseMessage.SUCCESS;
         }
-        catch (MyException e) {
+        catch (SmsLoginException e) {
            return ResponseMessage.FAILED(e.getMessage());
 
         }
