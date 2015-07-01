@@ -83,7 +83,7 @@ public class UserApi extends AbstractApi {
 
     @RequestMapping(value = "/nickname", method = RequestMethod.POST)
     public ResponseMessage updateNickName(@RequestParam String utoken, @RequestParam(value = "nickname") String nickName) {
-        if(nickName == "") return ResponseMessage.FAILED("nickname is empty, please enter your nickname");
+        if(nickName.equals("")) return ResponseMessage.FAILED("nickname is empty, please enter your nickname");
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -105,7 +105,7 @@ public class UserApi extends AbstractApi {
 
     @RequestMapping(value = "/name", method = RequestMethod.POST)
     public ResponseMessage updateName(@RequestParam String utoken, @RequestParam String name) {
-        if(name == "") return ResponseMessage.FAILED("name is empty, please enter your name");
+        if(name.equals("")) return ResponseMessage.FAILED("name is empty, please enter your name");
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -117,7 +117,7 @@ public class UserApi extends AbstractApi {
 
     @RequestMapping(value = "/sex", method = RequestMethod.POST)
     public ResponseMessage updateSex(@RequestParam String utoken, @RequestParam String sex) {
-        if(sex == "") return ResponseMessage.FAILED("sex is empty, please enter your sex");
+        if(sex.equals("")) return ResponseMessage.FAILED("sex is empty, please enter your sex");
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -129,7 +129,7 @@ public class UserApi extends AbstractApi {
 
     @RequestMapping(value = "/birthday", method = RequestMethod.POST)
     public ResponseMessage updateBirthday(@RequestParam String utoken, @RequestParam String birthday) {
-        if(birthday == null) return ResponseMessage.FAILED("birthday is empty, please enter your birthday");
+        if(birthday.equals("")) return ResponseMessage.FAILED("birthday is empty, please enter your birthday");
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -153,7 +153,7 @@ public class UserApi extends AbstractApi {
 
     @RequestMapping(value = "/address", method = RequestMethod.POST)
     public ResponseMessage updateAddress(@RequestParam String utoken, @RequestParam String address) {
-        if(address == "") return ResponseMessage.FAILED("address is empty, please enter your address");
+        if(address.equals("")) return ResponseMessage.FAILED("address is empty, please enter your address");
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
