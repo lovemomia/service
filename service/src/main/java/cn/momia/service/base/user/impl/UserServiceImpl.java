@@ -85,7 +85,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         user.setId(rs.getLong("id"));
         user.setToken(rs.getString("token"));
         user.setNickName(rs.getString("nickName"));
-        user.setMobile(encryptMobile(rs.getString("mobile")));
+        user.setMobile(rs.getString("mobile"));
         user.setAvatar(rs.getString("avatar"));
         user.setName(rs.getString("name"));
         user.setSex(rs.getString("sex"));
@@ -96,9 +96,6 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         return user;
     }
 
-    private String encryptMobile(String mobile) {
-        return mobile.substring(0, 3) + "****" + mobile.substring(7);
-    }
 
     @Override
     public Map<Long, User> get(List<Long> ids) {

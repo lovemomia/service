@@ -70,12 +70,16 @@ public class UserDto implements Dto {
     public UserDto(JSONObject userJson) {
         this.token = userJson.getString("token");
         this.nickName = userJson.getString("nickName");
-        this.mobile = userJson.getString("mobile");
+        this.mobile = encryptMobile(userJson.getString("mobile"));
         this.avatar = ImageFile.url(userJson.getString("avatar"));
         this.name = userJson.getString("name");
         this.sex = userJson.getString("sex");
         this.birthday = userJson.getDate("birthday");
         this.city = userJson.getString("city");
         this.address = userJson.getString("address");
+    }
+
+    private String encryptMobile(String mobile) {
+        return mobile.substring(0, 3) + "****" + mobile.substring(7);
     }
 }
