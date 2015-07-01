@@ -24,25 +24,24 @@ public class ValidationFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-        /*if (isUserAgentMissing(httpRequest) || isInvalidScheme(httpRequest)) {
-            forwardErrorPage(request, response, 403);
+        if (isUserAgentMissing(httpRequest)) {
+            forwardErrorPage(request, response, 400);
             return;
         }
 
-        if (!needParamsValidation(httpRequest)) {
-            if (isParamMissing(httpRequest))
-            {
-                forwardErrorPage(request, response, 400);
-                return;
-            }
-
-            if (isInvalidUri(httpRequest) || isExpired(httpRequest) || isInvalidSign(httpRequest))
-            {
-                forwardErrorPage(request, response, 403);
-                return;
-            }
-        }
-       */
+//        if (!needParamsValidation(httpRequest)) {
+//            if (isParamMissing(httpRequest))
+//            {
+//                forwardErrorPage(request, response, 400);
+//                return;
+//            }
+//
+//            if (isInvalidUri(httpRequest) || isExpired(httpRequest) || isInvalidSign(httpRequest))
+//            {
+//                forwardErrorPage(request, response, 403);
+//                return;
+//            }
+//        }
 
         chain.doFilter(request, response);
     }
@@ -51,19 +50,6 @@ public class ValidationFilter implements Filter {
         String userAgent = httpRequest.getHeader("user-agent");
 
         return StringUtils.isBlank(userAgent);
-    }
-
-    private boolean isInvalidScheme(HttpServletRequest request) {
-        String scheme = request.getScheme();
-        String uri = request.getRequestURI();
-
-        if (!(uri.startsWith("/callback") ||
-                uri.startsWith("/order") ||
-                uri.startsWith("/m/order") ||
-                uri.startsWith("/payment") ||
-                uri.startsWith("/m/payment"))) return false;
-        if (!scheme.equals("https")) return true;
-        return false;
     }
 
     private boolean needParamsValidation(HttpServletRequest request) {
