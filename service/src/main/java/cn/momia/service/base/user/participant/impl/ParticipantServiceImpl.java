@@ -17,11 +17,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ParticipantServiceImpl extends DbAccessService implements ParticipantService {
+    private static final String[] PARTICIPANT_FIELDS = { "id", "userId", "name", "sex", "birthday", "idType", "idNo" };
     @Override
     public long add(final Participant participant) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -63,7 +65,7 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
 
     @Override
     public Participant get(long id) {
-        String sql = "SELECT id, userId, name, sex, birthday, idType, idNo FROM t_user_participant WHERE id=? AND status=1";
+        String sql = "SELECT " + joinFields() + " FROM t_user_participant WHERE id=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Participant>() {
             @Override
@@ -72,6 +74,10 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
                 return Participant.NOT_EXIST_PARTICIPANT;
             }
         });
+    }
+
+    private String joinFields() {
+        return StringUtils.join(PARTICIPANT_FIELDS, ",");
     }
 
     public Participant buildParticipant(ResultSet rs) throws SQLException {
@@ -88,11 +94,11 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
     }
 
     @Override
-    public Map<Long, Participant> get(List<Long> ids) {
+    public Map<Long, Participant> get(Collection<Long> ids) {
         final Map<Long, Participant> participants = new HashMap<Long, Participant>();
         if (ids.size() <= 0) return participants;
 
-        String sql = "SELECT id, userId, name, sex, birthday, idType, idNo FROM t_user_participant WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
+        String sql = "SELECT " + joinFields() + " FROM t_user_participant WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -108,7 +114,7 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
     public List<Participant> getByUser(long userId) {
         final List<Participant> participants = new ArrayList<Participant>();
 
-        String sql = "SELECT id, userId, name, sex, birthday, idType, idNo FROM t_user_participant WHERE userId=? AND status=1";
+        String sql = "SELECT " + joinFields() + " FROM t_user_participant WHERE userId=? AND status=1";
         jdbcTemplate.query(sql, new Object[] { userId }, new RowCallbackHandler() {
 
             @Override

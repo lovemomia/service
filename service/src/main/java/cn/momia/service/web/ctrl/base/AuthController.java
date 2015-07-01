@@ -33,12 +33,11 @@ public class AuthController extends AbstractController {
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     public ResponseMessage send(@RequestParam String mobile, @RequestParam String type) {
         try {
-            smsSender.send(mobile,type);
+            smsSender.send(mobile, type);
             return ResponseMessage.SUCCESS;
         }
         catch (SmsLoginException e) {
            return ResponseMessage.FAILED(e.getMessage());
-
         }
         catch (Exception e) {
             LOGGER.error("fail to send verify code for {}", mobile, e);

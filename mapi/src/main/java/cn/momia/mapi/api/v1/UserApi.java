@@ -6,18 +6,24 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.OrderDto;
+import cn.momia.mapi.api.v1.dto.base.ParticipantDto;
+import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import cn.momia.mapi.api.v1.dto.composite.PagedListDto;
 import cn.momia.mapi.api.v1.dto.base.UserDto;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Set;
 
 @RestController
 @RequestMapping("/v1/user")
@@ -164,4 +170,61 @@ public class UserApi extends AbstractApi {
         return executeRequest(request, userFunc);
     }
 
+    @RequestMapping(value = "/child", method = RequestMethod.POST)
+    public ResponseMessage addChild(@RequestParam String utoken, @RequestParam String child) {
+        JSONObject childJson = JSON.parseObject(child);
+        childJson.put("userId", getUserId(utoken));
+        MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("user/child"), childJson.toString());
+
+        return executeRequest(request);
+    }
+
+    @RequestMapping(value = "/child/update", method = RequestMethod.POST)
+    public ResponseMessage updateChild(@RequestParam String utoken, @RequestParam String child) {
+        JSONObject childJson = JSON.parseObject(child);
+        childJson.put("userId", getUserId(utoken));
+        MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("participant"), childJson.toString());
+
+        return executeRequest(request);
+    }
+
+    @RequestMapping(value = "/child/delete", method = RequestMethod.POST)
+    public ResponseMessage deleteChild(@RequestParam String utoken, @RequestParam(value = "cid") long childId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        MomiaHttpRequest request = MomiaHttpRequest.DELETE(baseServiceUrl("user/child", childId), builder.build());
+
+        return executeRequest(request);
+    }
+
+    @RequestMapping(value = "/child", method = RequestMethod.GET)
+    public ResponseMessage getChild(@PathVariable(value = "cid") long childId, @RequestParam String utoken) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user/child", childId), builder.build());
+
+        return executeRequest(request);
+    }
+
+    @RequestMapping(value = "/child/list", method = RequestMethod.GET)
+    public ResponseMessage getChildren(@RequestParam String utoken) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user/child"), builder.build());
+
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                ListDto children = new ListDto();
+                JSONArray childrenJson = (JSONArray) data;
+                for (int i = 0; i < childrenJson.size(); i++) {
+                    try {
+                        JSONObject childJson = childrenJson.getJSONObject(i);
+                        children.add(new ParticipantDto(childJson));
+                    } catch (Exception e) {
+                        LOGGER.error("invalid child: {}", childrenJson);
+                    }
+                }
+
+                return children;
+            }
+        });
+    }
 }
