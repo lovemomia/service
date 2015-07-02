@@ -175,8 +175,13 @@ public class UserApi extends AbstractApi {
 
     @RequestMapping(value = "/child", method = RequestMethod.POST)
     public ResponseMessage addChild(@RequestParam String utoken, @RequestParam String child) {
+        if(StringUtils.isBlank(utoken) || StringUtils.isBlank(child)) return ResponseMessage.BAD_REQUEST;
+
+        long userId = getUserId(utoken);
+        if (userId <= 0) return ResponseMessage.TOKEN_EXPIRED;
+
         JSONObject childJson = JSON.parseObject(child);
-        childJson.put("userId", getUserId(utoken));
+        childJson.put("userId", userId);
         MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("user/child"), childJson.toString());
 
         return executeRequest(request);
@@ -186,8 +191,11 @@ public class UserApi extends AbstractApi {
     public ResponseMessage updateChild(@RequestParam String utoken, @RequestParam String child) {
         if(StringUtils.isBlank(utoken) || StringUtils.isBlank(child)) return ResponseMessage.BAD_REQUEST;
 
+        long userId = getUserId(utoken);
+        if (userId <= 0) return ResponseMessage.TOKEN_EXPIRED;
+
         JSONObject childJson = JSON.parseObject(child);
-        childJson.put("userId", getUserId(utoken));
+        childJson.put("userId", userId);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("participant"), childJson.toString());
 
         return executeRequest(request);

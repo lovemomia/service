@@ -28,8 +28,11 @@ public class ParticipantApi extends AbstractApi {
     public ResponseMessage addParticipant(@RequestParam String utoken, @RequestParam String participant) {
         if (StringUtils.isBlank(utoken) || StringUtils.isBlank(participant)) return ResponseMessage.BAD_REQUEST;
 
+        long userId = getUserId(utoken);
+        if (userId <= 0) return ResponseMessage.TOKEN_EXPIRED;
+
         JSONObject paticipantJson = JSON.parseObject(participant);
-        paticipantJson.put("userId", getUserId(utoken));
+        paticipantJson.put("userId", userId);
         MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("participant"), paticipantJson.toString());
 
         return executeRequest(request);
@@ -54,8 +57,11 @@ public class ParticipantApi extends AbstractApi {
     public ResponseMessage updateParticipant(@RequestParam String utoken, @RequestParam String participant) {
         if (StringUtils.isBlank(utoken) || StringUtils.isBlank(participant)) return ResponseMessage.BAD_REQUEST;
 
+        long userId = getUserId(utoken);
+        if (userId <= 0) return ResponseMessage.TOKEN_EXPIRED;
+
         JSONObject paticipantJson = JSON.parseObject(participant);
-        paticipantJson.put("userId", getUserId(utoken));
+        paticipantJson.put("userId", userId);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("participant"), paticipantJson.toString());
 
         return executeRequest(request);

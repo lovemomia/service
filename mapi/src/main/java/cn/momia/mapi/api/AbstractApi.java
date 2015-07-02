@@ -78,6 +78,7 @@ public abstract class AbstractApi {
 
         ResponseMessage responseMessage = executeRequest(request);
         if (responseMessage.getErrno() == ErrorCode.SUCCESS) return ((JSONObject) responseMessage.getData()).getLong("id");
+        if (responseMessage.getErrno() == ErrorCode.TOKEN_EXPIRED) return 0;
 
         throw new RuntimeException("fail to get user id");
     }
