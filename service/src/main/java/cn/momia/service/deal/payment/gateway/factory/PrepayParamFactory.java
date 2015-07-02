@@ -31,7 +31,17 @@ public class PrepayParamFactory {
 
     private static PrepayParam createWechatpayPrepayParam(Map<String, String[]> httpParams, Product product, Order order) {
         PrepayParam prepayParam = new PrepayParam();
-        prepayParam.add(WechatpayPrepayFields.APPID, conf.getString("Payment.Wechat.AppId"));
+        String tradeType = httpParams.get(WechatpayPrepayFields.TRADE_TYPE)[0];
+        if (tradeType.equals("NATIVE")) {
+            prepayParam.add(WechatpayPrepayFields.APPID, conf.getString("Payment.Wechat.NativeAppId"));
+            prepayParam.add(WechatpayPrepayFields.PRODUCT_ID, String.valueOf(product.getId()));
+        } else if (tradeType.equals("JSAPI")) {
+            prepayParam.add(WechatpayPrepayFields.APPID, conf.getString("Payment.Wechat.JsApiAppId"));
+            prepayParam.add(WechatpayPrepayFields.OPENID, httpParams.get(WechatpayPrepayFields.OPENID)[0]);
+        } else {
+            throw new RuntimeException("not supported trade type: " + tradeType);
+        }
+
         prepayParam.add(WechatpayPrepayFields.MCH_ID, conf.getString("Payment.Wechat.MchId"));
         prepayParam.add(WechatpayPrepayFields.NONCE_STR, WechatpayUtil.createNoncestr(32));
         prepayParam.add(WechatpayPrepayFields.BODY, product.getTitle());
@@ -39,10 +49,7 @@ public class PrepayParamFactory {
         prepayParam.add(WechatpayPrepayFields.TOTAL_FEE, String.valueOf(order.getTotalFee().floatValue() * 100));
         prepayParam.add(WechatpayPrepayFields.SPBILL_CREATE_IP, httpParams.get(WechatpayPrepayFields.SPBILL_CREATE_IP)[0]);
         prepayParam.add(WechatpayPrepayFields.NOTIFY_URL, conf.getString("Payment.Wechat.NotifyUrl"));
-        String tradeType = httpParams.get(WechatpayPrepayFields.TRADE_TYPE)[0];
         prepayParam.add(WechatpayPrepayFields.TRADE_TYPE, tradeType);
-        if (tradeType.equals("NATIVE")) prepayParam.add(WechatpayPrepayFields.PRODUCT_ID, String.valueOf(product.getId()));
-        if (tradeType.equals("JSAPI")) prepayParam.add(WechatpayPrepayFields.OPENID, httpParams.get(WechatpayPrepayFields.OPENID)[0]);
         prepayParam.add(WechatpayPrepayFields.SIGN, WechatpayUtil.sign(prepayParam));
 
         return prepayParam;
