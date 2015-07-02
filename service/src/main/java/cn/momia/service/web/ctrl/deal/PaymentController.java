@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/payment")
@@ -36,12 +37,13 @@ public class PaymentController extends AbstractController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) ResponseMessage.FAILED("user not exists");
 
-        Product product = getProduct(request);
         Order order = getOrder(request);
-        if (!product.exists() || !order.exists()) return ResponseMessage.FAILED("product or(and) order does not exist");
+        Product product = getProduct(request);
+        if (!order.exists() || !product.exists()) return ResponseMessage.FAILED("order or(and) product does not exist");
 
-        PrepayParam prepayParam = PrepayParamFactory.create(request.getParameterMap(), product, order, Payment.Type.WECHATPAY);
         PaymentGateway gateway = PaymentGatewayFactory.create(Payment.Type.WECHATPAY);
+        Map<String, String> params = gateway.extractPrepayParams(request.getParameterMap(), order, product);
+        PrepayParam prepayParam = PrepayParamFactory.create(params, Payment.Type.WECHATPAY);
         PrepayResult prepayResult = gateway.prepay(prepayParam);
 
         return new ResponseMessage(prepayResult);

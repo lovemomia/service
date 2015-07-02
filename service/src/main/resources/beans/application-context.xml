@@ -69,10 +69,6 @@
     </bean>
     <bean id="smsVerifier" class="cn.momia.service.sms.SmsVerifier" parent="dbAccessService" />
 
-    <bean class="cn.momia.service.deal.payment.gateway.factory.PrepayParamFactory">
-        <property name="conf" ref="conf" />
-    </bean>
-
     <bean id="alipay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
         <property name="staticField" value="cn.momia.service.deal.payment.Payment.Type.ALIPAY" />
     </bean>

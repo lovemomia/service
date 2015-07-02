@@ -2,6 +2,9 @@ package cn.momia.service.deal.payment.gateway.wechatpay;
 
 import cn.momia.common.config.Configuration;
 import cn.momia.common.misc.XmlUtil;
+import cn.momia.common.web.secret.SecretKey;
+import cn.momia.service.base.product.Product;
+import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.deal.payment.Payment;
 import cn.momia.service.deal.payment.PaymentService;
@@ -10,9 +13,12 @@ import cn.momia.service.deal.payment.gateway.CallbackResult;
 import cn.momia.service.deal.payment.gateway.PaymentGateway;
 import cn.momia.service.deal.payment.gateway.PrepayParam;
 import cn.momia.service.deal.payment.gateway.PrepayResult;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
@@ -25,6 +31,7 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.Map;
 
 public class WechatpayGateway implements PaymentGateway {
@@ -50,6 +57,63 @@ public class WechatpayGateway implements PaymentGateway {
 
     public void setPaymentService(PaymentService paymentService) {
         this.paymentService = paymentService;
+    }
+
+    @Override
+    public Map<String, String> extractPrepayParams(Map<String, String[]> httpParams, Order order, Product product) {
+        Map<String, String> params = new HashMap<String, String>();
+        String tradeType = httpParams.get(WechatpayPrepayFields.TRADE_TYPE)[0];
+        if (tradeType.equals("NATIVE")) {
+            params.put(WechatpayPrepayFields.APPID, conf.getString("Payment.Wechat.NativeAppId"));
+            params.put(WechatpayPrepayFields.PRODUCT_ID, String.valueOf(product.getId()));
+        } else if (tradeType.equals("JSAPI")) {
+            params.put(WechatpayPrepayFields.APPID, conf.getString("Payment.Wechat.JsApiAppId"));
+            params.put(WechatpayPrepayFields.OPENID, getJsApiOpenId(httpParams.get(WechatpayPrepayFields.CODE)[0]));
+        } else {
+            throw new RuntimeException("not supported trade type: " + tradeType);
+        }
+
+        params.put(WechatpayPrepayFields.MCH_ID, conf.getString("Payment.Wechat.MchId"));
+        params.put(WechatpayPrepayFields.NONCE_STR, WechatpayUtil.createNoncestr(32));
+        params.put(WechatpayPrepayFields.BODY, product.getTitle());
+        params.put(WechatpayPrepayFields.OUT_TRADE_NO, String.valueOf(order.getId()));
+        params.put(WechatpayPrepayFields.TOTAL_FEE, String.valueOf(order.getTotalFee().floatValue() * 100));
+        params.put(WechatpayPrepayFields.SPBILL_CREATE_IP, httpParams.get(WechatpayPrepayFields.SPBILL_CREATE_IP)[0]);
+        params.put(WechatpayPrepayFields.NOTIFY_URL, conf.getString("Payment.Wechat.NotifyUrl"));
+        params.put(WechatpayPrepayFields.TRADE_TYPE, tradeType);
+        params.put(WechatpayPrepayFields.SIGN, WechatpayUtil.sign(params, tradeType));
+
+        return params;
+    }
+
+    private String getJsApiOpenId(String code) {
+        try {
+            HttpClient httpClient = HttpClients.createDefault();
+            StringBuilder urlBuilder = new StringBuilder();
+            urlBuilder.append(conf.getString("Payment.Wechat.AccessTokenService"))
+                    .append("?")
+                    .append("appid=").append(conf.getString("Payment.Wechat.JsApiAppId"))
+                    .append("&")
+                    .append("secret=").append(SecretKey.get("wechatpayAppKey"))
+                    .append("&")
+                    .append("code=").append(code)
+                    .append("&")
+                    .append("grant_type=authorization_code");
+            HttpGet request = new HttpGet(urlBuilder.toString());
+            HttpResponse response = httpClient.execute(request);
+            if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                throw new RuntimeException("fail to execute request: " + request);
+            }
+
+            String entity = EntityUtils.toString(response.getEntity());
+            JSONObject resultJson = JSON.parseObject(entity);
+
+            if (resultJson.containsKey("openid")) return resultJson.getString("openid");
+
+            throw new RuntimeException("fail to get openid");
+        } catch (Exception e) {
+            throw new RuntimeException("fail to get openid");
+        }
     }
 
     @Override
