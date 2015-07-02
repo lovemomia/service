@@ -12,7 +12,7 @@ public class ParticipantDto implements Dto {
     private String sex;
     @JSONField(format = "yyyy-MM-dd") private Date birthday;
     private String type;
-    private int idType;
+    private Integer idType;
     private String idNo;
 
     public long getId() {
@@ -33,7 +33,7 @@ public class ParticipantDto implements Dto {
 
     public String getType() { return type; }
 
-    public int getIdType() {
+    public Integer getIdType() {
         return idType;
     }
 
