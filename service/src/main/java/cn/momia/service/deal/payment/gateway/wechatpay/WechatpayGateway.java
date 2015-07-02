@@ -113,6 +113,7 @@ public class WechatpayGateway implements PaymentGateway {
             result.add(WechatpayCallbackFields.RETURN_CODE, FAIL);
             result.add(WechatpayCallbackFields.RETURN_MSG, ERROR);
         } else {
+            result.setSuccessful(true);
             result.add(WechatpayCallbackFields.RETURN_CODE, SUCCESS);
             result.add(WechatpayCallbackFields.RETURN_MSG, OK);
         }
