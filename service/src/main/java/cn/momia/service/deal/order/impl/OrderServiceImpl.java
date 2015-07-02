@@ -224,9 +224,9 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
-    public boolean check(long userId, long productId, long skuId) {
-        String sql = "SELECT status FROM t_order WHERE customerId=? AND productId=? AND skuId=?";
-        int status = jdbcTemplate.query(sql, new Object[] { userId, productId, skuId }, new ResultSetExtractor<Integer>() {
+    public boolean check(long id, long userId, long productId, long skuId) {
+        String sql = "SELECT status FROM t_order WHERE id=? AND customerId=? AND productId=? AND skuId=?";
+        int status = jdbcTemplate.query(sql, new Object[] { id, userId, productId, skuId }, new ResultSetExtractor<Integer>() {
             @Override
             public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
                 if (rs.next()) return rs.getInt("status");
