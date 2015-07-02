@@ -49,12 +49,12 @@ public class PaymentController extends AbstractController {
         return new ResponseMessage(prepayResult);
     }
 
-    private Product getProduct(HttpServletRequest request) {
-        return productService.get(Long.valueOf(request.getParameter("productid")));
+    private Order getOrder(HttpServletRequest request) {
+        return orderService.get(Long.valueOf(request.getParameter("oid")));
     }
 
-    private Order getOrder(HttpServletRequest request) {
-        return orderService.get(Long.valueOf(request.getParameter("orderid")));
+    private Product getProduct(HttpServletRequest request) {
+        return productService.get(Long.valueOf(request.getParameter("pid")));
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.GET)

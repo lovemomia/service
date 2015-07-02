@@ -77,7 +77,7 @@ public class WechatpayGateway implements PaymentGateway {
         params.put(WechatpayPrepayFields.NONCE_STR, WechatpayUtil.createNoncestr(32));
         params.put(WechatpayPrepayFields.BODY, product.getTitle());
         params.put(WechatpayPrepayFields.OUT_TRADE_NO, String.valueOf(order.getId()));
-        params.put(WechatpayPrepayFields.TOTAL_FEE, String.valueOf(order.getTotalFee().floatValue() * 100));
+        params.put(WechatpayPrepayFields.TOTAL_FEE, String.valueOf((int) (order.getTotalFee().floatValue() * 100)));
         params.put(WechatpayPrepayFields.SPBILL_CREATE_IP, httpParams.get(WechatpayPrepayFields.SPBILL_CREATE_IP)[0]);
         params.put(WechatpayPrepayFields.NOTIFY_URL, conf.getString("Payment.Wechat.NotifyUrl"));
         params.put(WechatpayPrepayFields.TRADE_TYPE, tradeType);
@@ -128,7 +128,7 @@ public class WechatpayGateway implements PaymentGateway {
                 throw new RuntimeException("fail to execute request: " + request);
             }
 
-            String entity = EntityUtils.toString(response.getEntity());
+            String entity = EntityUtils.toString(response.getEntity(), "utf-8");
             processResponseEntity(result, entity);
         } catch (Exception e) {
             LOGGER.error("fail to prepay", e);
@@ -167,6 +167,8 @@ public class WechatpayGateway implements PaymentGateway {
             result.add(WechatpayPrepayFields.SIGN, params.get(WechatpayPrepayFields.SIGN));
             result.add(WechatpayPrepayFields.TRADE_TYPE, params.get(WechatpayPrepayFields.TRADE_TYPE));
             result.add(WechatpayPrepayFields.PREPAY_ID, params.get(WechatpayPrepayFields.PREPAY_ID));
+        } else {
+            LOGGER.error("fail to prepay: {}/{}", params.get(WechatpayPrepayFields.RETURN_CODE), params.get(WechatpayPrepayFields.RETURN_MSG));
         }
     }
 

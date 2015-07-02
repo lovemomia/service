@@ -16,6 +16,8 @@ public class WechatpayPrepayFields {
 
     public static final String RETURN_CODE = "return_code";
     public static final String RETURN_MSG = "return_msg";
+    public static final String ERR_CODE = "err_code";
+    public static final String ERR_CODE_DES = "err_code_des";
 
     public static final String RESULT_CODE = "result_code"; //返回结果编码
     public static final String TRADE_TYPE = "trade_type";
