@@ -77,6 +77,8 @@ public class AuthController extends AbstractController {
         if (StringUtils.isBlank(nickName) || StringUtils.isBlank(mobile) || StringUtils.isBlank(code))
             return ResponseMessage.FAILED("one or more of nickName, mobile and verify code is empty");
 
+        if(userService.getByNickName(nickName).exists()) return ResponseMessage.FAILED("fail to register, nickName already exists");
+
         if (!smsVerifier.verify(mobile, code)) return ResponseMessage.FAILED("fail to verify code");
 
         User user = userService.getByMobile(mobile);

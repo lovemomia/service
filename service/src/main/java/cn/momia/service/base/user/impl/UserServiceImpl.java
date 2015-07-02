@@ -159,6 +159,19 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
+    public User getByNickName(String nickName) {
+        String sql = "SELECT " + joinFields() + " FROM t_user WHERE nickName=?";
+
+        return jdbcTemplate.query(sql, new Object[]{nickName}, new ResultSetExtractor<User>() {
+            @Override
+            public User extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if(rs.next()) return buildUser(rs);
+                return User.NOT_EXIST_USER;
+            }
+        });
+    }
+
+    @Override
     public boolean updateToken(long id, String token) {
         String sql = "UPDATE t_user SET token=? WHERE id=?";
 
