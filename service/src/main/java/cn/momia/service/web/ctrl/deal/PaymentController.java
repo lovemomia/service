@@ -48,7 +48,7 @@ public class PaymentController extends AbstractController {
         if (order.getCustomerId() != user.getId() || order.getSkuId() != skuId) return ResponseMessage.FAILED("params not match");
 
         PaymentGateway gateway = PaymentGatewayFactory.create(Payment.Type.WECHATPAY);
-        Map<String, String> params = gateway.extractPrepayParams(request.getParameterMap(), order, product);
+        Map<String, String> params = gateway.extractPrepayParams(request, order, product);
         PrepayParam prepayParam = PrepayParamFactory.create(params, Payment.Type.WECHATPAY);
         PrepayResult prepayResult = gateway.prepay(prepayParam);
 
@@ -68,7 +68,7 @@ public class PaymentController extends AbstractController {
         if (StringUtils.isBlank(utoken) || productId <= 0 || skuId <= 0) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         long userId = user.getId();
         if (!orderService.check(orderId, userId, productId, skuId)) return new ResponseMessage("FAIL");

@@ -45,7 +45,7 @@ public class UserController extends AbstractController {
 
         User user = userService.getByToken(utoken);
 
-        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
         return new ResponseMessage(user);
     }
 
@@ -54,7 +54,7 @@ public class UserController extends AbstractController {
         if (StringUtils.isBlank(utoken) || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         long totalCount = orderService.queryCountByUser(user.getId(), status, type);
         List<Order> orders = orderService.queryByUser(user.getId(), status, type, start, count);
@@ -104,7 +104,7 @@ public class UserController extends AbstractController {
         if(StringUtils.isBlank(utoken) || StringUtils.isBlank(nickName)) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         boolean successful = userService.updateNickName(user.getId(), nickName);
 
@@ -117,7 +117,7 @@ public class UserController extends AbstractController {
         if(StringUtils.isBlank(utoken) || StringUtils.isBlank(avatar)) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         boolean successful = userService.updateAvatar(user.getId(), avatar);
 
@@ -130,7 +130,7 @@ public class UserController extends AbstractController {
         if(StringUtils.isBlank(utoken) || StringUtils.isBlank(name)) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         boolean successful = userService.updateName(user.getId(), name);
 
@@ -143,7 +143,7 @@ public class UserController extends AbstractController {
         if(StringUtils.isBlank(utoken) || StringUtils.isBlank(sex)) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         boolean successful = userService.updateSex(user.getId(), sex);
 
@@ -156,7 +156,7 @@ public class UserController extends AbstractController {
         if(StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         boolean successful = userService.updateBirthday(user.getId(), birthday);
 
@@ -169,7 +169,7 @@ public class UserController extends AbstractController {
         if(StringUtils.isBlank(utoken) || city < 0) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         boolean successful = userService.updateCityId(user.getId(), city);
 
@@ -182,7 +182,7 @@ public class UserController extends AbstractController {
         if(StringUtils.isBlank(utoken) || StringUtils.isBlank(address)) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         boolean successful = userService.updateAddress(user.getId(), address);
 
@@ -210,7 +210,7 @@ public class UserController extends AbstractController {
         if (StringUtils.isBlank(utoken) || childId < 0) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         Set<Long> children = user.getChildren();
         children.remove(childId);
@@ -224,7 +224,7 @@ public class UserController extends AbstractController {
         if (StringUtils.isBlank(utoken) || childId < 0) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         Set<Long> children = user.getChildren();
         if (!children.contains(childId)) return ResponseMessage.FAILED("child not exists");
@@ -237,7 +237,7 @@ public class UserController extends AbstractController {
         if (StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         Set<Long> children = user.getChildren();
 

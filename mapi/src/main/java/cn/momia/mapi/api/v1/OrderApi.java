@@ -23,9 +23,12 @@ public class OrderApi extends AbstractApi {
         if (StringUtils.isBlank(utoken) || StringUtils.isBlank(order)) return ResponseMessage.BAD_REQUEST;
 
         JSONObject orderJson = JSON.parseObject(order);
-        if(!orderJson.containsKey("productId")) return  ResponseMessage.FAILED("productId is empty");
+        if(!orderJson.containsKey("productId")) return ResponseMessage.FAILED("productId is empty");
 
-        orderJson.put("customerId", getUserId(utoken));
+        long userId = getUserId(utoken);
+        if (userId <= 0) return ResponseMessage.TOKEN_EXPIRED;
+
+        orderJson.put("customerId", userId);
         MomiaHttpRequest request = MomiaHttpRequest.POST(dealServiceUrl("order"), orderJson.toString());
 
         return executeRequest(request, new Function<Object, Dto>() {
