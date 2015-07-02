@@ -13,6 +13,7 @@ import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.web.ctrl.AbstractController;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +41,8 @@ public class UserController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getUser(@RequestParam String utoken) {
+        if (StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
+
         User user = userService.getByToken(utoken);
 
         if (!user.exists()) return ResponseMessage.FAILED("user not exists");
@@ -47,8 +50,8 @@ public class UserController extends AbstractController {
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
-    public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam String type, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return ResponseMessage.FAILED("invalid limit params");
+    public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam(defaultValue = "eq") String type, @RequestParam int start, @RequestParam int count) {
+        if (StringUtils.isBlank(utoken) || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.FAILED("user not exists");
@@ -98,6 +101,8 @@ public class UserController extends AbstractController {
 
     @RequestMapping(value = "/nickname", method = RequestMethod.PUT)
     public ResponseMessage updateNickName(@RequestParam String utoken, @RequestParam(value = "nickname") String nickName) {
+        if(StringUtils.isBlank(utoken) || StringUtils.isBlank(nickName)) return ResponseMessage.BAD_REQUEST;
+
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
@@ -109,6 +114,8 @@ public class UserController extends AbstractController {
 
     @RequestMapping(value = "/avatar", method = RequestMethod.PUT)
     public ResponseMessage updateAvatar(@RequestParam String utoken, @RequestParam String avatar) {
+        if(StringUtils.isBlank(utoken) || StringUtils.isBlank(avatar)) return ResponseMessage.BAD_REQUEST;
+
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
@@ -120,6 +127,8 @@ public class UserController extends AbstractController {
 
     @RequestMapping(value = "/name", method = RequestMethod.PUT)
     public ResponseMessage updateName(@RequestParam String utoken, @RequestParam String name) {
+        if(StringUtils.isBlank(utoken) || StringUtils.isBlank(name)) return ResponseMessage.BAD_REQUEST;
+
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
@@ -131,6 +140,8 @@ public class UserController extends AbstractController {
 
     @RequestMapping(value = "/sex", method = RequestMethod.PUT)
     public ResponseMessage updateSex(@RequestParam String utoken, @RequestParam String sex) {
+        if(StringUtils.isBlank(utoken) || StringUtils.isBlank(sex)) return ResponseMessage.BAD_REQUEST;
+
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
@@ -142,6 +153,8 @@ public class UserController extends AbstractController {
 
     @RequestMapping(value = "/birthday", method = RequestMethod.PUT)
     public ResponseMessage updateDesc(@RequestParam String utoken, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date birthday) {
+        if(StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
+
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
@@ -153,6 +166,8 @@ public class UserController extends AbstractController {
 
     @RequestMapping(value = "/city", method = RequestMethod.PUT)
     public ResponseMessage updateDesc(@RequestParam String utoken, @RequestParam int city) {
+        if(StringUtils.isBlank(utoken) || city < 0) return ResponseMessage.BAD_REQUEST;
+
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
@@ -164,6 +179,8 @@ public class UserController extends AbstractController {
 
     @RequestMapping(value = "/address", method = RequestMethod.PUT)
     public ResponseMessage updateAddress(@RequestParam String utoken, @RequestParam String address) {
+        if(StringUtils.isBlank(utoken) || StringUtils.isBlank(address)) return ResponseMessage.BAD_REQUEST;
+
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
@@ -189,19 +206,23 @@ public class UserController extends AbstractController {
     }
 
     @RequestMapping(value = "/child/{cid}", method = RequestMethod.DELETE)
-    public ResponseMessage deleteChild(@PathVariable(value = "cid") long participantId, @RequestParam String utoken) {
+    public ResponseMessage deleteChild(@RequestParam String utoken, @PathVariable(value = "cid") long childId) {
+        if (StringUtils.isBlank(utoken) || childId < 0) return ResponseMessage.BAD_REQUEST;
+
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
         Set<Long> children = user.getChildren();
-        children.remove(participantId);
+        children.remove(childId);
         if (!userService.updateChild(user.getId(), children)) return ResponseMessage.FAILED("fail to delete child");
 
         return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/child/{cid}", method = RequestMethod.GET)
-    public ResponseMessage getChild(@PathVariable(value = "cid") long childId, @RequestParam String utoken) {
+    public ResponseMessage getChild(@RequestParam String utoken, @PathVariable(value = "cid") long childId) {
+        if (StringUtils.isBlank(utoken) || childId < 0) return ResponseMessage.BAD_REQUEST;
+
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
@@ -213,6 +234,8 @@ public class UserController extends AbstractController {
 
     @RequestMapping(value = "/child", method = RequestMethod.GET)
     public ResponseMessage getChildren(@RequestParam String utoken) {
+        if (StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
+
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 

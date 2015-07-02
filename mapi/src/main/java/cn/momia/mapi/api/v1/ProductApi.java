@@ -4,6 +4,7 @@ import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.mapi.api.AbstractApi;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.ContactsDto;
 import cn.momia.mapi.api.v1.dto.base.Dto;
@@ -34,7 +35,7 @@ public class ProductApi extends AbstractApi {
     public ResponseMessage getProducts(@RequestParam(value = "city") final int cityId, @RequestParam final int start, @RequestParam final int count, @RequestParam(required = false) String query) {
         final int maxPageCount = conf.getInt("Product.MaxPageCount");
         final int pageSize = conf.getInt("Product.PageSize");
-        if (start > maxPageCount * pageSize) return ResponseMessage.FAILED;
+        if (cityId < 0 || start < 0 || count <= 0 || start > maxPageCount * pageSize) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
@@ -62,6 +63,8 @@ public class ProductApi extends AbstractApi {
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getProduct(@RequestParam long id) {
+        if (id <= 0) return ResponseMessage.BAD_REQUEST;
+
         List<MomiaHttpRequest> requests = buildProductRequests(id);
 
         return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {
@@ -167,8 +170,8 @@ public class ProductApi extends AbstractApi {
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
-    public ResponseMessage getProductOrder(@RequestParam long id, @RequestParam String utoken) {
-        if(StringUtils.isBlank(utoken)) return ResponseMessage.FAILED("please login in first");
+    public ResponseMessage getProductOrder(@RequestParam String utoken, @RequestParam long id) {
+        if(StringUtils.isBlank(utoken) || id <= 0) return ResponseMessage.BAD_REQUEST;
         
         List<MomiaHttpRequest> requests = buildProductOrderRequests(id, utoken);
 

@@ -1,5 +1,7 @@
 package cn.momia.mapi.web.controller;
 
+import org.apache.commons.lang3.StringUtils;
+
 import javax.servlet.http.HttpServletRequest;
 
 public abstract class AbstractController {
@@ -12,6 +14,10 @@ public abstract class AbstractController {
     }
 
     private String getApiVersion(HttpServletRequest request) {
+//        String uri = request.getRequestURI();
+//        String teminal = request.getParameter("teminal");
+//
+//        if (uri.equalsIgnoreCase("/home") && !StringUtils.isBlank(teminal)) return "v2";
         return "v1";
     }
 }

@@ -37,7 +37,7 @@ public class ProductController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getProducts(@RequestParam(value = "city") int cityId, @RequestParam int start, @RequestParam int count, @RequestParam(required = false) String query) {
-        if (isInvalidLimit(start, count)) return ResponseMessage.FAILED("invalid limit params");
+        if (cityId < 0 || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
 
         long totalCount = productService.queryCount(new ProductQuery(cityId, query));
         List<Product> products = productService.query(start, count, new ProductQuery(cityId, query));
@@ -51,6 +51,8 @@ public class ProductController extends AbstractController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseMessage getProduct(@PathVariable long id) {
+        if (id <= 0) return ResponseMessage.BAD_REQUEST;
+
         Product product = productService.get(id);
         if (!product.exists()) return ResponseMessage.FAILED("product not exists");
 
@@ -59,6 +61,8 @@ public class ProductController extends AbstractController {
 
     @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
     public ResponseMessage getProductSkus(@PathVariable long id) {
+        if (id <= 0) return ResponseMessage.BAD_REQUEST;
+
         List<Sku> skus = productService.getSkus(id);
 
         return new ResponseMessage(skus);
@@ -66,7 +70,7 @@ public class ProductController extends AbstractController {
 
     @RequestMapping(value = "/{id}/customer", method = RequestMethod.GET)
     public ResponseMessage getProductCustomersInfo(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return ResponseMessage.FAILED("invalid limit params");
+        if (id <= 0 || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
 
         List<Order> orders = orderService.queryDistinctCustomerOrderByProduct(id, start, count);
         List<Customer> customers = new ArrayList<Customer>();

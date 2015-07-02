@@ -3,6 +3,8 @@ package cn.momia.mapi.api.v1;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.mapi.api.AbstractApi;
+import cn.momia.common.misc.ValidateUtil;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.UserDto;
 import com.alibaba.fastjson.JSONObject;
@@ -18,8 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthApi extends AbstractApi {
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     public ResponseMessage send(@RequestParam String mobile, @RequestParam String type)  {
-        if(StringUtils.isBlank(type)||!(StringUtils.equals(type,"login")||StringUtils.equals(type,"register")))
-            return ResponseMessage.FAILED("send code failed, please make sure your type is correct.");
+        if (ValidateUtil.isInvalidMobile(mobile) || ValidateUtil.notIn(type, "login", "register")) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("mobile", mobile)
@@ -31,6 +32,8 @@ public class AuthApi extends AbstractApi {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseMessage login(@RequestParam String mobile, @RequestParam String code) {
+        if (ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
+
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("mobile", mobile)
                 .add("code", code);
@@ -46,6 +49,8 @@ public class AuthApi extends AbstractApi {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseMessage register(@RequestParam String nickName, @RequestParam String mobile, @RequestParam String code) {
+        if (StringUtils.isBlank(nickName) || ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
+
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("nickName", nickName)
                 .add("mobile", mobile)

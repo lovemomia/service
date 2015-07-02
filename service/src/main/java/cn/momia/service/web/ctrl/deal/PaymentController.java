@@ -14,6 +14,7 @@ import cn.momia.service.deal.payment.gateway.PrepayResult;
 import cn.momia.service.deal.payment.gateway.factory.PaymentGatewayFactory;
 import cn.momia.service.deal.payment.gateway.factory.PrepayParamFactory;
 import cn.momia.service.web.ctrl.AbstractController;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -56,6 +57,8 @@ public class PaymentController extends AbstractController {
 
     @RequestMapping(value = "/check", method = RequestMethod.GET)
     public ResponseMessage checkPayment(@RequestParam String utoken, @RequestParam(value = "pid") long productId, @RequestParam(value = "sid") long skuId) {
+        if (StringUtils.isBlank(utoken) || productId <= 0 || skuId <= 0) return ResponseMessage.BAD_REQUEST;
+
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 

@@ -17,8 +17,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 public abstract class AbstractSmsSender extends DbAccessService implements SmsSender {
-    private static final Pattern MOBILE_PATTERN = Pattern.compile("^1[0-9]{10}$");
-
     private ExecutorService executorService;
 
     protected Configuration conf;
@@ -36,9 +34,8 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
 
     @Override
     public void send(String mobile, String type) throws SmsLoginException {
-        if (!MOBILE_PATTERN.matcher(mobile).find()) throw new RuntimeException("invalid mobile: " + mobile);
-
         if(StringUtils.equals(type, "login") && !userExists(mobile)) throw new SmsLoginException("user does not exits");
+
         String code = getGeneratedCode(mobile);
         if (StringUtils.isBlank(code)) {
             boolean outOfDate = (code != null); // null 表示没有生成过，空表示生成过，但已过期

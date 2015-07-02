@@ -1,4 +1,4 @@
-package cn.momia.mapi.api.v1;
+package cn.momia.mapi.api.v2;
 
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
@@ -8,8 +8,8 @@ import cn.momia.mapi.api.AbstractApi;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.BannerDto;
 import cn.momia.mapi.api.v1.dto.base.Dto;
-import cn.momia.mapi.api.v1.dto.composite.HomeDto;
 import cn.momia.mapi.api.v1.dto.base.ProductDto;
+import cn.momia.mapi.api.v1.dto.composite.HomeDto;
 import cn.momia.mapi.img.ImageFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -23,13 +23,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/home")
+@RequestMapping("/v2/home")
 public class HomeApi extends AbstractApi {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage home(@RequestParam(value = "pageindex") final int pageIndex, @RequestParam(value = "city") int cityId) {
         final int maxPageCount = conf.getInt("Home.MaxPageCount");
         final int pageSize = conf.getInt("Home.PageSize");
-        if (pageIndex >= maxPageCount || cityId < 0) return ResponseMessage.BAD_REQUEST;
+        if (pageIndex >= maxPageCount) return ResponseMessage.FAILED;
 
         List<MomiaHttpRequest> requests = buildHomeRequests(pageIndex, cityId);
 

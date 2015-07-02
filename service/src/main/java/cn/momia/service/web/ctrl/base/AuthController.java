@@ -1,5 +1,6 @@
 package cn.momia.service.web.ctrl.base;
 
+import cn.momia.common.misc.ValidateUtil;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.common.web.secret.SecretKey;
 import cn.momia.service.base.user.User;
@@ -32,6 +33,8 @@ public class AuthController extends AbstractController {
 
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     public ResponseMessage send(@RequestParam String mobile, @RequestParam String type) {
+        if (ValidateUtil.isInvalidMobile(mobile) || ValidateUtil.notIn(type, "login", "register")) return ResponseMessage.BAD_REQUEST;
+
         try {
             smsSender.send(mobile, type);
             return ResponseMessage.SUCCESS;
@@ -47,8 +50,7 @@ public class AuthController extends AbstractController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseMessage login(@RequestParam String mobile, @RequestParam String code) {
-        if (StringUtils.isBlank(mobile) || StringUtils.isBlank(code))
-            return ResponseMessage.FAILED("mobile or(and) verify code is empty");
+        if (ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
 
         if (!smsVerifier.verify(mobile, code)) return ResponseMessage.FAILED("fail to verify code");
 
@@ -74,8 +76,7 @@ public class AuthController extends AbstractController {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseMessage register(@RequestParam String nickName, @RequestParam String mobile, @RequestParam String code){
-        if (StringUtils.isBlank(nickName) || StringUtils.isBlank(mobile) || StringUtils.isBlank(code))
-            return ResponseMessage.FAILED("one or more of nickName, mobile and verify code is empty");
+        if (StringUtils.isBlank(nickName) || ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
 
         if (!smsVerifier.verify(mobile, code)) return ResponseMessage.FAILED("fail to verify code");
 
