@@ -62,6 +62,8 @@
     <bean id="orderService" class="cn.momia.service.deal.order.impl.OrderServiceImpl" parent="dbAccessService" />
     <bean id="paymentService" class="cn.momia.service.deal.payment.impl.PaymentServiceImpl" parent="dbAccessService" />
 
+    <bean id="feedbackService" class="cn.momia.service.base.feedback.impl.FeedbackServiceImpl" parent="dbAccessService" />
+
     <bean id="smsSender" class="cn.momia.service.sms.impl.LuosimaoSmsSender" parent="dbAccessService" init-method="init">
         <property name="conf" ref="conf" />
     </bean>
