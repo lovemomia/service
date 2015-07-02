@@ -5,6 +5,7 @@ import cn.momia.service.base.user.User;
 import cn.momia.service.base.user.UserService;
 import cn.momia.service.base.user.participant.Participant;
 import cn.momia.service.base.user.participant.ParticipantService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +30,9 @@ public class ParticipantController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseMessage getParticipant(@PathVariable long id, @RequestParam String utoken){
+    public ResponseMessage getParticipant(@RequestParam String utoken, @PathVariable long id){
+        if (StringUtils.isBlank(utoken) || id <= 0) return ResponseMessage.BAD_REQUEST;
+
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
@@ -48,7 +51,9 @@ public class ParticipantController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseMessage deleteParticipant(@PathVariable long id, @RequestParam String utoken){
+    public ResponseMessage deleteParticipant(@RequestParam String utoken, @PathVariable long id){
+        if (StringUtils.isBlank(utoken) || id <= 0) return ResponseMessage.BAD_REQUEST;
+
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
@@ -60,6 +65,8 @@ public class ParticipantController {
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getParticipantsOfUser(@RequestParam String utoken){
+        if (StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
+
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 

@@ -1,4 +1,4 @@
-package cn.momia.mapi.api.misc;
+package cn.momia.common.misc;
 
 import org.apache.commons.lang3.StringUtils;
 

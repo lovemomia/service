@@ -4,7 +4,7 @@ import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.AbstractApi;
-import cn.momia.mapi.api.misc.ValidateUtil;
+import cn.momia.common.misc.ValidateUtil;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.UserDto;
 import com.alibaba.fastjson.JSONObject;
@@ -49,8 +49,7 @@ public class AuthApi extends AbstractApi {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseMessage register(@RequestParam String nickName, @RequestParam String mobile, @RequestParam String code) {
-        if (StringUtils.isBlank(nickName) || ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(code))
-            return ResponseMessage.BAD_REQUEST;
+        if (StringUtils.isBlank(nickName) || ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("nickName", nickName)

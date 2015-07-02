@@ -70,7 +70,9 @@ public class OrderController extends AbstractController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseMessage deleteOrder(@PathVariable long id, @RequestParam String utoken) {
+    public ResponseMessage deleteOrder(@RequestParam String utoken, @PathVariable long id) {
+        if (StringUtils.isBlank(utoken) || id <= 0) return ResponseMessage.BAD_REQUEST;
+
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 

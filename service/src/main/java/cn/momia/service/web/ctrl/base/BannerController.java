@@ -18,6 +18,8 @@ public class BannerController {
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getBanners(@RequestParam(value = "city") int cityId, @RequestParam int count) {
+        if (cityId < 0 || count <= 0) return ResponseMessage.BAD_REQUEST;
+
         List<Banner> banners = bannerService.getBanners(cityId, count);
 
         return new ResponseMessage(banners);
