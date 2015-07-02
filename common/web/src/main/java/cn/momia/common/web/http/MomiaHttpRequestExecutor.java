@@ -40,7 +40,9 @@ public class MomiaHttpRequestExecutor {
 
                         String entity = EntityUtils.toString(response.getEntity());
                         JSONObject responseJson = JSON.parseObject(entity);
-                        if (responseJson.getInteger("errno") != ErrorCode.SUCCESS) {
+                        int errorno = responseJson.getInteger("errno");
+                        if (errorno != ErrorCode.SUCCESS) {
+                            collector.addErrno(errorno);
                             if (request.isRequired()) throw new RuntimeException("fail to execute request: " + request);
                             return;
                         }

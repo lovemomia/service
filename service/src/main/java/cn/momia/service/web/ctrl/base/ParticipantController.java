@@ -34,7 +34,7 @@ public class ParticipantController {
         if (StringUtils.isBlank(utoken) || id <= 0) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         Participant participant = participantService.get(id);
         if (!participant.exists() || participant.getUserId() != user.getId()) return ResponseMessage.FAILED("participant not exists");
@@ -55,7 +55,7 @@ public class ParticipantController {
         if (StringUtils.isBlank(utoken) || id <= 0) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         boolean successful = participantService.delete(id, user.getId());
         if (!successful) return ResponseMessage.FAILED("fail to delete participant");
@@ -68,7 +68,7 @@ public class ParticipantController {
         if (StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         List<Participant> participants = participantService.getByUser(user.getId());
 

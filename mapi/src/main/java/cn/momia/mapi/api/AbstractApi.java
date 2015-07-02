@@ -64,6 +64,8 @@ public abstract class AbstractApi {
 
     protected ResponseMessage executeRequests(List<MomiaHttpRequest> requests, Function<MomiaHttpResponseCollector, Dto> buildResponseData) {
         MomiaHttpResponseCollector collector = requestExecutor.execute(requests);
+        if (collector.getErrnos().contains(ErrorCode.TOKEN_EXPIRED)) return ResponseMessage.TOKEN_EXPIRED;
+
         if (!collector.isSuccessful()) {
             LOGGER.error("fail to execute requests: {}, exceptions: {}", requests, collector.getExceptions());
             return new ResponseMessage(ErrorCode.FAILED, "fail to execute requests");

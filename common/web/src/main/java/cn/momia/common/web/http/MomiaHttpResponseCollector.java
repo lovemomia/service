@@ -2,11 +2,14 @@ package cn.momia.common.web.http;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class MomiaHttpResponseCollector {
     private boolean successful;
+    private Set<Integer> errnos = new HashSet<Integer>();
     private List<Throwable> exceptions = new ArrayList<Throwable>();
     private Map<String, Object> responses = new HashMap<String, Object>();
 
@@ -16,6 +19,14 @@ public class MomiaHttpResponseCollector {
 
     public void setSuccessful(boolean successful) {
         this.successful = successful;
+    }
+
+    public void addErrno(int errno) {
+        errnos.add(errno);
+    }
+
+    public Set<Integer> getErrnos() {
+        return errnos;
     }
 
     public void addException(Throwable throwable) {

@@ -74,7 +74,7 @@ public class OrderController extends AbstractController {
         if (StringUtils.isBlank(utoken) || id <= 0) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         Order order = orderService.get(id);
         if (!order.exists()) return ResponseMessage.FAILED("order not exists");

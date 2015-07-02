@@ -68,7 +68,7 @@ public class PaymentController extends AbstractController {
         if (StringUtils.isBlank(utoken) || productId <= 0 || skuId <= 0) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         long userId = user.getId();
         if (!orderService.check(orderId, userId, productId, skuId)) return new ResponseMessage("FAIL");
