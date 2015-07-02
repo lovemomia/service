@@ -4,6 +4,10 @@ import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.AbstractApi;
+import cn.momia.mapi.api.v1.dto.base.Dto;
+import cn.momia.mapi.api.v1.dto.base.WechatpayPrepayDto;
+import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,7 +28,25 @@ public class PaymentApi extends AbstractApi {
             params.put(entry.getKey(), entry.getValue()[0]);
         }
 
-        return executeRequest(MomiaHttpRequest.POST(dealServiceUrl("payment/prepay/wechatpay"), params));
+        return executeRequest(MomiaHttpRequest.POST(dealServiceUrl("payment/prepay/wechatpay"), params), new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                WechatpayPrepayDto wechatpayPrepayDto = new WechatpayPrepayDto();
+                JSONObject prepayJson = (JSONObject) data;
+                wechatpayPrepayDto.setSuccessful(prepayJson.getBoolean("successful"));
+                if (wechatpayPrepayDto.isSuccessful()) {
+                    JSONObject paramJson = prepayJson.getJSONObject("all");
+                    wechatpayPrepayDto.setAppId(paramJson.getString("appid"));
+                    wechatpayPrepayDto.setMchId(paramJson.getString("mch_id"));
+                    wechatpayPrepayDto.setPrepayId(paramJson.getString("prepay_id"));
+                    wechatpayPrepayDto.setNonceStr(paramJson.getString("nonce_str"));
+                    wechatpayPrepayDto.setSignType("MD5");
+                    wechatpayPrepayDto.setSign(paramJson.getString("sign"));
+                }
+
+                return wechatpayPrepayDto;
+            }
+        });
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.POST)
