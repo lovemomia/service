@@ -8,11 +8,12 @@ import cn.momia.service.deal.payment.gateway.PaymentGateway;
 import cn.momia.service.deal.payment.gateway.PrepayParam;
 import cn.momia.service.deal.payment.gateway.PrepayResult;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 public class AlipayGateway implements PaymentGateway {
     @Override
-    public Map<String, String> extractPrepayParams(Map<String, String[]> parameterMap, Order order, Product product) {
+    public Map<String, String> extractPrepayParams(HttpServletRequest request, Order order, Product product) {
         // TODO
         return null;
     }

@@ -48,7 +48,7 @@ public class PaymentController extends AbstractController {
         if (order.getCustomerId() != user.getId() || order.getSkuId() != skuId) return ResponseMessage.FAILED("params not match");
 
         PaymentGateway gateway = PaymentGatewayFactory.create(Payment.Type.WECHATPAY);
-        Map<String, String> params = gateway.extractPrepayParams(request.getParameterMap(), order, product);
+        Map<String, String> params = gateway.extractPrepayParams(request, order, product);
         PrepayParam prepayParam = PrepayParamFactory.create(params, Payment.Type.WECHATPAY);
         PrepayResult prepayResult = gateway.prepay(prepayParam);
 

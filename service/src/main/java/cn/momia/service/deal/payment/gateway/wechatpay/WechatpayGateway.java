@@ -2,6 +2,7 @@ package cn.momia.service.deal.payment.gateway.wechatpay;
 
 import cn.momia.common.config.Configuration;
 import cn.momia.common.misc.XmlUtil;
+import cn.momia.common.web.misc.RequestUtil;
 import cn.momia.common.web.secret.SecretKey;
 import cn.momia.service.base.product.Product;
 import cn.momia.service.deal.order.Order;
@@ -27,6 +28,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -60,8 +62,9 @@ public class WechatpayGateway implements PaymentGateway {
     }
 
     @Override
-    public Map<String, String> extractPrepayParams(Map<String, String[]> httpParams, Order order, Product product) {
+    public Map<String, String> extractPrepayParams(HttpServletRequest request, Order order, Product product) {
         Map<String, String> params = new HashMap<String, String>();
+        Map<String, String[]> httpParams = request.getParameterMap();
         String tradeType = httpParams.get(WechatpayPrepayFields.TRADE_TYPE)[0];
         if (tradeType.equals("NATIVE")) {
             params.put(WechatpayPrepayFields.APPID, conf.getString("Payment.Wechat.NativeAppId"));
@@ -78,7 +81,7 @@ public class WechatpayGateway implements PaymentGateway {
         params.put(WechatpayPrepayFields.BODY, product.getTitle());
         params.put(WechatpayPrepayFields.OUT_TRADE_NO, String.valueOf(order.getId()));
         params.put(WechatpayPrepayFields.TOTAL_FEE, String.valueOf((int) (order.getTotalFee().floatValue() * 100)));
-        params.put(WechatpayPrepayFields.SPBILL_CREATE_IP, httpParams.get(WechatpayPrepayFields.SPBILL_CREATE_IP)[0]);
+        params.put(WechatpayPrepayFields.SPBILL_CREATE_IP, RequestUtil.getRemoteIp(request));
         params.put(WechatpayPrepayFields.NOTIFY_URL, conf.getString("Payment.Wechat.NotifyUrl"));
         params.put(WechatpayPrepayFields.TRADE_TYPE, tradeType);
         params.put(WechatpayPrepayFields.SIGN, WechatpayUtil.sign(params, tradeType));
