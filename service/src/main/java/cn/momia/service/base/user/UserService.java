@@ -11,6 +11,7 @@ public interface UserService {
     Map<Long, User> get(List<Long> ids);
     User getByToken(String token);
     User getByMobile(String mobile);
+    User getByNickName(String nickName);
     boolean updateToken(long id, String token);
     boolean updateNickName(long id, String nickName);
     boolean updateAvatar(long id, String avatar);
