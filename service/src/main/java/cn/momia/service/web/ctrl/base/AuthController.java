@@ -55,17 +55,17 @@ public class AuthController extends AbstractController {
         if (!smsVerifier.verify(mobile, code)) return ResponseMessage.FAILED("fail to verify code");
 
         User user = userService.getByMobile(mobile);
-        String token = generateToken(mobile);
+//        String token = generateToken(mobile);
         if (!user.exists()) {
                 LOGGER.error("fail to login user for {}", mobile);
                 return ResponseMessage.FAILED("fail to login, mobile does not exist, please register first.");
-        } else {
+        }/* else {
             if (!userService.updateToken(user.getId(), token)) {
                 LOGGER.warn("fail to update token for {}, will use old token", mobile);
             } else {
                 user.setToken(token);
             }
-        }
+        }*/
 
         return new ResponseMessage(user);
     }
