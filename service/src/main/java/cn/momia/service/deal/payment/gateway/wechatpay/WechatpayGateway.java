@@ -33,6 +33,7 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,6 +85,7 @@ public class WechatpayGateway implements PaymentGateway {
         params.put(WechatpayPrepayFields.SPBILL_CREATE_IP, RequestUtil.getRemoteIp(request));
         params.put(WechatpayPrepayFields.NOTIFY_URL, conf.getString("Payment.Wechat.NotifyUrl"));
         params.put(WechatpayPrepayFields.TRADE_TYPE, tradeType);
+        params.put(WechatpayPrepayFields.TIME_EXPIRE, DATE_FORMATTER.format(new Date(System.currentTimeMillis() + 30 * 60 * 1000)));
         params.put(WechatpayPrepayFields.SIGN, WechatpayUtil.sign(params, tradeType));
 
         return params;
