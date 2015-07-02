@@ -34,12 +34,18 @@ public class PaymentController extends AbstractController {
     @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)
     public ResponseMessage prepayWechatpay(HttpServletRequest request) {
         String utoken = request.getParameter("utoken");
+        long orderId = Long.valueOf(request.getParameter("oid"));
+        long productId = Long.valueOf(request.getParameter("pid"));
+        long skuId = Long.valueOf(request.getParameter("sid"));
+        if (StringUtils.isBlank(utoken) || orderId <= 0 || productId <= 0 || skuId <= 0) return ResponseMessage.BAD_REQUEST;
+
         User user = userService.getByToken(utoken);
         if (!user.exists()) ResponseMessage.FAILED("user not exists");
 
-        Order order = getOrder(request);
-        Product product = getProduct(request);
+        Order order = orderService.get(orderId);
+        Product product = productService.get(productId);
         if (!order.exists() || !product.exists()) return ResponseMessage.FAILED("order or(and) product does not exist");
+        if (order.getCustomerId() != user.getId() || order.getSkuId() != skuId) return ResponseMessage.FAILED("params not match");
 
         PaymentGateway gateway = PaymentGatewayFactory.create(Payment.Type.WECHATPAY);
         Map<String, String> params = gateway.extractPrepayParams(request.getParameterMap(), order, product);
