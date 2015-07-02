@@ -56,14 +56,14 @@ public class PaymentController extends AbstractController {
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.GET)
-    public ResponseMessage checkPayment(@RequestParam String utoken, @RequestParam(value = "pid") long productId, @RequestParam(value = "sid") long skuId) {
+    public ResponseMessage checkPayment(@RequestParam String utoken, @RequestParam(value = "oid") long orderId, @RequestParam(value = "pid") long productId, @RequestParam(value = "sid") long skuId) {
         if (StringUtils.isBlank(utoken) || productId <= 0 || skuId <= 0) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
         long userId = user.getId();
-        if (!orderService.check(userId, productId, skuId)) return new ResponseMessage("FAIL");
+        if (!orderService.check(orderId, userId, productId, skuId)) return new ResponseMessage("FAIL");
 
         return new ResponseMessage("OK");
     }
