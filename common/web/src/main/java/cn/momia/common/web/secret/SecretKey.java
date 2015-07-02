@@ -61,8 +61,4 @@ public class SecretKey
     public static String getAlipayPublicKey() {
         return keys.get("alipayPublicKey");
     }
-
-    public static String getWechatpayPrivateKey() {
-        return keys.get("wechatpayPrivateKey");
-    }
 }

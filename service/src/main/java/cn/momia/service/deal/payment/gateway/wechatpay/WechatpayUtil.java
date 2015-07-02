@@ -24,7 +24,7 @@ public class WechatpayUtil {
         return res;
     }
 
-    public static String sign(PrepayParam param) {
+    public static String sign(PrepayParam param, String tradeType) {
         List<String> kvs = new ArrayList<String>();
         for (Entry<String, String> entry : param.getAll().entrySet()) {
             String key = entry.getKey();
@@ -33,7 +33,7 @@ public class WechatpayUtil {
             kvs.add(key + "=" + value);
         }
         Collections.sort(kvs);
-        kvs.add("key=" + SecretKey.getWechatpayPrivateKey());
+        kvs.add("key=" + (tradeType.equalsIgnoreCase("NATIVE") ? SecretKey.get("wechatpayNative") : SecretKey.get("wechatpayJsApi")));
 
         try {
             MessageDigest md5 = MessageDigest.getInstance("MD5");

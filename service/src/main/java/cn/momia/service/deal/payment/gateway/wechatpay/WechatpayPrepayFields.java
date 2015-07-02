@@ -12,6 +12,7 @@ public class WechatpayPrepayFields {
     public static final String NOTIFY_URL = "notify_url"; //通知地址
     public static final String PRODUCT_ID = "product_id"; //通知地址
     public static final String OPENID = "openid"; //通知地址
+    public static final String CODE = "code"; //通知地址
 
     public static final String RETURN_CODE = "return_code";
     public static final String RETURN_MSG = "return_msg";
