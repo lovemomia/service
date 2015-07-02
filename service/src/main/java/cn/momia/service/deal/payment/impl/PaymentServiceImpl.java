@@ -26,7 +26,7 @@ public class PaymentServiceImpl extends DbAccessService implements PaymentServic
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException
             {
-                String sql = "INSERT INTO t_payment(orderId, payerId, finishTime, payType, tradeNo, fee, addTime) VALUES(?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO t_payment(orderId, payerId, finishTime, payType, tradeNo, fee, addTime) VALUES(?, ?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setLong(1, payment.getOrderId());
                 ps.setString(2, payment.getPayerId());
