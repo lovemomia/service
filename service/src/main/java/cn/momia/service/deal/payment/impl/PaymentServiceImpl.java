@@ -26,13 +26,14 @@ public class PaymentServiceImpl extends DbAccessService implements PaymentServic
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException
             {
-                String sql = "INSERT INTO t_payment(orderId, finishTime, payType, tradeNo, fee, addTime) VALUES(?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO t_payment(orderId, payerId, finishTime, payType, tradeNo, fee, addTime) VALUES(?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setLong(1, payment.getOrderId());
-                ps.setDate(2, new Date(payment.getFinishTime().getTime()));
-                ps.setInt(3, payment.getPayType());
-                ps.setString(4, payment.getTradeNo());
-                ps.setBigDecimal(5, payment.getFee());
+                ps.setString(2, payment.getPayerId());
+                ps.setDate(3, new Date(payment.getFinishTime().getTime()));
+                ps.setInt(4, payment.getPayType());
+                ps.setString(5, payment.getTradeNo());
+                ps.setBigDecimal(6, payment.getFee());
 
                 return ps;
             }
@@ -63,6 +64,7 @@ public class PaymentServiceImpl extends DbAccessService implements PaymentServic
 
         payment.setId(rs.getLong("id"));
         payment.setOrderId(rs.getLong("orderId"));
+        payment.setPayerId(rs.getString("payerId"));
         payment.setFinishTime(rs.getTimestamp("finishTime"));
         payment.setPayType(rs.getInt("payType"));
         payment.setTradeNo(rs.getString("tradeNo"));
