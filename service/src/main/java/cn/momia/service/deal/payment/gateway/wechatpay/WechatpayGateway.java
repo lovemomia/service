@@ -110,11 +110,11 @@ public class WechatpayGateway implements PaymentGateway {
     public CallbackResult callback(CallbackParam param) {
         CallbackResult result = new CallbackResult();
         if (isPayedSuccessfully(param) && !finishPayment(param)) {
-            result.add(WechatpayCallbackFields.RETURN_CODE, SUCCESS);
-            result.add(WechatpayCallbackFields.RETURN_MSG, OK);
-        } else {
             result.add(WechatpayCallbackFields.RETURN_CODE, FAIL);
             result.add(WechatpayCallbackFields.RETURN_MSG, ERROR);
+        } else {
+            result.add(WechatpayCallbackFields.RETURN_CODE, SUCCESS);
+            result.add(WechatpayCallbackFields.RETURN_MSG, OK);
         }
 
         return result;
