@@ -33,8 +33,8 @@
     <Payment>
         <Wechat>
             <PrepayService>https://api.mch.weixin.qq.com/pay/unifiedorder</PrepayService>
-            <AppId></AppId>
-            <MchId></MchId>
+            <AppId>wxc4ca5800d28b5650</AppId>
+            <MchId>1251671101</MchId>
             <NotifyUrl></NotifyUrl>
         </Wechat>
     </Payment>

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/payment")
@@ -36,34 +37,35 @@ public class PaymentController extends AbstractController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) ResponseMessage.FAILED("user not exists");
 
-        Product product = getProduct(request);
         Order order = getOrder(request);
-        if (!product.exists() || !order.exists()) return ResponseMessage.FAILED("product or(and) order does not exist");
+        Product product = getProduct(request);
+        if (!order.exists() || !product.exists()) return ResponseMessage.FAILED("order or(and) product does not exist");
 
-        PrepayParam prepayParam = PrepayParamFactory.create(request.getParameterMap(), product, order, Payment.Type.WECHATPAY);
         PaymentGateway gateway = PaymentGatewayFactory.create(Payment.Type.WECHATPAY);
+        Map<String, String> params = gateway.extractPrepayParams(request.getParameterMap(), order, product);
+        PrepayParam prepayParam = PrepayParamFactory.create(params, Payment.Type.WECHATPAY);
         PrepayResult prepayResult = gateway.prepay(prepayParam);
 
         return new ResponseMessage(prepayResult);
     }
 
-    private Product getProduct(HttpServletRequest request) {
-        return productService.get(Long.valueOf(request.getParameter("productid")));
+    private Order getOrder(HttpServletRequest request) {
+        return orderService.get(Long.valueOf(request.getParameter("oid")));
     }
 
-    private Order getOrder(HttpServletRequest request) {
-        return orderService.get(Long.valueOf(request.getParameter("orderid")));
+    private Product getProduct(HttpServletRequest request) {
+        return productService.get(Long.valueOf(request.getParameter("pid")));
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.GET)
-    public ResponseMessage checkPayment(@RequestParam String utoken, @RequestParam(value = "pid") long productId, @RequestParam(value = "sid") long skuId) {
+    public ResponseMessage checkPayment(@RequestParam String utoken, @RequestParam(value = "oid") long orderId, @RequestParam(value = "pid") long productId, @RequestParam(value = "sid") long skuId) {
         if (StringUtils.isBlank(utoken) || productId <= 0 || skuId <= 0) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
         long userId = user.getId();
-        if (!orderService.check(userId, productId, skuId)) return new ResponseMessage("FAIL");
+        if (!orderService.check(orderId, userId, productId, skuId)) return new ResponseMessage("FAIL");
 
         return new ResponseMessage("OK");
     }

@@ -217,16 +217,16 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public boolean pay(long id) {
-        String sql = "UPDATE t_order SET status=? WHERE id=? AND status=?";
-        int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PAYED, id, Order.Status.PRE_PAYED });
+        String sql = "UPDATE t_order SET status=? WHERE id=? AND (status=? OR status=?)";
+        int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PAYED, id, Order.Status.NOT_PAYED, Order.Status.PAYED });
 
         return updateCount == 1;
     }
 
     @Override
-    public boolean check(long userId, long productId, long skuId) {
-        String sql = "SELECT status FROM t_order WHERE customerId=? AND productId=? AND skuId=?";
-        int status = jdbcTemplate.query(sql, new Object[] { userId, productId, skuId }, new ResultSetExtractor<Integer>() {
+    public boolean check(long id, long userId, long productId, long skuId) {
+        String sql = "SELECT status FROM t_order WHERE id=? AND customerId=? AND productId=? AND skuId=?";
+        int status = jdbcTemplate.query(sql, new Object[] { id, userId, productId, skuId }, new ResultSetExtractor<Integer>() {
             @Override
             public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
                 if (rs.next()) return rs.getInt("status");
