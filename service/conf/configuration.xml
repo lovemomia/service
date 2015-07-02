@@ -32,9 +32,11 @@
 
     <Payment>
         <Wechat>
+            <AccessTokenService>https://api.weixin.qq.com/sns/oauth2/access_token</AccessTokenService>
             <PrepayService>https://api.mch.weixin.qq.com/pay/unifiedorder</PrepayService>
-            <AppId>wxc4ca5800d28b5650</AppId>
-            <MchId>1251671101</MchId>
+            <NativeAppId></NativeAppId>
+            <JsApiAppId></JsApiAppId>
+            <MchId></MchId>
             <NotifyUrl></NotifyUrl>
         </Wechat>
     </Payment>
