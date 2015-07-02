@@ -29,7 +29,7 @@ public class HomeApi extends AbstractApi {
     public ResponseMessage home(@RequestParam(value = "pageindex") final int pageIndex, @RequestParam(value = "city") int cityId) {
         final int maxPageCount = conf.getInt("Home.MaxPageCount");
         final int pageSize = conf.getInt("Home.PageSize");
-        if (pageIndex >= maxPageCount) return ResponseMessage.FAILED;
+        if (pageIndex >= maxPageCount || cityId < 0) return ResponseMessage.BAD_REQUEST;
 
         List<MomiaHttpRequest> requests = buildHomeRequests(pageIndex, cityId);
 

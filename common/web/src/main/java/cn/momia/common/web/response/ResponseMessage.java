@@ -9,6 +9,7 @@ public class ResponseMessage implements Serializable
 {
     public static final ResponseMessage SUCCESS = new ResponseMessage("success");
     public static final ResponseMessage FAILED = new ResponseMessage(ErrorCode.FAILED, "failed");
+    public static final ResponseMessage BAD_REQUEST = new ResponseMessage(ErrorCode.BAD_REQUEST, "invalid params");
 
     public static ResponseMessage FAILED(String errmsg) {
         return new ResponseMessage(ErrorCode.FAILED, errmsg);

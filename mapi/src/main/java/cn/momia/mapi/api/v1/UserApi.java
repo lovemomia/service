@@ -37,6 +37,8 @@ public class UserApi extends AbstractApi {
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getUser(@RequestParam String utoken) {
+        if (StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
+
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user"), builder.build());
 
@@ -47,7 +49,7 @@ public class UserApi extends AbstractApi {
     public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam(defaultValue = "eq") String type, @RequestParam final int start, @RequestParam final int count) {
         final int maxPageCount = conf.getInt("Order.MaxPageCount");
         final int pageSize = conf.getInt("Order.PageSize");
-        if (start > maxPageCount * pageSize) return ResponseMessage.FAILED;
+        if (StringUtils.isBlank(utoken) || start < 0 || count <= 0 || start > maxPageCount * pageSize) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -89,7 +91,7 @@ public class UserApi extends AbstractApi {
 
     @RequestMapping(value = "/nickname", method = RequestMethod.POST)
     public ResponseMessage updateNickName(@RequestParam String utoken, @RequestParam(value = "nickname") String nickName) {
-        if(StringUtils.isBlank(nickName)) return ResponseMessage.FAILED("nickname is empty, please enter your nickname");
+        if(StringUtils.isBlank(utoken) || StringUtils.isBlank(nickName)) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -101,6 +103,8 @@ public class UserApi extends AbstractApi {
 
     @RequestMapping(value = "/avatar", method = RequestMethod.POST)
     public ResponseMessage updateAvatar(@RequestParam String utoken, @RequestParam String avatar) {
+        if(StringUtils.isBlank(utoken) || StringUtils.isBlank(avatar)) return ResponseMessage.BAD_REQUEST;
+
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("avatar", avatar);
@@ -111,7 +115,7 @@ public class UserApi extends AbstractApi {
 
     @RequestMapping(value = "/name", method = RequestMethod.POST)
     public ResponseMessage updateName(@RequestParam String utoken, @RequestParam String name) {
-        if(StringUtils.isBlank(name)) return ResponseMessage.FAILED("name is empty, please enter your name");
+        if(StringUtils.isBlank(utoken) || StringUtils.isBlank(name)) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -123,7 +127,7 @@ public class UserApi extends AbstractApi {
 
     @RequestMapping(value = "/sex", method = RequestMethod.POST)
     public ResponseMessage updateSex(@RequestParam String utoken, @RequestParam String sex) {
-        if(StringUtils.isBlank(sex)) return ResponseMessage.FAILED("sex is empty, please enter your sex");
+        if(StringUtils.isBlank(utoken) || StringUtils.isBlank(sex)) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -135,7 +139,7 @@ public class UserApi extends AbstractApi {
 
     @RequestMapping(value = "/birthday", method = RequestMethod.POST)
     public ResponseMessage updateBirthday(@RequestParam String utoken, @RequestParam String birthday) {
-        if(StringUtils.isBlank(birthday)) return ResponseMessage.FAILED("birthday is empty, please enter your birthday");
+        if(StringUtils.isBlank(utoken) || StringUtils.isBlank(birthday)) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -147,7 +151,7 @@ public class UserApi extends AbstractApi {
 
     @RequestMapping(value = "/city", method = RequestMethod.POST)
     public ResponseMessage updateCity(@RequestParam String utoken, @RequestParam int city) {
-        if(city <= 0 ) return ResponseMessage.FAILED("city does not exist, please make sure your city > 0");
+        if(StringUtils.isBlank(utoken) || city <= 0) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -159,7 +163,7 @@ public class UserApi extends AbstractApi {
 
     @RequestMapping(value = "/address", method = RequestMethod.POST)
     public ResponseMessage updateAddress(@RequestParam String utoken, @RequestParam String address) {
-        if(StringUtils.isBlank(address)) return ResponseMessage.FAILED("address is empty, please enter your address");
+        if(StringUtils.isBlank(utoken) || StringUtils.isBlank(address)) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -180,6 +184,8 @@ public class UserApi extends AbstractApi {
 
     @RequestMapping(value = "/child/update", method = RequestMethod.POST)
     public ResponseMessage updateChild(@RequestParam String utoken, @RequestParam String child) {
+        if(StringUtils.isBlank(utoken) || StringUtils.isBlank(child)) return ResponseMessage.BAD_REQUEST;
+
         JSONObject childJson = JSON.parseObject(child);
         childJson.put("userId", getUserId(utoken));
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("participant"), childJson.toString());
@@ -189,6 +195,8 @@ public class UserApi extends AbstractApi {
 
     @RequestMapping(value = "/child/delete", method = RequestMethod.POST)
     public ResponseMessage deleteChild(@RequestParam String utoken, @RequestParam(value = "cid") long childId) {
+        if(StringUtils.isBlank(utoken) || childId <= 0) return ResponseMessage.BAD_REQUEST;
+
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         MomiaHttpRequest request = MomiaHttpRequest.DELETE(baseServiceUrl("user/child", childId), builder.build());
 
@@ -196,7 +204,9 @@ public class UserApi extends AbstractApi {
     }
 
     @RequestMapping(value = "/child", method = RequestMethod.GET)
-    public ResponseMessage getChild(@PathVariable(value = "cid") long childId, @RequestParam String utoken) {
+    public ResponseMessage getChild(@RequestParam String utoken, @PathVariable(value = "cid") long childId) {
+        if(StringUtils.isBlank(utoken) || childId <= 0) return ResponseMessage.BAD_REQUEST;
+
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user/child", childId), builder.build());
 
@@ -205,6 +215,8 @@ public class UserApi extends AbstractApi {
 
     @RequestMapping(value = "/child/list", method = RequestMethod.GET)
     public ResponseMessage getChildren(@RequestParam String utoken) {
+        if(StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
+
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user/child"), builder.build());
 
