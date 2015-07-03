@@ -164,12 +164,12 @@ public class WechatpayGateway implements PaymentGateway {
         result.setSuccessful(successful);
 
         if (successful) {
-            result.add("appId", params.get(WechatpayPrepayFields.APPID));
-            result.add("timeStamp", String.valueOf(new Date().getTime()).substring(0, 10));
-            result.add("nonceStr", params.get(WechatpayPrepayFields.NONCE_STR));
-            result.add("package", "prepay_id=" + params.get(WechatpayPrepayFields.PREPAY_ID));
-            result.add("signType", "MD5");
-            result.add("paySign", WechatpayUtil.sign(result.getAll(), tradeType));
+            result.add(WechatpayPrepayFields.PREPAY_RETURN_APPID, params.get(WechatpayPrepayFields.APPID));
+            result.add(WechatpayPrepayFields.PREPAY_RETURN_TIMESTAMP, String.valueOf(new Date().getTime()).substring(0, 10));
+            result.add(WechatpayPrepayFields.PREPAY_RETURN_NONCE_STR, params.get(WechatpayPrepayFields.NONCE_STR));
+            result.add(WechatpayPrepayFields.PREPAY_RETURN_PACKAGE, "prepay_id=" + params.get(WechatpayPrepayFields.PREPAY_ID));
+            result.add(WechatpayPrepayFields.PREPAY_RETURN_SIGN_TYPE, "MD5");
+            result.add(WechatpayPrepayFields.PREPAY_RETURN_PAY_SIGN, WechatpayUtil.sign(result.getAll(), tradeType));
         } else {
             LOGGER.error("fail to prepay: {}/{}", params.get(WechatpayPrepayFields.RETURN_CODE), params.get(WechatpayPrepayFields.RETURN_MSG));
         }

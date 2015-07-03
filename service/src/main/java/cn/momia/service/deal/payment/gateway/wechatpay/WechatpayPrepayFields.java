@@ -23,4 +23,11 @@ public class WechatpayPrepayFields {
     public static final String RESULT_CODE = "result_code"; //返回结果编码
     public static final String TRADE_TYPE = "trade_type";
     public static final String PREPAY_ID = "prepay_id";
+
+    public static final String PREPAY_RETURN_APPID = "appId";
+    public static final String PREPAY_RETURN_TIMESTAMP = "timeStamp";
+    public static final String PREPAY_RETURN_NONCE_STR = "nonceStr";
+    public static final String PREPAY_RETURN_PACKAGE = "package";
+    public static final String PREPAY_RETURN_SIGN_TYPE = "signType";
+    public static final String PREPAY_RETURN_PAY_SIGN = "paySign";
 }
