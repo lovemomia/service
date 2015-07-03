@@ -1,5 +1,7 @@
 package cn.momia.service.base.user;
 
+import cn.momia.service.base.user.participant.Participant;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -20,5 +22,5 @@ public interface UserService {
     boolean updateBirthday(long id, Date birthday);
     boolean updateCityId(long id, int cityId);
     boolean updateAddress(long id, String address);
-    boolean updateChild(long id, Set<Long> children);
+    boolean updateChild(long id, Set<Participant> children);
 }

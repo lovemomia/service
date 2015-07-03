@@ -1,6 +1,8 @@
 package cn.momia.service.base.user.impl;
 
 import cn.momia.service.base.city.CityService;
+import cn.momia.service.base.user.participant.Participant;
+import cn.momia.service.base.user.participant.ParticipantService;
 import cn.momia.service.common.DbAccessService;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +31,11 @@ import java.util.Set;
 public class UserServiceImpl extends DbAccessService implements UserService {
     private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "avatar", "name", "sex", "birthday", "cityId", "address", "children" };
     private CityService cityService;
+    private ParticipantService participantService;
+
+    public void setParticipantService(ParticipantService participantService) {
+        this.participantService = participantService;
+    }
 
     public void setCityService(CityService cityService) {
         this.cityService = cityService;
@@ -100,7 +108,12 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         user.setBirthday(rs.getDate("birthday"));
         user.setCity(cityService.get(rs.getInt("cityId")).getName());
         user.setAddress(rs.getString("address"));
-        user.setChildren(parseChildren(rs.getString("children")));
+
+        Set<Long> childList = parseChildren(rs.getString("children"));
+        Set<Participant> participants = new HashSet<Participant>();
+        for(Long child : childList)
+           participants.add(participantService.get(child));
+        user.setChildren(participants);
 
         return user;
     }
@@ -238,9 +251,12 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
-    public boolean updateChild(long id, Set<Long> children) {
+    public boolean updateChild(long id, Set<Participant> children) {
         String sql = "UPDATE t_user SET children=? WHERE id=?";
+        Set<Long> childrenIds = new HashSet<Long>();
+        for(Participant child :children)
+            childrenIds.add(child.getId());
 
-        return update(id, sql, new Object[] { StringUtils.join(children, ","), id });
+        return update(id, sql, new Object[] { StringUtils.join(childrenIds, ","), id });
     }
 }

@@ -54,10 +54,13 @@
     </bean>
 
     <bean id="cityService" class="cn.momia.service.base.city.impl.CityServiceImpl" parent="dbAccessService" init-method="init" />
+    <bean id="participantService" class="cn.momia.service.base.user.participant.impl.ParticipantServiceImpl" parent="dbAccessService" />
+
     <bean id="userService" class="cn.momia.service.base.user.impl.UserServiceImpl" parent="dbAccessService">
         <property name="cityService" ref="cityService" />
+        <property name="participantService" ref="participantService" />
     </bean>
-    <bean id="participantService" class="cn.momia.service.base.user.participant.impl.ParticipantServiceImpl" parent="dbAccessService" />
+
 
     <bean id="orderService" class="cn.momia.service.deal.order.impl.OrderServiceImpl" parent="dbAccessService" />
     <bean id="paymentService" class="cn.momia.service.deal.payment.impl.PaymentServiceImpl" parent="dbAccessService" />

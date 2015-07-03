@@ -11,18 +11,18 @@ import cn.momia.mapi.api.v1.dto.base.ParticipantDto;
 import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import cn.momia.mapi.api.v1.dto.composite.PagedListDto;
 import cn.momia.mapi.api.v1.dto.base.UserDto;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
 
 @RestController
 @RequestMapping("/v1/user")
@@ -177,42 +177,86 @@ public class UserApi extends AbstractApi {
     public ResponseMessage addChild(@RequestParam String utoken, @RequestParam String child) {
         if(StringUtils.isBlank(utoken) || StringUtils.isBlank(child)) return ResponseMessage.BAD_REQUEST;
 
-        long userId = getUserId(utoken);
-        if (userId <= 0) return ResponseMessage.TOKEN_EXPIRED;
+        JSONArray childJsonArray = JSONArray.parseArray(child);
+        for(int i=0; i<childJsonArray.size(); i++)
+            childJsonArray.getJSONObject(i).put("userId", getUserId(utoken));
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("user/child"), childJsonArray.toString());
 
-        JSONObject childJson = JSON.parseObject(child);
-        childJson.put("userId", userId);
-        MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("user/child"), childJson.toString());
+        if (executeRequest(request).getErrno() != 0) return executeRequest(request);
 
-        return executeRequest(request);
+        MomiaHttpRequest requestUser = MomiaHttpRequest.GET(baseServiceUrl("user"), builder.build());
+        return executeRequest(requestUser, userFunc);
+
     }
 
-    @RequestMapping(value = "/child/update", method = RequestMethod.POST)
-    public ResponseMessage updateChild(@RequestParam String utoken, @RequestParam String child) {
-        if(StringUtils.isBlank(utoken) || StringUtils.isBlank(child)) return ResponseMessage.BAD_REQUEST;
+    @RequestMapping(value = "/child/name", method = RequestMethod.POST)
+    public ResponseMessage updateChildByName(@RequestParam String utoken,@RequestParam long id, @RequestParam String name) {
+        if(StringUtils.isBlank(utoken) || StringUtils.isBlank(name)) return ResponseMessage.BAD_REQUEST;
 
-        long userId = getUserId(utoken);
-        if (userId <= 0) return ResponseMessage.TOKEN_EXPIRED;
-
-        JSONObject childJson = JSON.parseObject(child);
-        childJson.put("userId", userId);
-        MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("participant"), childJson.toString());
-
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("id", id)
+                .add("name", name);
+        MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("participant/name"),builder.build());
+        if(executeRequest(request).getErrno() == 0) {
+            MomiaHttpParamBuilder builderUser = new MomiaHttpParamBuilder().add("utoken", utoken);
+            MomiaHttpRequest requestUser = MomiaHttpRequest.GET(baseServiceUrl("user"), builderUser.build());
+            return executeRequest(requestUser, userFunc);
+        }
         return executeRequest(request);
+
+
     }
 
+
+    @RequestMapping(value = "/child/sex", method = RequestMethod.POST)
+    public ResponseMessage updateChildBySex(@RequestParam String utoken,@RequestParam long id, @RequestParam String sex) {
+        if(StringUtils.isBlank(utoken) || StringUtils.isBlank(sex)) return ResponseMessage.BAD_REQUEST;
+
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("id", id)
+                .add("sex", sex);
+        MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("participant/sex"),builder.build());
+        if(executeRequest(request).getErrno() == 0) {
+            MomiaHttpParamBuilder builderUser = new MomiaHttpParamBuilder().add("utoken", utoken);
+            MomiaHttpRequest requestUser = MomiaHttpRequest.GET(baseServiceUrl("user"), builderUser.build());
+            return executeRequest(requestUser, userFunc);
+        }
+        return executeRequest(request);
+
+    }
+
+    @RequestMapping(value = "/child/birthday", method = RequestMethod.POST)
+    public ResponseMessage updateChildByBirthday(@RequestParam String utoken,@RequestParam long id, @RequestParam String birthday) {
+        if(StringUtils.isBlank(utoken) || StringUtils.isBlank(birthday)) return ResponseMessage.BAD_REQUEST;
+
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("id", id)
+                .add("birthday", birthday);
+        MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("participant/birthday"),builder.build());
+        if(executeRequest(request).getErrno() == 0) {
+            MomiaHttpParamBuilder builderUser = new MomiaHttpParamBuilder().add("utoken", utoken);
+            MomiaHttpRequest requestUser = MomiaHttpRequest.GET(baseServiceUrl("user"), builderUser.build());
+            return executeRequest(requestUser, userFunc);
+        }
+        return executeRequest(request);
+
+    }
     @RequestMapping(value = "/child/delete", method = RequestMethod.POST)
     public ResponseMessage deleteChild(@RequestParam String utoken, @RequestParam(value = "cid") long childId) {
         if(StringUtils.isBlank(utoken) || childId <= 0) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         MomiaHttpRequest request = MomiaHttpRequest.DELETE(baseServiceUrl("user/child", childId), builder.build());
-
+        if(executeRequest(request).getErrno() == 0) {
+            MomiaHttpRequest requestUser = MomiaHttpRequest.GET(baseServiceUrl("user"), builder.build());
+            return executeRequest(requestUser, userFunc);
+        }
         return executeRequest(request);
     }
 
     @RequestMapping(value = "/child", method = RequestMethod.GET)
-    public ResponseMessage getChild(@RequestParam String utoken, @PathVariable(value = "cid") long childId) {
+    public ResponseMessage getChild(@RequestParam String utoken, @RequestParam(value = "cid") long childId) {
         if(StringUtils.isBlank(utoken) || childId <= 0) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);

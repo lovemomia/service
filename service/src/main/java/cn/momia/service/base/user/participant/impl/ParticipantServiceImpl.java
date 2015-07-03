@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,36 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
         int updateCount = jdbcTemplate.update(sql, new Object[] { participant.getName(), participant.getSex(), participant.getBirthday(), participant.getIdType(), participant.getIdNo(), participant.getId(), participant.getUserId() });
 
         return updateCount == 1;
+    }
+
+    private boolean update(long id, String sql, Object[] args) {
+        Participant participant = get(id);
+        if (!participant.exists()) return false;
+
+        int affectedRowCount = jdbcTemplate.update(sql, args);
+        if (affectedRowCount != 1) return false;
+
+        return true;
+    }
+    @Override
+    public boolean updateByName( long id, String name) {
+        String sql = "UPDATE t_user_participant SET name=? WHERE id=?";
+
+        return update(id, sql, new Object[]{ name, id });
+    }
+
+    @Override
+    public boolean updateBySex(long id, String sex) {
+        String sql = "UPDATE t_user_participant SET sex=? WHERE id=?";
+
+        return update(id, sql, new Object[]{ sex, id });
+    }
+
+    @Override
+    public boolean updateByBirthday(long id, Date birthday) {
+        String sql = "UPDATE t_user_participant SET birthday=? WHERE id=?";
+
+        return update(id, sql, new Object[]{ birthday, id });
     }
 
     @Override
