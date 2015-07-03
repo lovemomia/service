@@ -206,7 +206,9 @@ public class ProductApi extends AbstractApi {
         return request;
     }
 
-    private ContactsDto getContacts(JSONObject userJson) {
+    private ContactsDto getContacts(JSONObject userPackJson) {
+        if (userPackJson == null) return null;
+        JSONObject userJson = userPackJson.getJSONObject("user");
         if (userJson == null) return null;
 
         ContactsDto contacts = new ContactsDto();

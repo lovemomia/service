@@ -75,7 +75,11 @@ public class UserDto implements Dto {
     }
 
     public UserDto(JSONObject userJson, JSONArray childrenJson) {
-        this.token = userJson.getString("token");
+        this(userJson, childrenJson, false);
+    }
+
+    public UserDto(JSONObject userJson, JSONArray childrenJson, boolean showToken) {
+        if (showToken) this.token = userJson.getString("token");
         this.nickName = userJson.getString("nickName");
         this.mobile = encryptMobile(userJson.getString("mobile"));
         this.avatar = ImageFile.url(userJson.getString("avatar"));

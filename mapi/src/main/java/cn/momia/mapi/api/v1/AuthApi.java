@@ -18,6 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/v1/auth")
 public class AuthApi extends AbstractApi {
+    private static final Function<Object, Dto> userFunc = new Function<Object, Dto>() {
+        @Override
+        public Dto apply(Object data) {
+            JSONObject userPackJson = (JSONObject) data;
+            return new UserDto(userPackJson.getJSONObject("user"), userPackJson.getJSONArray("children"), true);
+        }
+    };
+
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     public ResponseMessage send(@RequestParam String mobile, @RequestParam String type)  {
         if (ValidateUtil.isInvalidMobile(mobile) || ValidateUtil.notIn(type, "login", "register")) return ResponseMessage.BAD_REQUEST;

@@ -21,14 +21,6 @@ import java.util.List;
 public abstract class AbstractApi {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractApi.class);
 
-    protected static final Function<Object, Dto> userFunc = new Function<Object, Dto>() {
-        @Override
-        public Dto apply(Object data) {
-            JSONObject userPackJson = (JSONObject) data;
-            return new UserDto(userPackJson.getJSONObject("user"), userPackJson.getJSONArray("children"));
-        }
-    };
-
     @Autowired
     protected Configuration conf;
 
@@ -88,7 +80,7 @@ public abstract class AbstractApi {
         MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user"), builder.build());
 
         ResponseMessage responseMessage = executeRequest(request);
-        if (responseMessage.getErrno() == ErrorCode.SUCCESS) return ((JSONObject) responseMessage.getData()).getLong("id");
+        if (responseMessage.getErrno() == ErrorCode.SUCCESS) return ((JSONObject) responseMessage.getData()).getJSONObject("user").getLong("id");
         if (responseMessage.getErrno() == ErrorCode.TOKEN_EXPIRED) return 0;
 
         throw new RuntimeException("fail to get user id");

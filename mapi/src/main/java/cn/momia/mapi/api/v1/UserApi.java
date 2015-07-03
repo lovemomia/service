@@ -28,6 +28,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserApi extends AbstractApi {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserApi.class);
 
+    private static final Function<Object, Dto> userFunc = new Function<Object, Dto>() {
+        @Override
+        public Dto apply(Object data) {
+            JSONObject userPackJson = (JSONObject) data;
+            return new UserDto(userPackJson.getJSONObject("user"), userPackJson.getJSONArray("children"));
+        }
+    };
+
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getUser(@RequestParam String utoken) {
         if (StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
