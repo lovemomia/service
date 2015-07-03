@@ -40,12 +40,12 @@ public class PaymentController extends AbstractController {
         if (StringUtils.isBlank(utoken) || orderId <= 0 || productId <= 0 || skuId <= 0) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
-        if (!user.exists()) ResponseMessage.FAILED("user not exists");
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         Order order = orderService.get(orderId);
         Product product = productService.get(productId);
-        if (!order.exists() || !product.exists()) return ResponseMessage.FAILED("order or(and) product does not exist");
-        if (order.getCustomerId() != user.getId() || order.getSkuId() != skuId) return ResponseMessage.FAILED("params not match");
+        if (!order.exists() || !product.exists()) return ResponseMessage.BAD_REQUEST;
+        if (order.getCustomerId() != user.getId() || order.getSkuId() != skuId) return ResponseMessage.BAD_REQUEST;
 
         PaymentGateway gateway = PaymentGatewayFactory.create(Payment.Type.WECHATPAY);
         Map<String, String> params = gateway.extractPrepayParams(request, order, product);

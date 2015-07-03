@@ -47,7 +47,7 @@ public class AuthController extends AbstractController {
         }
         catch (Exception e) {
             LOGGER.error("fail to send verify code for {}", mobile, e);
-            return ResponseMessage.FAILED;
+            return ResponseMessage.FAILED("发送验证码失败");
         }
     }
 
@@ -55,13 +55,13 @@ public class AuthController extends AbstractController {
     public ResponseMessage login(@RequestParam String mobile, @RequestParam String code) {
         if (ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
 
-        if (!smsVerifier.verify(mobile, code)) return ResponseMessage.FAILED("fail to verify code");
+        if (!smsVerifier.verify(mobile, code)) return ResponseMessage.FAILED("验证码不正确");
 
         User user = userService.getByMobile(mobile);
 //        String token = generateToken(mobile);
         if (!user.exists()) {
                 LOGGER.error("fail to login user for {}", mobile);
-                return ResponseMessage.FAILED("fail to login, mobile does not exist, please register first.");
+                return ResponseMessage.FAILED("登录失败，用户不存在，请先注册");
         }/* else {
             if (!userService.updateToken(user.getId(), token)) {
                 LOGGER.warn("fail to update token for {}, will use old token", mobile);
@@ -89,9 +89,9 @@ public class AuthController extends AbstractController {
     public ResponseMessage register(@RequestParam String nickName, @RequestParam String mobile, @RequestParam String code){
         if (StringUtils.isBlank(nickName) || ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
 
-        if(userService.getByNickName(nickName).exists()) return ResponseMessage.FAILED("fail to register, nickName already exists");
+        if(userService.getByNickName(nickName).exists()) return ResponseMessage.FAILED("注册失败，用户昵称已存在");
 
-        if (!smsVerifier.verify(mobile, code)) return ResponseMessage.FAILED("fail to verify code");
+        if (!smsVerifier.verify(mobile, code)) return ResponseMessage.FAILED("验证码不正确");
 
         User user = userService.getByMobile(mobile);
         String token = generateToken(mobile);
@@ -99,10 +99,10 @@ public class AuthController extends AbstractController {
             user = userService.add(nickName, mobile, token);
             if (!user.exists()) {
                 LOGGER.error("fail to register user for {}", mobile);
-                return ResponseMessage.FAILED("fail to register");
+                return ResponseMessage.FAILED("注册失败，服务器内部错误");
             }
         } else {
-            return ResponseMessage.FAILED("fail to register, user already exists");
+            return ResponseMessage.FAILED("注册失败，用户已存在");
         }
 
         return new ResponseMessage(buildUserResponse(user));

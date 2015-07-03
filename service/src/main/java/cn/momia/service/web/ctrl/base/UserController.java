@@ -120,7 +120,7 @@ public class UserController extends AbstractController {
 
         boolean successful = userService.updateNickName(user.getId(), nickName);
 
-        if (!successful) return ResponseMessage.FAILED("fail to update user nick name");
+        if (!successful) return ResponseMessage.FAILED("更新用户昵称失败，内部服务器错误");
 
         user.setNickName(nickName);
         return new ResponseMessage(buildUserResponse(user));
@@ -135,7 +135,7 @@ public class UserController extends AbstractController {
 
         boolean successful = userService.updateAvatar(user.getId(), avatar);
 
-        if (!successful) return ResponseMessage.FAILED("fail to update user avatar");
+        if (!successful) return ResponseMessage.FAILED("更新用户头像失败，内部服务器错误");
 
         user.setAvatar(avatar);
         return new ResponseMessage(buildUserResponse(user));
@@ -150,7 +150,7 @@ public class UserController extends AbstractController {
 
         boolean successful = userService.updateName(user.getId(), name);
 
-        if (!successful) return ResponseMessage.FAILED("fail to update user name");
+        if (!successful) return ResponseMessage.FAILED("更新用户名字失败，内部服务器错误");
 
         user.setName(name);
         return new ResponseMessage(buildUserResponse(user));
@@ -165,7 +165,7 @@ public class UserController extends AbstractController {
 
         boolean successful = userService.updateSex(user.getId(), sex);
 
-        if (!successful) return ResponseMessage.FAILED("fail to update user sex");
+        if (!successful) return ResponseMessage.FAILED("更新用户性别失败，内部服务器错误");
 
         user.setSex(sex);
         return new ResponseMessage(buildUserResponse(user));
@@ -180,7 +180,7 @@ public class UserController extends AbstractController {
 
         boolean successful = userService.updateBirthday(user.getId(), birthday);
 
-        if (!successful) return ResponseMessage.FAILED("fail to update user birthday");
+        if (!successful) return ResponseMessage.FAILED("更新用户生日失败，内部服务器错误");
 
         user.setBirthday(birthday);
         return new ResponseMessage(buildUserResponse(user));
@@ -195,7 +195,7 @@ public class UserController extends AbstractController {
 
         boolean successful = userService.updateCityId(user.getId(), city);
 
-        if (!successful) return ResponseMessage.FAILED("fail to update user city");
+        if (!successful) return ResponseMessage.FAILED("更新用户城市失败，内部服务器错误");
 
         user.setCity(cityService.get(city).getName());
         return new ResponseMessage(buildUserResponse(user));
@@ -210,7 +210,7 @@ public class UserController extends AbstractController {
 
         boolean successful = userService.updateAddress(user.getId(), address);
 
-        if (!successful) return ResponseMessage.FAILED("fail to update user address");
+        if (!successful) return ResponseMessage.FAILED("更新用户地址失败，内部服务器错误");
 
         user.setAddress(address);
         return new ResponseMessage(buildUserResponse(user));
@@ -222,13 +222,13 @@ public class UserController extends AbstractController {
         Set<Long> childrenIds = new HashSet<Long>();
         for(Participant child : children) {
             long childId = participantService.add(child);
-            if (childId <= 0) return ResponseMessage.FAILED("fail to add child");
+            if (childId <= 0) return ResponseMessage.FAILED("添加孩子信息失败");
 
             userId = child.getUserId();
             childrenIds.add(childId);
         }
 
-        if (userId > 0 && !userService.updateChildren(userId, childrenIds)) return ResponseMessage.FAILED;
+        if (userId > 0 && !userService.updateChildren(userId, childrenIds)) return ResponseMessage.FAILED("添加孩子信息失败");
 
         return new ResponseMessage(buildUserResponse(userService.get(userId)));
     }
@@ -242,7 +242,7 @@ public class UserController extends AbstractController {
 
         Set<Long> children = user.getChildren();
         children.remove(childId);
-        if (!userService.updateChildren(user.getId(), children)) return ResponseMessage.FAILED("fail to delete child");
+        if (!userService.updateChildren(user.getId(), children)) return ResponseMessage.FAILED("删除孩子信息失败");
 
         user.setChildren(children);
         return new ResponseMessage(buildUserResponse(user));
@@ -256,7 +256,7 @@ public class UserController extends AbstractController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         Set<Long> children = user.getChildren();
-        if (!children.contains(childId)) return ResponseMessage.FAILED("child not exists");
+        if (!children.contains(childId)) return ResponseMessage.BAD_REQUEST;
 
         return new ResponseMessage(participantService.get(childId));
     }

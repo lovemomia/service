@@ -27,7 +27,7 @@ public class ParticipantController {
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage addParticipant(@RequestBody Participant participant) {
         long participantId = participantService.add(participant);
-        if(participantId <= 0) return ResponseMessage.FAILED("fail to add participant");
+        if(participantId <= 0) return ResponseMessage.FAILED("添加出行人失败，内部服务器错误");
         return ResponseMessage.SUCCESS;
     }
 
@@ -39,7 +39,7 @@ public class ParticipantController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         Participant participant = participantService.get(id);
-        if (!participant.exists() || participant.getUserId() != user.getId()) return ResponseMessage.FAILED("participant not exists");
+        if (!participant.exists() || participant.getUserId() != user.getId()) return ResponseMessage.BAD_REQUEST;
 
         return new ResponseMessage(participant);
     }
@@ -48,7 +48,7 @@ public class ParticipantController {
     public ResponseMessage updateParticipantName(@RequestBody Participant participant) {
         boolean successful = participantService.update(participant);
 
-        if (!successful) return ResponseMessage.FAILED("fail to update participant");
+        if (!successful) return ResponseMessage.FAILED("更新出行人失败，内部服务器错误");
         return ResponseMessage.SUCCESS;
     }
 
@@ -61,7 +61,7 @@ public class ParticipantController {
 
         boolean successful = participantService.updateByName(id, name, user.getId());
 
-        if (!successful) return ResponseMessage.FAILED("fail to update participant name");
+        if (!successful) return ResponseMessage.FAILED("更新姓名失败，内部服务器错误");
         return ResponseMessage.SUCCESS;
     }
 
@@ -74,7 +74,7 @@ public class ParticipantController {
 
         boolean successful = participantService.updateBySex(id, sex, user.getId());
 
-        if (!successful) return ResponseMessage.FAILED("fail to update participant sex");
+        if (!successful) return ResponseMessage.FAILED("更新性别失败，内部服务器错误");
         return ResponseMessage.SUCCESS;
     }
     @RequestMapping(value = "/birthday",method = RequestMethod.PUT)
@@ -86,7 +86,7 @@ public class ParticipantController {
 
         boolean successful = participantService.updateByBirthday(id, birthday, user.getId());
 
-        if (!successful) return ResponseMessage.FAILED("fail to update participant name");
+        if (!successful) return ResponseMessage.FAILED("更新生日失败，内部服务器错误");
         return ResponseMessage.SUCCESS;
     }
 
@@ -98,7 +98,7 @@ public class ParticipantController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         boolean successful = participantService.delete(id, user.getId());
-        if (!successful) return ResponseMessage.FAILED("fail to delete participant");
+        if (!successful) return ResponseMessage.FAILED("删除出行人失败，内部服务器错误");
 
         return ResponseMessage.SUCCESS;
     }
