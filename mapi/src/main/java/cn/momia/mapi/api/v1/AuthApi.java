@@ -39,12 +39,7 @@ public class AuthApi extends AbstractApi {
                 .add("code", code);
         MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("auth/login"), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return new UserDto((JSONObject) data);
-            }
-        });
+        return executeRequest(request, userFunc);
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
@@ -57,11 +52,6 @@ public class AuthApi extends AbstractApi {
                 .add("code", code);
         MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("auth/register"), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return new UserDto((JSONObject) data);
-            }
-        });
+        return executeRequest(request, userFunc);
     }
 }

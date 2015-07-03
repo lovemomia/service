@@ -27,12 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/user")
 public class UserApi extends AbstractApi {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserApi.class);
-    private static final Function<Object, Dto> userFunc = new Function<Object, Dto>() {
-        @Override
-        public Dto apply(Object data) {
-            return new UserDto((JSONObject) data);
-        }
-    };
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getUser(@RequestParam String utoken) {

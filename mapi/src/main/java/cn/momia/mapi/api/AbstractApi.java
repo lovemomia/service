@@ -9,6 +9,7 @@ import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.v1.dto.base.Dto;
+import cn.momia.mapi.api.v1.dto.base.UserDto;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
 import org.slf4j.Logger;
@@ -19,6 +20,14 @@ import java.util.List;
 
 public abstract class AbstractApi {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractApi.class);
+
+    protected static final Function<Object, Dto> userFunc = new Function<Object, Dto>() {
+        @Override
+        public Dto apply(Object data) {
+            JSONObject userPackJson = (JSONObject) data;
+            return new UserDto(userPackJson.getJSONObject("user"), userPackJson.getJSONArray("children"));
+        }
+    };
 
     @Autowired
     protected Configuration conf;
