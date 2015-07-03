@@ -3,11 +3,11 @@ package cn.momia.mapi.api.v1.dto.base;
 public class WechatpayPrepayDto implements Dto {
     private boolean successful;
     private String appId;
-    private String mchId;
-    private String prepayId;
+    private String timeStamp;
     private String nonceStr;
+    private String prepayId;
     private String signType;
-    private String sign;
+    private String paySign;
 
     public boolean isSuccessful() {
         return successful;
@@ -25,20 +25,12 @@ public class WechatpayPrepayDto implements Dto {
         this.appId = appId;
     }
 
-    public String getMchId() {
-        return mchId;
+    public String getTimeStamp() {
+        return timeStamp;
     }
 
-    public void setMchId(String mchId) {
-        this.mchId = mchId;
-    }
-
-    public String getPrepayId() {
-        return prepayId;
-    }
-
-    public void setPrepayId(String prepayId) {
-        this.prepayId = prepayId;
+    public void setTimeStamp(String timeStamp) {
+        this.timeStamp = timeStamp;
     }
 
     public String getNonceStr() {
@@ -49,6 +41,14 @@ public class WechatpayPrepayDto implements Dto {
         this.nonceStr = nonceStr;
     }
 
+    public String getPrepayId() {
+        return prepayId;
+    }
+
+    public void setPrepayId(String prepayId) {
+        this.prepayId = prepayId;
+    }
+
     public String getSignType() {
         return signType;
     }
@@ -57,11 +57,11 @@ public class WechatpayPrepayDto implements Dto {
         this.signType = signType;
     }
 
-    public String getSign() {
-        return sign;
+    public String getPaySign() {
+        return paySign;
     }
 
-    public void setSign(String sign) {
-        this.sign = sign;
+    public void setPaySign(String paySign) {
+        this.paySign = paySign;
     }
 }
