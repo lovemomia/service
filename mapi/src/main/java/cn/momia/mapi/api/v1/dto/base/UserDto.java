@@ -7,13 +7,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Set;
 
 public class UserDto implements Dto {
     public static class Other extends UserDto {
-        public Other(JSONObject userJson) {
-            super(userJson);
+        public Other(JSONObject userJson, JSONArray childrenJson) {
+            super(userJson, childrenJson);
         }
 
         public String getToken() {
@@ -76,8 +74,12 @@ public class UserDto implements Dto {
         return children;
     }
 
-    public UserDto(JSONObject userJson) {
-        this.token = userJson.getString("token");
+    public UserDto(JSONObject userJson, JSONArray childrenJson) {
+        this(userJson, childrenJson, false);
+    }
+
+    public UserDto(JSONObject userJson, JSONArray childrenJson, boolean showToken) {
+        if (showToken) this.token = userJson.getString("token");
         this.nickName = userJson.getString("nickName");
         this.mobile = encryptMobile(userJson.getString("mobile"));
         this.avatar = ImageFile.url(userJson.getString("avatar"));
@@ -86,22 +88,15 @@ public class UserDto implements Dto {
         this.birthday = userJson.getDate("birthday");
         this.city = userJson.getString("city");
         this.address = userJson.getString("address");
-        JSONArray participantsJson  = userJson.getJSONArray("children");
 
-        ListDto participants = new ListDto();
-
-        for(int i=0; i<participantsJson.size(); i++) {
-            JSONObject participantJson = participantsJson.getJSONObject(i);
-            participants.add(new ParticipantDto(participantJson));
+        this.children = new ListDto();
+        for (int i = 0; i < childrenJson.size(); i++) {
+            JSONObject childJson = childrenJson.getJSONObject(i);
+            this.children.add(new ParticipantDto(childJson));
         }
-        this.children = participants;
-
-
-
     }
 
     private String encryptMobile(String mobile) {
         return mobile.substring(0, 3) + "****" + mobile.substring(7);
     }
-
 }

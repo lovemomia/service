@@ -87,7 +87,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
     @Override
     public Map<Long, List<Sku>> queryByProducts(List<Long> productIds) {
         final Map<Long, List<Sku>> skusOfProducts = new HashMap<Long, List<Sku>>();
-        if (productIds.isEmpty()) return skusOfProducts;
+        if (productIds == null || productIds.isEmpty()) return skusOfProducts;
 
         String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId IN (" + StringUtils.join(productIds, ",") + ") AND status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {

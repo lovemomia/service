@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PlaceServiceImpl.class);
-    private static final String[] PLACE_FIELDS = {"id", "name", "address", "`desc`", "lng", "lat", "image"};
+    private static final String[] PLACE_FIELDS = {"id", "cityId", "regionId", "name", "address", "`desc`", "lng", "lat", "image"};
 
     @Override
     public Place get(long id) {
@@ -41,6 +41,8 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
         try {
             Place place = new Place();
             place.setId(rs.getLong("id"));
+            place.setCityId(rs.getInt("cityId"));
+            place.setRegionId(rs.getInt("regionId"));
             place.setName(rs.getString("name"));
             place.setAddress(rs.getString("address"));
             place.setDesc(rs.getString("desc"));
@@ -59,7 +61,7 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     @Override
     public Map<Long, Place> get(List<Long> ids) {
         final Map<Long, Place> places = new HashMap<Long, Place>();
-        if (ids.isEmpty()) return places;
+        if (ids == null || ids.isEmpty()) return places;
 
         String sql = "SELECT " + joinFields() + " FROM t_place WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {

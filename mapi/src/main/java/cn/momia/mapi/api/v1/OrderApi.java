@@ -23,7 +23,7 @@ public class OrderApi extends AbstractApi {
         if (StringUtils.isBlank(utoken) || StringUtils.isBlank(order)) return ResponseMessage.BAD_REQUEST;
 
         JSONObject orderJson = JSON.parseObject(order);
-        if(!orderJson.containsKey("productId")) return ResponseMessage.FAILED("productId is empty");
+        if(!orderJson.containsKey("productId") || !orderJson.containsKey("skuId") || !orderJson.containsKey("prices")) return ResponseMessage.BAD_REQUEST;
 
         long userId = getUserId(utoken);
         if (userId <= 0) return ResponseMessage.TOKEN_EXPIRED;

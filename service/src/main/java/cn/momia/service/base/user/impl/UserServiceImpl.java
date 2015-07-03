@@ -1,8 +1,6 @@
 package cn.momia.service.base.user.impl;
 
 import cn.momia.service.base.city.CityService;
-import cn.momia.service.base.user.participant.Participant;
-import cn.momia.service.base.user.participant.ParticipantService;
 import cn.momia.service.common.DbAccessService;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
@@ -20,7 +18,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,11 +28,6 @@ import java.util.Set;
 public class UserServiceImpl extends DbAccessService implements UserService {
     private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "avatar", "name", "sex", "birthday", "cityId", "address", "children" };
     private CityService cityService;
-    private ParticipantService participantService;
-
-    public void setParticipantService(ParticipantService participantService) {
-        this.participantService = participantService;
-    }
 
     public void setCityService(CityService cityService) {
         this.cityService = cityService;
@@ -108,30 +100,24 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         user.setBirthday(rs.getDate("birthday"));
         user.setCity(cityService.get(rs.getInt("cityId")).getName());
         user.setAddress(rs.getString("address"));
-
-        Set<Long> childList = parseChildren(rs.getString("children"));
-        Set<Participant> participants = new HashSet<Participant>();
-        for(Long child : childList)
-           participants.add(participantService.get(child));
-        user.setChildren(participants);
+        user.setChildren(parseChildren(rs.getString("children")));
 
         return user;
     }
 
-
     private Set<Long> parseChildren(String children) {
-        Set<Long> childList = new HashSet<Long>();
-        for (String child : Splitter.on(",").trimResults().omitEmptyStrings().split(children)) {
-            childList.add(Long.valueOf(child));
+        Set<Long> childrenIds = new HashSet<Long>();
+        for (String childId : Splitter.on(",").trimResults().omitEmptyStrings().split(children)) {
+            childrenIds.add(Long.valueOf(childId));
         }
 
-        return childList;
+        return childrenIds;
     }
 
     @Override
     public Map<Long, User> get(List<Long> ids) {
         final Map<Long, User> users = new HashMap<Long, User>();
-        if (ids.size() <= 0) return users;
+        if (ids == null || ids.size() <= 0) return users;
 
         String sql = "SELECT " + joinFields() + " FROM t_user WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
@@ -188,75 +174,66 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     public boolean updateToken(long id, String token) {
         String sql = "UPDATE t_user SET token=? WHERE id=?";
 
-        return update(id, sql, new Object[] { token, id });
+        return update(sql, new Object[] { token, id });
     }
 
-    private boolean update(long id, String sql, Object[] args) {
-        User user = get(id);
-        if (!user.exists()) return false;
-
-        int affectedRowCount = jdbcTemplate.update(sql, args);
-        if (affectedRowCount != 1) return false;
-
-        return true;
+    private boolean update(String sql, Object[] args) {
+        return jdbcTemplate.update(sql, args) == 1;
     }
 
     @Override
     public boolean updateNickName(long id, String nickName) {
         String sql = "UPDATE t_user SET nickName=? WHERE id=?";
 
-        return update(id, sql, new Object[] { nickName, id });
+        return update(sql, new Object[] { nickName, id });
     }
 
     @Override
     public boolean updateAvatar(long id, String avatar) {
         String sql = "UPDATE t_user SET avatar=? WHERE id=?";
 
-        return update(id, sql, new Object[] { avatar, id });
+        return update(sql, new Object[] { avatar, id });
     }
 
     @Override
     public boolean updateName(long id, String name) {
         String sql = "UPDATE t_user SET name=? WHERE id=?";
 
-        return update(id, sql, new Object[] { name, id });
+        return update(sql, new Object[] { name, id });
     }
 
     @Override
     public boolean updateSex(long id, String sex) {
         String sql = "UPDATE t_user SET sex=? WHERE id=?";
 
-        return update(id, sql, new Object[] { sex, id });
+        return update(sql, new Object[] { sex, id });
     }
 
     @Override
     public boolean updateBirthday(long id, Date birthday) {
         String sql = "UPDATE t_user SET `birthday`=? WHERE id=?";
 
-        return update(id, sql, new Object[] { birthday, id });
+        return update(sql, new Object[] { birthday, id });
     }
 
     @Override
     public boolean updateCityId(long id, int cityId) {
         String sql = "UPDATE t_user SET `cityId`=? WHERE id=?";
 
-        return update(id, sql, new Object[] { cityId, id });
+        return update(sql, new Object[] { cityId, id });
     }
 
     @Override
     public boolean updateAddress(long id, String address) {
         String sql = "UPDATE t_user SET address=? WHERE id=?";
 
-        return update(id, sql, new Object[] { address, id });
+        return update(sql, new Object[] { address, id });
     }
 
     @Override
-    public boolean updateChild(long id, Set<Participant> children) {
+    public boolean updateChildren(long id, Set<Long> children) {
         String sql = "UPDATE t_user SET children=? WHERE id=?";
-        Set<Long> childrenIds = new HashSet<Long>();
-        for(Participant child :children)
-            childrenIds.add(child.getId());
 
-        return update(id, sql, new Object[] { StringUtils.join(childrenIds, ","), id });
+        return update(sql, new Object[] { StringUtils.join(children, ","), id });
     }
 }

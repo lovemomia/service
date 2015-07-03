@@ -3,9 +3,7 @@ package cn.momia.service.base.user;
 import cn.momia.service.base.user.participant.Participant;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 public class User implements Serializable {
@@ -31,7 +29,7 @@ public class User implements Serializable {
     private Date birthday;
     private String city;
     private String address;
-    private Set<Participant> children;
+    private Set<Long> children;
 
     public long getId() {
         return id;
@@ -113,11 +111,11 @@ public class User implements Serializable {
         this.address = address;
     }
 
-    public Set<Participant> getChildren() {
+    public Set<Long> getChildren() {
         return children;
     }
 
-    public void setChildren(Set<Participant> children) {
+    public void setChildren(Set<Long> children) {
         this.children = children;
     }
 

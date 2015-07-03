@@ -36,12 +36,12 @@ public class PaymentApi extends AbstractApi {
                 wechatpayPrepayDto.setSuccessful(prepayJson.getBoolean("successful"));
                 if (wechatpayPrepayDto.isSuccessful()) {
                     JSONObject paramJson = prepayJson.getJSONObject("all");
-                    wechatpayPrepayDto.setAppId(paramJson.getString("appid"));
-                    wechatpayPrepayDto.setMchId(paramJson.getString("mch_id"));
-                    wechatpayPrepayDto.setPrepayId(paramJson.getString("prepay_id"));
-                    wechatpayPrepayDto.setNonceStr(paramJson.getString("nonce_str"));
-                    wechatpayPrepayDto.setSignType("MD5");
-                    wechatpayPrepayDto.setSign(paramJson.getString("sign"));
+                    wechatpayPrepayDto.setAppId(paramJson.getString("appId"));
+                    wechatpayPrepayDto.setTimeStamp(paramJson.getString("timeStamp"));
+                    wechatpayPrepayDto.setNonceStr(paramJson.getString("nonceStr"));
+                    wechatpayPrepayDto.setPrepayId(paramJson.getString("package"));
+                    wechatpayPrepayDto.setSignType(paramJson.getString("signType"));
+                    wechatpayPrepayDto.setPaySign(paramJson.getString("paySign"));
                 }
 
                 return wechatpayPrepayDto;

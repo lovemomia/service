@@ -9,6 +9,7 @@ import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.v1.dto.base.Dto;
+import cn.momia.mapi.api.v1.dto.base.UserDto;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
 import org.slf4j.Logger;
@@ -79,7 +80,7 @@ public abstract class AbstractApi {
         MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user"), builder.build());
 
         ResponseMessage responseMessage = executeRequest(request);
-        if (responseMessage.getErrno() == ErrorCode.SUCCESS) return ((JSONObject) responseMessage.getData()).getLong("id");
+        if (responseMessage.getErrno() == ErrorCode.SUCCESS) return ((JSONObject) responseMessage.getData()).getJSONObject("user").getLong("id");
         if (responseMessage.getErrno() == ErrorCode.TOKEN_EXPIRED) return 0;
 
         throw new RuntimeException("fail to get user id");

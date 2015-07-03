@@ -30,7 +30,7 @@ public class OrderController extends AbstractController {
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage placeOrder(@RequestBody Order order) {
         processContacts(order.getCustomerId(), order.getContacts(), order.getMobile());
-        if (!lockSku(order)) return ResponseMessage.FAILED("low stocks");
+        if (!lockSku(order)) return ResponseMessage.FAILED("库存不足");
 
         long orderId = 0;
         try {
@@ -46,7 +46,7 @@ public class OrderController extends AbstractController {
         // TODO 需要告警
         if (orderId <= 0 && !unlockSku(order)) LOGGER.error("fail to unlock sku, skuId: {}, count: {}", new Object[] { order.getSkuId(), order.getCount() });
 
-        return ResponseMessage.FAILED("fail to place order");
+        return ResponseMessage.FAILED("下单失败，服务器内部错误");
     }
 
     private void processContacts(long customerId, String contacts, String mobile) {
@@ -77,9 +77,9 @@ public class OrderController extends AbstractController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         Order order = orderService.get(id);
-        if (!order.exists()) return ResponseMessage.FAILED("order not exists");
+        if (!order.exists()) return ResponseMessage.BAD_REQUEST;
 
-        if (!orderService.delete(id, user.getId())) return ResponseMessage.FAILED("fail to delete order");
+        if (!orderService.delete(id, user.getId())) return ResponseMessage.FAILED("删除订单失败，服务器内部错误");
 
         // TODO 需要告警
         if (!unlockSku(order)) LOGGER.error("fail to unlock sku, skuId: {}, count: {}", new Object[] { order.getSkuId(), order.getCount() });

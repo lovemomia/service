@@ -54,7 +54,7 @@ public class ProductController extends AbstractController {
         if (id <= 0) return ResponseMessage.BAD_REQUEST;
 
         Product product = productService.get(id);
-        if (!product.exists()) return ResponseMessage.FAILED("product not exists");
+        if (!product.exists()) return ResponseMessage.BAD_REQUEST;
 
         return new ResponseMessage(product);
     }

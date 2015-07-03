@@ -1,6 +1,7 @@
 package cn.momia.service.web.ctrl.base;
 
 import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.service.base.city.CityService;
 import cn.momia.service.base.product.Product;
 import cn.momia.service.base.product.ProductService;
 import cn.momia.service.base.product.sku.Sku;
@@ -24,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,6 +35,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/user")
 public class UserController extends AbstractController {
+    @Autowired private CityService cityService;
     @Autowired private UserService userService;
     @Autowired private ParticipantService participantService;
 
@@ -48,7 +49,16 @@ public class UserController extends AbstractController {
         User user = userService.getByToken(utoken);
 
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
-        return new ResponseMessage(user);
+
+        return new ResponseMessage(buildUserResponse(user));
+    }
+
+    private JSONObject buildUserResponse(User user) {
+        JSONObject userPackJson = new JSONObject();
+        userPackJson.put("user", user);
+        userPackJson.put("children", participantService.get(user.getChildren()).values());
+
+        return userPackJson;
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
@@ -110,8 +120,10 @@ public class UserController extends AbstractController {
 
         boolean successful = userService.updateNickName(user.getId(), nickName);
 
-        if (!successful) return ResponseMessage.FAILED("fail to update user nick name");
-        return new ResponseMessage(userService.get(user.getId()));
+        if (!successful) return ResponseMessage.FAILED("更新用户昵称失败，内部服务器错误");
+
+        user.setNickName(nickName);
+        return new ResponseMessage(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/avatar", method = RequestMethod.PUT)
@@ -123,8 +135,10 @@ public class UserController extends AbstractController {
 
         boolean successful = userService.updateAvatar(user.getId(), avatar);
 
-        if (!successful) return ResponseMessage.FAILED("fail to update user avatar");
-        return new ResponseMessage(userService.get(user.getId()));
+        if (!successful) return ResponseMessage.FAILED("更新用户头像失败，内部服务器错误");
+
+        user.setAvatar(avatar);
+        return new ResponseMessage(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/name", method = RequestMethod.PUT)
@@ -136,8 +150,10 @@ public class UserController extends AbstractController {
 
         boolean successful = userService.updateName(user.getId(), name);
 
-        if (!successful) return ResponseMessage.FAILED("fail to update user name");
-        return new ResponseMessage(userService.get(user.getId()));
+        if (!successful) return ResponseMessage.FAILED("更新用户名字失败，内部服务器错误");
+
+        user.setName(name);
+        return new ResponseMessage(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/sex", method = RequestMethod.PUT)
@@ -149,8 +165,10 @@ public class UserController extends AbstractController {
 
         boolean successful = userService.updateSex(user.getId(), sex);
 
-        if (!successful) return ResponseMessage.FAILED("fail to update user sex");
-        return new ResponseMessage(userService.get(user.getId()));
+        if (!successful) return ResponseMessage.FAILED("更新用户性别失败，内部服务器错误");
+
+        user.setSex(sex);
+        return new ResponseMessage(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/birthday", method = RequestMethod.PUT)
@@ -162,8 +180,10 @@ public class UserController extends AbstractController {
 
         boolean successful = userService.updateBirthday(user.getId(), birthday);
 
-        if (!successful) return ResponseMessage.FAILED("fail to update user birthday");
-        return new ResponseMessage(userService.get(user.getId()));
+        if (!successful) return ResponseMessage.FAILED("更新用户生日失败，内部服务器错误");
+
+        user.setBirthday(birthday);
+        return new ResponseMessage(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/city", method = RequestMethod.PUT)
@@ -175,8 +195,10 @@ public class UserController extends AbstractController {
 
         boolean successful = userService.updateCityId(user.getId(), city);
 
-        if (!successful) return ResponseMessage.FAILED("fail to update user city");
-        return new ResponseMessage(userService.get(user.getId()));
+        if (!successful) return ResponseMessage.FAILED("更新用户城市失败，内部服务器错误");
+
+        user.setCity(cityService.get(city).getName());
+        return new ResponseMessage(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/address", method = RequestMethod.PUT)
@@ -188,41 +210,42 @@ public class UserController extends AbstractController {
 
         boolean successful = userService.updateAddress(user.getId(), address);
 
-        if (!successful) return ResponseMessage.FAILED("fail to update user address");
-        return new ResponseMessage(userService.get(user.getId()));
-    }
+        if (!successful) return ResponseMessage.FAILED("更新用户地址失败，内部服务器错误");
 
+        user.setAddress(address);
+        return new ResponseMessage(buildUserResponse(user));
+    }
 
     @RequestMapping(value = "/child", method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage addChild(@RequestBody Participant[] children) {
+        long userId = 0;
+        Set<Long> childrenIds = new HashSet<Long>();
         for(Participant child : children) {
-            User user = userService.get(child.getUserId());
-            if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+            long childId = participantService.add(child);
+            if (childId <= 0) return ResponseMessage.FAILED("添加孩子信息失败");
 
-            long participantId = participantService.add(child);
-            if (participantId <= 0) return ResponseMessage.FAILED("fail to add child");
-
-            Set<Participant> participants = user.getChildren();
-            participants.add(participantService.get(participantId));
-            if (!userService.updateChild(user.getId(), participants)) return ResponseMessage.FAILED("fail to add child");
+            userId = child.getUserId();
+            childrenIds.add(childId);
         }
 
-        return ResponseMessage.SUCCESS;
+        if (userId > 0 && !userService.updateChildren(userId, childrenIds)) return ResponseMessage.FAILED("添加孩子信息失败");
+
+        return new ResponseMessage(buildUserResponse(userService.get(userId)));
     }
 
     @RequestMapping(value = "/child/{cid}", method = RequestMethod.DELETE)
     public ResponseMessage deleteChild(@RequestParam String utoken, @PathVariable(value = "cid") long childId) {
-        if (StringUtils.isBlank(utoken) || childId < 0) return ResponseMessage.BAD_REQUEST;
+        if (StringUtils.isBlank(utoken) || childId <= 0) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        Set<Participant> children = user.getChildren();
-        children.remove(participantService.get(childId));
-        if (!userService.updateChild(user.getId(), children)) return ResponseMessage.FAILED("fail to delete child");
+        Set<Long> children = user.getChildren();
+        children.remove(childId);
+        if (!userService.updateChildren(user.getId(), children)) return ResponseMessage.FAILED("删除孩子信息失败");
 
-
-        return ResponseMessage.SUCCESS;
+        user.setChildren(children);
+        return new ResponseMessage(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/child/{cid}", method = RequestMethod.GET)
@@ -232,11 +255,8 @@ public class UserController extends AbstractController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        Set<Participant> children = user.getChildren();
-        Set<Long> childIds = new HashSet<Long>();
-        for (Participant child : children)
-            childIds.add(child.getId());
-        if (!childIds.contains(childId)) return ResponseMessage.FAILED("child not exists");
+        Set<Long> children = user.getChildren();
+        if (!children.contains(childId)) return ResponseMessage.BAD_REQUEST;
 
         return new ResponseMessage(participantService.get(childId));
     }
@@ -248,8 +268,8 @@ public class UserController extends AbstractController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        Set<Participant> children = user.getChildren();
+        Set<Long> children = user.getChildren();
 
-      return new ResponseMessage(children);
+      return new ResponseMessage(participantService.get(children).values());
     }
 }
