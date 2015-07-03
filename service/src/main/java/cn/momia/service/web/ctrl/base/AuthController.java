@@ -80,8 +80,6 @@ public class AuthController extends AbstractController {
 
         if(userService.getByNickName(nickName).exists()) return ResponseMessage.FAILED("fail to register, nickName already exists");
 
-        if(userService.getByNickName(nickName).exists()) return ResponseMessage.FAILED("fail to register, nickName already exists");
-
         if (!smsVerifier.verify(mobile, code)) return ResponseMessage.FAILED("fail to verify code");
 
         User user = userService.getByMobile(mobile);

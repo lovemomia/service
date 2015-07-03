@@ -73,6 +73,21 @@ public class Participant implements Serializable {
         this.idNo = idNo;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Participant)) return false;
+
+        Participant that = (Participant) o;
+
+        return getId() == that.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (getId() ^ (getId() >>> 32));
+    }
+
     public boolean exists() {
         return !this.equals(NOT_EXIST_PARTICIPANT);
     }

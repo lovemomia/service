@@ -1,10 +1,14 @@
 package cn.momia.mapi.api.v1.dto.base;
 
+import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import cn.momia.mapi.img.ImageFile;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 public class UserDto implements Dto {
     public static class Other extends UserDto {
@@ -30,6 +34,7 @@ public class UserDto implements Dto {
     @JSONField(format = "yyyy-MM-dd") private Date birthday;
     private String city;
     private String address;
+    private ListDto children;
 
     public String getToken() {
         return token;
@@ -67,6 +72,10 @@ public class UserDto implements Dto {
         return address;
     }
 
+    public ListDto getChildren() {
+        return children;
+    }
+
     public UserDto(JSONObject userJson) {
         this.token = userJson.getString("token");
         this.nickName = userJson.getString("nickName");
@@ -77,9 +86,22 @@ public class UserDto implements Dto {
         this.birthday = userJson.getDate("birthday");
         this.city = userJson.getString("city");
         this.address = userJson.getString("address");
+        JSONArray participantsJson  = userJson.getJSONArray("children");
+
+        ListDto participants = new ListDto();
+
+        for(int i=0; i<participantsJson.size(); i++) {
+            JSONObject participantJson = participantsJson.getJSONObject(i);
+            participants.add(new ParticipantDto(participantJson));
+        }
+        this.children = participants;
+
+
+
     }
 
     private String encryptMobile(String mobile) {
         return mobile.substring(0, 3) + "****" + mobile.substring(7);
     }
+
 }

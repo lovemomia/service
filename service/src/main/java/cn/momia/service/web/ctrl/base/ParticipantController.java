@@ -7,6 +7,7 @@ import cn.momia.service.base.user.participant.Participant;
 import cn.momia.service.base.user.participant.ParticipantService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -47,6 +49,29 @@ public class ParticipantController {
         boolean successful = participantService.update(participant);
 
         if (!successful) return ResponseMessage.FAILED("fail to update participant");
+        return ResponseMessage.SUCCESS;
+    }
+
+    @RequestMapping(value = "/name",method = RequestMethod.PUT)
+    public ResponseMessage updateParticipantByName(@RequestParam long id, @RequestParam String name) {
+        boolean successful = participantService.updateByName(id, name);
+
+        if (!successful) return ResponseMessage.FAILED("fail to update participant name");
+        return ResponseMessage.SUCCESS;
+    }
+
+    @RequestMapping(value = "/sex",method = RequestMethod.PUT)
+    public ResponseMessage updateParticipantBySex(@RequestParam long id, @RequestParam String sex) {
+        boolean successful = participantService.updateBySex(id, sex);
+
+        if (!successful) return ResponseMessage.FAILED("fail to update participant sex");
+        return ResponseMessage.SUCCESS;
+    }
+    @RequestMapping(value = "/birthday",method = RequestMethod.PUT)
+    public ResponseMessage updateParticipantByBirthday(@RequestParam long id, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd")Date birthday) {
+        boolean successful = participantService.updateByBirthday(id, birthday);
+
+        if (!successful) return ResponseMessage.FAILED("fail to update participant name");
         return ResponseMessage.SUCCESS;
     }
 

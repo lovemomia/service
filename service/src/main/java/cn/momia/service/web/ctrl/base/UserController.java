@@ -24,8 +24,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -190,17 +192,20 @@ public class UserController extends AbstractController {
         return new ResponseMessage(userService.get(user.getId()));
     }
 
+
     @RequestMapping(value = "/child", method = RequestMethod.POST, consumes = "application/json")
-    public ResponseMessage addChild(@RequestBody Participant child) {
-        User user = userService.get(child.getUserId());
-        if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+    public ResponseMessage addChild(@RequestBody Participant[] children) {
+        for(Participant child : children) {
+            User user = userService.get(child.getUserId());
+            if (!user.exists()) return ResponseMessage.FAILED("user not exists");
 
-        long participantId = participantService.add(child);
-        if (participantId <= 0) return ResponseMessage.FAILED("fail to add child");
+            long participantId = participantService.add(child);
+            if (participantId <= 0) return ResponseMessage.FAILED("fail to add child");
 
-        Set<Long> children = user.getChildren();
-        children.add(participantId);
-        if (!userService.updateChild(user.getId(), children)) return ResponseMessage.FAILED("fail to add child");
+            Set<Participant> participants = user.getChildren();
+            participants.add(participantService.get(participantId));
+            if (!userService.updateChild(user.getId(), participants)) return ResponseMessage.FAILED("fail to add child");
+        }
 
         return ResponseMessage.SUCCESS;
     }
@@ -212,9 +217,10 @@ public class UserController extends AbstractController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        Set<Long> children = user.getChildren();
-        children.remove(childId);
+        Set<Participant> children = user.getChildren();
+        children.remove(participantService.get(childId));
         if (!userService.updateChild(user.getId(), children)) return ResponseMessage.FAILED("fail to delete child");
+
 
         return ResponseMessage.SUCCESS;
     }
@@ -226,8 +232,11 @@ public class UserController extends AbstractController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        Set<Long> children = user.getChildren();
-        if (!children.contains(childId)) return ResponseMessage.FAILED("child not exists");
+        Set<Participant> children = user.getChildren();
+        Set<Long> childIds = new HashSet<Long>();
+        for (Participant child : children)
+            childIds.add(child.getId());
+        if (!childIds.contains(childId)) return ResponseMessage.FAILED("child not exists");
 
         return new ResponseMessage(participantService.get(childId));
     }
@@ -239,8 +248,8 @@ public class UserController extends AbstractController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        Set<Long> children = user.getChildren();
+        Set<Participant> children = user.getChildren();
 
-        return new ResponseMessage(participantService.get(children).values());
+      return new ResponseMessage(children);
     }
 }
