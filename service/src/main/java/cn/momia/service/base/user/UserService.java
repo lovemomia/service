@@ -22,5 +22,5 @@ public interface UserService {
     boolean updateBirthday(long id, Date birthday);
     boolean updateCityId(long id, int cityId);
     boolean updateAddress(long id, String address);
-    boolean updateChildren(long id, Set<Long> childrenIds);
+    boolean updateChildren(long id, Set<Long> children);
 }

@@ -119,7 +119,7 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
     @Override
     public Map<Long, Participant> get(Collection<Long> ids) {
         final Map<Long, Participant> participants = new HashMap<Long, Participant>();
-        if (ids.size() <= 0) return participants;
+        if (ids == null || ids.size() <= 0) return participants;
 
         String sql = "SELECT " + joinFields() + " FROM t_user_participant WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {

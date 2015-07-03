@@ -60,7 +60,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     @Override
     public List<BaseProduct> get(List<Long> ids) {
         final List<BaseProduct> baseProducts = new ArrayList<BaseProduct>();
-        if (ids.isEmpty()) return baseProducts;
+        if (ids == null || ids.isEmpty()) return baseProducts;
 
         String sql = "SELECT " + joinFields() + " FROM t_product WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1 ORDER BY addTime DESC";
         jdbcTemplate.query(sql, new RowCallbackHandler() {

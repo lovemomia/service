@@ -61,7 +61,7 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     @Override
     public Map<Long, Place> get(List<Long> ids) {
         final Map<Long, Place> places = new HashMap<Long, Place>();
-        if (ids.isEmpty()) return places;
+        if (ids == null || ids.isEmpty()) return places;
 
         String sql = "SELECT " + joinFields() + " FROM t_place WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {

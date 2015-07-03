@@ -1,8 +1,6 @@
 package cn.momia.service.base.user.impl;
 
 import cn.momia.service.base.city.CityService;
-import cn.momia.service.base.user.participant.Participant;
-import cn.momia.service.base.user.participant.ParticipantService;
 import cn.momia.service.common.DbAccessService;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
@@ -30,14 +28,9 @@ import java.util.Set;
 public class UserServiceImpl extends DbAccessService implements UserService {
     private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "avatar", "name", "sex", "birthday", "cityId", "address", "children" };
     private CityService cityService;
-    private ParticipantService participantService;
 
     public void setCityService(CityService cityService) {
         this.cityService = cityService;
-    }
-
-    public void setParticipantService(ParticipantService participantService) {
-        this.participantService = participantService;
     }
 
     @Override
@@ -107,16 +100,12 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         user.setBirthday(rs.getDate("birthday"));
         user.setCity(cityService.get(rs.getInt("cityId")).getName());
         user.setAddress(rs.getString("address"));
-
-        Set<Long> childrenIds = parseChildrenIds(rs.getString("children"));
-        Set<Participant> children = new HashSet<Participant>();
-        children.addAll(participantService.get(childrenIds).values());
-        user.setChildren(children);
+        user.setChildren(parseChildren(rs.getString("children")));
 
         return user;
     }
 
-    private Set<Long> parseChildrenIds(String children) {
+    private Set<Long> parseChildren(String children) {
         Set<Long> childrenIds = new HashSet<Long>();
         for (String childId : Splitter.on(",").trimResults().omitEmptyStrings().split(children)) {
             childrenIds.add(Long.valueOf(childId));
@@ -128,7 +117,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     @Override
     public Map<Long, User> get(List<Long> ids) {
         final Map<Long, User> users = new HashMap<Long, User>();
-        if (ids.size() <= 0) return users;
+        if (ids == null || ids.size() <= 0) return users;
 
         String sql = "SELECT " + joinFields() + " FROM t_user WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
@@ -242,9 +231,9 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
-    public boolean updateChildren(long id, Set<Long> childrenIds) {
+    public boolean updateChildren(long id, Set<Long> children) {
         String sql = "UPDATE t_user SET children=? WHERE id=?";
 
-        return update(sql, new Object[] { StringUtils.join(childrenIds, ","), id });
+        return update(sql, new Object[] { StringUtils.join(children, ","), id });
     }
 }

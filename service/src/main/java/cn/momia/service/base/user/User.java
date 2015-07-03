@@ -29,7 +29,7 @@ public class User implements Serializable {
     private Date birthday;
     private String city;
     private String address;
-    private Set<Participant> children;
+    private Set<Long> children;
 
     public long getId() {
         return id;
@@ -111,11 +111,11 @@ public class User implements Serializable {
         this.address = address;
     }
 
-    public Set<Participant> getChildren() {
+    public Set<Long> getChildren() {
         return children;
     }
 
-    public void setChildren(Set<Participant> children) {
+    public void setChildren(Set<Long> children) {
         this.children = children;
     }
 
