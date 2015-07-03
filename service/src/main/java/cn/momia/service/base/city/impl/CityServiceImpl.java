@@ -34,8 +34,8 @@ public class CityServiceImpl extends DbAccessService implements CityService {
     }
 
     @Override
-    public City get(int i) {
-        Integer index = citysMap.get(i);
+    public City get(int id) {
+        Integer index = citysMap.get(id);
         if (index == null) return City.NOT_EXIST_CITY;
 
         return citiesCache.get(index);
