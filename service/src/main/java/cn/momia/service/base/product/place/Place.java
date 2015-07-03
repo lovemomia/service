@@ -12,6 +12,8 @@ public class Place implements Serializable {
     }
 
     private long id;
+    private int cityId;
+    private int regionId;
     private String name;
     private String address;
     private String desc;
@@ -25,6 +27,22 @@ public class Place implements Serializable {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public int getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(int cityId) {
+        this.cityId = cityId;
+    }
+
+    public int getRegionId() {
+        return regionId;
+    }
+
+    public void setRegionId(int regionId) {
+        this.regionId = regionId;
     }
 
     public String getName() {
