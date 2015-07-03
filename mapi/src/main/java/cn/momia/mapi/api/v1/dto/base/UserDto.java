@@ -7,8 +7,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Set;
 
 public class UserDto implements Dto {
     public static class Other extends UserDto {
@@ -86,22 +84,16 @@ public class UserDto implements Dto {
         this.birthday = userJson.getDate("birthday");
         this.city = userJson.getString("city");
         this.address = userJson.getString("address");
-        JSONArray participantsJson  = userJson.getJSONArray("children");
 
-        ListDto participants = new ListDto();
-
-        for(int i=0; i<participantsJson.size(); i++) {
-            JSONObject participantJson = participantsJson.getJSONObject(i);
-            participants.add(new ParticipantDto(participantJson));
+        this.children = new ListDto();
+        JSONArray childrenJson = userJson.getJSONArray("children");
+        for (int i = 0; i < childrenJson.size(); i++) {
+            JSONObject childJson = childrenJson.getJSONObject(i);
+            this.children.add(new ParticipantDto(childJson));
         }
-        this.children = participants;
-
-
-
     }
 
     private String encryptMobile(String mobile) {
         return mobile.substring(0, 3) + "****" + mobile.substring(7);
     }
-
 }

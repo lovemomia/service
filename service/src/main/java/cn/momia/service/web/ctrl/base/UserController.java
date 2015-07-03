@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -192,35 +191,35 @@ public class UserController extends AbstractController {
         return new ResponseMessage(userService.get(user.getId()));
     }
 
-
     @RequestMapping(value = "/child", method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage addChild(@RequestBody Participant[] children) {
+        long userId = 0;
+        Set<Long> childrenIds = new HashSet<Long>();
         for(Participant child : children) {
-            User user = userService.get(child.getUserId());
-            if (!user.exists()) return ResponseMessage.FAILED("user not exists");
+            long childId = participantService.add(child);
+            if (childId <= 0) return ResponseMessage.FAILED("fail to add child");
 
-            long participantId = participantService.add(child);
-            if (participantId <= 0) return ResponseMessage.FAILED("fail to add child");
-
-            Set<Participant> participants = user.getChildren();
-            participants.add(participantService.get(participantId));
-            if (!userService.updateChild(user.getId(), participants)) return ResponseMessage.FAILED("fail to add child");
+            userId = child.getUserId();
+            childrenIds.add(childId);
         }
+
+        if (userId > 0 && !userService.updateChildren(userId, childrenIds)) return ResponseMessage.FAILED;
 
         return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/child/{cid}", method = RequestMethod.DELETE)
     public ResponseMessage deleteChild(@RequestParam String utoken, @PathVariable(value = "cid") long childId) {
-        if (StringUtils.isBlank(utoken) || childId < 0) return ResponseMessage.BAD_REQUEST;
+        if (StringUtils.isBlank(utoken) || childId <= 0) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         Set<Participant> children = user.getChildren();
-        children.remove(participantService.get(childId));
-        if (!userService.updateChild(user.getId(), children)) return ResponseMessage.FAILED("fail to delete child");
-
+        Set<Long> childrenIds = new HashSet<Long>();
+        for (Participant child : children) childrenIds.add(child.getId());
+        childrenIds.remove(childId);
+        if (!userService.updateChildren(user.getId(), childrenIds)) return ResponseMessage.FAILED("fail to delete child");
 
         return ResponseMessage.SUCCESS;
     }

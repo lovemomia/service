@@ -53,23 +53,38 @@ public class ParticipantController {
     }
 
     @RequestMapping(value = "/name",method = RequestMethod.PUT)
-    public ResponseMessage updateParticipantByName(@RequestParam long id, @RequestParam String name) {
-        boolean successful = participantService.updateByName(id, name);
+    public ResponseMessage updateParticipantByName(@RequestParam String utoken, @RequestParam long id, @RequestParam String name) {
+        if (StringUtils.isBlank(utoken) || id <= 0 || StringUtils.isBlank(name)) return ResponseMessage.BAD_REQUEST;
+
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        boolean successful = participantService.updateByName(id, name, user.getId());
 
         if (!successful) return ResponseMessage.FAILED("fail to update participant name");
         return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/sex",method = RequestMethod.PUT)
-    public ResponseMessage updateParticipantBySex(@RequestParam long id, @RequestParam String sex) {
-        boolean successful = participantService.updateBySex(id, sex);
+    public ResponseMessage updateParticipantBySex(@RequestParam String utoken, @RequestParam long id, @RequestParam String sex) {
+        if (StringUtils.isBlank(utoken) || id <= 0 || StringUtils.isBlank(sex)) return ResponseMessage.BAD_REQUEST;
+
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        boolean successful = participantService.updateBySex(id, sex, user.getId());
 
         if (!successful) return ResponseMessage.FAILED("fail to update participant sex");
         return ResponseMessage.SUCCESS;
     }
     @RequestMapping(value = "/birthday",method = RequestMethod.PUT)
-    public ResponseMessage updateParticipantByBirthday(@RequestParam long id, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd")Date birthday) {
-        boolean successful = participantService.updateByBirthday(id, birthday);
+    public ResponseMessage updateParticipantByBirthday(@RequestParam String utoken, @RequestParam long id, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd")Date birthday) {
+        if (StringUtils.isBlank(utoken) || id <= 0 || birthday == null) return ResponseMessage.BAD_REQUEST;
+
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        boolean successful = participantService.updateByBirthday(id, birthday, user.getId());
 
         if (!successful) return ResponseMessage.FAILED("fail to update participant name");
         return ResponseMessage.SUCCESS;
