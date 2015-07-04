@@ -99,7 +99,7 @@ public class AuthController extends AbstractController {
             user = userService.add(nickName, mobile, token);
             if (!user.exists()) {
                 LOGGER.error("fail to register user for {}", mobile);
-                return ResponseMessage.FAILED("注册失败，服务器内部错误");
+                return ResponseMessage.FAILED("注册失败");
             }
         } else {
             return ResponseMessage.FAILED("注册失败，用户已存在");

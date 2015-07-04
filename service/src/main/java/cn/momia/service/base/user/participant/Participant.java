@@ -1,5 +1,7 @@
 package cn.momia.service.base.user.participant;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -90,5 +92,9 @@ public class Participant implements Serializable {
 
     public boolean exists() {
         return !this.equals(NOT_EXIST_PARTICIPANT);
+    }
+
+    public boolean isInvalid() {
+        return userId <= 0 || StringUtils.isBlank(name) || StringUtils.isBlank(sex) || birthday == null;
     }
 }

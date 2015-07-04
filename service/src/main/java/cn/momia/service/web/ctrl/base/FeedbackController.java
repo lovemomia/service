@@ -22,7 +22,9 @@ public class FeedbackController {
     private UserService userService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseMessage addFeedback(@RequestParam(required = false) String utoken, @RequestParam String content, @RequestParam String email) {
+    public ResponseMessage addFeedback(@RequestParam(required = false) String utoken,
+                                       @RequestParam String content,
+                                       @RequestParam String email) {
         if (StringUtils.isBlank(content) || StringUtils.isBlank(email)) return ResponseMessage.BAD_REQUEST;
 
         long userId = 0;
