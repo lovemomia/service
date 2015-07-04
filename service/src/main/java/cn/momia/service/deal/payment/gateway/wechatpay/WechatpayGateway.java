@@ -133,7 +133,7 @@ public class WechatpayGateway implements PaymentGateway {
                 throw new RuntimeException("fail to execute request: " + request);
             }
 
-            String entity = EntityUtils.toString(response.getEntity(), "utf-8");
+            String entity = EntityUtils.toString(response.getEntity(), "UTF-8");
             processResponseEntity(result, entity, param.get(WechatpayPrepayFields.TRADE_TYPE));
         } catch (Exception e) {
             LOGGER.error("fail to prepay", e);
@@ -146,9 +146,9 @@ public class WechatpayGateway implements PaymentGateway {
     private HttpPost createRequest(PrepayParam param) {
         HttpPost httpPost = new HttpPost(conf.getString("Payment.Wechat.PrepayService"));
         httpPost.addHeader(HTTP.CONTENT_TYPE, "application/xml");
-        StringEntity entity = new StringEntity(XmlUtil.paramsToXml(param.getAll()), "utf-8");
+        StringEntity entity = new StringEntity(XmlUtil.paramsToXml(param.getAll()), "UTF-8");
         entity.setContentType("application/xml");
-        entity.setContentEncoding("utf-8");
+        entity.setContentEncoding("UTF-8");
         httpPost.setEntity(entity);
 
         return httpPost;

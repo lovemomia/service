@@ -66,7 +66,7 @@ public abstract class MomiaHttpRequest implements HttpUriRequest, HttpEntityEncl
                 try {
                     HttpPost httpPost = new HttpPost(uri);
                     if (params != null && !params.isEmpty()) {
-                        HttpEntity entity = new UrlEncodedFormEntity(toNameValuePairs(params), "utf-8");
+                        HttpEntity entity = new UrlEncodedFormEntity(toNameValuePairs(params), "UTF-8");
                         httpPost.setEntity(entity);
                         setEntity(entity);
                     }
@@ -118,7 +118,7 @@ public abstract class MomiaHttpRequest implements HttpUriRequest, HttpEntityEncl
                 try {
                     HttpPut httpPut = new HttpPut(uri);
                     if (params != null && !params.isEmpty()) {
-                        HttpEntity entity = new UrlEncodedFormEntity(toNameValuePairs(params), "utf-8");
+                        HttpEntity entity = new UrlEncodedFormEntity(toNameValuePairs(params), "UTF-8");
                         httpPut.setEntity(entity);
                         setEntity(entity);
                     }
@@ -224,9 +224,9 @@ public abstract class MomiaHttpRequest implements HttpUriRequest, HttpEntityEncl
     }
 
     protected static StringEntity toEntity(String content, String contentType) {
-        StringEntity entity = new StringEntity(content, "utf-8");
+        StringEntity entity = new StringEntity(content, "UTF-8");
         entity.setContentType(contentType);
-        entity.setContentEncoding("utf-8");
+        entity.setContentEncoding("UTF-8");
 
         return entity;
     }
