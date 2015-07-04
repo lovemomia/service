@@ -156,8 +156,6 @@ public class WechatpayGateway implements PaymentGateway {
 
     private void processResponseEntity(PrepayResult result, String entity, String tradeType) {
         Map<String, String> params = XmlUtil.xmlToParams(entity);
-        if (!WechatpayUtil.validateSign(params, tradeType)) throw new RuntimeException("fail to prepay, invalid sign");
-
         String return_code = params.get(WechatpayPrepayFields.RETURN_CODE);
         String result_code = params.get(WechatpayPrepayFields.RESULT_CODE);
 
@@ -165,6 +163,8 @@ public class WechatpayGateway implements PaymentGateway {
         result.setSuccessful(successful);
 
         if (successful) {
+            if (!WechatpayUtil.validateSign(params, tradeType)) throw new RuntimeException("fail to prepay, invalid sign");
+
             result.add(WechatpayPrepayFields.PREPAY_RESULT_APPID, params.get(WechatpayPrepayFields.APPID));
             result.add(WechatpayPrepayFields.PREPAY_RESULT_TIMESTAMP, String.valueOf(new Date().getTime()).substring(0, 10));
             result.add(WechatpayPrepayFields.PREPAY_RESULT_NONCE_STR, params.get(WechatpayPrepayFields.NONCE_STR));
