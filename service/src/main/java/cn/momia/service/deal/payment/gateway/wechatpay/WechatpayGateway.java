@@ -222,7 +222,7 @@ public class WechatpayGateway implements PaymentGateway {
     private Payment createPayment(CallbackParam param) throws ParseException {
         Payment payment = new Payment();
         payment.setOrderId(Long.valueOf(param.get(WechatpayCallbackFields.OUT_TRADE_NO)));
-        payment.setPayerId(param.get(WechatpayCallbackFields.OPEN_ID));
+        payment.setPayer(param.get(WechatpayCallbackFields.OPEN_ID));
         payment.setFinishTime(DATE_FORMATTER.parse(param.get(WechatpayCallbackFields.TIME_END)));
         payment.setPayType(Payment.Type.WECHATPAY);
         payment.setTradeNo(param.get(WechatpayCallbackFields.TRANSACTION_ID));

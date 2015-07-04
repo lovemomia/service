@@ -18,7 +18,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class PaymentServiceImpl extends DbAccessService implements PaymentService {
-    private static final String[] PAYMENT_FIELDS = { "id", "orderId", "finishTime", "payType", "tradeNo", "fee" };
+    private static final String[] PAYMENT_FIELDS = { "id", "orderId", "payer", "finishTime", "payType", "tradeNo", "fee" };
     @Override
     public long add(final Payment payment) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -26,10 +26,10 @@ public class PaymentServiceImpl extends DbAccessService implements PaymentServic
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException
             {
-                String sql = "INSERT INTO t_payment(orderId, payerId, finishTime, payType, tradeNo, fee, addTime) VALUES(?, ?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO t_payment(orderId, payer, finishTime, payType, tradeNo, fee, addTime) VALUES(?, ?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setLong(1, payment.getOrderId());
-                ps.setString(2, payment.getPayerId());
+                ps.setString(2, payment.getPayer());
                 ps.setDate(3, new Date(payment.getFinishTime().getTime()));
                 ps.setInt(4, payment.getPayType());
                 ps.setString(5, payment.getTradeNo());
@@ -64,7 +64,7 @@ public class PaymentServiceImpl extends DbAccessService implements PaymentServic
 
         payment.setId(rs.getLong("id"));
         payment.setOrderId(rs.getLong("orderId"));
-        payment.setPayerId(rs.getString("payerId"));
+        payment.setPayer(rs.getString("payer"));
         payment.setFinishTime(rs.getTimestamp("finishTime"));
         payment.setPayType(rs.getInt("payType"));
         payment.setTradeNo(rs.getString("tradeNo"));

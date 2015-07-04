@@ -38,7 +38,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         STATUS_QUERY_TYPE.put("ge", ">=");
         STATUS_QUERY_TYPE.put("gt", ">");
     }
-    private static final String[] ORDER_FIELDS = { "id", "customerId", "productId", "skuId", "price", "contacts", "mobile", "participants", "status", "addTime" };
+    private static final String[] ORDER_FIELDS = { "id", "customerId", "productId", "skuId", "prices", "contacts", "mobile", "participants", "status", "addTime" };
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
 
@@ -49,7 +49,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException
             {
-                String sql = "INSERT INTO t_order(customerId, productId, skuId, price, contacts, mobile, participants, addTime) VALUES(?, ?, ?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO t_order(customerId, productId, skuId, prices, contacts, mobile, participants, addTime) VALUES(?, ?, ?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setLong(1, order.getCustomerId());
                 ps.setLong(2, order.getProductId());
@@ -90,7 +90,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         order.setCustomerId(rs.getLong("customerId"));
         order.setProductId(rs.getLong("productId"));
         order.setSkuId(rs.getLong("skuId"));
-        order.setPrices(parseOrderPrices(order.getId(), rs.getString("price")));
+        order.setPrices(parseOrderPrices(order.getId(), rs.getString("prices")));
         order.setContacts(rs.getString("contacts"));
         order.setMobile(rs.getString("mobile"));
         order.setStatus(rs.getInt("status"));

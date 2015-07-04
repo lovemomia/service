@@ -17,7 +17,7 @@ public class Payment implements Serializable {
 
     private long id;
     private long orderId;
-    private String payerId;
+    private String payer;
     private Date finishTime;
     private int payType;
     private String tradeNo;
@@ -39,12 +39,12 @@ public class Payment implements Serializable {
         this.orderId = orderId;
     }
 
-    public String getPayerId() {
-        return payerId;
+    public String getPayer() {
+        return payer;
     }
 
-    public void setPayerId(String payerId) {
-        this.payerId = payerId;
+    public void setPayer(String payer) {
+        this.payer = payer;
     }
 
     public Date getFinishTime() {
