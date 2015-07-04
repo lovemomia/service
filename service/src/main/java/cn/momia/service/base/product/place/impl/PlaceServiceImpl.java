@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PlaceServiceImpl.class);
-    private static final String[] PLACE_FIELDS = {"id", "cityId", "regionId", "name", "address", "`desc`", "lng", "lat", "image"};
+    private static final String[] PLACE_FIELDS = { "id", "cityId", "regionId", "name", "address", "`desc`", "lng", "lat" };
 
     @Override
     public Place get(long id) {
@@ -48,7 +48,6 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
             place.setDesc(rs.getString("desc"));
             place.setLng(rs.getDouble("lng"));
             place.setLat(rs.getDouble("lat"));
-            place.setImage(rs.getString("image"));
 
             return place;
         }
