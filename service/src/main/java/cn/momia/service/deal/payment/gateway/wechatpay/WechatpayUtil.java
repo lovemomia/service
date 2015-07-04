@@ -37,4 +37,11 @@ public class WechatpayUtil {
         String s = StringUtils.join(kvs, "&");
         return DigestUtils.md5Hex(s).toUpperCase();
     }
+
+    public static boolean validateSign(Map<String, String> params, String tradeType) {
+        String returnedSign = params.get(WechatpayPrepayFields.SIGN);
+        String generatedSign = sign(params, tradeType);
+
+        return generatedSign.equals(returnedSign);
+    }
 }

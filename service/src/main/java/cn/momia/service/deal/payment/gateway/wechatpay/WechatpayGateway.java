@@ -156,6 +156,7 @@ public class WechatpayGateway implements PaymentGateway {
 
     private void processResponseEntity(PrepayResult result, String entity, String tradeType) {
         Map<String, String> params = XmlUtil.xmlToParams(entity);
+        if (!WechatpayUtil.validateSign(params, tradeType)) throw new RuntimeException("fail to prepay, invalid sign");
 
         String return_code = params.get(WechatpayPrepayFields.RETURN_CODE);
         String result_code = params.get(WechatpayPrepayFields.RESULT_CODE);
