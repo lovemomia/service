@@ -1,5 +1,7 @@
 package cn.momia.mapi.api.v1.dto.base;
 
+import com.alibaba.fastjson.JSONObject;
+
 public class WechatpayPrepayDto implements Dto {
     private boolean successful;
     private String appId;
@@ -13,55 +15,40 @@ public class WechatpayPrepayDto implements Dto {
         return successful;
     }
 
-    public void setSuccessful(boolean successful) {
-        this.successful = successful;
-    }
-
     public String getAppId() {
         return appId;
-    }
-
-    public void setAppId(String appId) {
-        this.appId = appId;
     }
 
     public String getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(String timeStamp) {
-        this.timeStamp = timeStamp;
-    }
-
     public String getNonceStr() {
         return nonceStr;
-    }
-
-    public void setNonceStr(String nonceStr) {
-        this.nonceStr = nonceStr;
     }
 
     public String getPrepayId() {
         return prepayId;
     }
 
-    public void setPrepayId(String prepayId) {
-        this.prepayId = prepayId;
-    }
-
     public String getSignType() {
         return signType;
-    }
-
-    public void setSignType(String signType) {
-        this.signType = signType;
     }
 
     public String getPaySign() {
         return paySign;
     }
 
-    public void setPaySign(String paySign) {
-        this.paySign = paySign;
+    public WechatpayPrepayDto(JSONObject prepayJson) {
+        this.successful = prepayJson.getBoolean("successful");
+        if (this.successful) {
+            JSONObject paramJson = prepayJson.getJSONObject("all");
+            this.appId = paramJson.getString("appId");
+            this.timeStamp = paramJson.getString("timeStamp");
+            this.nonceStr = paramJson.getString("nonceStr");
+            this.prepayId = paramJson.getString("package");
+            this.signType = paramJson.getString("signType");
+            this.paySign = paramJson.getString("paySign");
+        }
     }
 }

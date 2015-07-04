@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1/user")
-public class UserApi extends AbstractApi {
+public class UserApi extends AbstractV1Api {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserApi.class);
 
     private static final Function<Object, Dto> userFunc = new Function<Object, Dto>() {
@@ -47,7 +47,11 @@ public class UserApi extends AbstractApi {
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
-    public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam(defaultValue = "eq") String type, @RequestParam final int start, @RequestParam final int count) {
+    public ResponseMessage getOrdersOfUser(@RequestParam String utoken,
+                                           @RequestParam int status,
+                                           @RequestParam(defaultValue = "eq") String type,
+                                           @RequestParam final int start,
+                                           @RequestParam final int count) {
         final int maxPageCount = conf.getInt("Order.MaxPageCount");
         final int pageSize = conf.getInt("Order.PageSize");
         if (StringUtils.isBlank(utoken) || start < 0 || count <= 0 || start > maxPageCount * pageSize) return ResponseMessage.BAD_REQUEST;
@@ -189,7 +193,9 @@ public class UserApi extends AbstractApi {
     }
 
     @RequestMapping(value = "/child/name", method = RequestMethod.POST)
-    public ResponseMessage updateChildByName(@RequestParam String utoken, @RequestParam(value = "cid") long childId, @RequestParam String name) {
+    public ResponseMessage updateChildByName(@RequestParam String utoken,
+                                             @RequestParam(value = "cid") long childId,
+                                             @RequestParam String name) {
         if (StringUtils.isBlank(utoken) || childId <= 0 || StringUtils.isBlank(name)) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
@@ -206,7 +212,9 @@ public class UserApi extends AbstractApi {
 
 
     @RequestMapping(value = "/child/sex", method = RequestMethod.POST)
-    public ResponseMessage updateChildBySex(@RequestParam String utoken, @RequestParam(value = "cid") long childId, @RequestParam String sex) {
+    public ResponseMessage updateChildBySex(@RequestParam String utoken,
+                                            @RequestParam(value = "cid") long childId,
+                                            @RequestParam String sex) {
         if (StringUtils.isBlank(utoken) || childId <= 0 || StringUtils.isBlank(sex)) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
@@ -222,7 +230,9 @@ public class UserApi extends AbstractApi {
     }
 
     @RequestMapping(value = "/child/birthday", method = RequestMethod.POST)
-    public ResponseMessage updateChildByBirthday(@RequestParam String utoken, @RequestParam(value = "cid") long childId, @RequestParam String birthday) {
+    public ResponseMessage updateChildByBirthday(@RequestParam String utoken,
+                                                 @RequestParam(value = "cid") long childId,
+                                                 @RequestParam String birthday) {
         if (StringUtils.isBlank(utoken) || childId <= 0 || StringUtils.isBlank(birthday)) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()

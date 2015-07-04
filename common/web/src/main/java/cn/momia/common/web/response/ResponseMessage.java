@@ -16,7 +16,16 @@ public class ResponseMessage implements Serializable
         return new ResponseMessage(ErrorCode.FAILED, errmsg);
     }
 
-    private int errno;
+    public static ResponseMessage formJson(JSONObject jsonObject) {
+        ResponseMessage responseMessage = new ResponseMessage();
+        responseMessage.errno = jsonObject.getInteger("errno");
+        responseMessage.errmsg = jsonObject.getString("errmsg");
+        responseMessage.data = jsonObject.get("data");
+
+        return responseMessage;
+    }
+
+    private int errno = ErrorCode.FAILED;
     private String errmsg;
     private Object data = "";
     private long time = new Date().getTime();
@@ -77,12 +86,7 @@ public class ResponseMessage implements Serializable
         this.time = time;
     }
 
-    public static ResponseMessage formJson(JSONObject jsonObject) {
-        ResponseMessage responseMessage = new ResponseMessage();
-        responseMessage.errno = jsonObject.getInteger("errno");
-        responseMessage.errmsg = jsonObject.getString("errmsg");
-        responseMessage.data = jsonObject.get("data");
-
-        return responseMessage;
+    public boolean isSuccessful() {
+        return errno == ErrorCode.SUCCESS;
     }
 }

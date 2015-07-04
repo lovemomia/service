@@ -27,8 +27,11 @@ public class ParticipantController {
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage addParticipant(@RequestBody Participant participant) {
         long participantId = participantService.add(participant);
+
         if(participantId <= 0) return ResponseMessage.FAILED("添加出行人失败，内部服务器错误");
-        return ResponseMessage.SUCCESS;
+
+        participant.setId(participantId);
+        return new ResponseMessage(participant);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -49,7 +52,7 @@ public class ParticipantController {
         boolean successful = participantService.update(participant);
 
         if (!successful) return ResponseMessage.FAILED("更新出行人失败，内部服务器错误");
-        return ResponseMessage.SUCCESS;
+        return new ResponseMessage(participant);
     }
 
     @RequestMapping(value = "/name",method = RequestMethod.PUT)
