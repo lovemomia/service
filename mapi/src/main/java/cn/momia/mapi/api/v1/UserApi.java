@@ -189,7 +189,7 @@ public class UserApi extends AbstractApi {
     }
 
     @RequestMapping(value = "/child/name", method = RequestMethod.POST)
-    public ResponseMessage updateChildByName(@RequestParam String utoken, @RequestParam long childId, @RequestParam String name) {
+    public ResponseMessage updateChildByName(@RequestParam String utoken, @RequestParam(value = "cid") long childId, @RequestParam String name) {
         if (StringUtils.isBlank(utoken) || childId <= 0 || StringUtils.isBlank(name)) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
@@ -206,13 +206,13 @@ public class UserApi extends AbstractApi {
 
 
     @RequestMapping(value = "/child/sex", method = RequestMethod.POST)
-    public ResponseMessage updateChildBySex(@RequestParam String utoken, @RequestParam long childId, @RequestParam String sex) {
+    public ResponseMessage updateChildBySex(@RequestParam String utoken, @RequestParam(value = "cid") long childId, @RequestParam String sex) {
         if (StringUtils.isBlank(utoken) || childId <= 0 || StringUtils.isBlank(sex)) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("id", childId)
-                .add("name", sex);
+                .add("sex", sex);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("participant/sex"), builder.build());
 
         ResponseMessage response = executeRequest(request);
@@ -222,13 +222,13 @@ public class UserApi extends AbstractApi {
     }
 
     @RequestMapping(value = "/child/birthday", method = RequestMethod.POST)
-    public ResponseMessage updateChildByBirthday(@RequestParam String utoken, @RequestParam long childId, @RequestParam String birthday) {
+    public ResponseMessage updateChildByBirthday(@RequestParam String utoken, @RequestParam(value = "cid") long childId, @RequestParam String birthday) {
         if (StringUtils.isBlank(utoken) || childId <= 0 || StringUtils.isBlank(birthday)) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("id", childId)
-                .add("name", birthday);
+                .add("birthday", birthday);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("participant/birthday"), builder.build());
 
         ResponseMessage response = executeRequest(request);
