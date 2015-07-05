@@ -1,5 +1,5 @@
 CREATE TABLE `t_admin` (
-  `id` bigint(int) NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增ID',
   `username` varchar(50) NOT NULL COMMENT '用户名',
   `password` varchar(50) NOT NULL COMMENT '用户密码',
   `status` int(1) NOT NULL DEFAULT '1' COMMENT '状态,0为删除',
