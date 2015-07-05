@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cn.momia</groupId>
-    <artifactId>image</artifactId>
+    <artifactId>duola-image</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
