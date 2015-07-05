@@ -13,7 +13,7 @@ fi
 
 cd `dirname $0`/..
 
-APPNAME="service"
+APPNAME="duola-service"
 
 LOGSDIR="logs"
 SYSLOGDIR="/data/applogs/$APPNAME"
