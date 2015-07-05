@@ -3,7 +3,6 @@ package cn.momia.mapi.api.v1;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.AbstractApi;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.OrderDto;
 import com.alibaba.fastjson.JSON;
@@ -17,17 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1/order")
-public class OrderApi extends AbstractApi {
+public class OrderApi extends AbstractV1Api {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseMessage placeOrder(@RequestParam String utoken, @RequestParam String order) {
         if (StringUtils.isBlank(utoken) || StringUtils.isBlank(order)) return ResponseMessage.BAD_REQUEST;
 
-        JSONObject orderJson = JSON.parseObject(order);
-        if(!orderJson.containsKey("productId") || !orderJson.containsKey("skuId") || !orderJson.containsKey("prices")) return ResponseMessage.BAD_REQUEST;
-
         long userId = getUserId(utoken);
         if (userId <= 0) return ResponseMessage.TOKEN_EXPIRED;
 
+        JSONObject orderJson = JSON.parseObject(order);
         orderJson.put("customerId", userId);
         MomiaHttpRequest request = MomiaHttpRequest.POST(dealServiceUrl("order"), orderJson.toString());
 

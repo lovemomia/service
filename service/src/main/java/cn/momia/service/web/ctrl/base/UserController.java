@@ -62,7 +62,11 @@ public class UserController extends AbstractController {
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
-    public ResponseMessage getOrdersOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam(defaultValue = "eq") String type, @RequestParam int start, @RequestParam int count) {
+    public ResponseMessage getOrdersOfUser(@RequestParam String utoken,
+                                           @RequestParam int status,
+                                           @RequestParam(defaultValue = "eq") String type,
+                                           @RequestParam int start,
+                                           @RequestParam int count) {
         if (StringUtils.isBlank(utoken) || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
@@ -120,7 +124,7 @@ public class UserController extends AbstractController {
 
         boolean successful = userService.updateNickName(user.getId(), nickName);
 
-        if (!successful) return ResponseMessage.FAILED("更新用户昵称失败，内部服务器错误");
+        if (!successful) return ResponseMessage.FAILED("更新用户昵称失败");
 
         user.setNickName(nickName);
         return new ResponseMessage(buildUserResponse(user));
@@ -135,7 +139,7 @@ public class UserController extends AbstractController {
 
         boolean successful = userService.updateAvatar(user.getId(), avatar);
 
-        if (!successful) return ResponseMessage.FAILED("更新用户头像失败，内部服务器错误");
+        if (!successful) return ResponseMessage.FAILED("更新用户头像失败");
 
         user.setAvatar(avatar);
         return new ResponseMessage(buildUserResponse(user));
@@ -150,7 +154,7 @@ public class UserController extends AbstractController {
 
         boolean successful = userService.updateName(user.getId(), name);
 
-        if (!successful) return ResponseMessage.FAILED("更新用户名字失败，内部服务器错误");
+        if (!successful) return ResponseMessage.FAILED("更新用户名字失败");
 
         user.setName(name);
         return new ResponseMessage(buildUserResponse(user));
@@ -165,7 +169,7 @@ public class UserController extends AbstractController {
 
         boolean successful = userService.updateSex(user.getId(), sex);
 
-        if (!successful) return ResponseMessage.FAILED("更新用户性别失败，内部服务器错误");
+        if (!successful) return ResponseMessage.FAILED("更新用户性别失败");
 
         user.setSex(sex);
         return new ResponseMessage(buildUserResponse(user));
@@ -180,7 +184,7 @@ public class UserController extends AbstractController {
 
         boolean successful = userService.updateBirthday(user.getId(), birthday);
 
-        if (!successful) return ResponseMessage.FAILED("更新用户生日失败，内部服务器错误");
+        if (!successful) return ResponseMessage.FAILED("更新用户生日失败");
 
         user.setBirthday(birthday);
         return new ResponseMessage(buildUserResponse(user));
@@ -195,7 +199,7 @@ public class UserController extends AbstractController {
 
         boolean successful = userService.updateCityId(user.getId(), city);
 
-        if (!successful) return ResponseMessage.FAILED("更新用户城市失败，内部服务器错误");
+        if (!successful) return ResponseMessage.FAILED("更新用户城市失败");
 
         user.setCity(cityService.get(city).getName());
         return new ResponseMessage(buildUserResponse(user));
@@ -210,7 +214,7 @@ public class UserController extends AbstractController {
 
         boolean successful = userService.updateAddress(user.getId(), address);
 
-        if (!successful) return ResponseMessage.FAILED("更新用户地址失败，内部服务器错误");
+        if (!successful) return ResponseMessage.FAILED("更新用户地址失败");
 
         user.setAddress(address);
         return new ResponseMessage(buildUserResponse(user));
@@ -221,6 +225,7 @@ public class UserController extends AbstractController {
         long userId = 0;
         Set<Long> childrenIds = new HashSet<Long>();
         for(Participant child : children) {
+            if (child.isInvalid()) return ResponseMessage.BAD_REQUEST;
             long childId = participantService.add(child);
             if (childId <= 0) return ResponseMessage.FAILED("添加孩子信息失败");
 

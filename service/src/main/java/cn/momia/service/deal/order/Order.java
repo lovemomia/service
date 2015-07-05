@@ -1,5 +1,7 @@
 package cn.momia.service.deal.order;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -130,6 +132,10 @@ public class Order implements Serializable {
 
     public boolean exists() {
         return !this.equals(NOT_EXIST_ORDER);
+    }
+
+    public boolean isInvalid() {
+        return customerId <= 0 || productId <= 0 || skuId <= 0 || prices.isEmpty() || StringUtils.isBlank(mobile) || participants.isEmpty();
     }
 
     public BigDecimal getTotalFee() {

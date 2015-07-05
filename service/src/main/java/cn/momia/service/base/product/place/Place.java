@@ -19,7 +19,6 @@ public class Place implements Serializable {
     private String desc;
     private double lng;
     private double lat;
-    private String image;
 
     public long getId() {
         return id;
@@ -83,14 +82,6 @@ public class Place implements Serializable {
 
     public void setLat(double lat) {
         this.lat = lat;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
     }
 
     @Override

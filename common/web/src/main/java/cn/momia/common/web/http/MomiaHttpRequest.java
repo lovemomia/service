@@ -47,16 +47,8 @@ public abstract class MomiaHttpRequest implements HttpUriRequest, HttpEntityEncl
         };
     }
 
-    public static MomiaHttpRequest POST(String uri) {
-        return POST("anonymous", true, uri, null);
-    }
-
     public static MomiaHttpRequest POST(String uri, Map<String, String> params) {
         return POST("anonymous", true, uri, params);
-    }
-
-    public static MomiaHttpRequest POST(String name, boolean required, String uri) {
-        return POST(name, required, uri, null);
     }
 
     public static MomiaHttpRequest POST(String name, boolean required, String uri, Map<String, String> params) {
@@ -66,7 +58,7 @@ public abstract class MomiaHttpRequest implements HttpUriRequest, HttpEntityEncl
                 try {
                     HttpPost httpPost = new HttpPost(uri);
                     if (params != null && !params.isEmpty()) {
-                        HttpEntity entity = new UrlEncodedFormEntity(toNameValuePairs(params), "utf-8");
+                        HttpEntity entity = new UrlEncodedFormEntity(toNameValuePairs(params), "UTF-8");
                         httpPost.setEntity(entity);
                         setEntity(entity);
                     }
@@ -99,16 +91,8 @@ public abstract class MomiaHttpRequest implements HttpUriRequest, HttpEntityEncl
         };
     }
 
-    public static MomiaHttpRequest PUT(String uri) {
-        return PUT("anonymous", true, uri, null);
-    }
-
     public static MomiaHttpRequest PUT(String uri, Map<String, String> params) {
         return PUT("anonymous", true, uri, params);
-    }
-
-    public static MomiaHttpRequest PUT(String name, boolean required, String uri) {
-        return PUT(name, required, uri, null);
     }
 
     public static MomiaHttpRequest PUT(String name, boolean required, String uri, Map<String, String> params) {
@@ -118,7 +102,7 @@ public abstract class MomiaHttpRequest implements HttpUriRequest, HttpEntityEncl
                 try {
                     HttpPut httpPut = new HttpPut(uri);
                     if (params != null && !params.isEmpty()) {
-                        HttpEntity entity = new UrlEncodedFormEntity(toNameValuePairs(params), "utf-8");
+                        HttpEntity entity = new UrlEncodedFormEntity(toNameValuePairs(params), "UTF-8");
                         httpPut.setEntity(entity);
                         setEntity(entity);
                     }
@@ -224,9 +208,9 @@ public abstract class MomiaHttpRequest implements HttpUriRequest, HttpEntityEncl
     }
 
     protected static StringEntity toEntity(String content, String contentType) {
-        StringEntity entity = new StringEntity(content, "utf-8");
+        StringEntity entity = new StringEntity(content, "UTF-8");
         entity.setContentType(contentType);
-        entity.setContentEncoding("utf-8");
+        entity.setContentEncoding("UTF-8");
 
         return entity;
     }
@@ -352,6 +336,7 @@ public abstract class MomiaHttpRequest implements HttpUriRequest, HttpEntityEncl
     @Override
     public boolean expectContinue() {
         final Header expect = getFirstHeader(HTTP.EXPECT_DIRECTIVE);
+
         return expect != null && HTTP.EXPECT_CONTINUE.equalsIgnoreCase(expect.getValue());
     }
 

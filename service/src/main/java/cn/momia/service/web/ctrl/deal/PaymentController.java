@@ -64,8 +64,14 @@ public class PaymentController extends AbstractController {
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.GET)
-    public ResponseMessage checkPayment(@RequestParam String utoken, @RequestParam(value = "oid") long orderId, @RequestParam(value = "pid") long productId, @RequestParam(value = "sid") long skuId) {
-        if (StringUtils.isBlank(utoken) || productId <= 0 || skuId <= 0) return ResponseMessage.BAD_REQUEST;
+    public ResponseMessage checkPayment(@RequestParam String utoken,
+                                        @RequestParam(value = "oid") long orderId,
+                                        @RequestParam(value = "pid") long productId,
+                                        @RequestParam(value = "sid") long skuId) {
+        if (StringUtils.isBlank(utoken) ||
+                orderId <= 0 ||
+                productId <= 0 ||
+                skuId <= 0) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;

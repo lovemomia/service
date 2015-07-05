@@ -4,13 +4,12 @@ import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.AbstractApi;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.BannerDto;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.composite.HomeDto;
 import cn.momia.mapi.api.v1.dto.base.ProductDto;
-import cn.momia.mapi.img.ImageFile;
+import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
@@ -24,7 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/home")
-public class HomeApi extends AbstractApi {
+public class HomeApi extends AbstractV1Api {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage home(@RequestParam(value = "pageindex") final int pageIndex, @RequestParam(value = "city") int cityId) {
         final int maxPageCount = conf.getInt("Home.MaxPageCount");
@@ -65,6 +64,7 @@ public class HomeApi extends AbstractApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
                 .add("count", count);
+
         return MomiaHttpRequest.GET("banners", true, baseServiceUrl("banner"), builder.build());
     }
 
@@ -78,16 +78,10 @@ public class HomeApi extends AbstractApi {
         return MomiaHttpRequest.GET("products", true, baseServiceUrl("product"), builder.build());
     }
 
-    private List<BannerDto> extractBannerData(JSONArray bannersJson) {
-        List<BannerDto> banners = new ArrayList<BannerDto>();
-
+    private ListDto extractBannerData(JSONArray bannersJson) {
+        ListDto banners = new ListDto();
         for (int i = 0; i < bannersJson.size(); i++) {
-            JSONObject bannerJson = bannersJson.getJSONObject(i);
-            BannerDto banner = new BannerDto();
-            banner.setCover(ImageFile.url(bannerJson.getString("cover")));
-            banner.setAction(bannerJson.getString("action"));
-
-            banners.add(banner);
+            banners.add(new BannerDto(bannersJson.getJSONObject(i)));
         }
 
         return banners;

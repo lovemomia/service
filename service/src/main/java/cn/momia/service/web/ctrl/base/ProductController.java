@@ -36,7 +36,10 @@ public class ProductController extends AbstractController {
     @Autowired private ParticipantService participantService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage getProducts(@RequestParam(value = "city") int cityId, @RequestParam int start, @RequestParam int count, @RequestParam(required = false) String query) {
+    public ResponseMessage getProducts(@RequestParam(value = "city") int cityId,
+                                       @RequestParam int start,
+                                       @RequestParam int count,
+                                       @RequestParam(required = false) String query) {
         if (cityId < 0 || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
 
         long totalCount = productService.queryCount(new ProductQuery(cityId, query));

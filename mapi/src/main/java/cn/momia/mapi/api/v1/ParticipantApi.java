@@ -3,7 +3,6 @@ package cn.momia.mapi.api.v1;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.AbstractApi;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.ParticipantDto;
 import cn.momia.mapi.api.v1.dto.composite.ListDto;
@@ -21,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1/participant")
-public class ParticipantApi extends AbstractApi {
+public class ParticipantApi extends AbstractV1Api {
     private static final Logger LOGGER = LoggerFactory.getLogger(ParticipantApi.class);
 
     @RequestMapping(method = RequestMethod.POST)
@@ -35,7 +34,12 @@ public class ParticipantApi extends AbstractApi {
         paticipantJson.put("userId", userId);
         MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("participant"), paticipantJson.toString());
 
-        return executeRequest(request);
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                return new ParticipantDto((JSONObject) data);
+            }
+        });
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -64,7 +68,12 @@ public class ParticipantApi extends AbstractApi {
         paticipantJson.put("userId", userId);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("participant"), paticipantJson.toString());
 
-        return executeRequest(request);
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                return new ParticipantDto((JSONObject) data, true);
+            }
+        });
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
@@ -94,7 +103,7 @@ public class ParticipantApi extends AbstractApi {
                         JSONObject participantJson = participantsJson.getJSONObject(i);
                         participants.add(new ParticipantDto(participantJson));
                     } catch (Exception e) {
-                        LOGGER.error("invalid participant: {}", participantsJson);
+                        LOGGER.error("invalid participant: {}", participantsJson.get(i));
                     }
                 }
 

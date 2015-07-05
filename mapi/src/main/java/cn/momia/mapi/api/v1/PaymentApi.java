@@ -3,7 +3,6 @@ package cn.momia.mapi.api.v1;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.AbstractApi;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.WechatpayPrepayDto;
 import com.alibaba.fastjson.JSONObject;
@@ -14,44 +13,49 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
-
 @RestController
 @RequestMapping("/v1/payment")
-public class PaymentApi extends AbstractApi {
+public class PaymentApi extends AbstractV1Api {
     @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)
-    public ResponseMessage prepayWechatpay(HttpServletRequest request) {
-        Map<String, String> params = new HashMap<String, String>();
-        for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
-            params.put(entry.getKey(), entry.getValue()[0]);
-        }
+    public ResponseMessage prepayWechatpay(@RequestParam String utoken,
+                                           @RequestParam(value = "oid") long orderId,
+                                           @RequestParam(value = "pid") long productId,
+                                           @RequestParam(value = "sid") long skuId,
+                                           @RequestParam String code,
+                                           @RequestParam(value = "trade_type") String tradeType) {
+        if (StringUtils.isBlank(utoken) ||
+                orderId <= 0||
+                productId <= 0 ||
+                skuId <= 0 ||
+                StringUtils.isBlank(code) ||
+                StringUtils.isBlank(tradeType)) return ResponseMessage.BAD_REQUEST;
 
-        return executeRequest(MomiaHttpRequest.POST(dealServiceUrl("payment/prepay/wechatpay"), params), new Function<Object, Dto>() {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("oid", orderId)
+                .add("pid", productId)
+                .add("sid", skuId)
+                .add("code", code)
+                .add("trade_type", tradeType);
+        MomiaHttpRequest request = MomiaHttpRequest.POST(dealServiceUrl("payment/prepay/wechatpay"), builder.build());
+
+        return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                WechatpayPrepayDto wechatpayPrepayDto = new WechatpayPrepayDto();
-                JSONObject prepayJson = (JSONObject) data;
-                wechatpayPrepayDto.setSuccessful(prepayJson.getBoolean("successful"));
-                if (wechatpayPrepayDto.isSuccessful()) {
-                    JSONObject paramJson = prepayJson.getJSONObject("all");
-                    wechatpayPrepayDto.setAppId(paramJson.getString("appId"));
-                    wechatpayPrepayDto.setTimeStamp(paramJson.getString("timeStamp"));
-                    wechatpayPrepayDto.setNonceStr(paramJson.getString("nonceStr"));
-                    wechatpayPrepayDto.setPrepayId(paramJson.getString("package"));
-                    wechatpayPrepayDto.setSignType(paramJson.getString("signType"));
-                    wechatpayPrepayDto.setPaySign(paramJson.getString("paySign"));
-                }
-
-                return wechatpayPrepayDto;
+                return new WechatpayPrepayDto((JSONObject) data);
             }
         });
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.POST)
-    public ResponseMessage checkPayment(@RequestParam String utoken, @RequestParam(value = "oid") long orderId, @RequestParam(value = "pid") long productId, @RequestParam(value = "sid") long skuId) {
-        if (StringUtils.isBlank(utoken) || productId <= 0 || skuId <= 0) return ResponseMessage.BAD_REQUEST;
+    public ResponseMessage checkPayment(@RequestParam String utoken,
+                                        @RequestParam(value = "oid") long orderId,
+                                        @RequestParam(value = "pid") long productId,
+                                        @RequestParam(value = "sid") long skuId) {
+        if (StringUtils.isBlank(utoken) ||
+                orderId <= 0 ||
+                productId <= 0 ||
+                skuId <= 0) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)

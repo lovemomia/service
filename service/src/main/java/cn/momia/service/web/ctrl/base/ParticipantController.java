@@ -26,9 +26,14 @@ public class ParticipantController {
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage addParticipant(@RequestBody Participant participant) {
+        if (participant.isInvalid()) return ResponseMessage.BAD_REQUEST;
+
         long participantId = participantService.add(participant);
-        if(participantId <= 0) return ResponseMessage.FAILED("添加出行人失败，内部服务器错误");
-        return ResponseMessage.SUCCESS;
+
+        if(participantId <= 0) return ResponseMessage.FAILED("添加出行人失败");
+
+        participant.setId(participantId);
+        return new ResponseMessage(participant);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -46,14 +51,18 @@ public class ParticipantController {
 
     @RequestMapping(method = RequestMethod.PUT, consumes = "application/json")
     public ResponseMessage updateParticipantName(@RequestBody Participant participant) {
+        if (participant.isInvalid()) return ResponseMessage.BAD_REQUEST;
+
         boolean successful = participantService.update(participant);
 
-        if (!successful) return ResponseMessage.FAILED("更新出行人失败，内部服务器错误");
-        return ResponseMessage.SUCCESS;
+        if (!successful) return ResponseMessage.FAILED("更新出行人失败");
+        return new ResponseMessage(participant);
     }
 
     @RequestMapping(value = "/name",method = RequestMethod.PUT)
-    public ResponseMessage updateParticipantByName(@RequestParam String utoken, @RequestParam long id, @RequestParam String name) {
+    public ResponseMessage updateParticipantByName(@RequestParam String utoken,
+                                                   @RequestParam long id,
+                                                   @RequestParam String name) {
         if (StringUtils.isBlank(utoken) || id <= 0 || StringUtils.isBlank(name)) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
@@ -61,12 +70,14 @@ public class ParticipantController {
 
         boolean successful = participantService.updateByName(id, name, user.getId());
 
-        if (!successful) return ResponseMessage.FAILED("更新姓名失败，内部服务器错误");
+        if (!successful) return ResponseMessage.FAILED("更新姓名失败");
         return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/sex",method = RequestMethod.PUT)
-    public ResponseMessage updateParticipantBySex(@RequestParam String utoken, @RequestParam long id, @RequestParam String sex) {
+    public ResponseMessage updateParticipantBySex(@RequestParam String utoken,
+                                                  @RequestParam long id,
+                                                  @RequestParam String sex) {
         if (StringUtils.isBlank(utoken) || id <= 0 || StringUtils.isBlank(sex)) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
@@ -74,11 +85,13 @@ public class ParticipantController {
 
         boolean successful = participantService.updateBySex(id, sex, user.getId());
 
-        if (!successful) return ResponseMessage.FAILED("更新性别失败，内部服务器错误");
+        if (!successful) return ResponseMessage.FAILED("更新性别失败");
         return ResponseMessage.SUCCESS;
     }
     @RequestMapping(value = "/birthday",method = RequestMethod.PUT)
-    public ResponseMessage updateParticipantByBirthday(@RequestParam String utoken, @RequestParam long id, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd")Date birthday) {
+    public ResponseMessage updateParticipantByBirthday(@RequestParam String utoken,
+                                                       @RequestParam long id,
+                                                       @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd")Date birthday) {
         if (StringUtils.isBlank(utoken) || id <= 0 || birthday == null) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
@@ -86,7 +99,7 @@ public class ParticipantController {
 
         boolean successful = participantService.updateByBirthday(id, birthday, user.getId());
 
-        if (!successful) return ResponseMessage.FAILED("更新生日失败，内部服务器错误");
+        if (!successful) return ResponseMessage.FAILED("更新生日失败");
         return ResponseMessage.SUCCESS;
     }
 
@@ -98,7 +111,7 @@ public class ParticipantController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         boolean successful = participantService.delete(id, user.getId());
-        if (!successful) return ResponseMessage.FAILED("删除出行人失败，内部服务器错误");
+        if (!successful) return ResponseMessage.FAILED("删除出行人失败");
 
         return ResponseMessage.SUCCESS;
     }

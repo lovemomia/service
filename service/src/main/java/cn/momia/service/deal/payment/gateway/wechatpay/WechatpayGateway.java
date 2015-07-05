@@ -133,7 +133,7 @@ public class WechatpayGateway implements PaymentGateway {
                 throw new RuntimeException("fail to execute request: " + request);
             }
 
-            String entity = EntityUtils.toString(response.getEntity(), "utf-8");
+            String entity = EntityUtils.toString(response.getEntity(), "UTF-8");
             processResponseEntity(result, entity, param.get(WechatpayPrepayFields.TRADE_TYPE));
         } catch (Exception e) {
             LOGGER.error("fail to prepay", e);
@@ -146,9 +146,9 @@ public class WechatpayGateway implements PaymentGateway {
     private HttpPost createRequest(PrepayParam param) {
         HttpPost httpPost = new HttpPost(conf.getString("Payment.Wechat.PrepayService"));
         httpPost.addHeader(HTTP.CONTENT_TYPE, "application/xml");
-        StringEntity entity = new StringEntity(XmlUtil.paramsToXml(param.getAll()), "utf-8");
+        StringEntity entity = new StringEntity(XmlUtil.paramsToXml(param.getAll()), "UTF-8");
         entity.setContentType("application/xml");
-        entity.setContentEncoding("utf-8");
+        entity.setContentEncoding("UTF-8");
         httpPost.setEntity(entity);
 
         return httpPost;
@@ -156,7 +156,6 @@ public class WechatpayGateway implements PaymentGateway {
 
     private void processResponseEntity(PrepayResult result, String entity, String tradeType) {
         Map<String, String> params = XmlUtil.xmlToParams(entity);
-
         String return_code = params.get(WechatpayPrepayFields.RETURN_CODE);
         String result_code = params.get(WechatpayPrepayFields.RESULT_CODE);
 
@@ -164,12 +163,14 @@ public class WechatpayGateway implements PaymentGateway {
         result.setSuccessful(successful);
 
         if (successful) {
-            result.add(WechatpayPrepayFields.PREPAY_RETURN_APPID, params.get(WechatpayPrepayFields.APPID));
-            result.add(WechatpayPrepayFields.PREPAY_RETURN_TIMESTAMP, String.valueOf(new Date().getTime()).substring(0, 10));
-            result.add(WechatpayPrepayFields.PREPAY_RETURN_NONCE_STR, params.get(WechatpayPrepayFields.NONCE_STR));
-            result.add(WechatpayPrepayFields.PREPAY_RETURN_PACKAGE, "prepay_id=" + params.get(WechatpayPrepayFields.PREPAY_ID));
-            result.add(WechatpayPrepayFields.PREPAY_RETURN_SIGN_TYPE, "MD5");
-            result.add(WechatpayPrepayFields.PREPAY_RETURN_PAY_SIGN, WechatpayUtil.sign(result.getAll(), tradeType));
+            if (!WechatpayUtil.validateSign(params, tradeType)) throw new RuntimeException("fail to prepay, invalid sign");
+
+            result.add(WechatpayPrepayFields.PREPAY_RESULT_APPID, params.get(WechatpayPrepayFields.APPID));
+            result.add(WechatpayPrepayFields.PREPAY_RESULT_TIMESTAMP, String.valueOf(new Date().getTime()).substring(0, 10));
+            result.add(WechatpayPrepayFields.PREPAY_RESULT_NONCE_STR, params.get(WechatpayPrepayFields.NONCE_STR));
+            result.add(WechatpayPrepayFields.PREPAY_RESULT_PACKAGE, "prepay_id=" + params.get(WechatpayPrepayFields.PREPAY_ID));
+            result.add(WechatpayPrepayFields.PREPAY_RESULT_SIGN_TYPE, "MD5");
+            result.add(WechatpayPrepayFields.PREPAY_RESULT_PAY_SIGN, WechatpayUtil.sign(result.getAll(), tradeType));
         } else {
             LOGGER.error("fail to prepay: {}/{}", params.get(WechatpayPrepayFields.RETURN_CODE), params.get(WechatpayPrepayFields.RETURN_MSG));
         }
@@ -221,7 +222,7 @@ public class WechatpayGateway implements PaymentGateway {
     private Payment createPayment(CallbackParam param) throws ParseException {
         Payment payment = new Payment();
         payment.setOrderId(Long.valueOf(param.get(WechatpayCallbackFields.OUT_TRADE_NO)));
-        payment.setPayerId(param.get(WechatpayCallbackFields.OPEN_ID));
+        payment.setPayer(param.get(WechatpayCallbackFields.OPEN_ID));
         payment.setFinishTime(DATE_FORMATTER.parse(param.get(WechatpayCallbackFields.TIME_END)));
         payment.setPayType(Payment.Type.WECHATPAY);
         payment.setTradeNo(param.get(WechatpayCallbackFields.TRANSACTION_ID));
