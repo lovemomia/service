@@ -1,6 +1,7 @@
 package cn.momia.service.web.ctrl.base;
 
 import cn.momia.common.misc.ValidateUtil;
+import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.common.web.secret.SecretKey;
 import cn.momia.service.base.user.User;
@@ -43,7 +44,7 @@ public class AuthController extends AbstractController {
             return ResponseMessage.SUCCESS;
         }
         catch (SmsLoginException e) {
-           return ResponseMessage.FAILED(e.getMessage());
+           return new ResponseMessage(ErrorCode.NOT_REGISTERED, e.getMessage());
         }
         catch (Exception e) {
             LOGGER.error("fail to send verify code for {}", mobile, e);
@@ -61,7 +62,7 @@ public class AuthController extends AbstractController {
 //        String token = generateToken(mobile);
         if (!user.exists()) {
                 LOGGER.error("fail to login user for {}", mobile);
-                return ResponseMessage.FAILED("登录失败，用户不存在，请先注册");
+                return new ResponseMessage(ErrorCode.NOT_REGISTERED, "登录失败，用户不存在，请先注册");
         }/* else {
             if (!userService.updateToken(user.getId(), token)) {
                 LOGGER.warn("fail to update token for {}, will use old token", mobile);
