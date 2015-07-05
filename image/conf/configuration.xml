@@ -19,7 +19,7 @@
     <Image>
         <Upload>
             <Local>
-                <Dir>/data/appdatas/imgs</Dir>
+                <Dir>/data/upload/imgs</Dir>
             </Local>
             <Oss>
                 <AccessId>JsG07PUh4wXM4GLE</AccessId>
