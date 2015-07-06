@@ -29,7 +29,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/product")
-public class ProductApi extends AbstractV1Api {
+public class ProductV1Api extends AbstractV1Api {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public ResponseMessage getProducts(@RequestParam(value = "city") final int cityId,
                                        @RequestParam final int start,

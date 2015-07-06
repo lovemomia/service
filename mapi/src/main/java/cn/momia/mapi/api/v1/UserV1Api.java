@@ -2,7 +2,6 @@ package cn.momia.mapi.api.v1;
 
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
-import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.Dto;
@@ -24,8 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1/user")
-public class UserApi extends AbstractV1Api {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserApi.class);
+public class UserV1Api extends AbstractV1Api {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserV1Api.class);
 
     private static final Function<Object, Dto> userFunc = new Function<Object, Dto>() {
         @Override

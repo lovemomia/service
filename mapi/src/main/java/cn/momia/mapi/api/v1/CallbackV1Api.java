@@ -16,8 +16,8 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/callback")
-public class CallbackApi extends AbstractV1Api {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CallbackApi.class);
+public class CallbackV1Api extends AbstractV1Api {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CallbackV1Api.class);
 
     @RequestMapping(value = "/wechatpay", method = RequestMethod.POST, produces = "application/xml")
     public Xml wechatpayCallback(HttpServletRequest request) {

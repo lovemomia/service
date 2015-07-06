@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1/participant")
-public class ParticipantApi extends AbstractV1Api {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ParticipantApi.class);
+public class ParticipantV1Api extends AbstractV1Api {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParticipantV1Api.class);
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseMessage addParticipant(@RequestParam String utoken, @RequestParam String participant) {

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1/auth")
-public class AuthApi extends AbstractV1Api {
+public class AuthV1Api extends AbstractV1Api {
     private static final Function<Object, Dto> userFunc = new Function<Object, Dto>() {
         @Override
         public Dto apply(Object data) {
