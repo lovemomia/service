@@ -229,6 +229,7 @@ public class ProductV1Api extends AbstractV1Api {
             sku.setProductId(skuJson.getLong("productId"));
             sku.setSkuId(skuJson.getLong("id"));
             sku.setLimit(skuJson.getInteger("limit"));
+            sku.setNeedRealName(skuJson.getBoolean("needRealName"));
             sku.setStock(skuJson.getInteger("unlockedStock"));
             sku.setMinPrice(ProductUtil.getSkuMiniPrice(skuJson.getJSONArray("prices")));
             sku.setTime(ProductUtil.getSkuScheduler(skuJson.getJSONArray("properties")));
