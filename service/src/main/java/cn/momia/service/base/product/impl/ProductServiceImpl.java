@@ -170,4 +170,9 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     public boolean unlockStock(long skuId, int count) {
         return skuService.unlock(skuId, count);
     }
+
+    @Override
+    public boolean sold(long id, int count) {
+        return baseProductService.sold(id, count);
+    }
 }

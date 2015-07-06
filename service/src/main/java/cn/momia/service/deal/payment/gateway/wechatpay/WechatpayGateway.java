@@ -5,6 +5,7 @@ import cn.momia.common.misc.XmlUtil;
 import cn.momia.common.web.misc.RequestUtil;
 import cn.momia.common.web.secret.SecretKey;
 import cn.momia.service.base.product.Product;
+import cn.momia.service.base.product.ProductService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.deal.payment.Payment;
@@ -49,6 +50,7 @@ public class WechatpayGateway implements PaymentGateway {
     private Configuration conf;
     private OrderService orderService;
     private PaymentService paymentService;
+    private ProductService productService;
 
     public void setConf(Configuration conf) {
         this.conf = conf;
@@ -60,6 +62,10 @@ public class WechatpayGateway implements PaymentGateway {
 
     public void setPaymentService(PaymentService paymentService) {
         this.paymentService = paymentService;
+    }
+
+    public void setProductService(ProductService productService) {
+        this.productService = productService;
     }
 
     @Override
@@ -213,7 +219,20 @@ public class WechatpayGateway implements PaymentGateway {
     private void logPayment(CallbackParam param) {
         try {
             long paymentId = paymentService.add(createPayment(param));
-            if (paymentId <= 0) LOGGER.error("fail to log payment: {}", param);
+            if (paymentId <= 0) {
+                LOGGER.error("fail to log payment: {}", param);
+                return;
+            }
+
+            Order order = orderService.get(Long.valueOf(param.get(WechatpayCallbackFields.OUT_TRADE_NO)));
+            if (!order.exists()) {
+                LOGGER.error("invalid order: {}", order.getId());
+                return;
+            }
+
+            if (!productService.sold(order.getProductId(), order.getCount())) {
+                LOGGER.error("fail to log sales of order: {}", order.getId());
+            }
         } catch (Exception e) {
             LOGGER.error("fail to log payment: {}", param, e);
         }

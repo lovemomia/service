@@ -101,4 +101,11 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
 
         return baseProducts;
     }
+
+    @Override
+    public boolean sold(long id, int count) {
+        String sql = "UPDATE t_product SET sales=sales+? WHERE id=?";
+
+        return jdbcTemplate.update(sql, new Object[] { count, id }) == 1;
+    }
 }

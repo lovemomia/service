@@ -7,4 +7,5 @@ public interface BaseProductService {
     List<BaseProduct> get(List<Long> ids);
     long queryCount(String query);
     List<BaseProduct> query(int start, int count, String query);
+    boolean sold(long id, int count);
 }
