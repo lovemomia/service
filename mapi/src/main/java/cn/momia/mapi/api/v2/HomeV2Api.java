@@ -39,7 +39,7 @@ public class HomeV2Api extends AbstractApi {
             public Dto apply(MomiaHttpResponseCollector collector) {
                 HomeDto homeDto = new HomeDto();
 
-             //   if (pageIndex == 0) homeDto.setBanners(extractBannerData((JSONArray) collector.getResponse("banners")));
+                if (pageIndex == 0) homeDto.setBanners(extractBannerData((JSONArray) collector.getResponse("banners")));
 
                 JSONObject productsPackJson = (JSONObject) collector.getResponse("products");
                 long totalCount = productsPackJson.getLong("totalCount");
