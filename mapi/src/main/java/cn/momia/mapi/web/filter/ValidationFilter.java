@@ -29,7 +29,7 @@ public class ValidationFilter implements Filter {
             return;
         }
 
-        if (!needParamsValidation(httpRequest)) {
+        if (needParamsValidation(httpRequest)) {
             if (isParamMissing(httpRequest))
             {
                 forwardErrorPage(request, response, 400);
