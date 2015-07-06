@@ -135,7 +135,7 @@ public class Order implements Serializable {
     }
 
     public boolean isInvalid() {
-        return customerId <= 0 || productId <= 0 || skuId <= 0 || prices.isEmpty() || StringUtils.isBlank(mobile) || participants.isEmpty();
+        return customerId <= 0 || productId <= 0 || skuId <= 0 || prices.isEmpty() || StringUtils.isBlank(mobile);
     }
 
     public BigDecimal getTotalFee() {
