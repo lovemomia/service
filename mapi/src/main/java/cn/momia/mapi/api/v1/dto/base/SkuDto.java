@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 public class SkuDto implements Dto {
     private long productId;
     private long skuId;
+    private int limit;
     private int stock;
     private BigDecimal minPrice;
     private String time;
@@ -26,6 +27,14 @@ public class SkuDto implements Dto {
 
     public void setSkuId(long skuId) {
         this.skuId = skuId;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
     }
 
     public int getStock() {

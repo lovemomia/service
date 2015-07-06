@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class SkuServiceImpl extends DbAccessService implements SkuService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SkuServiceImpl.class);
-    private static final String[] SKU_FIELDS = {"id", "productId", "properties", "prices", "stock", "unlockedStock", "lockedStock"};
+    private static final String[] SKU_FIELDS = {"id", "productId", "properties", "prices", "`limit`", "stock", "unlockedStock", "lockedStock"};
 
     @Override
     public List<Sku> queryByProduct(long productId) {
@@ -50,6 +50,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
             sku.setProductId(rs.getLong("productId"));
             sku.setProperties(parseProperties(sku.getId(), rs.getString("properties")));
             sku.setPrices(parsePrices(sku.getId(), rs.getString("prices")));
+            sku.setLimit(rs.getInt("limit"));
             sku.setStock(rs.getInt("stock"));
             sku.setUnlockedStock(rs.getInt("unlockedStock"));
             sku.setLockedStock(rs.getInt("lockedStock"));

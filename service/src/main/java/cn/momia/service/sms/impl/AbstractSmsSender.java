@@ -34,7 +34,7 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
 
     @Override
     public void send(String mobile, String type) throws SmsLoginException {
-        if(StringUtils.equals(type, "login") && !userExists(mobile)) throw new SmsLoginException("user does not exits");
+        if(StringUtils.equals(type, "login") && !userExists(mobile)) throw new SmsLoginException("用户不存在，请先注册");
 
         String code = getGeneratedCode(mobile);
         if (StringUtils.isBlank(code)) {
@@ -59,17 +59,6 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
                 return 0;
             }
         }) > 0;
-    }
-
-    private void sendAsync(final String mobile, final String code) {
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                if (doSend(mobile, code)) {
-                    updateSendTime(mobile);
-                }
-            }
-        });
     }
 
     private String getGeneratedCode(String mobile)
@@ -125,6 +114,17 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
             {
                 if (rs.next()) return rs.getTimestamp("sendTime");
                 return null;
+            }
+        });
+    }
+
+    private void sendAsync(final String mobile, final String code) {
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (doSend(mobile, code)) {
+                    updateSendTime(mobile);
+                }
             }
         });
     }

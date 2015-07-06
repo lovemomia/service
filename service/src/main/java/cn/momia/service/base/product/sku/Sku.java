@@ -16,6 +16,7 @@ public class Sku implements Serializable {
     private long productId;
     private List<SkuProperty> properties;
     private List<SkuPrice> prices;
+    private int limit;
     private int stock;
     private int lockedStock;
     private int unlockedStock;
@@ -50,6 +51,14 @@ public class Sku implements Serializable {
 
     public void setPrices(List<SkuPrice> prices) {
         this.prices = prices;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
     }
 
     public int getStock() {
