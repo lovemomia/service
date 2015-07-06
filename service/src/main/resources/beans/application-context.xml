@@ -83,6 +83,7 @@
         <property name="conf" ref="conf" />
         <property name="orderService" ref="orderService" />
         <property name="paymentService" ref="paymentService" />
+        <property name="productService" ref="productService" />
     </bean>
 
     <bean class="cn.momia.service.deal.payment.gateway.factory.PaymentGatewayFactory">
