@@ -259,7 +259,7 @@ public class ProductV1Api extends AbstractV1Api {
     }
 
     @RequestMapping(value = "customer", method = RequestMethod.GET)
-    public ResponseMessage getProductPlaymates(@RequestParam String utoken, @RequestParam long id, @RequestParam int start, @RequestParam int count) {
+    public ResponseMessage getProductPlaymates(@RequestParam long id, @RequestParam int start, @RequestParam int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
                 .add("count", count);

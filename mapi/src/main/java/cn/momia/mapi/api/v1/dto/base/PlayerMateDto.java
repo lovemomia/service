@@ -52,7 +52,7 @@ public class PlayerMateDto implements Dto {
 
             }
                 this.customers = customerList;
-                this.text = "一共" + count +"人报名(成人" + adult + "人,儿童" + child +"人)";
+                this.text =  count +"人已报名(" + adult + "成人" + child + "儿童)";
             }
 
 
