@@ -235,7 +235,8 @@ public class UserController extends AbstractController {
             userId = child.getUserId();
             childrenIds.add(childId);
         }
-
+        for(Long cid : userService.get(userId).getChildren())
+            childrenIds.add(cid);
         if (userId > 0 && !userService.updateChildren(userId, childrenIds)) return ResponseMessage.FAILED("添加孩子信息失败");
 
         return new ResponseMessage(buildUserResponse(userService.get(userId)));
