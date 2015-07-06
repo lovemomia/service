@@ -26,8 +26,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/product")
@@ -115,7 +117,10 @@ public class ProductController extends AbstractController {
                 if (user == null || !user.exists()) continue;
                 customer.setAvatar(user.getAvatar());
                 customer.setName(user.getName());
-                customer.setChildren(user.getChildren());
+                Set<Participant> children = new HashSet<Participant>();
+                for(Participant participant : participantService.get(user.getChildren()).values())
+                    children.add(participant);
+                customer.setChildren(children);
                 customer.setUserId(user.getId());
                 customer.setNickName(user.getNickName());
 
@@ -132,8 +137,6 @@ public class ProductController extends AbstractController {
             playMate.setSkuProperties(sku.getProperties());
             playMate.setCustomers(validCustomers);
             playMates.add(playMate);
-
-            System.out.println(sku.getProperties()+":"+validCustomers );
         }
 
 
