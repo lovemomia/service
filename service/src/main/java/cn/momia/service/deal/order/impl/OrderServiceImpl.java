@@ -1,5 +1,6 @@
 package cn.momia.service.deal.order.impl;
 
+import cn.momia.service.base.product.ProductService;
 import cn.momia.service.common.DbAccessService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderPrice;
@@ -24,6 +25,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -41,6 +43,12 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     private static final String[] ORDER_FIELDS = { "id", "customerId", "productId", "skuId", "prices", "contacts", "mobile", "participants", "status", "addTime" };
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
+
+    private ProductService productService;
+
+    public void setProductService(ProductService productService) {
+        this.productService = productService;
+    }
 
     @Override
     public long add(final Order order) {
@@ -236,5 +244,37 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         });
 
         return status >= Order.Status.PAYED;
+    }
+
+    @Override
+    public void cleanExpiredOrders() {
+        LOGGER.info("start to clean expired orders ...");
+
+        final List<Order> orders = new ArrayList<Order>();
+        Date expiredDate = new Date(new Date().getTime() - 30 * 60 * 1000);
+        String sql = "SELECT " + joinFields() + " FROM t_order WHERE status=1 AND addTime<?";
+        jdbcTemplate.query(sql, new Object[] { expiredDate }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                orders.add(buildOrder(rs));
+            }
+        });
+
+        for (Order order : orders) {
+            try {
+                if (!delete(order.getId(), order.getCustomerId()))
+                {
+                    LOGGER.error("fail to unlock order: {}", order.getId());
+                    continue;
+                }
+
+                if (!productService.unlockStock(order.getSkuId(), order.getCount()))
+                    LOGGER.error("fail to unlock order: {}", order.getId());
+            } catch (Exception e) {
+                LOGGER.error("fail to unlock order: {}", order.getId());
+            }
+        }
+
+        LOGGER.info("clean expired orders finished");
     }
 }
