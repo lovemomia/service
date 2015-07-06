@@ -41,6 +41,7 @@ public class ProductV1Api extends AbstractV1Api {
             PagedListDto<PlayerMateDto> playerMateDtoPagedListDto = new PagedListDto<PlayerMateDto>();
             for(int i=0; i<jsonArray.size(); i++)
                 playerMateDtoPagedListDto.add(new PlayerMateDto(jsonArray.getJSONObject(i)));
+            playerMateDtoPagedListDto.setTotalCount(jsonArray.size());
             return playerMateDtoPagedListDto;
         }
     };
