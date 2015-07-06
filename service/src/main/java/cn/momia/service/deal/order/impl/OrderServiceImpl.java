@@ -57,7 +57,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
                 ps.setString(4, JSON.toJSONString(order.getPrices()));
                 ps.setString(5, order.getContacts());
                 ps.setString(6, order.getMobile());
-                ps.setString(7, StringUtils.join(order.getParticipants(), ","));
+                List<Long> participants = order.getParticipants();
+                ps.setString(7, (participants == null ? "" : StringUtils.join(participants, ",")));
 
                 return ps;
             }
