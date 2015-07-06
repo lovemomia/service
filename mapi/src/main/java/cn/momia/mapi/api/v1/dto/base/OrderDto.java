@@ -12,6 +12,7 @@ public class OrderDto implements Dto {
     private int count;
     private BigDecimal totalFee;
     private String participants;
+    private String cover;
 
     private String title;
     private String time;
@@ -38,6 +39,14 @@ public class OrderDto implements Dto {
 
     public String getParticipants() {
         return participants;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
     }
 
     public String getTitle() {
