@@ -204,7 +204,7 @@ public class UserApi extends AbstractV1Api {
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("participant/name"), builder.build());
 
         ResponseMessage response = executeRequest(request);
-        if (response.getErrno() != ErrorCode.SUCCESS) return response;
+        if (!response.successful()) return response;
 
         return executeRequest(MomiaHttpRequest.GET(baseServiceUrl("user"), new MomiaHttpParamBuilder().add("utoken", utoken).build()), userFunc);
     }
@@ -223,7 +223,7 @@ public class UserApi extends AbstractV1Api {
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("participant/sex"), builder.build());
 
         ResponseMessage response = executeRequest(request);
-        if (response.getErrno() != ErrorCode.SUCCESS) return response;
+        if (!response.successful()) return response;
 
         return executeRequest(MomiaHttpRequest.GET(baseServiceUrl("user"), new MomiaHttpParamBuilder().add("utoken", utoken).build()), userFunc);
     }
@@ -241,7 +241,7 @@ public class UserApi extends AbstractV1Api {
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("participant/birthday"), builder.build());
 
         ResponseMessage response = executeRequest(request);
-        if (response.getErrno() != ErrorCode.SUCCESS) return response;
+        if (!response.successful()) return response;
 
         return executeRequest(MomiaHttpRequest.GET(baseServiceUrl("user"), new MomiaHttpParamBuilder().add("utoken", utoken).build()), userFunc);
     }

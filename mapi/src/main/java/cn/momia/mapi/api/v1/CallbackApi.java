@@ -24,7 +24,7 @@ public class CallbackApi extends AbstractV1Api {
         try {
             Map<String, String> params = XmlUtil.xmlToParams(IOUtils.toString(request.getInputStream()));
             ResponseMessage response = executeRequest(MomiaHttpRequest.POST(dealServiceUrl("callback/wechatpay"), params));
-            if (response.isSuccessful()) return new Xml("SUCCESS", "OK");
+            if (response.successful()) return new Xml("SUCCESS", "OK");
         } catch (Exception e) {
             LOGGER.error("wechat pay callback error", e);
         }
