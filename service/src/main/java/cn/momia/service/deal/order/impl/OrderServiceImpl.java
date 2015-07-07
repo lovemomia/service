@@ -204,7 +204,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public List<Order> queryDistinctCustomerOrderByProduct(long productId, int start, int count) {
-        String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status>0 GROUP BY customerId LIMIT ?,?";
+        String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status=3 GROUP BY customerId LIMIT ?,?";
         final List<Order> orders = new ArrayList<Order>();
         jdbcTemplate.query(sql, new Object[] { productId, start, count }, new RowCallbackHandler() {
             @Override
@@ -215,6 +215,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
         return orders;
     }
+
 
     @Override
     public boolean delete(long id, long userId) {

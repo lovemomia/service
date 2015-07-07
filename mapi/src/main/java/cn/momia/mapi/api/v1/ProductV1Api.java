@@ -4,9 +4,11 @@ import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.mapi.api.AbstractApi;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.ContactsDto;
 import cn.momia.mapi.api.v1.dto.base.Dto;
+import cn.momia.mapi.api.v1.dto.base.PlayerMateDto;
 import cn.momia.mapi.api.v1.dto.base.ProductDto;
 import cn.momia.mapi.api.v1.dto.base.SkuDto;
 import cn.momia.mapi.api.v1.dto.composite.PagedListDto;
@@ -29,7 +31,21 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/product")
+
+
 public class ProductV1Api extends AbstractV1Api {
+    private static final Function<Object, Dto> PlaymateFunc = new Function<Object, Dto>() {
+        @Override
+        public Dto apply(Object data) {
+            JSONArray jsonArray = (JSONArray) data;
+            PagedListDto<PlayerMateDto> playerMateDtoPagedListDto = new PagedListDto<PlayerMateDto>();
+            for(int i=0; i<jsonArray.size(); i++)
+                playerMateDtoPagedListDto.add(new PlayerMateDto(jsonArray.getJSONObject(i)));
+            playerMateDtoPagedListDto.setTotalCount(jsonArray.size());
+            return playerMateDtoPagedListDto;
+        }
+    };
+
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public ResponseMessage getProducts(@RequestParam(value = "city") final int cityId,
                                        @RequestParam final int start,
@@ -37,7 +53,8 @@ public class ProductV1Api extends AbstractV1Api {
                                        @RequestParam(required = false) String query) {
         final int maxPageCount = conf.getInt("Product.MaxPageCount");
         final int pageSize = conf.getInt("Product.PageSize");
-        if (cityId < 0 || start < 0 || count <= 0 || start > maxPageCount * pageSize) return ResponseMessage.BAD_REQUEST;
+        if (cityId < 0 || start < 0 || count <= 0 || start > maxPageCount * pageSize)
+            return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
@@ -173,8 +190,8 @@ public class ProductV1Api extends AbstractV1Api {
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
     public ResponseMessage getProductOrder(@RequestParam String utoken, @RequestParam long id) {
-        if(StringUtils.isBlank(utoken) || id <= 0) return ResponseMessage.BAD_REQUEST;
-        
+        if (StringUtils.isBlank(utoken) || id <= 0) return ResponseMessage.BAD_REQUEST;
+
         List<MomiaHttpRequest> requests = buildProductOrderRequests(id, utoken);
 
         return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {
@@ -239,5 +256,14 @@ public class ProductV1Api extends AbstractV1Api {
         }
 
         return skus;
+    }
+
+    @RequestMapping(value = "customer", method = RequestMethod.GET)
+    public ResponseMessage getProductPlaymates(@RequestParam long id, @RequestParam int start, @RequestParam int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("start", start)
+                .add("count", count);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("product", id, "customer"), builder.build());
+        return executeRequest(request, PlaymateFunc);
     }
 }
