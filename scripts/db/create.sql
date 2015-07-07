@@ -160,6 +160,7 @@ CREATE TABLE `t_sku` (
   `properties` varchar(500) NOT NULL COMMENT '属性',
   `prices` varchar(1000) NOT NULL COMMENT '价格信息',
   `limit` int(11) NOT NULL DEFAULT 0 COMMENT '限额',
+  `needRealName` int(1) NOT NULL DEFAULT 0 COMMENT '是否实名',
   `stock` int(11) NOT NULL COMMENT '库存',
   `unlockedStock` int(11) NOT NULL COMMENT '未锁定的库存',
   `lockedStock` int(11) NOT NULL COMMENT '锁定的库存',
