@@ -58,19 +58,12 @@ public class AuthController extends AbstractController {
 
         User user = userService.getByMobile(mobile);
         if (!user.exists()) {
-                LOGGER.error("fail to login user for {}", mobile);
-                return new ResponseMessage(ErrorCode.NOT_REGISTERED, "登录失败，用户不存在，请先注册");
-        }
-        else {
-            if (!userService.validatePassword(mobile, password))
-                return ResponseMessage.FAILED("密码不正确，登录失败");
+            LOGGER.error("fail to login user for {}", mobile);
+            return new ResponseMessage(ErrorCode.NOT_REGISTERED, "登录失败，用户不存在，请先注册");
         }
 
+        if (!userService.validatePassword(mobile, password)) return ResponseMessage.FAILED("登录失败，密码不正确");
         return new ResponseMessage(buildUserResponse(user));
-    }
-
-    private String generateToken(String mobile) {
-        return DigestUtils.md5Hex(StringUtils.join(new String[] { mobile, new Date().toString(), SecretKey.get() }, "|"));
     }
 
     private JSONObject buildUserResponse(User user) {
@@ -83,7 +76,7 @@ public class AuthController extends AbstractController {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseMessage register(@RequestParam String nickName, @RequestParam String mobile, @RequestParam String password, @RequestParam String code){
-        if (StringUtils.isBlank(nickName) || ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(code) || StringUtils.isBlank(password)) return ResponseMessage.BAD_REQUEST;
+        if (StringUtils.isBlank(nickName) || ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(password) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
 
         if(userService.getByNickName(nickName).exists()) return ResponseMessage.FAILED("注册失败，用户昵称已存在");
 
@@ -102,5 +95,9 @@ public class AuthController extends AbstractController {
         }
 
         return new ResponseMessage(buildUserResponse(user));
+    }
+
+    private String generateToken(String mobile) {
+        return DigestUtils.md5Hex(StringUtils.join(new String[] { mobile, new Date().toString(), SecretKey.get() }, "|"));
     }
 }
