@@ -46,7 +46,7 @@ public class ProductUtil {
         JSONArray skusJson = productJson.getJSONArray("skus");
 
         product.setId(productJson.getLong("id"));
-        product.setCover(productJson.getString("cover"));
+        product.setCover(ImageFile.url(productJson.getString("cover")));
         product.setTitle(productJson.getString("title"));
         product.setJoined(productJson.getInteger("sales"));
         product.setPrice(ProductUtil.getMiniPrice(skusJson));
