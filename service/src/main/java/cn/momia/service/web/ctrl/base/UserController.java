@@ -107,6 +107,7 @@ public class UserController extends AbstractController {
             if (product != null) orderJson.put("product", product.getTitle());
             Sku sku = skuMap.get(order.getSkuId());
             if (sku != null) orderJson.put("sku", sku.getProperties());
+            orderJson.put("cover", product.getCover());
 
             ordersJson.add(orderJson);
         }
