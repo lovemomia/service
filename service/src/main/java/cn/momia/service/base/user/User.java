@@ -30,7 +30,6 @@ public class User implements Serializable {
     private String city;
     private String address;
     private Set<Long> children;
-    private String password;
 
     public long getId() {
         return id;
@@ -118,14 +117,6 @@ public class User implements Serializable {
 
     public void setChildren(Set<Long> children) {
         this.children = children;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     @Override

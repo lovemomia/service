@@ -62,7 +62,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, nickName);
                 ps.setString(2, mobile);
-                ps.setString(3,password);
+                ps.setString(3, password);
                 ps.setString(4, token);
 
                 return ps;
@@ -95,7 +95,6 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         user.setToken(rs.getString("token"));
         user.setNickName(rs.getString("nickName"));
         user.setMobile(rs.getString("mobile"));
-        user.setPassword(rs.getString("password"));
         user.setAvatar(rs.getString("avatar"));
         user.setName(rs.getString("name"));
         user.setSex(rs.getString("sex"));
@@ -168,6 +167,19 @@ public class UserServiceImpl extends DbAccessService implements UserService {
             public User extractData(ResultSet rs) throws SQLException, DataAccessException {
                 if(rs.next()) return buildUser(rs);
                 return User.NOT_EXIST_USER;
+            }
+        });
+    }
+
+    @Override
+    public boolean validateUser(String mobile, String password) {
+        String sql = "SELECT mobile, password FROM t_user WHERE mobile=? AND password=?";
+
+        return jdbcTemplate.query(sql, new Object[]{mobile, password}, new ResultSetExtractor<Boolean>() {
+            @Override
+            public Boolean extractData(ResultSet resultSet) throws SQLException, DataAccessException {
+                if(resultSet.next()) return true;
+                return false;
             }
         });
     }
