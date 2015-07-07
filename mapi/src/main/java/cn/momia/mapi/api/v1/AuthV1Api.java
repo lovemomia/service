@@ -38,24 +38,25 @@ public class AuthV1Api extends AbstractV1Api {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseMessage login(@RequestParam String mobile, @RequestParam String code) {
-        if (ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
+    public ResponseMessage login(@RequestParam String mobile, @RequestParam String password) {
+        if (ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(password)) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("mobile", mobile)
-                .add("code", code);
+                .add("password", password);
         MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("auth/login"), builder.build());
 
         return executeRequest(request, userFunc);
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ResponseMessage register(@RequestParam String nickName, @RequestParam String mobile, @RequestParam String code) {
-        if (StringUtils.isBlank(nickName) || ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
+    public ResponseMessage register(@RequestParam String nickName, @RequestParam String mobile, @RequestParam String password, @RequestParam String code) {
+        if (StringUtils.isBlank(nickName) || ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(password) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("nickName", nickName)
                 .add("mobile", mobile)
+                .add("password", password)
                 .add("code", code);
         MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("auth/register"), builder.build());
 

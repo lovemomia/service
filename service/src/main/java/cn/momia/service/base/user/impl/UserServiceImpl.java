@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class UserServiceImpl extends DbAccessService implements UserService {
-    private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "avatar", "name", "sex", "birthday", "cityId", "address", "children" };
+    private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile","password", "avatar", "name", "sex", "birthday", "cityId", "address", "children" };
     private CityService cityService;
 
     public void setCityService(CityService cityService) {
@@ -34,10 +34,10 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
-    public User add(String nickName, String mobile, String token) {
+    public User add(String nickName, String mobile, String password, String token) {
         if (!validateMobile(mobile)) return User.DUPLICATE_USER;
 
-        return addUser(nickName, mobile,  token);
+        return addUser(nickName, mobile, password, token);
     }
 
     public boolean validateMobile(String mobile) {
@@ -53,16 +53,17 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         return count == 0;
     }
 
-    public User addUser(final String nickName, final String mobile,  final String token) {
+    public User addUser(final String nickName, final String mobile, final String password, final String token) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO t_user(nickName, mobile, token, addTime) VALUES (?, ?, ?, NOW())";
+                String sql = "INSERT INTO t_user(nickName, mobile, password, token, addTime) VALUES (?, ?, ?, ?,NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, nickName);
                 ps.setString(2, mobile);
-                ps.setString(3, token);
+                ps.setString(3,password);
+                ps.setString(4, token);
 
                 return ps;
             }
@@ -94,6 +95,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         user.setToken(rs.getString("token"));
         user.setNickName(rs.getString("nickName"));
         user.setMobile(rs.getString("mobile"));
+        user.setPassword(rs.getString("password"));
         user.setAvatar(rs.getString("avatar"));
         user.setName(rs.getString("name"));
         user.setSex(rs.getString("sex"));

@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 public interface UserService {
-    User add(String nickName, String mobile, String token);
+    User add(String nickName, String mobile, String password, String token);
     User get(long id);
     Map<Long, User> get(List<Long> ids);
     User getByToken(String token);
