@@ -3,6 +3,7 @@ package cn.momia.mapi.api.v1.dto.composite;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.ProductDto;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -16,7 +17,6 @@ public class ProductDetailDto implements Dto {
 
     private ProductDto productDto;
     private Customers customers;
-
 
     public long getId() {
         return productDto.getId();
@@ -54,11 +54,11 @@ public class ProductDetailDto implements Dto {
         return productDto.getPoi();
     }
 
-    public Date getStartTime() {
+    @JSONField(format = "yyyy-MM-dd hh:mm:ss") public Date getStartTime() {
         return productDto.getStartTime();
     }
 
-    public Date getEndTime() {
+    @JSONField(format = "yyyy-MM-dd hh:mm:ss") public Date getEndTime() {
         return productDto.getEndTime();
     }
 
