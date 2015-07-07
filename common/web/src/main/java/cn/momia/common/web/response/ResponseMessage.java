@@ -86,7 +86,7 @@ public class ResponseMessage implements Serializable
         this.time = time;
     }
 
-    public boolean isSuccessful() {
+    public boolean successful() {
         return errno == ErrorCode.SUCCESS;
     }
 }

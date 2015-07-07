@@ -12,6 +12,7 @@ public class SkuPrice implements Serializable {
     private int child;
     private BigDecimal price;
     private String unit;
+    private String desc;
 
     public int getAdult() {
         return adult;
@@ -29,10 +30,15 @@ public class SkuPrice implements Serializable {
         return unit;
     }
 
+    public String getDesc() {
+        return desc;
+    }
+
     public SkuPrice(JSONObject priceJson) {
         this.adult = priceJson.containsKey("adult") ? priceJson.getInteger("adult") : 0;
         this.child = priceJson.containsKey("child") ? priceJson.getInteger("child") : 0;
         this.price = priceJson.getBigDecimal("price");
         this.unit = UNIT[priceJson.getInteger("unit")];
+        this.desc = priceJson.containsKey("desc") ? priceJson.getString("desc") : null;
     }
 }

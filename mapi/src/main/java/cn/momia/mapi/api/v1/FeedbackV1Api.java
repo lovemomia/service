@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1/feedback")
-public class FeedbackApi extends AbstractV1Api {
+public class FeedbackV1Api extends AbstractV1Api {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseMessage addFeedback(@RequestParam(required = false) String utoken,
                                        @RequestParam String content,

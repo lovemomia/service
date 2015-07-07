@@ -1,17 +1,15 @@
-package cn.momia.mapi.api.v2;
+package cn.momia.mapi.api.v1;
 
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.AbstractApi;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.BannerDto;
 import cn.momia.mapi.api.v1.dto.base.Dto;
-import cn.momia.mapi.api.v1.dto.base.ProductDto;
 import cn.momia.mapi.api.v1.dto.composite.HomeDto;
+import cn.momia.mapi.api.v1.dto.base.ProductDto;
 import cn.momia.mapi.api.v1.dto.composite.ListDto;
-import cn.momia.mapi.img.ImageFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
@@ -24,13 +22,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v2/home")
-public class HomeApi extends AbstractApi {
+@RequestMapping("/v1/home")
+public class HomeV1Api extends AbstractV1Api {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage home(@RequestParam(value = "pageindex") final int pageIndex, @RequestParam(value = "city") int cityId) {
         final int maxPageCount = conf.getInt("Home.MaxPageCount");
         final int pageSize = conf.getInt("Home.PageSize");
-        if (pageIndex >= maxPageCount) return ResponseMessage.FAILED;
+        if (pageIndex >= maxPageCount || cityId < 0) return ResponseMessage.BAD_REQUEST;
 
         List<MomiaHttpRequest> requests = buildHomeRequests(pageIndex, cityId);
 
@@ -66,6 +64,7 @@ public class HomeApi extends AbstractApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
                 .add("count", count);
+
         return MomiaHttpRequest.GET("banners", true, baseServiceUrl("banner"), builder.build());
     }
 
@@ -81,7 +80,6 @@ public class HomeApi extends AbstractApi {
 
     private ListDto extractBannerData(JSONArray bannersJson) {
         ListDto banners = new ListDto();
-
         for (int i = 0; i < bannersJson.size(); i++) {
             banners.add(new BannerDto(bannersJson.getJSONObject(i)));
         }

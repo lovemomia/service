@@ -8,6 +8,7 @@ public class SkuDto implements Dto {
     private long productId;
     private long skuId;
     private int limit;
+    private boolean needRealName;
     private int stock;
     private BigDecimal minPrice;
     private String time;
@@ -35,6 +36,14 @@ public class SkuDto implements Dto {
 
     public void setLimit(int limit) {
         this.limit = limit;
+    }
+
+    public boolean isNeedRealName() {
+        return needRealName;
+    }
+
+    public void setNeedRealName(boolean needRealName) {
+        this.needRealName = needRealName;
     }
 
     public int getStock() {

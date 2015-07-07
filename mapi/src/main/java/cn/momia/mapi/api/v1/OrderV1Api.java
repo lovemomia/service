@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1/order")
-public class OrderApi extends AbstractV1Api {
+public class OrderV1Api extends AbstractV1Api {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseMessage placeOrder(@RequestParam String utoken, @RequestParam String order) {
         if (StringUtils.isBlank(utoken) || StringUtils.isBlank(order)) return ResponseMessage.BAD_REQUEST;

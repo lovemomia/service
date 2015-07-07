@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1/payment")
-public class PaymentApi extends AbstractV1Api {
+public class PaymentV1Api extends AbstractV1Api {
     @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)
     public ResponseMessage prepayWechatpay(@RequestParam String utoken,
                                            @RequestParam(value = "oid") long orderId,

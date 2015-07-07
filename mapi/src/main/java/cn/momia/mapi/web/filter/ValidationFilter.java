@@ -29,19 +29,19 @@ public class ValidationFilter implements Filter {
             return;
         }
 
-//        if (!needParamsValidation(httpRequest)) {
-//            if (isParamMissing(httpRequest))
-//            {
-//                forwardErrorPage(request, response, 400);
-//                return;
-//            }
-//
-//            if (isInvalidUri(httpRequest) || isExpired(httpRequest) || isInvalidSign(httpRequest))
-//            {
-//                forwardErrorPage(request, response, 403);
-//                return;
-//            }
-//        }
+        if (needParamsValidation(httpRequest)) {
+            if (isParamMissing(httpRequest))
+            {
+                forwardErrorPage(request, response, 400);
+                return;
+            }
+
+            if (isInvalidUri(httpRequest) || isInvalidSign(httpRequest))
+            {
+                forwardErrorPage(request, response, 403);
+                return;
+            }
+        }
 
         chain.doFilter(request, response);
     }
@@ -65,7 +65,6 @@ public class ValidationFilter implements Filter {
         String device = httpRequest.getParameter("device");
         String channel = httpRequest.getParameter("channel");
         String net = httpRequest.getParameter("net");
-        String expired = httpRequest.getParameter("expired");
         String sign = httpRequest.getParameter("sign");
 
         return (StringUtils.isBlank(version) ||
@@ -74,7 +73,6 @@ public class ValidationFilter implements Filter {
                 StringUtils.isBlank(device) ||
                 StringUtils.isBlank(channel) ||
                 StringUtils.isBlank(net) ||
-                StringUtils.isBlank(expired) ||
                 StringUtils.isBlank(sign));
     }
 
@@ -83,12 +81,6 @@ public class ValidationFilter implements Filter {
 
         if (VERSION_PATTERN.matcher(uri).find()) return true;
         return false;
-    }
-
-    private boolean isExpired(HttpServletRequest httpRequest) {
-        String expired = httpRequest.getParameter("expired");
-
-        return System.currentTimeMillis() > Long.valueOf(expired);
     }
 
     private boolean isInvalidSign(HttpServletRequest httpRequest) {

@@ -18,7 +18,7 @@ import java.util.List;
 
 public class BaseProductServiceImpl extends DbAccessService implements BaseProductService {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseProductServiceImpl.class);
-    private static final String[] PRODUCT_FIELDS = {"id", "cityId", "title", "cover", "crowd", "placeId", "content", "sales"};
+    private static final String[] PRODUCT_FIELDS = { "id", "cityId", "title", "cover", "crowd", "placeId", "content", "sales" };
 
     @Override
     public BaseProduct get(long id) {
@@ -100,5 +100,12 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
         });
 
         return baseProducts;
+    }
+
+    @Override
+    public boolean sold(long id, int count) {
+        String sql = "UPDATE t_product SET sales=sales+? WHERE id=?";
+
+        return jdbcTemplate.update(sql, new Object[] { count, id }) == 1;
     }
 }

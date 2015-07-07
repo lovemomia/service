@@ -13,9 +13,9 @@ public class AbstractV1Api extends AbstractApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user"), builder.build());
 
-        ResponseMessage responseMessage = executeRequest(request);
-        if (responseMessage.getErrno() == ErrorCode.SUCCESS) return ((JSONObject) responseMessage.getData()).getJSONObject("user").getLong("id");
-        if (responseMessage.getErrno() == ErrorCode.TOKEN_EXPIRED) return 0;
+        ResponseMessage response = executeRequest(request);
+        if (response.successful()) return ((JSONObject) response.getData()).getJSONObject("user").getLong("id");
+        if (response.getErrno() == ErrorCode.TOKEN_EXPIRED) return 0;
 
         throw new RuntimeException("fail to get user id");
     }

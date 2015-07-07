@@ -17,6 +17,7 @@ public class Sku implements Serializable {
     private List<SkuProperty> properties;
     private List<SkuPrice> prices;
     private int limit;
+    private boolean needRealName;
     private int stock;
     private int lockedStock;
     private int unlockedStock;
@@ -59,6 +60,14 @@ public class Sku implements Serializable {
 
     public void setLimit(int limit) {
         this.limit = limit;
+    }
+
+    public boolean isNeedRealName() {
+        return needRealName;
+    }
+
+    public void setNeedRealName(boolean needRealName) {
+        this.needRealName = needRealName;
     }
 
     public int getStock() {

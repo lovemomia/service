@@ -12,4 +12,5 @@ public interface OrderService {
     boolean delete(long id, long userId);
     boolean pay(long id);
     boolean check(long id, long userId, long productId, long skuId);
+    void cleanExpiredOrders();
 }

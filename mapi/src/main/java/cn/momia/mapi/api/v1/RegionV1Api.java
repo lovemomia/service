@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/v1/city")
-public class CityApi extends AbstractV1Api {
+@RequestMapping("/v1/region")
+public class RegionV1Api extends AbstractV1Api {
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage getAllCities() {
-        return executeRequest(MomiaHttpRequest.GET(baseServiceUrl("city")));
+    public ResponseMessage getAllRegions() {
+        return executeRequest(MomiaHttpRequest.GET(baseServiceUrl("region")));
     }
 }
