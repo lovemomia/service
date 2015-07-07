@@ -30,31 +30,40 @@ public class ProductUtil {
 
         for (int i = 0; i < productsJson.size(); i++) {
             try {
-                ProductDto product = new ProductDto();
-
-                JSONObject productJson = productsJson.getJSONObject(i);
-                JSONObject placeJson = productJson.getJSONObject("place");
-                JSONArray skusJson = productJson.getJSONArray("skus");
-
-                product.setId(productJson.getLong("id"));
-                product.setCover(ImageFile.url(productJson.getString("cover")));
-                product.setTitle(productJson.getString("title"));
-                product.setAddress(placeJson.getString("address"));
-                product.setPoi(StringUtils.join(new Object[] { placeJson.getDouble("lng"), placeJson.getDouble("lat") }, ":"));
-                product.setStartTime(productJson.getDate("startTime"));
-                product.setEndTime(productJson.getDate("endTime"));
-                product.setSoldOut(getSoldOut(productJson.getInteger("sales"), skusJson));
-                product.setScheduler(ProductUtil.getScheduler(skusJson));
-                product.setJoined(productJson.getInteger("sales"));
-                product.setPrice(ProductUtil.getMiniPrice(skusJson));
-
-                products.add(product);
+                products.add(extractProductData(productsJson.getJSONObject(i), false));
             } catch (Exception e) {
                 LOGGER.error("fail to parse product: ", productsJson.getJSONObject(i), e);
             }
         }
 
         return products;
+    }
+
+    public static ProductDto extractProductData(JSONObject productJson, boolean extractExtraInfo) {
+        ProductDto product = new ProductDto();
+
+        JSONObject placeJson = productJson.getJSONObject("place");
+        JSONArray skusJson = productJson.getJSONArray("skus");
+
+        product.setId(productJson.getLong("id"));
+        product.setCover(productJson.getString("cover"));
+        product.setTitle(productJson.getString("title"));
+        product.setJoined(productJson.getInteger("sales"));
+        product.setPrice(ProductUtil.getMiniPrice(skusJson));
+        product.setCrowd(productJson.getString("crowd"));
+        product.setScheduler(ProductUtil.getScheduler(skusJson));
+        product.setAddress(placeJson.getString("address"));
+        product.setPoi(StringUtils.join(new Object[] { placeJson.getDouble("lng"), placeJson.getDouble("lat") }, ":"));
+        product.setStartTime(productJson.getDate("startTime"));
+        product.setEndTime(productJson.getDate("endTime"));
+        product.setSoldOut(getSoldOut(productJson.getInteger("sales"), skusJson));
+
+        if (extractExtraInfo) {
+            product.setImgs(extractProductImgs(productJson));
+            product.setContent(extractProductContent(productJson));
+        }
+
+        return product;
     }
 
     public static BigDecimal getMiniPrice(JSONArray skusJson) {
@@ -153,6 +162,31 @@ public class ProductUtil {
                 return DATE_FORMATTER.format(start) + "-" + DATE_FORMATTER.format(end) + " " + TimeUtil.getWeekDay(start) + "-" + TimeUtil.getWeekDay(end) + " 共" + count + "场";
             }
         }
+    }
+
+    private static List<String> extractProductImgs(JSONObject productJson) {
+        List<String> imgs = new ArrayList<String>();
+        JSONArray imgJson = productJson.getJSONArray("imgs");
+        for (int i = 0; i < imgJson.size(); i++) {
+            imgs.add(ImageFile.url(imgJson.getJSONObject(i).getString("url")));
+        }
+
+        return imgs;
+    }
+
+    private static JSONArray extractProductContent(JSONObject productJson) {
+        JSONArray contentJson = productJson.getJSONArray("content");
+        for (int i = 0; i < contentJson.size(); i++) {
+            JSONObject contentBlockJson = contentJson.getJSONObject(i);
+            JSONArray bodyJson = contentBlockJson.getJSONArray("body");
+            for (int j = 0; j < bodyJson.size(); j++) {
+                JSONObject bodyBlockJson = bodyJson.getJSONObject(j);
+                String img = bodyBlockJson.getString("img");
+                if (!StringUtils.isBlank(img)) bodyBlockJson.put("img", ImageFile.url(img));
+            }
+        }
+
+        return contentJson;
     }
 
     public static String getSkuScheduler(JSONArray propertiesJson) {

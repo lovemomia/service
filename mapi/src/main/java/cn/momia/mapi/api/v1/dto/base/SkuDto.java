@@ -1,6 +1,8 @@
 package cn.momia.mapi.api.v1.dto.base;
 
+import cn.momia.mapi.api.misc.ProductUtil;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 import java.math.BigDecimal;
 
@@ -18,63 +20,42 @@ public class SkuDto implements Dto {
         return productId;
     }
 
-    public void setProductId(long productId) {
-        this.productId = productId;
-    }
-
     public long getSkuId() {
         return skuId;
-    }
-
-    public void setSkuId(long skuId) {
-        this.skuId = skuId;
     }
 
     public int getLimit() {
         return limit;
     }
 
-    public void setLimit(int limit) {
-        this.limit = limit;
-    }
-
     public boolean isNeedRealName() {
         return needRealName;
-    }
-
-    public void setNeedRealName(boolean needRealName) {
-        this.needRealName = needRealName;
     }
 
     public int getStock() {
         return stock;
     }
 
-    public void setStock(int stock) {
-        this.stock = stock;
-    }
-
     public BigDecimal getMinPrice() {
         return minPrice;
-    }
-
-    public void setMinPrice(BigDecimal minPrice) {
-        this.minPrice = minPrice;
     }
 
     public String getTime() {
         return time;
     }
 
-    public void setTime(String time) {
-        this.time = time;
-    }
-
     public JSONArray getPrices() {
         return prices;
     }
 
-    public void setPrices(JSONArray prices) {
-        this.prices = prices;
+    public SkuDto(JSONObject skuJson) {
+        this.productId = skuJson.getLong("productId");
+        this.skuId = skuJson.getLong("id");
+        this.limit = skuJson.getInteger("limit");
+        this.needRealName = skuJson.getBoolean("needRealName");
+        this.stock = skuJson.getInteger("unlockedStock");
+        this.minPrice = ProductUtil.getSkuMiniPrice(skuJson.getJSONArray("prices"));
+        this.time = ProductUtil.getSkuScheduler(skuJson.getJSONArray("properties"));
+        this.prices = skuJson.getJSONArray("prices");
     }
 }
