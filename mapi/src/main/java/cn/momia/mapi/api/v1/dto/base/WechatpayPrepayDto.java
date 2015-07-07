@@ -5,9 +5,11 @@ import com.alibaba.fastjson.JSONObject;
 public class WechatpayPrepayDto implements Dto {
     private boolean successful;
     private String appId;
+    private String partnerId;
     private String timeStamp;
     private String nonceStr;
     private String prepayId;
+    private String packageInfo;
     private String signType;
     private String paySign;
 
@@ -17,6 +19,10 @@ public class WechatpayPrepayDto implements Dto {
 
     public String getAppId() {
         return appId;
+    }
+
+    public String getPartnerId() {
+        return partnerId;
     }
 
     public String getTimeStamp() {
@@ -31,6 +37,10 @@ public class WechatpayPrepayDto implements Dto {
         return prepayId;
     }
 
+    public String getPackageInfo() {
+        return packageInfo;
+    }
+
     public String getSignType() {
         return signType;
     }
@@ -39,16 +49,26 @@ public class WechatpayPrepayDto implements Dto {
         return paySign;
     }
 
-    public WechatpayPrepayDto(JSONObject prepayJson) {
+    public WechatpayPrepayDto(JSONObject prepayJson, String tradeType) {
         this.successful = prepayJson.getBoolean("successful");
         if (this.successful) {
             JSONObject paramJson = prepayJson.getJSONObject("all");
-            this.appId = paramJson.getString("appId");
-            this.timeStamp = paramJson.getString("timeStamp");
-            this.nonceStr = paramJson.getString("nonceStr");
-            this.prepayId = paramJson.getString("package");
-            this.signType = paramJson.getString("signType");
-            this.paySign = paramJson.getString("paySign");
+            if (tradeType.equals("NATIVE")) {
+                this.appId = paramJson.getString("appid");
+                this.partnerId = paramJson.getString("partnerid");
+                this.timeStamp = paramJson.getString("timestamp");
+                this.nonceStr = paramJson.getString("noncestr");
+                this.prepayId = paramJson.getString("prepayid");
+                this.packageInfo = paramJson.getString("package");
+                this.paySign = paramJson.getString("sign");
+            } else if (tradeType.equals("JSAPI")) {
+                this.appId = paramJson.getString("appId");
+                this.timeStamp = paramJson.getString("timeStamp");
+                this.nonceStr = paramJson.getString("nonceStr");
+                this.prepayId = paramJson.getString("package");
+                this.signType = paramJson.getString("signType");
+                this.paySign = paramJson.getString("paySign");
+            }
         }
     }
 }

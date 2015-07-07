@@ -21,7 +21,7 @@ public class PaymentV1Api extends AbstractV1Api {
                                            @RequestParam(value = "oid") long orderId,
                                            @RequestParam(value = "pid") long productId,
                                            @RequestParam(value = "sid") long skuId,
-                                           @RequestParam(value = "trade_type") String tradeType,
+                                           @RequestParam(value = "trade_type") final String tradeType,
                                            @RequestParam(required = false) String code) {
         if (StringUtils.isBlank(utoken) ||
                 orderId <= 0||
@@ -43,7 +43,7 @@ public class PaymentV1Api extends AbstractV1Api {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                return new WechatpayPrepayDto((JSONObject) data);
+                return new WechatpayPrepayDto((JSONObject) data, tradeType);
             }
         });
     }
