@@ -115,6 +115,8 @@ CREATE TABLE `t_product` (
   `placeId` int(11) NOT NULL COMMENT '地点ID',
   `content` mediumtext NOT NULL COMMENT '内容',
   `sales` int(11) NOT NULL COMMENT '销量',
+  `startTime` datetime NOT NULL COMMENT '开始时间',
+  `endTime` datetime NOT NULL COMMENT '结束时间',
   `status` int(1) NOT NULL DEFAULT '1' COMMENT '状态,0为删除',
   `addTime` datetime NOT NULL COMMENT '添加时间',
   `updateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',

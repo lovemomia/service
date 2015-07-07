@@ -40,6 +40,9 @@ public class ProductUtil {
                 product.setTitle(productJson.getString("title"));
                 product.setAddress(placeJson.getString("address"));
                 product.setPoi(StringUtils.join(new Object[] { placeJson.getDouble("lng"), placeJson.getDouble("lat") }, ":"));
+                product.setStartTime(productJson.getDate("startTime"));
+                product.setEndTime(productJson.getDate("endTime"));
+                product.setSoldOut(getSoldOut(productJson.getInteger("sales"), skusJson));
                 product.setScheduler(ProductUtil.getScheduler(skusJson));
                 product.setJoined(productJson.getInteger("sales"));
                 product.setPrice(ProductUtil.getMiniPrice(skusJson));
@@ -76,6 +79,16 @@ public class ProductUtil {
         }
 
         return miniPrice;
+    }
+
+    private static boolean getSoldOut(Integer sales, JSONArray skusJson) {
+        int totalStock = 0;
+        for (int i = 0; i < skusJson.size(); i++) {
+            JSONObject skuJson = skusJson.getJSONObject(i);
+            totalStock += skuJson.getInteger("stock");
+        }
+
+        return sales >= totalStock;
     }
 
     public static String getScheduler(JSONArray skusJson) {

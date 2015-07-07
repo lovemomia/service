@@ -6,6 +6,7 @@ import cn.momia.service.base.product.sku.Sku;
 import com.alibaba.fastjson.JSONArray;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 public class Product implements Serializable {
@@ -43,6 +44,14 @@ public class Product implements Serializable {
 
     public int getSales() {
         return baseProduct.getSales();
+    }
+
+    public Date getStartTime() {
+        return baseProduct.getStartTime();
+    }
+
+    public Date getEndTime() {
+        return baseProduct.getEndTime();
     }
 
     public void setBaseProduct(BaseProduct baseProduct) {

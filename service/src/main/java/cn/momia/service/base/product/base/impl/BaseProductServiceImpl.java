@@ -18,11 +18,11 @@ import java.util.List;
 
 public class BaseProductServiceImpl extends DbAccessService implements BaseProductService {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseProductServiceImpl.class);
-    private static final String[] PRODUCT_FIELDS = { "id", "cityId", "title", "cover", "crowd", "placeId", "content", "sales" };
+    private static final String[] PRODUCT_FIELDS = { "id", "cityId", "title", "cover", "crowd", "placeId", "content", "sales", "startTime", "endTime" };
 
     @Override
     public BaseProduct get(long id) {
-        String sql = "SELECT " + joinFields() + " FROM t_product WHERE id=? AND status=1";
+        String sql = "SELECT " + joinFields() + " FROM t_product WHERE id=? AND status<>0 AND startTime<=NOW() AND endTime>=NOW()";
 
         return jdbcTemplate.query(sql, new Object[]{id}, new ResultSetExtractor<BaseProduct>() {
             @Override
@@ -37,7 +37,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
         return StringUtils.join(PRODUCT_FIELDS, ",");
     }
 
-    public BaseProduct buildBaseProduct(ResultSet rs) throws SQLException {
+    private BaseProduct buildBaseProduct(ResultSet rs) throws SQLException {
         try {
             BaseProduct baseProduct = new BaseProduct();
             baseProduct.setId(rs.getLong("id"));
@@ -48,6 +48,8 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
             baseProduct.setPlaceId(rs.getLong("placeId"));
             baseProduct.setContent(JSON.parseArray(rs.getString("content")));
             baseProduct.setSales(rs.getInt("sales"));
+            baseProduct.setStartTime(rs.getTimestamp("startTime"));
+            baseProduct.setEndTime(rs.getTimestamp("endTime"));
 
             return baseProduct;
         }
@@ -62,7 +64,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
         final List<BaseProduct> baseProducts = new ArrayList<BaseProduct>();
         if (ids == null || ids.isEmpty()) return baseProducts;
 
-        String sql = "SELECT " + joinFields() + " FROM t_product WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1 ORDER BY addTime DESC";
+        String sql = "SELECT " + joinFields() + " FROM t_product WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status<>0 AND startTime<=NOW() AND endTime>=NOW() ORDER BY status ASC, addTime DESC";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -76,7 +78,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
 
     @Override
     public long queryCount(String query) {
-        String sql = "SELECT COUNT(1) FROM t_product WHERE status=1 AND " + query;
+        String sql = "SELECT COUNT(1) FROM t_product WHERE status<>0 AND startTime<=NOW() AND endTime>=NOW() AND " + query;
 
         return jdbcTemplate.query(sql, new ResultSetExtractor<Long>() {
             @Override
@@ -90,7 +92,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     public List<BaseProduct> query(int start, int count, String query) {
         final List<BaseProduct> baseProducts = new ArrayList<BaseProduct>();
 
-        String sql = "SELECT " + joinFields() + " FROM t_product WHERE status=1 AND " + query + " ORDER BY addTime DESC LIMIT ?,?";
+        String sql = "SELECT " + joinFields() + " FROM t_product WHERE status<>0 AND startTime<=NOW() AND endTime>=NOW() AND " + query + " ORDER BY status ASC, addTime DESC LIMIT ?,?";
         jdbcTemplate.query(sql, new Object[]{start, count}, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -104,7 +106,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
 
     @Override
     public boolean sold(long id, int count) {
-        String sql = "UPDATE t_product SET sales=sales+? WHERE id=?";
+        String sql = "UPDATE t_product SET sales=sales+? WHERE id=? AND status<>0";
 
         return jdbcTemplate.update(sql, new Object[] { count, id }) == 1;
     }

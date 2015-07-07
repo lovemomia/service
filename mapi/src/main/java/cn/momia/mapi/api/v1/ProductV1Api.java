@@ -87,7 +87,10 @@ public class ProductV1Api extends AbstractV1Api {
                 product.setCrowd(productJson.getString("crowd"));
                 product.setScheduler(ProductUtil.getScheduler(skusJson));
                 product.setAddress(placeJson.getString("address"));
-                product.setPoi(StringUtils.join(new Object[]{placeJson.getDouble("lng"), placeJson.getDouble("lat")}, ":"));
+                product.setPoi(StringUtils.join(new Object[] { placeJson.getDouble("lng"), placeJson.getDouble("lat") }, ":"));
+                product.setStartTime(productJson.getDate("startTime"));
+                product.setEndTime(productJson.getDate("endTime"));
+                product.setSoldOut(getSoldOut(productJson.getInteger("sales"), skusJson));
                 product.setImgs(getImgs(productJson));
                 product.setCustomers(getCustomers(customersJson));
                 product.setContent(processImages(productJson.getJSONArray("content")));
@@ -115,6 +118,16 @@ public class ProductV1Api extends AbstractV1Api {
                 .add("count", conf.getInt("Product.CustomerPageSize"));
 
         return MomiaHttpRequest.GET("customers", false, baseServiceUrl("product", productId, "customer"), builder.build());
+    }
+
+    private boolean getSoldOut(Integer sales, JSONArray skusJson) {
+        int totalStock = 0;
+        for (int i = 0; i < skusJson.size(); i++) {
+            JSONObject skuJson = skusJson.getJSONObject(i);
+            totalStock += skuJson.getInteger("stock");
+        }
+
+        return sales >= totalStock;
     }
 
     private List<String> getImgs(JSONObject productJson) {

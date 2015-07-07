@@ -3,6 +3,7 @@ package cn.momia.mapi.api.v1.dto.base;
 import com.alibaba.fastjson.JSONArray;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 public class ProductDto implements Dto {
@@ -16,6 +17,9 @@ public class ProductDto implements Dto {
     private String scheduler;
     private String address;
     private String poi;
+    private Date startTime;
+    private Date endTime;
+    private boolean soldOut;
 
     // extra info
     private List<String> imgs;
@@ -91,6 +95,30 @@ public class ProductDto implements Dto {
 
     public void setPoi(String poi) {
         this.poi = poi;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    public boolean isSoldOut() {
+        return soldOut;
+    }
+
+    public void setSoldOut(boolean soldOut) {
+        this.soldOut = soldOut;
     }
 
     public List<String> getImgs() {
