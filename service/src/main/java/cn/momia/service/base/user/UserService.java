@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 public interface UserService {
-    User add(String nickName, String mobile, String token);
+    User add(String nickName, String mobile,String password, String token);
     User get(long id);
     Map<Long, User> get(List<Long> ids);
     User getByToken(String token);
@@ -23,4 +23,5 @@ public interface UserService {
     boolean updateCityId(long id, int cityId);
     boolean updateAddress(long id, String address);
     boolean updateChildren(long id, Set<Long> children);
+    boolean updatePassword(long id, String oldPwd, String newPwd);
 }
