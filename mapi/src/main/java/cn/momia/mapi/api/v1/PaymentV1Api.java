@@ -21,22 +21,23 @@ public class PaymentV1Api extends AbstractV1Api {
                                            @RequestParam(value = "oid") long orderId,
                                            @RequestParam(value = "pid") long productId,
                                            @RequestParam(value = "sid") long skuId,
-                                           @RequestParam String code,
-                                           @RequestParam(value = "trade_type") String tradeType) {
+                                           @RequestParam(value = "trade_type") String tradeType,
+                                           @RequestParam(required = false) String code) {
         if (StringUtils.isBlank(utoken) ||
                 orderId <= 0||
                 productId <= 0 ||
                 skuId <= 0 ||
-                StringUtils.isBlank(code) ||
                 StringUtils.isBlank(tradeType)) return ResponseMessage.BAD_REQUEST;
+
+        if (tradeType.equals("JSAPI") && StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("oid", orderId)
                 .add("pid", productId)
                 .add("sid", skuId)
-                .add("code", code)
                 .add("trade_type", tradeType);
+        if (!StringUtils.isBlank(code)) builder.add("code", code);
         MomiaHttpRequest request = MomiaHttpRequest.POST(dealServiceUrl("payment/prepay/wechatpay"), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
