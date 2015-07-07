@@ -185,7 +185,7 @@ public class WechatpayGateway implements PaymentGateway {
     @Override
     public CallbackResult callback(CallbackParam param) {
         CallbackResult result = new CallbackResult();
-        if (isPayedSuccessfully(param) && !finishPayment(param)) {
+        if (isPayedSuccessfully(param) && validateCallbackSign(param) && !finishPayment(param)) {
             result.add(WechatpayCallbackFields.RETURN_CODE, FAIL);
             result.add(WechatpayCallbackFields.RETURN_MSG, ERROR);
         } else {
@@ -203,6 +203,12 @@ public class WechatpayGateway implements PaymentGateway {
 
         return return_code != null && return_code.equalsIgnoreCase(SUCCESS) &&
                 result_code != null && result_code.equalsIgnoreCase(SUCCESS);
+    }
+
+    private boolean validateCallbackSign(CallbackParam param) {
+        String tradeType = param.get(WechatpayPrepayFields.TRADE_TYPE);
+
+        return WechatpayUtil.validateSign(param.getAll(), tradeType);
     }
 
     private boolean finishPayment(CallbackParam param) {
