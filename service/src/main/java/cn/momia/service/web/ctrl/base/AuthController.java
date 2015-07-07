@@ -1,7 +1,6 @@
 package cn.momia.service.web.ctrl.base;
 
 import cn.momia.common.misc.ValidateUtil;
-import cn.momia.common.secret.PasswordEncryptor;
 import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.common.web.secret.SecretKey;
@@ -58,19 +57,13 @@ public class AuthController extends AbstractController {
         if (ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(password)) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByMobile(mobile);
-        String encryptPassword = PasswordEncryptor.encrypt(mobile, password);
-        String token = generateToken(mobile);
         if (!user.exists()) {
                 LOGGER.error("fail to login user for {}", mobile);
                 return new ResponseMessage(ErrorCode.NOT_REGISTERED, "登录失败，用户不存在，请先注册");
-        } else {
-            if(!userService.validateUser(mobile,encryptPassword))
-                return  ResponseMessage.FAILED("密码不正确，登录失败");
-            if (!userService.updateToken(user.getId(), token)) {
-                LOGGER.warn("fail to update token for {}, will use old token", mobile);
-            } else {
-                user.setToken(token);
-            }
+        }
+        else {
+            if (!userService.validatePassword(mobile, password))
+                return ResponseMessage.FAILED("密码不正确，登录失败");
         }
 
         return new ResponseMessage(buildUserResponse(user));
@@ -98,9 +91,8 @@ public class AuthController extends AbstractController {
 
         User user = userService.getByMobile(mobile);
         String token = generateToken(mobile);
-        String encryptPassword = PasswordEncryptor.encrypt(mobile, password);
         if (!user.exists()) {
-            user = userService.add(nickName, mobile, encryptPassword, token);
+            user = userService.add(nickName, mobile, password, token);
             if (!user.exists()) {
                 LOGGER.error("fail to register user for {}", mobile);
                 return ResponseMessage.FAILED("注册失败");

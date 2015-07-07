@@ -1,5 +1,6 @@
 package cn.momia.service.base.user.impl;
 
+import cn.momia.common.secret.PasswordEncryptor;
 import cn.momia.service.base.city.CityService;
 import cn.momia.service.common.DbAccessService;
 import com.google.common.base.Splitter;
@@ -26,7 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class UserServiceImpl extends DbAccessService implements UserService {
-    private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile","password", "avatar", "name", "sex", "birthday", "cityId", "address", "children" };
+    private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "avatar", "name", "sex", "birthday", "cityId", "address", "children" };
     private CityService cityService;
 
     public void setCityService(CityService cityService) {
@@ -36,8 +37,8 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     @Override
     public User add(String nickName, String mobile, String password, String token) {
         if (!validateMobile(mobile)) return User.DUPLICATE_USER;
-
-        return addUser(nickName, mobile, password, token);
+        String encryptPassword = PasswordEncryptor.encrypt(mobile, password);
+        return addUser(nickName, mobile, encryptPassword, token);
     }
 
     public boolean validateMobile(String mobile) {
@@ -172,10 +173,11 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
-    public boolean validateUser(String mobile, String password) {
+    public boolean validatePassword(String mobile, String password) {
+        String encryptPassword = PasswordEncryptor.encrypt(mobile, password);
         String sql = "SELECT mobile, password FROM t_user WHERE mobile=? AND password=?";
 
-        return jdbcTemplate.query(sql, new Object[]{mobile, password}, new ResultSetExtractor<Boolean>() {
+        return jdbcTemplate.query(sql, new Object[]{mobile, encryptPassword}, new ResultSetExtractor<Boolean>() {
             @Override
             public Boolean extractData(ResultSet resultSet) throws SQLException, DataAccessException {
                 if(resultSet.next()) return true;
