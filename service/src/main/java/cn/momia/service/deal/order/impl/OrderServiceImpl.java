@@ -178,6 +178,20 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
+    public List<Order> queryByUserAndSku(long userId, long skuId) {
+        final List<Order> orders = new ArrayList<Order>();
+        String sql = "SELECT " + joinFields() + " FROM t_order WHERE customerId=? AND skuId=? AND status<>0";
+        jdbcTemplate.query(sql, new Object[] { userId, skuId }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                orders.add(buildOrder(rs));
+            }
+        });
+
+        return orders;
+    }
+
+    @Override
     public List<Order> queryByUser(long userId, int status, String type, int start, int count) {
         final List<Order> orders = new ArrayList<Order>();
 

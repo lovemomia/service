@@ -11,6 +11,8 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;
@@ -25,18 +27,16 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
     private static final String[] SKU_FIELDS = { "id", "productId", "properties", "prices", "`limit`", "needRealName", "stock", "unlockedStock", "lockedStock" };
 
     @Override
-    public List<Sku> queryByProduct(long productId) {
-        final List<Sku> skus = new ArrayList<Sku>();
-        String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId=? AND status=1";
-        jdbcTemplate.query(sql, new Object[]{productId}, new RowCallbackHandler() {
+    public Sku get(long id) {
+        String sql = "SELECT " + joinFields() + " FROM t_sku WHERE id=? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Sku>() {
             @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                Sku sku = buildSku(rs);
-                if (sku.exists()) skus.add(sku);
+            public Sku extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (rs.next()) return buildSku(rs);
+                return Sku.NOT_EXIST_SKU;
             }
         });
-
-        return skus;
     }
 
     private String joinFields() {
@@ -84,6 +84,21 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
         }
 
         return prices;
+    }
+
+    @Override
+    public List<Sku> queryByProduct(long productId) {
+        final List<Sku> skus = new ArrayList<Sku>();
+        String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId=? AND status=1";
+        jdbcTemplate.query(sql, new Object[] { productId }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                Sku sku = buildSku(rs);
+                if (sku.exists()) skus.add(sku);
+            }
+        });
+
+        return skus;
     }
 
     @Override

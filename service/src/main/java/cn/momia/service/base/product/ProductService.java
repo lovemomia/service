@@ -11,6 +11,7 @@ public interface ProductService {
     long queryCount(ProductQuery productQuery);
     List<Product> query(int start, int count, ProductQuery query);
     List<Sku> getSkus(long id);
+    Sku getSku(long skuId);
     boolean lockStock(long skuId, int count);
     boolean unlockStock(long skuId, int count);
     boolean sold(long id, int count);

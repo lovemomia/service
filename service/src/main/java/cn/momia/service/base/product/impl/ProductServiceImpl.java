@@ -162,6 +162,11 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     }
 
     @Override
+    public Sku getSku(long skuId) {
+        return skuService.get(skuId);
+    }
+
+    @Override
     public boolean lockStock(long skuId, int count) {
         return skuService.lock(skuId, count);
     }
