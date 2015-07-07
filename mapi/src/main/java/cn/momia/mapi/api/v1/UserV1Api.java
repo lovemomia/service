@@ -79,7 +79,7 @@ public class UserV1Api extends AbstractV1Api {
                         OrderDto orderDto = new OrderDto(orderJson);
                         orderDto.setTitle(orderPackJson.getString("product"));
                         orderDto.setTime(ProductUtil.getSkuScheduler(orderPackJson.getJSONArray("sku")));
-
+                        orderDto.setCover(orderPackJson.getString("cover"));
                         orders.add(orderDto);
                     } catch (Exception e) {
                         LOGGER.error("fail to parse order: {}", ordersJson.getJSONObject(i), e);

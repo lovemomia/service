@@ -107,6 +107,7 @@ public class UserController extends AbstractController {
             if (product != null) orderJson.put("product", product.getTitle());
             Sku sku = skuMap.get(order.getSkuId());
             if (sku != null) orderJson.put("sku", sku.getProperties());
+            orderJson.put("cover", product.getCover());
 
             ordersJson.add(orderJson);
         }
@@ -232,6 +233,8 @@ public class UserController extends AbstractController {
             userId = child.getUserId();
             childrenIds.add(childId);
         }
+        for(long cid : userService.get(userId).getChildren())
+            childrenIds.add(cid);
 
         if (userId > 0 && !userService.updateChildren(userId, childrenIds)) return ResponseMessage.FAILED("添加孩子信息失败");
 
