@@ -89,7 +89,7 @@ public class ProductUtil {
 
         Collections.sort(times);
 
-        return ProductUtil.format(times);
+        return ProductUtil.format(times, skusJson.size());
     }
 
     private static List<Date> castToDate(List<String> timeStrs) {
@@ -125,26 +125,34 @@ public class ProductUtil {
         return timeStrs;
     }
 
-    private static String format(List<Date> times) {
+    private static String format(List<Date> times, int count) {
         if (times.isEmpty()) return "";
         if (times.size() == 1) {
             Date start = times.get(0);
-            return DATE_FORMATTER.format(start) + " " + TimeUtil.getWeekDay(start) + " 共1场";
+            return DATE_FORMATTER.format(start) + " " + TimeUtil.getWeekDay(start) + " 共" + count + "场";
         } else {
             Date start = times.get(0);
             Date end = times.get(times.size() - 1);
             if (TimeUtil.isSameDay(start, end)) {
-                return DATE_FORMATTER.format(start) + " " + TimeUtil.getWeekDay(start) + " 共" + times.size() + "场";
+                return DATE_FORMATTER.format(start) + " " + TimeUtil.getWeekDay(start) + " 共" + count + "场";
             } else {
-                return DATE_FORMATTER.format(start) + "-" + DATE_FORMATTER.format(end) + " " + TimeUtil.getWeekDay(start) + "-" + TimeUtil.getWeekDay(end) + " 共" + times.size() + "场";
+                return DATE_FORMATTER.format(start) + "-" + DATE_FORMATTER.format(end) + " " + TimeUtil.getWeekDay(start) + "-" + TimeUtil.getWeekDay(end) + " 共" + count + "场";
             }
         }
     }
 
     public static String getSkuScheduler(JSONArray propertiesJson) {
-        List<String> timeStrs = extractSkuTimes(propertiesJson);
         StringBuilder builder = new StringBuilder();
-        if (timeStrs.size() == 1) {
+        List<String> timeStrs = extractSkuTimes(propertiesJson);
+        if (timeStrs.isEmpty()) return "";
+
+        Collections.sort(timeStrs);
+        List<Date> times = castToDate(timeStrs);
+        if (times.isEmpty()) return "";
+
+        Date start = times.get(0);
+        Date end = times.get(timeStrs.size() - 1);
+        if (TimeUtil.isSameDay(start, end)) {
             String timeStr = timeStrs.get(0);
             Date time = castToDate(timeStr);
             if (time != null) {
@@ -153,19 +161,10 @@ public class ProductUtil {
                     builder.append(TimeUtil.getAmPm(time))
                             .append(TIME_FORMATTER.format(time));
             }
-        } else if (timeStrs.size() > 1) {
-            List<Date> times = castToDate(timeStrs);
-            if (times.size() > 1) {
-                Collections.sort(times);
-                Date start = times.get(0);
-                Date end = times.get(timeStrs.size() - 1);
-                builder.append(buildDateWithWeekDay(start))
-                        .append("~")
-                        .append(buildDateWithWeekDay(end));
-            } else {
-                Date time = times.get(0);
-                builder.append(buildDateWithWeekDay(time));
-            }
+        } else {
+            builder.append(buildDateWithWeekDay(start))
+                    .append("~")
+                    .append(buildDateWithWeekDay(end));
         }
 
         return builder.toString();
