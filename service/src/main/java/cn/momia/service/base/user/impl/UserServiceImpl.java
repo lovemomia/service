@@ -238,10 +238,4 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
         return update(sql, new Object[] { StringUtils.join(children, ","), id });
     }
-
-    @Override
-    public boolean updatePassword(long id, String oldPwd, String newPwd) {
-        String sql = "UPDATE t_user SET password=? WHERE id=? AND password=?";
-        return update(sql, new Object[]{ newPwd, id, oldPwd });
-    }
 }

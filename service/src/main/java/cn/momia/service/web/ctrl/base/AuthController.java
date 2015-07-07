@@ -56,7 +56,6 @@ public class AuthController extends AbstractController {
     public ResponseMessage login(@RequestParam String mobile, @RequestParam String password) {
         if (ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(password)) return ResponseMessage.BAD_REQUEST;
 
-
         User user = userService.getByMobile(mobile);
         String token = generateToken(mobile);
         if (!user.exists()) {
