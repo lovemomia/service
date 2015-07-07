@@ -112,7 +112,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
     @Override
     public boolean lock(long id, int count) {
         String sql = "UPDATE t_sku SET unlockedStock=unlockedStock-?, lockedStock=lockedStock+? WHERE id=? AND unlockedStock>=? AND status=1";
-        int updateCount = jdbcTemplate.update(sql, new Object[]{count, count, id, count});
+        int updateCount = jdbcTemplate.update(sql, new Object[]{ count, count, id, count });
 
         return updateCount == 1;
     }
@@ -120,7 +120,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
     @Override
     public boolean unlock(long id, int count) {
         String sql = "UPDATE t_sku SET unlockedStock=unlockedStock+?, lockedStock=lockedStock-? WHERE id=? AND lockedStock>=? AND status=1";
-        int updateCount = jdbcTemplate.update(sql, new Object[]{count, count, id, count});
+        int updateCount = jdbcTemplate.update(sql, new Object[]{ count, count, id, count });
 
         return updateCount == 1;
     }
