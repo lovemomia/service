@@ -22,7 +22,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
 
     @Override
     public BaseProduct get(long id) {
-        String sql = "SELECT " + joinFields() + " FROM t_product WHERE id=? AND status<>0 AND startTime<=NOW() AND endTime>=NOW()";
+        String sql = "SELECT " + joinFields() + " FROM t_product WHERE id=? AND status=1 AND startTime<=NOW() AND endTime>=NOW()";
 
         return jdbcTemplate.query(sql, new Object[]{id}, new ResultSetExtractor<BaseProduct>() {
             @Override
@@ -64,7 +64,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
         final List<BaseProduct> baseProducts = new ArrayList<BaseProduct>();
         if (ids == null || ids.isEmpty()) return baseProducts;
 
-        String sql = "SELECT " + joinFields() + " FROM t_product WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status<>0 AND startTime<=NOW() AND endTime>=NOW() ORDER BY status ASC, addTime DESC";
+        String sql = "SELECT " + joinFields() + " FROM t_product WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1 AND startTime<=NOW() AND endTime>=NOW() ORDER BY addTime DESC";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -78,7 +78,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
 
     @Override
     public long queryCount(String query) {
-        String sql = "SELECT COUNT(1) FROM t_product WHERE status<>0 AND startTime<=NOW() AND endTime>=NOW() AND " + query;
+        String sql = "SELECT COUNT(1) FROM t_product WHERE status=1 AND startTime<=NOW() AND endTime>=NOW() AND " + query;
 
         return jdbcTemplate.query(sql, new ResultSetExtractor<Long>() {
             @Override
@@ -92,7 +92,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     public List<BaseProduct> query(int start, int count, String query) {
         final List<BaseProduct> baseProducts = new ArrayList<BaseProduct>();
 
-        String sql = "SELECT " + joinFields() + " FROM t_product WHERE status<>0 AND startTime<=NOW() AND endTime>=NOW() AND " + query + " ORDER BY status ASC, addTime DESC LIMIT ?,?";
+        String sql = "SELECT " + joinFields() + " FROM t_product WHERE status=1 AND startTime<=NOW() AND endTime>=NOW() AND " + query + " ORDER BY addTime DESC LIMIT ?,?";
         jdbcTemplate.query(sql, new Object[]{start, count}, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -106,7 +106,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
 
     @Override
     public boolean sold(long id, int count) {
-        String sql = "UPDATE t_product SET sales=sales+? WHERE id=? AND status<>0";
+        String sql = "UPDATE t_product SET sales=sales+? WHERE id=? AND status=1";
 
         return jdbcTemplate.update(sql, new Object[] { count, id }) == 1;
     }
