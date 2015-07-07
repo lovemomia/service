@@ -1,6 +1,7 @@
 package cn.momia.mapi.api.v1.dto.base;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -17,8 +18,8 @@ public class ProductDto implements Dto {
     private String scheduler;
     private String address;
     private String poi;
-    private Date startTime;
-    private Date endTime;
+    @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date startTime;
+    @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date endTime;
     private boolean soldOut;
 
     // extra info
