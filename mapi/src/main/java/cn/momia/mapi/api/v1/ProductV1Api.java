@@ -9,6 +9,7 @@ import cn.momia.mapi.api.v1.dto.base.ContactsDto;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.ProductDto;
 import cn.momia.mapi.api.v1.dto.base.SkuDto;
+import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import cn.momia.mapi.api.v1.dto.composite.PagedListDto;
 import cn.momia.mapi.api.v1.dto.composite.ProductDetailDto;
 import cn.momia.mapi.api.v1.dto.composite.PlaceOrderDto;
@@ -233,8 +234,8 @@ public class ProductV1Api extends AbstractV1Api {
         return contacts;
     }
 
-    private List<SkuDto> getSkus(JSONArray skusJson) {
-        List<SkuDto> skus = new ArrayList<SkuDto>();
+    private ListDto getSkus(JSONArray skusJson) {
+        ListDto skus = new ListDto();
 
         for (int i = 0; i < skusJson.size(); i++) {
             JSONObject skuJson = skusJson.getJSONObject(i);

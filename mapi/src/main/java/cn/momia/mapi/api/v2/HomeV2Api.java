@@ -44,7 +44,7 @@ public class HomeV2Api extends AbstractApi {
                 JSONObject productsPackJson = (JSONObject) collector.getResponse("products");
                 long totalCount = productsPackJson.getLong("totalCount");
                 JSONArray productsJson = productsPackJson.getJSONArray("products");
-                List<ProductDto> products = ProductUtil.extractProductsData(productsJson);
+                ListDto products = ProductUtil.extractProductsData(productsJson);
                 homeDto.setProducts(products);
                 if (pageIndex < maxPageCount - 1 && (pageIndex + 1) * pageSize < totalCount) homeDto.setNextpage(pageIndex + 1);
 

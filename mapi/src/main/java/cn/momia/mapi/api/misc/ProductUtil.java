@@ -1,6 +1,7 @@
 package cn.momia.mapi.api.misc;
 
 import cn.momia.mapi.api.v1.dto.base.ProductDto;
+import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import cn.momia.mapi.img.ImageFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -24,8 +25,8 @@ public class ProductUtil {
     private static final DateFormat DATE_FORMATTER = new SimpleDateFormat("M月d日");
     private static final DateFormat TIME_FORMATTER = new SimpleDateFormat("h:mm");
 
-    public static List<ProductDto> extractProductsData(JSONArray productsJson) {
-        List<ProductDto> products = new ArrayList<ProductDto>();
+    public static ListDto extractProductsData(JSONArray productsJson) {
+        ListDto products = new ListDto();
 
         for (int i = 0; i < productsJson.size(); i++) {
             try {
