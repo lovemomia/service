@@ -2,10 +2,12 @@ package cn.momia.service.web.ctrl.base;
 
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.base.product.Customer;
+import cn.momia.service.base.product.Playmates;
 import cn.momia.service.base.product.Product;
 import cn.momia.service.base.product.ProductQuery;
 import cn.momia.service.base.product.ProductService;
 import cn.momia.service.base.product.sku.Sku;
+import cn.momia.service.base.product.sku.SkuProperty;
 import cn.momia.service.base.user.User;
 import cn.momia.service.base.user.UserService;
 import cn.momia.service.base.user.participant.Participant;
@@ -23,8 +25,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/product")
@@ -113,4 +117,66 @@ public class ProductController extends AbstractController {
 
         return new ResponseMessage(validCustomers);
     }
+
+    @RequestMapping(value = "/{id}/playmates", method = RequestMethod.GET)
+    public ResponseMessage getProductPlaymates(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
+        if (id <= 0 || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
+
+        List<Order> orders = orderService.queryDistinctCustomerOrderByProduct(id, start, count);
+        List<Customer> customers = new ArrayList<Customer>();
+        List<Long> participantIds = new ArrayList<Long>();
+        List<Sku> skus = productService.getSkus(id);
+        List<SkuProperty> skuProperties = new ArrayList<SkuProperty>();
+        Map<Long, List<Long>> participantsMap = new HashMap<Long, List<Long>>();
+        Map<Long, List<Long>> skuCustomerIdsMap = new HashMap<Long, List<Long>>();
+        Map<List<SkuProperty>, List<Customer>> validCustomersMap = new HashMap<List<SkuProperty>, List<Customer>>();
+        List<Playmates> playMates = new ArrayList<Playmates>();
+        for(Sku sku : skus) {
+            List<Long> customerIds = new ArrayList<Long>();
+            for (Order order : orders) {
+                if (sku.getId() == order.getSkuId()) {
+                    Customer customer = new Customer();
+                    customer.setUserId(order.getCustomerId());
+                    customer.setOrderDate(order.getAddTime());
+                    customer.setOrderStatus(order.getStatus());
+                    customers.add(customer);
+                    customerIds.add(order.getCustomerId());
+                    participantIds.addAll(order.getParticipants());
+                    participantsMap.put(order.getCustomerId(), order.getParticipants());
+                }
+            }
+            skuCustomerIdsMap.put(sku.getId(), customerIds);
+            Map<Long, User> users = userService.get(skuCustomerIdsMap.get(sku.getId()));
+            Map<Long, Participant> participants = participantService.get(participantIds);
+            List<Customer> validCustomers = new ArrayList<Customer>();
+            for (int i = 0; i < customers.size(); i++) {
+                Customer customer = customers.get(i);
+                User user = users.get(customer.getUserId());
+                if (user == null || !user.exists()) continue;
+                customer.setAvatar(user.getAvatar());
+                customer.setName(user.getName());
+                customer.setUserId(user.getId());
+                customer.setNickName(user.getNickName());
+                List<Participant> participantList = new ArrayList<Participant>();
+                Set<Participant> children = new HashSet<Participant>();
+                for (long participantId : participantsMap.get(customer.getUserId())) {
+                    participantList.add(participants.get(participantId));
+                }
+                for(long cid : user.getChildren())
+                    children.add(participantService.get(cid));
+                customer.setParticipants(participantList);
+                customer.setChildren(children);
+                validCustomers.add(customer);
+            }
+            validCustomersMap.put(sku.getProperties(), validCustomers);
+            Playmates playMate = new Playmates();
+            playMate.setSkuProperties(sku.getProperties());
+            playMate.setCustomers(validCustomers);
+            playMates.add(playMate);
+
+        }
+
+        return new ResponseMessage(playMates);
+    }
+
 }
