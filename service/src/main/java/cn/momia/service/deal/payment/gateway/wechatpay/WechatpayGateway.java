@@ -219,8 +219,10 @@ public class WechatpayGateway implements PaymentGateway {
 
     private boolean validateCallbackSign(CallbackParam param) {
         String tradeType = param.get(WechatpayPrepayFields.TRADE_TYPE);
+        boolean successful = WechatpayUtil.validateSign(param.getAll(), tradeType);
+        if (!successful) LOGGER.warn("invalidate sign, order id: {} ", param.get(WechatpayPrepayFields.OUT_TRADE_NO));
 
-        return WechatpayUtil.validateSign(param.getAll(), tradeType);
+        return successful;
     }
 
     private boolean finishPayment(CallbackParam param) {
@@ -228,6 +230,7 @@ public class WechatpayGateway implements PaymentGateway {
             if (!orderService.pay(Long.valueOf(param.get("out_trade_no")))) return false;
             logPayment(param);
         } catch (Exception e) {
+            LOGGER.error("fail to pay order", e);
             return false;
         }
 
