@@ -1,4 +1,4 @@
-package cn.momia.mapi.api.misc;
+package cn.momia.common.misc;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

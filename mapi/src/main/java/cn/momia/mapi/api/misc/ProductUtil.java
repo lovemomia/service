@@ -1,5 +1,6 @@
 package cn.momia.mapi.api.misc;
 
+import cn.momia.common.misc.TimeUtil;
 import cn.momia.mapi.api.v1.dto.base.ProductDto;
 import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import cn.momia.mapi.img.ImageFile;

@@ -19,10 +19,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -117,7 +117,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
-    public Map<Long, User> get(List<Long> ids) {
+    public Map<Long, User> get(Collection<Long> ids) {
         final Map<Long, User> users = new HashMap<Long, User>();
         if (ids == null || ids.size() <= 0) return users;
 

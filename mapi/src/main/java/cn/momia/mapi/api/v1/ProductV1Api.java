@@ -7,7 +7,6 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.ContactsDto;
 import cn.momia.mapi.api.v1.dto.base.Dto;
-import cn.momia.mapi.api.v1.dto.base.PlayMateDto;
 import cn.momia.mapi.api.v1.dto.base.ProductDto;
 import cn.momia.mapi.api.v1.dto.base.SkuDto;
 import cn.momia.mapi.api.v1.dto.composite.ListDto;
@@ -198,19 +197,9 @@ public class ProductV1Api extends AbstractV1Api {
     public ResponseMessage getProductPlaymates(@RequestParam long id) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", 0)
-                .add("count", conf.getInt("Product.Playmate.MaxCount"));
+                .add("count", conf.getInt("Product.Playmate.MaxSkuCount"));
         MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("product", id, "playmate"), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                JSONArray jsonArray = (JSONArray) data;
-                PagedListDto<PlayMateDto> playerMateDtoPagedListDto = new PagedListDto<PlayMateDto>();
-                for(int i=0; i<jsonArray.size(); i++)
-                    playerMateDtoPagedListDto.add(new PlayMateDto(jsonArray.getJSONObject(i)));
-                playerMateDtoPagedListDto.setTotalCount(jsonArray.size());
-                return playerMateDtoPagedListDto;
-            }
-        });
+        return executeRequest(request);
     }
 }

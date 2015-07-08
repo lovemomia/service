@@ -36,7 +36,7 @@
         <MaxPageCount>50</MaxPageCount>
         <CustomerPageSize>6</CustomerPageSize>
         <Playmate>
-            <MaxCount>200</MaxCount>
+            <MaxSkuCount>20</MaxSkuCount>
         </Playmate>
     </Product>
 

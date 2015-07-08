@@ -1,5 +1,6 @@
 package cn.momia.service.deal.order;
 
+import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -8,6 +9,8 @@ import java.util.Date;
 import java.util.List;
 
 public class Order implements Serializable {
+    public static final Splitter PARTICIPANTS_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
+
     public static class Status {
         public static final int ALL = -1;
         public static final int DELETED = 0;
@@ -152,6 +155,24 @@ public class Order implements Serializable {
         int count = 0;
         for (OrderPrice price : prices) {
             count += price.getCount();
+        }
+
+        return count;
+    }
+
+    public int getAdultCount() {
+        int count = 0;
+        for (OrderPrice price : prices) {
+            count += price.getAdult();
+        }
+
+        return count;
+    }
+
+    public int getChildCount() {
+        int count = 0;
+        for (OrderPrice price : prices) {
+            count += price.getChild();
         }
 
         return count;

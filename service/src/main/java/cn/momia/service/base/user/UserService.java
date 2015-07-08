@@ -1,16 +1,14 @@
 package cn.momia.service.base.user;
 
-import cn.momia.service.base.user.participant.Participant;
-
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public interface UserService {
     User add(String nickName, String mobile, String password, String token);
     User get(long id);
-    Map<Long, User> get(List<Long> ids);
+    Map<Long, User> get(Collection<Long> ids);
     User getByToken(String token);
     User getByMobile(String mobile);
     User getByNickName(String nickName);

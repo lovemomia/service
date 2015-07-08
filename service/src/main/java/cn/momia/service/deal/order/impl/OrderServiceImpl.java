@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,7 +107,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         order.setAddTime(rs.getTimestamp("addTime"));
 
         List<Long> participants = new ArrayList<Long>();
-        for (String participant : Splitter.on(",").omitEmptyStrings().trimResults().split(rs.getString("participants")))
+        for (String participant : Order.PARTICIPANTS_SPLITTER.split(rs.getString("participants")))
         {
             participants.add(Long.valueOf(participant));
         }
@@ -217,10 +218,24 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
-    public List<Order> queryDistinctCustomerOrderByProduct(long productId, int start, int count) {
-        String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status>0 GROUP BY customerId LIMIT ?,?";
+    public List<Order> queryAllCustomerOrderByProduct(long productId) {
+        String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status=?";
         final List<Order> orders = new ArrayList<Order>();
-        jdbcTemplate.query(sql, new Object[] { productId, start, count }, new RowCallbackHandler() {
+        jdbcTemplate.query(sql, new Object[] { productId, Order.Status.PAYED }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                orders.add(buildOrder(rs));
+            }
+        });
+
+        return orders;
+    }
+
+    @Override
+    public List<Order> queryDistinctCustomerOrderByProduct(long productId, int start, int count) {
+        String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status=? GROUP BY customerId LIMIT ?,?";
+        final List<Order> orders = new ArrayList<Order>();
+        jdbcTemplate.query(sql, new Object[] { productId, Order.Status.PAYED, start, count }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 orders.add(buildOrder(rs));
