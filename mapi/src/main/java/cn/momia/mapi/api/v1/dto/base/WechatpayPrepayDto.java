@@ -60,7 +60,7 @@ public class WechatpayPrepayDto implements Dto {
             this.timeStamp = paramJson.getString("timestamp");
             this.paySign = paramJson.getString("pay_sign");
 
-            if (tradeType.equals("NATIVE")) {
+            if (tradeType.equals("APP")) {
                 this.partnerId = paramJson.getString("partner_id");
                 this.packageInfo = paramJson.getString("package");
             } else if (tradeType.equals("JSAPI")) {

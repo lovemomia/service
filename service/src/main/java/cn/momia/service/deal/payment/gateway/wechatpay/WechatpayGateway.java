@@ -73,10 +73,10 @@ public class WechatpayGateway implements PaymentGateway {
         Map<String, String> params = new HashMap<String, String>();
         Map<String, String[]> httpParams = request.getParameterMap();
         String tradeType = httpParams.get(WechatpayPrepayFields.TRADE_TYPE)[0];
-        if (tradeType.equals("NATIVE")) {
-            params.put(WechatpayPrepayFields.APPID, conf.getString("Payment.Wechat.NativeAppId"));
+        if (tradeType.equals("APP")) {
+            params.put(WechatpayPrepayFields.APPID, conf.getString("Payment.Wechat.AppAppId"));
             params.put(WechatpayPrepayFields.PRODUCT_ID, String.valueOf(product.getId()));
-            params.put(WechatpayPrepayFields.MCH_ID, conf.getString("Payment.Wechat.NativeMchId"));
+            params.put(WechatpayPrepayFields.MCH_ID, conf.getString("Payment.Wechat.AppMchId"));
         } else if (tradeType.equals("JSAPI")) {
             params.put(WechatpayPrepayFields.APPID, conf.getString("Payment.Wechat.JsApiAppId"));
             params.put(WechatpayPrepayFields.OPENID, getJsApiOpenId(httpParams.get(WechatpayPrepayFields.CODE)[0]));
@@ -172,9 +172,9 @@ public class WechatpayGateway implements PaymentGateway {
         if (successful) {
             if (!WechatpayUtil.validateSign(params, tradeType)) throw new RuntimeException("fail to prepay, invalid sign");
 
-            if (tradeType.equals("NATIVE")) {
-                result.add(WechatpayPrepayFields.PREPAY_RESULT_APPID, conf.getString("Payment.Wechat.NativeAppId"));
-                result.add(WechatpayPrepayFields.PREPAY_RESULT_PARTNERID, conf.getString("Payment.Wechat.NativeMchId"));
+            if (tradeType.equals("APP")) {
+                result.add(WechatpayPrepayFields.PREPAY_RESULT_APPID, conf.getString("Payment.Wechat.AppAppId"));
+                result.add(WechatpayPrepayFields.PREPAY_RESULT_PARTNERID, conf.getString("Payment.Wechat.AppMchId"));
                 result.add(WechatpayPrepayFields.PREPAY_RESULT_PREPAYID, params.get(WechatpayPrepayFields.PREPAY_ID));
                 result.add(WechatpayPrepayFields.PREPAY_RESULT_PACKAGE, "Sign=WXPay");
 

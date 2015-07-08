@@ -32,7 +32,7 @@ public class WechatpayUtil {
             kvs.add(key + "=" + value);
         }
         Collections.sort(kvs);
-        kvs.add("key=" + (tradeType.equalsIgnoreCase("NATIVE") ? SecretKey.get("wechatpayNative") : SecretKey.get("wechatpayJsApi")));
+        kvs.add("key=" + (tradeType.equalsIgnoreCase("APP") ? SecretKey.get("wechatpayApp") : SecretKey.get("wechatpayJsApi")));
 
         String s = StringUtils.join(kvs, "&");
         return DigestUtils.md5Hex(s).toUpperCase();

@@ -34,10 +34,11 @@
         <Wechat>
             <AccessTokenService>https://api.weixin.qq.com/sns/oauth2/access_token</AccessTokenService>
             <PrepayService>https://api.mch.weixin.qq.com/pay/unifiedorder</PrepayService>
-            <NativeAppId></NativeAppId>
-            <JsApiAppId></JsApiAppId>
-            <MchId></MchId>
-            <NotifyUrl></NotifyUrl>
+            <AppAppId>wxcf7b15b51d3b4e53</AppAppId>
+            <AppMchId>1252007801</AppMchId>
+            <JsApiAppId>wx87fe777cf7bfb987</JsApiAppId>
+            <JsApiMchId>1252837901</JsApiMchId>
+            <NotifyUrl>https://i.momia.cn/callback/wechatpay</NotifyUrl>
         </Wechat>
     </Payment>
 </Configuration>
