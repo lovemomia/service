@@ -32,17 +32,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/product")
 public class ProductV1Api extends AbstractV1Api {
-    private static final Function<Object, Dto> PlaymateFunc = new Function<Object, Dto>() {
-        @Override
-        public Dto apply(Object data) {
-            JSONArray jsonArray = (JSONArray) data;
-            PagedListDto<PlayMateDto> playerMateDtoPagedListDto = new PagedListDto<PlayMateDto>();
-            for(int i=0; i<jsonArray.size(); i++)
-                playerMateDtoPagedListDto.add(new PlayMateDto(jsonArray.getJSONObject(i)));
-            playerMateDtoPagedListDto.setTotalCount(jsonArray.size());
-            return playerMateDtoPagedListDto;
-        }
-    };
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public ResponseMessage getProducts(@RequestParam(value = "city") final int cityId,
                                        @RequestParam final int start,
@@ -205,12 +194,23 @@ public class ProductV1Api extends AbstractV1Api {
         return skus;
     }
 
-    @RequestMapping(value = "customer", method = RequestMethod.GET)
+    @RequestMapping(value = "/playmate", method = RequestMethod.GET)
     public ResponseMessage getProductPlaymates(@RequestParam long id) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", 0)
-                .add("count", conf.getInt("Product.MaxPageCount"));
-        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("product", id, "playmates"), builder.build());
-        return executeRequest(request, PlaymateFunc);
+                .add("count", conf.getInt("Product.Playmate.MaxCount"));
+        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("product", id, "playmate"), builder.build());
+
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                JSONArray jsonArray = (JSONArray) data;
+                PagedListDto<PlayMateDto> playerMateDtoPagedListDto = new PagedListDto<PlayMateDto>();
+                for(int i=0; i<jsonArray.size(); i++)
+                    playerMateDtoPagedListDto.add(new PlayMateDto(jsonArray.getJSONObject(i)));
+                playerMateDtoPagedListDto.setTotalCount(jsonArray.size());
+                return playerMateDtoPagedListDto;
+            }
+        });
     }
 }

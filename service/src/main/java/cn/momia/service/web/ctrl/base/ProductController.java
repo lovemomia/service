@@ -118,7 +118,7 @@ public class ProductController extends AbstractController {
         return new ResponseMessage(validCustomers);
     }
 
-    @RequestMapping(value = "/{id}/playmates", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}/playmate", method = RequestMethod.GET)
     public ResponseMessage getProductPlaymates(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
         if (id <= 0 || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
 
