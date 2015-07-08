@@ -34,7 +34,6 @@ public class PlaceOrderDto implements Dto {
 
     private ListDto getSkus(JSONArray skusJson) {
         ListDto skus = new ListDto();
-
         for (int i = 0; i < skusJson.size(); i++) {
             skus.add(new SkuDto(skusJson.getJSONObject(i)));
         }
