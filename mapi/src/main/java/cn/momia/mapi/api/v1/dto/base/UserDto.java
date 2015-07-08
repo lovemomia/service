@@ -10,8 +10,8 @@ import java.util.Date;
 
 public class UserDto implements Dto {
     public static class Other extends UserDto {
-        public Other(JSONObject userJson, JSONArray childrenJson) {
-            super(userJson, childrenJson);
+        public Other(JSONObject userPackJson) {
+            super(userPackJson);
         }
 
         public String getToken() {
@@ -74,11 +74,14 @@ public class UserDto implements Dto {
         return children;
     }
 
-    public UserDto(JSONObject userJson, JSONArray childrenJson) {
-        this(userJson, childrenJson, false);
+    public UserDto(JSONObject userPackJson) {
+        this(userPackJson, false);
     }
 
-    public UserDto(JSONObject userJson, JSONArray childrenJson, boolean showToken) {
+    public UserDto(JSONObject userPackJson, boolean showToken) {
+        JSONObject userJson = userPackJson.getJSONObject("user");
+        JSONArray childrenJson = userPackJson.getJSONArray("children");
+
         if (showToken) this.token = userJson.getString("token");
         this.nickName = userJson.getString("nickName");
         this.mobile = encryptMobile(userJson.getString("mobile"));

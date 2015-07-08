@@ -1,5 +1,6 @@
 package cn.momia.mapi.api.v1.dto.base;
 
+import cn.momia.mapi.api.misc.ProductUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -65,13 +66,19 @@ public class OrderDto implements Dto {
         this.time = time;
     }
 
-    public OrderDto(JSONObject orderJson) {
+    public OrderDto(JSONObject orderPackJson) {
+        JSONObject orderJson = orderPackJson.getJSONObject("order");
+
         this.id = orderJson.getInteger("id");
         this.productId = orderJson.getLong("productId");
         this.skuId = orderJson.getLong("skuId");
         this.count = orderJson.getInteger("count");
         this.totalFee = orderJson.getBigDecimal("totalFee");
         this.participants = buildParticipants(orderJson.getJSONArray("prices"));
+
+        this.cover = orderPackJson.getString("cover");
+        this.title = orderPackJson.getString("title");
+        this.time = ProductUtil.getSkuScheduler(orderPackJson.getJSONArray("sku"));
     }
 
     private String buildParticipants(JSONArray prices) {

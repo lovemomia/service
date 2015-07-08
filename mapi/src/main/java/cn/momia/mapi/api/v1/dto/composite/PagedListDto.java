@@ -2,7 +2,7 @@ package cn.momia.mapi.api.v1.dto.composite;
 
 import cn.momia.mapi.api.v1.dto.base.Dto;
 
-public class PagedListDto<T extends Dto> implements Dto {
+public class PagedListDto implements Dto {
     private long totalCount;
     private Integer nextIndex;
     private ListDto list = new ListDto();
@@ -31,7 +31,7 @@ public class PagedListDto<T extends Dto> implements Dto {
         this.list = list;
     }
 
-    public void add(T dto) {
+    public void add(Dto dto) {
         list.add(dto);
     }
 

@@ -39,10 +39,11 @@ public class HomeV1Api extends AbstractV1Api {
                 if (pageIndex == 0) homeDto.setBanners(extractBannerData((JSONArray) collector.getResponse("banners")));
 
                 JSONObject productsPackJson = (JSONObject) collector.getResponse("products");
-                long totalCount = productsPackJson.getLong("totalCount");
+
                 JSONArray productsJson = productsPackJson.getJSONArray("products");
-                ListDto products = ProductUtil.extractProductsData(productsJson);
-                homeDto.setProducts(products);
+                homeDto.setProducts(ProductUtil.extractProductsData(productsJson));
+
+                long totalCount = productsPackJson.getLong("totalCount");
                 if (pageIndex < maxPageCount - 1 && (pageIndex + 1) * pageSize < totalCount) homeDto.setNextpage(pageIndex + 1);
 
                 return homeDto;

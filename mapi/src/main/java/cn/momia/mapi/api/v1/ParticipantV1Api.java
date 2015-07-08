@@ -34,12 +34,7 @@ public class ParticipantV1Api extends AbstractV1Api {
         paticipantJson.put("userId", userId);
         MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("participant"), paticipantJson.toString());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return new ParticipantDto((JSONObject) data);
-            }
-        });
+        return executeRequest(request);
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -68,12 +63,7 @@ public class ParticipantV1Api extends AbstractV1Api {
         paticipantJson.put("userId", userId);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("participant"), paticipantJson.toString());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return new ParticipantDto((JSONObject) data, true);
-            }
-        });
+        return executeRequest(request);
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
@@ -96,19 +86,22 @@ public class ParticipantV1Api extends AbstractV1Api {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                ListDto participants = new ListDto();
-                JSONArray participantsJson = (JSONArray) data;
-                for (int i = 0; i < participantsJson.size(); i++) {
-                    try {
-                        JSONObject participantJson = participantsJson.getJSONObject(i);
-                        participants.add(new ParticipantDto(participantJson));
-                    } catch (Exception e) {
-                        LOGGER.error("invalid participant: {}", participantsJson.get(i));
-                    }
-                }
-
-                return participants;
+                return buildParticipantsDto((JSONArray) data);
             }
         });
+    }
+
+    private Dto buildParticipantsDto(JSONArray participantsJson) {
+        ListDto participants = new ListDto();
+        for (int i = 0; i < participantsJson.size(); i++) {
+            try {
+                JSONObject participantJson = participantsJson.getJSONObject(i);
+                participants.add(new ParticipantDto(participantJson));
+            } catch (Exception e) {
+                LOGGER.error("invalid participant: {}", participantsJson.get(i));
+            }
+        }
+
+        return participants;
     }
 }
