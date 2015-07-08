@@ -4,7 +4,6 @@ import cn.momia.service.common.DbAccessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class OrderCleanJob extends DbAccessService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderCleanJob.class);
 

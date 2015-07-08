@@ -2,9 +2,6 @@ package cn.momia.mapi.api.v1.dto.composite;
 
 import cn.momia.mapi.api.v1.dto.base.Dto;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class PagedListDto<T extends Dto> implements Dto {
     private long totalCount;
     private Integer nextIndex;

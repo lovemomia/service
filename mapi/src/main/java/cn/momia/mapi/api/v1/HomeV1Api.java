@@ -8,7 +8,6 @@ import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.BannerDto;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.composite.HomeDto;
-import cn.momia.mapi.api.v1.dto.base.ProductDto;
 import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
