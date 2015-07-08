@@ -2,6 +2,7 @@ package cn.momia.service.web.ctrl.deal;
 
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.base.product.ProductService;
+import cn.momia.service.base.product.sku.Sku;
 import cn.momia.service.base.user.User;
 import cn.momia.service.base.user.UserService;
 import cn.momia.service.deal.order.Order;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/order")
 public class OrderController extends AbstractController {
@@ -30,25 +33,32 @@ public class OrderController extends AbstractController {
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage placeOrder(@RequestBody Order order) {
         if (order.isInvalid()) return ResponseMessage.BAD_REQUEST;
-        
-        processContacts(order.getCustomerId(), order.getContacts(), order.getMobile());
         if (!lockSku(order)) return ResponseMessage.FAILED("库存不足");
 
         long orderId = 0;
         try {
+            processContacts(order.getCustomerId(), order.getContacts(), order.getMobile());
+            checkLimit(order.getCustomerId(), order.getSkuId(), order.getCount());
+
             orderId = orderService.add(order);
             if (orderId > 0) {
                 order.setId(orderId);
                 return new ResponseMessage(order);
             }
+        } catch (OrderLimitException e) {
+            return ResponseMessage.FAILED("本单有限购，您以超出购买限额，超出数量：" + e.getOverCount());
         } catch (Exception e) {
             LOGGER.error("fail to place order, customerId: {}, productId: {}, skuId: {}", new Object[] { order.getCustomerId(), order.getProductId(), order.getSkuId(), e });
+        } finally {
+            // TODO 需要告警
+            if (orderId <= 0 && !unlockSku(order)) LOGGER.error("fail to unlock sku, skuId: {}, count: {}", new Object[] { order.getSkuId(), order.getCount() });
         }
 
-        // TODO 需要告警
-        if (orderId <= 0 && !unlockSku(order)) LOGGER.error("fail to unlock sku, skuId: {}, count: {}", new Object[] { order.getSkuId(), order.getCount() });
-
         return ResponseMessage.FAILED("下单失败");
+    }
+
+    private boolean lockSku(Order order) {
+        return productService.lockStock(order.getSkuId(), order.getCount());
     }
 
     private void processContacts(long customerId, String contacts, String mobile) {
@@ -63,8 +73,25 @@ public class OrderController extends AbstractController {
         }
     }
 
-    private boolean lockSku(Order order) {
-        return productService.lockStock(order.getSkuId(), order.getCount());
+    private void checkLimit(long customerId, long skuId, int count) throws OrderLimitException {
+        int limit;
+        try {
+            Sku sku = productService.getSku(skuId);
+            limit = sku.getLimit();
+            if (limit <= 0) return;
+
+            List<Order> orders = orderService.queryByUserAndSku(customerId, skuId);
+            for (Order order : orders) {
+                if (!order.exists()) continue;
+                count += order.getCount();
+            }
+
+            if (count <= limit) return;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        throw new OrderLimitException(count - limit);
     }
 
     private boolean unlockSku(Order order) {
@@ -87,5 +114,17 @@ public class OrderController extends AbstractController {
         if (!unlockSku(order)) LOGGER.error("fail to unlock sku, skuId: {}, count: {}", new Object[] { order.getSkuId(), order.getCount() });
 
         return ResponseMessage.SUCCESS;
+    }
+
+    private static class OrderLimitException extends Exception {
+        private int overCount;
+
+        public int getOverCount() {
+            return overCount;
+        }
+
+        public OrderLimitException(int overCount) {
+            this.overCount = overCount;
+        }
     }
 }

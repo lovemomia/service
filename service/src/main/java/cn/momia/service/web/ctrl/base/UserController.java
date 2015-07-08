@@ -103,11 +103,15 @@ public class UserController extends AbstractController {
         for (Order order : orders) {
             JSONObject orderJson = new JSONObject();
             orderJson.put("order", order);
+
             Product product = productMap.get(order.getProductId());
-            if (product != null) orderJson.put("product", product.getTitle());
+            if (product != null) {
+                orderJson.put("cover", product.getCover());
+                orderJson.put("title", product.getTitle());
+            }
+
             Sku sku = skuMap.get(order.getSkuId());
             if (sku != null) orderJson.put("sku", sku.getProperties());
-            orderJson.put("cover", product.getCover());
 
             ordersJson.add(orderJson);
         }
@@ -233,8 +237,8 @@ public class UserController extends AbstractController {
             userId = child.getUserId();
             childrenIds.add(childId);
         }
-        for(long cid : userService.get(userId).getChildren())
-            childrenIds.add(cid);
+
+        childrenIds.addAll(userService.get(userId).getChildren());
 
         if (userId > 0 && !userService.updateChildren(userId, childrenIds)) return ResponseMessage.FAILED("添加孩子信息失败");
 

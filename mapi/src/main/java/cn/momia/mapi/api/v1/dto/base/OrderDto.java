@@ -13,9 +13,9 @@ public class OrderDto implements Dto {
     private BigDecimal totalFee;
     private String participants;
 
+    private String cover;
     private String title;
     private String time;
-    private String cover;
 
     public long getId() {
         return id;
@@ -41,6 +41,14 @@ public class OrderDto implements Dto {
         return participants;
     }
 
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -55,14 +63,6 @@ public class OrderDto implements Dto {
 
     public void setTime(String time) {
         this.time = time;
-    }
-
-    public String getCover() {
-        return cover;
-    }
-
-    public void setCover(String cover) {
-        this.cover = cover;
     }
 
     public OrderDto(JSONObject orderJson) {

@@ -24,10 +24,12 @@ public class WechatpayPrepayFields {
     public static final String TRADE_TYPE = "trade_type";
     public static final String PREPAY_ID = "prepay_id";
 
-    public static final String PREPAY_RESULT_APPID = "appId";
-    public static final String PREPAY_RESULT_TIMESTAMP = "timeStamp";
-    public static final String PREPAY_RESULT_NONCE_STR = "nonceStr";
+    public static final String PREPAY_RESULT_APPID = "app_id";
+    public static final String PREPAY_RESULT_PARTNERID = "partner_id";
+    public static final String PREPAY_RESULT_PREPAYID = "prepay_id";
     public static final String PREPAY_RESULT_PACKAGE = "package";
-    public static final String PREPAY_RESULT_SIGN_TYPE = "signType";
-    public static final String PREPAY_RESULT_PAY_SIGN = "paySign";
+    public static final String PREPAY_RESULT_NONCE_STR = "nonce_str";
+    public static final String PREPAY_RESULT_TIMESTAMP = "timestamp";
+    public static final String PREPAY_RESULT_SIGN_TYPE = "sign_type";
+    public static final String PREPAY_RESULT_PAY_SIGN = "pay_sign";
 }

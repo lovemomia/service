@@ -56,11 +56,8 @@ public class ParticipantDto implements Dto {
         calendar.setTime(this.birthday);
         int yearBorn = calendar.get(Calendar.YEAR);
 
-        if (yearNow - yearBorn > 15)
-            this.type = "成人";
-        else
-            this.type = "儿童";
-
+        if (yearNow - yearBorn > 15) this.type = "成人";
+        else this.type = "儿童";
 
         if (showIdNo) {
             this.idType = participantJson.getInteger("idType");

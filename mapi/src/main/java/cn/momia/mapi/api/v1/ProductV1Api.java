@@ -9,6 +9,7 @@ import cn.momia.mapi.api.v1.dto.base.ContactsDto;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.ProductDto;
 import cn.momia.mapi.api.v1.dto.base.SkuDto;
+import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import cn.momia.mapi.api.v1.dto.composite.PagedListDto;
 import cn.momia.mapi.api.v1.dto.composite.ProductDetailDto;
 import cn.momia.mapi.api.v1.dto.composite.PlaceOrderDto;
@@ -72,27 +73,16 @@ public class ProductV1Api extends AbstractV1Api {
         return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {
             @Override
             public Dto apply(MomiaHttpResponseCollector collector) {
-                ProductDetailDto product = new ProductDetailDto();
+                ProductDetailDto productDetail = new ProductDetailDto();
 
                 JSONObject productJson = (JSONObject) collector.getResponse("product");
-                JSONObject placeJson = productJson.getJSONObject("place");
-                JSONArray skusJson = productJson.getJSONArray("skus");
+                ProductDto product = ProductUtil.extractProductData(productJson, true);
+                productDetail.setProductDto(product);
+
                 JSONArray customersJson = (JSONArray) collector.getResponse("customers");
+                productDetail.setCustomers(getCustomers(customersJson));
 
-                product.setId(productJson.getLong("id"));
-                product.setCover(productJson.getString("cover"));
-                product.setTitle(productJson.getString("title"));
-                product.setJoined(productJson.getInteger("sales"));
-                product.setPrice(ProductUtil.getMiniPrice(skusJson));
-                product.setCrowd(productJson.getString("crowd"));
-                product.setScheduler(ProductUtil.getScheduler(skusJson));
-                product.setAddress(placeJson.getString("address"));
-                product.setPoi(StringUtils.join(new Object[]{placeJson.getDouble("lng"), placeJson.getDouble("lat")}, ":"));
-                product.setImgs(getImgs(productJson));
-                product.setCustomers(getCustomers(customersJson));
-                product.setContent(processImages(productJson.getJSONArray("content")));
-
-                return product;
+                return productDetail;
             }
         });
     }
@@ -115,16 +105,6 @@ public class ProductV1Api extends AbstractV1Api {
                 .add("count", conf.getInt("Product.CustomerPageSize"));
 
         return MomiaHttpRequest.GET("customers", false, baseServiceUrl("product", productId, "customer"), builder.build());
-    }
-
-    private List<String> getImgs(JSONObject productJson) {
-        List<String> imgs = new ArrayList<String>();
-        JSONArray imgJson = productJson.getJSONArray("imgs");
-        for (int i = 0; i < imgJson.size(); i++) {
-            imgs.add(ImageFile.url(imgJson.getJSONObject(i).getString("url")));
-        }
-
-        return imgs;
     }
 
     private ProductDetailDto.Customers getCustomers(JSONArray customersJson) {
@@ -155,20 +135,6 @@ public class ProductV1Api extends AbstractV1Api {
         else customers.text = childCount + "个孩子，" + adultCount + "个大人参加";
 
         return customers;
-    }
-
-    private JSONArray processImages(JSONArray contentJson) {
-        for (int i = 0; i < contentJson.size(); i++) {
-            JSONObject contentBlockJson = contentJson.getJSONObject(i);
-            JSONArray bodyJson = contentBlockJson.getJSONArray("body");
-            for (int j = 0; j < bodyJson.size(); j++) {
-                JSONObject bodyBlockJson = bodyJson.getJSONObject(j);
-                String img = bodyBlockJson.getString("img");
-                if (!StringUtils.isBlank(img)) bodyBlockJson.put("img", ImageFile.url(img));
-            }
-        }
-
-        return contentJson;
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
@@ -210,32 +176,18 @@ public class ProductV1Api extends AbstractV1Api {
 
     private ContactsDto getContacts(JSONObject userPackJson) {
         if (userPackJson == null) return null;
+
         JSONObject userJson = userPackJson.getJSONObject("user");
         if (userJson == null) return null;
 
-        ContactsDto contacts = new ContactsDto();
-        contacts.setName(userJson.getString("name"));
-        contacts.setMobile(userJson.getString("mobile"));
-
-        return contacts;
+        return new ContactsDto(userJson);
     }
 
-    private List<SkuDto> getSkus(JSONArray skusJson) {
-        List<SkuDto> skus = new ArrayList<SkuDto>();
+    private ListDto getSkus(JSONArray skusJson) {
+        ListDto skus = new ListDto();
 
         for (int i = 0; i < skusJson.size(); i++) {
-            JSONObject skuJson = skusJson.getJSONObject(i);
-            SkuDto sku = new SkuDto();
-            sku.setProductId(skuJson.getLong("productId"));
-            sku.setSkuId(skuJson.getLong("id"));
-            sku.setLimit(skuJson.getInteger("limit"));
-            sku.setNeedRealName(skuJson.getBoolean("needRealName"));
-            sku.setStock(skuJson.getInteger("unlockedStock"));
-            sku.setMinPrice(ProductUtil.getSkuMiniPrice(skuJson.getJSONArray("prices")));
-            sku.setTime(ProductUtil.getSkuScheduler(skuJson.getJSONArray("properties")));
-            sku.setPrices(skuJson.getJSONArray("prices"));
-
-            skus.add(sku);
+            skus.add(new SkuDto(skusJson.getJSONObject(i)));
         }
 
         return skus;

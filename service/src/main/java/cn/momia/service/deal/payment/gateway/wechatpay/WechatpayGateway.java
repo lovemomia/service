@@ -76,14 +76,15 @@ public class WechatpayGateway implements PaymentGateway {
         if (tradeType.equals("NATIVE")) {
             params.put(WechatpayPrepayFields.APPID, conf.getString("Payment.Wechat.NativeAppId"));
             params.put(WechatpayPrepayFields.PRODUCT_ID, String.valueOf(product.getId()));
+            params.put(WechatpayPrepayFields.MCH_ID, conf.getString("Payment.Wechat.NativeMchId"));
         } else if (tradeType.equals("JSAPI")) {
             params.put(WechatpayPrepayFields.APPID, conf.getString("Payment.Wechat.JsApiAppId"));
             params.put(WechatpayPrepayFields.OPENID, getJsApiOpenId(httpParams.get(WechatpayPrepayFields.CODE)[0]));
+            params.put(WechatpayPrepayFields.MCH_ID, conf.getString("Payment.Wechat.JsApiMchId"));
         } else {
             throw new RuntimeException("not supported trade type: " + tradeType);
         }
 
-        params.put(WechatpayPrepayFields.MCH_ID, conf.getString("Payment.Wechat.MchId"));
         params.put(WechatpayPrepayFields.NONCE_STR, WechatpayUtil.createNoncestr(32));
         params.put(WechatpayPrepayFields.BODY, product.getTitle());
         params.put(WechatpayPrepayFields.OUT_TRADE_NO, String.valueOf(order.getId()));
@@ -171,15 +172,26 @@ public class WechatpayGateway implements PaymentGateway {
         if (successful) {
             if (!WechatpayUtil.validateSign(params, tradeType)) throw new RuntimeException("fail to prepay, invalid sign");
 
-            result.add(WechatpayPrepayFields.PREPAY_RESULT_APPID, params.get(WechatpayPrepayFields.APPID));
-            result.add(WechatpayPrepayFields.PREPAY_RESULT_TIMESTAMP, String.valueOf(new Date().getTime()).substring(0, 10));
-            result.add(WechatpayPrepayFields.PREPAY_RESULT_NONCE_STR, params.get(WechatpayPrepayFields.NONCE_STR));
-            result.add(WechatpayPrepayFields.PREPAY_RESULT_PACKAGE, "prepay_id=" + params.get(WechatpayPrepayFields.PREPAY_ID));
-            result.add(WechatpayPrepayFields.PREPAY_RESULT_SIGN_TYPE, "MD5");
-            result.add(WechatpayPrepayFields.PREPAY_RESULT_PAY_SIGN, WechatpayUtil.sign(result.getAll(), tradeType));
+            if (tradeType.equals("NATIVE")) {
+                result.add(WechatpayPrepayFields.PREPAY_RESULT_APPID, conf.getString("Payment.Wechat.NativeAppId"));
+                result.add(WechatpayPrepayFields.PREPAY_RESULT_PARTNERID, conf.getString("Payment.Wechat.NativeMchId"));
+                result.add(WechatpayPrepayFields.PREPAY_RESULT_PREPAYID, params.get(WechatpayPrepayFields.PREPAY_ID));
+                result.add(WechatpayPrepayFields.PREPAY_RESULT_PACKAGE, "Sign=WXPay");
+
+            } else if (tradeType.equals("JSAPI")) {
+                result.add(WechatpayPrepayFields.PREPAY_RESULT_APPID, conf.getString("Payment.Wechat.JsApiAppId"));
+                result.add(WechatpayPrepayFields.PREPAY_RESULT_PACKAGE, "prepay_id=" + params.get(WechatpayPrepayFields.PREPAY_ID));
+                result.add(WechatpayPrepayFields.PREPAY_RESULT_SIGN_TYPE, "MD5");
+            } else {
+                throw new RuntimeException("unsupported trade type: " + tradeType);
+            }
         } else {
             LOGGER.error("fail to prepay: {}/{}", params.get(WechatpayPrepayFields.RETURN_CODE), params.get(WechatpayPrepayFields.RETURN_MSG));
         }
+
+        result.add(WechatpayPrepayFields.PREPAY_RESULT_NONCE_STR, WechatpayUtil.createNoncestr(32));
+        result.add(WechatpayPrepayFields.PREPAY_RESULT_TIMESTAMP, String.valueOf(new Date().getTime()).substring(0, 10));
+        result.add(WechatpayPrepayFields.PREPAY_RESULT_PAY_SIGN, WechatpayUtil.sign(result.getAll(), tradeType));
     }
 
     @Override

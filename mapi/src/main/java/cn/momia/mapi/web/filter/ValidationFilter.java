@@ -60,7 +60,7 @@ public class ValidationFilter implements Filter {
 
     private boolean isParamMissing(HttpServletRequest httpRequest) {
         String version = httpRequest.getParameter("v");
-        String teminal = httpRequest.getParameter("teminal");
+        String teminal = httpRequest.getParameter("terminal");
         String os = httpRequest.getParameter("os");
         String device = httpRequest.getParameter("device");
         String channel = httpRequest.getParameter("channel");
@@ -90,7 +90,7 @@ public class ValidationFilter implements Filter {
                 .append("expired=").append(httpRequest.getParameter("expired")).append("&")
                 .append("net=").append(httpRequest.getParameter("net")).append("&")
                 .append("os=").append(httpRequest.getParameter("os")).append("&")
-                .append("teminal=").append(httpRequest.getParameter("teminal")).append("&")
+                .append("terminal=").append(httpRequest.getParameter("terminal")).append("&")
                 .append("v=").append(httpRequest.getParameter("v")).append("&")
                 .append("key=").append(SecretKey.get());
 

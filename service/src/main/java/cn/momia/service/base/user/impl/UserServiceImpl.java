@@ -37,8 +37,8 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     @Override
     public User add(String nickName, String mobile, String password, String token) {
         if (!validateMobile(mobile)) return User.DUPLICATE_USER;
-        String encryptPassword = PasswordEncryptor.encrypt(mobile, password);
-        return addUser(nickName, mobile, encryptPassword, token);
+
+        return addUser(nickName, mobile, PasswordEncryptor.encrypt(mobile, password), token);
     }
 
     public boolean validateMobile(String mobile) {
@@ -174,13 +174,12 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public boolean validatePassword(String mobile, String password) {
-        String encryptPassword = PasswordEncryptor.encrypt(mobile, password);
         String sql = "SELECT mobile, password FROM t_user WHERE mobile=? AND password=?";
 
-        return jdbcTemplate.query(sql, new Object[]{mobile, encryptPassword}, new ResultSetExtractor<Boolean>() {
+        return jdbcTemplate.query(sql, new Object[] { mobile, PasswordEncryptor.encrypt(mobile, password) }, new ResultSetExtractor<Boolean>() {
             @Override
             public Boolean extractData(ResultSet resultSet) throws SQLException, DataAccessException {
-                if(resultSet.next()) return true;
+                if (resultSet.next()) return true;
                 return false;
             }
         });
