@@ -106,7 +106,7 @@ public class WechatpayGateway implements PaymentGateway {
                     .append("?")
                     .append("appid=").append(conf.getString("Payment.Wechat.JsApiAppId"))
                     .append("&")
-                    .append("secret=").append(SecretKey.get("wechatpayAppKey"))
+                    .append("secret=").append(SecretKey.get("wechatpayJsApiKey"))
                     .append("&")
                     .append("code=").append(code)
                     .append("&")

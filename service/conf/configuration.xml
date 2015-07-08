@@ -36,8 +36,8 @@
             <PrepayService>https://api.mch.weixin.qq.com/pay/unifiedorder</PrepayService>
             <AppAppId>wxcf7b15b51d3b4e53</AppAppId>
             <AppMchId>1252007801</AppMchId>
-            <JsApiAppId>wx87fe777cf7bfb987</JsApiAppId>
-            <JsApiMchId>1252837901</JsApiMchId>
+            <JsApiAppId>wxc4ca5800d28b5650</JsApiAppId>
+            <JsApiMchId>1251671101</JsApiMchId>
             <NotifyUrl>https://i.momia.cn/callback/wechatpay</NotifyUrl>
         </Wechat>
     </Payment>
