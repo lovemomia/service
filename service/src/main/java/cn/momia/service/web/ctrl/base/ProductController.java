@@ -6,7 +6,7 @@ import cn.momia.service.web.ctrl.dto.Playmate;
 import cn.momia.service.base.product.Product;
 import cn.momia.service.base.product.ProductQuery;
 import cn.momia.service.base.product.ProductService;
-import cn.momia.service.web.ctrl.dto.SkuPlaymate;
+import cn.momia.service.web.ctrl.dto.SkuPlaymates;
 import cn.momia.service.base.product.sku.Sku;
 import cn.momia.service.base.user.User;
 import cn.momia.service.base.user.UserService;
@@ -174,19 +174,19 @@ public class ProductController extends AbstractController {
         return new ResponseMessage(buildPlaymates(skus, skuOrdersMap, skuCustomerIdsMap, customerPrticipantsIdsMap, customersMap, participantsMap));
     }
 
-    private List<SkuPlaymate> buildPlaymates(List<Sku> skus,
+    private List<SkuPlaymates> buildPlaymates(List<Sku> skus,
                                              Map<Long, List<Order>> skuOrdersMap,
                                              Map<Long, Set<Long>> skuCustomerIdsMap,
                                              Map<Long, Set<Long>> customerPrticipantsIdsMap,
                                              Map<Long, User> customersMap,
                                              Map<Long, Participant> participantsMap) {
-        List<SkuPlaymate> skuPlaymates = new ArrayList<SkuPlaymate>();
+        List<SkuPlaymates> skuPlaymates = new ArrayList<SkuPlaymates>();
         for (Sku sku : skus) {
             if (!sku.exists()) continue;
 
             try {
-                SkuPlaymate skuPlaymate = new SkuPlaymate();
-                skuPlaymate.setTime(sku.formatTime());
+                SkuPlaymates skuPlaymate = new SkuPlaymates();
+                skuPlaymate.setTime(sku.scheduler());
                 skuPlaymate.setJoined(formatJoined(skuOrdersMap.get(sku.getId())));
                 skuPlaymate.setPlaymates(extractPlayMates(sku.getId(), skuCustomerIdsMap, customerPrticipantsIdsMap, customersMap, participantsMap));
 

@@ -2,7 +2,7 @@ package cn.momia.service.web.ctrl.dto;
 
 import java.util.List;
 
-public class SkuPlaymate {
+public class SkuPlaymates {
     private String time;
     private String joined;
     private List<Playmate> playmates;
