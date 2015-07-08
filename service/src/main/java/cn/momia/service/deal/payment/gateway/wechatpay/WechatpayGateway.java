@@ -221,7 +221,7 @@ public class WechatpayGateway implements PaymentGateway {
     private boolean validateCallbackSign(CallbackParam param) {
         String tradeType = param.get(WechatpayPrepayFields.TRADE_TYPE);
         boolean successful = WechatpayUtil.validateSign(param.getAll(), tradeType);
-        if (!successful) LOGGER.warn("invalidate sign, order id: {} ", param.get(WechatpayPrepayFields.OUT_TRADE_NO));
+        if (!successful) LOGGER.warn("invalid sign, order id: {} ", param.get(WechatpayPrepayFields.OUT_TRADE_NO));
 
         return successful;
     }
