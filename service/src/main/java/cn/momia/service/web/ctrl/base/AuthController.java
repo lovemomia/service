@@ -60,7 +60,7 @@ public class AuthController extends UserRelatedController {
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ResponseMessage register(@RequestParam String nickName, @RequestParam String mobile, @RequestParam String password, @RequestParam String code){
+    public ResponseMessage register(@RequestParam(value = "nickname") String nickName, @RequestParam String mobile, @RequestParam String password, @RequestParam String code){
         if (StringUtils.isBlank(nickName) || ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(password) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
 
         if(userService.getByNickName(nickName).exists()) return ResponseMessage.FAILED("注册失败，用户昵称已存在");
