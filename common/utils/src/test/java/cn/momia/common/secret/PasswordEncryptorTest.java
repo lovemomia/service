@@ -6,10 +6,11 @@ import org.testng.annotations.Test;
 public class PasswordEncryptorTest {
     @Test
     public void testEncrypt() {
-        String salt = "qiufeng.wu";
+        String mobile = "13918872284";
         String password = "qiufeng!@123Wu?";
+        String secretKey = "jnv923opvFGUekfke23iomek!@@#02oidmopz3";
 
-        String encryptedPassword = PasswordEncryptor.encrypt(salt, password);
-        Assert.assertEquals(encryptedPassword, "hiqC+hr1lIhbtVSzIVBBZw==");
+        String encryptedPassword = PasswordEncryptor.encrypt(mobile, password, secretKey);
+        Assert.assertEquals(encryptedPassword, "9XCjB+hLjmUHc2UX6/gBrQ==");
     }
 }

@@ -76,7 +76,9 @@
     <bean id="alipay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
         <property name="staticField" value="cn.momia.service.deal.payment.Payment.Type.ALIPAY" />
     </bean>
-    <bean id="alipayGateway" class="cn.momia.service.deal.payment.gateway.alipay.AlipayGateway" />
+    <bean id="alipayGateway" class="cn.momia.service.deal.payment.gateway.alipay.AlipayGateway">
+        <property name="conf" ref="conf" />
+    </bean>
 
     <bean id="wechatpay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
         <property name="staticField" value="cn.momia.service.deal.payment.Payment.Type.WECHATPAY" />
@@ -98,30 +100,6 @@
                     <ref bean="wechatpayGateway" />
                 </entry>
             </map>
-        </property>
-    </bean>
-
-    <bean id="orderCleanJob" class="cn.momia.service.deal.order.OrderCleanJob" parent="dbAccessService">
-        <property name="orderService" ref="orderService" />
-    </bean>
-
-    <bean id="cleanOrderJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-        <property name="targetObject" ref="orderCleanJob" />
-        <property name="targetMethod" value="run" />
-        <property name="concurrent" value="false" />
-    </bean>
-
-    <bean id="cleanOrderTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
-        <property name="jobDetail" ref="cleanOrderJob" />
-        <property name="startDelay" value="10000" />
-        <property name="repeatInterval" value="300000" />
-    </bean>
-
-    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
-        <property name="triggers">
-            <list>
-                <ref bean="cleanOrderTrigger" />
-            </list>
         </property>
     </bean>
 </beans>

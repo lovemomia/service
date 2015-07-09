@@ -2,13 +2,10 @@ package cn.momia.mapi.api.v1.dto.composite;
 
 import cn.momia.mapi.api.v1.dto.base.Dto;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class PagedListDto<T extends Dto> implements Dto {
+public class PagedListDto implements Dto {
     private long totalCount;
     private Integer nextIndex;
-    private List<T> list = new ArrayList<T>();
+    private ListDto list = new ListDto();
 
     public long getTotalCount() {
         return totalCount;
@@ -26,19 +23,19 @@ public class PagedListDto<T extends Dto> implements Dto {
         this.nextIndex = nextIndex;
     }
 
-    public List<T> getList() {
+    public ListDto getList() {
         return list;
     }
 
-    public void setList(List<T> list) {
+    public void setList(ListDto list) {
         this.list = list;
     }
 
-    public void add(T dto) {
+    public void add(Dto dto) {
         list.add(dto);
     }
 
-    public void addAll(List<T> dtos) {
+    public void addAll(ListDto dtos) {
         list.addAll(dtos);
     }
 }

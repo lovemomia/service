@@ -12,8 +12,8 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class PlaceServiceImpl extends DbAccessService implements PlaceService {
@@ -58,7 +58,7 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     }
 
     @Override
-    public Map<Long, Place> get(List<Long> ids) {
+    public Map<Long, Place> get(Collection<Long> ids) {
         final Map<Long, Place> places = new HashMap<Long, Place>();
         if (ids == null || ids.isEmpty()) return places;
 

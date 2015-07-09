@@ -16,7 +16,7 @@
         <property name="conf" ref="conf" />
     </bean>
 
-    <bean class="cn.momia.mapi.img.ImageFile">
+    <bean class="cn.momia.common.web.img.ImageFile">
         <property name="domain" value="${Image.Domain}" />
     </bean>
 

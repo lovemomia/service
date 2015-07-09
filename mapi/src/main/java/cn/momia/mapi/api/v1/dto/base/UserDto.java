@@ -1,7 +1,8 @@
 package cn.momia.mapi.api.v1.dto.base;
 
+import cn.momia.common.secret.MobileEncryptor;
 import cn.momia.mapi.api.v1.dto.composite.ListDto;
-import cn.momia.mapi.img.ImageFile;
+import cn.momia.common.web.img.ImageFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -10,8 +11,8 @@ import java.util.Date;
 
 public class UserDto implements Dto {
     public static class Other extends UserDto {
-        public Other(JSONObject userJson, JSONArray childrenJson) {
-            super(userJson, childrenJson);
+        public Other(JSONObject userPackJson) {
+            super(userPackJson);
         }
 
         public String getToken() {
@@ -74,14 +75,17 @@ public class UserDto implements Dto {
         return children;
     }
 
-    public UserDto(JSONObject userJson, JSONArray childrenJson) {
-        this(userJson, childrenJson, false);
+    public UserDto(JSONObject userPackJson) {
+        this(userPackJson, false);
     }
 
-    public UserDto(JSONObject userJson, JSONArray childrenJson, boolean showToken) {
+    public UserDto(JSONObject userPackJson, boolean showToken) {
+        JSONObject userJson = userPackJson.getJSONObject("user");
+        JSONArray childrenJson = userPackJson.getJSONArray("children");
+
         if (showToken) this.token = userJson.getString("token");
         this.nickName = userJson.getString("nickName");
-        this.mobile = encryptMobile(userJson.getString("mobile"));
+        this.mobile = MobileEncryptor.encrypt(userJson.getString("mobile"));
         this.avatar = ImageFile.url(userJson.getString("avatar"));
         this.name = userJson.getString("name");
         this.sex = userJson.getString("sex");
@@ -94,9 +98,5 @@ public class UserDto implements Dto {
             JSONObject childJson = childrenJson.getJSONObject(i);
             this.children.add(new ParticipantDto(childJson));
         }
-    }
-
-    private String encryptMobile(String mobile) {
-        return mobile.substring(0, 3) + "****" + mobile.substring(7);
     }
 }

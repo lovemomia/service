@@ -14,7 +14,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 public abstract class AbstractSmsSender extends DbAccessService implements SmsSender {
     private ExecutorService executorService;

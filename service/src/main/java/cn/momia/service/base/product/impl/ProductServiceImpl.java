@@ -14,13 +14,12 @@ import cn.momia.service.base.product.sku.SkuService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,7 +81,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     }
 
     @Override
-    public List<Product> get(List<Long> ids) {
+    public List<Product> get(Collection<Long> ids) {
         List<BaseProduct> baseProducts = baseProductService.get(ids);
 
         return buildProducts(baseProducts);
@@ -159,6 +158,11 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     @Override
     public List<Sku> getSkus(long id) {
         return skuService.queryByProduct(id);
+    }
+
+    @Override
+    public Sku getSku(long skuId) {
+        return skuService.get(skuId);
     }
 
     @Override

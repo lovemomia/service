@@ -1,9 +1,13 @@
 package cn.momia.mapi.api.v1.dto.base;
 
+import cn.momia.common.secret.MobileEncryptor;
+import cn.momia.common.web.img.ImageFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 public class OrderDto implements Dto {
     private long id;
@@ -12,8 +16,16 @@ public class OrderDto implements Dto {
     private int count;
     private BigDecimal totalFee;
     private String participants;
+    private String contacts;
+    private String mobile;
+    @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date addTime;
 
+    // extra info
+    private String cover;
     private String title;
+    private String scheduler;
+    private String address;
+    private BigDecimal price;
     private String time;
 
     public long getId() {
@@ -40,29 +52,67 @@ public class OrderDto implements Dto {
         return participants;
     }
 
+    public String getContacts() {
+        return contacts;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public Date getAddTime() {
+        return addTime;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public String getScheduler() {
+        return scheduler;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
     }
 
     public String getTime() {
         return time;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public OrderDto(JSONObject orderPackJson) {
+        this(orderPackJson, false);
     }
 
-    public OrderDto(JSONObject orderJson) {
+    public OrderDto(JSONObject orderPackJson, boolean extractExtraInfo) {
+        JSONObject orderJson = orderPackJson.getJSONObject("order");
+
         this.id = orderJson.getInteger("id");
         this.productId = orderJson.getLong("productId");
         this.skuId = orderJson.getLong("skuId");
         this.count = orderJson.getInteger("count");
         this.totalFee = orderJson.getBigDecimal("totalFee");
         this.participants = buildParticipants(orderJson.getJSONArray("prices"));
+        this.contacts = orderJson.getString("contacts");
+        this.mobile = MobileEncryptor.encrypt(orderJson.getString("mobile"));
+        this.addTime = orderJson.getDate("addTime");
+
+        if (extractExtraInfo) {
+            this.cover = ImageFile.url(orderPackJson.getString("cover"));
+            this.title = orderPackJson.getString("title");
+            this.scheduler = orderPackJson.getString("scheduler");
+            this.price = orderPackJson.getBigDecimal("price");
+            this.address = orderPackJson.getString("address");
+            this.time = orderPackJson.getString("time");
+        }
     }
 
     private String buildParticipants(JSONArray prices) {

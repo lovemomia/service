@@ -1,17 +1,15 @@
 package cn.momia.service.web.ctrl.base;
 
+import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.base.city.CityService;
 import cn.momia.service.base.product.Product;
 import cn.momia.service.base.product.ProductService;
 import cn.momia.service.base.product.sku.Sku;
 import cn.momia.service.base.user.User;
-import cn.momia.service.base.user.UserService;
 import cn.momia.service.base.user.participant.Participant;
-import cn.momia.service.base.user.participant.ParticipantService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
-import cn.momia.service.web.ctrl.AbstractController;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -34,10 +32,8 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/user")
-public class UserController extends AbstractController {
+public class UserController extends UserRelatedController {
     @Autowired private CityService cityService;
-    @Autowired private UserService userService;
-    @Autowired private ParticipantService participantService;
 
     @Autowired private OrderService orderService;
     @Autowired private ProductService productService;
@@ -51,14 +47,6 @@ public class UserController extends AbstractController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         return new ResponseMessage(buildUserResponse(user));
-    }
-
-    private JSONObject buildUserResponse(User user) {
-        JSONObject userPackJson = new JSONObject();
-        userPackJson.put("user", user);
-        userPackJson.put("children", participantService.get(user.getChildren()).values());
-
-        return userPackJson;
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
@@ -88,11 +76,9 @@ public class UserController extends AbstractController {
         Map<Long, Product> productMap = new HashMap<Long, Product>();
         Map<Long, Sku> skuMap = new HashMap<Long, Sku>();
         for (Product product : products) {
-            if (product.exists()) {
-                productMap.put(product.getId(), product);
-                for (Sku sku : product.getSkus()) {
-                    if (sku.exists()) skuMap.put(sku.getId(), sku);
-                }
+            productMap.put(product.getId(), product);
+            for (Sku sku : product.getSkus()) {
+                skuMap.put(sku.getId(), sku);
             }
         }
 
@@ -103,16 +89,51 @@ public class UserController extends AbstractController {
         for (Order order : orders) {
             JSONObject orderJson = new JSONObject();
             orderJson.put("order", order);
+
             Product product = productMap.get(order.getProductId());
-            if (product != null) orderJson.put("product", product.getTitle());
+            if (product != null) {
+                orderJson.put("cover", product.getCover());
+                orderJson.put("title", product.getTitle());
+            }
+
             Sku sku = skuMap.get(order.getSkuId());
-            if (sku != null) orderJson.put("sku", sku.getProperties());
+            if (sku != null) orderJson.put("time", sku.time());
 
             ordersJson.add(orderJson);
         }
         ordersPackJson.put("orders", ordersJson);
 
         return ordersPackJson;
+    }
+
+    @RequestMapping(value = "/order/{oid}", method = RequestMethod.GET)
+    public ResponseMessage getOrdersOfUser(@RequestParam String utoken,
+                                           @PathVariable(value = "oid") long orderId,
+                                           @RequestParam(value = "pid") long productId) {
+        if (StringUtils.isBlank(utoken) || orderId <= 0 || productId <= 0) return ResponseMessage.BAD_REQUEST;
+
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        Order order = orderService.get(orderId);
+        if (!order.exists()) return ResponseMessage.BAD_REQUEST;
+
+        Product product = productService.get(productId);
+        if (!product.exists()) return ResponseMessage.BAD_REQUEST;
+
+        return new ResponseMessage(buildOrderDetail(order, product));
+    }
+
+    private JSONObject buildOrderDetail(Order order, Product product) {
+        JSONObject orderDetailJson = new JSONObject();
+        orderDetailJson.put("order", order);
+        orderDetailJson.put("cover", product.getCover());
+        orderDetailJson.put("title", product.getTitle());
+        orderDetailJson.put("scheduler", product.getScheduler());
+        orderDetailJson.put("address", product.getPlace().getAddress());
+        orderDetailJson.put("price", product.getMinPrice());
+
+        return orderDetailJson;
     }
 
     @RequestMapping(value = "/nickname", method = RequestMethod.PUT)
@@ -122,8 +143,9 @@ public class UserController extends AbstractController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        boolean successful = userService.updateNickName(user.getId(), nickName);
+        if(userService.getByNickName(nickName).exists()) return new ResponseMessage(ErrorCode.EXIST_NICKNAME, "用户昵称已存在");
 
+        boolean successful = userService.updateNickName(user.getId(), nickName);
         if (!successful) return ResponseMessage.FAILED("更新用户昵称失败");
 
         user.setNickName(nickName);
@@ -233,9 +255,13 @@ public class UserController extends AbstractController {
             childrenIds.add(childId);
         }
 
-        if (userId > 0 && !userService.updateChildren(userId, childrenIds)) return ResponseMessage.FAILED("添加孩子信息失败");
+        User user = userService.get(userId);
+        if (!user.exists()) return ResponseMessage.FAILED("添加孩子信息失败，用户不存在");
 
-        return new ResponseMessage(buildUserResponse(userService.get(userId)));
+        user.getChildren().addAll(childrenIds);
+        if (!userService.updateChildren(userId, user.getChildren())) return ResponseMessage.FAILED("添加孩子信息失败");
+
+        return new ResponseMessage(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/child/{cid}", method = RequestMethod.DELETE)

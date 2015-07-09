@@ -31,9 +31,7 @@ public class ParticipantController {
         long participantId = participantService.add(participant);
 
         if(participantId <= 0) return ResponseMessage.FAILED("添加出行人失败");
-
-        participant.setId(participantId);
-        return new ResponseMessage(participant);
+        return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -56,7 +54,7 @@ public class ParticipantController {
         boolean successful = participantService.update(participant);
 
         if (!successful) return ResponseMessage.FAILED("更新出行人失败");
-        return new ResponseMessage(participant);
+        return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/name",method = RequestMethod.PUT)
@@ -88,6 +86,7 @@ public class ParticipantController {
         if (!successful) return ResponseMessage.FAILED("更新性别失败");
         return ResponseMessage.SUCCESS;
     }
+
     @RequestMapping(value = "/birthday",method = RequestMethod.PUT)
     public ResponseMessage updateParticipantByBirthday(@RequestParam String utoken,
                                                        @RequestParam long id,
@@ -111,8 +110,8 @@ public class ParticipantController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         boolean successful = participantService.delete(id, user.getId());
-        if (!successful) return ResponseMessage.FAILED("删除出行人失败");
 
+        if (!successful) return ResponseMessage.FAILED("删除出行人失败");
         return ResponseMessage.SUCCESS;
     }
 

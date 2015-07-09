@@ -5,13 +5,9 @@ import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.common.web.secret.SecretKey;
 import cn.momia.service.base.user.User;
-import cn.momia.service.base.user.UserService;
-import cn.momia.service.base.user.participant.ParticipantService;
 import cn.momia.service.sms.SmsSender;
 import cn.momia.service.sms.SmsVerifier;
 import cn.momia.service.sms.impl.SmsLoginException;
-import cn.momia.service.web.ctrl.AbstractController;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -26,14 +22,11 @@ import java.util.Date;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthController extends AbstractController {
+public class AuthController extends UserRelatedController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired private SmsSender smsSender;
     @Autowired private SmsVerifier smsVerifier;
-
-    @Autowired private UserService userService;
-    @Autowired private ParticipantService participantService;
 
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     public ResponseMessage send(@RequestParam String mobile, @RequestParam String type) {
@@ -53,42 +46,22 @@ public class AuthController extends AbstractController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseMessage login(@RequestParam String mobile, @RequestParam String code) {
-        if (ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
-
-        if (!smsVerifier.verify(mobile, code)) return ResponseMessage.FAILED("验证码不正确");
+    public ResponseMessage login(@RequestParam String mobile, @RequestParam String password) {
+        if (ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(password)) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByMobile(mobile);
-//        String token = generateToken(mobile);
         if (!user.exists()) {
-                LOGGER.error("fail to login user for {}", mobile);
-                return new ResponseMessage(ErrorCode.NOT_REGISTERED, "登录失败，用户不存在，请先注册");
-        }/* else {
-            if (!userService.updateToken(user.getId(), token)) {
-                LOGGER.warn("fail to update token for {}, will use old token", mobile);
-            } else {
-                user.setToken(token);
-            }
-        }*/
+            LOGGER.error("fail to login user for {}", mobile);
+            return new ResponseMessage(ErrorCode.NOT_REGISTERED, "登录失败，用户不存在，请先注册");
+        }
 
+        if (!userService.validatePassword(mobile, password)) return ResponseMessage.FAILED("登录失败，密码不正确");
         return new ResponseMessage(buildUserResponse(user));
     }
 
-    private String generateToken(String mobile) {
-        return DigestUtils.md5Hex(StringUtils.join(new String[] { mobile, new Date().toString(), SecretKey.get() }, "|"));
-    }
-
-    private JSONObject buildUserResponse(User user) {
-        JSONObject userPackJson = new JSONObject();
-        userPackJson.put("user", user);
-        userPackJson.put("children", participantService.get(user.getChildren()).values());
-
-        return userPackJson;
-    }
-
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ResponseMessage register(@RequestParam String nickName, @RequestParam String mobile, @RequestParam String code){
-        if (StringUtils.isBlank(nickName) || ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
+    public ResponseMessage register(@RequestParam(value = "nickname") String nickName, @RequestParam String mobile, @RequestParam String password, @RequestParam String code){
+        if (StringUtils.isBlank(nickName) || ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(password) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
 
         if(userService.getByNickName(nickName).exists()) return ResponseMessage.FAILED("注册失败，用户昵称已存在");
 
@@ -97,7 +70,7 @@ public class AuthController extends AbstractController {
         User user = userService.getByMobile(mobile);
         String token = generateToken(mobile);
         if (!user.exists()) {
-            user = userService.add(nickName, mobile, token);
+            user = userService.add(nickName, mobile, password, token);
             if (!user.exists()) {
                 LOGGER.error("fail to register user for {}", mobile);
                 return ResponseMessage.FAILED("注册失败");
@@ -107,5 +80,9 @@ public class AuthController extends AbstractController {
         }
 
         return new ResponseMessage(buildUserResponse(user));
+    }
+
+    private String generateToken(String mobile) {
+        return DigestUtils.md5Hex(StringUtils.join(new String[] { mobile, new Date().toString(), SecretKey.get() }, "|"));
     }
 }

@@ -1,4 +1,4 @@
-package cn.momia.mapi.img;
+package cn.momia.common.web.img;
 
 import java.util.ArrayList;
 import java.util.List;

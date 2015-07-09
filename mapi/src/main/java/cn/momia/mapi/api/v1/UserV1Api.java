@@ -3,7 +3,6 @@ package cn.momia.mapi.api.v1;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.OrderDto;
 import cn.momia.mapi.api.v1.dto.base.ParticipantDto;
@@ -29,8 +28,7 @@ public class UserV1Api extends AbstractV1Api {
     private static final Function<Object, Dto> userFunc = new Function<Object, Dto>() {
         @Override
         public Dto apply(Object data) {
-            JSONObject userPackJson = (JSONObject) data;
-            return new UserDto(userPackJson.getJSONObject("user"), userPackJson.getJSONArray("children"));
+            return new UserDto((JSONObject) data);
         }
     };
 
@@ -65,29 +63,45 @@ public class UserV1Api extends AbstractV1Api {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                PagedListDto<OrderDto> orders = new PagedListDto<OrderDto>();
+                return buildOrdersDto((JSONObject) data, start, count);
+            }
+        });
+    }
 
-                JSONObject ordersPackJson = (JSONObject) data;
-                final long totalCount = ordersPackJson.getLong("totalCount");
-                orders.setTotalCount(totalCount);
-                JSONArray ordersJson = ordersPackJson.getJSONArray("orders");
-                for (int i = 0; i < ordersJson.size(); i++) {
-                    try {
-                        JSONObject orderPackJson = ordersJson.getJSONObject(i);
-                        JSONObject orderJson = orderPackJson.getJSONObject("order");
+    private Dto buildOrdersDto(JSONObject ordersPackJson, int start, int count) {
+        PagedListDto orders = new PagedListDto();
 
-                        OrderDto orderDto = new OrderDto(orderJson);
-                        orderDto.setTitle(orderPackJson.getString("product"));
-                        orderDto.setTime(ProductUtil.getSkuScheduler(orderPackJson.getJSONArray("sku")));
+        long totalCount = ordersPackJson.getLong("totalCount");
+        orders.setTotalCount(totalCount);
 
-                        orders.add(orderDto);
-                    } catch (Exception e) {
-                        LOGGER.error("fail to parse order: {}", ordersJson.getJSONObject(i), e);
-                    }
-                }
-                if (start + count < totalCount) orders.setNextIndex(start + count);
+        JSONArray ordersJson = ordersPackJson.getJSONArray("orders");
+        for (int i = 0; i < ordersJson.size(); i++) {
+            try {
+                orders.add(new OrderDto(ordersJson.getJSONObject(i), true));
+            } catch (Exception e) {
+                LOGGER.error("fail to parse order: {}", ordersJson.getJSONObject(i), e);
+            }
+        }
+        if (start + count < totalCount) orders.setNextIndex(start + count);
 
-                return orders;
+        return orders;
+    }
+
+    @RequestMapping(value = "/order/detail", method = RequestMethod.GET)
+    public ResponseMessage getOrderDetailOfUser(@RequestParam String utoken,
+                                                @RequestParam(value = "oid") long orderId,
+                                                @RequestParam(value = "pid") long productId) {
+        if (StringUtils.isBlank(utoken) || orderId <= 0 || productId <= 0) return ResponseMessage.BAD_REQUEST;
+
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("pid", productId);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user/order", orderId), builder.build());
+
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                return new OrderDto((JSONObject) data, true);
             }
         });
     }
@@ -280,19 +294,22 @@ public class UserV1Api extends AbstractV1Api {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                ListDto children = new ListDto();
-                JSONArray childrenJson = (JSONArray) data;
-                for (int i = 0; i < childrenJson.size(); i++) {
-                    try {
-                        JSONObject childJson = childrenJson.getJSONObject(i);
-                        children.add(new ParticipantDto(childJson));
-                    } catch (Exception e) {
-                        LOGGER.error("invalid child: {}", childrenJson);
-                    }
-                }
-
-                return children;
+                return buildChildrenDto((JSONArray) data);
             }
         });
+    }
+
+    private Dto buildChildrenDto(JSONArray childrenJson) {
+        ListDto children = new ListDto();
+        for (int i = 0; i < childrenJson.size(); i++) {
+            try {
+                JSONObject childJson = childrenJson.getJSONObject(i);
+                children.add(new ParticipantDto(childJson));
+            } catch (Exception e) {
+                LOGGER.error("invalid child: {}", childrenJson);
+            }
+        }
+
+        return children;
     }
 }

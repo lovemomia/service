@@ -4,31 +4,70 @@ import com.alibaba.fastjson.JSONObject;
 
 public class WechatpayPrepayDto implements Dto {
     private boolean successful;
-    private String appId;
-    private String timeStamp;
-    private String nonceStr;
-    private String prepayId;
-    private String signType;
-    private String paySign;
 
     public boolean isSuccessful() {
         return successful;
     }
 
+    // App
+    private String appid;
+    private String partnerid;
+    private String prepayid;
+    private String package_app;
+    private String noncestr;
+    private String timestamp;
+    private String sign;
+
+    public String getAppid() {
+        return appid;
+    }
+
+    public String getPartnerid() {
+        return partnerid;
+    }
+
+    public String getPrepayid() {
+        return prepayid;
+    }
+
+    public String getPackage_app() {
+        return package_app;
+    }
+
+    public String getNoncestr() {
+        return noncestr;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public String getSign() {
+        return sign;
+    }
+
+    // JsApi
+    private String appId;
+    private String prepayId;
+    private String nonceStr;
+    private String timeStamp;
+    private String signType;
+    private String paySign;
+
     public String getAppId() {
         return appId;
     }
 
-    public String getTimeStamp() {
-        return timeStamp;
+    public String getPrepayId() {
+        return prepayId;
     }
 
     public String getNonceStr() {
         return nonceStr;
     }
 
-    public String getPrepayId() {
-        return prepayId;
+    public String getTimeStamp() {
+        return timeStamp;
     }
 
     public String getSignType() {
@@ -39,16 +78,26 @@ public class WechatpayPrepayDto implements Dto {
         return paySign;
     }
 
-    public WechatpayPrepayDto(JSONObject prepayJson) {
+    public WechatpayPrepayDto(JSONObject prepayJson, String tradeType) {
         this.successful = prepayJson.getBoolean("successful");
         if (this.successful) {
             JSONObject paramJson = prepayJson.getJSONObject("all");
-            this.appId = paramJson.getString("appId");
-            this.timeStamp = paramJson.getString("timeStamp");
-            this.nonceStr = paramJson.getString("nonceStr");
-            this.prepayId = paramJson.getString("package");
-            this.signType = paramJson.getString("signType");
-            this.paySign = paramJson.getString("paySign");
+            if (tradeType.equals("APP")) {
+                this.appid = paramJson.getString("appid");
+                this.partnerid = paramJson.getString("partnerid");
+                this.prepayid = paramJson.getString("prepayid");
+                this.package_app = paramJson.getString("package");
+                this.noncestr = paramJson.getString("noncestr");
+                this.timestamp = paramJson.getString("timestamp");
+                this.sign = paramJson.getString("sign");
+            } else if (tradeType.equals("JSAPI")) {
+                this.appId = paramJson.getString("appId");
+                this.prepayId = paramJson.getString("package");
+                this.nonceStr = paramJson.getString("nonceStr");
+                this.timeStamp = paramJson.getString("timeStamp");
+                this.signType = paramJson.getString("signType");
+                this.paySign = paramJson.getString("paySign");
+            }
         }
     }
 }

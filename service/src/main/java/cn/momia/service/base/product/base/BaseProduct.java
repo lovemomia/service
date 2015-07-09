@@ -2,6 +2,8 @@ package cn.momia.service.base.product.base;
 
 import com.alibaba.fastjson.JSONArray;
 
+import java.util.Date;
+
 public class BaseProduct {
     public static final BaseProduct NOT_EXIST_BASEPRODUCT = new BaseProduct();
     public static final BaseProduct INVALID_BASEPRODUCT = new BaseProduct();
@@ -19,6 +21,8 @@ public class BaseProduct {
     private long placeId;
     private JSONArray content;
     private int sales;
+    private Date startTime;
+    private Date endTime;
 
     public long getId() {
         return id;
@@ -82,6 +86,22 @@ public class BaseProduct {
 
     public void setSales(int sales) {
         this.sales = sales;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
     @Override

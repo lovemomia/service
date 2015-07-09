@@ -4,11 +4,10 @@ import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.misc.ProductUtil;
+import cn.momia.mapi.api.v1.dto.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.BannerDto;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.composite.HomeDto;
-import cn.momia.mapi.api.v1.dto.base.ProductDto;
 import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -40,10 +39,11 @@ public class HomeV1Api extends AbstractV1Api {
                 if (pageIndex == 0) homeDto.setBanners(extractBannerData((JSONArray) collector.getResponse("banners")));
 
                 JSONObject productsPackJson = (JSONObject) collector.getResponse("products");
-                long totalCount = productsPackJson.getLong("totalCount");
+
                 JSONArray productsJson = productsPackJson.getJSONArray("products");
-                List<ProductDto> products = ProductUtil.extractProductsData(productsJson);
-                homeDto.setProducts(products);
+                homeDto.setProducts(ProductUtil.extractProductsData(productsJson));
+
+                long totalCount = productsPackJson.getLong("totalCount");
                 if (pageIndex < maxPageCount - 1 && (pageIndex + 1) * pageSize < totalCount) homeDto.setNextpage(pageIndex + 1);
 
                 return homeDto;

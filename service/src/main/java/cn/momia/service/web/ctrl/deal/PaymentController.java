@@ -31,8 +31,12 @@ public class PaymentController extends AbstractController {
     @Autowired private ProductService productService;
     @Autowired private OrderService orderService;
 
-    @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)
-    public ResponseMessage prepayWechatpay(HttpServletRequest request) {
+    @RequestMapping(value = "/prepay/alipay", method = RequestMethod.POST)
+    public ResponseMessage prepayAlipay(HttpServletRequest request) {
+        return prepay(request, Payment.Type.ALIPAY);
+    }
+
+    private ResponseMessage prepay(HttpServletRequest request, int payType) {
         String utoken = request.getParameter("utoken");
         long orderId = Long.valueOf(request.getParameter("oid"));
         long productId = Long.valueOf(request.getParameter("pid"));
@@ -47,11 +51,12 @@ public class PaymentController extends AbstractController {
         if (!order.exists() || !product.exists()) return ResponseMessage.BAD_REQUEST;
         if (order.getCustomerId() != user.getId() || order.getSkuId() != skuId) return ResponseMessage.BAD_REQUEST;
 
-        PaymentGateway gateway = PaymentGatewayFactory.create(Payment.Type.WECHATPAY);
+        PaymentGateway gateway = PaymentGatewayFactory.create(payType);
         Map<String, String> params = gateway.extractPrepayParams(request, order, product);
-        PrepayParam prepayParam = PrepayParamFactory.create(params, Payment.Type.WECHATPAY);
+        PrepayParam prepayParam = PrepayParamFactory.create(params, payType);
         PrepayResult prepayResult = gateway.prepay(prepayParam);
 
+        if (!prepayResult.isSuccessful()) return ResponseMessage.FAILED;
         return new ResponseMessage(prepayResult);
     }
 
@@ -61,6 +66,11 @@ public class PaymentController extends AbstractController {
 
     private Product getProduct(HttpServletRequest request) {
         return productService.get(Long.valueOf(request.getParameter("pid")));
+    }
+
+    @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)
+    public ResponseMessage prepayWechatpay(HttpServletRequest request) {
+        return prepay(request, Payment.Type.WECHATPAY);
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.GET)
