@@ -1,9 +1,13 @@
-package cn.momia.common.misc;
+package cn.momia.common.web.misc;
 
+import cn.momia.common.misc.TimeUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -13,6 +17,22 @@ import java.util.List;
 public class SkuUtil {
     public static final Splitter TIME_SPLITTER = Splitter.on("~").trimResults().omitEmptyStrings();
     private static final DateFormat TIME_FORMATTER = new SimpleDateFormat("h:mm");
+
+    public static BigDecimal getSkuMiniPrice(JSONArray pricesJson) {
+        BigDecimal miniPrice = new BigDecimal(Float.MAX_VALUE);
+
+        for (int i = 0; i < pricesJson.size(); i++) {
+            JSONObject priceJson = pricesJson.getJSONObject(i);
+            BigDecimal price = priceJson.getBigDecimal("price");
+            if (price.compareTo(miniPrice) <= 0) miniPrice = price;
+        }
+
+        return miniPrice;
+    }
+
+    public static String getSkuScheduler(JSONArray propertiesJson) {
+        return SkuUtil.getSkuScheduler(extractSkuTimeValue(propertiesJson));
+    }
 
     public static String getSkuScheduler(String timeValue) {
         if (StringUtils.isBlank(timeValue)) return "";
@@ -46,5 +66,18 @@ public class SkuUtil {
         }
 
         return builder.toString();
+    }
+
+    public static List<String> extractSkuTimes(JSONArray propertiesJson) {
+        return Lists.newArrayList(SkuUtil.TIME_SPLITTER.split(extractSkuTimeValue(propertiesJson)));
+    }
+
+    private static String extractSkuTimeValue(JSONArray propertiesJson) {
+        for (int i = 0; i < propertiesJson.size(); i++) {
+            JSONObject propertyJson = propertiesJson.getJSONObject(i);
+            if ("time".equals(propertyJson.getString("name")))  return propertyJson.getString("value");
+        }
+
+        return "";
     }
 }

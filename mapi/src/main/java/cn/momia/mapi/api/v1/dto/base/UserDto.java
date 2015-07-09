@@ -1,7 +1,7 @@
 package cn.momia.mapi.api.v1.dto.base;
 
 import cn.momia.mapi.api.v1.dto.composite.ListDto;
-import cn.momia.mapi.img.ImageFile;
+import cn.momia.common.web.img.ImageFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;

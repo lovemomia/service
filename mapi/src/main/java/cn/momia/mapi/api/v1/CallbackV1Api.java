@@ -2,7 +2,7 @@ package cn.momia.mapi.api.v1;
 
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.misc.Xml;
+import cn.momia.mapi.api.v1.dto.misc.Xml;
 import cn.momia.common.misc.XmlUtil;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;

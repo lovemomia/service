@@ -1,6 +1,6 @@
 package cn.momia.service.base.product.sku;
 
-import cn.momia.common.misc.SkuUtil;
+import cn.momia.common.web.misc.SkuUtil;
 import cn.momia.common.misc.TimeUtil;
 import com.google.common.collect.Lists;
 
