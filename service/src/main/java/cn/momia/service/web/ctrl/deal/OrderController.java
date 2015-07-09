@@ -8,6 +8,7 @@ import cn.momia.service.base.user.UserService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.web.ctrl.AbstractController;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +44,10 @@ public class OrderController extends AbstractController {
             orderId = orderService.add(order);
             if (orderId > 0) {
                 order.setId(orderId);
-                return new ResponseMessage(order);
+                JSONObject orderPackJson = new JSONObject();
+                orderPackJson.put("order", order);
+
+                return new ResponseMessage(orderPackJson);
             }
         } catch (OrderLimitException e) {
             return ResponseMessage.FAILED("本单有限购，您以超出购买限额，超出数量：" + e.getOverCount());

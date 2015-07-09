@@ -1,5 +1,6 @@
 package cn.momia.mapi.api.v1.dto.composite;
 
+import cn.momia.common.web.img.ImageFile;
 import cn.momia.mapi.api.v1.dto.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.ProductDto;
@@ -77,6 +78,18 @@ public class ProductDetailDto implements Dto {
 
     public ProductDetailDto(JSONObject productJson, JSONObject customersJson) {
         this.productDto = ProductUtil.extractProductData(productJson, true);
-        this.customers = customersJson;
+        this.customers = processImages(customersJson);
+    }
+
+    private JSONObject processImages(JSONObject customersJson) {
+        JSONArray avatarsJson = customersJson.getJSONArray("avatars");
+        if (avatarsJson != null) {
+            for (int i = 0; i < avatarsJson.size(); i++) {
+                String avatar = avatarsJson.getString(i);
+                avatarsJson.set(i, ImageFile.url(avatar));
+            }
+        }
+
+        return customersJson;
     }
 }

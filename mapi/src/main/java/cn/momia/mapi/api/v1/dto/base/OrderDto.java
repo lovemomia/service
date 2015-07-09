@@ -1,5 +1,6 @@
 package cn.momia.mapi.api.v1.dto.base;
 
+import cn.momia.common.web.img.ImageFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -76,7 +77,8 @@ public class OrderDto implements Dto {
         this.totalFee = orderJson.getBigDecimal("totalFee");
         this.participants = buildParticipants(orderJson.getJSONArray("prices"));
 
-        this.cover = orderPackJson.getString("cover");
+        String cover = orderPackJson.getString("cover");
+        this.cover = cover != null ? ImageFile.url(cover) : cover;
         this.title = orderPackJson.getString("title");
         this.time = orderPackJson.getString("scheduler");
     }

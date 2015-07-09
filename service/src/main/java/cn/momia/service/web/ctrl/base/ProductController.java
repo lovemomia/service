@@ -84,7 +84,7 @@ public class ProductController extends AbstractController {
         if (id <= 0 || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
 
         List<Order> orders = orderService.queryDistinctCustomerOrderByProduct(id, start, count);
-        if (orders.isEmpty()) return ResponseMessage.EMPTY_ARRAY;
+        if (orders.isEmpty()) return new ResponseMessage(new Customers("目前还没有人参加", null));
 
         List<Long> customerIds = new ArrayList<Long>();
         for (Order order : orders) customerIds.add(order.getCustomerId());
