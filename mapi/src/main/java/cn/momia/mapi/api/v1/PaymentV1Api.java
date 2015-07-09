@@ -16,6 +16,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/v1/payment")
 public class PaymentV1Api extends AbstractV1Api {
+    @RequestMapping(value = "/prepay/alipay", method = RequestMethod.POST)
+    public ResponseMessage prepayAlipay(@RequestParam String utoken,
+                                        @RequestParam(value = "oid") long orderId,
+                                        @RequestParam(value = "pid") long productId,
+                                        @RequestParam(value = "sid") long skuId) {
+        if (StringUtils.isBlank(utoken) ||
+                orderId <= 0||
+                productId <= 0 ||
+                skuId <= 0) return ResponseMessage.BAD_REQUEST;
+
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("oid", orderId)
+                .add("pid", productId)
+                .add("sid", skuId);
+        MomiaHttpRequest request = MomiaHttpRequest.POST(dealServiceUrl("payment/prepay/wechatpay"), builder.build());
+
+        return executeRequest(request);
+    }
+
     @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)
     public ResponseMessage prepayWechatpay(@RequestParam String utoken,
                                            @RequestParam(value = "oid") long orderId,

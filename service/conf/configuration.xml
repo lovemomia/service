@@ -31,6 +31,10 @@
     </Database>
 
     <Payment>
+        <Ali>
+            <Partner>2088911944697039</Partner>
+            <NotifyUrl>https://i.momia.cn/callback/alipay</NotifyUrl>
+        </Ali>
         <Wechat>
             <AccessTokenService>https://api.weixin.qq.com/sns/oauth2/access_token</AccessTokenService>
             <PrepayService>https://api.mch.weixin.qq.com/pay/unifiedorder</PrepayService>
