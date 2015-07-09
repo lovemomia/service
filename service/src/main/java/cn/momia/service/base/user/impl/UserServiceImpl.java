@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class UserServiceImpl extends DbAccessService implements UserService {
+    private static final Splitter CHILDREN_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
     private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "avatar", "name", "sex", "birthday", "cityId", "address", "children" };
     private CityService cityService;
 
@@ -109,7 +110,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     private Set<Long> parseChildren(String children) {
         Set<Long> childrenIds = new HashSet<Long>();
-        for (String childId : Splitter.on(",").trimResults().omitEmptyStrings().split(children)) {
+        for (String childId : CHILDREN_SPLITTER.split(children)) {
             childrenIds.add(Long.valueOf(childId));
         }
 

@@ -19,6 +19,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,7 +81,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     }
 
     @Override
-    public List<Product> get(List<Long> ids) {
+    public List<Product> get(Collection<Long> ids) {
         List<BaseProduct> baseProducts = baseProductService.get(ids);
 
         return buildProducts(baseProducts);

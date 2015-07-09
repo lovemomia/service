@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class BaseProductServiceImpl extends DbAccessService implements BaseProductService {
@@ -60,7 +61,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     }
 
     @Override
-    public List<BaseProduct> get(List<Long> ids) {
+    public List<BaseProduct> get(Collection<Long> ids) {
         final List<BaseProduct> baseProducts = new ArrayList<BaseProduct>();
         if (ids == null || ids.isEmpty()) return baseProducts;
 
