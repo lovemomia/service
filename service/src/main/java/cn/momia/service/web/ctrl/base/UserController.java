@@ -1,5 +1,6 @@
 package cn.momia.service.web.ctrl.base;
 
+import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.base.city.CityService;
 import cn.momia.service.base.product.Product;
@@ -111,7 +112,7 @@ public class UserController extends AbstractController {
             }
 
             Sku sku = skuMap.get(order.getSkuId());
-            if (sku != null) orderJson.put("sku", sku.getProperties());
+            if (sku != null) orderJson.put("scheduler", sku.scheduler());
 
             ordersJson.add(orderJson);
         }
@@ -127,8 +128,9 @@ public class UserController extends AbstractController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        boolean successful = userService.updateNickName(user.getId(), nickName);
+        if(userService.getByNickName(nickName).exists()) return new ResponseMessage(ErrorCode.EXIST_NICKNAME, "用户昵称已存在");
 
+        boolean successful = userService.updateNickName(user.getId(), nickName);
         if (!successful) return ResponseMessage.FAILED("更新用户昵称失败");
 
         user.setNickName(nickName);

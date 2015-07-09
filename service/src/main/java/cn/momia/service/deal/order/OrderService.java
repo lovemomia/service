@@ -9,9 +9,9 @@ public interface OrderService {
     long queryCountByUser(long userId, int status, String type);
     List<Order> queryByUserAndSku(long userId, long skuId);
     List<Order> queryByUser(long userId, int status, String type, int start, int count);
+    List<Order> queryAllCustomerOrderByProduct(long productId);
     List<Order> queryDistinctCustomerOrderByProduct(long productId, int start, int count);
     boolean delete(long id, long userId);
     boolean pay(long id);
     boolean check(long id, long userId, long productId, long skuId);
-    void cleanExpiredOrders();
 }

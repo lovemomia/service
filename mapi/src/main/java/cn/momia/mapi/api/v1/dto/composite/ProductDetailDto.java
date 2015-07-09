@@ -1,11 +1,16 @@
 package cn.momia.mapi.api.v1.dto.composite;
 
+import cn.momia.common.misc.AgeUtil;
+import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.ProductDto;
+import cn.momia.mapi.img.ImageFile;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -84,5 +89,38 @@ public class ProductDetailDto implements Dto {
 
     public void setCustomers(Customers customers) {
         this.customers = customers;
+    }
+
+    public ProductDetailDto(JSONObject productJson, JSONArray customersJson) {
+        this.productDto = ProductUtil.extractProductData(productJson, true);
+        this.customers = buildCustomersDto(customersJson);
+    }
+
+    private Customers buildCustomersDto(JSONArray customersJson) {
+        ProductDetailDto.Customers customers = new ProductDetailDto.Customers();
+
+        int childCount = 0;
+        int adultCount = 0;
+
+        for (int i = 0; i < customersJson.size(); i++) {
+            JSONObject customerJson = customersJson.getJSONObject(i);
+
+            if (customers.avatars == null) customers.avatars = new ArrayList<String>();
+            customers.avatars.add(ImageFile.url(customerJson.getString("avatar")));
+
+            JSONArray participantsJson = customerJson.getJSONArray("participants");
+            for (int j = 0; j < participantsJson.size(); j++) {
+                Date birthday = participantsJson.getJSONObject(j).getDate("birthday");
+                if (AgeUtil.isAdult(birthday)) adultCount++;
+                else childCount++;
+            }
+        }
+
+        if (childCount == 0 && adultCount == 0) customers.text = "目前还没有人参加";
+        else if (childCount > 0 && adultCount == 0) customers.text = childCount + "个孩子参加";
+        else if (childCount == 0 && adultCount > 0) customers.text = adultCount + "个大人参加";
+        else customers.text = childCount + "个孩子，" + adultCount + "个大人参加";
+
+        return customers;
     }
 }

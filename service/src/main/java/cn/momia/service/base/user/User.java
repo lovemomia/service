@@ -1,7 +1,5 @@
 package cn.momia.service.base.user;
 
-import cn.momia.service.base.user.participant.Participant;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;

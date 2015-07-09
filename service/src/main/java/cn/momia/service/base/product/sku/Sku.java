@@ -1,6 +1,13 @@
 package cn.momia.service.base.product.sku;
 
+import cn.momia.common.misc.SkuUtil;
+import cn.momia.common.misc.TimeUtil;
+import com.google.common.collect.Lists;
+
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 public class Sku implements Serializable {
@@ -10,6 +17,42 @@ public class Sku implements Serializable {
     static {
         NOT_EXIST_SKU.setId(0);
         INVALID_SKU.setId(0);
+    }
+
+    public static List<Sku> sortByStartTime(List<Sku> skus) {
+        Collections.sort(skus, new Comparator<Sku>() {
+            @Override
+            public int compare(Sku s1, Sku s2) {
+                Date time1 = s1.startTime();
+                Date time2 = s2.startTime();
+
+                if (time1 == null) return 1;
+                if (time2 == null) return -1;
+
+                long timeStamp1 = time1.getTime();
+                long timeStamp2 = time2.getTime();
+
+                if (timeStamp1 <= timeStamp2) return 1;
+                return -1;
+            }
+        });
+
+        return skus;
+    }
+
+    private Date startTime() {
+        for (SkuProperty property : properties) {
+            if ("time".equalsIgnoreCase(property.getName())) {
+                List<Date> times = TimeUtil.castToDates(Lists.newArrayList(SkuUtil.TIME_SPLITTER.split(property.getValue())));
+
+                if (times.isEmpty()) return null;
+
+                Collections.sort(times);
+                return times.get(0);
+            }
+        }
+
+        return null;
     }
 
     private long id;
@@ -111,5 +154,13 @@ public class Sku implements Serializable {
 
     public boolean exists() {
         return !this.equals(NOT_EXIST_SKU);
+    }
+
+    public String scheduler() {
+        for (SkuProperty property : properties) {
+            if ("time".equalsIgnoreCase(property.getName())) return SkuUtil.getSkuScheduler(property.getValue());
+        }
+
+        return "";
     }
 }

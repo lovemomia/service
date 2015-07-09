@@ -24,12 +24,18 @@ public class WechatpayPrepayFields {
     public static final String TRADE_TYPE = "trade_type";
     public static final String PREPAY_ID = "prepay_id";
 
-    public static final String PREPAY_RESULT_APPID = "app_id";
-    public static final String PREPAY_RESULT_PARTNERID = "partner_id";
-    public static final String PREPAY_RESULT_PREPAYID = "prepay_id";
-    public static final String PREPAY_RESULT_PACKAGE = "package";
-    public static final String PREPAY_RESULT_NONCE_STR = "nonce_str";
-    public static final String PREPAY_RESULT_TIMESTAMP = "timestamp";
-    public static final String PREPAY_RESULT_SIGN_TYPE = "sign_type";
-    public static final String PREPAY_RESULT_PAY_SIGN = "pay_sign";
+    public static final String PREPAY_RESULT_JSAPI_APPID = "appId";
+    public static final String PREPAY_RESULT_JSAPI_PACKAGE = "package";
+    public static final String PREPAY_RESULT_JSAPI_NONCE_STR = "nonceStr";
+    public static final String PREPAY_RESULT_JSAPI_TIMESTAMP = "timeStamp";
+    public static final String PREPAY_RESULT_JSAPI_SIGN_TYPE = "signType";
+    public static final String PREPAY_RESULT_JSAPI_PAY_SIGN = "paySign";
+
+    public static final String PREPAY_RESULT_APP_APPID = "appid";
+    public static final String PREPAY_RESULT_APP_PARTNERID = "partnerid";
+    public static final String PREPAY_RESULT_APP_PREPAYID = "prepayid";
+    public static final String PREPAY_RESULT_APP_PACKAGE = "package";
+    public static final String PREPAY_RESULT_APP_NONCE_STR = "noncestr";
+    public static final String PREPAY_RESULT_APP_TIMESTAMP = "timestamp";
+    public static final String PREPAY_RESULT_APP_SIGN = "sign";
 }

@@ -18,6 +18,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,7 +103,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
     }
 
     @Override
-    public Map<Long, List<Sku>> queryByProducts(List<Long> productIds) {
+    public Map<Long, List<Sku>> queryByProducts(Collection<Long> productIds) {
         final Map<Long, List<Sku>> skusOfProducts = new HashMap<Long, List<Sku>>();
         if (productIds == null || productIds.isEmpty()) return skusOfProducts;
 

@@ -20,8 +20,7 @@ public class AuthV1Api extends AbstractV1Api {
     private static final Function<Object, Dto> userFunc = new Function<Object, Dto>() {
         @Override
         public Dto apply(Object data) {
-            JSONObject userPackJson = (JSONObject) data;
-            return new UserDto(userPackJson.getJSONObject("user"), userPackJson.getJSONArray("children"), true);
+            return new UserDto((JSONObject) data, true);
         }
     };
 

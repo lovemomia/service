@@ -1,12 +1,13 @@
 package cn.momia.mapi.api.misc;
 
+import cn.momia.common.misc.SkuUtil;
+import cn.momia.common.misc.TimeUtil;
 import cn.momia.mapi.api.v1.dto.base.ProductDto;
 import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import cn.momia.mapi.img.ImageFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.util.TypeUtils;
-import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,6 @@ public class ProductUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductUtil.class);
 
     private static final DateFormat DATE_FORMATTER = new SimpleDateFormat("M月d日");
-    private static final DateFormat TIME_FORMATTER = new SimpleDateFormat("h:mm");
 
     public static ListDto extractProductsData(JSONArray productsJson) {
         ListDto products = new ListDto();
@@ -66,7 +66,7 @@ public class ProductUtil {
         return product;
     }
 
-    public static BigDecimal getMiniPrice(JSONArray skusJson) {
+    private static BigDecimal getMiniPrice(JSONArray skusJson) {
         BigDecimal miniPrice = new BigDecimal(Float.MAX_VALUE);
 
         for (int i = 0; i < skusJson.size(); i++) {
@@ -91,23 +91,13 @@ public class ProductUtil {
         return miniPrice;
     }
 
-    private static boolean getSoldOut(Integer sales, JSONArray skusJson) {
-        int totalStock = 0;
-        for (int i = 0; i < skusJson.size(); i++) {
-            JSONObject skuJson = skusJson.getJSONObject(i);
-            totalStock += skuJson.getInteger("stock");
-        }
-
-        return sales >= totalStock;
-    }
-
-    public static String getScheduler(JSONArray skusJson) {
+    private static String getScheduler(JSONArray skusJson) {
         List<Date> times = new ArrayList<Date>();
         for (int i = 0; i < skusJson.size(); i++) {
             JSONObject skuJson = skusJson.getJSONObject(i);
             JSONArray propertiesJson = skuJson.getJSONArray("properties");
             List<String> timeStrs = extractSkuTimes(propertiesJson);
-            times.addAll(castToDate(timeStrs));
+            times.addAll(TimeUtil.castToDates(timeStrs));
         }
 
         Collections.sort(times);
@@ -115,37 +105,17 @@ public class ProductUtil {
         return ProductUtil.format(times, skusJson.size());
     }
 
-    private static List<Date> castToDate(List<String> timeStrs) {
-        List<Date> times = new ArrayList<Date>();
-        for (String timeStr : timeStrs) {
-            Date time = castToDate(timeStr);
-            if (time != null) times.add(time);
-        }
-
-        return times;
-    }
-
-    private static Date castToDate(String timeStr) {
-        try {
-            return TypeUtils.castToDate(timeStr);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     private static List<String> extractSkuTimes(JSONArray propertiesJson) {
-        List<String> timeStrs = new ArrayList<String>();
+        return Lists.newArrayList(SkuUtil.TIME_SPLITTER.split(extractSkuTimeValue(propertiesJson)));
+    }
 
+    private static String extractSkuTimeValue(JSONArray propertiesJson) {
         for (int i = 0; i < propertiesJson.size(); i++) {
             JSONObject propertyJson = propertiesJson.getJSONObject(i);
-            if (propertyJson.getString("name").equals("time")) {
-                for (String timeStr : Splitter.on("~").trimResults().omitEmptyStrings().split(propertyJson.getString("value"))) {
-                    timeStrs.add(timeStr);
-                }
-            }
+            if ("time".equals(propertyJson.getString("name")))  return propertyJson.getString("value");
         }
 
-        return timeStrs;
+        return "";
     }
 
     private static String format(List<Date> times, int count) {
@@ -162,6 +132,16 @@ public class ProductUtil {
                 return DATE_FORMATTER.format(start) + "-" + DATE_FORMATTER.format(end) + " " + TimeUtil.getWeekDay(start) + "-" + TimeUtil.getWeekDay(end) + " 共" + count + "场";
             }
         }
+    }
+
+    private static boolean getSoldOut(int sales, JSONArray skusJson) {
+        int totalStock = 0;
+        for (int i = 0; i < skusJson.size(); i++) {
+            JSONObject skuJson = skusJson.getJSONObject(i);
+            totalStock += skuJson.getInteger("stock");
+        }
+
+        return sales >= totalStock;
     }
 
     private static List<String> extractProductImgs(JSONObject productJson) {
@@ -190,41 +170,6 @@ public class ProductUtil {
     }
 
     public static String getSkuScheduler(JSONArray propertiesJson) {
-        StringBuilder builder = new StringBuilder();
-        List<String> timeStrs = extractSkuTimes(propertiesJson);
-        if (timeStrs.isEmpty()) return "";
-
-        Collections.sort(timeStrs);
-        List<Date> times = castToDate(timeStrs);
-        if (times.isEmpty()) return "";
-
-        Date start = times.get(0);
-        Date end = times.get(timeStrs.size() - 1);
-        if (TimeUtil.isSameDay(start, end)) {
-            String timeStr = timeStrs.get(0);
-            Date time = castToDate(timeStr);
-            if (time != null) {
-                builder.append(buildDateWithWeekDay(time));
-                if (timeStr.contains(":"))
-                    builder.append(TimeUtil.getAmPm(time))
-                            .append(TIME_FORMATTER.format(time));
-            }
-        } else {
-            builder.append(buildDateWithWeekDay(start))
-                    .append("~")
-                    .append(buildDateWithWeekDay(end));
-        }
-
-        return builder.toString();
-    }
-
-    private static String buildDateWithWeekDay(Date time) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(DATE_FORMATTER.format(time))
-                .append("(")
-                .append(TimeUtil.getWeekDay(time))
-                .append(")");
-
-        return builder.toString();
+        return SkuUtil.getSkuScheduler(extractSkuTimeValue(propertiesJson));
     }
 }

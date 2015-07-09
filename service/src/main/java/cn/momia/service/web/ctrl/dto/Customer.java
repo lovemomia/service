@@ -1,12 +1,10 @@
-package cn.momia.service.base.product;
+package cn.momia.service.web.ctrl.dto;
 
 import cn.momia.service.base.user.participant.Participant;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 public class Customer implements Serializable {
     private long userId;
@@ -15,9 +13,6 @@ public class Customer implements Serializable {
     private List<Participant> participants;
     private Date orderDate;
     private int orderStatus;
-    private String nickName;
-    private Set<Participant> children;
-
 
     public long getUserId() {
         return userId;
@@ -65,21 +60,5 @@ public class Customer implements Serializable {
 
     public void setOrderStatus(int orderStatus) {
         this.orderStatus = orderStatus;
-    }
-
-    public String getNickName() {
-        return nickName;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-    }
-
-    public Set<Participant> getChildren() {
-        return children;
-    }
-
-    public void setChildren(Set<Participant> children) {
-        this.children = children;
     }
 }

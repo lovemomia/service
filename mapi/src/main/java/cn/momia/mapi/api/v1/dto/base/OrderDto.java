@@ -13,6 +13,7 @@ public class OrderDto implements Dto {
     private BigDecimal totalFee;
     private String participants;
 
+    // extra info
     private String cover;
     private String title;
     private String time;
@@ -65,13 +66,19 @@ public class OrderDto implements Dto {
         this.time = time;
     }
 
-    public OrderDto(JSONObject orderJson) {
+    public OrderDto(JSONObject orderPackJson) {
+        JSONObject orderJson = orderPackJson.getJSONObject("order");
+
         this.id = orderJson.getInteger("id");
         this.productId = orderJson.getLong("productId");
         this.skuId = orderJson.getLong("skuId");
         this.count = orderJson.getInteger("count");
         this.totalFee = orderJson.getBigDecimal("totalFee");
         this.participants = buildParticipants(orderJson.getJSONArray("prices"));
+
+        this.cover = orderPackJson.getString("cover");
+        this.title = orderPackJson.getString("title");
+        this.time = orderPackJson.getString("scheduler");
     }
 
     private String buildParticipants(JSONArray prices) {

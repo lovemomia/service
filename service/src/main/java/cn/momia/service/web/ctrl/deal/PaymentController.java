@@ -52,6 +52,7 @@ public class PaymentController extends AbstractController {
         PrepayParam prepayParam = PrepayParamFactory.create(params, Payment.Type.WECHATPAY);
         PrepayResult prepayResult = gateway.prepay(prepayParam);
 
+        if (!prepayResult.isSuccessful()) return ResponseMessage.FAILED;
         return new ResponseMessage(prepayResult);
     }
 

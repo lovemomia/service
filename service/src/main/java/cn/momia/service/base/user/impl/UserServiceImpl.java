@@ -1,6 +1,7 @@
 package cn.momia.service.base.user.impl;
 
 import cn.momia.common.secret.PasswordEncryptor;
+import cn.momia.common.web.secret.SecretKey;
 import cn.momia.service.base.city.CityService;
 import cn.momia.service.common.DbAccessService;
 import com.google.common.base.Splitter;
@@ -19,14 +20,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class UserServiceImpl extends DbAccessService implements UserService {
+    private static final Splitter CHILDREN_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
     private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "avatar", "name", "sex", "birthday", "cityId", "address", "children" };
     private CityService cityService;
 
@@ -38,7 +40,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     public User add(String nickName, String mobile, String password, String token) {
         if (!validateMobile(mobile)) return User.DUPLICATE_USER;
 
-        return addUser(nickName, mobile, PasswordEncryptor.encrypt(mobile, password), token);
+        return addUser(nickName, mobile, PasswordEncryptor.encrypt(mobile, password, SecretKey.getPasswordSecretKey()), token);
     }
 
     public boolean validateMobile(String mobile) {
@@ -109,7 +111,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     private Set<Long> parseChildren(String children) {
         Set<Long> childrenIds = new HashSet<Long>();
-        for (String childId : Splitter.on(",").trimResults().omitEmptyStrings().split(children)) {
+        for (String childId : CHILDREN_SPLITTER.split(children)) {
             childrenIds.add(Long.valueOf(childId));
         }
 
@@ -117,7 +119,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
-    public Map<Long, User> get(List<Long> ids) {
+    public Map<Long, User> get(Collection<Long> ids) {
         final Map<Long, User> users = new HashMap<Long, User>();
         if (ids == null || ids.size() <= 0) return users;
 
@@ -176,7 +178,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     public boolean validatePassword(String mobile, String password) {
         String sql = "SELECT mobile, password FROM t_user WHERE mobile=? AND password=?";
 
-        return jdbcTemplate.query(sql, new Object[] { mobile, PasswordEncryptor.encrypt(mobile, password) }, new ResultSetExtractor<Boolean>() {
+        return jdbcTemplate.query(sql, new Object[] { mobile, PasswordEncryptor.encrypt(mobile, password, SecretKey.getPasswordSecretKey()) }, new ResultSetExtractor<Boolean>() {
             @Override
             public Boolean extractData(ResultSet resultSet) throws SQLException, DataAccessException {
                 if (resultSet.next()) return true;
