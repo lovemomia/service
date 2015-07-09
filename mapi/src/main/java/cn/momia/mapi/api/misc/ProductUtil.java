@@ -134,7 +134,7 @@ public class ProductUtil {
         }
     }
 
-    private static boolean getSoldOut(Integer sales, JSONArray skusJson) {
+    private static boolean getSoldOut(int sales, JSONArray skusJson) {
         int totalStock = 0;
         for (int i = 0; i < skusJson.size(); i++) {
             JSONObject skuJson = skusJson.getJSONObject(i);
