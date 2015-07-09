@@ -240,11 +240,13 @@ public class UserController extends AbstractController {
             childrenIds.add(childId);
         }
 
-        childrenIds.addAll(userService.get(userId).getChildren());
+        User user = userService.get(userId);
+        if (!user.exists()) return ResponseMessage.FAILED("添加孩子信息失败，用户不存在");
 
-        if (userId > 0 && !userService.updateChildren(userId, childrenIds)) return ResponseMessage.FAILED("添加孩子信息失败");
+        user.getChildren().addAll(childrenIds);
+        if (!userService.updateChildren(userId, user.getChildren())) return ResponseMessage.FAILED("添加孩子信息失败");
 
-        return new ResponseMessage(buildUserResponse(userService.get(userId)));
+        return new ResponseMessage(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/child/{cid}", method = RequestMethod.DELETE)

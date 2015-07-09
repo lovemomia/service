@@ -77,6 +77,8 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public User get(long id) {
+        if (id <= 0) return User.NOT_EXIST_USER;
+
         String sql = "SELECT " + joinFields() + " FROM t_user WHERE id=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<User>() {

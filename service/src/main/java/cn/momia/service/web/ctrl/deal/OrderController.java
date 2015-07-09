@@ -77,6 +77,7 @@ public class OrderController extends AbstractController {
         int limit;
         try {
             Sku sku = productService.getSku(skuId);
+
             limit = sku.getLimit();
             if (limit <= 0) return;
 
