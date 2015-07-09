@@ -7,12 +7,9 @@ import cn.momia.service.base.product.Product;
 import cn.momia.service.base.product.ProductService;
 import cn.momia.service.base.product.sku.Sku;
 import cn.momia.service.base.user.User;
-import cn.momia.service.base.user.UserService;
 import cn.momia.service.base.user.participant.Participant;
-import cn.momia.service.base.user.participant.ParticipantService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
-import cn.momia.service.web.ctrl.AbstractController;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -35,10 +32,8 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/user")
-public class UserController extends AbstractController {
+public class UserController extends UserRelatedController {
     @Autowired private CityService cityService;
-    @Autowired private UserService userService;
-    @Autowired private ParticipantService participantService;
 
     @Autowired private OrderService orderService;
     @Autowired private ProductService productService;
@@ -52,14 +47,6 @@ public class UserController extends AbstractController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         return new ResponseMessage(buildUserResponse(user));
-    }
-
-    private JSONObject buildUserResponse(User user) {
-        JSONObject userPackJson = new JSONObject();
-        userPackJson.put("user", user);
-        userPackJson.put("children", participantService.get(user.getChildren()).values());
-
-        return userPackJson;
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)

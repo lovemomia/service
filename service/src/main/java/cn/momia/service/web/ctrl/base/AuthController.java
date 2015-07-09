@@ -5,13 +5,9 @@ import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.common.web.secret.SecretKey;
 import cn.momia.service.base.user.User;
-import cn.momia.service.base.user.UserService;
-import cn.momia.service.base.user.participant.ParticipantService;
 import cn.momia.service.sms.SmsSender;
 import cn.momia.service.sms.SmsVerifier;
 import cn.momia.service.sms.impl.SmsLoginException;
-import cn.momia.service.web.ctrl.AbstractController;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -26,14 +22,11 @@ import java.util.Date;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthController extends AbstractController {
+public class AuthController extends UserRelatedController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired private SmsSender smsSender;
     @Autowired private SmsVerifier smsVerifier;
-
-    @Autowired private UserService userService;
-    @Autowired private ParticipantService participantService;
 
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     public ResponseMessage send(@RequestParam String mobile, @RequestParam String type) {
@@ -64,14 +57,6 @@ public class AuthController extends AbstractController {
 
         if (!userService.validatePassword(mobile, password)) return ResponseMessage.FAILED("登录失败，密码不正确");
         return new ResponseMessage(buildUserResponse(user));
-    }
-
-    private JSONObject buildUserResponse(User user) {
-        JSONObject userPackJson = new JSONObject();
-        userPackJson.put("user", user);
-        userPackJson.put("children", participantService.get(user.getChildren()).values());
-
-        return userPackJson;
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
