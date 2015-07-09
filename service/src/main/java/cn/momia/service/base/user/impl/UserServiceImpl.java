@@ -1,6 +1,7 @@
 package cn.momia.service.base.user.impl;
 
 import cn.momia.common.secret.PasswordEncryptor;
+import cn.momia.common.web.secret.SecretKey;
 import cn.momia.service.base.city.CityService;
 import cn.momia.service.common.DbAccessService;
 import com.google.common.base.Splitter;
@@ -39,7 +40,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     public User add(String nickName, String mobile, String password, String token) {
         if (!validateMobile(mobile)) return User.DUPLICATE_USER;
 
-        return addUser(nickName, mobile, PasswordEncryptor.encrypt(mobile, password), token);
+        return addUser(nickName, mobile, PasswordEncryptor.encrypt(mobile, password, SecretKey.getPasswordSecretKey()), token);
     }
 
     public boolean validateMobile(String mobile) {
@@ -177,7 +178,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     public boolean validatePassword(String mobile, String password) {
         String sql = "SELECT mobile, password FROM t_user WHERE mobile=? AND password=?";
 
-        return jdbcTemplate.query(sql, new Object[] { mobile, PasswordEncryptor.encrypt(mobile, password) }, new ResultSetExtractor<Boolean>() {
+        return jdbcTemplate.query(sql, new Object[] { mobile, PasswordEncryptor.encrypt(mobile, password, SecretKey.getPasswordSecretKey()) }, new ResultSetExtractor<Boolean>() {
             @Override
             public Boolean extractData(ResultSet resultSet) throws SQLException, DataAccessException {
                 if (resultSet.next()) return true;
