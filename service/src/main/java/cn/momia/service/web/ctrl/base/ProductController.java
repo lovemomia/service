@@ -174,34 +174,9 @@ public class ProductController extends AbstractController {
         return new ResponseMessage(buildPlaymates(skus, skuOrdersMap, skuCustomerIdsMap, customerPrticipantsIdsMap, customersMap, participantsMap));
     }
 
-    private List<SkuPlaymates> buildPlaymates(List<Sku> skus,
-                                             Map<Long, List<Order>> skuOrdersMap,
-                                             Map<Long, Set<Long>> skuCustomerIdsMap,
-                                             Map<Long, Set<Long>> customerPrticipantsIdsMap,
-                                             Map<Long, User> customersMap,
-                                             Map<Long, Participant> participantsMap) {
-        List<SkuPlaymates> skuPlaymates = new ArrayList<SkuPlaymates>();
-        for (Sku sku : skus) {
-            if (!sku.exists()) continue;
-
-            try {
-                SkuPlaymates skuPlaymate = new SkuPlaymates();
-                skuPlaymate.setTime(sku.scheduler());
-                skuPlaymate.setJoined(formatJoined(skuOrdersMap.get(sku.getId())));
-                skuPlaymate.setPlaymates(extractPlayMates(sku.getId(), skuCustomerIdsMap, customerPrticipantsIdsMap, customersMap, participantsMap));
-
-                skuPlaymates.add(skuPlaymate);
-            } catch (Exception e) {
-                LOGGER.error("fail to build playmate for sku: {}", sku.getId(), e);
-            }
-        }
-
-        return skuPlaymates;
-    }
-
     private List<Sku> extractSkus(long id, int start, int count) {
         List<Sku> skus = productService.getSkus(id);
-        skus = Sku.sortByTime(skus);
+        skus = Sku.sortByStartTime(skus);
 
         List<Sku> result = new ArrayList<Sku>();
         for (int i = start; i < Math.min(skus.size(), start + count); i++) {
@@ -224,6 +199,29 @@ public class ProductController extends AbstractController {
         }
 
         return result;
+    }
+
+    private List<SkuPlaymates> buildPlaymates(List<Sku> skus,
+                                              Map<Long, List<Order>> skuOrdersMap,
+                                              Map<Long, Set<Long>> skuCustomerIdsMap,
+                                              Map<Long, Set<Long>> customerPrticipantsIdsMap,
+                                              Map<Long, User> customersMap,
+                                              Map<Long, Participant> participantsMap) {
+        List<SkuPlaymates> skuPlaymates = new ArrayList<SkuPlaymates>();
+        for (Sku sku : skus) {
+            try {
+                SkuPlaymates skuPlaymate = new SkuPlaymates();
+                skuPlaymate.setTime(sku.scheduler());
+                skuPlaymate.setJoined(formatJoined(skuOrdersMap.get(sku.getId())));
+                skuPlaymate.setPlaymates(extractPlayMates(sku.getId(), skuCustomerIdsMap, customerPrticipantsIdsMap, customersMap, participantsMap));
+
+                skuPlaymates.add(skuPlaymate);
+            } catch (Exception e) {
+                LOGGER.error("fail to build playmate for sku: {}", sku.getId(), e);
+            }
+        }
+
+        return skuPlaymates;
     }
 
     private String formatJoined(List<Order> orders) {
@@ -275,10 +273,12 @@ public class ProductController extends AbstractController {
 
                 List<String> children = new ArrayList<String>();
                 Set<Long> customerPrticipantsIds = customerPrticipantsIdsMap.get(customerId);
-                for (long participantId : customerPrticipantsIds) {
-                    Participant participant = participantsMap.get(participantId);
-                    if (participant.child()) {
-                        children.add(participant.desc());
+                if (customerPrticipantsIds != null) {
+                    for (long participantId : customerPrticipantsIds) {
+                        Participant participant = participantsMap.get(participantId);
+                        if (participant != null && participant.child()) {
+                            children.add(participant.desc());
+                        }
                     }
                 }
                 playmate.setChildren(children);

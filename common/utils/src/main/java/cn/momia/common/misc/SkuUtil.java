@@ -21,7 +21,7 @@ public class SkuUtil {
         if (timeStrs.isEmpty()) return "";
 
         Collections.sort(timeStrs);
-        List<Date> times = TimeUtil.castToDate(timeStrs);
+        List<Date> times = TimeUtil.castToDates(timeStrs);
         if (times.isEmpty()) return "";
 
         StringBuilder builder = new StringBuilder();
@@ -30,7 +30,7 @@ public class SkuUtil {
         Date end = times.get(timeStrs.size() - 1);
         if (TimeUtil.isSameDay(start, end)) {
             for (String timeStr : timeStrs) {
-                Date time = TimeUtil.castToDate(timeStr);
+                Date time = TimeUtil.castToDates(timeStr);
                 if (time != null) {
                     builder.append(TimeUtil.buildDateWithWeekDay(time));
                     if (timeStr.contains(":"))

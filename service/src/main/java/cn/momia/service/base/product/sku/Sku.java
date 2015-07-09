@@ -43,7 +43,7 @@ public class Sku implements Serializable {
     private Date startTime() {
         for (SkuProperty property : properties) {
             if ("time".equalsIgnoreCase(property.getName())) {
-                List<Date> times = TimeUtil.castToDate(Lists.newArrayList(SkuUtil.TIME_SPLITTER.split(property.getValue())));
+                List<Date> times = TimeUtil.castToDates(Lists.newArrayList(SkuUtil.TIME_SPLITTER.split(property.getValue())));
 
                 if (times.isEmpty()) return null;
 

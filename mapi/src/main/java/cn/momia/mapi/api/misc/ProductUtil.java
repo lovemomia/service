@@ -97,7 +97,7 @@ public class ProductUtil {
             JSONObject skuJson = skusJson.getJSONObject(i);
             JSONArray propertiesJson = skuJson.getJSONArray("properties");
             List<String> timeStrs = extractSkuTimes(propertiesJson);
-            times.addAll(TimeUtil.castToDate(timeStrs));
+            times.addAll(TimeUtil.castToDates(timeStrs));
         }
 
         Collections.sort(times);
