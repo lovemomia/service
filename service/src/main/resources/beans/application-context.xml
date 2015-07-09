@@ -73,22 +73,22 @@
     </bean>
     <bean id="smsVerifier" class="cn.momia.service.sms.SmsVerifier" parent="dbAccessService" />
 
-    <bean id="alipay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
-        <property name="staticField" value="cn.momia.service.deal.payment.Payment.Type.ALIPAY" />
-    </bean>
-    <bean id="alipayGateway" class="cn.momia.service.deal.payment.gateway.alipay.AlipayGateway">
-        <property name="conf" ref="conf" />
-    </bean>
-
-    <bean id="wechatpay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
-        <property name="staticField" value="cn.momia.service.deal.payment.Payment.Type.WECHATPAY" />
-    </bean>
-    <bean id="wechatpayGateway" class="cn.momia.service.deal.payment.gateway.wechatpay.WechatpayGateway">
+    <bean id="abstractPaymentGateway" class="cn.momia.service.deal.payment.gateway.AbstractPaymentGateway" abstract="true">
         <property name="conf" ref="conf" />
         <property name="orderService" ref="orderService" />
         <property name="paymentService" ref="paymentService" />
         <property name="productService" ref="productService" />
     </bean>
+
+    <bean id="alipay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
+        <property name="staticField" value="cn.momia.service.deal.payment.Payment.Type.ALIPAY" />
+    </bean>
+    <bean id="alipayGateway" class="cn.momia.service.deal.payment.gateway.alipay.AlipayGateway" parent="abstractPaymentGateway" />
+
+    <bean id="wechatpay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
+        <property name="staticField" value="cn.momia.service.deal.payment.Payment.Type.WECHATPAY" />
+    </bean>
+    <bean id="wechatpayGateway" class="cn.momia.service.deal.payment.gateway.wechatpay.WechatpayGateway" parent="abstractPaymentGateway" />
 
     <bean class="cn.momia.service.deal.payment.gateway.factory.PaymentGatewayFactory">
         <property name="prototypes">

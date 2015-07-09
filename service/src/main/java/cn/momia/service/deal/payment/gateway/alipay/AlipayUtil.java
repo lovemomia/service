@@ -21,4 +21,9 @@ public class AlipayUtil {
 
         return RSA.sign(StringUtils.join(kvs, "&"), SecretKey.get("alipayPrivateKey"), "utf-8");
     }
+
+    public static boolean validateSign(Map<String, String> params) {
+        // TODO
+        return false;
+    }
 }
