@@ -76,7 +76,9 @@
     <bean id="alipay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
         <property name="staticField" value="cn.momia.service.deal.payment.Payment.Type.ALIPAY" />
     </bean>
-    <bean id="alipayGateway" class="cn.momia.service.deal.payment.gateway.alipay.AlipayGateway" />
+    <bean id="alipayGateway" class="cn.momia.service.deal.payment.gateway.alipay.AlipayGateway">
+        <property name="conf" ref="conf" />
+    </bean>
 
     <bean id="wechatpay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
         <property name="staticField" value="cn.momia.service.deal.payment.Payment.Type.WECHATPAY" />

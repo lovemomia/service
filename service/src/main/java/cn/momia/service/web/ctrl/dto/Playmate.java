@@ -1,8 +1,9 @@
 package cn.momia.service.web.ctrl.dto;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Playmate {
+public class Playmate implements Serializable {
     private long id;
     private String nickName;
     private String avatar;

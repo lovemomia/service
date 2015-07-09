@@ -111,8 +111,9 @@ public class Participant implements Serializable {
         if (AgeUtil.isAdult(this.birthday)) return "成人";
 
         int age = AgeUtil.getAge(this.birthday);
+        String ageStr = age <= 0 ? "不到1" : String.valueOf(age);
 
-        if (!("男".equals(this.sex) || "女".equals(this.sex))) return "孩子" +age  + "岁";
-        return this.sex + "孩" + age + "岁";
+        if (!("男".equals(this.sex) || "女".equals(this.sex))) return "孩子" + ageStr + "岁";
+        return this.sex + "孩" + ageStr + "岁";
     }
 }

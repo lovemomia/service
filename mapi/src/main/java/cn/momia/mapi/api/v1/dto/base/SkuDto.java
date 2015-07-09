@@ -1,6 +1,6 @@
 package cn.momia.mapi.api.v1.dto.base;
 
-import cn.momia.mapi.api.misc.ProductUtil;
+import cn.momia.common.web.misc.SkuUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -54,8 +54,8 @@ public class SkuDto implements Dto {
         this.limit = skuJson.getInteger("limit");
         this.needRealName = skuJson.getBoolean("needRealName");
         this.stock = skuJson.getInteger("unlockedStock");
-        this.minPrice = ProductUtil.getSkuMiniPrice(skuJson.getJSONArray("prices"));
-        this.time = ProductUtil.getSkuScheduler(skuJson.getJSONArray("properties"));
+        this.minPrice = skuJson.getBigDecimal("minPrice");
+        this.time = SkuUtil.getSkuTime(skuJson.getJSONArray("properties"));
         this.prices = skuJson.getJSONArray("prices");
     }
 }

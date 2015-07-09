@@ -1,8 +1,9 @@
 package cn.momia.service.web.ctrl.dto;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class SkuPlaymates {
+public class SkuPlaymates implements Serializable {
     private String time;
     private String joined;
     private List<Playmate> playmates;
