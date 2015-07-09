@@ -1,22 +1,19 @@
 package cn.momia.service.deal.payment.gateway.wechatpay;
 
-import cn.momia.common.config.Configuration;
 import cn.momia.common.misc.XmlUtil;
 import cn.momia.common.web.misc.RequestUtil;
 import cn.momia.common.web.secret.SecretKey;
 import cn.momia.service.base.product.Product;
-import cn.momia.service.base.product.ProductService;
 import cn.momia.service.deal.order.Order;
-import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.deal.payment.Payment;
-import cn.momia.service.deal.payment.PaymentService;
+import cn.momia.service.deal.payment.gateway.AbstractPaymentGateway;
 import cn.momia.service.deal.payment.gateway.CallbackParam;
 import cn.momia.service.deal.payment.gateway.CallbackResult;
-import cn.momia.service.deal.payment.gateway.PaymentGateway;
 import cn.momia.service.deal.payment.gateway.PrepayParam;
 import cn.momia.service.deal.payment.gateway.PrepayResult;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.util.TypeUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
@@ -32,13 +29,12 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WechatpayGateway implements PaymentGateway {
+public class WechatpayGateway extends AbstractPaymentGateway {
     private static final Logger LOGGER = LoggerFactory.getLogger(WechatpayGateway.class);
 
     private static final DateFormat DATE_FORMATTER = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -46,27 +42,6 @@ public class WechatpayGateway implements PaymentGateway {
     private static final String OK = "OK";
     private static final String FAIL = "FAIL";
     private static final String ERROR = "ERROR";
-
-    private Configuration conf;
-    private OrderService orderService;
-    private PaymentService paymentService;
-    private ProductService productService;
-
-    public void setConf(Configuration conf) {
-        this.conf = conf;
-    }
-
-    public void setOrderService(OrderService orderService) {
-        this.orderService = orderService;
-    }
-
-    public void setPaymentService(PaymentService paymentService) {
-        this.paymentService = paymentService;
-    }
-
-    public void setProductService(ProductService productService) {
-        this.productService = productService;
-    }
 
     @Override
     public Map<String, String> extractPrepayParams(HttpServletRequest request, Order order, Product product) {
@@ -196,21 +171,7 @@ public class WechatpayGateway implements PaymentGateway {
     }
 
     @Override
-    public CallbackResult callback(CallbackParam param) {
-        CallbackResult result = new CallbackResult();
-        if (isPayedSuccessfully(param) && validateCallbackSign(param) && !finishPayment(param)) {
-            result.add(WechatpayCallbackFields.RETURN_CODE, FAIL);
-            result.add(WechatpayCallbackFields.RETURN_MSG, ERROR);
-        } else {
-            result.setSuccessful(true);
-            result.add(WechatpayCallbackFields.RETURN_CODE, SUCCESS);
-            result.add(WechatpayCallbackFields.RETURN_MSG, OK);
-        }
-
-        return result;
-    }
-
-    private boolean isPayedSuccessfully(CallbackParam param) {
+    protected boolean isPayedSuccessfully(CallbackParam param) {
         String return_code = param.get(WechatpayCallbackFields.RETURN_CODE);
         String result_code = param.get(WechatpayCallbackFields.RESULT_CODE);
 
@@ -218,57 +179,45 @@ public class WechatpayGateway implements PaymentGateway {
                 result_code != null && result_code.equalsIgnoreCase(SUCCESS);
     }
 
-    private boolean validateCallbackSign(CallbackParam param) {
+    @Override
+    protected boolean validateCallbackSign(CallbackParam param) {
         String tradeType = param.get(WechatpayPrepayFields.TRADE_TYPE);
         boolean successful = WechatpayUtil.validateSign(param.getAll(), tradeType);
-        if (!successful) LOGGER.warn("invalid sign, order id: {} ", param.get(WechatpayPrepayFields.OUT_TRADE_NO));
+        if (!successful) LOGGER.warn("invalid sign, order id: {} ", param.get(WechatpayCallbackFields.OUT_TRADE_NO));
 
         return successful;
     }
 
-    private boolean finishPayment(CallbackParam param) {
-        try {
-            if (!orderService.pay(Long.valueOf(param.get("out_trade_no")))) return false;
-            logPayment(param);
-        } catch (Exception e) {
-            LOGGER.error("fail to pay order", e);
-            return false;
-        }
-
-        return true;
-    }
-
-    private void logPayment(CallbackParam param) {
-        try {
-            long paymentId = paymentService.add(createPayment(param));
-            if (paymentId <= 0) {
-                LOGGER.error("fail to log payment: {}", param);
-                return;
-            }
-
-            Order order = orderService.get(Long.valueOf(param.get(WechatpayCallbackFields.OUT_TRADE_NO)));
-            if (!order.exists()) {
-                LOGGER.error("invalid order: {}", order.getId());
-                return;
-            }
-
-            if (!productService.sold(order.getProductId(), order.getCount())) {
-                LOGGER.error("fail to log sales of order: {}", order.getId());
-            }
-        } catch (Exception e) {
-            LOGGER.error("fail to log payment: {}", param, e);
-        }
-    }
-
-    private Payment createPayment(CallbackParam param) throws ParseException {
+    @Override
+    protected Payment createPayment(CallbackParam param) {
         Payment payment = new Payment();
         payment.setOrderId(Long.valueOf(param.get(WechatpayCallbackFields.OUT_TRADE_NO)));
         payment.setPayer(param.get(WechatpayCallbackFields.OPEN_ID));
-        payment.setFinishTime(DATE_FORMATTER.parse(param.get(WechatpayCallbackFields.TIME_END)));
+        payment.setFinishTime(TypeUtils.castToDate(param.get(WechatpayCallbackFields.TIME_END)));
         payment.setPayType(Payment.Type.WECHATPAY);
         payment.setTradeNo(param.get(WechatpayCallbackFields.TRANSACTION_ID));
         payment.setFee(new BigDecimal(param.get(WechatpayCallbackFields.TOTAL_FEE)).divide(new BigDecimal(100)));
 
         return payment;
+    }
+
+    @Override
+    protected CallbackResult buildFailResult() {
+        CallbackResult result = new CallbackResult();
+        result.setSuccessful(false);
+        result.add(WechatpayCallbackFields.RETURN_CODE, FAIL);
+        result.add(WechatpayCallbackFields.RETURN_MSG, ERROR);
+
+        return result;
+    }
+
+    @Override
+    protected CallbackResult buildSuccessResult() {
+        CallbackResult result = new CallbackResult();
+        result.setSuccessful(true);
+        result.add(WechatpayCallbackFields.RETURN_CODE, SUCCESS);
+        result.add(WechatpayCallbackFields.RETURN_MSG, OK);
+
+        return result;
     }
 }
