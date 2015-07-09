@@ -31,7 +31,7 @@ public class PaymentV1Api extends AbstractV1Api {
                 .add("oid", orderId)
                 .add("pid", productId)
                 .add("sid", skuId);
-        MomiaHttpRequest request = MomiaHttpRequest.POST(dealServiceUrl("payment/prepay/wechatpay"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.POST(dealServiceUrl("payment/prepay/alipay"), builder.build());
 
         return executeRequest(request);
     }
