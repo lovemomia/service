@@ -1,7 +1,7 @@
 package cn.momia.service.web.ctrl.base;
 
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.service.web.ctrl.dto.Customer;
+import cn.momia.service.web.ctrl.dto.Customers;
 import cn.momia.service.web.ctrl.dto.Playmate;
 import cn.momia.service.base.product.Product;
 import cn.momia.service.base.product.ProductQuery;
@@ -84,42 +84,32 @@ public class ProductController extends AbstractController {
         if (id <= 0 || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
 
         List<Order> orders = orderService.queryDistinctCustomerOrderByProduct(id, start, count);
-        List<Customer> customers = new ArrayList<Customer>();
+        if (orders.isEmpty()) return ResponseMessage.EMPTY_ARRAY;
+
         List<Long> customerIds = new ArrayList<Long>();
-        List<Long> participantIds = new ArrayList<Long>();
-        Map<Long, List<Long>> participantsMap = new HashMap<Long, List<Long>>();
+        for (Order order : orders) customerIds.add(order.getCustomerId());
+        Map<Long, User> customers = userService.get(customerIds);
+
+        int adultCount = 0;
+        int childCount = 0;
+        List<String > avatars = new ArrayList<String>();
         for (Order order : orders) {
-            Customer customer = new Customer();
-            customer.setUserId(order.getCustomerId());
-            customer.setOrderDate(order.getAddTime());
-            customer.setOrderStatus(order.getStatus());
-            customers.add(customer);
-            customerIds.add(order.getCustomerId());
-            participantIds.addAll(order.getParticipants());
-            participantsMap.put(order.getCustomerId(), order.getParticipants());
+            long customerId = order.getCustomerId();
+            User customer = customers.get(customerId);
+            if (customer == null) continue;
+
+            adultCount += order.getAdultCount();
+            childCount += order.getChildCount();
+            avatars.add(customer.getAvatar());
         }
 
-        Map<Long, User> users = userService.get(customerIds);
-        Map<Long, Participant> participants = participantService.get(participantIds);
+        StringBuilder builder = new StringBuilder();
+        if (adultCount <= 0 && childCount <= 0) builder.append("目前还没有人参加");
+        else if (adultCount > 0 && childCount <= 0) builder.append(adultCount).append("个大人参加");
+        else if (adultCount <= 0 && childCount > 0) builder.append(childCount).append("个孩子参加");
+        else builder.append(childCount).append("个孩子，").append(adultCount).append("个大人参加");
 
-        List<Customer> validCustomers = new ArrayList<Customer>();
-        for (int i = 0; i < customers.size(); i++) {
-            Customer customer = customers.get(i);
-            User user = users.get(customer.getUserId());
-            if (user == null || !user.exists()) continue;
-            customer.setAvatar(user.getAvatar());
-            customer.setName(user.getName());
-
-            List<Participant> participantList = new ArrayList<Participant>();
-            for (long participantId : participantsMap.get(customer.getUserId())) {
-                participantList.add(participants.get(participantId));
-            }
-            customer.setParticipants(participantList);
-
-            validCustomers.add(customer);
-        }
-
-        return new ResponseMessage(validCustomers);
+        return new ResponseMessage(new Customers(builder.toString(), avatars));
     }
 
     @RequestMapping(value = "/{id}/playmate", method = RequestMethod.GET)
