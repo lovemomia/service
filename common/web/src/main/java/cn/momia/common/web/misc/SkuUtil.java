@@ -7,7 +7,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 
-import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -18,23 +17,11 @@ public class SkuUtil {
     public static final Splitter TIME_SPLITTER = Splitter.on("~").trimResults().omitEmptyStrings();
     private static final DateFormat TIME_FORMATTER = new SimpleDateFormat("h:mm");
 
-    public static BigDecimal getSkuMiniPrice(JSONArray pricesJson) {
-        BigDecimal miniPrice = new BigDecimal(Float.MAX_VALUE);
-
-        for (int i = 0; i < pricesJson.size(); i++) {
-            JSONObject priceJson = pricesJson.getJSONObject(i);
-            BigDecimal price = priceJson.getBigDecimal("price");
-            if (price.compareTo(miniPrice) <= 0) miniPrice = price;
-        }
-
-        return miniPrice;
+    public static String getSkuTime(JSONArray propertiesJson) {
+        return SkuUtil.getSkuTime(extractSkuTimeValue(propertiesJson));
     }
 
-    public static String getSkuScheduler(JSONArray propertiesJson) {
-        return SkuUtil.getSkuScheduler(extractSkuTimeValue(propertiesJson));
-    }
-
-    public static String getSkuScheduler(String timeValue) {
+    public static String getSkuTime(String timeValue) {
         if (StringUtils.isBlank(timeValue)) return "";
 
         List<String> timeStrs = Lists.newArrayList(TIME_SPLITTER.split(timeValue));

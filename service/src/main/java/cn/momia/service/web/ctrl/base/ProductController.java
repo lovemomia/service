@@ -201,7 +201,7 @@ public class ProductController extends AbstractController {
         for (Sku sku : skus) {
             try {
                 SkuPlaymates skuPlaymate = new SkuPlaymates();
-                skuPlaymate.setTime(sku.scheduler());
+                skuPlaymate.setTime(sku.time());
                 skuPlaymate.setJoined(formatJoined(skuOrdersMap.get(sku.getId())));
                 skuPlaymate.setPlaymates(extractPlayMates(sku.getId(), skuCustomerIdsMap, customerPrticipantsIdsMap, customersMap, participantsMap));
 

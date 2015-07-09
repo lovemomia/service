@@ -54,8 +54,8 @@ public class SkuDto implements Dto {
         this.limit = skuJson.getInteger("limit");
         this.needRealName = skuJson.getBoolean("needRealName");
         this.stock = skuJson.getInteger("unlockedStock");
-        this.minPrice = SkuUtil.getSkuMiniPrice(skuJson.getJSONArray("prices"));
-        this.time = SkuUtil.getSkuScheduler(skuJson.getJSONArray("properties"));
+        this.minPrice = skuJson.getBigDecimal("minPrice");
+        this.time = SkuUtil.getSkuTime(skuJson.getJSONArray("properties"));
         this.prices = skuJson.getJSONArray("prices");
     }
 }

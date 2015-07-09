@@ -76,11 +76,9 @@ public class UserController extends UserRelatedController {
         Map<Long, Product> productMap = new HashMap<Long, Product>();
         Map<Long, Sku> skuMap = new HashMap<Long, Sku>();
         for (Product product : products) {
-            if (product.exists()) {
-                productMap.put(product.getId(), product);
-                for (Sku sku : product.getSkus()) {
-                    if (sku.exists()) skuMap.put(sku.getId(), sku);
-                }
+            productMap.put(product.getId(), product);
+            for (Sku sku : product.getSkus()) {
+                skuMap.put(sku.getId(), sku);
             }
         }
 
@@ -99,13 +97,43 @@ public class UserController extends UserRelatedController {
             }
 
             Sku sku = skuMap.get(order.getSkuId());
-            if (sku != null) orderJson.put("scheduler", sku.scheduler());
+            if (sku != null) orderJson.put("time", sku.time());
 
             ordersJson.add(orderJson);
         }
         ordersPackJson.put("orders", ordersJson);
 
         return ordersPackJson;
+    }
+
+    @RequestMapping(value = "/order/{oid}", method = RequestMethod.GET)
+    public ResponseMessage getOrdersOfUser(@RequestParam String utoken,
+                                           @PathVariable(value = "oid") long orderId,
+                                           @RequestParam(value = "pid") long productId) {
+        if (StringUtils.isBlank(utoken) || orderId <= 0 || productId <= 0) return ResponseMessage.BAD_REQUEST;
+
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        Order order = orderService.get(orderId);
+        if (!order.exists()) return ResponseMessage.BAD_REQUEST;
+
+        Product product = productService.get(productId);
+        if (!product.exists()) return ResponseMessage.BAD_REQUEST;
+
+        return new ResponseMessage(buildOrderDetail(order, product));
+    }
+
+    private JSONObject buildOrderDetail(Order order, Product product) {
+        JSONObject orderDetailJson = new JSONObject();
+        orderDetailJson.put("order", order);
+        orderDetailJson.put("cover", product.getCover());
+        orderDetailJson.put("title", product.getTitle());
+        orderDetailJson.put("scheduler", product.getScheduler());
+        orderDetailJson.put("address", product.getPlace().getAddress());
+        orderDetailJson.put("price", product.getMinPrice());
+
+        return orderDetailJson;
     }
 
     @RequestMapping(value = "/nickname", method = RequestMethod.PUT)

@@ -77,7 +77,7 @@ public class UserV1Api extends AbstractV1Api {
         JSONArray ordersJson = ordersPackJson.getJSONArray("orders");
         for (int i = 0; i < ordersJson.size(); i++) {
             try {
-                orders.add(new OrderDto(ordersJson.getJSONObject(i)));
+                orders.add(new OrderDto(ordersJson.getJSONObject(i), true));
             } catch (Exception e) {
                 LOGGER.error("fail to parse order: {}", ordersJson.getJSONObject(i), e);
             }
@@ -85,6 +85,25 @@ public class UserV1Api extends AbstractV1Api {
         if (start + count < totalCount) orders.setNextIndex(start + count);
 
         return orders;
+    }
+
+    @RequestMapping(value = "/order/detail", method = RequestMethod.GET)
+    public ResponseMessage getOrderDetailOfUser(@RequestParam String utoken,
+                                                @RequestParam(value = "oid") long orderId,
+                                                @RequestParam(value = "pid") long productId) {
+        if (StringUtils.isBlank(utoken) || orderId <= 0 || productId <= 0) return ResponseMessage.BAD_REQUEST;
+
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("pid", productId);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user/order", orderId), builder.build());
+
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                return new OrderDto((JSONObject) data, true);
+            }
+        });
     }
 
     @RequestMapping(value = "/nickname", method = RequestMethod.POST)
