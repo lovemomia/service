@@ -44,8 +44,8 @@ public class AlipayGateway implements PaymentGateway {
     @Override
     public PrepayResult prepay(PrepayParam param) {
         PrepayResult result = new PrepayResult();
-        result.setSuccessful(true);
-        result.addAll(param.getAll());
+        result.setSuccessful(param.get(AlipayPrepayFields.SIGN) != null);
+        if (result.isSuccessful()) result.addAll(param.getAll());
 
         return result;
     }

@@ -3,6 +3,7 @@ package cn.momia.mapi.api.v1;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.mapi.api.v1.dto.base.AlipayPrepayDto;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.WechatpayPrepayDto;
 import com.alibaba.fastjson.JSONObject;
@@ -33,7 +34,12 @@ public class PaymentV1Api extends AbstractV1Api {
                 .add("sid", skuId);
         MomiaHttpRequest request = MomiaHttpRequest.POST(dealServiceUrl("payment/prepay/alipay"), builder.build());
 
-        return executeRequest(request);
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                return new AlipayPrepayDto((JSONObject) data);
+            }
+        });
     }
 
     @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)
