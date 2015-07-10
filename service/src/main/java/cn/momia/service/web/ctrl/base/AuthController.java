@@ -45,26 +45,10 @@ public class AuthController extends UserRelatedController {
         }
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseMessage login(@RequestParam String mobile, @RequestParam String password) {
-        if (ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(password)) return ResponseMessage.BAD_REQUEST;
-
-        User user = userService.getByMobile(mobile);
-        if (!user.exists()) {
-            LOGGER.error("fail to login user for {}", mobile);
-            return new ResponseMessage(ErrorCode.NOT_REGISTERED, "登录失败，用户不存在，请先注册");
-        }
-
-        if (!userService.validatePassword(mobile, password)) return ResponseMessage.FAILED("登录失败，密码不正确");
-        return new ResponseMessage(buildUserResponse(user));
-    }
-
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseMessage register(@RequestParam(value = "nickname") String nickName, @RequestParam String mobile, @RequestParam String password, @RequestParam String code){
         if (StringUtils.isBlank(nickName) || ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(password) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
-
         if(userService.getByNickName(nickName).exists()) return ResponseMessage.FAILED("注册失败，用户昵称已存在");
-
         if (!smsVerifier.verify(mobile, code)) return ResponseMessage.FAILED("验证码不正确");
 
         User user = userService.getByMobile(mobile);
@@ -84,5 +68,27 @@ public class AuthController extends UserRelatedController {
 
     private String generateToken(String mobile) {
         return DigestUtils.md5Hex(StringUtils.join(new String[] { mobile, new Date().toString(), SecretKey.get() }, "|"));
+    }
+
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public ResponseMessage login(@RequestParam String mobile, @RequestParam String password) {
+        if (ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(password)) return ResponseMessage.BAD_REQUEST;
+        if (!userService.validatePassword(mobile, password)) return ResponseMessage.FAILED("登录失败，密码不正确");
+
+        User user = userService.getByMobile(mobile);
+        if (!user.exists()) return new ResponseMessage(ErrorCode.FORBIDDEN, "登录失败，用户账号被禁用");
+
+        return new ResponseMessage(buildUserResponse(user));
+    }
+
+    @RequestMapping(value = "/login/code", method = RequestMethod.POST)
+    public ResponseMessage loginByCode(@RequestParam String mobile, @RequestParam String code) {
+        if (ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
+        if (!smsVerifier.verify(mobile, code)) return ResponseMessage.FAILED("验证码不正确");
+
+        User user = userService.getByMobile(mobile);
+        if (!user.exists()) return new ResponseMessage(ErrorCode.FORBIDDEN, "登录失败，用户账号被禁用");
+
+        return new ResponseMessage(buildUserResponse(user));
     }
 }
