@@ -4,6 +4,7 @@ import cn.momia.service.common.DbAccessService;
 import cn.momia.service.base.product.base.BaseProduct;
 import cn.momia.service.base.product.base.BaseProductService;
 import com.alibaba.fastjson.JSON;
+import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,11 +16,27 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BaseProductServiceImpl extends DbAccessService implements BaseProductService {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseProductServiceImpl.class);
-    private static final String[] PRODUCT_FIELDS = { "id", "cityId", "title", "cover", "crowd", "placeId", "content", "sales", "startTime", "endTime" };
+    private static final Splitter TAGS_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
+    private static final String[] PRODUCT_FIELDS = { "id", "cityId", "tags", "title", "cover", "crowd", "placeId", "content", "sales", "startTime", "endTime" };
+
+    private Map<Integer, String> tagsCache;
+
+    public void init() {
+        tagsCache = new HashMap<Integer, String>();
+        String sql = "SELECT id, name FROM t_tag WHERE status=1";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                tagsCache.put(rs.getInt("id"), rs.getString("name"));
+            }
+        });
+    }
 
     @Override
     public BaseProduct get(long id) {
@@ -43,6 +60,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
             BaseProduct baseProduct = new BaseProduct();
             baseProduct.setId(rs.getLong("id"));
             baseProduct.setCityId(rs.getInt("cityId"));
+            baseProduct.setTags(parseTags(rs.getString("tags")));
             baseProduct.setTitle(rs.getString("title"));
             baseProduct.setCover(rs.getString("cover"));
             baseProduct.setCrowd(rs.getString("crowd"));
@@ -58,6 +76,16 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
             LOGGER.error("fail to build base product: {}", rs.getLong("id"), e);
             return BaseProduct.INVALID_BASEPRODUCT;
         }
+    }
+
+    private List<String> parseTags(String tagsStr) {
+        List<String> tags = new ArrayList<String>();
+        for (String tagStr : TAGS_SPLITTER.split(tagsStr)) {
+            String tagName = tagsCache.get(Integer.valueOf(tagStr));
+            if (!StringUtils.isBlank(tagName)) tags.add(tagName);
+        }
+
+        return tags;
     }
 
     @Override

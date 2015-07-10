@@ -44,6 +44,7 @@ public class ProductUtil {
         product.setScheduler(productJson.getString("scheduler"));
         product.setAddress(placeJson.getString("address"));
         product.setPoi(StringUtils.join(new Object[] { placeJson.getDouble("lng"), placeJson.getDouble("lat") }, ":"));
+        product.setTags(productJson.getJSONArray("tags"));
         product.setStartTime(productJson.getDate("startTime"));
         product.setEndTime(productJson.getDate("endTime"));
         product.setSoldOut(getSoldOut(productJson.getInteger("sales"), skusJson));

@@ -52,6 +52,10 @@ public class ProductDetailDto implements Dto {
         return productDto.getPoi();
     }
 
+    public JSONArray getTags() {
+        return productDto.getTags();
+    }
+
     @JSONField(format = "yyyy-MM-dd hh:mm:ss") public Date getStartTime() {
         return productDto.getStartTime();
     }

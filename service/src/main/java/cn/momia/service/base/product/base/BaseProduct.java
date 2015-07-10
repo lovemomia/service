@@ -3,6 +3,7 @@ package cn.momia.service.base.product.base;
 import com.alibaba.fastjson.JSONArray;
 
 import java.util.Date;
+import java.util.List;
 
 public class BaseProduct {
     public static final BaseProduct NOT_EXIST_BASEPRODUCT = new BaseProduct();
@@ -15,6 +16,7 @@ public class BaseProduct {
 
     private long id;
     private int cityId;
+    private List<String> tags;
     private String title;
     private String cover;
     private String crowd;
@@ -38,6 +40,14 @@ public class BaseProduct {
 
     public void setCityId(int cityId) {
         this.cityId = cityId;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
     public String getTitle() {
