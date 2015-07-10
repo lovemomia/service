@@ -6,6 +6,7 @@ import java.util.Set;
 
 public class User implements Serializable {
     public static final User NOT_EXIST_USER = new User();
+    public static final User INVALID_USER = new User();
     public static final User DUPLICATE_USER = new User() {
         public boolean duplicated() {
             return true;
@@ -14,6 +15,7 @@ public class User implements Serializable {
 
     static {
         NOT_EXIST_USER.setId(0);
+        INVALID_USER.setId(0);
         DUPLICATE_USER.setId(0);
     }
 

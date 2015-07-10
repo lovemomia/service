@@ -4,6 +4,8 @@ import cn.momia.service.common.DbAccessService;
 import cn.momia.service.base.user.participant.Participant;
 import cn.momia.service.base.user.participant.ParticipantService;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -24,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ParticipantServiceImpl extends DbAccessService implements ParticipantService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParticipantServiceImpl.class);
+
     private static final String[] PARTICIPANT_FIELDS = { "id", "userId", "name", "sex", "birthday", "idType", "idNo" };
     @Override
     public long add(final Participant participant) {
@@ -104,16 +108,21 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
     }
 
     public Participant buildParticipant(ResultSet rs) throws SQLException {
-        Participant participant = new Participant();
-        participant.setId(rs.getLong("id"));
-        participant.setUserId(rs.getLong("userId"));
-        participant.setName(rs.getString("name"));
-        participant.setSex(rs.getString("sex"));
-        participant.setBirthday(rs.getDate("birthday"));
-        participant.setIdType(rs.getInt("idType"));
-        participant.setIdNo(rs.getString("idNo"));
+        try {
+            Participant participant = new Participant();
+            participant.setId(rs.getLong("id"));
+            participant.setUserId(rs.getLong("userId"));
+            participant.setName(rs.getString("name"));
+            participant.setSex(rs.getString("sex"));
+            participant.setBirthday(rs.getDate("birthday"));
+            participant.setIdType(rs.getInt("idType"));
+            participant.setIdNo(rs.getString("idNo"));
 
-        return participant;
+            return participant;
+        } catch (Exception e) {
+            LOGGER.error("fail to build participant: {}", rs.getLong("id"), e);
+            return Participant.INVALID_PARTICIPANT;
+        }
     }
 
     @Override

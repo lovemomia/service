@@ -91,26 +91,30 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     private Order buildOrder(ResultSet rs) throws SQLException {
-        Order order = new Order();
+        try {
+            Order order = new Order();
 
-        order.setId(rs.getLong("id"));
-        order.setCustomerId(rs.getLong("customerId"));
-        order.setProductId(rs.getLong("productId"));
-        order.setSkuId(rs.getLong("skuId"));
-        order.setPrices(parseOrderPrices(order.getId(), rs.getString("prices")));
-        order.setContacts(rs.getString("contacts"));
-        order.setMobile(rs.getString("mobile"));
-        order.setStatus(rs.getInt("status"));
-        order.setAddTime(rs.getTimestamp("addTime"));
+            order.setId(rs.getLong("id"));
+            order.setCustomerId(rs.getLong("customerId"));
+            order.setProductId(rs.getLong("productId"));
+            order.setSkuId(rs.getLong("skuId"));
+            order.setPrices(parseOrderPrices(order.getId(), rs.getString("prices")));
+            order.setContacts(rs.getString("contacts"));
+            order.setMobile(rs.getString("mobile"));
+            order.setStatus(rs.getInt("status"));
+            order.setAddTime(rs.getTimestamp("addTime"));
 
-        List<Long> participants = new ArrayList<Long>();
-        for (String participant : Order.PARTICIPANTS_SPLITTER.split(rs.getString("participants")))
-        {
-            participants.add(Long.valueOf(participant));
+            List<Long> participants = new ArrayList<Long>();
+            for (String participant : Order.PARTICIPANTS_SPLITTER.split(rs.getString("participants"))) {
+                participants.add(Long.valueOf(participant));
+            }
+            order.setParticipants(participants);
+
+            return order;
+        } catch (Exception e) {
+            LOGGER.error("fail to build order: {}", rs.getLong("id"), e);
+            return Order.INVALID_ORDER;
         }
-        order.setParticipants(participants);
-
-        return order;
     }
 
     private List<OrderPrice> parseOrderPrices(long id, String priceJson) {
@@ -138,7 +142,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
             jdbcTemplate.query(sql, new Object[] { productId, start, count }, new RowCallbackHandler() {
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
-                    orders.add(buildOrder(rs));
+                    Order order = buildOrder(rs);
+                    if (order.exists()) orders.add(order);
                 }
             });
         } else {
@@ -146,7 +151,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
             jdbcTemplate.query(sql, new Object[] { productId, status, start, count }, new RowCallbackHandler() {
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
-                    orders.add(buildOrder(rs));
+                    Order order = buildOrder(rs);
+                    if (order.exists()) orders.add(order);
                 }
             });
         }
@@ -182,7 +188,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         jdbcTemplate.query(sql, new Object[] { userId, skuId }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
-                orders.add(buildOrder(rs));
+                Order order = buildOrder(rs);
+                if (order.exists()) orders.add(order);
             }
         });
 
@@ -198,7 +205,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
             jdbcTemplate.query(sql, new Object[] { userId, start, count }, new RowCallbackHandler() {
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
-                    orders.add(buildOrder(rs));
+                    Order order = buildOrder(rs);
+                    if (order.exists()) orders.add(order);
                 }
             });
         } else {
@@ -206,7 +214,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
             jdbcTemplate.query(sql, new Object[] { userId, status, start, count }, new RowCallbackHandler() {
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
-                    orders.add(buildOrder(rs));
+                    Order order = buildOrder(rs);
+                    if (order.exists()) orders.add(order);
                 }
             });
         }
@@ -221,7 +230,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         jdbcTemplate.query(sql, new Object[] { productId, Order.Status.PAYED }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
-                orders.add(buildOrder(rs));
+                Order order = buildOrder(rs);
+                if (order.exists()) orders.add(order);
             }
         });
 
@@ -235,7 +245,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         jdbcTemplate.query(sql, new Object[] { productId, Order.Status.PAYED, start, count }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
-                orders.add(buildOrder(rs));
+                Order order = buildOrder(rs);
+                if (order.exists()) orders.add(order);
             }
         });
 

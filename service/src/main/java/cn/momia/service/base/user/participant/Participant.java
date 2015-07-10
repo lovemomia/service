@@ -8,8 +8,10 @@ import java.util.Date;
 
 public class Participant implements Serializable {
     public static final Participant NOT_EXIST_PARTICIPANT = new Participant();
+    public static final Participant INVALID_PARTICIPANT = new Participant();
     static {
         NOT_EXIST_PARTICIPANT.setId(0);
+        INVALID_PARTICIPANT.setId(0);
     }
 
     private long id;

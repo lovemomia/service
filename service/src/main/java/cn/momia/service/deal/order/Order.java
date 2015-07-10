@@ -23,8 +23,10 @@ public class Order implements Serializable {
     }
 
     public static final Order NOT_EXIST_ORDER = new Order();
+    public static final Order INVALID_ORDER = new Order();
     static {
         NOT_EXIST_ORDER.setId(0);
+        INVALID_ORDER.setId(0);
     }
 
     private long id;
