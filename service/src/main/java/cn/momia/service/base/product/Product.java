@@ -66,6 +66,8 @@ public class Product implements Serializable {
         return baseProduct.getEndTime();
     }
 
+    public String getAbstracts(){ return baseProduct.getAbstracts(); }
+
     public void setBaseProduct(BaseProduct baseProduct) {
         this.baseProduct = baseProduct;
     }

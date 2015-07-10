@@ -38,6 +38,7 @@ public class ProductUtil {
         product.setId(productJson.getLong("id"));
         product.setCover(ImageFile.url(productJson.getString("cover")));
         product.setTitle(productJson.getString("title"));
+        product.setAbstracts(productJson.getString("abstracts"));
         product.setJoined(productJson.getInteger("sales"));
         product.setPrice(productJson.getBigDecimal("minPrice"));
         product.setCrowd(productJson.getString("crowd"));

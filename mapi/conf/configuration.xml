@@ -38,7 +38,7 @@
         <Playmate>
             <MaxSkuCount>20</MaxSkuCount>
         </Playmate>
-        <Domain>http://m.momia.cn/actsDetail.html</Domain>
+        <Url>http://m.momia.cn/actsDetail.html</Url>
     </Product>
 
     <Order>

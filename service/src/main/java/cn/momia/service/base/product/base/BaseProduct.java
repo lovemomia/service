@@ -25,6 +25,7 @@ public class BaseProduct {
     private int sales;
     private Date startTime;
     private Date endTime;
+    private String abstracts;
 
     public long getId() {
         return id;
@@ -112,6 +113,14 @@ public class BaseProduct {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public String getAbstracts() {
+        return abstracts;
+    }
+
+    public void setAbstracts(String abstracts) {
+        this.abstracts = abstracts;
     }
 
     @Override
