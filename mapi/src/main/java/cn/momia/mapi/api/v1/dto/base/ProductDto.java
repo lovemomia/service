@@ -12,6 +12,7 @@ public class ProductDto implements Dto {
     private long id;
     private String cover;
     private String title;
+    private String abstracts;
     private int joined;
     private BigDecimal price;
     private String crowd;
@@ -49,6 +50,14 @@ public class ProductDto implements Dto {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getAbstracts() {
+        return abstracts;
+    }
+
+    public void setAbstracts(String abstracts) {
+        this.abstracts = abstracts;
     }
 
     public int getJoined() {
@@ -153,6 +162,7 @@ public class ProductDto implements Dto {
         this.id = productDto.id;
         this.cover = productDto.cover;
         this.title = productDto.title;
+        this.abstracts = productDto.abstracts;
         this.joined = productDto.joined;
         this.price = productDto.price;
         this.crowd = productDto.crowd;

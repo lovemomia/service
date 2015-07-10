@@ -71,7 +71,7 @@ public class ProductV1Api extends AbstractV1Api {
             @Override
             public Dto apply(MomiaHttpResponseCollector collector) {
                 ProductDetailDto productDetailDto = new ProductDetailDto((JSONObject) collector.getResponse("product"), (JSONObject) collector.getResponse("customers"));
-                productDetailDto.setUrl(conf.getString("Product.Domain") + "?id=" + id);
+                productDetailDto.setUrl(conf.getString("Product.Url") + "?id=" + id);
                 return productDetailDto;
             }
         });
