@@ -18,6 +18,7 @@ public class BaseProduct {
     private int cityId;
     private List<String> tags;
     private String title;
+    private String abstracts;
     private String cover;
     private String crowd;
     private long placeId;
@@ -25,7 +26,6 @@ public class BaseProduct {
     private int sales;
     private Date startTime;
     private Date endTime;
-    private String abstracts;
 
     public long getId() {
         return id;
@@ -57,6 +57,14 @@ public class BaseProduct {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getAbstracts() {
+        return abstracts;
+    }
+
+    public void setAbstracts(String abstracts) {
+        this.abstracts = abstracts;
     }
 
     public String getCover() {
@@ -113,14 +121,6 @@ public class BaseProduct {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
-    }
-
-    public String getAbstracts() {
-        return abstracts;
-    }
-
-    public void setAbstracts(String abstracts) {
-        this.abstracts = abstracts;
     }
 
     @Override

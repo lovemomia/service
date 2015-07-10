@@ -1,5 +1,6 @@
 package cn.momia.mapi.api.v1.dto.misc;
 
+import cn.momia.common.config.Configuration;
 import cn.momia.mapi.api.v1.dto.base.ProductDto;
 import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import cn.momia.common.web.img.ImageFile;
@@ -14,6 +15,11 @@ import java.util.List;
 
 public class ProductUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductUtil.class);
+    private static Configuration conf;
+
+    public void setConf(Configuration conf) {
+        ProductUtil.conf = conf;
+    }
 
     public static ListDto extractProductsData(JSONArray productsJson) {
         ListDto products = new ListDto();
@@ -91,5 +97,9 @@ public class ProductUtil {
         }
 
         return contentJson;
+    }
+
+    public static String buildUrl(long id) {
+        return conf.getString("Product.Url") + "?id=" + id;
     }
 }

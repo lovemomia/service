@@ -24,7 +24,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseProductServiceImpl.class);
     private static final Splitter TAGS_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
     private static final int MAX_TAG_COUNT = 3;
-    private static final String[] PRODUCT_FIELDS = { "id", "cityId", "tags", "title", "abstracts",  "cover", "crowd", "placeId", "content", "sales", "startTime", "endTime" };
+    private static final String[] PRODUCT_FIELDS = { "id", "cityId", "tags", "title", "abstracts", "cover", "crowd", "placeId", "content", "sales", "startTime", "endTime" };
 
     private Map<Integer, String> tagsCache;
 

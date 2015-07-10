@@ -42,6 +42,8 @@ public class Product implements Serializable {
         return baseProduct.getTitle();
     }
 
+    public String getAbstracts(){ return baseProduct.getAbstracts(); }
+
     public String getCover() {
         return baseProduct.getCover();
     }
@@ -65,8 +67,6 @@ public class Product implements Serializable {
     public Date getEndTime() {
         return baseProduct.getEndTime();
     }
-
-    public String getAbstracts(){ return baseProduct.getAbstracts(); }
 
     public void setBaseProduct(BaseProduct baseProduct) {
         this.baseProduct = baseProduct;
