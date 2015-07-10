@@ -146,4 +146,25 @@ public class ProductDto implements Dto {
     public void setContent(JSONArray content) {
         this.content = content;
     }
+
+    public ProductDto() {}
+
+    public ProductDto(ProductDto productDto) {
+        this.id = productDto.id;
+        this.cover = productDto.cover;
+        this.title = productDto.title;
+        this.joined = productDto.joined;
+        this.price = productDto.price;
+        this.crowd = productDto.crowd;
+        this.scheduler = productDto.scheduler;
+        this.address = productDto.address;
+        this.poi = productDto.poi;
+        this.tags = productDto.tags;
+        this.startTime = productDto.startTime;
+        this.endTime = productDto.endTime;
+        this.soldOut = productDto.soldOut;
+
+        this.imgs = productDto.imgs;
+        this.content = productDto.content;
+    }
 }
