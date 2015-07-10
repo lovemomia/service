@@ -18,6 +18,7 @@ public class ProductDto implements Dto {
     private String scheduler;
     private String address;
     private String poi;
+    private JSONArray tags;
     @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date startTime;
     @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date endTime;
     private boolean soldOut;
@@ -98,6 +99,14 @@ public class ProductDto implements Dto {
         this.poi = poi;
     }
 
+    public JSONArray getTags() {
+        return tags;
+    }
+
+    public void setTags(JSONArray tags) {
+        this.tags = tags;
+    }
+
     public Date getStartTime() {
         return startTime;
     }
@@ -136,5 +145,26 @@ public class ProductDto implements Dto {
 
     public void setContent(JSONArray content) {
         this.content = content;
+    }
+
+    public ProductDto() {}
+
+    public ProductDto(ProductDto productDto) {
+        this.id = productDto.id;
+        this.cover = productDto.cover;
+        this.title = productDto.title;
+        this.joined = productDto.joined;
+        this.price = productDto.price;
+        this.crowd = productDto.crowd;
+        this.scheduler = productDto.scheduler;
+        this.address = productDto.address;
+        this.poi = productDto.poi;
+        this.tags = productDto.tags;
+        this.startTime = productDto.startTime;
+        this.endTime = productDto.endTime;
+        this.soldOut = productDto.soldOut;
+
+        this.imgs = productDto.imgs;
+        this.content = productDto.content;
     }
 }

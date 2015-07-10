@@ -6,6 +6,7 @@ import java.util.Set;
 
 public class User implements Serializable {
     public static final User NOT_EXIST_USER = new User();
+    public static final User INVALID_USER = new User();
     public static final User DUPLICATE_USER = new User() {
         public boolean duplicated() {
             return true;
@@ -14,6 +15,7 @@ public class User implements Serializable {
 
     static {
         NOT_EXIST_USER.setId(0);
+        INVALID_USER.setId(0);
         DUPLICATE_USER.setId(0);
     }
 
@@ -21,6 +23,7 @@ public class User implements Serializable {
     private String token;
     private String nickName;
     private String mobile;
+    private boolean hasPassword;
     private String avatar;
     private String name;
     private String sex;
@@ -59,6 +62,14 @@ public class User implements Serializable {
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
+    }
+
+    public boolean isHasPassword() {
+        return hasPassword;
+    }
+
+    public void setHasPassword(boolean hasPassword) {
+        this.hasPassword = hasPassword;
     }
 
     public String getAvatar() {

@@ -34,6 +34,10 @@ public class Product implements Serializable {
         return baseProduct.getCityId();
     }
 
+    public List<String> getTags() {
+        return baseProduct.getTags();
+    }
+
     public String getTitle() {
         return baseProduct.getTitle();
     }

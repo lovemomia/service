@@ -44,7 +44,7 @@
     </bean>
     <bean id="bannerService" class="cn.momia.service.base.banner.impl.BannerServiceImpl" parent="dbAccessService" />
 
-    <bean id="baseProductService" class="cn.momia.service.base.product.base.impl.BaseProductServiceImpl" parent="dbAccessService" />
+    <bean id="baseProductService" class="cn.momia.service.base.product.base.impl.BaseProductServiceImpl" parent="dbAccessService" init-method="init" />
     <bean id="placeService" class="cn.momia.service.base.product.place.impl.PlaceServiceImpl" parent="dbAccessService" />
     <bean id="skuService" class="cn.momia.service.base.product.sku.impl.SkuServiceImpl" parent="dbAccessService" />
     <bean id="productService" class="cn.momia.service.base.product.impl.ProductServiceImpl" parent="dbAccessService">
