@@ -14,7 +14,8 @@ public class AlipayUtil {
         for (Map.Entry<String, String> entry : params.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
-            if (key.equalsIgnoreCase(AlipayPrepayFields.SIGN_TYPE) || key.equalsIgnoreCase(AlipayPrepayFields.SIGN) || StringUtils.isBlank(value)) continue;
+            if (key.equalsIgnoreCase(AlipayPrepayFields.SIGN_TYPE) || key.equalsIgnoreCase(AlipayPrepayFields.SIGN) || StringUtils.isBlank(value))
+                continue;
             kvs.add(key + "=" + value);
         }
         Collections.sort(kvs);
@@ -23,7 +24,8 @@ public class AlipayUtil {
     }
 
     public static boolean validateSign(Map<String, String> params) {
-        // TODO
-        return false;
+        String generatedSign = sign(params);
+        String returnedSign = params.get(AlipayCallbackFields.SIGN);
+       return RSA.verify(generatedSign, returnedSign, SecretKey.get("alipayPublicKey"), "utf-8");
     }
 }

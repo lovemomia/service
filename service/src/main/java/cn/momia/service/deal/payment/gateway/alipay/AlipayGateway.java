@@ -8,15 +8,18 @@ import cn.momia.service.deal.payment.gateway.CallbackParam;
 import cn.momia.service.deal.payment.gateway.CallbackResult;
 import cn.momia.service.deal.payment.gateway.PrepayParam;
 import cn.momia.service.deal.payment.gateway.PrepayResult;
+import com.alibaba.fastjson.util.TypeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
 public class AlipayGateway extends AbstractPaymentGateway {
     private static final Logger LOGGER = LoggerFactory.getLogger(AlipayGateway.class);
+    private static final String SUCCESS = "TRADE_SUCCESS";
 
     @Override
     public Map<String, String> extractPrepayParams(HttpServletRequest request, Order order, Product product) {
@@ -50,8 +53,8 @@ public class AlipayGateway extends AbstractPaymentGateway {
 
     @Override
     protected boolean isPayedSuccessfully(CallbackParam param) {
-        // TODO
-        return false;
+        String trade_status = param.get(AlipayCallbackFields.TRADE_STATUS);
+        return trade_status != null && trade_status.equalsIgnoreCase(SUCCESS);
     }
 
     @Override
@@ -64,8 +67,15 @@ public class AlipayGateway extends AbstractPaymentGateway {
 
     @Override
     protected Payment createPayment(CallbackParam param) {
-        // TODO
-        return null;
+        Payment payment = new Payment();
+        payment.setOrderId(Long.valueOf(param.get(AlipayCallbackFields.OUT_TRADE_NO)));
+        payment.setPayer(param.get(AlipayCallbackFields.BUYER_EMAIL));
+        payment.setFinishTime(TypeUtils.castToDate(param.get(AlipayCallbackFields.GMT_PAYMENT)));
+        payment.setPayType(Payment.Type.ALIPAY);
+        payment.setTradeNo(param.get(AlipayCallbackFields.TRADE_NO));
+        payment.setFee(new BigDecimal(param.get(AlipayCallbackFields.TOTAL_FEE)));
+
+        return payment;
     }
 
     @Override
