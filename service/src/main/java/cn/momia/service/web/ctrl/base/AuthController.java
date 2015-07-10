@@ -72,6 +72,8 @@ public class AuthController extends UserRelatedController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseMessage login(@RequestParam String mobile, @RequestParam String password) {
+        LOGGER.info("login by password: {}", mobile);
+
         if (ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(password)) return ResponseMessage.BAD_REQUEST;
         if (!userService.validatePassword(mobile, password)) return ResponseMessage.FAILED("登录失败，密码不正确");
 
@@ -83,6 +85,8 @@ public class AuthController extends UserRelatedController {
 
     @RequestMapping(value = "/login/code", method = RequestMethod.POST)
     public ResponseMessage loginByCode(@RequestParam String mobile, @RequestParam String code) {
+        LOGGER.info("login by code: {}", mobile);
+
         if (ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
         if (!smsVerifier.verify(mobile, code)) return ResponseMessage.FAILED("验证码不正确");
 
