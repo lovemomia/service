@@ -23,6 +23,7 @@ import java.util.Map;
 public class BaseProductServiceImpl extends DbAccessService implements BaseProductService {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseProductServiceImpl.class);
     private static final Splitter TAGS_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
+    private static final int MAX_TAG_COUNT = 3;
     private static final String[] PRODUCT_FIELDS = { "id", "cityId", "tags", "title", "cover", "crowd", "placeId", "content", "sales", "startTime", "endTime" };
 
     private Map<Integer, String> tagsCache;
@@ -80,7 +81,9 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
 
     private List<String> parseTags(String tagsStr) {
         List<String> tags = new ArrayList<String>();
+        int count = 0;
         for (String tagStr : TAGS_SPLITTER.split(tagsStr)) {
+            if (++count > MAX_TAG_COUNT) break;
             String tagName = tagsCache.get(Integer.valueOf(tagStr));
             if (!StringUtils.isBlank(tagName)) tags.add(tagName);
         }
