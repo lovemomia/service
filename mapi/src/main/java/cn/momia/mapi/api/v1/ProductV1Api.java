@@ -62,7 +62,7 @@ public class ProductV1Api extends AbstractV1Api {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage getProduct(@RequestParam long id) {
+    public ResponseMessage getProduct(@RequestParam final long id) {
         if (id <= 0) return ResponseMessage.BAD_REQUEST;
 
         List<MomiaHttpRequest> requests = buildProductRequests(id);
@@ -70,7 +70,9 @@ public class ProductV1Api extends AbstractV1Api {
         return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {
             @Override
             public Dto apply(MomiaHttpResponseCollector collector) {
-                return new ProductDetailDto((JSONObject) collector.getResponse("product"), (JSONObject) collector.getResponse("customers"));
+                ProductDetailDto productDetailDto = new ProductDetailDto((JSONObject) collector.getResponse("product"), (JSONObject) collector.getResponse("customers"));
+                productDetailDto.setUrl(conf.getString("Product.Domain") + "?id=" + id);
+                return productDetailDto;
             }
         });
     }
