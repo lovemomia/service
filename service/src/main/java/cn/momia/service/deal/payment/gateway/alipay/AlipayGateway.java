@@ -48,6 +48,7 @@ public class AlipayGateway extends AbstractPaymentGateway {
         params.put(AlipayPrepayFields.TOTAL_FEE, String.valueOf(order.getTotalFee().floatValue()));
         params.put(AlipayPrepayFields.BODY, product.getTitle());
         params.put(AlipayPrepayFields.IT_B_PAY, "30m");
+        params.put(AlipayPrepayFields.SHOW_URL, "m.duolaqinzi.com");
         params.put(AlipayPrepayFields.SIGN, AlipayUtil.sign(params));
 
         return params;
