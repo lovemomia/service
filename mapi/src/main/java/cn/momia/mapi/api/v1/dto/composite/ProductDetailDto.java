@@ -8,9 +8,18 @@ import com.alibaba.fastjson.JSONObject;
 
 public class ProductDetailDto extends ProductDto {
     private JSONObject customers;
+    private String url;
 
     public JSONObject getCustomers() {
         return customers;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public ProductDetailDto(JSONObject productJson, JSONObject customersJson) {
