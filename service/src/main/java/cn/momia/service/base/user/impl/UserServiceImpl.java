@@ -29,7 +29,7 @@ import java.util.Set;
 
 public class UserServiceImpl extends DbAccessService implements UserService {
     private static final Splitter CHILDREN_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
-    private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "avatar", "name", "sex", "birthday", "cityId", "address", "children" };
+    private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "password", "avatar", "name", "sex", "birthday", "cityId", "address", "children" };
     private CityService cityService;
 
     public void setCityService(CityService cityService) {
@@ -100,6 +100,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         user.setToken(rs.getString("token"));
         user.setNickName(rs.getString("nickName"));
         user.setMobile(rs.getString("mobile"));
+        user.setHasPassword(!StringUtils.isBlank(rs.getString("password")));
         user.setAvatar(rs.getString("avatar"));
         user.setName(rs.getString("name"));
         user.setSex(rs.getString("sex"));
@@ -254,5 +255,12 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         String sql = "UPDATE t_user SET children=? WHERE id=?";
 
         return update(sql, new Object[] { StringUtils.join(children, ","), id });
+    }
+
+    @Override
+    public boolean updatePassword(long id, String mobile, String password) {
+        String sql = "UPDATE t_user SET password=? WHERE id=?";
+
+        return update(sql, new Object[] { PasswordEncryptor.encrypt(mobile, password, SecretKey.getPasswordSecretKey()), id });
     }
 }

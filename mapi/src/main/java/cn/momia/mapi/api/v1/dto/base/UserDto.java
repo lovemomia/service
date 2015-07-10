@@ -27,6 +27,7 @@ public class UserDto implements Dto {
     private String token;
     private String nickName;
     private String mobile;
+    private boolean hasPassword;
     private String avatar;
     private String name;
     private String sex;
@@ -45,6 +46,10 @@ public class UserDto implements Dto {
 
     public String getMobile() {
         return mobile;
+    }
+
+    public boolean isHasPassword() {
+        return hasPassword;
     }
 
     public String getAvatar() {
@@ -86,6 +91,7 @@ public class UserDto implements Dto {
         if (showToken) this.token = userJson.getString("token");
         this.nickName = userJson.getString("nickName");
         this.mobile = MobileEncryptor.encrypt(userJson.getString("mobile"));
+        this.hasPassword = userJson.getBoolean("hasPassword");
         this.avatar = ImageFile.url(userJson.getString("avatar"));
         this.name = userJson.getString("name");
         this.sex = userJson.getString("sex");

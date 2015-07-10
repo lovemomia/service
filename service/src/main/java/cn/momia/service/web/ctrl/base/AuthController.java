@@ -95,4 +95,16 @@ public class AuthController extends UserRelatedController {
 
         return new ResponseMessage(buildUserResponse(user));
     }
+
+    @RequestMapping(value = "/password", method = RequestMethod.PUT)
+    public ResponseMessage updatePassword(@RequestParam String mobile, @RequestParam String password, @RequestParam String code) {
+        if (StringUtils.isBlank(mobile) || StringUtils.isBlank(password) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
+        if (!smsVerifier.verify(mobile, code)) return ResponseMessage.FAILED("验证码不正确");
+
+        User user = userService.getByMobile(mobile);
+        if (!user.exists()) return new ResponseMessage(ErrorCode.FORBIDDEN, "用户不存在");
+
+        if (!userService.updatePassword(user.getId(), mobile, password)) return ResponseMessage.FAILED("更改密码失败");
+        return new ResponseMessage(buildUserResponse(user));
+    }
 }
