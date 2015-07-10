@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class AlipayUtil {
-    public static String sign(Map<String, String> params) {
+    public static List<String> getSignContent(Map<String, String> params) {
         List<String> kvs = new ArrayList<String>();
         for (Map.Entry<String, String> entry : params.entrySet()) {
             String key = entry.getKey();
@@ -19,13 +19,20 @@ public class AlipayUtil {
             kvs.add(key + "=" + value);
         }
         Collections.sort(kvs);
+        return kvs;
+    }
+
+    public static String sign(Map<String, String> params) {
+        List<String> kvs = getSignContent(params);
 
         return RSA.sign(StringUtils.join(kvs, "&"), SecretKey.get("alipayPrivateKey"), "utf-8");
     }
 
     public static boolean validateSign(Map<String, String> params) {
-        String generatedSign = sign(params);
+        List<String> kvs = getSignContent(params);
+
         String returnedSign = params.get(AlipayCallbackFields.SIGN);
-       return RSA.verify(generatedSign, returnedSign, SecretKey.get("alipayPublicKey"), "utf-8");
+
+        return RSA.verify(StringUtils.join(kvs, "&"), returnedSign, SecretKey.get("alipayPublicKey"), "utf-8");
     }
 }
