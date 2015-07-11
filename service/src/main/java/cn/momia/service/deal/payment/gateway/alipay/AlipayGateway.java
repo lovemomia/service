@@ -1,6 +1,5 @@
 package cn.momia.service.deal.payment.gateway.alipay;
 
-import cn.momia.common.web.secret.SecretKey;
 import cn.momia.service.base.product.Product;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
@@ -10,28 +9,23 @@ import cn.momia.service.deal.payment.gateway.CallbackResult;
 import cn.momia.service.deal.payment.gateway.PrepayParam;
 import cn.momia.service.deal.payment.gateway.PrepayResult;
 import com.alibaba.fastjson.util.TypeUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.crypto.Data;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class AlipayGateway extends AbstractPaymentGateway {
     private static final Logger LOGGER = LoggerFactory.getLogger(AlipayGateway.class);
-    private static final String HTTPS_VERIFY_URL = "https://mapi.alipay.com/gateway.do?service=notify_verify&";
-    private static final DateFormat DATE_FORMATTER = new SimpleDateFormat("yyyyMMddHHmmss");
+
     @Override
     public Map<String, String> extractPrepayParams(HttpServletRequest request, Order order, Product product) {
         Map<String, String> params = new HashMap<String, String>();
@@ -65,39 +59,30 @@ public class AlipayGateway extends AbstractPaymentGateway {
 
     @Override
     protected boolean isPayedSuccessfully(CallbackParam param) {
-        String responseTxt = "true";
-        if(param.get("notify_id") != null) {
-            String notify_id = param.get("notify_id");
-            responseTxt = verifyResponse(notify_id);
-        }
-        if (responseTxt.equals("true")) {
-            return true;
-        } else {
+        String notifyId = param.get(AlipayCallbackFields.NOTIFY_ID);
+        if (notifyId != null) return verifyResponse(notifyId);
+
+        return false;
+    }
+
+    private boolean verifyResponse(String notifyId) {
+        String partner = conf.getString("Payment.Ali.Partner");
+        String verifyUrl = conf.getString("Payment.Ali.VerifyUrl") + "partner=" + partner + "&notify_id=" + notifyId;
+
+        try {
+            HttpClient httpClient = HttpClients.createDefault();
+            HttpGet request = new HttpGet(verifyUrl);
+            HttpResponse response = httpClient.execute(request);
+            if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                throw new RuntimeException("fail to execute request: " + request);
+            }
+
+            String entity = EntityUtils.toString(response.getEntity());
+
+            return Boolean.valueOf(entity);
+        } catch (Exception e) {
             return false;
         }
-    }
-
-    private String verifyResponse(String notify_id) {
-        String partner = conf.getString("Payment.Ali.Partner");
-        String veryfy_url = HTTPS_VERIFY_URL + "partner=" + partner + "&notify_id=" + notify_id;
-
-        return checkUrl(veryfy_url);
-    }
-
-    private String checkUrl(String urlvalue) {
-        String inputLine = "";
-        try {
-            URL url = new URL(urlvalue);
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection
-                    .getInputStream()));
-            inputLine = in.readLine().toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-            inputLine = "";
-        }
-
-        return inputLine;
     }
 
     @Override
@@ -111,16 +96,10 @@ public class AlipayGateway extends AbstractPaymentGateway {
 
     @Override
     protected Payment createPayment(CallbackParam param) {
-        String finishTime = param.get(AlipayCallbackFields.GMT_PAYMENT);
-        if(StringUtils.isBlank(finishTime))
-            finishTime = DATE_FORMATTER.format(new Date());
         Payment payment = new Payment();
-        if(StringUtils.isBlank(param.get(AlipayCallbackFields.BUYER_EMAIL))) payment.setPayer("");
-        if(StringUtils.isBlank(param.get(AlipayCallbackFields.TRADE_NO))) payment.setPayer("");
-        if(StringUtils.isBlank(param.get(AlipayCallbackFields.TOTAL_FEE))) payment.setFee(new BigDecimal(0));
         payment.setOrderId(Long.valueOf(param.get(AlipayCallbackFields.OUT_TRADE_NO)));
-        payment.setPayer(param.get(AlipayCallbackFields.BUYER_EMAIL));
-        payment.setFinishTime(TypeUtils.castToDate(finishTime));
+        payment.setPayer(param.get(AlipayCallbackFields.BUYER_ID));
+        payment.setFinishTime(TypeUtils.castToDate(param.get(AlipayCallbackFields.GMT_PAYMENT)));
         payment.setPayType(Payment.Type.ALIPAY);
         payment.setTradeNo(param.get(AlipayCallbackFields.TRADE_NO));
         payment.setFee(new BigDecimal(param.get(AlipayCallbackFields.TOTAL_FEE)));
