@@ -10,6 +10,7 @@ public class SkuDto implements Dto {
     private long productId;
     private long skuId;
     private String desc;
+    private int type;
     private int limit;
     private boolean needRealName;
     private int stock;
@@ -27,6 +28,10 @@ public class SkuDto implements Dto {
 
     public String getDesc() {
         return desc;
+    }
+
+    public int getType() {
+        return type;
     }
 
     public int getLimit() {
@@ -57,11 +62,15 @@ public class SkuDto implements Dto {
         this.productId = skuJson.getLong("productId");
         this.skuId = skuJson.getLong("id");
         this.desc = skuJson.getString("desc");
+        this.type = skuJson.getInteger("type");
         this.limit = skuJson.getInteger("limit");
         this.needRealName = skuJson.getBoolean("needRealName");
         this.stock = skuJson.getInteger("unlockedStock");
         this.minPrice = skuJson.getBigDecimal("minPrice");
         this.time = SkuUtil.getSkuTime(skuJson.getJSONArray("properties"));
         this.prices = skuJson.getJSONArray("prices");
+
+        if (limit < 0) limit = type == 0 ? 0 : 1;
+        if (stock < 0) stock = 0;
     }
 }
