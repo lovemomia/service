@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 public class SkuDto implements Dto {
     private long productId;
     private long skuId;
+    private String desc;
     private int limit;
     private boolean needRealName;
     private int stock;
@@ -22,6 +23,10 @@ public class SkuDto implements Dto {
 
     public long getSkuId() {
         return skuId;
+    }
+
+    public String getDesc() {
+        return desc;
     }
 
     public int getLimit() {
@@ -51,6 +56,7 @@ public class SkuDto implements Dto {
     public SkuDto(JSONObject skuJson) {
         this.productId = skuJson.getLong("productId");
         this.skuId = skuJson.getLong("id");
+        this.desc = skuJson.getString("desc");
         this.limit = skuJson.getInteger("limit");
         this.needRealName = skuJson.getBoolean("needRealName");
         this.stock = skuJson.getInteger("unlockedStock");

@@ -52,6 +52,7 @@ public class Sku implements Serializable {
 
     private long id;
     private long productId;
+    private String desc;
     private List<SkuProperty> properties;
     private List<SkuPrice> prices;
     private int limit;
@@ -74,6 +75,14 @@ public class Sku implements Serializable {
 
     public void setProductId(long productId) {
         this.productId = productId;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 
     public List<SkuProperty> getProperties() {
