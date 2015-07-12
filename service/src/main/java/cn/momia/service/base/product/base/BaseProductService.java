@@ -10,4 +10,6 @@ public interface BaseProductService {
     List<BaseProduct> query(int start, int count, String query);
     boolean join(long id, int count);
     boolean sold(long id, int count);
+    int getSales(long id);
+    boolean soldOut(long id);
 }

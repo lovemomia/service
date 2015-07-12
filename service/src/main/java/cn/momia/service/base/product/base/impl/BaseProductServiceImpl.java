@@ -152,4 +152,24 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
 
         return jdbcTemplate.update(sql, new Object[] { count, id }) == 1;
     }
+
+    @Override
+    public int getSales(long id) {
+        String sql = "SELECT sales FROM t_product WHERE id=? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[]{id}, new ResultSetExtractor<Integer>() {
+            @Override
+            public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (rs.next()) return rs.getInt("sales");
+                return Integer.MAX_VALUE;
+            }
+        });
+    }
+
+    @Override
+    public boolean soldOut(long id) {
+        String sql = "UPDATE t_product SET soldOut=1 WHERE id=? AND status=1";
+
+        return jdbcTemplate.update(sql, new Object[] { id }) == 1;
+    }
 }
