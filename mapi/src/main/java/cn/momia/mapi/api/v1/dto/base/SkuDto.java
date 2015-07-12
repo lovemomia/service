@@ -70,7 +70,7 @@ public class SkuDto implements Dto {
         this.time = SkuUtil.getSkuTime(skuJson.getJSONArray("properties"));
         this.prices = skuJson.getJSONArray("prices");
 
-        if (limit < 0) limit = type == 0 ? 0 : 1;
+        if (limit < 0) limit = type == 1 ? 1 : 0;
         if (stock < 0) stock = 0;
     }
 }

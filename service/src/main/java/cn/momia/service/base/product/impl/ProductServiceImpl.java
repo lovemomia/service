@@ -194,7 +194,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
         int totalStock = 0;
         List<Sku> skus = getSkus(id);
         for (Sku sku : skus) {
-            if (sku.getType() != 0) return false;
+            if (sku.getType() == Sku.Type.NO_CEILING) return false;
             totalStock += sku.getStock();
         }
 

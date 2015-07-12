@@ -129,14 +129,30 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
 
     @Override
     public boolean lock(long id, int count) {
+        if (isNoCeiling(id)) return true;
+
         String sql = "UPDATE t_sku SET unlockedStock=unlockedStock-?, lockedStock=lockedStock+? WHERE id=? AND unlockedStock>=? AND stock-lockedStock>=? AND status=1";
         int updateCount = jdbcTemplate.update(sql, new Object[]{ count, count, id, count, count });
 
         return updateCount == 1;
     }
 
+    private boolean isNoCeiling(long id) {
+        String sql = "SELECT `type` FROM t_sku WHERE id=? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[]{id}, new ResultSetExtractor<Boolean>() {
+            @Override
+            public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (rs.next()) return rs.getInt("type") == Sku.Type.NO_CEILING;
+                return false;
+            }
+        });
+    }
+
     @Override
     public boolean unlock(long id, int count) {
+        if (isNoCeiling(id)) return true;
+
         String sql = "UPDATE t_sku SET unlockedStock=unlockedStock+?, lockedStock=lockedStock-? WHERE id=? AND lockedStock>=? AND stock-unlockedStock>=? AND status=1";
         int updateCount = jdbcTemplate.update(sql, new Object[]{ count, count, id, count, count });
 

@@ -13,6 +13,11 @@ import java.util.Date;
 import java.util.List;
 
 public class Sku implements Serializable {
+    public static class Type {
+        public static final int NORMAL = 0;
+        public static final int NO_CEILING = 1;
+    }
+
     public static final Sku NOT_EXIST_SKU = new Sku();
     public static final Sku INVALID_SKU = new Sku();
 
