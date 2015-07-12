@@ -176,6 +176,11 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     }
 
     @Override
+    public boolean join(long id, int count) {
+        return baseProductService.join(id, count);
+    }
+
+    @Override
     public boolean sold(long id, int count) {
         return baseProductService.sold(id, count);
     }

@@ -140,6 +140,13 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     }
 
     @Override
+    public boolean join(long id, int count) {
+        String sql = "UPDATE t_product SET joined=joined+? WHERE id=? AND status=1";
+
+        return jdbcTemplate.update(sql, new Object[] { count, id }) == 1;
+    }
+
+    @Override
     public boolean sold(long id, int count) {
         String sql = "UPDATE t_product SET sales=sales+? WHERE id=? AND status=1";
 
