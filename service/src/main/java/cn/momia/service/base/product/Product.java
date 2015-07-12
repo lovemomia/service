@@ -56,8 +56,16 @@ public class Product implements Serializable {
         return baseProduct.getContent();
     }
 
+    public int getJoined() {
+        return baseProduct.getJoined();
+    }
+
     public int getSales() {
         return baseProduct.getSales();
+    }
+
+    public boolean isSoldOut() {
+        return baseProduct.isSoldOut();
     }
 
     public Date getStartTime() {

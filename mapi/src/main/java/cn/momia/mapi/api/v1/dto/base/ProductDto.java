@@ -14,6 +14,8 @@ public class ProductDto implements Dto {
     private String title;
     private String abstracts;
     private int joined;
+    private int sales;
+    private boolean soldOut;
     private BigDecimal price;
     private String crowd;
     private String scheduler;
@@ -22,7 +24,6 @@ public class ProductDto implements Dto {
     private JSONArray tags;
     @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date startTime;
     @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date endTime;
-    private boolean soldOut;
 
     // extra info
     private List<String> imgs;
@@ -66,6 +67,22 @@ public class ProductDto implements Dto {
 
     public void setJoined(int joined) {
         this.joined = joined;
+    }
+
+    public int getSales() {
+        return sales;
+    }
+
+    public void setSales(int sales) {
+        this.sales = sales;
+    }
+
+    public boolean isSoldOut() {
+        return soldOut;
+    }
+
+    public void setSoldOut(boolean soldOut) {
+        this.soldOut = soldOut;
     }
 
     public BigDecimal getPrice() {
@@ -132,14 +149,6 @@ public class ProductDto implements Dto {
         this.endTime = endTime;
     }
 
-    public boolean isSoldOut() {
-        return soldOut;
-    }
-
-    public void setSoldOut(boolean soldOut) {
-        this.soldOut = soldOut;
-    }
-
     public List<String> getImgs() {
         return imgs;
     }
@@ -164,6 +173,8 @@ public class ProductDto implements Dto {
         this.title = productDto.title;
         this.abstracts = productDto.abstracts;
         this.joined = productDto.joined;
+        this.sales = productDto.sales;
+        this.soldOut = productDto.soldOut;
         this.price = productDto.price;
         this.crowd = productDto.crowd;
         this.scheduler = productDto.scheduler;
@@ -172,7 +183,6 @@ public class ProductDto implements Dto {
         this.tags = productDto.tags;
         this.startTime = productDto.startTime;
         this.endTime = productDto.endTime;
-        this.soldOut = productDto.soldOut;
 
         this.imgs = productDto.imgs;
         this.content = productDto.content;

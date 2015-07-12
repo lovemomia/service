@@ -23,7 +23,9 @@ public class BaseProduct {
     private String crowd;
     private long placeId;
     private JSONArray content;
+    private int joined;
     private int sales;
+    private boolean soldOut;
     private Date startTime;
     private Date endTime;
 
@@ -99,12 +101,28 @@ public class BaseProduct {
         this.content = content;
     }
 
+    public int getJoined() {
+        return joined;
+    }
+
+    public void setJoined(int joined) {
+        this.joined = joined;
+    }
+
     public int getSales() {
         return sales;
     }
 
     public void setSales(int sales) {
         this.sales = sales;
+    }
+
+    public boolean isSoldOut() {
+        return soldOut;
+    }
+
+    public void setSoldOut(boolean soldOut) {
+        this.soldOut = soldOut;
     }
 
     public Date getStartTime() {

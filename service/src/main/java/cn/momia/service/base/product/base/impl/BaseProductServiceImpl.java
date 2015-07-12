@@ -24,7 +24,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseProductServiceImpl.class);
     private static final Splitter TAGS_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
     private static final int MAX_TAG_COUNT = 3;
-    private static final String[] PRODUCT_FIELDS = { "id", "cityId", "tags", "title", "abstracts", "cover", "crowd", "placeId", "content", "sales", "startTime", "endTime" };
+    private static final String[] PRODUCT_FIELDS = { "id", "cityId", "tags", "title", "abstracts", "cover", "crowd", "placeId", "content", "joined", "sales", "soldOut", "startTime", "endTime" };
 
     private Map<Integer, String> tagsCache;
 
@@ -68,7 +68,9 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
             baseProduct.setCrowd(rs.getString("crowd"));
             baseProduct.setPlaceId(rs.getLong("placeId"));
             baseProduct.setContent(JSON.parseArray(rs.getString("content")));
+            baseProduct.setJoined(rs.getInt("joined"));
             baseProduct.setSales(rs.getInt("sales"));
+            baseProduct.setSoldOut(rs.getBoolean("soldOut"));
             baseProduct.setStartTime(rs.getTimestamp("startTime"));
             baseProduct.setEndTime(rs.getTimestamp("endTime"));
 
@@ -125,7 +127,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     public List<BaseProduct> query(int start, int count, String query) {
         final List<BaseProduct> baseProducts = new ArrayList<BaseProduct>();
 
-        String sql = "SELECT " + joinFields() + " FROM t_product WHERE status=1 AND startTime<=NOW() AND endTime>=NOW() AND " + query + " ORDER BY addTime DESC LIMIT ?,?";
+        String sql = "SELECT " + joinFields() + " FROM t_product WHERE status=1 AND startTime<=NOW() AND endTime>=NOW() AND " + query + " ORDER BY ordinal DESC, soldOut ASC, addTime DESC LIMIT ?,?";
         jdbcTemplate.query(sql, new Object[]{start, count}, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {

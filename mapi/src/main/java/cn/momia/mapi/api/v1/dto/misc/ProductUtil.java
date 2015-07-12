@@ -45,7 +45,9 @@ public class ProductUtil {
         product.setCover(ImageFile.url(productJson.getString("cover")));
         product.setTitle(productJson.getString("title"));
         product.setAbstracts(productJson.getString("abstracts"));
-        product.setJoined(productJson.getInteger("sales"));
+        product.setJoined(productJson.getInteger("joined"));
+        product.setSales(productJson.getInteger("sales"));
+        product.setSoldOut(productJson.getBoolean("sales"));
         product.setPrice(productJson.getBigDecimal("minPrice"));
         product.setCrowd(productJson.getString("crowd"));
         product.setScheduler(productJson.getString("scheduler"));
@@ -54,7 +56,6 @@ public class ProductUtil {
         product.setTags(productJson.getJSONArray("tags"));
         product.setStartTime(productJson.getDate("startTime"));
         product.setEndTime(productJson.getDate("endTime"));
-        product.setSoldOut(getSoldOut(productJson.getInteger("sales"), skusJson));
 
         if (extractExtraInfo) {
             product.setImgs(extractProductImgs(productJson));
@@ -62,16 +63,6 @@ public class ProductUtil {
         }
 
         return product;
-    }
-
-    private static boolean getSoldOut(int sales, JSONArray skusJson) {
-        int totalStock = 0;
-        for (int i = 0; i < skusJson.size(); i++) {
-            JSONObject skuJson = skusJson.getJSONObject(i);
-            totalStock += skuJson.getInteger("stock");
-        }
-
-        return sales >= totalStock;
     }
 
     private static List<String> extractProductImgs(JSONObject productJson) {
