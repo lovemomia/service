@@ -2,7 +2,6 @@ package cn.momia.service.web.ctrl.base;
 
 import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.service.base.city.CityService;
 import cn.momia.service.base.product.Product;
 import cn.momia.service.base.product.ProductService;
 import cn.momia.service.base.product.sku.Sku;
@@ -35,8 +34,6 @@ import java.util.Set;
 @RestController
 @RequestMapping("/user")
 public class UserController extends UserRelatedController {
-    @Autowired private CityService cityService;
-
     @Autowired private OrderService orderService;
     @Autowired private ProductService productService;
 
@@ -249,7 +246,7 @@ public class UserController extends UserRelatedController {
 
         if (!successful) return ResponseMessage.FAILED("更新用户城市失败");
 
-        user.setCity(cityService.get(city).getName());
+        user.setCity(city);
         return new ResponseMessage(buildUserResponse(user));
     }
 
