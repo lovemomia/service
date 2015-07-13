@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,6 +26,38 @@ import java.util.List;
 
 public class CouponServiceImpl extends DbAccessService implements CouponService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CouponServiceImpl.class);
+
+    @Override
+    public Coupon getCoupon(int couponId) {
+        String sql = "SELECT id, `type`, title, `desc`, discount, consumption, accumulation, duration FROM t_coupon WHERE id=? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[] { couponId }, new ResultSetExtractor<Coupon>() {
+            @Override
+            public Coupon extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (rs.next()) return buildCoupon(rs);
+                return Coupon.NOT_EXIST_COUPON;
+            }
+        });
+    }
+
+    private Coupon buildCoupon(ResultSet rs) throws SQLException {
+        try {
+            Coupon coupon = new Coupon();
+            coupon.setId(rs.getInt("id"));
+            coupon.setType(rs.getInt("type"));
+            coupon.setTitle(rs.getString("title"));
+            coupon.setDesc(rs.getString("desc"));
+            coupon.setDiscount(rs.getBigDecimal("discount"));
+            coupon.setConsumption(rs.getBigDecimal("consumption"));
+            coupon.setAccumulation(rs.getInt("accumulation"));
+            coupon.setDuration(rs.getLong("duration"));
+
+            return coupon;
+        } catch (Exception e) {
+            LOGGER.error("fail to build coupon: {}", rs.getInt("id"), e);
+            return Coupon.INVALID_COUPON;
+        }
+    }
 
     @Override
     public long getUserRegisterCoupon(final long userId) {
@@ -69,7 +102,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
         });
     }
 
-    public Coupon getRegisterCoupon() {
+    private Coupon getRegisterCoupon() {
         String sql = "SELECT id, `type`, title, `desc`, discount, consumption, accumulation, duration FROM t_coupon WHERE status=1 AND usage=? ORDER BY addTime DESC LIMIT 1";
 
         return jdbcTemplate.query(sql, new Object[] { Coupon.Usage.REGISTER }, new ResultSetExtractor<Coupon>() {
@@ -79,25 +112,6 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
                 return Coupon.NOT_EXIST_COUPON;
             }
         });
-    }
-
-    private Coupon buildCoupon(ResultSet rs) throws SQLException {
-        try {
-            Coupon coupon = new Coupon();
-            coupon.setId(rs.getInt("id"));
-            coupon.setType(rs.getInt("type"));
-            coupon.setTitle(rs.getString("title"));
-            coupon.setDesc(rs.getString("desc"));
-            coupon.setDiscount(rs.getBigDecimal("discount"));
-            coupon.setConsumption(rs.getBigDecimal("consumption"));
-            coupon.setAccumulation(rs.getInt("accumulation"));
-            coupon.setDuration(rs.getLong("duration"));
-
-            return coupon;
-        } catch (Exception e) {
-            LOGGER.error("fail to build coupon: {}", rs.getInt("id"), e);
-            return Coupon.INVALID_COUPON;
-        }
     }
 
     @Override
@@ -117,7 +131,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     public List<UserCoupon> queryByUser(long userId, int status, int start, int count) {
         final List<UserCoupon> userCoupons = new ArrayList<UserCoupon>();
 
-        String sql = "SELECT id, userId, couponId, type, expiredTime, status FROM t_user_coupon WHERE userId=? AND status=? ORDER BY addTime DESC LIMIT ?,?";
+        String sql = "SELECT id, userId, couponId, `type`, expiredTime, status FROM t_user_coupon WHERE userId=? AND status=? ORDER BY addTime DESC LIMIT ?,?";
         jdbcTemplate.query(sql, new Object[] { userId, status, start, count }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -144,5 +158,30 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
             LOGGER.error("fail to build user coupon: {}", rs.getLong("id"), e);
             return UserCoupon.INVALID_USER_COUPON;
         }
+    }
+
+
+    @Override
+    public UserCoupon getUserCoupon(long userId, long userCouponId) {
+        String sql = "SELECT id, userId, couponId, `type`, expiredTime, status FROM t_user_coupon WHERE id=? AND userId=? AND status=1 AND expiredTime>NOW()";
+
+        return jdbcTemplate.query(sql, new Object[] { userCouponId, userId }, new ResultSetExtractor<UserCoupon>() {
+            @Override
+            public UserCoupon extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (rs.next()) return buildUserCoupon(rs);
+                return UserCoupon.NOT_EXIST_USER_COUPON;
+            }
+        });
+    }
+
+    @Override
+    public BigDecimal calcTotalFee(BigDecimal totalFee, Coupon coupon) {
+        // TODO 更丰富的优惠方式
+        if (coupon.getConsumption().compareTo(totalFee) > 0) {
+            totalFee = totalFee.subtract(coupon.getDiscount());
+            totalFee = totalFee.compareTo(new BigDecimal(0)) < 0 ? new BigDecimal(0) : totalFee;
+        }
+
+        return totalFee;
     }
 }

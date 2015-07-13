@@ -80,6 +80,7 @@
         <property name="orderService" ref="orderService" />
         <property name="paymentService" ref="paymentService" />
         <property name="productService" ref="productService" />
+        <property name="couponService" ref="couponService" />
     </bean>
 
     <bean id="alipay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">

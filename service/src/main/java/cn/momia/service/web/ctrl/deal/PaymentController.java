@@ -13,7 +13,12 @@ import cn.momia.service.deal.payment.gateway.PrepayParam;
 import cn.momia.service.deal.payment.gateway.PrepayResult;
 import cn.momia.service.deal.payment.gateway.factory.PaymentGatewayFactory;
 import cn.momia.service.deal.payment.gateway.factory.PrepayParamFactory;
+import cn.momia.service.promo.coupon.Coupon;
+import cn.momia.service.promo.coupon.CouponService;
+import cn.momia.service.promo.coupon.UserCoupon;
 import cn.momia.service.web.ctrl.AbstractController;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,14 +27,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/payment")
 public class PaymentController extends AbstractController {
+    private static final Splitter COUPONS_SPLITTER = Splitter.on(",").omitEmptyStrings().trimResults();
+
     @Autowired private UserService userService;
     @Autowired private ProductService productService;
     @Autowired private OrderService orderService;
+    @Autowired private CouponService couponService;
 
     @RequestMapping(value = "/prepay/alipay", method = RequestMethod.POST)
     public ResponseMessage prepayAlipay(HttpServletRequest request) {
@@ -51,8 +62,18 @@ public class PaymentController extends AbstractController {
         if (!order.exists() || !product.exists()) return ResponseMessage.BAD_REQUEST;
         if (order.getCustomerId() != user.getId() || order.getSkuId() != skuId) return ResponseMessage.BAD_REQUEST;
 
+        Coupon coupon = Coupon.NOT_EXIST_COUPON;
+        long userCouponId = 0;
+        String couponStr = request.getParameter("coupon");
+        if (!StringUtils.isBlank(couponStr)) userCouponId = Long.valueOf(couponStr);
+        if (userCouponId > 0) {
+            UserCoupon userCoupon = couponService.getUserCoupon(user.getId(), userCouponId);
+            if (!userCoupon.exists()) return ResponseMessage.FAILED("无效的优惠券");
+            coupon = couponService.getCoupon(userCoupon.getCouponId());
+        }
+
         PaymentGateway gateway = PaymentGatewayFactory.create(payType);
-        Map<String, String> params = gateway.extractPrepayParams(request, order, product);
+        Map<String, String> params = gateway.extractPrepayParams(request, order, product, coupon);
         PrepayParam prepayParam = PrepayParamFactory.create(params, payType);
         PrepayResult prepayResult = gateway.prepay(prepayParam);
 
