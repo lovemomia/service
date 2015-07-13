@@ -62,15 +62,8 @@ public class PaymentController extends AbstractController {
         if (!order.exists() || !product.exists()) return ResponseMessage.BAD_REQUEST;
         if (order.getCustomerId() != user.getId() || order.getSkuId() != skuId) return ResponseMessage.BAD_REQUEST;
 
-        Coupon coupon = Coupon.NOT_EXIST_COUPON;
-        long userCouponId = 0;
-        String couponStr = request.getParameter("coupon");
-        if (!StringUtils.isBlank(couponStr)) userCouponId = Long.valueOf(couponStr);
-        if (userCouponId > 0) {
-            UserCoupon userCoupon = couponService.getUserCoupon(user.getId(), userCouponId);
-            if (!userCoupon.exists()) return ResponseMessage.FAILED("无效的优惠券");
-            coupon = couponService.getCoupon(userCoupon.getCouponId());
-        }
+        Coupon coupon = getCoupon(user.getId(), request);
+        if (coupon.invalid()) return ResponseMessage.FAILED("无效的优惠券");
 
         PaymentGateway gateway = PaymentGatewayFactory.create(payType);
         Map<String, String> params = gateway.extractPrepayParams(request, order, product, coupon);
@@ -81,12 +74,22 @@ public class PaymentController extends AbstractController {
         return new ResponseMessage(prepayResult);
     }
 
-    private Order getOrder(HttpServletRequest request) {
-        return orderService.get(Long.valueOf(request.getParameter("oid")));
-    }
+    private Coupon getCoupon(long userId, HttpServletRequest request) {
+        String couponStr = request.getParameter("coupon");
+        if (!StringUtils.isBlank(couponStr)) {
+            long userCouponId = Long.valueOf(couponStr);
+            if (userCouponId <= 0) return Coupon.INVALID_COUPON;
 
-    private Product getProduct(HttpServletRequest request) {
-        return productService.get(Long.valueOf(request.getParameter("pid")));
+            UserCoupon userCoupon = couponService.lockUserCoupon(userId, userCouponId);
+            if (!userCoupon.exists()) return Coupon.INVALID_COUPON;
+
+            Coupon coupon = couponService.getCoupon(userCoupon.getCouponId());
+            if (!coupon.exists()) return Coupon.INVALID_COUPON;
+
+            return coupon;
+        }
+
+        return Coupon.NOT_EXIST_COUPON;
     }
 
     @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)

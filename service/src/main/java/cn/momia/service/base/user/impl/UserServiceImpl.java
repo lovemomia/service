@@ -2,7 +2,6 @@ package cn.momia.service.base.user.impl;
 
 import cn.momia.common.secret.PasswordEncryptor;
 import cn.momia.common.web.secret.SecretKey;
-import cn.momia.service.base.city.CityService;
 import cn.momia.service.common.DbAccessService;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
@@ -34,11 +33,6 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     private static final Splitter CHILDREN_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
     private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "password", "avatar", "name", "sex", "birthday", "cityId", "address", "children" };
-    private CityService cityService;
-
-    public void setCityService(CityService cityService) {
-        this.cityService = cityService;
-    }
 
     @Override
     public User add(String nickName, String mobile, String password, String token) {
@@ -110,7 +104,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
             user.setName(rs.getString("name"));
             user.setSex(rs.getString("sex"));
             user.setBirthday(rs.getDate("birthday"));
-            user.setCity(cityService.get(rs.getInt("cityId")).getName());
+            user.setCity(rs.getInt("cityId"));
             user.setAddress(rs.getString("address"));
             user.setChildren(parseChildren(rs.getString("children")));
 

@@ -160,10 +160,17 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
         }
     }
 
-
     @Override
-    public UserCoupon getUserCoupon(long userId, long userCouponId) {
-        String sql = "SELECT id, userId, couponId, `type`, expiredTime, status FROM t_user_coupon WHERE id=? AND userId=? AND status=1 AND expiredTime>NOW()";
+    public UserCoupon lockUserCoupon(long userId, long userCouponId) {
+        String sql = "UPDATE t_user_coupon SET status=? WHERE id=? AND userId=? AND status=? AND expiredTime>NOW()";
+        boolean successful = jdbcTemplate.update(sql, new Object[] { Coupon.Status.USED, userCouponId, userId, Coupon.Status.NOT_USED }) == 1;
+        if (!successful) return UserCoupon.NOT_EXIST_USER_COUPON;
+
+        return getUserCoupon(userId, userCouponId);
+    }
+
+    private UserCoupon getUserCoupon(long userId, long userCouponId) {
+        String sql = "SELECT id, userId, couponId, `type`, expiredTime, status FROM t_user_coupon WHERE id=? AND userId=?";
 
         return jdbcTemplate.query(sql, new Object[] { userCouponId, userId }, new ResultSetExtractor<UserCoupon>() {
             @Override
@@ -177,7 +184,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     @Override
     public BigDecimal calcTotalFee(BigDecimal totalFee, Coupon coupon) {
         // TODO 更丰富的优惠方式
-        if (coupon.getConsumption().compareTo(totalFee) > 0) {
+        if (coupon.exists() && coupon.getConsumption().compareTo(totalFee) > 0) {
             totalFee = totalFee.subtract(coupon.getDiscount());
             totalFee = totalFee.compareTo(new BigDecimal(0)) < 0 ? new BigDecimal(0) : totalFee;
         }

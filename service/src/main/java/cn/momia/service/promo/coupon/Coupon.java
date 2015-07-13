@@ -8,6 +8,11 @@ public class Coupon {
         public static final int REGISTER = 1;
     }
 
+    public static class Status {
+        public static final int NOT_USED = 1;
+        public static final int USED = 2;
+    }
+
     public static final Coupon NOT_EXIST_COUPON = new Coupon();
     public static final Coupon INVALID_COUPON = new Coupon();
     static {
@@ -105,5 +110,9 @@ public class Coupon {
 
     public boolean exists() {
         return !this.equals(NOT_EXIST_COUPON);
+    }
+
+    public boolean invalid() {
+        return this == INVALID_COUPON;
     }
 }
