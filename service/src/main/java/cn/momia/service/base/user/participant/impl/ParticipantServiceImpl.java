@@ -151,7 +151,8 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
 
             @Override
             public void processRow(ResultSet rs) throws SQLException {
-                participants.add(buildParticipant(rs));
+                Participant participant = buildParticipant(rs);
+                if (participant.exists()) participants.add(participant);
             }
         });
 

@@ -7,6 +7,7 @@ import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.deal.payment.Payment;
 import cn.momia.service.deal.payment.PaymentService;
 import cn.momia.service.deal.payment.gateway.wechatpay.WechatpayCallbackFields;
+import cn.momia.service.promo.coupon.CouponService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,7 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
     protected OrderService orderService;
     protected PaymentService paymentService;
     protected ProductService productService;
+    protected CouponService couponService;
 
     public void setConf(Configuration conf) {
         this.conf = conf;
@@ -32,6 +34,10 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
 
     public void setProductService(ProductService productService) {
         this.productService = productService;
+    }
+
+    public void setCouponService(CouponService couponService) {
+        this.couponService = couponService;
     }
 
     @Override

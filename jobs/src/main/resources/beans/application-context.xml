@@ -33,11 +33,6 @@
         <property name="dataSource" ref="dataSource" />
     </bean>
 
-    <bean class="cn.momia.common.web.secret.SecretKey" init-method="init">
-        <property name="conf" ref="conf" />
-        <property name="jdbcTemplate" ref="jdbcTemplate" />
-    </bean>
-
     <bean id="orderCleaner" class="cn.momia.jobs.order.OrderCleaner">
         <property name="jdbcTemplate" ref="jdbcTemplate" />
     </bean>
@@ -51,7 +46,7 @@
     <bean id="orderCleanTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
         <property name="jobDetail" ref="orderCleanJob" />
         <property name="startDelay" value="10000" />
-        <property name="repeatInterval" value="300000" />
+        <property name="repeatInterval" value="900000" />
     </bean>
 
     <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">

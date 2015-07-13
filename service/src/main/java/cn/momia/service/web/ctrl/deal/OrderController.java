@@ -3,9 +3,11 @@ package cn.momia.service.web.ctrl.deal;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.base.product.ProductService;
 import cn.momia.service.base.product.sku.Sku;
+import cn.momia.service.base.product.sku.SkuPrice;
 import cn.momia.service.base.user.User;
 import cn.momia.service.base.user.UserService;
 import cn.momia.service.deal.order.Order;
+import cn.momia.service.deal.order.OrderPrice;
 import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.web.ctrl.AbstractController;
 import com.alibaba.fastjson.JSONObject;
@@ -33,11 +35,12 @@ public class OrderController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage placeOrder(@RequestBody Order order) {
-        if (order.isInvalid()) return ResponseMessage.BAD_REQUEST;
         if (!lockSku(order)) return ResponseMessage.FAILED("库存不足");
 
         long orderId = 0;
         try {
+            if (!checkOrder(order)) return ResponseMessage.BAD_REQUEST;
+
             processContacts(order.getCustomerId(), order.getContacts(), order.getMobile());
             checkLimit(order.getCustomerId(), order.getSkuId(), order.getCount());
             increaseJoined(order.getProductId(), order.getCount());
@@ -60,6 +63,22 @@ public class OrderController extends AbstractController {
         }
 
         return ResponseMessage.FAILED("下单失败");
+    }
+
+    private boolean checkOrder(Order order) {
+        if (order.getCustomerId() <= 0 ||
+                order.getProductId() <= 0 ||
+                order.getSkuId() <= 0 ||
+                order.getPrices().isEmpty() ||
+                StringUtils.isBlank(order.getMobile())) return false;
+
+        Sku sku = productService.getSku(order.getSkuId());
+        for (OrderPrice price : order.getPrices()) {
+            SkuPrice skuPrice = sku.getPrice(price.getAdult(), price.getChild());
+            if (skuPrice == null || price.getPrice().compareTo(skuPrice.getPrice()) != 0) return false;
+        }
+
+        return true;
     }
 
     private boolean lockSku(Order order) {

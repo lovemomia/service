@@ -42,6 +42,7 @@
     <bean id="dbAccessService" class="cn.momia.service.common.DbAccessService" abstract="true">
         <property name="jdbcTemplate" ref="jdbcTemplate" />
     </bean>
+
     <bean id="bannerService" class="cn.momia.service.base.banner.impl.BannerServiceImpl" parent="dbAccessService" />
 
     <bean id="baseProductService" class="cn.momia.service.base.product.base.impl.BaseProductServiceImpl" parent="dbAccessService" init-method="init" />
@@ -56,17 +57,14 @@
     <bean id="cityService" class="cn.momia.service.base.city.impl.CityServiceImpl" parent="dbAccessService" init-method="init" />
     <bean id="regionService" class="cn.momia.service.base.region.impl.RegionServiceImpl" parent="dbAccessService" init-method="init" />
     <bean id="participantService" class="cn.momia.service.base.user.participant.impl.ParticipantServiceImpl" parent="dbAccessService" />
+    <bean id="userService" class="cn.momia.service.base.user.impl.UserServiceImpl" parent="dbAccessService" />
 
-    <bean id="userService" class="cn.momia.service.base.user.impl.UserServiceImpl" parent="dbAccessService">
-        <property name="cityService" ref="cityService" />
-    </bean>
-
-    <bean id="orderService" class="cn.momia.service.deal.order.impl.OrderServiceImpl" parent="dbAccessService">
-        <property name="productService" ref="productService" />
-    </bean>
+    <bean id="orderService" class="cn.momia.service.deal.order.impl.OrderServiceImpl" parent="dbAccessService" />
     <bean id="paymentService" class="cn.momia.service.deal.payment.impl.PaymentServiceImpl" parent="dbAccessService" />
 
     <bean id="feedbackService" class="cn.momia.service.base.feedback.impl.FeedbackServiceImpl" parent="dbAccessService" />
+
+    <bean id="couponService" class="cn.momia.service.promo.coupon.impl.CouponServiceImpl" parent="dbAccessService" />
 
     <bean id="smsSender" class="cn.momia.service.sms.impl.LuosimaoSmsSender" parent="dbAccessService" init-method="init">
         <property name="conf" ref="conf" />
@@ -78,6 +76,7 @@
         <property name="orderService" ref="orderService" />
         <property name="paymentService" ref="paymentService" />
         <property name="productService" ref="productService" />
+        <property name="couponService" ref="couponService" />
     </bean>
 
     <bean id="alipay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">

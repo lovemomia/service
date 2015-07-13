@@ -1,6 +1,5 @@
 package cn.momia.service.deal.order.impl;
 
-import cn.momia.service.base.product.ProductService;
 import cn.momia.service.common.DbAccessService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderPrice;
@@ -41,12 +40,6 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     private static final String[] ORDER_FIELDS = { "id", "customerId", "productId", "skuId", "prices", "contacts", "mobile", "participants", "status", "addTime" };
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
-
-    private ProductService productService;
-
-    public void setProductService(ProductService productService) {
-        this.productService = productService;
-    }
 
     @Override
     public long add(final Order order) {

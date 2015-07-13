@@ -45,4 +45,9 @@
         <PageSize>20</PageSize>
         <MaxPageCount>50</MaxPageCount>
     </Order>
+
+    <Coupon>
+        <PageSize>20</PageSize>
+        <MaxPageCount>50</MaxPageCount>
+    </Coupon>
 </Configuration>

@@ -39,7 +39,6 @@ public class ProductUtil {
         ProductDto product = new ProductDto();
 
         JSONObject placeJson = productJson.getJSONObject("place");
-        JSONArray skusJson = productJson.getJSONArray("skus");
 
         product.setId(productJson.getLong("id"));
         product.setCover(ImageFile.url(productJson.getString("cover")));

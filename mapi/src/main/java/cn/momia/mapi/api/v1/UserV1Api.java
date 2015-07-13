@@ -6,6 +6,7 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.OrderDto;
 import cn.momia.mapi.api.v1.dto.base.ParticipantDto;
+import cn.momia.mapi.api.v1.dto.base.UserCouponDto;
 import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import cn.momia.mapi.api.v1.dto.composite.PagedListDto;
 import cn.momia.mapi.api.v1.dto.base.UserDto;
@@ -104,6 +105,46 @@ public class UserV1Api extends AbstractV1Api {
                 return new OrderDto((JSONObject) data, true);
             }
         });
+    }
+
+    @RequestMapping(value = "/coupon", method = RequestMethod.GET)
+    public ResponseMessage getCouponsOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam final int start, @RequestParam final int count) {
+        final int maxPageCount = conf.getInt("Coupon.MaxPageCount");
+        final int pageSize = conf.getInt("Coupon.PageSize");
+        if (StringUtils.isBlank(utoken) || start < 0 || count <= 0 || start > maxPageCount * pageSize) return ResponseMessage.BAD_REQUEST;
+
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("status", status)
+                .add("start", start)
+                .add("count", count);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user/coupon"), builder.build());
+
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                return buildCouponsDto((JSONObject) data, start, count);
+            }
+        });
+    }
+
+    private Dto buildCouponsDto(JSONObject userCouponsPackJson, int start, int count) {
+        PagedListDto userCoupons = new PagedListDto();
+
+        int totalCount = userCouponsPackJson.getInteger("totalCount");
+        userCoupons.setTotalCount(totalCount);
+
+        JSONArray userCouponsJson = userCouponsPackJson.getJSONArray("userCoupons");
+        for (int i = 0; i < userCouponsJson.size(); i++) {
+            try {
+                userCoupons.add(new UserCouponDto(userCouponsJson.getJSONObject(i)));
+            } catch (Exception e) {
+                LOGGER.error("fail to parse user coupon: {}", userCouponsJson.getJSONObject(i), e);
+            }
+        }
+        if (start + count < totalCount) userCoupons.setNextIndex(start + count);
+
+        return userCoupons;
     }
 
     @RequestMapping(value = "/nickname", method = RequestMethod.POST)

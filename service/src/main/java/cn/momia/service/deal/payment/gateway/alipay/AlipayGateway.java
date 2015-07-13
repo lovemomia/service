@@ -8,6 +8,7 @@ import cn.momia.service.deal.payment.gateway.CallbackParam;
 import cn.momia.service.deal.payment.gateway.CallbackResult;
 import cn.momia.service.deal.payment.gateway.PrepayParam;
 import cn.momia.service.deal.payment.gateway.PrepayResult;
+import cn.momia.service.promo.coupon.Coupon;
 import com.alibaba.fastjson.util.TypeUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -27,7 +28,7 @@ public class AlipayGateway extends AbstractPaymentGateway {
     private static final Logger LOGGER = LoggerFactory.getLogger(AlipayGateway.class);
 
     @Override
-    public Map<String, String> extractPrepayParams(HttpServletRequest request, Order order, Product product) {
+    public Map<String, String> extractPrepayParams(HttpServletRequest request, Order order, Product product, Coupon coupon) {
         Map<String, String> params = new HashMap<String, String>();
 
         params.put(AlipayPrepayFields.SERVICE, "mobile.securitypay.pay");
@@ -39,7 +40,7 @@ public class AlipayGateway extends AbstractPaymentGateway {
         params.put(AlipayPrepayFields.SUBJECT, product.getTitle());
         params.put(AlipayPrepayFields.PAYMENT_TYPE, "1");
         params.put(AlipayPrepayFields.SELLER_ID, conf.getString("Payment.Ali.Partner"));
-        params.put(AlipayPrepayFields.TOTAL_FEE, String.valueOf(order.getTotalFee().floatValue()));
+        params.put(AlipayPrepayFields.TOTAL_FEE, String.valueOf(couponService.calcTotalFee(order.getTotalFee(), coupon).floatValue()));
         params.put(AlipayPrepayFields.BODY, product.getTitle());
         params.put(AlipayPrepayFields.IT_B_PAY, "30m");
         params.put(AlipayPrepayFields.SHOW_URL, "m.duolaqinzi.com");

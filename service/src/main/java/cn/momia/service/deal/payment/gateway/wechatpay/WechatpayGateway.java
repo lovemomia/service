@@ -11,6 +11,7 @@ import cn.momia.service.deal.payment.gateway.CallbackParam;
 import cn.momia.service.deal.payment.gateway.CallbackResult;
 import cn.momia.service.deal.payment.gateway.PrepayParam;
 import cn.momia.service.deal.payment.gateway.PrepayResult;
+import cn.momia.service.promo.coupon.Coupon;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.util.TypeUtils;
@@ -44,7 +45,7 @@ public class WechatpayGateway extends AbstractPaymentGateway {
     private static final String ERROR = "ERROR";
 
     @Override
-    public Map<String, String> extractPrepayParams(HttpServletRequest request, Order order, Product product) {
+    public Map<String, String> extractPrepayParams(HttpServletRequest request, Order order, Product product, Coupon coupon) {
         Map<String, String> params = new HashMap<String, String>();
         Map<String, String[]> httpParams = request.getParameterMap();
         String tradeType = httpParams.get(WechatpayPrepayFields.TRADE_TYPE)[0];
@@ -63,7 +64,7 @@ public class WechatpayGateway extends AbstractPaymentGateway {
         params.put(WechatpayPrepayFields.NONCE_STR, WechatpayUtil.createNoncestr(32));
         params.put(WechatpayPrepayFields.BODY, product.getTitle());
         params.put(WechatpayPrepayFields.OUT_TRADE_NO, String.valueOf(order.getId()));
-        params.put(WechatpayPrepayFields.TOTAL_FEE, String.valueOf((int) (order.getTotalFee().floatValue() * 100)));
+        params.put(WechatpayPrepayFields.TOTAL_FEE, String.valueOf((int) (couponService.calcTotalFee(order.getTotalFee(), coupon).floatValue() * 100)));
         params.put(WechatpayPrepayFields.SPBILL_CREATE_IP, RequestUtil.getRemoteIp(request));
         params.put(WechatpayPrepayFields.NOTIFY_URL, conf.getString("Payment.Wechat.NotifyUrl"));
         params.put(WechatpayPrepayFields.TRADE_TYPE, tradeType);

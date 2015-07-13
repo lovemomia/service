@@ -12,6 +12,8 @@ import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +25,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/home")
 public class HomeV1Api extends AbstractV1Api {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HomeV1Api.class);
+
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage home(@RequestParam(value = "pageindex") final int pageIndex, @RequestParam(value = "city") int cityId) {
         final int maxPageCount = conf.getInt("Home.MaxPageCount");
@@ -81,7 +85,11 @@ public class HomeV1Api extends AbstractV1Api {
     private ListDto extractBannerData(JSONArray bannersJson) {
         ListDto banners = new ListDto();
         for (int i = 0; i < bannersJson.size(); i++) {
-            banners.add(new BannerDto(bannersJson.getJSONObject(i)));
+            try {
+                banners.add(new BannerDto(bannersJson.getJSONObject(i)));
+            } catch (Exception e) {
+                LOGGER.error("fail to parser the {}th banner", i, e);
+            }
         }
 
         return banners;

@@ -48,7 +48,9 @@ public class Product implements Serializable {
         return baseProduct.getCover();
     }
 
-    public String getThumb() { return baseProduct.getThumb();}
+    public String getThumb() {
+        return baseProduct.getThumb();
+    }
 
     public String getCrowd() {
         return baseProduct.getCrowd();
@@ -159,5 +161,12 @@ public class Product implements Serializable {
         }
 
         return miniPrice;
+    }
+
+    public boolean invalid() {
+        return !(baseProduct != null && baseProduct.exists() &&
+                imgs != null && !imgs.isEmpty() &&
+                place != null && place.exists() &&
+                skus != null && !skus.isEmpty());
     }
 }

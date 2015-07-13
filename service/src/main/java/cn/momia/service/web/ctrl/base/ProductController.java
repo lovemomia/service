@@ -51,7 +51,7 @@ public class ProductController extends AbstractController {
         if (cityId < 0 || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
 
         long totalCount = productService.queryCount(new ProductQuery(cityId, query));
-        List<Product> products = productService.query(start, count, new ProductQuery(cityId, query));
+        List<Product> products = totalCount > 0 ? productService.query(start, count, new ProductQuery(cityId, query)) : new ArrayList<Product>();
 
         JSONObject productsPackJson = new JSONObject();
         productsPackJson.put("totalCount", totalCount);
