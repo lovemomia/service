@@ -19,6 +19,7 @@ public class OrderDto implements Dto {
     private String contacts;
     private String mobile;
     @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date addTime;
+    private int status;
 
     // extra info
     private String cover;
@@ -88,6 +89,10 @@ public class OrderDto implements Dto {
         return time;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
     public OrderDto(JSONObject orderPackJson) {
         this(orderPackJson, false);
     }
@@ -104,6 +109,7 @@ public class OrderDto implements Dto {
         this.contacts = orderJson.getString("contacts");
         this.mobile = MobileEncryptor.encrypt(orderJson.getString("mobile"));
         this.addTime = orderJson.getDate("addTime");
+        this.status = orderJson.getInteger("status");
 
         if (extractExtraInfo) {
             this.cover = ImageFile.url(orderPackJson.getString("cover"));
