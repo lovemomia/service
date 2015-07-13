@@ -51,7 +51,7 @@
     <bean id="orderCleanTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
         <property name="jobDetail" ref="orderCleanJob" />
         <property name="startDelay" value="10000" />
-        <property name="repeatInterval" value="300000" />
+        <property name="repeatInterval" value="900000" />
     </bean>
 
     <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
