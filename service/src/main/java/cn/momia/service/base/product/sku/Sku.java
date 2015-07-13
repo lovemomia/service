@@ -201,4 +201,12 @@ public class Sku implements Serializable {
 
         return new ArrayList<Date>();
     }
+
+    public SkuPrice getPrice(int adult, int child) {
+        for (SkuPrice price : prices) {
+            if (price.getAdult() == adult && price.getChild() == child) return price;
+        }
+
+        return null;
+    }
 }

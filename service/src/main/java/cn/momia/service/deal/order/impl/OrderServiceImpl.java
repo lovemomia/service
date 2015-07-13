@@ -1,6 +1,8 @@
 package cn.momia.service.deal.order.impl;
 
 import cn.momia.service.base.product.ProductService;
+import cn.momia.service.base.product.sku.Sku;
+import cn.momia.service.base.product.sku.SkuPrice;
 import cn.momia.service.common.DbAccessService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderPrice;
@@ -46,6 +48,23 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     public void setProductService(ProductService productService) {
         this.productService = productService;
+    }
+
+    @Override
+    public boolean checkOrder(Order order) {
+        if (order.getCustomerId() <= 0 ||
+                order.getProductId() <= 0 ||
+                order.getSkuId() <= 0 ||
+                order.getPrices().isEmpty() ||
+                StringUtils.isBlank(order.getMobile())) return false;
+
+        Sku sku = productService.getSku(order.getSkuId());
+        for (OrderPrice price : order.getPrices()) {
+            SkuPrice skuPrice = sku.getPrice(price.getAdult(), price.getChild());
+            if (skuPrice == null || price.getPrice().compareTo(skuPrice.getPrice()) != 0) return false;
+        }
+
+        return true;
     }
 
     @Override

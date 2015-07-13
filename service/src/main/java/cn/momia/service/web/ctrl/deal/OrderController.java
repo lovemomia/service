@@ -33,7 +33,7 @@ public class OrderController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage placeOrder(@RequestBody Order order) {
-        if (order.isInvalid()) return ResponseMessage.BAD_REQUEST;
+        if (!orderService.checkOrder(order)) return ResponseMessage.BAD_REQUEST;
         if (!lockSku(order)) return ResponseMessage.FAILED("库存不足");
 
         long orderId = 0;

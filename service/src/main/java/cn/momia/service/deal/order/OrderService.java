@@ -3,6 +3,7 @@ package cn.momia.service.deal.order;
 import java.util.List;
 
 public interface OrderService {
+    boolean checkOrder(Order order);
     long add(Order order);
     Order get(long id);
     List<Order> queryByProduct(long productId, int status, String type, int start, int count);
