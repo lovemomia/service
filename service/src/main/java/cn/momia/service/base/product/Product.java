@@ -162,4 +162,11 @@ public class Product implements Serializable {
 
         return miniPrice;
     }
+
+    public boolean invalid() {
+        return !(baseProduct != null && baseProduct.exists() &&
+                imgs != null && !imgs.isEmpty() &&
+                place != null && place.exists() &&
+                skus != null && !skus.isEmpty());
+    }
 }
