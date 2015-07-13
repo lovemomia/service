@@ -20,6 +20,7 @@ public class BaseProduct {
     private String title;
     private String abstracts;
     private String cover;
+    private String thumb;
     private String crowd;
     private long placeId;
     private JSONArray content;
@@ -75,6 +76,14 @@ public class BaseProduct {
 
     public void setCover(String cover) {
         this.cover = cover;
+    }
+
+    public String getThumb() {
+        return thumb;
+    }
+
+    public void setThumb(String thumb) {
+        this.thumb = thumb;
     }
 
     public String getCrowd() {

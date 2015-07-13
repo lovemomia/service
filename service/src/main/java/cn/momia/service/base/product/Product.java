@@ -48,6 +48,8 @@ public class Product implements Serializable {
         return baseProduct.getCover();
     }
 
+    public String getThumb() { return baseProduct.getThumb();}
+
     public String getCrowd() {
         return baseProduct.getCrowd();
     }
