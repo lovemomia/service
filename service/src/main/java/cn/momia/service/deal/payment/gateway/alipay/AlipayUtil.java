@@ -2,9 +2,10 @@ package cn.momia.service.deal.payment.gateway.alipay;
 
 import cn.momia.common.web.secret.SecretKey;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 public class AlipayUtil {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AlipayUtil.class);
+
     public static String sign(Map<String, String> params) {
         List<String> kvs = new ArrayList<String>();
         kvs.add(AlipayPrepayFields.PARTNER + "=\"" + params.get(AlipayPrepayFields.PARTNER) + "\"");
@@ -44,12 +47,9 @@ public class AlipayUtil {
         }
         Collections.sort(kvs);
 
-        try {
-            String returnedSign = URLDecoder.decode(params.get(AlipayCallbackFields.SIGN), "utf-8");
-            return RSA.verify(StringUtils.join(kvs, "&"), returnedSign, SecretKey.get("alipayPublicKey"), "utf-8");
-        }
-        catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        String returnedSign = params.get(AlipayCallbackFields.SIGN);
+
+        return RSA.verify(StringUtils.join(kvs, "&"), returnedSign, SecretKey.get("alipayPublicKey"), "utf-8");
     }
+
 }
