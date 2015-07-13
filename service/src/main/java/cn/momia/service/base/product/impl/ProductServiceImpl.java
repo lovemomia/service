@@ -109,7 +109,8 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
             product.setBaseProduct(baseProduct);
             product.setImgs(imgsOfProducts.get(baseProduct.getId()));
             product.setPlace(placeOfProducts.get(baseProduct.getPlaceId()));
-            product.setSkus(skusOfProducts.get(baseProduct.getId()));
+            List<Sku> skus = skusOfProducts.get(baseProduct.getId());
+            product.setSkus(skus == null ? new ArrayList<Sku>() : skus);
 
             products.add(product);
         }
