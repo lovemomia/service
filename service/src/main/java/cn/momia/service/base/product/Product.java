@@ -153,6 +153,7 @@ public class Product implements Serializable {
 
     public BigDecimal getMinPrice() {
         BigDecimal miniPrice = new BigDecimal(Float.MAX_VALUE);
+        if(skus.isEmpty()) miniPrice = new BigDecimal(0);
         for (Sku sku : skus) {
             BigDecimal price = sku.getMinPrice();
             if (price.compareTo(miniPrice) <= 0) miniPrice = price;
