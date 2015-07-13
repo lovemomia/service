@@ -22,7 +22,7 @@ public class PaymentV1Api extends AbstractV1Api {
                                         @RequestParam(value = "oid") long orderId,
                                         @RequestParam(value = "pid") long productId,
                                         @RequestParam(value = "sid") long skuId,
-                                        @RequestParam(required = false) long coupon) {
+                                        @RequestParam(required = false) Long coupon) {
         if (StringUtils.isBlank(utoken) ||
                 orderId <= 0||
                 productId <= 0 ||
@@ -33,7 +33,7 @@ public class PaymentV1Api extends AbstractV1Api {
                 .add("oid", orderId)
                 .add("pid", productId)
                 .add("sid", skuId);
-        if (coupon > 0) builder.add("coupon", coupon);
+        if (coupon != null && coupon > 0) builder.add("coupon", coupon);
         MomiaHttpRequest request = MomiaHttpRequest.POST(dealServiceUrl("payment/prepay/alipay"), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
@@ -50,7 +50,7 @@ public class PaymentV1Api extends AbstractV1Api {
                                            @RequestParam(value = "pid") long productId,
                                            @RequestParam(value = "sid") long skuId,
                                            @RequestParam(value = "trade_type") final String tradeType,
-                                           @RequestParam(required = false) long coupon,
+                                           @RequestParam(required = false) Long coupon,
                                            @RequestParam(required = false) String code) {
         if (StringUtils.isBlank(utoken) ||
                 orderId <= 0||
@@ -66,7 +66,7 @@ public class PaymentV1Api extends AbstractV1Api {
                 .add("pid", productId)
                 .add("sid", skuId)
                 .add("trade_type", tradeType);
-        if (coupon > 0) builder.add("coupon", coupon);
+        if (coupon != null && coupon > 0) builder.add("coupon", coupon);
         if (!StringUtils.isBlank(code)) builder.add("code", code);
         MomiaHttpRequest request = MomiaHttpRequest.POST(dealServiceUrl("payment/prepay/wechatpay"), builder.build());
 
