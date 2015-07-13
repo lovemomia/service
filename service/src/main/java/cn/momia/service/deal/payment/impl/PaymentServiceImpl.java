@@ -11,11 +11,11 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 
 public class PaymentServiceImpl extends DbAccessService implements PaymentService {
     private static final String[] PAYMENT_FIELDS = { "id", "orderId", "payer", "finishTime", "payType", "tradeNo", "fee" };
@@ -30,7 +30,7 @@ public class PaymentServiceImpl extends DbAccessService implements PaymentServic
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setLong(1, payment.getOrderId());
                 ps.setString(2, payment.getPayer());
-                ps.setDate(3, new Date(payment.getFinishTime().getTime()));
+                ps.setTimestamp(3, new Timestamp(payment.getFinishTime().getTime()));
                 ps.setInt(4, payment.getPayType());
                 ps.setString(5, payment.getTradeNo());
                 ps.setBigDecimal(6, payment.getFee());

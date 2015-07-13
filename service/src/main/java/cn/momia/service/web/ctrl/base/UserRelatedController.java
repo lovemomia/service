@@ -15,11 +15,11 @@ public abstract class UserRelatedController extends AbstractController {
         return buildUserResponse(user, 0);
     }
 
-    protected JSONObject buildUserResponse(User user, long couponId) {
+    protected JSONObject buildUserResponse(User user, long userCouponId) {
         JSONObject userPackJson = new JSONObject();
         userPackJson.put("user", user);
         userPackJson.put("children", participantService.get(user.getChildren()).values());
-        if (couponId > 0) userPackJson.put("couponId", couponId);
+        if (userCouponId > 0) userPackJson.put("userCouponId", userCouponId);
 
         return userPackJson;
     }

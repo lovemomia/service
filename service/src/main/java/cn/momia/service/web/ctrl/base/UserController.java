@@ -10,6 +10,8 @@ import cn.momia.service.base.user.User;
 import cn.momia.service.base.user.participant.Participant;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
+import cn.momia.service.promo.coupon.CouponService;
+import cn.momia.service.promo.coupon.UserCoupon;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +40,8 @@ public class UserController extends UserRelatedController {
     @Autowired private OrderService orderService;
     @Autowired private ProductService productService;
 
+    @Autowired private CouponService couponService;
+
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getUser(@RequestParam String utoken) {
         if (StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
@@ -61,13 +65,14 @@ public class UserController extends UserRelatedController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         long totalCount = orderService.queryCountByUser(user.getId(), status, type);
-        List<Order> orders = orderService.queryByUser(user.getId(), status, type, start, count);
+        List<Order> orders = totalCount > 0 ? orderService.queryByUser(user.getId(), status, type, start, count) : new ArrayList<Order>();
+
         List<Long> productIds = new ArrayList<Long>();
         for (Order order : orders) {
             productIds.add(order.getProductId());
         }
 
-        List<Product> products = productService.get(productIds);
+        List<Product> products = productIds.isEmpty() ? new ArrayList<Product>() : productService.get(productIds);
 
         return new ResponseMessage(buildUserOrders(totalCount, orders, products));
     }
@@ -134,6 +139,27 @@ public class UserController extends UserRelatedController {
         orderDetailJson.put("price", product.getMinPrice());
 
         return orderDetailJson;
+    }
+
+    @RequestMapping(value = "/coupon", method = RequestMethod.GET)
+    public ResponseMessage getCouponsOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam int start, @RequestParam int count) {
+        if (StringUtils.isBlank(utoken) || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
+
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        int totalCount = couponService.queryCountByUser(user.getId(), status);
+        List<UserCoupon> userCoupons = totalCount > 0 ? couponService.queryByUser(user.getId(), status, start, count) : new ArrayList<UserCoupon>();
+
+        return new ResponseMessage(buildUserCoupons(totalCount, userCoupons));
+    }
+
+    private JSONObject buildUserCoupons(int totalCount, List<UserCoupon> userCoupons) {
+        JSONObject userCouponsPackJson = new JSONObject();
+        userCouponsPackJson.put("totalCount", totalCount);
+        userCouponsPackJson.put("userCoupons", userCoupons);
+
+        return userCouponsPackJson;
     }
 
     @RequestMapping(value = "/nickname", method = RequestMethod.PUT)

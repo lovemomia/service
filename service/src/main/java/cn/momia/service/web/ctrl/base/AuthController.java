@@ -54,7 +54,7 @@ public class AuthController extends UserRelatedController {
         if(userService.getByNickName(nickName).exists()) return ResponseMessage.FAILED("注册失败，用户昵称已存在");
         if (!smsVerifier.verify(mobile, code)) return ResponseMessage.FAILED("验证码不正确");
 
-        long couponId = 0;
+        long userCouponId = 0;
         User user = userService.getByMobile(mobile);
         String token = generateToken(mobile);
         if (!user.exists()) {
@@ -64,12 +64,12 @@ public class AuthController extends UserRelatedController {
                 return ResponseMessage.FAILED("注册失败");
             }
 
-            couponId = couponService.getUserRegisterCoupon(user.getId());
+            userCouponId = couponService.getUserRegisterCoupon(user.getId());
         } else {
             return ResponseMessage.FAILED("注册失败，用户已存在");
         }
 
-        return new ResponseMessage(buildUserResponse(user, couponId));
+        return new ResponseMessage(buildUserResponse(user, userCouponId));
     }
 
     private String generateToken(String mobile) {
