@@ -55,7 +55,7 @@ public class PaymentController extends AbstractController {
         if (!order.exists() || !product.exists()) return ResponseMessage.BAD_REQUEST;
         if (order.getCustomerId() != user.getId() || order.getSkuId() != skuId) return ResponseMessage.BAD_REQUEST;
 
-        Coupon coupon = getCoupon(user.getId(), request);
+        Coupon coupon = getCoupon(user.getId(), orderId, request);
         if (coupon.invalid()) return ResponseMessage.FAILED("无效的优惠券");
 
         PaymentGateway gateway = PaymentGatewayFactory.create(payType);
@@ -67,13 +67,13 @@ public class PaymentController extends AbstractController {
         return new ResponseMessage(prepayResult);
     }
 
-    private Coupon getCoupon(long userId, HttpServletRequest request) {
+    private Coupon getCoupon(long userId, long orderId, HttpServletRequest request) {
         String couponStr = request.getParameter("coupon");
         if (!StringUtils.isBlank(couponStr)) {
             long userCouponId = Long.valueOf(couponStr);
             if (userCouponId <= 0) return Coupon.INVALID_COUPON;
 
-            UserCoupon userCoupon = couponService.lockUserCoupon(userId, userCouponId);
+            UserCoupon userCoupon = couponService.lockUserCoupon(userId, orderId, userCouponId);
             if (!userCoupon.exists()) return Coupon.INVALID_COUPON;
 
             Coupon coupon = couponService.getCoupon(userCoupon.getCouponId());

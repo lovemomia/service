@@ -161,9 +161,9 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     }
 
     @Override
-    public UserCoupon lockUserCoupon(long userId, long userCouponId) {
-        String sql = "UPDATE t_user_coupon SET status=? WHERE id=? AND userId=? AND status=? AND expiredTime>NOW()";
-        boolean successful = jdbcTemplate.update(sql, new Object[] { Coupon.Status.USED, userCouponId, userId, Coupon.Status.NOT_USED }) == 1;
+    public UserCoupon lockUserCoupon(long userId, long orderId, long userCouponId) {
+        String sql = "UPDATE t_user_coupon SET orderId=?, status=? WHERE id=? AND userId=? AND orderId=0 AND status=? AND expiredTime>NOW()";
+        boolean successful = jdbcTemplate.update(sql, new Object[] { orderId, Coupon.Status.USED, userCouponId, userId, Coupon.Status.NOT_USED }) == 1;
         if (!successful) return UserCoupon.NOT_EXIST_USER_COUPON;
 
         return getUserCoupon(userId, userCouponId);
