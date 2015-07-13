@@ -27,6 +27,7 @@ public class OrderDto implements Dto {
     private String address;
     private BigDecimal price;
     private String time;
+    private int orderStatus;
 
     public long getId() {
         return id;
@@ -88,6 +89,10 @@ public class OrderDto implements Dto {
         return time;
     }
 
+    public int getOrderStatus() {
+        return orderStatus;
+    }
+
     public OrderDto(JSONObject orderPackJson) {
         this(orderPackJson, false);
     }
@@ -104,6 +109,7 @@ public class OrderDto implements Dto {
         this.contacts = orderJson.getString("contacts");
         this.mobile = MobileEncryptor.encrypt(orderJson.getString("mobile"));
         this.addTime = orderJson.getDate("addTime");
+        this.orderStatus = orderJson.getInteger("status");
 
         if (extractExtraInfo) {
             this.cover = ImageFile.url(orderPackJson.getString("cover"));
