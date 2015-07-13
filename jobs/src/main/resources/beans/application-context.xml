@@ -33,11 +33,6 @@
         <property name="dataSource" ref="dataSource" />
     </bean>
 
-    <bean class="cn.momia.common.web.secret.SecretKey" init-method="init">
-        <property name="conf" ref="conf" />
-        <property name="jdbcTemplate" ref="jdbcTemplate" />
-    </bean>
-
     <bean id="orderCleaner" class="cn.momia.jobs.order.OrderCleaner">
         <property name="jdbcTemplate" ref="jdbcTemplate" />
     </bean>
