@@ -70,13 +70,12 @@ public class PaymentController extends AbstractController {
     private Coupon getCoupon(long userId, long orderId, HttpServletRequest request) {
         String couponStr = request.getParameter("coupon");
         if (!StringUtils.isBlank(couponStr)) {
-            long userCouponId = Long.valueOf(couponStr);
-            if (userCouponId <= 0) return Coupon.INVALID_COUPON;
+            int couponId = Integer.valueOf(couponStr);
+            if (couponId <= 0) return Coupon.INVALID_COUPON;
 
-            UserCoupon userCoupon = couponService.lockUserCoupon(userId, orderId, userCouponId);
-            if (!userCoupon.exists()) return Coupon.INVALID_COUPON;
+            if (!couponService.lockUserCoupon(userId, orderId, couponId)) return Coupon.INVALID_COUPON;
 
-            Coupon coupon = couponService.getCoupon(userCoupon.getCouponId());
+            Coupon coupon = couponService.getCoupon(couponId);
             if (!coupon.exists()) return Coupon.INVALID_COUPON;
 
             return coupon;

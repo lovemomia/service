@@ -6,7 +6,7 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.OrderDto;
 import cn.momia.mapi.api.v1.dto.base.ParticipantDto;
-import cn.momia.mapi.api.v1.dto.base.UserCouponDto;
+import cn.momia.mapi.api.v1.dto.base.CouponDto;
 import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import cn.momia.mapi.api.v1.dto.composite.PagedListDto;
 import cn.momia.mapi.api.v1.dto.base.UserDto;
@@ -128,23 +128,23 @@ public class UserV1Api extends AbstractV1Api {
         });
     }
 
-    private Dto buildCouponsDto(JSONObject userCouponsPackJson, int start, int count) {
-        PagedListDto userCoupons = new PagedListDto();
+    private Dto buildCouponsDto(JSONObject couponsPackJson, int start, int count) {
+        PagedListDto coupons = new PagedListDto();
 
-        int totalCount = userCouponsPackJson.getInteger("totalCount");
-        userCoupons.setTotalCount(totalCount);
+        int totalCount = couponsPackJson.getInteger("totalCount");
+        coupons.setTotalCount(totalCount);
 
-        JSONArray userCouponsJson = userCouponsPackJson.getJSONArray("userCoupons");
-        for (int i = 0; i < userCouponsJson.size(); i++) {
+        JSONArray couponsJson = couponsPackJson.getJSONArray("coupons");
+        for (int i = 0; i < couponsJson.size(); i++) {
             try {
-                userCoupons.add(new UserCouponDto(userCouponsJson.getJSONObject(i)));
+                coupons.add(new CouponDto(couponsJson.getJSONObject(i)));
             } catch (Exception e) {
-                LOGGER.error("fail to parse user coupon: {}", userCouponsJson.getJSONObject(i), e);
+                LOGGER.error("fail to parse user coupon: {}", couponsJson.getJSONObject(i), e);
             }
         }
-        if (start + count < totalCount) userCoupons.setNextIndex(start + count);
+        if (start + count < totalCount) coupons.setNextIndex(start + count);
 
-        return userCoupons;
+        return coupons;
     }
 
     @RequestMapping(value = "/nickname", method = RequestMethod.POST)

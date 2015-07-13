@@ -8,6 +8,12 @@ public class UserCoupon {
         public static final int REGISTER = 1;
     }
 
+    public static class Status {
+        public static final int NOT_USED = 1;
+        public static final int USED = 2;
+        public static final int EXPIRED = 3;
+    }
+
     public static final UserCoupon NOT_EXIST_USER_COUPON = new UserCoupon();
     public static final UserCoupon INVALID_USER_COUPON = new UserCoupon();
     static {
@@ -19,7 +25,8 @@ public class UserCoupon {
     private long userId;
     private int couponId;
     private int type;
-    private Date expiredTime;
+    private Date startTime;
+    private Date endTime;
     private int status;
 
     public long getId() {
@@ -54,12 +61,20 @@ public class UserCoupon {
         this.type = type;
     }
 
-    public Date getExpiredTime() {
-        return expiredTime;
+    public Date getStartTime() {
+        return startTime;
     }
 
-    public void setExpiredTime(Date expiredTime) {
-        this.expiredTime = expiredTime;
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
     public int getStatus() {
