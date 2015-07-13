@@ -36,6 +36,8 @@ public class UserDto implements Dto {
     private String address;
     private ListDto children;
 
+    private Integer couponId;
+
     public String getToken() {
         return token;
     }
@@ -104,5 +106,7 @@ public class UserDto implements Dto {
             JSONObject childJson = childrenJson.getJSONObject(i);
             this.children.add(new ParticipantDto(childJson));
         }
+
+        this.couponId = userPackJson.getInteger("couponId");
     }
 }

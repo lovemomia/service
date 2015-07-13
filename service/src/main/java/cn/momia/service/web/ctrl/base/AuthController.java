@@ -5,6 +5,7 @@ import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.common.web.secret.SecretKey;
 import cn.momia.service.base.user.User;
+import cn.momia.service.promo.coupon.CouponService;
 import cn.momia.service.sms.SmsSender;
 import cn.momia.service.sms.SmsVerifier;
 import cn.momia.service.sms.impl.SmsLoginException;
@@ -27,6 +28,8 @@ public class AuthController extends UserRelatedController {
 
     @Autowired private SmsSender smsSender;
     @Autowired private SmsVerifier smsVerifier;
+
+    @Autowired private CouponService couponService;
 
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     public ResponseMessage send(@RequestParam String mobile, @RequestParam String type) {
@@ -51,6 +54,7 @@ public class AuthController extends UserRelatedController {
         if(userService.getByNickName(nickName).exists()) return ResponseMessage.FAILED("注册失败，用户昵称已存在");
         if (!smsVerifier.verify(mobile, code)) return ResponseMessage.FAILED("验证码不正确");
 
+        long couponId = 0;
         User user = userService.getByMobile(mobile);
         String token = generateToken(mobile);
         if (!user.exists()) {
@@ -59,11 +63,13 @@ public class AuthController extends UserRelatedController {
                 LOGGER.error("fail to register user for {}", mobile);
                 return ResponseMessage.FAILED("注册失败");
             }
+
+            couponId = couponService.getUserRegisterCoupon(user.getId());
         } else {
             return ResponseMessage.FAILED("注册失败，用户已存在");
         }
 
-        return new ResponseMessage(buildUserResponse(user));
+        return new ResponseMessage(buildUserResponse(user, couponId));
     }
 
     private String generateToken(String mobile) {
