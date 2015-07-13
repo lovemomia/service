@@ -40,6 +40,7 @@ public class OrderController extends AbstractController {
         try {
             processContacts(order.getCustomerId(), order.getContacts(), order.getMobile());
             checkLimit(order.getCustomerId(), order.getSkuId(), order.getCount());
+            increaseJoined(order.getProductId(), order.getCount());
 
             orderId = orderService.add(order);
             if (orderId > 0) {
@@ -97,6 +98,14 @@ public class OrderController extends AbstractController {
         }
 
         throw new OrderLimitException(count - limit);
+    }
+
+    private void increaseJoined(long productId, int count) {
+        try {
+            if (!productService.join(productId, count)) LOGGER.warn("fail to increase joined of product: {}", productId);
+        } catch (Exception e) {
+            LOGGER.warn("fail to increase joined of product: {}", productId);
+        }
     }
 
     private boolean unlockSku(Order order) {

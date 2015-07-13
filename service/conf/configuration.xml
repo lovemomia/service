@@ -34,6 +34,7 @@
         <Ali>
             <Partner>2088911944697039</Partner>
             <NotifyUrl>https://i.momia.cn/callback/alipay</NotifyUrl>
+            <VerifyUrl><![CDATA[https://mapi.alipay.com/gateway.do?service=notify_verify&]]></VerifyUrl>
         </Ali>
         <Wechat>
             <AccessTokenService>https://api.weixin.qq.com/sns/oauth2/access_token</AccessTokenService>

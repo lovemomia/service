@@ -11,8 +11,7 @@ import java.util.Date;
 public class SmsVerifier extends DbAccessService {
     public boolean verify(String mobile, String code) {
         String sql = "SELECT generateTime FROM t_verify WHERE mobile=? AND code=? AND status=1";
-
-        return jdbcTemplate.query(sql, new Object[] { mobile, code }, new ResultSetExtractor<Boolean>()
+        boolean successful = jdbcTemplate.query(sql, new Object[] { mobile, code }, new ResultSetExtractor<Boolean>()
         {
             @Override
             public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException
@@ -25,5 +24,13 @@ public class SmsVerifier extends DbAccessService {
                 return false;
             }
         });
+        if (successful) disable(mobile, code);
+
+        return successful;
+    }
+
+    private void disable(String mobile, String code) {
+        String sql = "UPDATE t_verify SET status=0 WHERE mobile=? AND code=?";
+        jdbcTemplate.update(sql, new Object[] { mobile, code });
     }
 }

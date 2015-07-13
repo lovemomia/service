@@ -70,9 +70,7 @@ public class ProductV1Api extends AbstractV1Api {
         return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {
             @Override
             public Dto apply(MomiaHttpResponseCollector collector) {
-                ProductDetailDto productDetailDto = new ProductDetailDto((JSONObject) collector.getResponse("product"), (JSONObject) collector.getResponse("customers"));
-                productDetailDto.setUrl(conf.getString("Product.Url") + "?id=" + id);
-                return productDetailDto;
+                return new ProductDetailDto((JSONObject) collector.getResponse("product"), (JSONObject) collector.getResponse("customers"));
             }
         });
     }

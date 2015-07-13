@@ -25,7 +25,7 @@ import java.util.Map;
 
 public class SkuServiceImpl extends DbAccessService implements SkuService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SkuServiceImpl.class);
-    private static final String[] SKU_FIELDS = { "id", "productId", "properties", "prices", "`limit`", "needRealName", "stock", "unlockedStock", "lockedStock" };
+    private static final String[] SKU_FIELDS = { "id", "productId", "`desc`", "`type`", "properties", "prices", "`limit`", "needRealName", "stock", "unlockedStock", "lockedStock" };
 
     @Override
     public Sku get(long id) {
@@ -49,6 +49,8 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
             Sku sku = new Sku();
             sku.setId(rs.getLong("id"));
             sku.setProductId(rs.getLong("productId"));
+            sku.setDesc(rs.getString("desc"));
+            sku.setType(rs.getInt("type"));
             sku.setProperties(parseProperties(sku.getId(), rs.getString("properties")));
             sku.setPrices(parsePrices(sku.getId(), rs.getString("prices")));
             sku.setLimit(rs.getInt("limit"));
@@ -127,14 +129,30 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
 
     @Override
     public boolean lock(long id, int count) {
+        if (isNoCeiling(id)) return true;
+
         String sql = "UPDATE t_sku SET unlockedStock=unlockedStock-?, lockedStock=lockedStock+? WHERE id=? AND unlockedStock>=? AND stock-lockedStock>=? AND status=1";
         int updateCount = jdbcTemplate.update(sql, new Object[]{ count, count, id, count, count });
 
         return updateCount == 1;
     }
 
+    private boolean isNoCeiling(long id) {
+        String sql = "SELECT `type` FROM t_sku WHERE id=? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[]{id}, new ResultSetExtractor<Boolean>() {
+            @Override
+            public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (rs.next()) return rs.getInt("type") == Sku.Type.NO_CEILING;
+                return false;
+            }
+        });
+    }
+
     @Override
     public boolean unlock(long id, int count) {
+        if (isNoCeiling(id)) return true;
+
         String sql = "UPDATE t_sku SET unlockedStock=unlockedStock+?, lockedStock=lockedStock-? WHERE id=? AND lockedStock>=? AND stock-unlockedStock>=? AND status=1";
         int updateCount = jdbcTemplate.update(sql, new Object[]{ count, count, id, count, count });
 

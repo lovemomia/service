@@ -61,7 +61,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     public List<ProductImage> getProductImgs(long productId) {
         final List<ProductImage> imgs = new ArrayList<ProductImage>();
         String sql = "SELECT url, width, height FROM t_product_img WHERE productId=? AND status=1";
-        jdbcTemplate.query(sql, new Object[] { productId }, new RowCallbackHandler() {
+        jdbcTemplate.query(sql, new Object[]{productId}, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 imgs.add(buildImage(rs));
@@ -176,7 +176,28 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     }
 
     @Override
+    public boolean join(long id, int count) {
+        return baseProductService.join(id, count);
+    }
+
+    @Override
     public boolean sold(long id, int count) {
-        return baseProductService.sold(id, count);
+        boolean successful = baseProductService.sold(id, count);
+        if (successful && isSoldOut(id)) {
+            if (!baseProductService.soldOut(id)) LOGGER.error("fail to set sold out status of product: {}", id);
+        }
+
+        return successful;
+    }
+
+    private boolean isSoldOut(long id) {
+        int totalStock = 0;
+        List<Sku> skus = getSkus(id);
+        for (Sku sku : skus) {
+            if (sku.getType() == Sku.Type.NO_CEILING) return false;
+            totalStock += sku.getStock();
+        }
+
+        return baseProductService.getSales(id) >= totalStock;
     }
 }

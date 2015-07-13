@@ -13,6 +13,11 @@ import java.util.Date;
 import java.util.List;
 
 public class Sku implements Serializable {
+    public static class Type {
+        public static final int NORMAL = 0;
+        public static final int NO_CEILING = 1;
+    }
+
     public static final Sku NOT_EXIST_SKU = new Sku();
     public static final Sku INVALID_SKU = new Sku();
 
@@ -52,6 +57,8 @@ public class Sku implements Serializable {
 
     private long id;
     private long productId;
+    private String desc;
+    private int type;
     private List<SkuProperty> properties;
     private List<SkuPrice> prices;
     private int limit;
@@ -74,6 +81,22 @@ public class Sku implements Serializable {
 
     public void setProductId(long productId) {
         this.productId = productId;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public List<SkuProperty> getProperties() {

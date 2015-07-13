@@ -44,4 +44,8 @@
 
     <bean id="httpClient" class="cn.momia.common.web.http.MomiaHttpClient" />
     <bean id="requestExecutor" class="cn.momia.common.web.http.MomiaHttpRequestExecutor" />
+
+    <bean class="cn.momia.mapi.api.v1.dto.misc.ProductUtil">
+        <property name="conf" ref="conf" />
+    </bean>
 </beans>

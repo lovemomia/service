@@ -42,6 +42,8 @@ public class Product implements Serializable {
         return baseProduct.getTitle();
     }
 
+    public String getAbstracts(){ return baseProduct.getAbstracts(); }
+
     public String getCover() {
         return baseProduct.getCover();
     }
@@ -54,8 +56,16 @@ public class Product implements Serializable {
         return baseProduct.getContent();
     }
 
+    public int getJoined() {
+        return baseProduct.getJoined();
+    }
+
     public int getSales() {
         return baseProduct.getSales();
+    }
+
+    public boolean isSoldOut() {
+        return baseProduct.isSoldOut();
     }
 
     public Date getStartTime() {
@@ -65,8 +75,6 @@ public class Product implements Serializable {
     public Date getEndTime() {
         return baseProduct.getEndTime();
     }
-
-    public String getAbstracts(){ return baseProduct.getAbstracts(); }
 
     public void setBaseProduct(BaseProduct baseProduct) {
         this.baseProduct = baseProduct;

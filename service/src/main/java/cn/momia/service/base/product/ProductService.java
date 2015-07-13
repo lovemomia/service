@@ -14,5 +14,6 @@ public interface ProductService {
     Sku getSku(long skuId);
     boolean lockStock(long skuId, int count);
     boolean unlockStock(long skuId, int count);
+    boolean join(long productId, int count);
     boolean sold(long id, int count);
 }

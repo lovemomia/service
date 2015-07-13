@@ -11,6 +11,5 @@ public class AlipayCallbackFields {
     public static final String TOTAL_FEE = "total_fee"; //总金额
     public static final String TRADE_NO = "trade_no";//支付宝交易号
     public static final String GMT_PAYMENT = "gmt_payment";//交易付款时间
-    public static final String TRADE_STATUS = "trade_status";//交易状态
-    public static final String BUYER_EMAIL = "buyer_email";//买家支付宝帐号
+    public static final String BUYER_ID = "buyer_id";//买家支付宝帐号
 }

@@ -18,13 +18,10 @@ public class ProductDetailDto extends ProductDto {
         return url;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
     public ProductDetailDto(JSONObject productJson, JSONObject customersJson) {
         super(ProductUtil.extractProductData(productJson, true));
         this.customers = processAvatars(customersJson);
+        this.url = ProductUtil.buildUrl(getId());
     }
 
     private JSONObject processAvatars(JSONObject customersJson) {

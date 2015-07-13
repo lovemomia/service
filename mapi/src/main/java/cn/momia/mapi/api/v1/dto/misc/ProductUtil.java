@@ -1,5 +1,6 @@
 package cn.momia.mapi.api.v1.dto.misc;
 
+import cn.momia.common.config.Configuration;
 import cn.momia.mapi.api.v1.dto.base.ProductDto;
 import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import cn.momia.common.web.img.ImageFile;
@@ -14,6 +15,11 @@ import java.util.List;
 
 public class ProductUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductUtil.class);
+    private static Configuration conf;
+
+    public void setConf(Configuration conf) {
+        ProductUtil.conf = conf;
+    }
 
     public static ListDto extractProductsData(JSONArray productsJson) {
         ListDto products = new ListDto();
@@ -39,7 +45,9 @@ public class ProductUtil {
         product.setCover(ImageFile.url(productJson.getString("cover")));
         product.setTitle(productJson.getString("title"));
         product.setAbstracts(productJson.getString("abstracts"));
-        product.setJoined(productJson.getInteger("sales"));
+        product.setJoined(productJson.getInteger("joined"));
+        product.setSales(productJson.getInteger("sales"));
+        product.setSoldOut(productJson.getBoolean("sales"));
         product.setPrice(productJson.getBigDecimal("minPrice"));
         product.setCrowd(productJson.getString("crowd"));
         product.setScheduler(productJson.getString("scheduler"));
@@ -48,7 +56,6 @@ public class ProductUtil {
         product.setTags(productJson.getJSONArray("tags"));
         product.setStartTime(productJson.getDate("startTime"));
         product.setEndTime(productJson.getDate("endTime"));
-        product.setSoldOut(getSoldOut(productJson.getInteger("sales"), skusJson));
 
         if (extractExtraInfo) {
             product.setImgs(extractProductImgs(productJson));
@@ -56,16 +63,6 @@ public class ProductUtil {
         }
 
         return product;
-    }
-
-    private static boolean getSoldOut(int sales, JSONArray skusJson) {
-        int totalStock = 0;
-        for (int i = 0; i < skusJson.size(); i++) {
-            JSONObject skuJson = skusJson.getJSONObject(i);
-            totalStock += skuJson.getInteger("stock");
-        }
-
-        return sales >= totalStock;
     }
 
     private static List<String> extractProductImgs(JSONObject productJson) {
@@ -91,5 +88,9 @@ public class ProductUtil {
         }
 
         return contentJson;
+    }
+
+    public static String buildUrl(long id) {
+        return conf.getString("Product.Url") + "?id=" + id;
     }
 }
