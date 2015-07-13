@@ -22,6 +22,7 @@ public class ProductDto implements Dto {
     private String address;
     private String poi;
     private JSONArray tags;
+    private String thumb;
     @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date startTime;
     @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date endTime;
 
@@ -165,6 +166,14 @@ public class ProductDto implements Dto {
         this.content = content;
     }
 
+    public String getThumb() {
+        return thumb;
+    }
+
+    public void setThumb(String thumb) {
+        this.thumb = thumb;
+    }
+
     public ProductDto() {}
 
     public ProductDto(ProductDto productDto) {
@@ -186,5 +195,6 @@ public class ProductDto implements Dto {
 
         this.imgs = productDto.imgs;
         this.content = productDto.content;
+        this.thumb = productDto.thumb;
     }
 }

@@ -43,6 +43,7 @@ public class ProductUtil {
 
         product.setId(productJson.getLong("id"));
         product.setCover(ImageFile.url(productJson.getString("cover")));
+        product.setThumb(productJson.getString("thumb"));
         product.setTitle(productJson.getString("title"));
         product.setAbstracts(productJson.getString("abstracts"));
         product.setJoined(productJson.getInteger("joined"));
