@@ -35,11 +35,12 @@ public class OrderController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage placeOrder(@RequestBody Order order) {
-        if (!checkOrder(order)) return ResponseMessage.BAD_REQUEST;
         if (!lockSku(order)) return ResponseMessage.FAILED("库存不足");
 
         long orderId = 0;
         try {
+            if (!checkOrder(order)) return ResponseMessage.BAD_REQUEST;
+
             processContacts(order.getCustomerId(), order.getContacts(), order.getMobile());
             checkLimit(order.getCustomerId(), order.getSkuId(), order.getCount());
             increaseJoined(order.getProductId(), order.getCount());
