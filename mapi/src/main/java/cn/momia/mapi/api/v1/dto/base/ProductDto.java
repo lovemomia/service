@@ -11,6 +11,7 @@ public class ProductDto implements Dto {
     // base info
     private long id;
     private String cover;
+    private String thumb;
     private String title;
     private String abstracts;
     private int joined;
@@ -22,7 +23,6 @@ public class ProductDto implements Dto {
     private String address;
     private String poi;
     private JSONArray tags;
-    private String thumb;
     @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date startTime;
     @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date endTime;
 
@@ -44,6 +44,14 @@ public class ProductDto implements Dto {
 
     public void setCover(String cover) {
         this.cover = cover;
+    }
+
+    public String getThumb() {
+        return thumb;
+    }
+
+    public void setThumb(String thumb) {
+        this.thumb = thumb;
     }
 
     public String getTitle() {
@@ -166,19 +174,12 @@ public class ProductDto implements Dto {
         this.content = content;
     }
 
-    public String getThumb() {
-        return thumb;
-    }
-
-    public void setThumb(String thumb) {
-        this.thumb = thumb;
-    }
-
     public ProductDto() {}
 
     public ProductDto(ProductDto productDto) {
         this.id = productDto.id;
         this.cover = productDto.cover;
+        this.thumb = productDto.thumb;
         this.title = productDto.title;
         this.abstracts = productDto.abstracts;
         this.joined = productDto.joined;
@@ -195,6 +196,5 @@ public class ProductDto implements Dto {
 
         this.imgs = productDto.imgs;
         this.content = productDto.content;
-        this.thumb = productDto.thumb;
     }
 }
