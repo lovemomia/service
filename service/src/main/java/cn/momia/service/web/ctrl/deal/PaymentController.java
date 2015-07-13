@@ -17,8 +17,6 @@ import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.CouponService;
 import cn.momia.service.promo.coupon.UserCoupon;
 import cn.momia.service.web.ctrl.AbstractController;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,16 +25,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/payment")
 public class PaymentController extends AbstractController {
-    private static final Splitter COUPONS_SPLITTER = Splitter.on(",").omitEmptyStrings().trimResults();
-
     @Autowired private UserService userService;
     @Autowired private ProductService productService;
     @Autowired private OrderService orderService;
