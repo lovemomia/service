@@ -51,8 +51,11 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
         Product product = new Product();
         product.setBaseProduct(baseProduct);
         product.setImgs(getProductImgs(baseProduct.getId()));
+
         Place place = placeService.get(baseProduct.getPlaceId());
-        if (place.exists()) product.setPlace(place);
+        if (!place.exists()) return Product.NOT_EXIST_PRODUCT;
+
+        product.setPlace(place);
         product.setSkus(skuService.queryByProduct(baseProduct.getId()));
 
         return product;
