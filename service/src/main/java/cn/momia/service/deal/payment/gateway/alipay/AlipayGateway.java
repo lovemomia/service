@@ -61,6 +61,9 @@ public class AlipayGateway extends AbstractPaymentGateway {
 
     @Override
     protected boolean isPayedSuccessfully(CallbackParam param) {
+        String tradeStatus = param.get(AlipayCallbackFields.TRADE_STATUS);
+        if (!"TRADE_SUCCESS".equalsIgnoreCase(tradeStatus)) return false;
+
         String notifyId = param.get(AlipayCallbackFields.NOTIFY_ID);
         if (notifyId != null) return verifyResponse(notifyId);
 
