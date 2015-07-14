@@ -6,8 +6,9 @@ import com.alibaba.fastjson.annotation.JSONField;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class CouponDto implements Dto {
-    private int id;
+public class UserCouponDto implements Dto {
+    private long id;
+    private int couponId;
     private int type;
     private String title;
     private String desc;
@@ -15,8 +16,12 @@ public class CouponDto implements Dto {
     @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date startTime;
     @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date endTime;
 
-    public int getId() {
+    public long getId() {
         return id;
+    }
+
+    public int getCouponId() {
+        return couponId;
     }
 
     public int getType() {
@@ -43,8 +48,9 @@ public class CouponDto implements Dto {
         return endTime;
     }
 
-    public CouponDto(JSONObject couponJson) {
-        this.id = couponJson.getInteger("id");
+    public UserCouponDto(long id, JSONObject couponJson) {
+        this.id = id;
+        this.couponId = couponJson.getInteger("couponId");
         this.type = couponJson.getInteger("type");
         this.title = couponJson.getString("title");
         this.desc = couponJson.getString("desc");
