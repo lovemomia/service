@@ -78,6 +78,28 @@ public class PaymentV1Api extends AbstractV1Api {
         });
     }
 
+    @RequestMapping(value = "/prepay/free", method = RequestMethod.POST)
+    public ResponseMessage prepayFree(@RequestParam String utoken,
+                                      @RequestParam(value = "oid") long orderId,
+                                      @RequestParam(value = "pid") long productId,
+                                      @RequestParam(value = "sid") long skuId,
+                                      @RequestParam(required = false) Long coupon) {
+        if (StringUtils.isBlank(utoken) ||
+                orderId <= 0 ||
+                productId <= 0 ||
+                skuId <= 0) return ResponseMessage.BAD_REQUEST;
+
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("oid", orderId)
+                .add("pid", productId)
+                .add("sid", skuId);
+        if (coupon != null && coupon > 0) builder.add("coupon", coupon);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("payment/prepay/free"), builder.build());
+
+        return executeRequest(request);
+    }
+
     @RequestMapping(value = "/check", method = RequestMethod.POST)
     public ResponseMessage checkPayment(@RequestParam String utoken,
                                         @RequestParam(value = "oid") long orderId,
