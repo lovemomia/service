@@ -21,8 +21,8 @@
     </Image>
 
     <Service>
-        <Base>http://localhost:9090</Base>
-        <Deal>http://localhost:9090</Deal>
+        <Base>http://localhost:7070</Base>
+        <Deal>http://localhost:7070</Deal>
     </Service>
 
     <Home>
