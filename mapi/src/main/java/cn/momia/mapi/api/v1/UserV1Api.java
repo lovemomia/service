@@ -142,7 +142,7 @@ public class UserV1Api extends AbstractV1Api {
                 JSONObject couponJson = couponsJson.getJSONObject(userCouponJson.getString("couponId"));
                 if (couponJson == null) continue;
 
-                userCoupons.add(new UserCouponDto(userCouponJson.getLong("id"), couponJson));
+                userCoupons.add(new UserCouponDto(userCouponJson, couponJson));
             } catch (Exception e) {
                 LOGGER.error("fail to parse user coupon: {}", userCouponsJson.getJSONObject(i), e);
             }

@@ -16,6 +16,7 @@ public class UserCouponDto implements Dto {
     private BigDecimal consumption;
     @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date startTime;
     @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date endTime;
+    private int status;
 
     public long getId() {
         return id;
@@ -53,8 +54,12 @@ public class UserCouponDto implements Dto {
         return endTime;
     }
 
-    public UserCouponDto(long id, JSONObject couponJson) {
-        this.id = id;
+    public int getStatus() {
+        return status;
+    }
+
+    public UserCouponDto(JSONObject userCouponJson, JSONObject couponJson) {
+        this.id = userCouponJson.getLong("id");
         this.couponId = couponJson.getInteger("id");
         this.type = couponJson.getInteger("type");
         this.title = couponJson.getString("title");
@@ -63,5 +68,11 @@ public class UserCouponDto implements Dto {
         this.consumption = couponJson.getBigDecimal("consumption");
         this.startTime = couponJson.getDate("startTime");
         this.endTime = couponJson.getDate("endTime");
+
+        int status = userCouponJson.getInteger("status");
+        if (status == 1) {
+            if (userCouponJson.getBoolean("expired")) status = 3;
+        }
+        this.status = status;
     }
 }

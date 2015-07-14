@@ -103,4 +103,9 @@ public class UserCoupon {
     public boolean exists() {
         return !this.equals(NOT_EXIST_USER_COUPON);
     }
+
+    public boolean isExpired() {
+        if (startTime == null || endTime == null) return true;
+        return endTime.before(new Date());
+    }
 }
