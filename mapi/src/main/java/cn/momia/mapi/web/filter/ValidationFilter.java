@@ -92,9 +92,9 @@ public class ValidationFilter implements Filter {
         Map<String, String[]> httpParams = httpRequest.getParameterMap();
         for (Map.Entry<String, String[]> entry : httpParams.entrySet()) {
             String key = entry.getKey();
-            if (key.equalsIgnoreCase("sign")) continue;
-
             String value = entry.getValue()[0];
+            if (key.equalsIgnoreCase("sign") || StringUtils.isBlank(value)) continue;
+
             kvs.add(key + "=" + value);
         }
         Collections.sort(kvs);
