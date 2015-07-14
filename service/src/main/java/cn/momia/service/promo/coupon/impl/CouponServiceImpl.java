@@ -228,7 +228,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     @Override
     public BigDecimal calcTotalFee(BigDecimal totalFee, Coupon coupon) {
         // TODO 更丰富的优惠方式
-        if (coupon.exists() && coupon.getConsumption().compareTo(totalFee) >= 0) {
+        if (coupon.exists() && coupon.getConsumption().compareTo(totalFee) <= 0) {
             totalFee = totalFee.subtract(coupon.getDiscount());
             totalFee = totalFee.compareTo(new BigDecimal(0)) < 0 ? new BigDecimal(0) : totalFee;
         }
