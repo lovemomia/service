@@ -66,8 +66,8 @@ public class UserCouponDto implements Dto {
         this.desc = couponJson.getString("desc");
         this.discount = couponJson.getBigDecimal("discount");
         this.consumption = couponJson.getBigDecimal("consumption");
-        this.startTime = couponJson.getDate("startTime");
-        this.endTime = couponJson.getDate("endTime");
+        this.startTime = userCouponJson.getDate("startTime");
+        this.endTime = userCouponJson.getDate("endTime");
 
         int status = userCouponJson.getInteger("status");
         if (status == 1) {
