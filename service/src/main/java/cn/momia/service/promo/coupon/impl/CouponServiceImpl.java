@@ -241,7 +241,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     }
 
     @Override
-    public UserCoupon getUserCoupon(int userCouponId) {
+    public UserCoupon getUserCoupon(long userCouponId) {
         String sql = "SELECT id, userId, couponId, `type`, startTime, endTime, status FROM t_user_coupon WHERE id=?";
 
         return jdbcTemplate.query(sql, new Object[] { userCouponId }, new ResultSetExtractor<UserCoupon>() {
@@ -258,8 +258,9 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
         // TODO 更丰富的优惠方式
         if (coupon.exists() && coupon.getConsumption().compareTo(totalFee) <= 0) {
             totalFee = totalFee.subtract(coupon.getDiscount());
-            totalFee = totalFee.compareTo(new BigDecimal(0)) < 0 ? new BigDecimal(0) : totalFee;
         }
+
+        totalFee = totalFee.compareTo(new BigDecimal(0)) < 0 ? new BigDecimal(0) : totalFee;
 
         return totalFee;
     }

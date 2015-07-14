@@ -24,7 +24,7 @@ public class PaymentV1Api extends AbstractV1Api {
                                         @RequestParam(value = "sid") long skuId,
                                         @RequestParam(required = false) Long coupon) {
         if (StringUtils.isBlank(utoken) ||
-                orderId <= 0||
+                orderId <= 0 ||
                 productId <= 0 ||
                 skuId <= 0) return ResponseMessage.BAD_REQUEST;
 
@@ -53,7 +53,7 @@ public class PaymentV1Api extends AbstractV1Api {
                                            @RequestParam(required = false) Long coupon,
                                            @RequestParam(required = false) String code) {
         if (StringUtils.isBlank(utoken) ||
-                orderId <= 0||
+                orderId <= 0 ||
                 productId <= 0 ||
                 skuId <= 0 ||
                 StringUtils.isBlank(tradeType)) return ResponseMessage.BAD_REQUEST;
