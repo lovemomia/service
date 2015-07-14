@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,6 +61,9 @@ public class AlipayGateway extends AbstractPaymentGateway {
 
     @Override
     protected boolean isPayedSuccessfully(CallbackParam param) {
+        String tradeStatus = param.get(AlipayCallbackFields.TRADE_STATUS);
+        if (!"TRADE_SUCCESS".equalsIgnoreCase(tradeStatus)) return false;
+
         String notifyId = param.get(AlipayCallbackFields.NOTIFY_ID);
         if (notifyId != null) return verifyResponse(notifyId);
 
@@ -100,7 +104,10 @@ public class AlipayGateway extends AbstractPaymentGateway {
         Payment payment = new Payment();
         payment.setOrderId(Long.valueOf(param.get(AlipayCallbackFields.OUT_TRADE_NO)));
         payment.setPayer(param.get(AlipayCallbackFields.BUYER_ID));
-        payment.setFinishTime(TypeUtils.castToDate(param.get(AlipayCallbackFields.GMT_PAYMENT)));
+
+        Date finishTime = TypeUtils.castToDate(param.get(AlipayCallbackFields.GMT_PAYMENT));
+        payment.setFinishTime(finishTime == null ? new Date() : finishTime);
+
         payment.setPayType(Payment.Type.ALIPAY);
         payment.setTradeNo(param.get(AlipayCallbackFields.TRADE_NO));
         payment.setFee(new BigDecimal(param.get(AlipayCallbackFields.TOTAL_FEE)));

@@ -9,6 +9,7 @@ import cn.momia.service.base.user.User;
 import cn.momia.service.base.user.participant.Participant;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
+import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.CouponService;
 import cn.momia.service.promo.coupon.UserCoupon;
 import com.alibaba.fastjson.JSONArray;
@@ -148,15 +149,20 @@ public class UserController extends UserRelatedController {
         int totalCount = couponService.queryCountByUser(user.getId(), status);
         List<UserCoupon> userCoupons = totalCount > 0 ? couponService.queryByUser(user.getId(), status, start, count) : new ArrayList<UserCoupon>();
 
-        return new ResponseMessage(buildUserCoupons(totalCount, userCoupons));
+        List<Integer> couponIds = new ArrayList<Integer>();
+        for (UserCoupon userCoupon : userCoupons) couponIds.add(userCoupon.getCouponId());
+        Map<Integer, Coupon> couponsMap = couponService.getCoupons(couponIds);
+
+        return new ResponseMessage(buildCoupons(totalCount, userCoupons, couponsMap));
     }
 
-    private JSONObject buildUserCoupons(int totalCount, List<UserCoupon> userCoupons) {
-        JSONObject userCouponsPackJson = new JSONObject();
-        userCouponsPackJson.put("totalCount", totalCount);
-        userCouponsPackJson.put("userCoupons", userCoupons);
+    private JSONObject buildCoupons(int totalCount, List<UserCoupon> userCoupons, Map<Integer, Coupon> couponsMap) {
+        JSONObject couponsPackJson = new JSONObject();
+        couponsPackJson.put("totalCount", totalCount);
+        couponsPackJson.put("userCoupons", userCoupons);
+        couponsPackJson.put("coupons", couponsMap);
 
-        return userCouponsPackJson;
+        return couponsPackJson;
     }
 
     @RequestMapping(value = "/nickname", method = RequestMethod.PUT)

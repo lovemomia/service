@@ -20,7 +20,7 @@ import java.util.Map;
 public class CallbackV1Api extends AbstractV1Api {
     private static final Logger LOGGER = LoggerFactory.getLogger(CallbackV1Api.class);
 
-    @RequestMapping(value = "/alipay", method = RequestMethod.POST)
+    @RequestMapping(value = "/alipay", method = RequestMethod.POST, produces = "text/plain")
     public String alipayCallback(HttpServletRequest request) {
         try {
             Map<String, String> params = extractParams(request);

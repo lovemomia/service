@@ -1,16 +1,12 @@
 package cn.momia.service.promo.coupon;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 public class Coupon {
     public static class Usage {
         public static final int NORMAL = 0;
         public static final int REGISTER = 1;
-    }
-
-    public static class Status {
-        public static final int NOT_USED = 1;
-        public static final int USED = 2;
     }
 
     public static final Coupon NOT_EXIST_COUPON = new Coupon();
@@ -27,7 +23,8 @@ public class Coupon {
     private BigDecimal discount;
     private BigDecimal consumption;
     private int accumulation;
-    private long duration;
+    private Date startTime;
+    private Date endTime;
 
     public int getId() {
         return id;
@@ -85,12 +82,20 @@ public class Coupon {
         this.accumulation = accumulation;
     }
 
-    public long getDuration() {
-        return duration;
+    public Date getStartTime() {
+        return startTime;
     }
 
-    public void setDuration(long duration) {
-        this.duration = duration;
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
     @Override

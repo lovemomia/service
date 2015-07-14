@@ -58,7 +58,7 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
             if (!orderService.pay(Long.valueOf(param.get("out_trade_no")))) return false;
             logPayment(param);
         } catch (Exception e) {
-            LOGGER.error("fail to pay order", e);
+            LOGGER.error("fail to pay order: {}", param.get("out_trade_no"), e);
             return false;
         }
 

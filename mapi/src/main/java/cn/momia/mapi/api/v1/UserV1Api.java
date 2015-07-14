@@ -108,7 +108,7 @@ public class UserV1Api extends AbstractV1Api {
     }
 
     @RequestMapping(value = "/coupon", method = RequestMethod.GET)
-    public ResponseMessage getCouponsOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam final int start, @RequestParam final int count) {
+    public ResponseMessage getCouponsOfUser(@RequestParam String utoken, @RequestParam(defaultValue = "0") int status, @RequestParam final int start, @RequestParam final int count) {
         final int maxPageCount = conf.getInt("Coupon.MaxPageCount");
         final int pageSize = conf.getInt("Coupon.PageSize");
         if (StringUtils.isBlank(utoken) || start < 0 || count <= 0 || start > maxPageCount * pageSize) return ResponseMessage.BAD_REQUEST;
@@ -123,21 +123,26 @@ public class UserV1Api extends AbstractV1Api {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                return buildCouponsDto((JSONObject) data, start, count);
+                return buildUserCouponsDto((JSONObject) data, start, count);
             }
         });
     }
 
-    private Dto buildCouponsDto(JSONObject userCouponsPackJson, int start, int count) {
+    private Dto buildUserCouponsDto(JSONObject userCouponsPackJson, int start, int count) {
         PagedListDto userCoupons = new PagedListDto();
 
         int totalCount = userCouponsPackJson.getInteger("totalCount");
         userCoupons.setTotalCount(totalCount);
 
         JSONArray userCouponsJson = userCouponsPackJson.getJSONArray("userCoupons");
+        JSONObject couponsJson = userCouponsPackJson.getJSONObject("coupons");
         for (int i = 0; i < userCouponsJson.size(); i++) {
             try {
-                userCoupons.add(new UserCouponDto(userCouponsJson.getJSONObject(i)));
+                JSONObject userCouponJson = userCouponsJson.getJSONObject(i);
+                JSONObject couponJson = couponsJson.getJSONObject(userCouponJson.getString("couponId"));
+                if (couponJson == null) continue;
+
+                userCoupons.add(new UserCouponDto(userCouponJson, couponJson));
             } catch (Exception e) {
                 LOGGER.error("fail to parse user coupon: {}", userCouponsJson.getJSONObject(i), e);
             }

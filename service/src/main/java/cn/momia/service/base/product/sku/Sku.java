@@ -183,6 +183,8 @@ public class Sku implements Serializable {
     }
 
     public BigDecimal getMinPrice() {
+        if (prices == null || prices.isEmpty()) return new BigDecimal(0);
+
         BigDecimal minPrice = new BigDecimal(Float.MAX_VALUE);
         for (SkuPrice skuPrice : prices) {
             BigDecimal price = skuPrice.getPrice();

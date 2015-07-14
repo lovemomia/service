@@ -4,6 +4,8 @@ import cn.momia.service.common.DbAccessService;
 import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.CouponService;
 import cn.momia.service.promo.coupon.UserCoupon;
+import com.google.common.collect.Sets;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -21,15 +23,19 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CouponServiceImpl extends DbAccessService implements CouponService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CouponServiceImpl.class);
+    private static final String[] COUPON_FIELDS = { "id", "`type`", "title", "`desc`", "discount", "consumption", "accumulation", "startTime", "endTime" };
+    private static final String[] USER_COUPON_FIELDS = { "id", "userId", "couponId", "`type`", "startTime", "endTime", "status" };
 
     @Override
     public Coupon getCoupon(int couponId) {
-        String sql = "SELECT id, `type`, title, `desc`, discount, consumption, accumulation, duration FROM t_coupon WHERE id=? AND status=1";
+        String sql = "SELECT " + joinCouponFields() + " FROM t_coupon WHERE id=? AND status=1 AND endTime>NOW()";
 
         return jdbcTemplate.query(sql, new Object[] { couponId }, new ResultSetExtractor<Coupon>() {
             @Override
@@ -38,6 +44,10 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
                 return Coupon.NOT_EXIST_COUPON;
             }
         });
+    }
+
+    private String joinCouponFields() {
+        return StringUtils.join(COUPON_FIELDS, ",");
     }
 
     private Coupon buildCoupon(ResultSet rs) throws SQLException {
@@ -50,13 +60,31 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
             coupon.setDiscount(rs.getBigDecimal("discount"));
             coupon.setConsumption(rs.getBigDecimal("consumption"));
             coupon.setAccumulation(rs.getInt("accumulation"));
-            coupon.setDuration(rs.getLong("duration"));
+            coupon.setStartTime(rs.getTimestamp("startTime"));
+            coupon.setEndTime(rs.getTimestamp("endTime"));
 
             return coupon;
         } catch (Exception e) {
             LOGGER.error("fail to build coupon: {}", rs.getInt("id"), e);
             return Coupon.INVALID_COUPON;
         }
+    }
+
+    @Override
+    public Map<Integer, Coupon> getCoupons(Collection<Integer> couponIds) {
+        final Map<Integer, Coupon> coupons = new HashMap<Integer, Coupon>();
+        if (couponIds == null || couponIds.isEmpty()) return coupons;
+
+        String sql = "SELECT " + joinCouponFields() + " FROM t_coupon WHERE id IN(" + StringUtils.join(Sets.newHashSet(couponIds), ",") + ") AND status=1 AND endTime>NOW() ";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                Coupon coupon = buildCoupon(rs);
+                if (coupon.exists()) coupons.put(coupon.getId(), coupon);
+            }
+        });
+
+        return coupons;
     }
 
     @Override
@@ -72,12 +100,13 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
             jdbcTemplate.update(new PreparedStatementCreator() {
                 @Override
                 public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                    String sql = "INSERT INTO t_user_coupon(userId, couponId, `type`, expiredTime, addTime) VALUES (?, ?, ?, ?, NOW())";
+                    String sql = "INSERT INTO t_user_coupon(userId, couponId, `type`, startTime, endTime, addTime) VALUES (?, ?, ?, ?, ?, NOW())";
                     PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                     ps.setLong(1, userId);
                     ps.setLong(2, registerCoupon.getId());
                     ps.setInt(3, UserCoupon.Type.REGISTER);
-                    ps.setTimestamp(4, new Timestamp(new Date().getTime() + registerCoupon.getDuration()));
+                    ps.setTimestamp(4, new Timestamp(registerCoupon.getStartTime().getTime()));
+                    ps.setTimestamp(5, new Timestamp(registerCoupon.getEndTime().getTime()));
 
                     return ps;
                 }
@@ -103,7 +132,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     }
 
     private Coupon getRegisterCoupon() {
-        String sql = "SELECT id, `type`, title, `desc`, discount, consumption, accumulation, duration FROM t_coupon WHERE status=1 AND usage=? ORDER BY addTime DESC LIMIT 1";
+        String sql = "SELECT " + joinCouponFields() + " FROM t_coupon WHERE status=1 AND usage=? AND endTime>NOW() ORDER BY addTime DESC LIMIT 1";
 
         return jdbcTemplate.query(sql, new Object[] { Coupon.Usage.REGISTER }, new ResultSetExtractor<Coupon>() {
             @Override
@@ -116,31 +145,74 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
 
     @Override
     public int queryCountByUser(long userId, int status) {
-        String sql = "SELECT COUNT(1) FROM t_user_coupon WHERE userId=? AND status=?";
+        if (status == UserCoupon.Status.EXPIRED) {
+            String sql = "SELECT COUNT(1) FROM t_user_coupon WHERE userId=? AND status=? AND endTime<=NOW()";
 
-        return jdbcTemplate.query(sql, new Object[] { userId, status }, new ResultSetExtractor<Integer>() {
-            @Override
-            public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
-                if (rs.next()) return rs.getInt(1);
-                return 0;
-            }
-        });
+            return jdbcTemplate.query(sql, new Object[] { userId, UserCoupon.Status.NOT_USED }, new ResultSetExtractor<Integer>() {
+                @Override
+                public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
+                    return rs.next() ? rs.getInt(1) : 0;
+                }
+            });
+        } else if (status > 0) {
+            String sql = "SELECT COUNT(1) FROM t_user_coupon WHERE userId=? AND status=?";
+
+            return jdbcTemplate.query(sql, new Object[] { userId, status }, new ResultSetExtractor<Integer>() {
+                @Override
+                public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
+                    return rs.next() ? rs.getInt(1) : 0;
+                }
+            });
+        } else {
+            String sql = "SELECT COUNT(1) FROM t_user_coupon WHERE userId=? AND status<>0";
+
+            return jdbcTemplate.query(sql, new Object[] { userId }, new ResultSetExtractor<Integer>() {
+                @Override
+                public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
+                    return rs.next() ? rs.getInt(1) : 0;
+                }
+            });
+        }
     }
 
     @Override
     public List<UserCoupon> queryByUser(long userId, int status, int start, int count) {
         final List<UserCoupon> userCoupons = new ArrayList<UserCoupon>();
 
-        String sql = "SELECT id, userId, couponId, `type`, expiredTime, status FROM t_user_coupon WHERE userId=? AND status=? ORDER BY addTime DESC LIMIT ?,?";
-        jdbcTemplate.query(sql, new Object[] { userId, status, start, count }, new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                UserCoupon userCoupon = buildUserCoupon(rs);
-                if (userCoupon.exists()) userCoupons.add(userCoupon);
-            }
-        });
+        if (status == UserCoupon.Status.EXPIRED) {
+            String sql = "SELECT " + joinUserCouponFields() + " FROM t_user_coupon WHERE userId=? AND status=? AND endTime<=NOW() ORDER BY addTime DESC LIMIT ?,?";
+            jdbcTemplate.query(sql, new Object[] { userId, UserCoupon.Status.NOT_USED, start, count }, new RowCallbackHandler() {
+                @Override
+                public void processRow(ResultSet rs) throws SQLException {
+                    UserCoupon userCoupon = buildUserCoupon(rs);
+                    if (userCoupon.exists()) userCoupons.add(userCoupon);
+                }
+            });
+        } else if (status > 0) {
+            String sql = "SELECT " + joinUserCouponFields() + " FROM t_user_coupon WHERE userId=? AND status=? ORDER BY addTime DESC LIMIT ?,?";
+            jdbcTemplate.query(sql, new Object[] { userId, status, start, count }, new RowCallbackHandler() {
+                @Override
+                public void processRow(ResultSet rs) throws SQLException {
+                    UserCoupon userCoupon = buildUserCoupon(rs);
+                    if (userCoupon.exists()) userCoupons.add(userCoupon);
+                }
+            });
+        } else {
+            String sql = "SELECT " + joinUserCouponFields() + " FROM t_user_coupon WHERE userId=? AND status<>0 ORDER BY addTime DESC LIMIT ?,?";
+            jdbcTemplate.query(sql, new Object[] { userId, start, count }, new RowCallbackHandler() {
+                @Override
+                public void processRow(ResultSet rs) throws SQLException {
+                    UserCoupon userCoupon = buildUserCoupon(rs);
+                    if (userCoupon.exists()) userCoupons.add(userCoupon);
+                }
+            });
+        }
 
         return userCoupons;
+    }
+
+    private String joinUserCouponFields() {
+        return StringUtils.join(USER_COUPON_FIELDS, ",");
     }
 
     private UserCoupon buildUserCoupon(ResultSet rs) throws SQLException {
@@ -150,7 +222,8 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
             userCoupon.setUserId(rs.getLong("userId"));
             userCoupon.setCouponId(rs.getInt("couponId"));
             userCoupon.setType(rs.getInt("type"));
-            userCoupon.setExpiredTime(rs.getTimestamp("expiredTime"));
+            userCoupon.setStartTime(rs.getTimestamp("startTime"));
+            userCoupon.setEndTime(rs.getTimestamp("endTime"));
             userCoupon.setStatus(rs.getInt("status"));
 
             return userCoupon;
@@ -161,18 +234,17 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     }
 
     @Override
-    public UserCoupon lockUserCoupon(long userId, long orderId, long userCouponId) {
-        String sql = "UPDATE t_user_coupon SET orderId=?, status=? WHERE id=? AND userId=? AND orderId=0 AND status=? AND expiredTime>NOW()";
-        boolean successful = jdbcTemplate.update(sql, new Object[] { orderId, Coupon.Status.USED, userCouponId, userId, Coupon.Status.NOT_USED }) == 1;
-        if (!successful) return UserCoupon.NOT_EXIST_USER_COUPON;
+    public boolean lockUserCoupon(long userId, long orderId, long userCouponId) {
+        String sql = "UPDATE t_user_coupon SET orderId=?, status=? WHERE id=? AND userId=? AND orderId=0 AND status=? AND endTime>NOW()";
 
-        return getUserCoupon(userId, userCouponId);
+        return jdbcTemplate.update(sql, new Object[] { orderId, UserCoupon.Status.USED, userCouponId, userId, UserCoupon.Status.NOT_USED }) == 1;
     }
 
-    private UserCoupon getUserCoupon(long userId, long userCouponId) {
-        String sql = "SELECT id, userId, couponId, `type`, expiredTime, status FROM t_user_coupon WHERE id=? AND userId=?";
+    @Override
+    public UserCoupon getUserCoupon(long userCouponId) {
+        String sql = "SELECT id, userId, couponId, `type`, startTime, endTime, status FROM t_user_coupon WHERE id=?";
 
-        return jdbcTemplate.query(sql, new Object[] { userCouponId, userId }, new ResultSetExtractor<UserCoupon>() {
+        return jdbcTemplate.query(sql, new Object[] { userCouponId }, new ResultSetExtractor<UserCoupon>() {
             @Override
             public UserCoupon extractData(ResultSet rs) throws SQLException, DataAccessException {
                 if (rs.next()) return buildUserCoupon(rs);
@@ -184,10 +256,11 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     @Override
     public BigDecimal calcTotalFee(BigDecimal totalFee, Coupon coupon) {
         // TODO 更丰富的优惠方式
-        if (coupon.exists() && coupon.getConsumption().compareTo(totalFee) >= 0) {
+        if (coupon.exists() && coupon.getConsumption().compareTo(totalFee) <= 0) {
             totalFee = totalFee.subtract(coupon.getDiscount());
-            totalFee = totalFee.compareTo(new BigDecimal(0)) < 0 ? new BigDecimal(0) : totalFee;
         }
+
+        totalFee = totalFee.compareTo(new BigDecimal(0)) < 0 ? new BigDecimal(0) : totalFee;
 
         return totalFee;
     }

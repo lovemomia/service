@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -194,7 +195,15 @@ public class WechatpayGateway extends AbstractPaymentGateway {
         Payment payment = new Payment();
         payment.setOrderId(Long.valueOf(param.get(WechatpayCallbackFields.OUT_TRADE_NO)));
         payment.setPayer(param.get(WechatpayCallbackFields.OPEN_ID));
-        payment.setFinishTime(TypeUtils.castToDate(param.get(WechatpayCallbackFields.TIME_END)));
+
+        Date finishTime;
+        try {
+            finishTime = DATE_FORMATTER.parse(param.get(WechatpayCallbackFields.TIME_END));
+        } catch (ParseException e) {
+            finishTime = new Date();
+        }
+        payment.setFinishTime(finishTime == null ? new Date() : finishTime);
+
         payment.setPayType(Payment.Type.WECHATPAY);
         payment.setTradeNo(param.get(WechatpayCallbackFields.TRANSACTION_ID));
         payment.setFee(new BigDecimal(param.get(WechatpayCallbackFields.TOTAL_FEE)).divide(new BigDecimal(100)));

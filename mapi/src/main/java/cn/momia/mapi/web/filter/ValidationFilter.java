@@ -12,6 +12,10 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class ValidationFilter implements Filter {
@@ -84,19 +88,21 @@ public class ValidationFilter implements Filter {
     }
 
     private boolean isInvalidSign(HttpServletRequest httpRequest) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("channel=").append(httpRequest.getParameter("channel")).append("&")
-                .append("device=").append(httpRequest.getParameter("device")).append("&")
-                .append("expired=").append(httpRequest.getParameter("expired")).append("&")
-                .append("net=").append(httpRequest.getParameter("net")).append("&")
-                .append("os=").append(httpRequest.getParameter("os")).append("&")
-                .append("terminal=").append(httpRequest.getParameter("terminal")).append("&")
-                .append("v=").append(httpRequest.getParameter("v")).append("&")
-                .append("key=").append(SecretKey.get());
+        List<String> kvs = new ArrayList<String>();
+        Map<String, String[]> httpParams = httpRequest.getParameterMap();
+        for (Map.Entry<String, String[]> entry : httpParams.entrySet()) {
+            String key = entry.getKey();
+            if (key.equalsIgnoreCase("sign")) continue;
+
+            String value = entry.getValue()[0];
+            kvs.add(key + "=" + value);
+        }
+        Collections.sort(kvs);
+        kvs.add("key=" + SecretKey.get());
 
         String sign = httpRequest.getParameter("sign");
 
-        return !sign.equals(DigestUtils.md5Hex(builder.toString()));
+        return !sign.equals(DigestUtils.md5Hex(StringUtils.join(kvs)));
     }
 
     private void forwardErrorPage(ServletRequest request, ServletResponse response, int errorCode) throws ServletException, IOException {
