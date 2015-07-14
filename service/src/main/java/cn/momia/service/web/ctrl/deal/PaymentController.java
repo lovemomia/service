@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.Map;
 
 @RestController
@@ -91,6 +92,45 @@ public class PaymentController extends AbstractController {
     @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)
     public ResponseMessage prepayWechatpay(HttpServletRequest request) {
         return prepay(request, Payment.Type.WECHATPAY);
+    }
+
+    @RequestMapping(value = "/prepay/free", method = RequestMethod.POST)
+    public ResponseMessage prepayFree(@RequestParam String utoken,
+                                      @RequestParam(value = "oid") long orderId,
+                                      @RequestParam(value = "pid") long productId,
+                                      @RequestParam(value = "sid") long skuId,
+                                      @RequestParam(value = "coupon", required = false) Long userCouponId) {
+        if (StringUtils.isBlank(utoken) ||
+                orderId <= 0 ||
+                productId <= 0 ||
+                skuId <= 0) return ResponseMessage.BAD_REQUEST;
+
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        Order order = orderService.get(orderId);
+        if (!order.exists()) return ResponseMessage.BAD_REQUEST;
+
+        if (order.getProductId() != productId || order.getSkuId() != skuId) return ResponseMessage.BAD_REQUEST;
+
+        if (userCouponId != null && userCouponId > 0) {
+            UserCoupon userCoupon = couponService.getUserCoupon(userCouponId);
+            if (!userCoupon.exists()) return ResponseMessage.FAILED("无效的优惠券");
+
+            Coupon coupon = couponService.getCoupon(userCoupon.getCouponId());
+            if (!coupon.exists()) return ResponseMessage.FAILED("无效的优惠券");
+
+            BigDecimal totalFee = order.getTotalFee();
+            if (coupon.getConsumption().compareTo(totalFee) > 0) return ResponseMessage.FAILED("消费条件不满足，无法使用优惠券");
+
+            if (couponService.calcTotalFee(totalFee, coupon).compareTo(new BigDecimal(0)) != 0) return new ResponseMessage("FAIL");
+        } else {
+            if (order.getTotalFee().compareTo(new BigDecimal(0)) != 0) return new ResponseMessage("FAIL");
+        }
+
+        // TODO
+
+        return new ResponseMessage("OK");
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.GET)
