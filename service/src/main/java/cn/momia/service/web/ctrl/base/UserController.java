@@ -152,7 +152,12 @@ public class UserController extends UserRelatedController {
         for (UserCoupon userCoupon : userCoupons) {
             couponIds.add(userCoupon.getCouponId());
         }
-        List<Coupon> coupons = couponService.getCoupons(couponIds);
+        Map<Integer, Coupon> couponsMap = couponService.getCoupons(couponIds);
+        List<Coupon> coupons = new ArrayList<Coupon>();
+        for (int couponId : couponIds) {
+            Coupon coupon = couponsMap.get(couponId);
+            if (coupon != null && coupon.exists()) coupons.add(coupon);
+        }
 
         return new ResponseMessage(buildCoupons(totalCount, coupons));
     }

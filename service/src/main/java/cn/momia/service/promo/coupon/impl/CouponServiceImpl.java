@@ -4,6 +4,7 @@ import cn.momia.service.common.DbAccessService;
 import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.CouponService;
 import cn.momia.service.promo.coupon.UserCoupon;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,9 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CouponServiceImpl extends DbAccessService implements CouponService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CouponServiceImpl.class);
@@ -62,16 +65,16 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     }
 
     @Override
-    public List<Coupon> getCoupons(Collection<Integer> couponIds) {
-        final List<Coupon> coupons = new ArrayList<Coupon>();
+    public Map<Integer, Coupon> getCoupons(Collection<Integer> couponIds) {
+        final Map<Integer, Coupon> coupons = new HashMap<Integer, Coupon>();
         if (couponIds == null || couponIds.isEmpty()) return coupons;
 
-        String sql = "SELECT id, `type`, title, `desc`, discount, consumption, accumulation, startTime, endTime FROM t_coupon WHERE id IN(" + StringUtils.join(couponIds, ",") + ") AND status=1 AND endTime>NOW() ";
+        String sql = "SELECT id, `type`, title, `desc`, discount, consumption, accumulation, startTime, endTime FROM t_coupon WHERE id IN(" + StringUtils.join(Sets.newHashSet(couponIds), ",") + ") AND status=1 AND endTime>NOW() ";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 Coupon coupon = buildCoupon(rs);
-                if (coupon.exists()) coupons.add(coupon);
+                if (coupon.exists()) coupons.put(coupon.getId(), coupon);
             }
         });
 
