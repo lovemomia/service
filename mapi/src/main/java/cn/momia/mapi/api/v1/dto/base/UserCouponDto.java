@@ -50,7 +50,7 @@ public class UserCouponDto implements Dto {
 
     public UserCouponDto(long id, JSONObject couponJson) {
         this.id = id;
-        this.couponId = couponJson.getInteger("couponId");
+        this.couponId = couponJson.getInteger("id");
         this.type = couponJson.getInteger("type");
         this.title = couponJson.getString("title");
         this.desc = couponJson.getString("desc");
