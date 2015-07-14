@@ -206,10 +206,23 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     }
 
     @Override
-    public boolean lockUserCoupon(long userId, long couponId, long orderId) {
-        String sql = "UPDATE t_user_coupon SET orderId=?, status=? WHERE userId=? AND couponId=? AND orderId=0 AND status=? AND endTime>NOW()";
+    public boolean lockUserCoupon(long userId, long orderId, long userCouponId) {
+        String sql = "UPDATE t_user_coupon SET orderId=?, status=? WHERE id=? AND userId=? AND orderId=0 AND status=? AND endTime>NOW()";
 
-        return jdbcTemplate.update(sql, new Object[] { orderId, UserCoupon.Status.USED, userId, couponId, UserCoupon.Status.NOT_USED }) == 1;
+        return jdbcTemplate.update(sql, new Object[] { orderId, UserCoupon.Status.USED, userCouponId, userId, UserCoupon.Status.NOT_USED }) == 1;
+    }
+
+    @Override
+    public UserCoupon getUserCoupon(int userCouponId) {
+        String sql = "SELECT id, userId, couponId, `type`, startTime, endTime, status FROM t_user_coupon WHERE id=?";
+
+        return jdbcTemplate.query(sql, new Object[] { userCouponId }, new ResultSetExtractor<UserCoupon>() {
+            @Override
+            public UserCoupon extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (rs.next()) return buildUserCoupon(rs);
+                return UserCoupon.NOT_EXIST_USER_COUPON;
+            }
+        });
     }
 
     @Override

@@ -12,5 +12,6 @@ public interface CouponService {
     int queryCountByUser(long userId, int status);
     List<UserCoupon> queryByUser(long userId, int status, int start, int count);
     boolean lockUserCoupon(long id, long orderId, long userCouponId);
+    UserCoupon getUserCoupon(int userCouponId);
     BigDecimal calcTotalFee(BigDecimal totalFee, Coupon coupon);
 }
