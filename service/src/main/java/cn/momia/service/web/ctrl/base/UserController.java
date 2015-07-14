@@ -148,24 +148,19 @@ public class UserController extends UserRelatedController {
 
         int totalCount = couponService.queryCountByUser(user.getId(), status);
         List<UserCoupon> userCoupons = totalCount > 0 ? couponService.queryByUser(user.getId(), status, start, count) : new ArrayList<UserCoupon>();
-        List<Integer> couponIds = new ArrayList<Integer>();
-        for (UserCoupon userCoupon : userCoupons) {
-            couponIds.add(userCoupon.getCouponId());
-        }
-        Map<Integer, Coupon> couponsMap = couponService.getCoupons(couponIds);
-        List<Coupon> coupons = new ArrayList<Coupon>();
-        for (int couponId : couponIds) {
-            Coupon coupon = couponsMap.get(couponId);
-            if (coupon != null && coupon.exists()) coupons.add(coupon);
-        }
 
-        return new ResponseMessage(buildCoupons(totalCount, coupons));
+        List<Integer> couponIds = new ArrayList<Integer>();
+        for (UserCoupon userCoupon : userCoupons) couponIds.add(userCoupon.getCouponId());
+        Map<Integer, Coupon> couponsMap = couponService.getCoupons(couponIds);
+
+        return new ResponseMessage(buildCoupons(totalCount, userCoupons, couponsMap));
     }
 
-    private JSONObject buildCoupons(int totalCount, List<Coupon> coupons) {
+    private JSONObject buildCoupons(int totalCount, List<UserCoupon> userCoupons, Map<Integer, Coupon> couponsMap) {
         JSONObject couponsPackJson = new JSONObject();
         couponsPackJson.put("totalCount", totalCount);
-        couponsPackJson.put("coupons", coupons);
+        couponsPackJson.put("userCoupons", userCoupons);
+        couponsPackJson.put("coupons", couponsMap);
 
         return couponsPackJson;
     }
