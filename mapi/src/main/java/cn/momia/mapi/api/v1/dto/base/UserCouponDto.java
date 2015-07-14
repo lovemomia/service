@@ -13,6 +13,7 @@ public class UserCouponDto implements Dto {
     private String title;
     private String desc;
     private BigDecimal discount;
+    private BigDecimal consumption;
     @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date startTime;
     @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date endTime;
 
@@ -40,6 +41,10 @@ public class UserCouponDto implements Dto {
         return discount;
     }
 
+    public BigDecimal getConsumption() {
+        return consumption;
+    }
+
     public Date getStartTime() {
         return startTime;
     }
@@ -55,6 +60,7 @@ public class UserCouponDto implements Dto {
         this.title = couponJson.getString("title");
         this.desc = couponJson.getString("desc");
         this.discount = couponJson.getBigDecimal("discount");
+        this.consumption = couponJson.getBigDecimal("consumption");
         this.startTime = couponJson.getDate("startTime");
         this.endTime = couponJson.getDate("endTime");
     }
