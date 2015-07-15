@@ -133,7 +133,7 @@ public class PaymentController extends AbstractController {
         if (!couponService.lockUserCoupon(user.getId(), orderId, userCouponId) || !couponService.useUserCoupon(user.getId(), orderId, userCouponId)) return new ResponseMessage("FAIL");
         if (!orderService.prepay(orderId) || !orderService.pay(orderId)) return new ResponseMessage("FAIL");
 
-        return new ResponseMessage("OK");
+        return new ResponseMessage(productService.get(productId));
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.GET)
@@ -152,6 +152,6 @@ public class PaymentController extends AbstractController {
         long userId = user.getId();
         if (!orderService.check(orderId, userId, productId, skuId)) return new ResponseMessage("FAIL");
 
-        return new ResponseMessage("OK");
+        return new ResponseMessage(productService.get(productId));
     }
 }
