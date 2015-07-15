@@ -47,7 +47,7 @@ public class ProductUtil {
         product.setAbstracts(productJson.getString("abstracts"));
         product.setJoined(productJson.getInteger("joined"));
         product.setSales(productJson.getInteger("sales"));
-        product.setSoldOut(productJson.getBoolean("sales"));
+        product.setSoldOut(productJson.getBoolean("soldOut"));
         product.setPrice(productJson.getBigDecimal("minPrice"));
         product.setCrowd(productJson.getString("crowd"));
         product.setScheduler(productJson.getString("scheduler"));
