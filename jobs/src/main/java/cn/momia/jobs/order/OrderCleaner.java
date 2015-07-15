@@ -27,9 +27,13 @@ public class OrderCleaner {
 
     public void run() {
         try {
+            LOGGER.info("start to clean orders ...");
+
             List<Order> expiredOrders = getExpiredOrders();
             List<Order> removedOrders = removeOrders(expiredOrders);
             unlockOrders(removedOrders);
+
+            LOGGER.info("clean orders finished");
         } catch (Exception e) {
             LOGGER.error("fail to clean expired orders", e);
         }
