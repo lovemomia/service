@@ -128,7 +128,7 @@ public class OrderCleaner {
 
     private void unSoldOut(long productId) {
         try {
-            String sql = "UPDATE t_product SET soldOut=0 WHERE id=? AND soldOut=1 AND AND status=1";
+            String sql = "UPDATE t_product SET soldOut=0 WHERE id=? AND soldOut=1 AND status=1";
             jdbcTemplate.update(sql, new Object[] { productId });
         } catch (Exception e) {
             LOGGER.error("fail to set sold out status of product: {}", productId, e);
