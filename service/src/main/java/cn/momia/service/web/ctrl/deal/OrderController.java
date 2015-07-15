@@ -93,7 +93,7 @@ public class OrderController extends AbstractController {
             User user = userService.getByMobile(mobile);
             if (!user.exists()) return;
 
-            if (user.getId() == customerId && StringUtils.isBlank(user.getName())) userService.updateName(user.getId(), contacts);
+            if (user.getId() == customerId && StringUtils.isBlank(user.getName()) && !contacts.equals(user.getNickName())) userService.updateName(user.getId(), contacts);
         } catch (Exception e) {
             LOGGER.warn("fail to process contacts, {}/{}", contacts, mobile);
         }
