@@ -56,7 +56,7 @@ public class OrderController extends AbstractController {
                 return new ResponseMessage(orderPackJson);
             }
         } catch (OrderLimitException e) {
-            return ResponseMessage.FAILED("本单有限购，您以超出购买限额，超出数量：" + e.getOverCount());
+            return ResponseMessage.FAILED("本单有限购，您已超出购买限额");
         } catch (Exception e) {
             LOGGER.error("fail to place order, customerId: {}, productId: {}, skuId: {}", new Object[] { order.getCustomerId(), order.getProductId(), order.getSkuId(), e });
         } finally {
