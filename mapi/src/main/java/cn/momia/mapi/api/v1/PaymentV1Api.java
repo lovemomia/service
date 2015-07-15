@@ -95,7 +95,7 @@ public class PaymentV1Api extends AbstractV1Api {
                 .add("pid", productId)
                 .add("sid", skuId);
         if (coupon != null && coupon > 0) builder.add("coupon", coupon);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("payment/prepay/free"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("payment/prepay/free"), builder.build());
 
         return executeRequest(request);
     }

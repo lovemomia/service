@@ -123,7 +123,7 @@ public class PaymentController extends AbstractController {
         BigDecimal totalFee = order.getTotalFee();
         if (userCouponId != null && userCouponId > 0) {
             Coupon coupon = getCoupon(userCouponId, totalFee);
-            if (!coupon.exists()) return ResponseMessage.FAILED("无效的优惠券，或消费条件不满足，无法使用优惠券");
+            if (!coupon.exists()) return ResponseMessage.FAILED("无效的优惠券，或消费条件不满足，无法使用");
 
             if (couponService.calcTotalFee(totalFee, coupon).compareTo(new BigDecimal(0)) != 0) return new ResponseMessage("FAIL");
         } else {
