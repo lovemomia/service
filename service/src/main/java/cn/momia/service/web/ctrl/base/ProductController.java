@@ -90,26 +90,26 @@ public class ProductController extends AbstractController {
         for (Order order : orders) customerIds.add(order.getCustomerId());
         Map<Long, User> customers = userService.get(customerIds);
 
-        int adultCount = 0;
-        int childCount = 0;
+//        int adultCount = 0;
+//        int childCount = 0;
         List<String > avatars = new ArrayList<String>();
         for (Order order : orders) {
             long customerId = order.getCustomerId();
             User customer = customers.get(customerId);
             if (customer == null) continue;
 
-            adultCount += order.getAdultCount();
-            childCount += order.getChildCount();
+//            adultCount += order.getAdultCount();
+//            childCount += order.getChildCount();
             avatars.add(customer.getAvatar());
         }
 
-        StringBuilder builder = new StringBuilder();
-        if (adultCount <= 0 && childCount <= 0) builder.append("目前还没有人参加");
-        else if (adultCount > 0 && childCount <= 0) builder.append(adultCount).append("个大人参加");
-        else if (adultCount <= 0 && childCount > 0) builder.append(childCount).append("个孩子参加");
-        else builder.append(childCount).append("个孩子，").append(adultCount).append("个大人参加");
+//        StringBuilder builder = new StringBuilder();
+//        if (adultCount <= 0 && childCount <= 0) builder.append("目前还没有人参加");
+//        else if (adultCount > 0 && childCount <= 0) builder.append(adultCount).append("个大人参加");
+//        else if (adultCount <= 0 && childCount > 0) builder.append(childCount).append("个孩子参加");
+//        else builder.append(childCount).append("个孩子，").append(adultCount).append("个大人参加");
 
-        return new ResponseMessage(new Customers(builder.toString(), avatars));
+        return new ResponseMessage(new Customers("玩伴信息", avatars));
     }
 
     @RequestMapping(value = "/{id}/playmate", method = RequestMethod.GET)
