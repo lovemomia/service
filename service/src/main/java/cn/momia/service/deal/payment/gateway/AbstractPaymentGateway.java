@@ -8,6 +8,7 @@ import cn.momia.service.deal.payment.Payment;
 import cn.momia.service.deal.payment.PaymentService;
 import cn.momia.service.deal.payment.gateway.wechatpay.WechatpayCallbackFields;
 import cn.momia.service.promo.coupon.CouponService;
+import cn.momia.service.promo.coupon.UserCoupon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +71,14 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
 
     private boolean finishPayment(CallbackParam param) {
         try {
-            if (!orderService.pay(Long.valueOf(param.get("out_trade_no")))) return false;
+            long orderId = Long.valueOf(param.get("out_trade_no"));
+            Order order = orderService.get(orderId);
+            if (!order.exists()) return false;
+
+            if (!orderService.pay(orderId)) return false;
+
+            UserCoupon userCoupon = couponService.getUserCouponByOrder(order.getId());
+            if (userCoupon.exists() && !couponService.useUserCoupon(order.getCustomerId(), order.getId(), userCoupon.getId())) return false;
             logPayment(param);
         } catch (Exception e) {
             LOGGER.error("fail to pay order: {}", param.get("out_trade_no"), e);
