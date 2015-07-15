@@ -75,7 +75,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
         final Map<Integer, Coupon> coupons = new HashMap<Integer, Coupon>();
         if (couponIds == null || couponIds.isEmpty()) return coupons;
 
-        String sql = "SELECT " + joinCouponFields() + " FROM t_coupon WHERE id IN(" + StringUtils.join(Sets.newHashSet(couponIds), ",") + ") AND status=1 AND endTime>NOW() ";
+        String sql = "SELECT " + joinCouponFields() + " FROM t_coupon WHERE id IN(" + StringUtils.join(Sets.newHashSet(couponIds), ",") + ") AND status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -256,9 +256,9 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
 
     @Override
     public UserCoupon getUserCoupon(long userCouponId) {
-        String sql = "SELECT " + joinUserCouponFields() + " FROM t_user_coupon WHERE id=?";
+        String sql = "SELECT " + joinUserCouponFields() + " FROM t_user_coupon WHERE id=? AND (status=? OR status=?) AND endTime>NOW()";
 
-        return jdbcTemplate.query(sql, new Object[] { userCouponId }, new ResultSetExtractor<UserCoupon>() {
+        return jdbcTemplate.query(sql, new Object[] { userCouponId, UserCoupon.Status.NOT_USED, UserCoupon.Status.LOCKED }, new ResultSetExtractor<UserCoupon>() {
             @Override
             public UserCoupon extractData(ResultSet rs) throws SQLException, DataAccessException {
                 if (rs.next()) return buildUserCoupon(rs);
@@ -281,7 +281,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
 
     @Override
     public UserCoupon getUserCouponByOrder(long orderId) {
-        String sql = "SELECT " + joinUserCouponFields() + " FROM t_user_coupon WHERE orderId=? LIMIT 1";
+        String sql = "SELECT " + joinUserCouponFields() + " FROM t_user_coupon WHERE orderId=? AND status<>0 LIMIT 1";
 
         return jdbcTemplate.query(sql, new Object[] { orderId }, new ResultSetExtractor<UserCoupon>() {
             @Override
