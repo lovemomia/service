@@ -120,7 +120,9 @@ public class OrderCleaner {
             long skuId = order.getSkuId();
             int count = order.getCount();
             String sql = "UPDATE t_sku SET unlockedStock=unlockedStock+?, lockedStock=lockedStock-? WHERE id=? AND lockedStock>=? AND status=1";
-            jdbcTemplate.update(sql, new Object[] { count, count, skuId, count });
+            if (jdbcTemplate.update(sql, new Object[] { count, count, skuId, count }) == 1) {
+                deleteJoined(order.getProductId(), count);
+            }
         } catch (Exception e) {
             LOGGER.error("fail to unlock order: {}", order.getId(), e);
         }
@@ -132,6 +134,15 @@ public class OrderCleaner {
             jdbcTemplate.update(sql, new Object[] { productId });
         } catch (Exception e) {
             LOGGER.error("fail to set sold out status of product: {}", productId, e);
+        }
+    }
+
+    private void deleteJoined(long productId, int count) {
+        try {
+            String sql = "UPDATE t_product SET joined=joined-? WHERE id=? AND joined>=? AND status=1";
+            jdbcTemplate.update(sql, new Object[] { productId, count });
+        } catch (Exception e) {
+            LOGGER.error("fail to decrease joined of product: {}", productId, e);
         }
     }
 }
