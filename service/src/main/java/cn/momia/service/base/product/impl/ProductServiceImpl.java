@@ -64,7 +64,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     public List<ProductImage> getProductImgs(long productId) {
         final List<ProductImage> imgs = new ArrayList<ProductImage>();
         String sql = "SELECT url, width, height FROM t_product_img WHERE productId=? AND status=1";
-        jdbcTemplate.query(sql, new Object[]{productId}, new RowCallbackHandler() {
+        jdbcTemplate.query(sql, new Object[] { productId }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 imgs.add(buildImage(rs));
@@ -169,13 +169,40 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     }
 
     @Override
-    public boolean lockStock(long skuId, int count) {
-        return skuService.lock(skuId, count);
+    public boolean lockStock(long id, long skuId, int count) {
+        boolean successful = skuService.lock(skuId, count);
+
+        try {
+            if (successful && isSoldOut(id) && !baseProductService.soldOut(id)) LOGGER.error("fail to set sold out status of product: {}", id);
+        } catch (Exception e) {
+            LOGGER.error("fail to set sold out status of product: {}", id, e);
+        }
+
+        return successful;
+    }
+
+    private boolean isSoldOut(long id) {
+        int unlockedStock = 0;
+        List<Sku> skus = getSkus(id);
+        for (Sku sku : skus) {
+            if (sku.getType() == Sku.Type.NO_CEILING) return false;
+            unlockedStock += sku.getUnlockedStock();
+        }
+
+        return unlockedStock <= 0;
     }
 
     @Override
-    public boolean unlockStock(long skuId, int count) {
-        return skuService.unlock(skuId, count);
+    public boolean unlockStock(long id, long skuId, int count) {
+        boolean successful = skuService.unlock(skuId, count);
+
+        try {
+            if (successful && !baseProductService.unSoldOut(id)) LOGGER.error("fail to set sold out status of product: {}", id);
+        } catch (Exception e) {
+            LOGGER.error("fail to set sold out status of product: {}", id, e);
+        }
+
+        return successful;
     }
 
     @Override
@@ -185,22 +212,6 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
 
     @Override
     public boolean sold(long id, int count) {
-        boolean successful = baseProductService.sold(id, count);
-        if (successful && isSoldOut(id)) {
-            if (!baseProductService.soldOut(id)) LOGGER.error("fail to set sold out status of product: {}", id);
-        }
-
-        return successful;
-    }
-
-    private boolean isSoldOut(long id) {
-        int totalStock = 0;
-        List<Sku> skus = getSkus(id);
-        for (Sku sku : skus) {
-            if (sku.getType() == Sku.Type.NO_CEILING) return false;
-            totalStock += sku.getStock();
-        }
-
-        return baseProductService.getSales(id) >= totalStock;
+        return baseProductService.sold(id, count);
     }
 }

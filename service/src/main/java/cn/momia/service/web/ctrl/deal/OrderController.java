@@ -84,7 +84,7 @@ public class OrderController extends AbstractController {
     }
 
     private boolean lockSku(Order order) {
-        return productService.lockStock(order.getSkuId(), order.getCount());
+        return productService.lockStock(order.getProductId(), order.getSkuId(), order.getCount());
     }
 
     private void processContacts(long customerId, String contacts, String mobile) {
@@ -130,7 +130,7 @@ public class OrderController extends AbstractController {
     }
 
     private boolean unlockSku(Order order) {
-        return productService.unlockStock(order.getSkuId(), order.getCount());
+        return productService.unlockStock(order.getProductId(), order.getSkuId(), order.getCount());
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)

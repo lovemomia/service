@@ -173,4 +173,11 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
 
         return jdbcTemplate.update(sql, new Object[] { id }) == 1;
     }
+
+    @Override
+    public boolean unSoldOut(long id) {
+        String sql = "UPDATE t_product SET soldOut=0 WHERE id=? AND status=1";
+
+        return jdbcTemplate.update(sql, new Object[] { id }) == 1;
+    }
 }
