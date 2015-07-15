@@ -1,5 +1,6 @@
 package cn.momia.mapi.api.v1.dto.base;
 
+import cn.momia.common.web.img.ImageFile;
 import cn.momia.mapi.api.v1.dto.misc.ProductUtil;
 import com.alibaba.fastjson.JSONObject;
 
@@ -26,7 +27,7 @@ public class PaymentResultDto implements Dto {
     }
 
     public PaymentResultDto(JSONObject productJson) {
-        this.thumb = productJson.getString("thumb");
+        this.thumb = ImageFile.url(productJson.getString("thumb"));
         this.title = productJson.getString("title");
         this.abstracts = productJson.getString("abstracts");
         this.url = ProductUtil.buildUrl(productJson.getLong("id"));
