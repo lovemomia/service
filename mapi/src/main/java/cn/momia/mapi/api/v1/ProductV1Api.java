@@ -4,6 +4,7 @@ import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.mapi.api.v1.dto.base.PlaymatesDto;
 import cn.momia.mapi.api.v1.dto.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.composite.PagedListDto;
@@ -135,6 +136,11 @@ public class ProductV1Api extends AbstractV1Api {
                 .add("count", conf.getInt("Product.Playmate.MaxSkuCount"));
         MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("product", id, "playmate"), builder.build());
 
-        return executeRequest(request);
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                return new PlaymatesDto((JSONArray) data);
+            }
+        });
     }
 }
