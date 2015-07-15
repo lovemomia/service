@@ -5,6 +5,7 @@ import cn.momia.service.base.user.User;
 import cn.momia.service.base.user.UserService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
+import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.CouponService;
 import cn.momia.service.promo.coupon.UserCoupon;
 import org.apache.commons.lang3.StringUtils;
@@ -24,8 +25,8 @@ public class CouponController {
     @Autowired private CouponService couponService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage coupon(@RequestParam String utoken, @RequestParam(value = "oid") long orderId, @RequestParam long coupon) {
-        if (StringUtils.isBlank(utoken) || orderId <= 0 || coupon <= 0) return ResponseMessage.BAD_REQUEST;
+    public ResponseMessage coupon(@RequestParam String utoken, @RequestParam(value = "oid") long orderId, @RequestParam(value = "coupon") long userCouponId) {
+        if (StringUtils.isBlank(utoken) || orderId <= 0 || userCouponId <= 0) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
@@ -33,11 +34,15 @@ public class CouponController {
         Order order = orderService.get(orderId);
         if (!order.exists()) return ResponseMessage.BAD_REQUEST;
 
-        UserCoupon userCoupon = couponService.getUserCoupon(coupon);
+        UserCoupon userCoupon = couponService.getUserCoupon(userCouponId);
         if (!userCoupon.exists()) return ResponseMessage.FAILED("无效的优惠券");
 
-        BigDecimal totalFee = couponService.calcTotalFee(order.getTotalFee(), couponService.getCoupon(userCoupon.getCouponId()));
+        Coupon coupon = couponService.getCoupon(userCoupon.getCouponId());
+        if (!coupon.exists()) return ResponseMessage.FAILED("无效的优惠券");
 
-        return new ResponseMessage(totalFee);
+        BigDecimal totalFee = order.getTotalFee();
+        if (coupon.getConsumption().compareTo(totalFee) > 0) return ResponseMessage.FAILED("消费条件不满足，无法使用优惠券");
+
+        return new ResponseMessage(couponService.calcTotalFee(totalFee, coupon));
     }
 }

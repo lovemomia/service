@@ -8,6 +8,7 @@ import cn.momia.service.deal.payment.Payment;
 import cn.momia.service.deal.payment.PaymentService;
 import cn.momia.service.deal.payment.gateway.wechatpay.WechatpayCallbackFields;
 import cn.momia.service.promo.coupon.CouponService;
+import cn.momia.service.promo.coupon.UserCoupon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,11 +42,26 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
     }
 
     @Override
+    public PrepayResult prepay(PrepayParam param) {
+        if (!orderService.prepay(Long.valueOf(param.get("out_trade_no")))) return buildFailPrepayResult();
+        return doPrepay(param);
+    }
+
+    private PrepayResult buildFailPrepayResult() {
+        PrepayResult result = new PrepayResult();
+        result.setSuccessful(false);
+
+        return result;
+    }
+
+    protected abstract PrepayResult doPrepay(PrepayParam param);
+
+    @Override
     public CallbackResult callback(CallbackParam param) {
         if (isPayedSuccessfully(param) && validateCallbackSign(param) && !finishPayment(param)) {
-            return buildFailResult();
+            return buildFailCallbackResult();
         } else {
-            return buildSuccessResult();
+            return buildSuccessCallbackResult();
         }
     }
 
@@ -55,7 +71,14 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
 
     private boolean finishPayment(CallbackParam param) {
         try {
-            if (!orderService.pay(Long.valueOf(param.get("out_trade_no")))) return false;
+            long orderId = Long.valueOf(param.get("out_trade_no"));
+            Order order = orderService.get(orderId);
+            if (!order.exists()) return false;
+
+            if (!orderService.pay(orderId)) return false;
+
+            UserCoupon userCoupon = couponService.getUserCouponByOrder(order.getId());
+            if (userCoupon.exists() && !couponService.useUserCoupon(order.getCustomerId(), order.getId(), userCoupon.getId())) return false;
             logPayment(param);
         } catch (Exception e) {
             LOGGER.error("fail to pay order: {}", param.get("out_trade_no"), e);
@@ -89,7 +112,7 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
 
     protected abstract Payment createPayment(CallbackParam param);
 
-    protected abstract CallbackResult buildFailResult();
+    protected abstract CallbackResult buildFailCallbackResult();
 
-    protected abstract CallbackResult buildSuccessResult();
+    protected abstract CallbackResult buildSuccessCallbackResult();
 }

@@ -51,7 +51,7 @@ public class AlipayGateway extends AbstractPaymentGateway {
     }
 
     @Override
-    public PrepayResult prepay(PrepayParam param) {
+    public PrepayResult doPrepay(PrepayParam param) {
         PrepayResult result = new PrepayResult();
         result.setSuccessful(param.get(AlipayPrepayFields.SIGN) != null);
         if (result.isSuccessful()) result.addAll(param.getAll());
@@ -116,7 +116,7 @@ public class AlipayGateway extends AbstractPaymentGateway {
     }
 
     @Override
-    protected CallbackResult buildFailResult() {
+    protected CallbackResult buildFailCallbackResult() {
         CallbackResult result = new CallbackResult();
         result.setSuccessful(false);
 
@@ -124,7 +124,7 @@ public class AlipayGateway extends AbstractPaymentGateway {
     }
 
     @Override
-    protected CallbackResult buildSuccessResult() {
+    protected CallbackResult buildSuccessCallbackResult() {
         CallbackResult result = new CallbackResult();
         result.setSuccessful(true);
 

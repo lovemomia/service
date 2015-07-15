@@ -12,6 +12,7 @@ public class UserCoupon {
         public static final int NOT_USED = 1;
         public static final int USED = 2;
         public static final int EXPIRED = 3;
+        public static final int LOCKED = 4;
     }
 
     public static final UserCoupon NOT_EXIST_USER_COUPON = new UserCoupon();

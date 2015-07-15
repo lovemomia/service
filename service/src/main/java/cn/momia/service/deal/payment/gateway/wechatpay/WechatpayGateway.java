@@ -106,7 +106,7 @@ public class WechatpayGateway extends AbstractPaymentGateway {
     }
 
     @Override
-    public PrepayResult prepay(PrepayParam param) {
+    public PrepayResult doPrepay(PrepayParam param) {
         PrepayResult result = new PrepayResult();
 
         try {
@@ -212,7 +212,7 @@ public class WechatpayGateway extends AbstractPaymentGateway {
     }
 
     @Override
-    protected CallbackResult buildFailResult() {
+    protected CallbackResult buildFailCallbackResult() {
         CallbackResult result = new CallbackResult();
         result.setSuccessful(false);
         result.add(WechatpayCallbackFields.RETURN_CODE, FAIL);
@@ -222,7 +222,7 @@ public class WechatpayGateway extends AbstractPaymentGateway {
     }
 
     @Override
-    protected CallbackResult buildSuccessResult() {
+    protected CallbackResult buildSuccessCallbackResult() {
         CallbackResult result = new CallbackResult();
         result.setSuccessful(true);
         result.add(WechatpayCallbackFields.RETURN_CODE, SUCCESS);

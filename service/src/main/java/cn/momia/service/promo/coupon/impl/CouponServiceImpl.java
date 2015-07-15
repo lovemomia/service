@@ -235,14 +235,21 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
 
     @Override
     public boolean lockUserCoupon(long userId, long orderId, long userCouponId) {
-        String sql = "UPDATE t_user_coupon SET orderId=?, status=? WHERE id=? AND userId=? AND orderId=0 AND status=? AND endTime>NOW()";
+        String sql = "UPDATE t_user_coupon SET orderId=?, status=? WHERE id=? AND userId=? AND (orderId=0 OR orderId=?) AND (status=? OR status=?) AND endTime>NOW()";
 
-        return jdbcTemplate.update(sql, new Object[] { orderId, UserCoupon.Status.USED, userCouponId, userId, UserCoupon.Status.NOT_USED }) == 1;
+        return jdbcTemplate.update(sql, new Object[] { orderId, UserCoupon.Status.LOCKED, userCouponId, userId, orderId, UserCoupon.Status.NOT_USED, UserCoupon.Status.LOCKED }) == 1;
+    }
+
+    @Override
+    public boolean useUserCoupon(long userId, long orderId, long userCouponId) {
+        String sql = "UPDATE t_user_coupon SET status=? WHERE id=? AND userId=? AND orderId=? AND (status=? OR status=?)";
+
+        return jdbcTemplate.update(sql, new Object[] { UserCoupon.Status.USED, userCouponId, userId, orderId, UserCoupon.Status.LOCKED, UserCoupon.Status.USED }) == 1;
     }
 
     @Override
     public UserCoupon getUserCoupon(long userCouponId) {
-        String sql = "SELECT id, userId, couponId, `type`, startTime, endTime, status FROM t_user_coupon WHERE id=?";
+        String sql = "SELECT " + joinUserCouponFields() + " FROM t_user_coupon WHERE id=?";
 
         return jdbcTemplate.query(sql, new Object[] { userCouponId }, new ResultSetExtractor<UserCoupon>() {
             @Override
@@ -263,5 +270,18 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
         totalFee = totalFee.compareTo(new BigDecimal(0)) < 0 ? new BigDecimal(0) : totalFee;
 
         return totalFee;
+    }
+
+    @Override
+    public UserCoupon getUserCouponByOrder(long orderId) {
+        String sql = "SELECT " + joinUserCouponFields() + " FROM t_user_coupon WHERE orderId=? LIMIT 1";
+
+        return jdbcTemplate.query(sql, new Object[] { orderId }, new ResultSetExtractor<UserCoupon>() {
+            @Override
+            public UserCoupon extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (rs.next()) return buildUserCoupon(rs);
+                return UserCoupon.NOT_EXIST_USER_COUPON;
+            }
+        });
     }
 }

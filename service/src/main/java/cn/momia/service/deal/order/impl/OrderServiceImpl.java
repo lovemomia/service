@@ -255,9 +255,17 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
+    public boolean prepay(long id) {
+        String sql = "UPDATE t_order SET status=? WHERE id=? AND (status=? OR status=?)";
+        int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PRE_PAYED, id, Order.Status.NOT_PAYED, Order.Status.PRE_PAYED });
+
+        return updateCount == 1;
+    }
+
+    @Override
     public boolean pay(long id) {
         String sql = "UPDATE t_order SET status=? WHERE id=? AND (status=? OR status=?)";
-        int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PAYED, id, Order.Status.NOT_PAYED, Order.Status.PAYED });
+        int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PAYED, id, Order.Status.PRE_PAYED, Order.Status.PAYED });
 
         return updateCount == 1;
     }
