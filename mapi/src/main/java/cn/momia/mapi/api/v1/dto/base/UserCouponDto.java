@@ -72,6 +72,8 @@ public class UserCouponDto implements Dto {
         int status = userCouponJson.getInteger("status");
         if (status == 1) {
             if (userCouponJson.getBoolean("expired")) status = 3;
+        } else if (status == 4) {
+            status = 2;
         }
         this.status = status;
     }
