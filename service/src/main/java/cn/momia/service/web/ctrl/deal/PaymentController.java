@@ -128,7 +128,7 @@ public class PaymentController extends AbstractController {
             if (order.getTotalFee().compareTo(new BigDecimal(0)) != 0) return new ResponseMessage("FAIL");
         }
 
-        // TODO
+        // TODO 更新状态
 
         return new ResponseMessage("OK");
     }

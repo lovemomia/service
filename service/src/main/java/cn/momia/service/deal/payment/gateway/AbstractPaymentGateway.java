@@ -41,11 +41,26 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
     }
 
     @Override
+    public PrepayResult prepay(PrepayParam param) {
+        if (!orderService.prepay(Long.valueOf(param.get("out_trade_no")))) return buildFailPrepayResult();
+        return doPrepay(param);
+    }
+
+    private PrepayResult buildFailPrepayResult() {
+        PrepayResult result = new PrepayResult();
+        result.setSuccessful(false);
+
+        return result;
+    }
+
+    protected abstract PrepayResult doPrepay(PrepayParam param);
+
+    @Override
     public CallbackResult callback(CallbackParam param) {
         if (isPayedSuccessfully(param) && validateCallbackSign(param) && !finishPayment(param)) {
-            return buildFailResult();
+            return buildFailCallbackResult();
         } else {
-            return buildSuccessResult();
+            return buildSuccessCallbackResult();
         }
     }
 
@@ -89,7 +104,7 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
 
     protected abstract Payment createPayment(CallbackParam param);
 
-    protected abstract CallbackResult buildFailResult();
+    protected abstract CallbackResult buildFailCallbackResult();
 
-    protected abstract CallbackResult buildSuccessResult();
+    protected abstract CallbackResult buildSuccessCallbackResult();
 }
