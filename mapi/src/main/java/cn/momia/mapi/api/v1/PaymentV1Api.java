@@ -5,6 +5,7 @@ import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.v1.dto.base.AlipayPrepayDto;
 import cn.momia.mapi.api.v1.dto.base.Dto;
+import cn.momia.mapi.api.v1.dto.base.PaymentResultDto;
 import cn.momia.mapi.api.v1.dto.base.WechatpayPrepayDto;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
@@ -95,9 +96,14 @@ public class PaymentV1Api extends AbstractV1Api {
                 .add("pid", productId)
                 .add("sid", skuId);
         if (coupon != null && coupon > 0) builder.add("coupon", coupon);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("payment/prepay/free"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("payment/prepay/free"), builder.build());
 
-        return executeRequest(request);
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                return new PaymentResultDto((JSONObject) data);
+            }
+        });
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.POST)
@@ -117,6 +123,11 @@ public class PaymentV1Api extends AbstractV1Api {
                 .add("sid", skuId);
         MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("payment/check"), builder.build());
 
-        return executeRequest(request);
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                return new PaymentResultDto((JSONObject) data);
+            }
+        });
     }
 }

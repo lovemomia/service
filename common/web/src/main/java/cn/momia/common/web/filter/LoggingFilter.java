@@ -28,12 +28,13 @@ public class LoggingFilter implements Filter
         long end = System.currentTimeMillis();
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-        REQUEST_LOGGER.info("{}\t{}\t{}ms\t{}\t{}\t{}", new Object[] { httpRequest.getMethod(),
+        REQUEST_LOGGER.info("{}\t{}\t{}ms\t{}\t{}\t{}\t{}", new Object[] { httpRequest.getMethod(),
                 httpRequest.getRequestURI(),
                 end - start,
-                request.getParameterMap(),
-                RequestUtil.getRemoteIp(httpRequest),
-                httpRequest.getHeader("user-agent")
+                httpRequest.getContentType(),
+                httpRequest.getHeader("user-agent"),
+                httpRequest.getParameterMap(),
+                RequestUtil.getRemoteIp(httpRequest)
         });
     }
 

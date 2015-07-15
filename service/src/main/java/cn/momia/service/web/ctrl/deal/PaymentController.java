@@ -123,16 +123,18 @@ public class PaymentController extends AbstractController {
         BigDecimal totalFee = order.getTotalFee();
         if (userCouponId != null && userCouponId > 0) {
             Coupon coupon = getCoupon(userCouponId, totalFee);
-            if (!coupon.exists()) return ResponseMessage.FAILED("无效的优惠券，或消费条件不满足，无法使用优惠券");
+            if (!coupon.exists()) return ResponseMessage.FAILED("无效的优惠券，或消费条件不满足，无法使用");
 
-            if (couponService.calcTotalFee(totalFee, coupon).compareTo(new BigDecimal(0)) != 0) return new ResponseMessage("FAIL");
-        } else {
-            if (totalFee.compareTo(new BigDecimal(0)) != 0) return new ResponseMessage("FAIL");
+            totalFee = couponService.calcTotalFee(totalFee, coupon);
         }
 
-        if (!orderService.prepay(orderId) || !orderService.pay(orderId)) return new ResponseMessage("FAIL");
+        if (totalFee.compareTo(new BigDecimal(0)) != 0 ||
+                !couponService.lockUserCoupon(user.getId(), orderId, userCouponId) ||
+                !couponService.useUserCoupon(user.getId(), orderId, userCouponId) ||
+                !orderService.prepay(orderId) ||
+                !orderService.pay(orderId)) return ResponseMessage.FAILED("支付失败");
 
-        return new ResponseMessage("OK");
+        return new ResponseMessage(productService.get(productId));
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.GET)
@@ -149,8 +151,8 @@ public class PaymentController extends AbstractController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         long userId = user.getId();
-        if (!orderService.check(orderId, userId, productId, skuId)) return new ResponseMessage("FAIL");
+        if (!orderService.check(orderId, userId, productId, skuId)) return ResponseMessage.FAILED("支付失败");
 
-        return new ResponseMessage("OK");
+        return new ResponseMessage(productService.get(productId));
     }
 }

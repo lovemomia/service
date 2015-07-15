@@ -41,7 +41,7 @@ public class CouponController {
         if (!coupon.exists()) return ResponseMessage.FAILED("无效的优惠券");
 
         BigDecimal totalFee = order.getTotalFee();
-        if (coupon.getConsumption().compareTo(totalFee) > 0) return ResponseMessage.FAILED("消费条件不满足，无法使用优惠券");
+        if (coupon.getConsumption().compareTo(totalFee) > 0) return ResponseMessage.FAILED("消费条件不满足，无法使用");
 
         return new ResponseMessage(couponService.calcTotalFee(totalFee, coupon));
     }

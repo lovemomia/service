@@ -9,6 +9,7 @@ import cn.momia.service.base.user.UserService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderPrice;
 import cn.momia.service.deal.order.OrderService;
+import cn.momia.service.promo.coupon.CouponService;
 import cn.momia.service.web.ctrl.AbstractController;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -32,6 +33,7 @@ public class OrderController extends AbstractController {
     @Autowired private OrderService orderService;
     @Autowired private ProductService productService;
     @Autowired private UserService userService;
+    @Autowired private CouponService couponService;
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage placeOrder(@RequestBody Order order) {
@@ -146,7 +148,21 @@ public class OrderController extends AbstractController {
         // TODO 需要告警
         if (!unlockSku(order)) LOGGER.error("fail to unlock sku, skuId: {}, count: {}", new Object[] { order.getSkuId(), order.getCount() });
 
+        int status = order.getStatus();
+        if (status == Order.Status.PRE_PAYED) {
+            releaseCoupon(order);
+        }
+
         return ResponseMessage.SUCCESS;
+    }
+
+    private void releaseCoupon(Order order) {
+        try {
+            if (!couponService.releaseUserCoupon(order.getCustomerId(), order.getId()))
+                LOGGER.error("fail to release coupon of order: {}", order.getId());
+        } catch (Exception e) {
+            LOGGER.error("fail to release coupon of order: {}", order.getId(), e);
+        }
     }
 
     private static class OrderLimitException extends Exception {
