@@ -194,15 +194,13 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
 
     @Override
     public boolean unlockStock(long id, long skuId, int count) {
-        boolean successful = skuService.unlock(skuId, count);
-
         try {
-            if (successful && !baseProductService.unSoldOut(id)) LOGGER.error("fail to set sold out status of product: {}", id);
+            baseProductService.unSoldOut(id);
         } catch (Exception e) {
             LOGGER.error("fail to set sold out status of product: {}", id, e);
         }
 
-        return successful;
+        return skuService.unlock(skuId, count);
     }
 
     @Override
