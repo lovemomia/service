@@ -71,22 +71,29 @@ public class PaymentController extends AbstractController {
     private Coupon useCoupon(long userId, Order order, String userCouponIdStr) {
         if (!StringUtils.isBlank(userCouponIdStr)) {
             int userCouponId = Integer.valueOf(userCouponIdStr);
-            if (userCouponId <= 0) return Coupon.INVALID_COUPON;
+            Coupon coupon = getCoupon(userCouponId, order.getTotalFee());
 
-            UserCoupon userCoupon = couponService.getUserCoupon(userCouponId);
-            if (!userCoupon.exists()) return Coupon.INVALID_COUPON;
-
-            Coupon coupon = couponService.getCoupon(userCoupon.getCouponId());
             if (!coupon.exists()) return Coupon.INVALID_COUPON;
-
-            if (coupon.getConsumption().compareTo(order.getTotalFee()) > 0) return Coupon.INVALID_COUPON;
-
             if (!couponService.lockUserCoupon(userId, order.getId(), userCouponId)) return Coupon.INVALID_COUPON;
 
             return coupon;
         }
 
         return Coupon.NOT_EXIST_COUPON;
+    }
+
+    private Coupon getCoupon(long userCouponId, BigDecimal totalFee) {
+        if (userCouponId <= 0) return Coupon.INVALID_COUPON;
+
+        UserCoupon userCoupon = couponService.getUserCoupon(userCouponId);
+        if (!userCoupon.exists()) return Coupon.INVALID_COUPON;
+
+        Coupon coupon = couponService.getCoupon(userCoupon.getCouponId());
+        if (!coupon.exists()) return Coupon.INVALID_COUPON;
+
+        if (coupon.getConsumption().compareTo(totalFee) > 0) return Coupon.INVALID_COUPON;
+
+        return coupon;
     }
 
     @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)
@@ -113,19 +120,14 @@ public class PaymentController extends AbstractController {
 
         if (order.getProductId() != productId || order.getSkuId() != skuId) return ResponseMessage.BAD_REQUEST;
 
+        BigDecimal totalFee = order.getTotalFee();
         if (userCouponId != null && userCouponId > 0) {
-            UserCoupon userCoupon = couponService.getUserCoupon(userCouponId);
-            if (!userCoupon.exists()) return ResponseMessage.FAILED("无效的优惠券");
-
-            Coupon coupon = couponService.getCoupon(userCoupon.getCouponId());
-            if (!coupon.exists()) return ResponseMessage.FAILED("无效的优惠券");
-
-            BigDecimal totalFee = order.getTotalFee();
-            if (coupon.getConsumption().compareTo(totalFee) > 0) return ResponseMessage.FAILED("消费条件不满足，无法使用优惠券");
+            Coupon coupon = getCoupon(userCouponId, totalFee);
+            if (!coupon.exists()) return ResponseMessage.FAILED("无效的优惠券，或消费条件不满足，无法使用优惠券");
 
             if (couponService.calcTotalFee(totalFee, coupon).compareTo(new BigDecimal(0)) != 0) return new ResponseMessage("FAIL");
         } else {
-            if (order.getTotalFee().compareTo(new BigDecimal(0)) != 0) return new ResponseMessage("FAIL");
+            if (totalFee.compareTo(new BigDecimal(0)) != 0) return new ResponseMessage("FAIL");
         }
 
         if (!orderService.prepay(orderId) || !orderService.pay(orderId)) return new ResponseMessage("FAIL");
