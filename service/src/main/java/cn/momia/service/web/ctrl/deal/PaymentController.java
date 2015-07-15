@@ -130,6 +130,7 @@ public class PaymentController extends AbstractController {
             if (totalFee.compareTo(new BigDecimal(0)) != 0) return new ResponseMessage("FAIL");
         }
 
+        if (!couponService.lockUserCoupon(user.getId(), orderId, userCouponId) || !couponService.useUserCoupon(user.getId(), orderId, userCouponId)) return new ResponseMessage("FAIL");
         if (!orderService.prepay(orderId) || !orderService.pay(orderId)) return new ResponseMessage("FAIL");
 
         return new ResponseMessage("OK");
