@@ -115,12 +115,23 @@ public class OrderCleaner {
 
     private void unlockOrder(Order order) {
         try {
+            unSoldOut(order.getProductId());
+
             long skuId = order.getSkuId();
             int count = order.getCount();
             String sql = "UPDATE t_sku SET unlockedStock=unlockedStock+?, lockedStock=lockedStock-? WHERE id=? AND lockedStock>=? AND status=1";
-            jdbcTemplate.update(sql, new Object[]{ count, count, skuId, count });
+            jdbcTemplate.update(sql, new Object[] { count, count, skuId, count });
         } catch (Exception e) {
-            LOGGER.error("fail to unloclk order: {}", order.getId(), e);
+            LOGGER.error("fail to unlock order: {}", order.getId(), e);
+        }
+    }
+
+    private void unSoldOut(long productId) {
+        try {
+            String sql = "UPDATE t_product SET soldOut=0 WHERE id=? AND soldOut=1 AND AND status=1";
+            jdbcTemplate.update(sql, new Object[] { productId });
+        } catch (Exception e) {
+            LOGGER.error("fail to set sold out status of product: {}", productId, e);
         }
     }
 }
