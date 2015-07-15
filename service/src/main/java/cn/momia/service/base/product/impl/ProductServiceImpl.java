@@ -200,7 +200,16 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
             LOGGER.error("fail to set sold out status of product: {}", id, e);
         }
 
-        return skuService.unlock(skuId, count);
+        boolean successful = skuService.unlock(skuId, count);
+        if (successful) {
+            try {
+                baseProductService.decreaseJoined(id, count);
+            } catch (Exception e) {
+                LOGGER.error("fail to decrease joined of product: {}", id, e);
+            }
+        }
+
+        return successful;
     }
 
     @Override

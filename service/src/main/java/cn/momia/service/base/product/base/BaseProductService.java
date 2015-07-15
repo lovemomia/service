@@ -13,4 +13,5 @@ public interface BaseProductService {
     int getSales(long id);
     boolean soldOut(long id);
     void unSoldOut(long id);
+    void decreaseJoined(long id, int count);
 }

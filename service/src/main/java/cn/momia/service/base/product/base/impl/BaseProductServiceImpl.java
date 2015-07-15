@@ -179,4 +179,10 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
         String sql = "UPDATE t_product SET soldOut=0 WHERE id=? AND soldOut=1 AND status=1";
         jdbcTemplate.update(sql, new Object[] { id });
     }
+
+    @Override
+    public void decreaseJoined(long id, int count) {
+        String sql = "UPDATE t_product SET joined=joined-? WHERE id=? AND joined>=? AND status=1";
+        jdbcTemplate.update(sql, new Object[] { id, count });
+    }
 }
