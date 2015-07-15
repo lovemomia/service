@@ -132,7 +132,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     }
 
     private Coupon getRegisterCoupon() {
-        String sql = "SELECT " + joinCouponFields() + " FROM t_coupon WHERE status=1 AND usage=? AND endTime>NOW() ORDER BY addTime DESC LIMIT 1";
+        String sql = "SELECT " + joinCouponFields() + " FROM t_coupon WHERE status=1 AND `usage`=? AND endTime>NOW() ORDER BY addTime DESC LIMIT 1";
 
         return jdbcTemplate.query(sql, new Object[] { Coupon.Usage.REGISTER }, new ResultSetExtractor<Coupon>() {
             @Override
