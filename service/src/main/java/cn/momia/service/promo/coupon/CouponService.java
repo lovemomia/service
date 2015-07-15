@@ -14,7 +14,7 @@ public interface CouponService {
     boolean lockUserCoupon(long userId, long orderId, long userCouponId);
     boolean useUserCoupon(long userId, long orderId, long userCouponId);
     boolean releaseUserCoupon(long userId, long orderId);
-    UserCoupon getUserCoupon(long userCouponId);
+    UserCoupon getUserCoupon(long userId, long orderId, long userCouponId);
     BigDecimal calcTotalFee(BigDecimal totalFee, Coupon coupon);
     UserCoupon getUserCouponByOrder(long orderId);
 }

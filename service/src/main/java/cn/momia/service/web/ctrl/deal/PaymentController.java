@@ -57,7 +57,7 @@ public class PaymentController extends AbstractController {
         if (order.getCustomerId() != user.getId() || order.getSkuId() != skuId) return ResponseMessage.BAD_REQUEST;
 
         Coupon coupon = useCoupon(user.getId(), order, request.getParameter("coupon"));
-        if (coupon.invalid()) return ResponseMessage.FAILED("无效的优惠券");
+        if (coupon.invalid()) return ResponseMessage.FAILED("无效的优惠券，或使用条件不满足");
 
         PaymentGateway gateway = PaymentGatewayFactory.create(payType);
         Map<String, String> params = gateway.extractPrepayParams(request, order, product, coupon);
@@ -71,7 +71,7 @@ public class PaymentController extends AbstractController {
     private Coupon useCoupon(long userId, Order order, String userCouponIdStr) {
         if (!StringUtils.isBlank(userCouponIdStr)) {
             int userCouponId = Integer.valueOf(userCouponIdStr);
-            Coupon coupon = getCoupon(userCouponId, order.getTotalFee());
+            Coupon coupon = getCoupon(userId, order.getId(), userCouponId, order.getTotalFee());
 
             if (!coupon.exists()) return Coupon.INVALID_COUPON;
             if (!couponService.lockUserCoupon(userId, order.getId(), userCouponId)) return Coupon.INVALID_COUPON;
@@ -82,10 +82,10 @@ public class PaymentController extends AbstractController {
         return Coupon.NOT_EXIST_COUPON;
     }
 
-    private Coupon getCoupon(long userCouponId, BigDecimal totalFee) {
+    private Coupon getCoupon(long userId, long orderId, long userCouponId, BigDecimal totalFee) {
         if (userCouponId <= 0) return Coupon.INVALID_COUPON;
 
-        UserCoupon userCoupon = couponService.getUserCoupon(userCouponId);
+        UserCoupon userCoupon = couponService.getUserCoupon(userId, orderId, userCouponId);
         if (!userCoupon.exists()) return Coupon.INVALID_COUPON;
 
         Coupon coupon = couponService.getCoupon(userCoupon.getCouponId());
@@ -122,8 +122,8 @@ public class PaymentController extends AbstractController {
 
         BigDecimal totalFee = order.getTotalFee();
         if (userCouponId != null && userCouponId > 0) {
-            Coupon coupon = getCoupon(userCouponId, totalFee);
-            if (!coupon.exists()) return ResponseMessage.FAILED("无效的优惠券，或消费条件不满足，无法使用");
+            Coupon coupon = getCoupon(user.getId(), order.getId(), userCouponId, totalFee);
+            if (!coupon.exists()) return ResponseMessage.FAILED("无效的优惠券，或使用条件不满足，无法使用");
 
             totalFee = couponService.calcTotalFee(totalFee, coupon);
         }
