@@ -248,8 +248,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public boolean delete(long id, long userId) {
-        String sql = "UPDATE t_order SET status=0 WHERE id=? AND customerId=? AND status=?";
-        int updateCount = jdbcTemplate.update(sql, new Object[] { id, userId, Order.Status.NOT_PAYED });
+        String sql = "UPDATE t_order SET status=0 WHERE id=? AND customerId=? AND (status=? OR status=?)";
+        int updateCount = jdbcTemplate.update(sql, new Object[] { id, userId, Order.Status.NOT_PAYED, Order.Status.PRE_PAYED });
 
         return updateCount == 1;
     }

@@ -248,6 +248,13 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     }
 
     @Override
+    public boolean releaseUserCoupon(long userId, long orderId) {
+        String sql = "UPDATE t_user_coupon SET orderId=0, status=? WHERE userId=? AND orderId=? AND (status=? OR status=?)";
+
+        return jdbcTemplate.update(sql, new Object[] { UserCoupon.Status.NOT_USED, userId, orderId, UserCoupon.Status.NOT_USED, UserCoupon.Status.LOCKED }) == 1;
+    }
+
+    @Override
     public UserCoupon getUserCoupon(long userCouponId) {
         String sql = "SELECT " + joinUserCouponFields() + " FROM t_user_coupon WHERE id=?";
 
