@@ -140,7 +140,7 @@ public class OrderCleaner {
     private void deleteJoined(long productId, int count) {
         try {
             String sql = "UPDATE t_product SET joined=joined-? WHERE id=? AND joined>=? AND status=1";
-            jdbcTemplate.update(sql, new Object[] { productId, count });
+            jdbcTemplate.update(sql, new Object[] { count, productId, count });
         } catch (Exception e) {
             LOGGER.error("fail to decrease joined of product: {}", productId, e);
         }
