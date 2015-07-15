@@ -14,8 +14,8 @@ public class UserCouponDto implements Dto {
     private String desc;
     private BigDecimal discount;
     private BigDecimal consumption;
-    @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date startTime;
-    @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date endTime;
+    @JSONField(format = "yyyy-MM-dd") private Date startTime;
+    @JSONField(format = "yyyy-MM-dd") private Date endTime;
     private int status;
 
     public long getId() {
