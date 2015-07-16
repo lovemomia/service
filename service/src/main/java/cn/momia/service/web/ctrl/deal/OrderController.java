@@ -76,8 +76,16 @@ public class OrderController extends AbstractController {
 
         Sku sku = productService.getSku(order.getSkuId());
         for (OrderPrice price : order.getPrices()) {
-            SkuPrice skuPrice = sku.getPrice(price.getAdult(), price.getChild());
-            if (skuPrice == null || price.getPrice().compareTo(skuPrice.getPrice()) != 0) return false;
+            boolean found = false;
+            List<SkuPrice> skuPrices = sku.getPrice(price.getAdult(), price.getChild());
+            for (SkuPrice skuPrice : skuPrices) {
+                if (price.getPrice().compareTo(skuPrice.getPrice()) == 0) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) return false;
         }
 
         return true;
