@@ -12,6 +12,10 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class ValidationFilter implements Filter {
@@ -60,7 +64,7 @@ public class ValidationFilter implements Filter {
 
     private boolean isParamMissing(HttpServletRequest httpRequest) {
         String version = httpRequest.getParameter("v");
-        String teminal = httpRequest.getParameter("teminal");
+        String teminal = httpRequest.getParameter("terminal");
         String os = httpRequest.getParameter("os");
         String device = httpRequest.getParameter("device");
         String channel = httpRequest.getParameter("channel");
@@ -84,19 +88,22 @@ public class ValidationFilter implements Filter {
     }
 
     private boolean isInvalidSign(HttpServletRequest httpRequest) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("channel=").append(httpRequest.getParameter("channel")).append("&")
-                .append("device=").append(httpRequest.getParameter("device")).append("&")
-                .append("expired=").append(httpRequest.getParameter("expired")).append("&")
-                .append("net=").append(httpRequest.getParameter("net")).append("&")
-                .append("os=").append(httpRequest.getParameter("os")).append("&")
-                .append("teminal=").append(httpRequest.getParameter("teminal")).append("&")
-                .append("v=").append(httpRequest.getParameter("v")).append("&")
-                .append("key=").append(SecretKey.get());
+        List<String> kvs = new ArrayList<String>();
+        Map<String, String[]> httpParams = httpRequest.getParameterMap();
+        for (Map.Entry<String, String[]> entry : httpParams.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue()[0];
+            if (key.equalsIgnoreCase("sign") || StringUtils.isBlank(value)) continue;
 
-        String sign = httpRequest.getParameter("sign");
+            kvs.add(key + "=" + value);
+        }
+        Collections.sort(kvs);
+        kvs.add("key=" + SecretKey.get());
+        String sign = DigestUtils.md5Hex(StringUtils.join(kvs, ""));
 
-        return !sign.equals(DigestUtils.md5Hex(builder.toString()));
+        String signInParam = httpRequest.getParameter("sign");
+
+        return !sign.equals(signInParam);
     }
 
     private void forwardErrorPage(ServletRequest request, ServletResponse response, int errorCode) throws ServletException, IOException {

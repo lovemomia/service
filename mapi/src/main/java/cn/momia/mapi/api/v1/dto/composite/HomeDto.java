@@ -1,13 +1,10 @@
 package cn.momia.mapi.api.v1.dto.composite;
 
 import cn.momia.mapi.api.v1.dto.base.Dto;
-import cn.momia.mapi.api.v1.dto.base.ProductDto;
-
-import java.util.List;
 
 public class HomeDto implements Dto {
     private ListDto banners;
-    private List<ProductDto> products;
+    private ListDto products;
     private Integer nextpage = null;
 
     public ListDto getBanners() {
@@ -18,11 +15,11 @@ public class HomeDto implements Dto {
         this.banners = banners;
     }
 
-    public List<ProductDto> getProducts() {
+    public ListDto getProducts() {
         return products;
     }
 
-    public void setProducts(List<ProductDto> products) {
+    public void setProducts(ListDto products) {
         this.products = products;
     }
 

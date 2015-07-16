@@ -1,23 +1,38 @@
 package cn.momia.mapi.api.v1.dto.composite;
 
-import cn.momia.mapi.api.v1.dto.base.Dto;
+import cn.momia.common.web.img.ImageFile;
+import cn.momia.mapi.api.v1.dto.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.ProductDto;
-
-import java.util.List;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 public class ProductDetailDto extends ProductDto {
-    public static class Customers implements Dto {
-        public String text;
-        public List<String> avatars;
-    }
+    private JSONObject customers;
+    private String url;
 
-    private Customers customers;
-
-    public Customers getCustomers() {
+    public JSONObject getCustomers() {
         return customers;
     }
 
-    public void setCustomers(Customers customers) {
-        this.customers = customers;
+    public String getUrl() {
+        return url;
+    }
+
+    public ProductDetailDto(JSONObject productJson, JSONObject customersJson) {
+        super(ProductUtil.extractProductData(productJson, true));
+        this.customers = processAvatars(customersJson);
+        this.url = ProductUtil.buildUrl(getId());
+    }
+
+    private JSONObject processAvatars(JSONObject customersJson) {
+        JSONArray avatarsJson = customersJson.getJSONArray("avatars");
+        if (avatarsJson != null) {
+            for (int i = 0; i < avatarsJson.size(); i++) {
+                String avatar = avatarsJson.getString(i);
+                avatarsJson.set(i, ImageFile.url(avatar));
+            }
+        }
+
+        return customersJson;
     }
 }

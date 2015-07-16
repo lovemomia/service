@@ -1,13 +1,12 @@
 package cn.momia.service.base.user;
 
-import cn.momia.service.base.user.participant.Participant;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
 public class User implements Serializable {
     public static final User NOT_EXIST_USER = new User();
+    public static final User INVALID_USER = new User();
     public static final User DUPLICATE_USER = new User() {
         public boolean duplicated() {
             return true;
@@ -16,6 +15,7 @@ public class User implements Serializable {
 
     static {
         NOT_EXIST_USER.setId(0);
+        INVALID_USER.setId(0);
         DUPLICATE_USER.setId(0);
     }
 
@@ -23,11 +23,12 @@ public class User implements Serializable {
     private String token;
     private String nickName;
     private String mobile;
+    private boolean hasPassword;
     private String avatar;
     private String name;
     private String sex;
     private Date birthday;
-    private String city;
+    private int city;
     private String address;
     private Set<Long> children;
 
@@ -63,6 +64,14 @@ public class User implements Serializable {
         this.mobile = mobile;
     }
 
+    public boolean isHasPassword() {
+        return hasPassword;
+    }
+
+    public void setHasPassword(boolean hasPassword) {
+        this.hasPassword = hasPassword;
+    }
+
     public String getAvatar() {
         return avatar;
     }
@@ -95,11 +104,11 @@ public class User implements Serializable {
         this.birthday = birthday;
     }
 
-    public String getCity() {
+    public int getCity() {
         return city;
     }
 
-    public void setCity(String city) {
+    public void setCity(int city) {
         this.city = city;
     }
 

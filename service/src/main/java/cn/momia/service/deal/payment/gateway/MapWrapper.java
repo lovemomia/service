@@ -14,6 +14,10 @@ public class MapWrapper {
         return params.get(key);
     }
 
+    public void addAll(Map<String, String> params) {
+        this.params = params;
+    }
+
     public Map<String, String> getAll() {
         return params;
     }

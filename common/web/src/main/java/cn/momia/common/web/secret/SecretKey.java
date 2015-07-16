@@ -41,8 +41,7 @@ public class SecretKey
         });
 
         if (StringUtils.isBlank(get())) throw new RuntimeException("secret key is empty");
-        if (StringUtils.isBlank(getAlipayPrivateKey())) throw new RuntimeException("alipay private key is empty");
-        if (StringUtils.isBlank(getAlipayPublicKey())) throw new RuntimeException("alipay public key is empty");
+        if (StringUtils.isBlank(getPasswordSecretKey())) throw new RuntimeException("password secret key is empty");
     }
 
     public static String get()
@@ -54,11 +53,7 @@ public class SecretKey
         return keys.get(biz);
     }
 
-    public static String getAlipayPrivateKey() {
-        return keys.get("alipayPrivateKey");
-    }
-
-    public static String getAlipayPublicKey() {
-        return keys.get("alipayPublicKey");
+    public static String getPasswordSecretKey() {
+        return keys.get("password");
     }
 }

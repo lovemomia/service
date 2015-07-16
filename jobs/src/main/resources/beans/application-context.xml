@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="conf" class="cn.momia.common.config.impl.XmlConfiguration" init-method="init">
+        <property name="fileName" value="conf/configuration.xml" />
+    </bean>
+
+    <bean class="cn.momia.common.web.config.XmlPropertyPlaceholderConfigurer">
+        <property name="conf" ref="conf" />
+    </bean>
+
+    <bean class="cn.momia.common.web.logger.LoggerConfigurer" init-method="init">
+        <property name="conf" ref="conf" />
+    </bean>
+
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="com.mysql.jdbc.Driver" />
+        <property name="jdbcUrl" value="${Database.Tongqu.JdbcUrl}" />
+        <property name="user" value="${Database.Tongqu.Username}" />
+        <property name="password" value="${Database.Tongqu.Password}" />
+        <property name="maxPoolSize" value="30" />
+        <property name="maxIdleTime" value="7200" />
+        <property name="testConnectionOnCheckin" value="true" />
+        <property name="idleConnectionTestPeriod" value="5" />
+        <property name="preferredTestQuery" value="SELECT 1" />
+        <property name="checkoutTimeout" value="1800000" />
+    </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <bean id="orderCleaner" class="cn.momia.jobs.order.OrderCleaner">
+        <property name="jdbcTemplate" ref="jdbcTemplate" />
+    </bean>
+
+    <bean id="orderCleanJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="orderCleaner" />
+        <property name="targetMethod" value="run" />
+        <property name="concurrent" value="false" />
+    </bean>
+
+    <bean id="orderCleanTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <property name="jobDetail" ref="orderCleanJob" />
+        <property name="startDelay" value="10000" />
+        <property name="repeatInterval" value="900000" />
+    </bean>
+
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="orderCleanTrigger" />
+            </list>
+        </property>
+    </bean>
+</beans>

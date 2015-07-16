@@ -1,6 +1,5 @@
 package cn.momia.service.deal.order.impl;
 
-import cn.momia.service.base.product.ProductService;
 import cn.momia.service.common.DbAccessService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderPrice;
@@ -8,7 +7,6 @@ import cn.momia.service.deal.order.OrderService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +23,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -43,12 +40,6 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     private static final String[] ORDER_FIELDS = { "id", "customerId", "productId", "skuId", "prices", "contacts", "mobile", "participants", "status", "addTime" };
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
-
-    private ProductService productService;
-
-    public void setProductService(ProductService productService) {
-        this.productService = productService;
-    }
 
     @Override
     public long add(final Order order) {
@@ -93,26 +84,30 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     private Order buildOrder(ResultSet rs) throws SQLException {
-        Order order = new Order();
+        try {
+            Order order = new Order();
 
-        order.setId(rs.getLong("id"));
-        order.setCustomerId(rs.getLong("customerId"));
-        order.setProductId(rs.getLong("productId"));
-        order.setSkuId(rs.getLong("skuId"));
-        order.setPrices(parseOrderPrices(order.getId(), rs.getString("prices")));
-        order.setContacts(rs.getString("contacts"));
-        order.setMobile(rs.getString("mobile"));
-        order.setStatus(rs.getInt("status"));
-        order.setAddTime(rs.getTimestamp("addTime"));
+            order.setId(rs.getLong("id"));
+            order.setCustomerId(rs.getLong("customerId"));
+            order.setProductId(rs.getLong("productId"));
+            order.setSkuId(rs.getLong("skuId"));
+            order.setPrices(parseOrderPrices(order.getId(), rs.getString("prices")));
+            order.setContacts(rs.getString("contacts"));
+            order.setMobile(rs.getString("mobile"));
+            order.setStatus(rs.getInt("status"));
+            order.setAddTime(rs.getTimestamp("addTime"));
 
-        List<Long> participants = new ArrayList<Long>();
-        for (String participant : Splitter.on(",").omitEmptyStrings().trimResults().split(rs.getString("participants")))
-        {
-            participants.add(Long.valueOf(participant));
+            List<Long> participants = new ArrayList<Long>();
+            for (String participant : Order.PARTICIPANTS_SPLITTER.split(rs.getString("participants"))) {
+                participants.add(Long.valueOf(participant));
+            }
+            order.setParticipants(participants);
+
+            return order;
+        } catch (Exception e) {
+            LOGGER.error("fail to build order: {}", rs.getLong("id"), e);
+            return Order.INVALID_ORDER;
         }
-        order.setParticipants(participants);
-
-        return order;
     }
 
     private List<OrderPrice> parseOrderPrices(long id, String priceJson) {
@@ -140,7 +135,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
             jdbcTemplate.query(sql, new Object[] { productId, start, count }, new RowCallbackHandler() {
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
-                    orders.add(buildOrder(rs));
+                    Order order = buildOrder(rs);
+                    if (order.exists()) orders.add(order);
                 }
             });
         } else {
@@ -148,7 +144,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
             jdbcTemplate.query(sql, new Object[] { productId, status, start, count }, new RowCallbackHandler() {
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
-                    orders.add(buildOrder(rs));
+                    Order order = buildOrder(rs);
+                    if (order.exists()) orders.add(order);
                 }
             });
         }
@@ -178,6 +175,21 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
+    public List<Order> queryByUserAndSku(long userId, long skuId) {
+        final List<Order> orders = new ArrayList<Order>();
+        String sql = "SELECT " + joinFields() + " FROM t_order WHERE customerId=? AND skuId=? AND status<>0";
+        jdbcTemplate.query(sql, new Object[] { userId, skuId }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                Order order = buildOrder(rs);
+                if (order.exists()) orders.add(order);
+            }
+        });
+
+        return orders;
+    }
+
+    @Override
     public List<Order> queryByUser(long userId, int status, String type, int start, int count) {
         final List<Order> orders = new ArrayList<Order>();
 
@@ -186,7 +198,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
             jdbcTemplate.query(sql, new Object[] { userId, start, count }, new RowCallbackHandler() {
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
-                    orders.add(buildOrder(rs));
+                    Order order = buildOrder(rs);
+                    if (order.exists()) orders.add(order);
                 }
             });
         } else {
@@ -194,7 +207,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
             jdbcTemplate.query(sql, new Object[] { userId, status, start, count }, new RowCallbackHandler() {
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
-                    orders.add(buildOrder(rs));
+                    Order order = buildOrder(rs);
+                    if (order.exists()) orders.add(order);
                 }
             });
         }
@@ -203,13 +217,29 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
-    public List<Order> queryDistinctCustomerOrderByProduct(long productId, int start, int count) {
-        String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status>0 GROUP BY customerId LIMIT ?,?";
+    public List<Order> queryAllCustomerOrderByProduct(long productId) {
+        String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status=?";
         final List<Order> orders = new ArrayList<Order>();
-        jdbcTemplate.query(sql, new Object[] { productId, start, count }, new RowCallbackHandler() {
+        jdbcTemplate.query(sql, new Object[] { productId, Order.Status.PAYED }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
-                orders.add(buildOrder(rs));
+                Order order = buildOrder(rs);
+                if (order.exists()) orders.add(order);
+            }
+        });
+
+        return orders;
+    }
+
+    @Override
+    public List<Order> queryDistinctCustomerOrderByProduct(long productId, int start, int count) {
+        String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status=? GROUP BY customerId LIMIT ?,?";
+        final List<Order> orders = new ArrayList<Order>();
+        jdbcTemplate.query(sql, new Object[] { productId, Order.Status.PAYED, start, count }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                Order order = buildOrder(rs);
+                if (order.exists()) orders.add(order);
             }
         });
 
@@ -218,8 +248,16 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public boolean delete(long id, long userId) {
-        String sql = "UPDATE t_order SET status=0 WHERE id=? AND customerId=? AND status=?";
-        int updateCount = jdbcTemplate.update(sql, new Object[] { id, userId, Order.Status.NOT_PAYED });
+        String sql = "UPDATE t_order SET status=0 WHERE id=? AND customerId=? AND (status=? OR status=?)";
+        int updateCount = jdbcTemplate.update(sql, new Object[] { id, userId, Order.Status.NOT_PAYED, Order.Status.PRE_PAYED });
+
+        return updateCount == 1;
+    }
+
+    @Override
+    public boolean prepay(long id) {
+        String sql = "UPDATE t_order SET status=? WHERE id=? AND (status=? OR status=?)";
+        int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PRE_PAYED, id, Order.Status.NOT_PAYED, Order.Status.PRE_PAYED });
 
         return updateCount == 1;
     }
@@ -227,7 +265,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     @Override
     public boolean pay(long id) {
         String sql = "UPDATE t_order SET status=? WHERE id=? AND (status=? OR status=?)";
-        int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PAYED, id, Order.Status.NOT_PAYED, Order.Status.PAYED });
+        int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PAYED, id, Order.Status.PRE_PAYED, Order.Status.PAYED });
 
         return updateCount == 1;
     }
@@ -244,37 +282,5 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         });
 
         return status >= Order.Status.PAYED;
-    }
-
-    @Override
-    public void cleanExpiredOrders() {
-        LOGGER.info("start to clean expired orders ...");
-
-        final List<Order> orders = new ArrayList<Order>();
-        Date expiredDate = new Date(new Date().getTime() - 30 * 60 * 1000);
-        String sql = "SELECT " + joinFields() + " FROM t_order WHERE status=1 AND addTime<?";
-        jdbcTemplate.query(sql, new Object[] { expiredDate }, new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                orders.add(buildOrder(rs));
-            }
-        });
-
-        for (Order order : orders) {
-            try {
-                if (!delete(order.getId(), order.getCustomerId()))
-                {
-                    LOGGER.error("fail to unlock order: {}", order.getId());
-                    continue;
-                }
-
-                if (!productService.unlockStock(order.getSkuId(), order.getCount()))
-                    LOGGER.error("fail to unlock order: {}", order.getId());
-            } catch (Exception e) {
-                LOGGER.error("fail to unlock order: {}", order.getId());
-            }
-        }
-
-        LOGGER.info("clean expired orders finished");
     }
 }

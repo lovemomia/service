@@ -1,12 +1,16 @@
 package cn.momia.mapi.api.v1.dto.base;
 
+import cn.momia.common.web.misc.SkuUtil;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 import java.math.BigDecimal;
 
 public class SkuDto implements Dto {
     private long productId;
     private long skuId;
+    private String desc;
+    private int type;
     private int limit;
     private boolean needRealName;
     private int stock;
@@ -18,63 +22,55 @@ public class SkuDto implements Dto {
         return productId;
     }
 
-    public void setProductId(long productId) {
-        this.productId = productId;
-    }
-
     public long getSkuId() {
         return skuId;
     }
 
-    public void setSkuId(long skuId) {
-        this.skuId = skuId;
+    public String getDesc() {
+        return desc;
+    }
+
+    public int getType() {
+        return type;
     }
 
     public int getLimit() {
         return limit;
     }
 
-    public void setLimit(int limit) {
-        this.limit = limit;
-    }
-
     public boolean isNeedRealName() {
         return needRealName;
-    }
-
-    public void setNeedRealName(boolean needRealName) {
-        this.needRealName = needRealName;
     }
 
     public int getStock() {
         return stock;
     }
 
-    public void setStock(int stock) {
-        this.stock = stock;
-    }
-
     public BigDecimal getMinPrice() {
         return minPrice;
-    }
-
-    public void setMinPrice(BigDecimal minPrice) {
-        this.minPrice = minPrice;
     }
 
     public String getTime() {
         return time;
     }
 
-    public void setTime(String time) {
-        this.time = time;
-    }
-
     public JSONArray getPrices() {
         return prices;
     }
 
-    public void setPrices(JSONArray prices) {
-        this.prices = prices;
+    public SkuDto(JSONObject skuJson) {
+        this.productId = skuJson.getLong("productId");
+        this.skuId = skuJson.getLong("id");
+        this.desc = skuJson.getString("desc");
+        this.type = skuJson.getInteger("type");
+        this.limit = skuJson.getInteger("limit");
+        this.needRealName = skuJson.getBoolean("needRealName");
+        this.stock = skuJson.getInteger("unlockedStock");
+        this.minPrice = skuJson.getBigDecimal("minPrice");
+        this.time = SkuUtil.getSkuTime(skuJson.getJSONArray("properties"));
+        this.prices = skuJson.getJSONArray("prices");
+
+        if (limit < 0) limit = type == 1 ? 1 : 0;
+        if (stock < 0) stock = 0;
     }
 }

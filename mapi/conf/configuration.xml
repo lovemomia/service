@@ -21,8 +21,8 @@
     </Image>
 
     <Service>
-        <Base>http://localhost:9090</Base>
-        <Deal>http://localhost:9090</Deal>
+        <Base>http://localhost:7070</Base>
+        <Deal>http://localhost:7070</Deal>
     </Service>
 
     <Home>
@@ -35,10 +35,19 @@
         <PageSize>25</PageSize>
         <MaxPageCount>50</MaxPageCount>
         <CustomerPageSize>6</CustomerPageSize>
+        <Playmate>
+            <MaxSkuCount>20</MaxSkuCount>
+        </Playmate>
+        <Url>http://m.momia.cn/actsDetail.html</Url>
     </Product>
 
     <Order>
         <PageSize>20</PageSize>
         <MaxPageCount>50</MaxPageCount>
     </Order>
+
+    <Coupon>
+        <PageSize>20</PageSize>
+        <MaxPageCount>50</MaxPageCount>
+    </Coupon>
 </Configuration>

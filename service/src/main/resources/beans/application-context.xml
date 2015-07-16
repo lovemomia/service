@@ -42,9 +42,10 @@
     <bean id="dbAccessService" class="cn.momia.service.common.DbAccessService" abstract="true">
         <property name="jdbcTemplate" ref="jdbcTemplate" />
     </bean>
+
     <bean id="bannerService" class="cn.momia.service.base.banner.impl.BannerServiceImpl" parent="dbAccessService" />
 
-    <bean id="baseProductService" class="cn.momia.service.base.product.base.impl.BaseProductServiceImpl" parent="dbAccessService" />
+    <bean id="baseProductService" class="cn.momia.service.base.product.base.impl.BaseProductServiceImpl" parent="dbAccessService" init-method="init" />
     <bean id="placeService" class="cn.momia.service.base.product.place.impl.PlaceServiceImpl" parent="dbAccessService" />
     <bean id="skuService" class="cn.momia.service.base.product.sku.impl.SkuServiceImpl" parent="dbAccessService" />
     <bean id="productService" class="cn.momia.service.base.product.impl.ProductServiceImpl" parent="dbAccessService">
@@ -56,37 +57,37 @@
     <bean id="cityService" class="cn.momia.service.base.city.impl.CityServiceImpl" parent="dbAccessService" init-method="init" />
     <bean id="regionService" class="cn.momia.service.base.region.impl.RegionServiceImpl" parent="dbAccessService" init-method="init" />
     <bean id="participantService" class="cn.momia.service.base.user.participant.impl.ParticipantServiceImpl" parent="dbAccessService" />
+    <bean id="userService" class="cn.momia.service.base.user.impl.UserServiceImpl" parent="dbAccessService" />
 
-    <bean id="userService" class="cn.momia.service.base.user.impl.UserServiceImpl" parent="dbAccessService">
-        <property name="cityService" ref="cityService" />
-    </bean>
-
-    <bean id="orderService" class="cn.momia.service.deal.order.impl.OrderServiceImpl" parent="dbAccessService">
-        <property name="productService" ref="productService" />
-    </bean>
+    <bean id="orderService" class="cn.momia.service.deal.order.impl.OrderServiceImpl" parent="dbAccessService" />
     <bean id="paymentService" class="cn.momia.service.deal.payment.impl.PaymentServiceImpl" parent="dbAccessService" />
 
     <bean id="feedbackService" class="cn.momia.service.base.feedback.impl.FeedbackServiceImpl" parent="dbAccessService" />
+
+    <bean id="couponService" class="cn.momia.service.promo.coupon.impl.CouponServiceImpl" parent="dbAccessService" />
 
     <bean id="smsSender" class="cn.momia.service.sms.impl.LuosimaoSmsSender" parent="dbAccessService" init-method="init">
         <property name="conf" ref="conf" />
     </bean>
     <bean id="smsVerifier" class="cn.momia.service.sms.SmsVerifier" parent="dbAccessService" />
 
-    <bean id="alipay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
-        <property name="staticField" value="cn.momia.service.deal.payment.Payment.Type.ALIPAY" />
-    </bean>
-    <bean id="alipayGateway" class="cn.momia.service.deal.payment.gateway.alipay.AlipayGateway" />
-
-    <bean id="wechatpay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
-        <property name="staticField" value="cn.momia.service.deal.payment.Payment.Type.WECHATPAY" />
-    </bean>
-    <bean id="wechatpayGateway" class="cn.momia.service.deal.payment.gateway.wechatpay.WechatpayGateway">
+    <bean id="abstractPaymentGateway" class="cn.momia.service.deal.payment.gateway.AbstractPaymentGateway" abstract="true">
         <property name="conf" ref="conf" />
         <property name="orderService" ref="orderService" />
         <property name="paymentService" ref="paymentService" />
         <property name="productService" ref="productService" />
+        <property name="couponService" ref="couponService" />
     </bean>
+
+    <bean id="alipay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
+        <property name="staticField" value="cn.momia.service.deal.payment.Payment.Type.ALIPAY" />
+    </bean>
+    <bean id="alipayGateway" class="cn.momia.service.deal.payment.gateway.alipay.AlipayGateway" parent="abstractPaymentGateway" />
+
+    <bean id="wechatpay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
+        <property name="staticField" value="cn.momia.service.deal.payment.Payment.Type.WECHATPAY" />
+    </bean>
+    <bean id="wechatpayGateway" class="cn.momia.service.deal.payment.gateway.wechatpay.WechatpayGateway" parent="abstractPaymentGateway" />
 
     <bean class="cn.momia.service.deal.payment.gateway.factory.PaymentGatewayFactory">
         <property name="prototypes">
@@ -98,30 +99,6 @@
                     <ref bean="wechatpayGateway" />
                 </entry>
             </map>
-        </property>
-    </bean>
-
-    <bean id="orderCleanJob" class="cn.momia.service.deal.order.OrderCleanJob" parent="dbAccessService">
-        <property name="orderService" ref="orderService" />
-    </bean>
-
-    <bean id="cleanOrderJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-        <property name="targetObject" ref="orderCleanJob" />
-        <property name="targetMethod" value="run" />
-        <property name="concurrent" value="false" />
-    </bean>
-
-    <bean id="cleanOrderTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
-        <property name="jobDetail" ref="cleanOrderJob" />
-        <property name="startDelay" value="10000" />
-        <property name="repeatInterval" value="300000" />
-    </bean>
-
-    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
-        <property name="triggers">
-            <list>
-                <ref bean="cleanOrderTrigger" />
-            </list>
         </property>
     </bean>
 </beans>

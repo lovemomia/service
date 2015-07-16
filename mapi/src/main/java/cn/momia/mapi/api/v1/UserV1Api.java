@@ -3,10 +3,10 @@ package cn.momia.mapi.api.v1;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.OrderDto;
 import cn.momia.mapi.api.v1.dto.base.ParticipantDto;
+import cn.momia.mapi.api.v1.dto.base.UserCouponDto;
 import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import cn.momia.mapi.api.v1.dto.composite.PagedListDto;
 import cn.momia.mapi.api.v1.dto.base.UserDto;
@@ -29,8 +29,7 @@ public class UserV1Api extends AbstractV1Api {
     private static final Function<Object, Dto> userFunc = new Function<Object, Dto>() {
         @Override
         public Dto apply(Object data) {
-            JSONObject userPackJson = (JSONObject) data;
-            return new UserDto(userPackJson.getJSONObject("user"), userPackJson.getJSONArray("children"));
+            return new UserDto((JSONObject) data);
         }
     };
 
@@ -65,31 +64,97 @@ public class UserV1Api extends AbstractV1Api {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                PagedListDto<OrderDto> orders = new PagedListDto<OrderDto>();
-
-                JSONObject ordersPackJson = (JSONObject) data;
-                final long totalCount = ordersPackJson.getLong("totalCount");
-                orders.setTotalCount(totalCount);
-                JSONArray ordersJson = ordersPackJson.getJSONArray("orders");
-                for (int i = 0; i < ordersJson.size(); i++) {
-                    try {
-                        JSONObject orderPackJson = ordersJson.getJSONObject(i);
-                        JSONObject orderJson = orderPackJson.getJSONObject("order");
-
-                        OrderDto orderDto = new OrderDto(orderJson);
-                        orderDto.setTitle(orderPackJson.getString("product"));
-                        orderDto.setTime(ProductUtil.getSkuScheduler(orderPackJson.getJSONArray("sku")));
-
-                        orders.add(orderDto);
-                    } catch (Exception e) {
-                        LOGGER.error("fail to parse order: {}", ordersJson.getJSONObject(i), e);
-                    }
-                }
-                if (start + count < totalCount) orders.setNextIndex(start + count);
-
-                return orders;
+                return buildOrdersDto((JSONObject) data, start, count);
             }
         });
+    }
+
+    private Dto buildOrdersDto(JSONObject ordersPackJson, int start, int count) {
+        PagedListDto orders = new PagedListDto();
+
+        long totalCount = ordersPackJson.getLong("totalCount");
+        orders.setTotalCount(totalCount);
+
+        JSONArray ordersJson = ordersPackJson.getJSONArray("orders");
+        for (int i = 0; i < ordersJson.size(); i++) {
+            try {
+                orders.add(new OrderDto(ordersJson.getJSONObject(i), true));
+            } catch (Exception e) {
+                LOGGER.error("fail to parse order: {}", ordersJson.getJSONObject(i), e);
+            }
+        }
+        if (start + count < totalCount) orders.setNextIndex(start + count);
+
+        return orders;
+    }
+
+    @RequestMapping(value = "/order/detail", method = RequestMethod.GET)
+    public ResponseMessage getOrderDetailOfUser(@RequestParam String utoken,
+                                                @RequestParam(value = "oid") long orderId,
+                                                @RequestParam(value = "pid") long productId) {
+        if (StringUtils.isBlank(utoken) || orderId <= 0 || productId <= 0) return ResponseMessage.BAD_REQUEST;
+
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("pid", productId);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user/order", orderId), builder.build());
+
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                return new OrderDto((JSONObject) data, true);
+            }
+        });
+    }
+
+    @RequestMapping(value = "/coupon", method = RequestMethod.GET)
+    public ResponseMessage getCouponsOfUser(@RequestParam String utoken,
+                                            @RequestParam(value = "oid", defaultValue = "0") long orderId,
+                                            @RequestParam(defaultValue = "0") int status,
+                                            @RequestParam final int start,
+                                            @RequestParam final int count) {
+        final int maxPageCount = conf.getInt("Coupon.MaxPageCount");
+        final int pageSize = conf.getInt("Coupon.PageSize");
+        if (StringUtils.isBlank(utoken) || start < 0 || count <= 0 || start > maxPageCount * pageSize) return ResponseMessage.BAD_REQUEST;
+
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("oid", orderId)
+                .add("status", status)
+                .add("start", start)
+                .add("count", count);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user/coupon"), builder.build());
+
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                return buildUserCouponsDto((JSONObject) data, start, count);
+            }
+        });
+    }
+
+    private Dto buildUserCouponsDto(JSONObject userCouponsPackJson, int start, int count) {
+        PagedListDto userCoupons = new PagedListDto();
+
+        int totalCount = userCouponsPackJson.getInteger("totalCount");
+        userCoupons.setTotalCount(totalCount);
+
+        JSONArray userCouponsJson = userCouponsPackJson.getJSONArray("userCoupons");
+        JSONObject couponsJson = userCouponsPackJson.getJSONObject("coupons");
+        for (int i = 0; i < userCouponsJson.size(); i++) {
+            try {
+                JSONObject userCouponJson = userCouponsJson.getJSONObject(i);
+                JSONObject couponJson = couponsJson.getJSONObject(userCouponJson.getString("couponId"));
+                if (couponJson == null) continue;
+
+                userCoupons.add(new UserCouponDto(userCouponJson, couponJson));
+            } catch (Exception e) {
+                LOGGER.error("fail to parse user coupon: {}", userCouponsJson.getJSONObject(i), e);
+            }
+        }
+        if (start + count < totalCount) userCoupons.setNextIndex(start + count);
+
+        return userCoupons;
     }
 
     @RequestMapping(value = "/nickname", method = RequestMethod.POST)
@@ -280,19 +345,22 @@ public class UserV1Api extends AbstractV1Api {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                ListDto children = new ListDto();
-                JSONArray childrenJson = (JSONArray) data;
-                for (int i = 0; i < childrenJson.size(); i++) {
-                    try {
-                        JSONObject childJson = childrenJson.getJSONObject(i);
-                        children.add(new ParticipantDto(childJson));
-                    } catch (Exception e) {
-                        LOGGER.error("invalid child: {}", childrenJson);
-                    }
-                }
-
-                return children;
+                return buildChildrenDto((JSONArray) data);
             }
         });
+    }
+
+    private Dto buildChildrenDto(JSONArray childrenJson) {
+        ListDto children = new ListDto();
+        for (int i = 0; i < childrenJson.size(); i++) {
+            try {
+                JSONObject childJson = childrenJson.getJSONObject(i);
+                children.add(new ParticipantDto(childJson));
+            } catch (Exception e) {
+                LOGGER.error("invalid child: {}", childrenJson);
+            }
+        }
+
+        return children;
     }
 }

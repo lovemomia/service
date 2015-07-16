@@ -1,9 +1,23 @@
 package cn.momia.service.base.product.sku;
 
+import cn.momia.common.web.misc.SkuUtil;
+import cn.momia.common.misc.TimeUtil;
+import com.google.common.collect.Lists;
+
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 public class Sku implements Serializable {
+    public static class Type {
+        public static final int NORMAL = 0;
+        public static final int NO_CEILING = 1;
+    }
+
     public static final Sku NOT_EXIST_SKU = new Sku();
     public static final Sku INVALID_SKU = new Sku();
 
@@ -12,8 +26,39 @@ public class Sku implements Serializable {
         INVALID_SKU.setId(0);
     }
 
+    public static List<Sku> sortByStartTime(List<Sku> skus) {
+        Collections.sort(skus, new Comparator<Sku>() {
+            @Override
+            public int compare(Sku s1, Sku s2) {
+                Date time1 = s1.startTime();
+                Date time2 = s2.startTime();
+
+                if (time1 == null) return 1;
+                if (time2 == null) return -1;
+
+                long timeStamp1 = time1.getTime();
+                long timeStamp2 = time2.getTime();
+
+                if (timeStamp1 <= timeStamp2) return 1;
+                return -1;
+            }
+        });
+
+        return skus;
+    }
+
+    private Date startTime() {
+        List<Date> times = startEndTimes();
+        if (times.isEmpty()) return null;
+
+        Collections.sort(times);
+        return times.get(0);
+    }
+
     private long id;
     private long productId;
+    private String desc;
+    private int type;
     private List<SkuProperty> properties;
     private List<SkuPrice> prices;
     private int limit;
@@ -36,6 +81,22 @@ public class Sku implements Serializable {
 
     public void setProductId(long productId) {
         this.productId = productId;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public List<SkuProperty> getProperties() {
@@ -111,5 +172,43 @@ public class Sku implements Serializable {
 
     public boolean exists() {
         return !this.equals(NOT_EXIST_SKU);
+    }
+
+    public String time() {
+        for (SkuProperty property : properties) {
+            if ("time".equalsIgnoreCase(property.getName())) return SkuUtil.getSkuTime(property.getValue());
+        }
+
+        return "";
+    }
+
+    public BigDecimal getMinPrice() {
+        if (prices == null || prices.isEmpty()) return new BigDecimal(0);
+
+        BigDecimal minPrice = new BigDecimal(Float.MAX_VALUE);
+        for (SkuPrice skuPrice : prices) {
+            BigDecimal price = skuPrice.getPrice();
+            if (price.compareTo(minPrice) <= 0) minPrice = price;
+        }
+
+        return minPrice;
+    }
+
+    public List<Date> startEndTimes() {
+        for (SkuProperty property : properties) {
+            if ("time".equalsIgnoreCase(property.getName())) {
+                return TimeUtil.castToDates(Lists.newArrayList(SkuUtil.TIME_SPLITTER.split(property.getValue())));
+            }
+        }
+
+        return new ArrayList<Date>();
+    }
+
+    public SkuPrice getPrice(int adult, int child) {
+        for (SkuPrice price : prices) {
+            if (price.getAdult() == adult && price.getChild() == child) return price;
+        }
+
+        return null;
     }
 }

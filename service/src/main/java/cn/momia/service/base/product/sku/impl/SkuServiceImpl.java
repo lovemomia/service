@@ -11,32 +11,33 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class SkuServiceImpl extends DbAccessService implements SkuService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SkuServiceImpl.class);
-    private static final String[] SKU_FIELDS = { "id", "productId", "properties", "prices", "`limit`", "needRealName", "stock", "unlockedStock", "lockedStock" };
+    private static final String[] SKU_FIELDS = { "id", "productId", "`desc`", "`type`", "properties", "prices", "`limit`", "needRealName", "stock", "unlockedStock", "lockedStock" };
 
     @Override
-    public List<Sku> queryByProduct(long productId) {
-        final List<Sku> skus = new ArrayList<Sku>();
-        String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId=? AND status=1";
-        jdbcTemplate.query(sql, new Object[]{productId}, new RowCallbackHandler() {
+    public Sku get(long id) {
+        String sql = "SELECT " + joinFields() + " FROM t_sku WHERE id=? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Sku>() {
             @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                Sku sku = buildSku(rs);
-                if (sku.exists()) skus.add(sku);
+            public Sku extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (rs.next()) return buildSku(rs);
+                return Sku.NOT_EXIST_SKU;
             }
         });
-
-        return skus;
     }
 
     private String joinFields() {
@@ -48,6 +49,8 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
             Sku sku = new Sku();
             sku.setId(rs.getLong("id"));
             sku.setProductId(rs.getLong("productId"));
+            sku.setDesc(rs.getString("desc"));
+            sku.setType(rs.getInt("type"));
             sku.setProperties(parseProperties(sku.getId(), rs.getString("properties")));
             sku.setPrices(parsePrices(sku.getId(), rs.getString("prices")));
             sku.setLimit(rs.getInt("limit"));
@@ -87,7 +90,22 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
     }
 
     @Override
-    public Map<Long, List<Sku>> queryByProducts(List<Long> productIds) {
+    public List<Sku> queryByProduct(long productId) {
+        final List<Sku> skus = new ArrayList<Sku>();
+        String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId=? AND status=1";
+        jdbcTemplate.query(sql, new Object[] { productId }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                Sku sku = buildSku(rs);
+                if (sku.exists()) skus.add(sku);
+            }
+        });
+
+        return skus;
+    }
+
+    @Override
+    public Map<Long, List<Sku>> queryByProducts(Collection<Long> productIds) {
         final Map<Long, List<Sku>> skusOfProducts = new HashMap<Long, List<Sku>>();
         if (productIds == null || productIds.isEmpty()) return skusOfProducts;
 
@@ -111,16 +129,32 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
 
     @Override
     public boolean lock(long id, int count) {
-        String sql = "UPDATE t_sku SET unlockedStock=unlockedStock-?, lockedStock=lockedStock+? WHERE id=? AND unlockedStock>=? AND status=1";
-        int updateCount = jdbcTemplate.update(sql, new Object[]{count, count, id, count});
+        if (isNoCeiling(id)) return true;
+
+        String sql = "UPDATE t_sku SET unlockedStock=unlockedStock-?, lockedStock=lockedStock+? WHERE id=? AND unlockedStock>=? AND stock-lockedStock>=? AND status=1";
+        int updateCount = jdbcTemplate.update(sql, new Object[]{ count, count, id, count, count });
 
         return updateCount == 1;
     }
 
+    private boolean isNoCeiling(long id) {
+        String sql = "SELECT `type` FROM t_sku WHERE id=? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[]{id}, new ResultSetExtractor<Boolean>() {
+            @Override
+            public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (rs.next()) return rs.getInt("type") == Sku.Type.NO_CEILING;
+                return false;
+            }
+        });
+    }
+
     @Override
     public boolean unlock(long id, int count) {
-        String sql = "UPDATE t_sku SET unlockedStock=unlockedStock+?, lockedStock=lockedStock-? WHERE id=? AND lockedStock>=? AND status=1";
-        int updateCount = jdbcTemplate.update(sql, new Object[]{count, count, id, count});
+        if (isNoCeiling(id)) return true;
+
+        String sql = "UPDATE t_sku SET unlockedStock=unlockedStock+?, lockedStock=lockedStock-? WHERE id=? AND lockedStock>=? AND stock-unlockedStock>=? AND status=1";
+        int updateCount = jdbcTemplate.update(sql, new Object[]{ count, count, id, count, count });
 
         return updateCount == 1;
     }

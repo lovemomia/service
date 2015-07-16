@@ -1,6 +1,6 @@
 package cn.momia.service.deal.order;
 
-import org.apache.commons.lang3.StringUtils;
+import com.google.common.base.Splitter;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.List;
 
 public class Order implements Serializable {
+    public static final Splitter PARTICIPANTS_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
+
     public static class Status {
         public static final int ALL = -1;
         public static final int DELETED = 0;
@@ -20,8 +22,10 @@ public class Order implements Serializable {
     }
 
     public static final Order NOT_EXIST_ORDER = new Order();
+    public static final Order INVALID_ORDER = new Order();
     static {
         NOT_EXIST_ORDER.setId(0);
+        INVALID_ORDER.setId(0);
     }
 
     private long id;
@@ -134,10 +138,6 @@ public class Order implements Serializable {
         return !this.equals(NOT_EXIST_ORDER);
     }
 
-    public boolean isInvalid() {
-        return customerId <= 0 || productId <= 0 || skuId <= 0 || prices.isEmpty() || StringUtils.isBlank(mobile);
-    }
-
     public BigDecimal getTotalFee() {
         BigDecimal totalFee = new BigDecimal(0);
         for (OrderPrice price : prices) {
@@ -152,6 +152,24 @@ public class Order implements Serializable {
         int count = 0;
         for (OrderPrice price : prices) {
             count += price.getCount();
+        }
+
+        return count;
+    }
+
+    public int getAdultCount() {
+        int count = 0;
+        for (OrderPrice price : prices) {
+            count += price.getAdult();
+        }
+
+        return count;
+    }
+
+    public int getChildCount() {
+        int count = 0;
+        for (OrderPrice price : prices) {
+            count += price.getChild();
         }
 
         return count;

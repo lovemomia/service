@@ -14,13 +14,12 @@ import cn.momia.service.base.product.sku.SkuService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,8 +51,11 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
         Product product = new Product();
         product.setBaseProduct(baseProduct);
         product.setImgs(getProductImgs(baseProduct.getId()));
+
         Place place = placeService.get(baseProduct.getPlaceId());
-        if (place.exists()) product.setPlace(place);
+        if (!place.exists()) return Product.NOT_EXIST_PRODUCT;
+
+        product.setPlace(place);
         product.setSkus(skuService.queryByProduct(baseProduct.getId()));
 
         return product;
@@ -82,7 +84,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     }
 
     @Override
-    public List<Product> get(List<Long> ids) {
+    public List<Product> get(Collection<Long> ids) {
         List<BaseProduct> baseProducts = baseProductService.get(ids);
 
         return buildProducts(baseProducts);
@@ -112,7 +114,7 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
             product.setPlace(placeOfProducts.get(baseProduct.getPlaceId()));
             product.setSkus(skusOfProducts.get(baseProduct.getId()));
 
-            products.add(product);
+            if (!product.invalid()) products.add(product);
         }
 
         return products;
@@ -162,13 +164,57 @@ public class ProductServiceImpl extends DbAccessService implements ProductServic
     }
 
     @Override
-    public boolean lockStock(long skuId, int count) {
-        return skuService.lock(skuId, count);
+    public Sku getSku(long skuId) {
+        return skuService.get(skuId);
     }
 
     @Override
-    public boolean unlockStock(long skuId, int count) {
-        return skuService.unlock(skuId, count);
+    public boolean lockStock(long id, long skuId, int count) {
+        boolean successful = skuService.lock(skuId, count);
+
+        try {
+            if (successful && isSoldOut(id) && !baseProductService.soldOut(id)) LOGGER.error("fail to set sold out status of product: {}", id);
+        } catch (Exception e) {
+            LOGGER.error("fail to set sold out status of product: {}", id, e);
+        }
+
+        return successful;
+    }
+
+    private boolean isSoldOut(long id) {
+        int unlockedStock = 0;
+        List<Sku> skus = getSkus(id);
+        for (Sku sku : skus) {
+            if (sku.getType() == Sku.Type.NO_CEILING) return false;
+            unlockedStock += sku.getUnlockedStock();
+        }
+
+        return unlockedStock <= 0;
+    }
+
+    @Override
+    public boolean unlockStock(long id, long skuId, int count) {
+        try {
+            baseProductService.unSoldOut(id);
+        } catch (Exception e) {
+            LOGGER.error("fail to set sold out status of product: {}", id, e);
+        }
+
+        boolean successful = skuService.unlock(skuId, count);
+        if (successful) {
+            try {
+                baseProductService.decreaseJoined(id, count);
+            } catch (Exception e) {
+                LOGGER.error("fail to decrease joined of product: {}", id, e);
+            }
+        }
+
+        return successful;
+    }
+
+    @Override
+    public boolean join(long id, int count) {
+        return baseProductService.join(id, count);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package cn.momia.service.base.user.participant;
 
+import cn.momia.common.misc.AgeUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -7,8 +8,10 @@ import java.util.Date;
 
 public class Participant implements Serializable {
     public static final Participant NOT_EXIST_PARTICIPANT = new Participant();
+    public static final Participant INVALID_PARTICIPANT = new Participant();
     static {
         NOT_EXIST_PARTICIPANT.setId(0);
+        INVALID_PARTICIPANT.setId(0);
     }
 
     private long id;
@@ -96,5 +99,23 @@ public class Participant implements Serializable {
 
     public boolean isInvalid() {
         return userId <= 0 || StringUtils.isBlank(name) || StringUtils.isBlank(sex) || birthday == null;
+    }
+
+    public boolean adult() {
+        return AgeUtil.isAdult(this.birthday);
+    }
+
+    public boolean child() {
+        return AgeUtil.isChild(this.birthday);
+    }
+
+    public String desc() {
+        if (AgeUtil.isAdult(this.birthday)) return "成人";
+
+        int age = AgeUtil.getAge(this.birthday);
+        String ageStr = age <= 0 ? "不到1" : String.valueOf(age);
+
+        if (!("男".equals(this.sex) || "女".equals(this.sex))) return "孩子" + ageStr + "岁";
+        return this.sex + "孩" + ageStr + "岁";
     }
 }

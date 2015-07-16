@@ -1,9 +1,12 @@
 package cn.momia.service.base.user.impl;
 
-import cn.momia.service.base.city.CityService;
+import cn.momia.common.secret.PasswordEncryptor;
+import cn.momia.common.web.secret.SecretKey;
 import cn.momia.service.common.DbAccessService;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -18,26 +21,24 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class UserServiceImpl extends DbAccessService implements UserService {
-    private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "avatar", "name", "sex", "birthday", "cityId", "address", "children" };
-    private CityService cityService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
-    public void setCityService(CityService cityService) {
-        this.cityService = cityService;
-    }
+    private static final Splitter CHILDREN_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
+    private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "password", "avatar", "name", "sex", "birthday", "cityId", "address", "children" };
 
     @Override
-    public User add(String nickName, String mobile, String token) {
+    public User add(String nickName, String mobile, String password, String token) {
         if (!validateMobile(mobile)) return User.DUPLICATE_USER;
 
-        return addUser(nickName, mobile,  token);
+        return addUser(nickName, mobile, PasswordEncryptor.encrypt(mobile, password, SecretKey.getPasswordSecretKey()), token);
     }
 
     public boolean validateMobile(String mobile) {
@@ -53,16 +54,17 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         return count == 0;
     }
 
-    public User addUser(final String nickName, final String mobile,  final String token) {
+    public User addUser(final String nickName, final String mobile, final String password, final String token) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO t_user(nickName, mobile, token, addTime) VALUES (?, ?, ?, NOW())";
+                String sql = "INSERT INTO t_user(nickName, mobile, password, token, addTime) VALUES (?, ?, ?, ?,NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, nickName);
                 ps.setString(2, mobile);
-                ps.setString(3, token);
+                ps.setString(3, password);
+                ps.setString(4, token);
 
                 return ps;
             }
@@ -73,6 +75,8 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public User get(long id) {
+        if (id <= 0) return User.NOT_EXIST_USER;
+
         String sql = "SELECT " + joinFields() + " FROM t_user WHERE id=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<User>() {
@@ -89,25 +93,31 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     private User buildUser(ResultSet rs) throws SQLException {
-        User user = new User();
-        user.setId(rs.getLong("id"));
-        user.setToken(rs.getString("token"));
-        user.setNickName(rs.getString("nickName"));
-        user.setMobile(rs.getString("mobile"));
-        user.setAvatar(rs.getString("avatar"));
-        user.setName(rs.getString("name"));
-        user.setSex(rs.getString("sex"));
-        user.setBirthday(rs.getDate("birthday"));
-        user.setCity(cityService.get(rs.getInt("cityId")).getName());
-        user.setAddress(rs.getString("address"));
-        user.setChildren(parseChildren(rs.getString("children")));
+        try {
+            User user = new User();
+            user.setId(rs.getLong("id"));
+            user.setToken(rs.getString("token"));
+            user.setNickName(rs.getString("nickName"));
+            user.setMobile(rs.getString("mobile"));
+            user.setHasPassword(!StringUtils.isBlank(rs.getString("password")));
+            user.setAvatar(rs.getString("avatar"));
+            user.setName(rs.getString("name"));
+            user.setSex(rs.getString("sex"));
+            user.setBirthday(rs.getDate("birthday"));
+            user.setCity(rs.getInt("cityId"));
+            user.setAddress(rs.getString("address"));
+            user.setChildren(parseChildren(rs.getString("children")));
 
-        return user;
+            return user;
+        } catch (Exception e) {
+            LOGGER.error("fail to build user: {}", rs.getLong("id"), e);
+            return User.INVALID_USER;
+        }
     }
 
     private Set<Long> parseChildren(String children) {
         Set<Long> childrenIds = new HashSet<Long>();
-        for (String childId : Splitter.on(",").trimResults().omitEmptyStrings().split(children)) {
+        for (String childId : CHILDREN_SPLITTER.split(children)) {
             childrenIds.add(Long.valueOf(childId));
         }
 
@@ -115,7 +125,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
-    public Map<Long, User> get(List<Long> ids) {
+    public Map<Long, User> get(Collection<Long> ids) {
         final Map<Long, User> users = new HashMap<Long, User>();
         if (ids == null || ids.size() <= 0) return users;
 
@@ -124,7 +134,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 User user = buildUser(rs);
-                users.put(user.getId(), user);
+                if (user.exists()) users.put(user.getId(), user);
             }
         });
 
@@ -166,6 +176,19 @@ public class UserServiceImpl extends DbAccessService implements UserService {
             public User extractData(ResultSet rs) throws SQLException, DataAccessException {
                 if(rs.next()) return buildUser(rs);
                 return User.NOT_EXIST_USER;
+            }
+        });
+    }
+
+    @Override
+    public boolean validatePassword(String mobile, String password) {
+        String sql = "SELECT mobile, password FROM t_user WHERE mobile=? AND password=?";
+
+        return jdbcTemplate.query(sql, new Object[] { mobile, PasswordEncryptor.encrypt(mobile, password, SecretKey.getPasswordSecretKey()) }, new ResultSetExtractor<Boolean>() {
+            @Override
+            public Boolean extractData(ResultSet resultSet) throws SQLException, DataAccessException {
+                if (resultSet.next()) return true;
+                return false;
             }
         });
     }
@@ -235,5 +258,12 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         String sql = "UPDATE t_user SET children=? WHERE id=?";
 
         return update(sql, new Object[] { StringUtils.join(children, ","), id });
+    }
+
+    @Override
+    public boolean updatePassword(long id, String mobile, String password) {
+        String sql = "UPDATE t_user SET password=? WHERE id=?";
+
+        return update(sql, new Object[] { PasswordEncryptor.encrypt(mobile, password, SecretKey.getPasswordSecretKey()), id });
     }
 }
