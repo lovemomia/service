@@ -141,7 +141,7 @@ public class UserController extends UserRelatedController {
 
     @RequestMapping(value = "/coupon", method = RequestMethod.GET)
     public ResponseMessage getCouponsOfUser(@RequestParam String utoken,
-                                            @RequestParam long orderId,
+                                            @RequestParam(value = "oid") long orderId,
                                             @RequestParam int status,
                                             @RequestParam int start,
                                             @RequestParam int count) {
