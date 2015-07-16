@@ -3,6 +3,12 @@ package cn.momia.mapi.api.v1.dto.composite;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 
 public class HomeDto implements Dto {
+    public static final HomeDto EMPTY = new HomeDto();
+    static {
+        EMPTY.setBanners(new ListDto());
+        EMPTY.setProducts(new ListDto());
+    }
+
     private ListDto banners;
     private ListDto products;
     private Integer nextpage = null;

@@ -1,7 +1,7 @@
 package cn.momia.service.sms.impl;
 
 import cn.momia.common.config.Configuration;
-import cn.momia.common.web.exception.MomiaException;
+import cn.momia.common.web.exception.MomiaFailedException;
 import cn.momia.service.common.DbAccessService;
 import cn.momia.service.sms.SmsSender;
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +34,7 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
 
     @Override
     public void send(String mobile, String type) {
-        if(StringUtils.equals(type, "login") && !userExists(mobile)) throw new MomiaException("用户不存在，请先注册");
+        if(StringUtils.equals(type, "login") && !userExists(mobile)) throw new MomiaFailedException("用户不存在，请先注册");
 
         String code = getGeneratedCode(mobile);
         if (StringUtils.isBlank(code)) {

@@ -21,11 +21,8 @@ public class OrderV1Api extends AbstractV1Api {
     public ResponseMessage placeOrder(@RequestParam String utoken, @RequestParam String order) {
         if (StringUtils.isBlank(utoken) || StringUtils.isBlank(order)) return ResponseMessage.BAD_REQUEST;
 
-        long userId = getUserId(utoken);
-        if (userId <= 0) return ResponseMessage.TOKEN_EXPIRED;
-
         JSONObject orderJson = JSON.parseObject(order);
-        orderJson.put("customerId", userId);
+        orderJson.put("customerId", getUserId(utoken));
         MomiaHttpRequest request = MomiaHttpRequest.POST(url("order"), orderJson.toString());
 
         return executeRequest(request, new Function<Object, Dto>() {

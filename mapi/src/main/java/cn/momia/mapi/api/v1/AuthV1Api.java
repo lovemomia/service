@@ -37,8 +37,14 @@ public class AuthV1Api extends AbstractV1Api {
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ResponseMessage register(@RequestParam(value = "nickname") String nickName, @RequestParam String mobile, @RequestParam String password, @RequestParam String code) {
-        if (StringUtils.isBlank(nickName) || ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(password) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
+    public ResponseMessage register(@RequestParam(value = "nickname") String nickName,
+                                    @RequestParam String mobile,
+                                    @RequestParam String password,
+                                    @RequestParam String code) {
+        if (StringUtils.isBlank(nickName) ||
+                ValidateUtil.isInvalidMobile(mobile) ||
+                StringUtils.isBlank(password) ||
+                StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("nickname", nickName)

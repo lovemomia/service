@@ -148,6 +148,7 @@ public class UserV1Api extends AbstractV1Api {
                 LOGGER.error("fail to parse user coupon: {}", userCouponsJson.getJSONObject(i), e);
             }
         }
+
         if (start + count < totalCount) userCoupons.setNextIndex(start + count);
 
         return userCoupons;
@@ -241,10 +242,8 @@ public class UserV1Api extends AbstractV1Api {
     public ResponseMessage addChild(@RequestParam String utoken, @RequestParam String children) {
         if(StringUtils.isBlank(utoken) || StringUtils.isBlank(children)) return ResponseMessage.BAD_REQUEST;
 
-        long userId = getUserId(utoken);
-        if (userId <= 0) return ResponseMessage.TOKEN_EXPIRED;
-
         JSONArray childrenJson = JSONArray.parseArray(children);
+        long userId = getUserId(utoken);
         for (int i = 0; i < childrenJson.size(); i++) childrenJson.getJSONObject(i).put("userId", userId);
         MomiaHttpRequest request = MomiaHttpRequest.POST(url("user/child"), childrenJson.toString());
 

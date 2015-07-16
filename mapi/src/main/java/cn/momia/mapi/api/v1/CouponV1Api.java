@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/coupon")
 public class CouponV1Api extends AbstractV1Api {
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage coupon(@RequestParam String utoken, @RequestParam(value = "oid") long orderId, @RequestParam long coupon) {
+    public ResponseMessage coupon(@RequestParam String utoken,
+                                  @RequestParam(value = "oid") long orderId,
+                                  @RequestParam long coupon) {
         if (StringUtils.isBlank(utoken) || orderId <= 0 || coupon <= 0) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()

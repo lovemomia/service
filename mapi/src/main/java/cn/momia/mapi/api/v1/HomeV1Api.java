@@ -28,29 +28,18 @@ public class HomeV1Api extends AbstractV1Api {
     private static final Logger LOGGER = LoggerFactory.getLogger(HomeV1Api.class);
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage home(@RequestParam(value = "pageindex") final int pageIndex, @RequestParam(value = "city") int cityId) {
+    public ResponseMessage home(@RequestParam(value = "pageindex") final int pageIndex,
+                                @RequestParam(value = "city") int cityId) {
         final int maxPageCount = conf.getInt("Home.MaxPageCount");
         final int pageSize = conf.getInt("Home.PageSize");
-        if (pageIndex >= maxPageCount || cityId < 0) return ResponseMessage.BAD_REQUEST;
+        if (pageIndex >= maxPageCount || cityId < 0) return new ResponseMessage(HomeDto.EMPTY);
 
         List<MomiaHttpRequest> requests = buildHomeRequests(pageIndex, cityId);
 
         return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {
             @Override
             public Dto apply(MomiaHttpResponseCollector collector) {
-                HomeDto homeDto = new HomeDto();
-
-                if (pageIndex == 0) homeDto.setBanners(extractBannerData((JSONArray) collector.getResponse("banners")));
-
-                JSONObject productsPackJson = (JSONObject) collector.getResponse("products");
-
-                JSONArray productsJson = productsPackJson.getJSONArray("products");
-                homeDto.setProducts(ProductUtil.extractProductsData(productsJson));
-
-                long totalCount = productsPackJson.getLong("totalCount");
-                if (pageIndex < maxPageCount - 1 && (pageIndex + 1) * pageSize < totalCount) homeDto.setNextpage(pageIndex + 1);
-
-                return homeDto;
+                return buildHomeDto(collector, pageIndex, maxPageCount, pageSize);
             }
         });
     }
@@ -80,6 +69,22 @@ public class HomeV1Api extends AbstractV1Api {
                 .add("count", String.valueOf(pageSize));
 
         return MomiaHttpRequest.GET("products", true, url("product"), builder.build());
+    }
+
+    private Dto buildHomeDto(MomiaHttpResponseCollector collector, int pageIndex, int maxPageCount, int pageSize) {
+        HomeDto homeDto = new HomeDto();
+
+        if (pageIndex == 0) homeDto.setBanners(extractBannerData((JSONArray) collector.getResponse("banners")));
+
+        JSONObject productsPackJson = (JSONObject) collector.getResponse("products");
+
+        JSONArray productsJson = productsPackJson.getJSONArray("products");
+        homeDto.setProducts(ProductUtil.extractProductsData(productsJson));
+
+        long totalCount = productsPackJson.getLong("totalCount");
+        if (pageIndex < maxPageCount - 1 && (pageIndex + 1) * pageSize < totalCount) homeDto.setNextpage(pageIndex + 1);
+
+        return homeDto;
     }
 
     private ListDto extractBannerData(JSONArray bannersJson) {

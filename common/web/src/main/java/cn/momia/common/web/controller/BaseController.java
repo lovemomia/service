@@ -1,6 +1,7 @@
 package cn.momia.common.web.controller;
 
-import cn.momia.common.web.exception.MomiaException;
+import cn.momia.common.web.exception.MomiaExpiredException;
+import cn.momia.common.web.exception.MomiaFailedException;
 import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -8,8 +9,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public abstract class BaseController {
     @ExceptionHandler
     public ResponseMessage exception(Exception exception) {
-        if(exception instanceof MomiaException) {
+        if(exception instanceof MomiaFailedException) {
             return ResponseMessage.FAILED(exception.getMessage());
+        } else if (exception instanceof MomiaExpiredException) {
+            return ResponseMessage.TOKEN_EXPIRED;
         } else {
             return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "500 internal server error");
         }
