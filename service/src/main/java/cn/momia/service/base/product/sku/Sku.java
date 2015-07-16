@@ -206,7 +206,7 @@ public class Sku implements Serializable {
 
     public List<SkuPrice> getPrice(int adult, int child) {
         List<SkuPrice> prices = new ArrayList<SkuPrice>();
-        for (SkuPrice price : prices) {
+        for (SkuPrice price : this.prices) {
             if (price.getAdult() == adult && price.getChild() == child) prices.add(price);
         }
 
