@@ -1,6 +1,7 @@
 package cn.momia.mapi.api;
 
 import cn.momia.common.config.Configuration;
+import cn.momia.common.web.controller.BaseController;
 import cn.momia.common.web.http.MomiaHttpClient;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpRequestExecutor;
@@ -16,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-public abstract class AbstractApi {
+public abstract class AbstractApi extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractApi.class);
 
     @Autowired

@@ -1,9 +1,10 @@
 package cn.momia.service.web.ctrl;
 
 import cn.momia.common.config.Configuration;
+import cn.momia.common.web.controller.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public abstract class AbstractController {
+public abstract class AbstractController extends BaseController {
     @Autowired
     protected Configuration conf;
 
