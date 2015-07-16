@@ -7,7 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import java.util.ArrayList;
 
-public class PlaymatesDto extends ArrayList<JSONObject> implements Dto {
+public class PlaymatesDto extends ListDto {
     public PlaymatesDto(JSONArray skusPlaymatesJson) {
         for (int i = 0; i < skusPlaymatesJson.size(); i++) {
             JSONObject skuPlaymatesJson = skusPlaymatesJson.getJSONObject(i);
