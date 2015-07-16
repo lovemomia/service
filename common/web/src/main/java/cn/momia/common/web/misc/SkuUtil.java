@@ -55,10 +55,6 @@ public class SkuUtil {
         return builder.toString();
     }
 
-    public static List<String> extractSkuTimes(JSONArray propertiesJson) {
-        return Lists.newArrayList(SkuUtil.TIME_SPLITTER.split(extractSkuTimeValue(propertiesJson)));
-    }
-
     private static String extractSkuTimeValue(JSONArray propertiesJson) {
         for (int i = 0; i < propertiesJson.size(); i++) {
             JSONObject propertyJson = propertiesJson.getJSONObject(i);
