@@ -1,6 +1,7 @@
 package cn.momia.service.sms.impl;
 
 import cn.momia.common.config.Configuration;
+import cn.momia.common.web.exception.MomiaException;
 import cn.momia.service.common.DbAccessService;
 import cn.momia.service.sms.SmsSender;
 import org.apache.commons.lang3.StringUtils;
@@ -32,8 +33,8 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
     }
 
     @Override
-    public void send(String mobile, String type) throws SmsLoginException {
-        if(StringUtils.equals(type, "login") && !userExists(mobile)) throw new SmsLoginException("用户不存在，请先注册");
+    public void send(String mobile, String type) {
+        if(StringUtils.equals(type, "login") && !userExists(mobile)) throw new MomiaException("用户不存在，请先注册");
 
         String code = getGeneratedCode(mobile);
         if (StringUtils.isBlank(code)) {
@@ -45,17 +46,15 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
         if (lastSendTime != null && new Date().getTime() - lastSendTime.getTime() < 60 * 1000) return;
 
         sendAsync(mobile, code);
-
     }
 
     private boolean userExists(String mobile) {
-        String sql = "select id from t_user where mobile=?";
+        String sql = "SELECT id FROM t_user WHERE mobile=?";
 
         return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<Integer>() {
             @Override
             public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
-                if (rs.next()) return rs.getInt(1);
-                return 0;
+                return rs.next() ? rs.getInt(1) : 0;
             }
         }) > 0;
     }

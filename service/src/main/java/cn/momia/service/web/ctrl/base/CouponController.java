@@ -25,7 +25,9 @@ public class CouponController {
     @Autowired private CouponService couponService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage coupon(@RequestParam String utoken, @RequestParam(value = "oid") long orderId, @RequestParam(value = "coupon") long userCouponId) {
+    public ResponseMessage coupon(@RequestParam String utoken,
+                                  @RequestParam(value = "oid") long orderId,
+                                  @RequestParam(value = "coupon") long userCouponId) {
         if (StringUtils.isBlank(utoken) || orderId <= 0 || userCouponId <= 0) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);

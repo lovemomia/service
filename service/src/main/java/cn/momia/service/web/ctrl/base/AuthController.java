@@ -8,7 +8,6 @@ import cn.momia.service.base.user.User;
 import cn.momia.service.promo.coupon.CouponService;
 import cn.momia.service.sms.SmsSender;
 import cn.momia.service.sms.SmsVerifier;
-import cn.momia.service.sms.impl.SmsLoginException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -35,22 +34,20 @@ public class AuthController extends UserRelatedController {
     public ResponseMessage send(@RequestParam String mobile, @RequestParam String type) {
         if (ValidateUtil.isInvalidMobile(mobile) || ValidateUtil.notIn(type, "login", "register")) return ResponseMessage.BAD_REQUEST;
 
-        try {
-            smsSender.send(mobile, type);
-            return ResponseMessage.SUCCESS;
-        }
-        catch (SmsLoginException e) {
-           return new ResponseMessage(ErrorCode.NOT_REGISTERED, e.getMessage());
-        }
-        catch (Exception e) {
-            LOGGER.error("fail to send verify code for {}", mobile, e);
-            return ResponseMessage.FAILED("发送验证码失败");
-        }
+        smsSender.send(mobile, type);
+
+        return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ResponseMessage register(@RequestParam(value = "nickname") String nickName, @RequestParam String mobile, @RequestParam String password, @RequestParam String code){
-        if (StringUtils.isBlank(nickName) || ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(password) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
+    public ResponseMessage register(@RequestParam(value = "nickname") String nickName,
+                                    @RequestParam String mobile,
+                                    @RequestParam String password,
+                                    @RequestParam String code){
+        if (StringUtils.isBlank(nickName) ||
+                ValidateUtil.isInvalidMobile(mobile) ||
+                StringUtils.isBlank(password) ||
+                StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
         if (userService.getByNickName(nickName).exists()) return ResponseMessage.FAILED("注册失败，用户昵称已存在");
         if (!smsVerifier.verify(mobile, code)) return ResponseMessage.FAILED("验证码不正确");
 
@@ -59,10 +56,7 @@ public class AuthController extends UserRelatedController {
 
         String token = generateToken(mobile);
         user = userService.add(nickName, mobile, password, token);
-        if (!user.exists()) {
-            LOGGER.error("fail to register user for {}", mobile);
-            return ResponseMessage.FAILED("注册失败");
-        }
+        if (!user.exists()) return ResponseMessage.FAILED("注册失败");
 
         long userCouponId = couponService.getUserRegisterCoupon(user.getId());
 
