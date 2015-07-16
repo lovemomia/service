@@ -31,7 +31,7 @@ import java.util.Map;
 public class CouponServiceImpl extends DbAccessService implements CouponService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CouponServiceImpl.class);
     private static final String[] COUPON_FIELDS = { "id", "`type`", "title", "`desc`", "discount", "consumption", "accumulation", "startTime", "endTime" };
-    private static final String[] USER_COUPON_FIELDS = { "id", "userId", "couponId", "`type`", "startTime", "endTime", "status" };
+    private static final String[] USER_COUPON_FIELDS = { "id", "userId", "couponId", "`type`", "startTime", "orderId", "endTime", "status" };
 
     @Override
     public Coupon getCoupon(int couponId) {
@@ -224,6 +224,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
             userCoupon.setType(rs.getInt("type"));
             userCoupon.setStartTime(rs.getTimestamp("startTime"));
             userCoupon.setEndTime(rs.getTimestamp("endTime"));
+            userCoupon.setOrderId(rs.getLong("orderId"));
             userCoupon.setStatus(rs.getInt("status"));
 
             return userCoupon;
@@ -280,10 +281,10 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     }
 
     @Override
-    public UserCoupon getUserCouponByOrder(long orderId) {
-        String sql = "SELECT " + joinUserCouponFields() + " FROM t_user_coupon WHERE orderId=? AND status<>0 LIMIT 1";
+    public UserCoupon getNotUsedUserCouponByOrder(long orderId) {
+        String sql = "SELECT " + joinUserCouponFields() + " FROM t_user_coupon WHERE orderId=? AND (status=? OR status=?) LIMIT 1";
 
-        return jdbcTemplate.query(sql, new Object[] { orderId }, new ResultSetExtractor<UserCoupon>() {
+        return jdbcTemplate.query(sql, new Object[] { orderId, UserCoupon.Status.NOT_USED, UserCoupon.Status.LOCKED }, new ResultSetExtractor<UserCoupon>() {
             @Override
             public UserCoupon extractData(ResultSet rs) throws SQLException, DataAccessException {
                 if (rs.next()) return buildUserCoupon(rs);

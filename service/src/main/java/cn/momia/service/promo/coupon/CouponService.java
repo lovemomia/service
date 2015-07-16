@@ -16,5 +16,5 @@ public interface CouponService {
     boolean releaseUserCoupon(long userId, long orderId);
     UserCoupon getUserCoupon(long userId, long orderId, long userCouponId);
     BigDecimal calcTotalFee(BigDecimal totalFee, Coupon coupon);
-    UserCoupon getUserCouponByOrder(long orderId);
+    UserCoupon getNotUsedUserCouponByOrder(long orderId);
 }

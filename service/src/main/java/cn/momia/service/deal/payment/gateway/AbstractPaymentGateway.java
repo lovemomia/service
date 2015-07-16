@@ -77,7 +77,7 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
 
             if (!orderService.pay(orderId)) return false;
 
-            UserCoupon userCoupon = couponService.getUserCouponByOrder(order.getId());
+            UserCoupon userCoupon = couponService.getNotUsedUserCouponByOrder(order.getId());
             if (userCoupon.exists() && !couponService.useUserCoupon(order.getCustomerId(), order.getId(), userCoupon.getId())) return false;
             logPayment(param);
         } catch (Exception e) {

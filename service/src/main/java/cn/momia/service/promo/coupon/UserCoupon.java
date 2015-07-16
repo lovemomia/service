@@ -28,6 +28,7 @@ public class UserCoupon {
     private int type;
     private Date startTime;
     private Date endTime;
+    private long orderId;
     private int status;
 
     public long getId() {
@@ -76,6 +77,14 @@ public class UserCoupon {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public long getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(long orderId) {
+        this.orderId = orderId;
     }
 
     public int getStatus() {

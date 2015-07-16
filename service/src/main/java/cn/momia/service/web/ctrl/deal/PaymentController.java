@@ -18,6 +18,8 @@ import cn.momia.service.promo.coupon.CouponService;
 import cn.momia.service.promo.coupon.UserCoupon;
 import cn.momia.service.web.ctrl.AbstractController;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,6 +33,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/payment")
 public class PaymentController extends AbstractController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PaymentController.class);
+
     @Autowired private UserService userService;
     @Autowired private ProductService productService;
     @Autowired private OrderService orderService;
@@ -56,8 +60,12 @@ public class PaymentController extends AbstractController {
         if (!order.exists() || !product.exists()) return ResponseMessage.BAD_REQUEST;
         if (order.getCustomerId() != user.getId() || order.getSkuId() != skuId) return ResponseMessage.BAD_REQUEST;
 
-        Coupon coupon = useCoupon(user.getId(), order, request.getParameter("coupon"));
-        if (coupon.invalid()) return ResponseMessage.FAILED("无效的优惠券，或使用条件不满足");
+        Coupon coupon = Coupon.NOT_EXIST_COUPON;
+        String userCouponIdStr = request.getParameter("coupon");
+        if (!StringUtils.isBlank(userCouponIdStr)) {
+            coupon = useCoupon(user.getId(), order, Long.valueOf(userCouponIdStr));
+            if (coupon.invalid()) return ResponseMessage.FAILED("无效的优惠券，或使用条件不满足");
+        }
 
         PaymentGateway gateway = PaymentGatewayFactory.create(payType);
         Map<String, String> params = gateway.extractPrepayParams(request, order, product, coupon);
@@ -68,9 +76,10 @@ public class PaymentController extends AbstractController {
         return new ResponseMessage(prepayResult);
     }
 
-    private Coupon useCoupon(long userId, Order order, String userCouponIdStr) {
-        if (!StringUtils.isBlank(userCouponIdStr)) {
-            int userCouponId = Integer.valueOf(userCouponIdStr);
+    private Coupon useCoupon(long userId, Order order, long userCouponId) {
+        UserCoupon previousUserCoupon = couponService.getNotUsedUserCouponByOrder(order.getId());
+        if (userCouponId > 0) {
+            if (previousUserCoupon.exists() && previousUserCoupon.getId() != userCouponId) releasePreviousUserCoupon(previousUserCoupon);
             Coupon coupon = getCoupon(userId, order.getId(), userCouponId, order.getTotalFee());
 
             if (!coupon.exists()) return Coupon.INVALID_COUPON;
@@ -79,7 +88,17 @@ public class PaymentController extends AbstractController {
             return coupon;
         }
 
+        if (previousUserCoupon.exists()) releasePreviousUserCoupon(previousUserCoupon);
+
         return Coupon.NOT_EXIST_COUPON;
+    }
+
+    private void releasePreviousUserCoupon(UserCoupon previousUserCoupon) {
+        try {
+            couponService.releaseUserCoupon(previousUserCoupon.getUserId(), previousUserCoupon.getOrderId());
+        } catch (Exception e) {
+            LOGGER.error("fail to release user coupon: {}", previousUserCoupon.getId(), e);
+        }
     }
 
     private Coupon getCoupon(long userId, long orderId, long userCouponId, BigDecimal totalFee) {
@@ -122,8 +141,8 @@ public class PaymentController extends AbstractController {
 
         BigDecimal totalFee = order.getTotalFee();
         if (userCouponId != null && userCouponId > 0) {
-            Coupon coupon = getCoupon(user.getId(), order.getId(), userCouponId, totalFee);
-            if (!coupon.exists()) return ResponseMessage.FAILED("无效的优惠券，或使用条件不满足，无法使用");
+            Coupon coupon = useCoupon(user.getId(), order, userCouponId);
+            if (coupon.invalid()) return ResponseMessage.FAILED("无效的优惠券，或使用条件不满足");
 
             totalFee = couponService.calcTotalFee(totalFee, coupon);
         }

@@ -51,23 +51,20 @@ public class AuthController extends UserRelatedController {
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseMessage register(@RequestParam(value = "nickname") String nickName, @RequestParam String mobile, @RequestParam String password, @RequestParam String code){
         if (StringUtils.isBlank(nickName) || ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(password) || StringUtils.isBlank(code)) return ResponseMessage.BAD_REQUEST;
-        if(userService.getByNickName(nickName).exists()) return ResponseMessage.FAILED("注册失败，用户昵称已存在");
+        if (userService.getByNickName(nickName).exists()) return ResponseMessage.FAILED("注册失败，用户昵称已存在");
         if (!smsVerifier.verify(mobile, code)) return ResponseMessage.FAILED("验证码不正确");
 
-        long userCouponId = 0;
         User user = userService.getByMobile(mobile);
-        String token = generateToken(mobile);
-        if (!user.exists()) {
-            user = userService.add(nickName, mobile, password, token);
-            if (!user.exists()) {
-                LOGGER.error("fail to register user for {}", mobile);
-                return ResponseMessage.FAILED("注册失败");
-            }
+        if (user.exists()) return ResponseMessage.FAILED("注册失败，用户已存在");
 
-            userCouponId = couponService.getUserRegisterCoupon(user.getId());
-        } else {
-            return ResponseMessage.FAILED("注册失败，用户已存在");
+        String token = generateToken(mobile);
+        user = userService.add(nickName, mobile, password, token);
+        if (!user.exists()) {
+            LOGGER.error("fail to register user for {}", mobile);
+            return ResponseMessage.FAILED("注册失败");
         }
+
+        long userCouponId = couponService.getUserRegisterCoupon(user.getId());
 
         return new ResponseMessage(buildUserResponse(user, userCouponId));
     }
