@@ -32,7 +32,7 @@ public class ParticipantV1Api extends AbstractV1Api {
 
         JSONObject paticipantJson = JSON.parseObject(participant);
         paticipantJson.put("userId", userId);
-        MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("participant"), paticipantJson.toString());
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("participant"), paticipantJson.toString());
 
         return executeRequest(request);
     }
@@ -42,7 +42,7 @@ public class ParticipantV1Api extends AbstractV1Api {
         if (StringUtils.isBlank(utoken) || id <= 0) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("participant", id), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("participant", id), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
@@ -61,7 +61,7 @@ public class ParticipantV1Api extends AbstractV1Api {
 
         JSONObject paticipantJson = JSON.parseObject(participant);
         paticipantJson.put("userId", userId);
-        MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("participant"), paticipantJson.toString());
+        MomiaHttpRequest request = MomiaHttpRequest.PUT(url("participant"), paticipantJson.toString());
 
         return executeRequest(request);
     }
@@ -71,7 +71,7 @@ public class ParticipantV1Api extends AbstractV1Api {
         if (StringUtils.isBlank(utoken) || id <= 0) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        MomiaHttpRequest request = MomiaHttpRequest.DELETE(baseServiceUrl("participant", id), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.DELETE(url("participant", id), builder.build());
 
         return executeRequest(request);
     }
@@ -81,7 +81,7 @@ public class ParticipantV1Api extends AbstractV1Api {
         if (StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("participant"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("participant"), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override

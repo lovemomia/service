@@ -31,7 +31,7 @@ public class AuthV1Api extends AbstractV1Api {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("mobile", mobile)
                 .add("type", type);
-        MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("auth/send"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("auth/send"), builder.build());
 
         return executeRequest(request);
     }
@@ -45,7 +45,7 @@ public class AuthV1Api extends AbstractV1Api {
                 .add("mobile", mobile)
                 .add("password", password)
                 .add("code", code);
-        MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("auth/register"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("auth/register"), builder.build());
 
         return executeRequest(request, userFunc);
     }
@@ -57,7 +57,7 @@ public class AuthV1Api extends AbstractV1Api {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("mobile", mobile)
                 .add("password", password);
-        MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("auth/login"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("auth/login"), builder.build());
 
         return executeRequest(request, userFunc);
     }
@@ -69,7 +69,7 @@ public class AuthV1Api extends AbstractV1Api {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("mobile", mobile)
                 .add("code", code);
-        MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("auth/login/code"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("auth/login/code"), builder.build());
 
         return executeRequest(request, userFunc);
     }
@@ -82,7 +82,7 @@ public class AuthV1Api extends AbstractV1Api {
                 .add("mobile", mobile)
                 .add("password", password)
                 .add("code", code);
-        MomiaHttpRequest request = MomiaHttpRequest.PUT(baseServiceUrl("auth/password"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.PUT(url("auth/password"), builder.build());
 
         return executeRequest(request, userFunc);
     }

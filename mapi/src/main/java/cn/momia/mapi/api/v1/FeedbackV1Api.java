@@ -20,7 +20,7 @@ public class FeedbackV1Api extends AbstractV1Api {
                 .add("content", content)
                 .add("email", email);
         if (!StringUtils.isBlank(utoken)) builder.add("utoken", utoken);
-        MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("feedback"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("feedback"), builder.build());
 
         return executeRequest(request);
     }

@@ -24,7 +24,7 @@ public class CallbackV1Api extends AbstractV1Api {
     public String alipayCallback(HttpServletRequest request) {
         try {
             Map<String, String> params = extractParams(request);
-            ResponseMessage response = executeRequest(MomiaHttpRequest.POST(dealServiceUrl("callback/alipay"), params));
+            ResponseMessage response = executeRequest(MomiaHttpRequest.POST(url("callback/alipay"), params));
             if (response.successful()) return "success";
         } catch (Exception e) {
             LOGGER.error("ali pay callback error", e);
@@ -47,7 +47,7 @@ public class CallbackV1Api extends AbstractV1Api {
     public Xml wechatpayCallback(HttpServletRequest request) {
         try {
             Map<String, String> params = XmlUtil.xmlToParams(IOUtils.toString(request.getInputStream()));
-            ResponseMessage response = executeRequest(MomiaHttpRequest.POST(dealServiceUrl("callback/wechatpay"), params));
+            ResponseMessage response = executeRequest(MomiaHttpRequest.POST(url("callback/wechatpay"), params));
             if (response.successful()) return new Xml("SUCCESS", "OK");
         } catch (Exception e) {
             LOGGER.error("wechat pay callback error", e);

@@ -26,7 +26,7 @@ public class OrderV1Api extends AbstractV1Api {
 
         JSONObject orderJson = JSON.parseObject(order);
         orderJson.put("customerId", userId);
-        MomiaHttpRequest request = MomiaHttpRequest.POST(dealServiceUrl("order"), orderJson.toString());
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("order"), orderJson.toString());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
@@ -41,7 +41,7 @@ public class OrderV1Api extends AbstractV1Api {
         if (StringUtils.isBlank(utoken) || id <= 0) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        MomiaHttpRequest request = MomiaHttpRequest.DELETE(dealServiceUrl("order", id), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.DELETE(url("order", id), builder.build());
 
         return executeRequest(request);
     }

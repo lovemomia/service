@@ -29,7 +29,8 @@ public abstract class AbstractApi extends BaseController {
     @Autowired
     protected MomiaHttpRequestExecutor requestExecutor;
 
-    protected String baseServiceUrl(Object... paths) {
+    protected String url(Object... paths) {
+        // TODO 根据paths判断使用哪个service
         return serviceUrl(conf.getString("Service.Base"), paths);
     }
 
@@ -41,10 +42,6 @@ public abstract class AbstractApi extends BaseController {
         }
 
         return urlBuilder.toString();
-    }
-
-    protected String dealServiceUrl(Object... paths) {
-        return serviceUrl(conf.getString("Service.Deal"), paths);
     }
 
     protected ResponseMessage executeRequest(MomiaHttpRequest request) {

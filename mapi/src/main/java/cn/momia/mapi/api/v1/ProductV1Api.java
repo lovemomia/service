@@ -40,7 +40,7 @@ public class ProductV1Api extends AbstractV1Api {
                 .add("city", cityId)
                 .add("start", start)
                 .add("count", pageSize);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("product/weekend"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("product"), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
@@ -70,7 +70,7 @@ public class ProductV1Api extends AbstractV1Api {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
                 .add("month", month);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("product/month"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("product/month"), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
@@ -122,7 +122,7 @@ public class ProductV1Api extends AbstractV1Api {
     }
 
     private MomiaHttpRequest buildProductRequest(long productId) {
-        return MomiaHttpRequest.GET("product", true, baseServiceUrl("product", productId));
+        return MomiaHttpRequest.GET("product", true, url("product", productId));
     }
 
     private MomiaHttpRequest buildProductCustomersRequest(long productId) {
@@ -130,7 +130,7 @@ public class ProductV1Api extends AbstractV1Api {
                 .add("start", 0)
                 .add("count", conf.getInt("Product.CustomerPageSize"));
 
-        return MomiaHttpRequest.GET("customers", false, baseServiceUrl("product", productId, "customer"), builder.build());
+        return MomiaHttpRequest.GET("customers", false, url("product", productId, "customer"), builder.build());
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
@@ -156,12 +156,12 @@ public class ProductV1Api extends AbstractV1Api {
     }
 
     private MomiaHttpRequest buildProductSkusRequest(long productId) {
-        return MomiaHttpRequest.GET("skus", true, baseServiceUrl("product", productId, "sku"));
+        return MomiaHttpRequest.GET("skus", true, url("product", productId, "sku"));
     }
 
     private MomiaHttpRequest buildUserRequest(String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        MomiaHttpRequest request = MomiaHttpRequest.GET("contacts", true, baseServiceUrl("user"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET("contacts", true, url("user"), builder.build());
 
         return request;
     }
@@ -171,7 +171,7 @@ public class ProductV1Api extends AbstractV1Api {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", 0)
                 .add("count", conf.getInt("Product.Playmate.MaxSkuCount"));
-        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("product", id, "playmate"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("product", id, "playmate"), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override

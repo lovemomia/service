@@ -69,7 +69,7 @@ public class HomeV1Api extends AbstractV1Api {
                 .add("city", cityId)
                 .add("count", count);
 
-        return MomiaHttpRequest.GET("banners", true, baseServiceUrl("banner"), builder.build());
+        return MomiaHttpRequest.GET("banners", true, url("banner"), builder.build());
     }
 
     private MomiaHttpRequest buildProductsRequest(int pageIndex, int cityId) {
@@ -79,7 +79,7 @@ public class HomeV1Api extends AbstractV1Api {
                 .add("start", String.valueOf(pageIndex * pageSize))
                 .add("count", String.valueOf(pageSize));
 
-        return MomiaHttpRequest.GET("products", true, baseServiceUrl("product"), builder.build());
+        return MomiaHttpRequest.GET("products", true, url("product"), builder.build());
     }
 
     private ListDto extractBannerData(JSONArray bannersJson) {

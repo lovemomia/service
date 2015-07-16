@@ -11,7 +11,7 @@ public class AbstractV1Api extends AbstractApi {
 
     protected long getUserId(String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("user"), builder.build());
 
         ResponseMessage response = executeRequest(request);
         if (response.successful()) return ((JSONObject) response.getData()).getJSONObject("user").getLong("id");

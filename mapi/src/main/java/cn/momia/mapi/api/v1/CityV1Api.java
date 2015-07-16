@@ -11,6 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class CityV1Api extends AbstractV1Api {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getAllCities() {
-        return executeRequest(MomiaHttpRequest.GET(baseServiceUrl("city")));
+        return executeRequest(MomiaHttpRequest.GET(url("city")));
     }
 }

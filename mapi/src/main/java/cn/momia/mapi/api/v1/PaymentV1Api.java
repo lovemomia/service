@@ -35,7 +35,7 @@ public class PaymentV1Api extends AbstractV1Api {
                 .add("pid", productId)
                 .add("sid", skuId);
         if (coupon != null && coupon > 0) builder.add("coupon", coupon);
-        MomiaHttpRequest request = MomiaHttpRequest.POST(dealServiceUrl("payment/prepay/alipay"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("payment/prepay/alipay"), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
@@ -69,7 +69,7 @@ public class PaymentV1Api extends AbstractV1Api {
                 .add("trade_type", tradeType);
         if (coupon != null && coupon > 0) builder.add("coupon", coupon);
         if (!StringUtils.isBlank(code)) builder.add("code", code);
-        MomiaHttpRequest request = MomiaHttpRequest.POST(dealServiceUrl("payment/prepay/wechatpay"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("payment/prepay/wechatpay"), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
@@ -96,7 +96,7 @@ public class PaymentV1Api extends AbstractV1Api {
                 .add("pid", productId)
                 .add("sid", skuId);
         if (coupon != null && coupon > 0) builder.add("coupon", coupon);
-        MomiaHttpRequest request = MomiaHttpRequest.POST(baseServiceUrl("payment/prepay/free"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("payment/prepay/free"), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
@@ -121,7 +121,7 @@ public class PaymentV1Api extends AbstractV1Api {
                 .add("oid", orderId)
                 .add("pid", productId)
                 .add("sid", skuId);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("payment/check"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("payment/check"), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override

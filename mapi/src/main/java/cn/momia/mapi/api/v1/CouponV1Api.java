@@ -20,7 +20,7 @@ public class CouponV1Api extends AbstractV1Api {
                 .add("utoken", utoken)
                 .add("oid", orderId)
                 .add("coupon", coupon);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(dealServiceUrl("coupon"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("coupon"), builder.build());
 
         return executeRequest(request);
     }
