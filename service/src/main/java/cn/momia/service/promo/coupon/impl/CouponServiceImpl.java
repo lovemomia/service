@@ -198,7 +198,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
                 }
             });
         } else if (status == UserCoupon.Status.NOT_USED && orderId > 0) {
-            String sql = "SELECT " + joinUserCouponFields() + " FROM t_user_coupon WHERE userId=? AND (status=? OR (orderId=? AND status=?) ORDER BY addTime DESC LIMIT ?,?";
+            String sql = "SELECT " + joinUserCouponFields() + " FROM t_user_coupon WHERE userId=? AND (status=? OR (orderId=? AND status=?)) ORDER BY addTime DESC LIMIT ?,?";
             jdbcTemplate.query(sql, new Object[] { userId, status, orderId, UserCoupon.Status.LOCKED, start, count }, new RowCallbackHandler() {
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
