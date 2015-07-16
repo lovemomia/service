@@ -5,19 +5,14 @@ import cn.momia.common.web.controller.BaseController;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpRequestExecutor;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
-import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import com.google.common.base.Function;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 public abstract class AbstractApi extends BaseController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractApi.class);
-
     @Autowired protected Configuration conf;
     @Autowired protected MomiaHttpRequestExecutor requestExecutor;
 
