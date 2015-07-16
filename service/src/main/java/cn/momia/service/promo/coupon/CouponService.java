@@ -9,8 +9,8 @@ public interface CouponService {
     Coupon getCoupon(int couponId);
     Map<Integer, Coupon> getCoupons(Collection<Integer> couponIds);
     long getUserRegisterCoupon(long userId);
-    int queryCountByUser(long userId, int status);
-    List<UserCoupon> queryByUser(long userId, int status, int start, int count);
+    int queryCountByUser(long userId, long orderId, int status);
+    List<UserCoupon> queryByUser(long userId, long orderId, int status, int start, int count);
     boolean lockUserCoupon(long userId, long orderId, long userCouponId);
     boolean useUserCoupon(long userId, long orderId, long userCouponId);
     boolean releaseUserCoupon(long userId, long orderId);

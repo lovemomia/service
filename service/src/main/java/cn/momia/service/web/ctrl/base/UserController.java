@@ -140,14 +140,18 @@ public class UserController extends UserRelatedController {
     }
 
     @RequestMapping(value = "/coupon", method = RequestMethod.GET)
-    public ResponseMessage getCouponsOfUser(@RequestParam String utoken, @RequestParam int status, @RequestParam int start, @RequestParam int count) {
+    public ResponseMessage getCouponsOfUser(@RequestParam String utoken,
+                                            @RequestParam long orderId,
+                                            @RequestParam int status,
+                                            @RequestParam int start,
+                                            @RequestParam int count) {
         if (StringUtils.isBlank(utoken) || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
 
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        int totalCount = couponService.queryCountByUser(user.getId(), status);
-        List<UserCoupon> userCoupons = totalCount > 0 ? couponService.queryByUser(user.getId(), status, start, count) : new ArrayList<UserCoupon>();
+        int totalCount = couponService.queryCountByUser(user.getId(), orderId, status);
+        List<UserCoupon> userCoupons = totalCount > 0 ? couponService.queryByUser(user.getId(), orderId, status, start, count) : new ArrayList<UserCoupon>();
 
         List<Integer> couponIds = new ArrayList<Integer>();
         for (UserCoupon userCoupon : userCoupons) couponIds.add(userCoupon.getCouponId());

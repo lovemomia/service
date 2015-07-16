@@ -108,13 +108,18 @@ public class UserV1Api extends AbstractV1Api {
     }
 
     @RequestMapping(value = "/coupon", method = RequestMethod.GET)
-    public ResponseMessage getCouponsOfUser(@RequestParam String utoken, @RequestParam(defaultValue = "0") int status, @RequestParam final int start, @RequestParam final int count) {
+    public ResponseMessage getCouponsOfUser(@RequestParam String utoken,
+                                            @RequestParam(value = "oid", defaultValue = "0") long orderId,
+                                            @RequestParam(defaultValue = "0") int status,
+                                            @RequestParam final int start,
+                                            @RequestParam final int count) {
         final int maxPageCount = conf.getInt("Coupon.MaxPageCount");
         final int pageSize = conf.getInt("Coupon.PageSize");
         if (StringUtils.isBlank(utoken) || start < 0 || count <= 0 || start > maxPageCount * pageSize) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
+                .add("oid", orderId)
                 .add("status", status)
                 .add("start", start)
                 .add("count", count);
