@@ -270,6 +270,46 @@ public class UserController extends UserRelatedController {
         return new ResponseMessage(buildUserResponse(user));
     }
 
+
+    @RequestMapping(value = "/child/name",method = RequestMethod.PUT)
+    public ResponseMessage updateParticipantName(@RequestParam String utoken,
+                                                 @RequestParam(value = "cid") long childId,
+                                                 @RequestParam String name) {
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        boolean successful = userServiceFacade.updateChildName(user.getId(), childId, name);
+        if (!successful) return ResponseMessage.FAILED("更新孩子姓名失败");
+
+        return ResponseMessage.SUCCESS;
+    }
+
+    @RequestMapping(value = "/child/sex",method = RequestMethod.PUT)
+    public ResponseMessage updateParticipantBySex(@RequestParam String utoken,
+                                                  @RequestParam(value = "cid") long childId,
+                                                  @RequestParam String sex) {
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        boolean successful = userServiceFacade.updateChildSex(user.getId(), childId, sex);
+        if (!successful) return ResponseMessage.FAILED("更新孩子性别失败");
+
+        return ResponseMessage.SUCCESS;
+    }
+
+    @RequestMapping(value = "/child/birthday",method = RequestMethod.PUT)
+    public ResponseMessage updateParticipantByBirthday(@RequestParam String utoken,
+                                                       @RequestParam(value = "cid") long childId,
+                                                       @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd")Date birthday) {
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        boolean successful = userServiceFacade.updateChildBirthday(user.getId(), childId, birthday);
+        if (!successful) return ResponseMessage.FAILED("更新孩子生日失败");
+
+        return ResponseMessage.SUCCESS;
+    }
+
     @RequestMapping(value = "/child/{cid}", method = RequestMethod.DELETE)
     public ResponseMessage deleteChild(@RequestParam String utoken, @PathVariable(value = "cid") long childId) {
         User user = userServiceFacade.getUserByToken(utoken);
@@ -289,7 +329,7 @@ public class UserController extends UserRelatedController {
         Set<Long> children = user.getChildren();
         if (!children.contains(childId)) return ResponseMessage.FAILED("孩子信息不存在");
 
-        Participant child = userServiceFacade.getChild(childId);
+        Participant child = userServiceFacade.getChild(user.getId(), childId);
         if (!child.exists()) return ResponseMessage.FAILED("孩子不存在");
 
         return new ResponseMessage(child);

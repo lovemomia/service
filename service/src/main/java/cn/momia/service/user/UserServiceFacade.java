@@ -19,7 +19,6 @@ public interface UserServiceFacade {
     User getUserByMobile(String mobile);
     List<User> getUsers(Collection<Long> userIds);
 
-    boolean updateUserToken(long userId, String token);
     boolean updateUserNickName(long userId, String nickName);
     boolean updateUserAvatar(long userId, String avatar);
     boolean updateUserName(long userId, String name);
@@ -32,7 +31,7 @@ public interface UserServiceFacade {
 
     // 孩子
     long addChild(Participant child);
-    Participant getChild(long childId);
+    Participant getChild(long userId, long childId);
     List<Participant> getChildren(Collection<Long> childIds);
     boolean updateChildName(long userId, long childId, String name);
     boolean updateChildSex(long userId, long childId, String sex);
@@ -40,7 +39,7 @@ public interface UserServiceFacade {
 
     // 出行人
     long addParticipant(Participant participant);
-    Participant getParticipant(long participantId);
+    Participant getParticipant(long userId, long participantId);
     List<Participant> getParticipants(Collection<Long> participantIds);
     List<Participant> getParticipantsByUser(long userId);
     boolean updateParticipant(Participant participant);

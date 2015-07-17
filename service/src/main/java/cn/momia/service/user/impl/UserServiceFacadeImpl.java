@@ -11,6 +11,7 @@ import cn.momia.service.user.participant.ParticipantService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -30,7 +31,7 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
 
     @Override
     public boolean exists(String field, String value) {
-        return !StringUtils.isBlank(value) && userService.exists(field, value);
+        return !StringUtils.isBlank(field) && !StringUtils.isBlank(value) && userService.exists(field, value);
     }
 
     @Override
@@ -75,12 +76,7 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
 
     @Override
     public List<User> getUsers(Collection<Long> userIds) {
-        return null;
-    }
-
-    @Override
-    public boolean updateUserToken(long userId, String token) {
-        return false;
+        return (List<User>) userService.get(userIds).values();
     }
 
     @Override
@@ -142,62 +138,69 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
 
     @Override
     public long addChild(Participant child) {
-        return participantService.add(child);
+        return addParticipant(child);
     }
 
     @Override
-    public Participant getChild(long childId) {
-        if (childId <= 0) return Participant.NOT_EXIST_PARTICIPANT;
-        return participantService.get(childId);
+    public Participant getChild(long userId, long childId) {
+        return getParticipant(userId, childId);
     }
 
     @Override
     public List<Participant> getChildren(Collection<Long> childIds) {
-        return (List<Participant>) participantService.get(childIds).values();
+        return getParticipants(childIds);
     }
 
     @Override
     public boolean updateChildName(long userId, long childId, String name) {
-        return false;
+        if (userId <= 0 || childId <= 0 || StringUtils.isBlank(name)) return false;
+        return participantService.updateName(childId, name, userId);
     }
 
     @Override
     public boolean updateChildSex(long userId, long childId, String sex) {
-        return false;
+        if (userId <= 0 || childId <= 0 || StringUtils.isBlank(sex)) return false;
+        return participantService.updateSex(childId, sex, userId);
     }
 
     @Override
     public boolean updateChildBirthday(long userId, long childId, Date birthday) {
-        return false;
+        if (userId <= 0 || childId <= 0 || birthday == null) return false;
+        return participantService.updateBirthday(childId, birthday, userId);
     }
 
     @Override
     public long addParticipant(Participant participant) {
-        return 0;
+        if (participant.isInvalid()) return 0;
+        return participantService.add(participant);
     }
 
     @Override
-    public Participant getParticipant(long participantId) {
-        return null;
+    public Participant getParticipant(long userId, long participantId) {
+        if (userId <= 0 || participantId <= 0) return Participant.NOT_EXIST_PARTICIPANT;
+        return participantService.get(participantId);
     }
 
     @Override
     public List<Participant> getParticipants(Collection<Long> participantIds) {
-        return null;
+        return (List<Participant>) participantService.get(participantIds).values();
     }
 
     @Override
     public List<Participant> getParticipantsByUser(long userId) {
-        return null;
+        if (userId <= 0) return new ArrayList<Participant>();
+        return participantService.getByUser(userId);
     }
 
     @Override
     public boolean updateParticipant(Participant participant) {
-        return false;
+        if (participant.isInvalid()) return false;
+        return participantService.update(participant);
     }
 
     @Override
     public boolean deleteParticipant(long userId, long participantId) {
-        return false;
+        if (userId <= 0 || participantId <= 0) return false;
+        return participantService.delete(participantId, userId);
     }
 }

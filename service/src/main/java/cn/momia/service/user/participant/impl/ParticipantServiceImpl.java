@@ -63,21 +63,21 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
     }
 
     @Override
-    public boolean updateByName( long id, String name, long userId) {
+    public boolean updateName(long id, String name, long userId) {
         String sql = "UPDATE t_user_participant SET name=? WHERE id=? AND userId=?";
 
         return update(sql, new Object[] { name, id, userId });
     }
 
     @Override
-    public boolean updateBySex(long id, String sex, long userId) {
+    public boolean updateSex(long id, String sex, long userId) {
         String sql = "UPDATE t_user_participant SET sex=? WHERE id=? AND userId=?";
 
         return update(sql, new Object[] { sex, id, userId });
     }
 
     @Override
-    public boolean updateByBirthday(long id, Date birthday, long userId) {
+    public boolean updateBirthday(long id, Date birthday, long userId) {
         String sql = "UPDATE t_user_participant SET birthday=? WHERE id=? AND userId=?";
 
         return update(sql, new Object[] { birthday, id, userId });
