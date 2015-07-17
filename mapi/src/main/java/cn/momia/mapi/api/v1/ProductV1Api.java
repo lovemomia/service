@@ -28,23 +28,22 @@ public class ProductV1Api extends AbstractV1Api {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public ResponseMessage getProducts(@RequestParam(value = "city") final int cityId,
                                        @RequestParam final int start,
-                                       @RequestParam final int count,
                                        @RequestParam(required = false) String query) {
-        final int maxPageCount = conf.getInt("Product.MaxPageCount");
         final int pageSize = conf.getInt("Product.PageSize");
-        if (cityId < 0 || start < 0 || count <= 0 || start > maxPageCount * pageSize) return ResponseMessage.BAD_REQUEST;
+        final int maxPageCount = conf.getInt("Product.MaxPageCount");
+        if (cityId < 0 || start < 0 || start > pageSize * maxPageCount) return new ResponseMessage(PagedListDto.EMPTY);
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
                 .add("start", start)
-                .add("count", count)
+                .add("count", pageSize)
                 .add("query", query);
         MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("product"), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                return buildProductsDto((JSONObject) data, start, count);
+                return buildProductsDto((JSONObject) data, start, pageSize);
             }
         });
     }

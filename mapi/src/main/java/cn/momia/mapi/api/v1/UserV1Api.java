@@ -108,24 +108,23 @@ public class UserV1Api extends AbstractV1Api {
     public ResponseMessage getCouponsOfUser(@RequestParam String utoken,
                                             @RequestParam(value = "oid", defaultValue = "0") long orderId,
                                             @RequestParam(defaultValue = "0") int status,
-                                            @RequestParam final int start,
-                                            @RequestParam final int count) {
-        final int maxPageCount = conf.getInt("Coupon.MaxPageCount");
+                                            @RequestParam final int start) {
         final int pageSize = conf.getInt("Coupon.PageSize");
-        if (StringUtils.isBlank(utoken) || start < 0 || count <= 0 || start > maxPageCount * pageSize) return ResponseMessage.BAD_REQUEST;
+        final int maxPageCount = conf.getInt("Coupon.MaxPageCount");
+        if (StringUtils.isBlank(utoken) || start < 0 || start > pageSize * maxPageCount) return new ResponseMessage(PagedListDto.EMPTY);
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("oid", orderId)
                 .add("status", status)
                 .add("start", start)
-                .add("count", count);
+                .add("count", pageSize);
         MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user/coupon"), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                return buildUserCouponsDto((JSONObject) data, start, count);
+                return buildUserCouponsDto((JSONObject) data, start, pageSize);
             }
         });
     }
