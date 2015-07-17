@@ -88,7 +88,7 @@ public class ProductController extends AbstractController {
         if (cityId < 0) return ResponseMessage.BAD_REQUEST;
 
         long totalCount = productService.queryCount(new ProductQuery(cityId, ""));
-        List<Product> products = totalCount > 0 ? productService.query(0, 1000, new ProductQuery(cityId, "")) : new ArrayList<Product>();
+        List<Product> products = totalCount > 0 ? productService.query(0, 100, new ProductQuery(cityId, "")) : new ArrayList<Product>();
 
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         JSONArray productsPackJson = new JSONArray();

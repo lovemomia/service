@@ -89,6 +89,7 @@ public class ProductV1Api extends AbstractV1Api {
             ProductsOfDayDto productsOfDayDto = productsOfDayDtoMap.get(dateStr);
             if (productsOfDayDto == null) {
                 productsOfDayDto = new ProductsOfDayDto();
+                products.add(productsOfDayDto);
                 productsOfDayDto.setDate(productPackJson.getDate("date"));
                 productsOfDayDtoMap.put(dateStr, productsOfDayDto);
             }
