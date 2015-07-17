@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/participant")
-public class ParticipantController extends AbstractController {
+public class ParticipantController extends UserRelatedController {
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage addParticipant(@RequestBody Participant participant) {
         long participantId = userServiceFacade.addParticipant(participant);
