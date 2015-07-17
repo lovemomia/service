@@ -1,11 +1,8 @@
 package cn.momia.mapi.api.v1.dto.composite;
 
 import cn.momia.common.web.img.ImageFile;
-import cn.momia.mapi.api.v1.dto.base.Dto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-
-import java.util.ArrayList;
 
 public class PlaymatesDto extends ListDto {
     public PlaymatesDto(JSONArray skusPlaymatesJson) {
