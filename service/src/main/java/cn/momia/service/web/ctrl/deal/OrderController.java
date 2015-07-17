@@ -1,9 +1,9 @@
 package cn.momia.service.web.ctrl.deal;
 
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.service.base.product.ProductService;
-import cn.momia.service.base.product.sku.Sku;
-import cn.momia.service.base.product.sku.SkuPrice;
+import cn.momia.service.product.ProductService;
+import cn.momia.service.product.sku.Sku;
+import cn.momia.service.product.sku.SkuPrice;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
 import cn.momia.service.deal.order.Order;

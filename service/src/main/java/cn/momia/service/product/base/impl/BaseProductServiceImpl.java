@@ -1,8 +1,8 @@
-package cn.momia.service.base.product.base.impl;
+package cn.momia.service.product.base.impl;
 
-import cn.momia.service.common.DbAccessService;
-import cn.momia.service.base.product.base.BaseProduct;
-import cn.momia.service.base.product.base.BaseProductService;
+import cn.momia.service.base.DbAccessService;
+import cn.momia.service.product.base.BaseProduct;
+import cn.momia.service.product.base.BaseProductService;
 import com.alibaba.fastjson.JSON;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;

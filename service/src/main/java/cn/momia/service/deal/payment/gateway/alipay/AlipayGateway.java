@@ -1,6 +1,6 @@
 package cn.momia.service.deal.payment.gateway.alipay;
 
-import cn.momia.service.base.product.Product;
+import cn.momia.service.product.Product;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
 import cn.momia.service.deal.payment.gateway.AbstractPaymentGateway;

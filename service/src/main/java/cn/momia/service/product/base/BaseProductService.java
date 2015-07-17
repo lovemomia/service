@@ -1,4 +1,4 @@
-package cn.momia.service.base.product.base;
+package cn.momia.service.product.base;
 
 import java.util.Collection;
 import java.util.List;

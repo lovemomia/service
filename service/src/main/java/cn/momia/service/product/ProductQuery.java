@@ -1,4 +1,4 @@
-package cn.momia.service.base.product;
+package cn.momia.service.product;
 
 public class ProductQuery {
     private int cityId;

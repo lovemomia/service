@@ -1,10 +1,10 @@
-package cn.momia.service.base.product.sku.impl;
+package cn.momia.service.product.sku.impl;
 
-import cn.momia.service.common.DbAccessService;
-import cn.momia.service.base.product.sku.Sku;
-import cn.momia.service.base.product.sku.SkuPrice;
-import cn.momia.service.base.product.sku.SkuProperty;
-import cn.momia.service.base.product.sku.SkuService;
+import cn.momia.service.base.DbAccessService;
+import cn.momia.service.product.sku.Sku;
+import cn.momia.service.product.sku.SkuPrice;
+import cn.momia.service.product.sku.SkuProperty;
+import cn.momia.service.product.sku.SkuService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;

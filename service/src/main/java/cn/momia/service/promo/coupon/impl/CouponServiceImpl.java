@@ -1,6 +1,6 @@
 package cn.momia.service.promo.coupon.impl;
 
-import cn.momia.service.common.DbAccessService;
+import cn.momia.service.base.DbAccessService;
 import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.CouponService;
 import cn.momia.service.promo.coupon.UserCoupon;

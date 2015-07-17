@@ -1,7 +1,7 @@
 package cn.momia.service.deal.payment.gateway;
 
 import cn.momia.common.config.Configuration;
-import cn.momia.service.base.product.ProductService;
+import cn.momia.service.product.ProductService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.deal.payment.Payment;

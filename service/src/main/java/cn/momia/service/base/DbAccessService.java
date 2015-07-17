@@ -1,4 +1,4 @@
-package cn.momia.service.common;
+package cn.momia.service.base;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 

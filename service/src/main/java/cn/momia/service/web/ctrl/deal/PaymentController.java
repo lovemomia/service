@@ -1,8 +1,8 @@
 package cn.momia.service.web.ctrl.deal;
 
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.service.base.product.Product;
-import cn.momia.service.base.product.ProductService;
+import cn.momia.service.product.Product;
+import cn.momia.service.product.ProductService;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
 import cn.momia.service.deal.order.Order;

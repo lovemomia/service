@@ -1,8 +1,8 @@
-package cn.momia.service.base.product.place.impl;
+package cn.momia.service.product.place.impl;
 
-import cn.momia.service.common.DbAccessService;
-import cn.momia.service.base.product.place.Place;
-import cn.momia.service.base.product.place.PlaceService;
+import cn.momia.service.base.DbAccessService;
+import cn.momia.service.product.place.Place;
+import cn.momia.service.product.place.PlaceService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

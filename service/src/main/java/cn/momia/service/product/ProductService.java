@@ -1,6 +1,6 @@
-package cn.momia.service.base.product;
+package cn.momia.service.product;
 
-import cn.momia.service.base.product.sku.Sku;
+import cn.momia.service.product.sku.Sku;
 
 import java.util.Collection;
 import java.util.List;

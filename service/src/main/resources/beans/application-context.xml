@@ -39,7 +39,7 @@
     </bean>
 
     <!-- Service -->
-    <bean id="dbAccessService" class="cn.momia.service.common.DbAccessService" abstract="true">
+    <bean id="dbAccessService" class="cn.momia.service.base.DbAccessService" abstract="true">
         <property name="jdbcTemplate" ref="jdbcTemplate" />
     </bean>
 
@@ -63,10 +63,10 @@
         <property name="couponService" ref="couponService" />
     </bean>
 
-    <bean id="baseProductService" class="cn.momia.service.base.product.base.impl.BaseProductServiceImpl" parent="dbAccessService" init-method="init" />
-    <bean id="placeService" class="cn.momia.service.base.product.place.impl.PlaceServiceImpl" parent="dbAccessService" />
-    <bean id="skuService" class="cn.momia.service.base.product.sku.impl.SkuServiceImpl" parent="dbAccessService" />
-    <bean id="productService" class="cn.momia.service.base.product.impl.ProductServiceImpl" parent="dbAccessService">
+    <bean id="baseProductService" class="cn.momia.service.product.base.impl.BaseProductServiceImpl" parent="dbAccessService" init-method="init" />
+    <bean id="placeService" class="cn.momia.service.product.place.impl.PlaceServiceImpl" parent="dbAccessService" />
+    <bean id="skuService" class="cn.momia.service.product.sku.impl.SkuServiceImpl" parent="dbAccessService" />
+    <bean id="productService" class="cn.momia.service.product.impl.ProductServiceImpl" parent="dbAccessService">
         <property name="baseProductService" ref="baseProductService" />
         <property name="placeService" ref="placeService" />
         <property name="skuService" ref="skuService" />

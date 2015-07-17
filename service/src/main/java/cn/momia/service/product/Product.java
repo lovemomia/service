@@ -1,9 +1,9 @@
-package cn.momia.service.base.product;
+package cn.momia.service.product;
 
 import cn.momia.common.misc.TimeUtil;
-import cn.momia.service.base.product.base.BaseProduct;
-import cn.momia.service.base.product.place.Place;
-import cn.momia.service.base.product.sku.Sku;
+import cn.momia.service.product.base.BaseProduct;
+import cn.momia.service.product.place.Place;
+import cn.momia.service.product.sku.Sku;
 import com.alibaba.fastjson.JSONArray;
 
 import java.io.Serializable;
