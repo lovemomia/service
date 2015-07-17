@@ -1,8 +1,10 @@
-package cn.momia.service.base.user.impl;
+package cn.momia.service.user.base.impl;
 
 import cn.momia.common.secret.PasswordEncryptor;
 import cn.momia.common.web.secret.SecretKey;
 import cn.momia.service.common.DbAccessService;
+import cn.momia.service.user.base.User;
+import cn.momia.service.user.base.UserService;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -13,8 +15,6 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import cn.momia.service.base.user.User;
-import cn.momia.service.base.user.UserService;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -35,31 +35,24 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "password", "avatar", "name", "sex", "birthday", "cityId", "address", "children" };
 
     @Override
-    public User add(String nickName, String mobile, String password, String token) {
-        if (!validateMobile(mobile)) return User.DUPLICATE_USER;
+    public boolean exists(String field, String value) {
+        String sql = "SELECT COUNT(1) FROM t_user WHERE " + field + "=?";
 
-        return addUser(nickName, mobile, PasswordEncryptor.encrypt(mobile, password, SecretKey.getPasswordSecretKey()), token);
-    }
-
-    public boolean validateMobile(String mobile) {
-        String sql = "SELECT COUNT(1) FROM t_user WHERE mobile=?";
-        int count = jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<Integer>() {
+        return jdbcTemplate.query(sql, new Object[] { value }, new ResultSetExtractor<Boolean>() {
             @Override
-            public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
-                if (rs.next()) return rs.getInt(1);
-                return 0;
+            public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getInt(1) > 0 : false;
             }
         });
-
-        return count == 0;
     }
 
-    public User addUser(final String nickName, final String mobile, final String password, final String token) {
+    @Override
+    public long add(final String nickName, final String mobile, final String password, final String token) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO t_user(nickName, mobile, password, token, addTime) VALUES (?, ?, ?, ?,NOW())";
+                String sql = "INSERT INTO t_user(nickName, mobile, password, token, addTime) VALUES (?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, nickName);
                 ps.setString(2, mobile);
@@ -70,7 +63,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
             }
         }, keyHolder);
 
-        return get(keyHolder.getKey().longValue());
+        return keyHolder.getKey().longValue();
     }
 
     @Override

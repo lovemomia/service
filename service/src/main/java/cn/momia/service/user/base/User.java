@@ -1,4 +1,4 @@
-package cn.momia.service.base.user;
+package cn.momia.service.user.base;
 
 import java.io.Serializable;
 import java.util.Date;

@@ -1,4 +1,4 @@
-package cn.momia.service.sms;
+package cn.momia.service.common.sms;
 
 import cn.momia.service.common.DbAccessService;
 import org.springframework.dao.DataAccessException;

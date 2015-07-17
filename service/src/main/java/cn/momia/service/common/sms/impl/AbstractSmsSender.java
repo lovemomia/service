@@ -1,9 +1,9 @@
-package cn.momia.service.sms.impl;
+package cn.momia.service.common.sms.impl;
 
 import cn.momia.common.config.Configuration;
 import cn.momia.common.web.exception.MomiaFailedException;
 import cn.momia.service.common.DbAccessService;
-import cn.momia.service.sms.SmsSender;
+import cn.momia.service.common.sms.SmsSender;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -33,7 +33,7 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
     }
 
     @Override
-    public void send(String mobile, String type) {
+    public boolean send(String mobile, String type) {
         if(StringUtils.equals(type, "login") && !userExists(mobile)) throw new MomiaFailedException("用户不存在，请先注册");
 
         String code = getGeneratedCode(mobile);
@@ -43,9 +43,11 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
             updateCode(mobile, code, outOfDate);
         }
         Date lastSendTime = getLastSendTime(mobile);
-        if (lastSendTime != null && new Date().getTime() - lastSendTime.getTime() < 60 * 1000) return;
+        if (lastSendTime != null && new Date().getTime() - lastSendTime.getTime() < 60 * 1000) return true;
 
         sendAsync(mobile, code);
+
+        return true;
     }
 
     private boolean userExists(String mobile) {

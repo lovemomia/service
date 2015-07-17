@@ -1,4 +1,4 @@
-package cn.momia.service.base.user.participant;
+package cn.momia.service.user.participant;
 
 import cn.momia.common.misc.AgeUtil;
 import org.apache.commons.lang3.StringUtils;

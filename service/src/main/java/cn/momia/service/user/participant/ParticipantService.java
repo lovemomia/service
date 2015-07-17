@@ -1,4 +1,4 @@
-package cn.momia.service.base.user.participant;
+package cn.momia.service.user.participant;
 
 import java.util.Collection;
 import java.util.Date;

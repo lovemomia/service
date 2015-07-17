@@ -1,8 +1,8 @@
-package cn.momia.service.base.user.participant.impl;
+package cn.momia.service.user.participant.impl;
 
 import cn.momia.service.common.DbAccessService;
-import cn.momia.service.base.user.participant.Participant;
-import cn.momia.service.base.user.participant.ParticipantService;
+import cn.momia.service.user.participant.Participant;
+import cn.momia.service.user.participant.ParticipantService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

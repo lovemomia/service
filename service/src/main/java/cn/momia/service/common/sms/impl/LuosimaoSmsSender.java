@@ -1,4 +1,4 @@
-package cn.momia.service.sms.impl;
+package cn.momia.service.common.sms.impl;
 
 import cn.momia.common.web.secret.SecretKey;
 import com.alibaba.fastjson.JSON;
