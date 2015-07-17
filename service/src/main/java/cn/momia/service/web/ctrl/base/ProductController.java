@@ -15,6 +15,7 @@ import cn.momia.service.base.user.participant.ParticipantService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.web.ctrl.AbstractController;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -56,6 +60,45 @@ public class ProductController extends AbstractController {
         JSONObject productsPackJson = new JSONObject();
         productsPackJson.put("totalCount", totalCount);
         productsPackJson.put("products", products);
+
+        return new ResponseMessage(productsPackJson);
+    }
+
+    @RequestMapping(value = "/weekend", method = RequestMethod.GET)
+    public ResponseMessage getProductsByWeekend(@RequestParam(value = "city") int cityId,
+                                                @RequestParam int start,
+                                                @RequestParam int count) {
+        // TODO
+        if (cityId < 0 || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
+
+        long totalCount = productService.queryCount(new ProductQuery(cityId, ""));
+        List<Product> products = totalCount > 0 ? productService.query(start, count, new ProductQuery(cityId, "")) : new ArrayList<Product>();
+
+        JSONObject productsPackJson = new JSONObject();
+        productsPackJson.put("totalCount", totalCount);
+        productsPackJson.put("products", products);
+
+        return new ResponseMessage(productsPackJson);
+    }
+
+    @RequestMapping(value = "/month", method = RequestMethod.GET)
+    public ResponseMessage getProductsByMonth(@RequestParam(value = "city") int cityId,
+                                              @RequestParam int month) {
+        // TODO
+        if (cityId < 0) return ResponseMessage.BAD_REQUEST;
+
+        long totalCount = productService.queryCount(new ProductQuery(cityId, ""));
+        List<Product> products = totalCount > 0 ? productService.query(0, 1000, new ProductQuery(cityId, "")) : new ArrayList<Product>();
+
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        JSONArray productsPackJson = new JSONArray();
+        for (Product product : products) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("date", df.format(product.getStartTime()));
+            jsonObject.put("product", product);
+
+            productsPackJson.add(jsonObject);
+        }
 
         return new ResponseMessage(productsPackJson);
     }
