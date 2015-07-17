@@ -66,7 +66,7 @@
     <bean id="baseProductService" class="cn.momia.service.product.base.impl.BaseProductServiceImpl" parent="dbAccessService" init-method="init" />
     <bean id="placeService" class="cn.momia.service.product.place.impl.PlaceServiceImpl" parent="dbAccessService" />
     <bean id="skuService" class="cn.momia.service.product.sku.impl.SkuServiceImpl" parent="dbAccessService" />
-    <bean id="productService" class="cn.momia.service.product.impl.ProductServiceImpl" parent="dbAccessService">
+    <bean id="productService" class="cn.momia.service.product.impl.ProductServiceFacadeImpl" parent="dbAccessService">
         <property name="baseProductService" ref="baseProductService" />
         <property name="placeService" ref="placeService" />
         <property name="skuService" ref="skuService" />
@@ -90,7 +90,7 @@
         <property name="conf" ref="conf" />
         <property name="orderService" ref="orderService" />
         <property name="paymentService" ref="paymentService" />
-        <property name="productService" ref="productService" />
+        <property name="productServiceFacade" ref="productService" />
         <property name="couponService" ref="couponService" />
     </bean>
 

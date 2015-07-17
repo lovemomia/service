@@ -1,7 +1,7 @@
 package cn.momia.service.web.ctrl.deal;
 
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.service.product.ProductService;
+import cn.momia.service.product.ProductServiceFacade;
 import cn.momia.service.product.sku.Sku;
 import cn.momia.service.product.sku.SkuPrice;
 import cn.momia.service.user.base.User;
@@ -31,7 +31,7 @@ public class OrderController extends AbstractController {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
 
     @Autowired private OrderService orderService;
-    @Autowired private ProductService productService;
+    @Autowired private ProductServiceFacade productServiceFacade;
     @Autowired private UserService userService;
     @Autowired private CouponService couponService;
 
@@ -74,7 +74,7 @@ public class OrderController extends AbstractController {
                 order.getPrices().isEmpty() ||
                 StringUtils.isBlank(order.getMobile())) return false;
 
-        Sku sku = productService.getSku(order.getSkuId());
+        Sku sku = productServiceFacade.getSku(order.getSkuId());
         for (OrderPrice price : order.getPrices()) {
             boolean found = false;
             List<SkuPrice> skuPrices = sku.getPrice(price.getAdult(), price.getChild());
@@ -92,7 +92,7 @@ public class OrderController extends AbstractController {
     }
 
     private boolean lockSku(Order order) {
-        return productService.lockStock(order.getProductId(), order.getSkuId(), order.getCount());
+        return productServiceFacade.lockStock(order.getProductId(), order.getSkuId(), order.getCount());
     }
 
     private void processContacts(long customerId, String contacts, String mobile) {
@@ -110,7 +110,7 @@ public class OrderController extends AbstractController {
     private void checkLimit(long customerId, long skuId, int count) throws OrderLimitException {
         int limit;
         try {
-            Sku sku = productService.getSku(skuId);
+            Sku sku = productServiceFacade.getSku(skuId);
 
             limit = sku.getLimit();
             if (limit <= 0) return;
@@ -131,14 +131,14 @@ public class OrderController extends AbstractController {
 
     private void increaseJoined(long productId, int count) {
         try {
-            if (!productService.join(productId, count)) LOGGER.warn("fail to increase joined of product: {}", productId);
+            if (!productServiceFacade.join(productId, count)) LOGGER.warn("fail to increase joined of product: {}", productId);
         } catch (Exception e) {
             LOGGER.warn("fail to increase joined of product: {}", productId);
         }
     }
 
     private boolean unlockSku(Order order) {
-        return productService.unlockStock(order.getProductId(), order.getSkuId(), order.getCount());
+        return productServiceFacade.unlockStock(order.getProductId(), order.getSkuId(), order.getCount());
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)

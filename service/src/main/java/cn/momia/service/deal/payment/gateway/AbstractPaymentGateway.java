@@ -1,7 +1,7 @@
 package cn.momia.service.deal.payment.gateway;
 
 import cn.momia.common.config.Configuration;
-import cn.momia.service.product.ProductService;
+import cn.momia.service.product.ProductServiceFacade;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.deal.payment.Payment;
@@ -18,7 +18,7 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
     protected Configuration conf;
     protected OrderService orderService;
     protected PaymentService paymentService;
-    protected ProductService productService;
+    protected ProductServiceFacade productServiceFacade;
     protected CouponService couponService;
 
     public void setConf(Configuration conf) {
@@ -33,8 +33,8 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
         this.paymentService = paymentService;
     }
 
-    public void setProductService(ProductService productService) {
-        this.productService = productService;
+    public void setProductServiceFacade(ProductServiceFacade productServiceFacade) {
+        this.productServiceFacade = productServiceFacade;
     }
 
     public void setCouponService(CouponService couponService) {
@@ -102,7 +102,7 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
                 return;
             }
 
-            if (!productService.sold(order.getProductId(), order.getCount())) {
+            if (!productServiceFacade.sold(order.getProductId(), order.getCount())) {
                 LOGGER.error("fail to log sales of order: {}", order.getId());
             }
         } catch (Exception e) {

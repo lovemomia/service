@@ -2,7 +2,7 @@ package cn.momia.service.web.ctrl.user;
 
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.product.Product;
-import cn.momia.service.product.ProductService;
+import cn.momia.service.product.ProductServiceFacade;
 import cn.momia.service.product.sku.Sku;
 import cn.momia.service.user.base.User;
 import cn.momia.service.deal.order.Order;
@@ -32,7 +32,7 @@ import java.util.Set;
 @RequestMapping("/user")
 public class UserController extends UserRelatedController {
     @Autowired private OrderService orderService;
-    @Autowired private ProductService productService;
+    @Autowired private ProductServiceFacade productServiceFacade;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getUser(@RequestParam String utoken) {
@@ -60,7 +60,7 @@ public class UserController extends UserRelatedController {
             productIds.add(order.getProductId());
         }
 
-        List<Product> products = productIds.isEmpty() ? new ArrayList<Product>() : productService.get(productIds);
+        List<Product> products = productIds.isEmpty() ? new ArrayList<Product>() : productServiceFacade.get(productIds);
 
         return new ResponseMessage(buildUserOrders(totalCount, orders, products));
     }
@@ -111,7 +111,7 @@ public class UserController extends UserRelatedController {
         Order order = orderService.get(orderId);
         if (!order.exists()) return ResponseMessage.BAD_REQUEST;
 
-        Product product = productService.get(productId);
+        Product product = productServiceFacade.get(productId);
         if (!product.exists()) return ResponseMessage.BAD_REQUEST;
 
         return new ResponseMessage(buildOrderDetail(order, product));

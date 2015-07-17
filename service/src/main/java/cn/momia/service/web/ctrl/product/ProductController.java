@@ -5,7 +5,7 @@ import cn.momia.service.web.dto.Customers;
 import cn.momia.service.web.dto.Playmate;
 import cn.momia.service.product.Product;
 import cn.momia.service.product.ProductQuery;
-import cn.momia.service.product.ProductService;
+import cn.momia.service.product.ProductServiceFacade;
 import cn.momia.service.web.dto.SkuPlaymates;
 import cn.momia.service.product.sku.Sku;
 import cn.momia.service.user.base.User;
@@ -40,7 +40,7 @@ import java.util.Set;
 public class ProductController extends AbstractController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductController.class);
 
-    @Autowired private ProductService productService;
+    @Autowired private ProductServiceFacade productServiceFacade;
 
     @Autowired private OrderService orderService;
     @Autowired private UserService userService;
@@ -53,8 +53,8 @@ public class ProductController extends AbstractController {
                                        @RequestParam(required = false) String query) {
         if (cityId < 0 || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
 
-        long totalCount = productService.queryCount(new ProductQuery(cityId, query));
-        List<Product> products = totalCount > 0 ? productService.query(start, count, new ProductQuery(cityId, query)) : new ArrayList<Product>();
+        long totalCount = productServiceFacade.queryCount(new ProductQuery(cityId, query));
+        List<Product> products = totalCount > 0 ? productServiceFacade.query(start, count, new ProductQuery(cityId, query)) : new ArrayList<Product>();
 
         JSONObject productsPackJson = new JSONObject();
         productsPackJson.put("totalCount", totalCount);
@@ -70,8 +70,8 @@ public class ProductController extends AbstractController {
         // TODO
         if (cityId < 0 || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
 
-        long totalCount = productService.queryCount(new ProductQuery(cityId, ""));
-        List<Product> products = totalCount > 0 ? productService.query(start, count, new ProductQuery(cityId, "")) : new ArrayList<Product>();
+        long totalCount = productServiceFacade.queryCount(new ProductQuery(cityId, ""));
+        List<Product> products = totalCount > 0 ? productServiceFacade.query(start, count, new ProductQuery(cityId, "")) : new ArrayList<Product>();
 
         JSONObject productsPackJson = new JSONObject();
         productsPackJson.put("totalCount", totalCount);
@@ -86,8 +86,8 @@ public class ProductController extends AbstractController {
         // TODO
         if (cityId < 0) return ResponseMessage.BAD_REQUEST;
 
-        long totalCount = productService.queryCount(new ProductQuery(cityId, ""));
-        List<Product> products = totalCount > 0 ? productService.query(0, 100, new ProductQuery(cityId, "")) : new ArrayList<Product>();
+        long totalCount = productServiceFacade.queryCount(new ProductQuery(cityId, ""));
+        List<Product> products = totalCount > 0 ? productServiceFacade.query(0, 100, new ProductQuery(cityId, "")) : new ArrayList<Product>();
 
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         JSONArray productsPackJson = new JSONArray();
@@ -106,7 +106,7 @@ public class ProductController extends AbstractController {
     public ResponseMessage getProduct(@PathVariable long id) {
         if (id <= 0) return ResponseMessage.BAD_REQUEST;
 
-        Product product = productService.get(id);
+        Product product = productServiceFacade.get(id);
         if (!product.exists()) return ResponseMessage.BAD_REQUEST;
 
         return new ResponseMessage(product);
@@ -116,7 +116,7 @@ public class ProductController extends AbstractController {
     public ResponseMessage getProductSkus(@PathVariable long id) {
         if (id <= 0) return ResponseMessage.BAD_REQUEST;
 
-        List<Sku> skus = productService.getSkus(id);
+        List<Sku> skus = productServiceFacade.getSkus(id);
 
         return new ResponseMessage(skus);
     }
@@ -207,7 +207,7 @@ public class ProductController extends AbstractController {
     }
 
     private List<Sku> extractSkus(long id, int start, int count) {
-        List<Sku> skus = productService.getSkus(id);
+        List<Sku> skus = productServiceFacade.getSkus(id);
         skus = Sku.sortByStartTime(skus);
 
         List<Sku> result = new ArrayList<Sku>();

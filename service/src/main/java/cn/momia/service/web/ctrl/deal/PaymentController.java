@@ -2,7 +2,7 @@ package cn.momia.service.web.ctrl.deal;
 
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.product.Product;
-import cn.momia.service.product.ProductService;
+import cn.momia.service.product.ProductServiceFacade;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
 import cn.momia.service.deal.order.Order;
@@ -36,7 +36,7 @@ public class PaymentController extends AbstractController {
     private static final Logger LOGGER = LoggerFactory.getLogger(PaymentController.class);
 
     @Autowired private UserService userService;
-    @Autowired private ProductService productService;
+    @Autowired private ProductServiceFacade productServiceFacade;
     @Autowired private OrderService orderService;
     @Autowired private CouponService couponService;
 
@@ -56,7 +56,7 @@ public class PaymentController extends AbstractController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         Order order = orderService.get(orderId);
-        Product product = productService.get(productId);
+        Product product = productServiceFacade.get(productId);
         if (!order.exists() || !product.exists()) return ResponseMessage.BAD_REQUEST;
         if (order.getCustomerId() != user.getId() || order.getSkuId() != skuId) return ResponseMessage.BAD_REQUEST;
 
@@ -153,7 +153,7 @@ public class PaymentController extends AbstractController {
                 !orderService.prepay(orderId) ||
                 !orderService.pay(orderId)) return ResponseMessage.FAILED("支付失败");
 
-        return new ResponseMessage(productService.get(productId));
+        return new ResponseMessage(productServiceFacade.get(productId));
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.GET)
@@ -172,6 +172,6 @@ public class PaymentController extends AbstractController {
         long userId = user.getId();
         if (!orderService.check(orderId, userId, productId, skuId)) return ResponseMessage.FAILED("支付失败");
 
-        return new ResponseMessage(productService.get(productId));
+        return new ResponseMessage(productServiceFacade.get(productId));
     }
 }

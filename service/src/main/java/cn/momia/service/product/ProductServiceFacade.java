@@ -5,7 +5,7 @@ import cn.momia.service.product.sku.Sku;
 import java.util.Collection;
 import java.util.List;
 
-public interface ProductService {
+public interface ProductServiceFacade {
     Product get(long id);
     List<Product> get(Collection<Long> ids);
     long queryCount(ProductQuery productQuery);

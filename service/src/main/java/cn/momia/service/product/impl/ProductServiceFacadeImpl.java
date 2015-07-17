@@ -4,7 +4,7 @@ import cn.momia.service.base.DbAccessService;
 import cn.momia.service.product.Product;
 import cn.momia.service.product.ProductImage;
 import cn.momia.service.product.ProductQuery;
-import cn.momia.service.product.ProductService;
+import cn.momia.service.product.ProductServiceFacade;
 import cn.momia.service.product.base.BaseProduct;
 import cn.momia.service.product.base.BaseProductService;
 import cn.momia.service.product.place.Place;
@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ProductServiceImpl extends DbAccessService implements ProductService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProductServiceImpl.class);
+public class ProductServiceFacadeImpl extends DbAccessService implements ProductServiceFacade {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProductServiceFacadeImpl.class);
 
     private BaseProductService baseProductService;
     private PlaceService placeService;
