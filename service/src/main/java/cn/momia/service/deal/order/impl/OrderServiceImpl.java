@@ -24,22 +24,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 public class OrderServiceImpl extends DbAccessService implements OrderService {
-    private static final Map<String, String> STATUS_QUERY_TYPE = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
-    static {
-        STATUS_QUERY_TYPE.put("lt", "<");
-        STATUS_QUERY_TYPE.put("le", "<=");
-        STATUS_QUERY_TYPE.put("eq", "=");
-        STATUS_QUERY_TYPE.put("ne", "<>");
-        STATUS_QUERY_TYPE.put("ge", ">=");
-        STATUS_QUERY_TYPE.put("gt", ">");
-    }
-    private static final String[] ORDER_FIELDS = { "id", "customerId", "productId", "skuId", "prices", "contacts", "mobile", "participants", "status", "addTime" };
-
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
+    private static final String[] ORDER_FIELDS = { "id", "customerId", "productId", "skuId", "prices", "contacts", "mobile", "participants", "status", "addTime" };
 
     @Override
     public long add(final Order order) {
@@ -127,12 +115,50 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
-    public List<Order> queryByProduct(long productId, int status, String type, int start, int count) {
+    public long queryCountByUser(long userId, int status) {
+        if (status == 0) {
+            String sql = "SELECT COUNT(1) FROM t_order WHERE customerId=? AND status<>0";
+            return jdbcTemplate.query(sql, new Object[] { userId }, new ResultSetExtractor<Long>() {
+                @Override
+                public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
+                    return rs.next() ? rs.getLong(1) : 0;
+                }
+            });
+        } else if (status == 2) {
+            String sql = "SELECT COUNT(1) FROM t_order WHERE customerId=? AND (status=? OR status=?)";
+            return jdbcTemplate.query(sql, new Object[] { userId, Order.Status.NOT_PAYED, Order.Status.PRE_PAYED }, new ResultSetExtractor<Long>() {
+                @Override
+                public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
+                    return rs.next() ? rs.getLong(1) : 0;
+                }
+            });
+        } else {
+            String sql = "SELECT COUNT(1) FROM t_order WHERE customerId=? AND status=?";
+            return jdbcTemplate.query(sql, new Object[] { userId, status }, new ResultSetExtractor<Long>() {
+                @Override
+                public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
+                    return rs.next() ? rs.getLong(1) : 0;
+                }
+            });
+        }
+    }
+
+    @Override
+    public List<Order> queryByUser(long userId, int status, int start, int count) {
         final List<Order> orders = new ArrayList<Order>();
 
-        if (status == Order.Status.ALL) {
-            String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status>0 LIMIT ?,?";
-            jdbcTemplate.query(sql, new Object[] { productId, start, count }, new RowCallbackHandler() {
+        if (status == 0) {
+            String sql = "SELECT " + joinFields() + " FROM t_order WHERE customerId=? AND status<>0 ORDER BY addTime DESC LIMIT ?,?";
+            jdbcTemplate.query(sql, new Object[] { userId, start, count }, new RowCallbackHandler() {
+                @Override
+                public void processRow(ResultSet rs) throws SQLException {
+                    Order order = buildOrder(rs);
+                    if (order.exists()) orders.add(order);
+                }
+            });
+        } else if (status == 2) {
+            String sql = "SELECT " + joinFields() + " FROM t_order WHERE customerId=? AND (status=? OR status=?) ORDER BY addTime DESC LIMIT ?,?";
+            jdbcTemplate.query(sql, new Object[] { userId, Order.Status.NOT_PAYED, Order.Status.PRE_PAYED, start, count }, new RowCallbackHandler() {
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
                     Order order = buildOrder(rs);
@@ -140,8 +166,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
                 }
             });
         } else {
-            String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status>0 AND status" + STATUS_QUERY_TYPE.get(type) + "? LIMIT ?,?";
-            jdbcTemplate.query(sql, new Object[] { productId, status, start, count }, new RowCallbackHandler() {
+            String sql = "SELECT " + joinFields() + " FROM t_order WHERE customerId=? AND status=? ORDER BY addTime DESC LIMIT ?,?";
+            jdbcTemplate.query(sql, new Object[] { userId, status, start, count }, new RowCallbackHandler() {
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
                     Order order = buildOrder(rs);
@@ -151,27 +177,6 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         }
 
         return orders;
-    }
-
-    @Override
-    public long queryCountByUser(long userId, int status, String type) {
-        if (status == Order.Status.ALL) {
-            String sql = "SELECT COUNT(1) FROM t_order WHERE customerId=? AND status>0";
-            return jdbcTemplate.query(sql, new Object[] { userId }, new ResultSetExtractor<Long>() {
-                @Override
-                public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
-                    return rs.next() ? rs.getLong(1) : 0;
-                }
-            });
-        } else {
-            String sql = "SELECT COUNT(1) FROM t_order WHERE customerId=? AND status>0 AND status" + STATUS_QUERY_TYPE.get(type) + "?";
-            return jdbcTemplate.query(sql, new Object[] { userId, status }, new ResultSetExtractor<Long>() {
-                @Override
-                public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
-                    return rs.next() ? rs.getLong(1) : 0;
-                }
-            });
-        }
     }
 
     @Override
@@ -185,33 +190,6 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
                 if (order.exists()) orders.add(order);
             }
         });
-
-        return orders;
-    }
-
-    @Override
-    public List<Order> queryByUser(long userId, int status, String type, int start, int count) {
-        final List<Order> orders = new ArrayList<Order>();
-
-        if (status == Order.Status.ALL) {
-            String sql = "SELECT " + joinFields() + " FROM t_order WHERE customerId=? AND status>0 ORDER BY addTime DESC LIMIT ?,?";
-            jdbcTemplate.query(sql, new Object[] { userId, start, count }, new RowCallbackHandler() {
-                @Override
-                public void processRow(ResultSet rs) throws SQLException {
-                    Order order = buildOrder(rs);
-                    if (order.exists()) orders.add(order);
-                }
-            });
-        } else {
-            String sql = "SELECT " + joinFields() + " FROM t_order WHERE customerId=? AND status>0 AND status" + STATUS_QUERY_TYPE.get(type) + "? ORDER BY addTime DESC LIMIT ?,?";
-            jdbcTemplate.query(sql, new Object[] { userId, status, start, count }, new RowCallbackHandler() {
-                @Override
-                public void processRow(ResultSet rs) throws SQLException {
-                    Order order = buildOrder(rs);
-                    if (order.exists()) orders.add(order);
-                }
-            });
-        }
 
         return orders;
     }

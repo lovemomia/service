@@ -54,7 +54,6 @@ public class UserController extends UserRelatedController {
     @RequestMapping(value = "/order", method = RequestMethod.GET)
     public ResponseMessage getOrdersOfUser(@RequestParam String utoken,
                                            @RequestParam int status,
-                                           @RequestParam(defaultValue = "eq") String type,
                                            @RequestParam int start,
                                            @RequestParam int count) {
         if (StringUtils.isBlank(utoken) || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
@@ -62,8 +61,8 @@ public class UserController extends UserRelatedController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        long totalCount = orderService.queryCountByUser(user.getId(), status, type);
-        List<Order> orders = totalCount > 0 ? orderService.queryByUser(user.getId(), status, type, start, count) : new ArrayList<Order>();
+        long totalCount = orderService.queryCountByUser(user.getId(), status);
+        List<Order> orders = totalCount > 0 ? orderService.queryByUser(user.getId(), status, start, count) : new ArrayList<Order>();
 
         List<Long> productIds = new ArrayList<Long>();
         for (Order order : orders) {

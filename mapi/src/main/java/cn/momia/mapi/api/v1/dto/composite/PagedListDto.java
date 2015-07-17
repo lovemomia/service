@@ -3,6 +3,8 @@ package cn.momia.mapi.api.v1.dto.composite;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 
 public class PagedListDto implements Dto {
+    public static final PagedListDto EMPTY = new PagedListDto();
+
     private long totalCount;
     private Integer nextIndex;
     private ListDto list = new ListDto();

@@ -46,25 +46,22 @@ public class UserV1Api extends AbstractV1Api {
     @RequestMapping(value = "/order", method = RequestMethod.GET)
     public ResponseMessage getOrdersOfUser(@RequestParam String utoken,
                                            @RequestParam int status,
-                                           @RequestParam(defaultValue = "eq") String type,
-                                           @RequestParam final int start,
-                                           @RequestParam final int count) {
-        final int maxPageCount = conf.getInt("Order.MaxPageCount");
+                                           @RequestParam final int start) {
         final int pageSize = conf.getInt("Order.PageSize");
-        if (StringUtils.isBlank(utoken) || start < 0 || count <= 0 || start > maxPageCount * pageSize) return ResponseMessage.BAD_REQUEST;
+        final int maxPageCount = conf.getInt("Order.MaxPageCount");
+        if (StringUtils.isBlank(utoken) || start < 0 || start > pageSize * maxPageCount) return new ResponseMessage(PagedListDto.EMPTY);
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("status", status)
-                .add("type", type)
                 .add("start", start)
-                .add("count", count);
+                .add("count", pageSize);
         MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("user/order"), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                return buildOrdersDto((JSONObject) data, start, count);
+                return buildOrdersDto((JSONObject) data, start, pageSize);
             }
         });
     }
