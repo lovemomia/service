@@ -43,7 +43,12 @@
         <property name="jdbcTemplate" ref="jdbcTemplate" />
     </bean>
 
-    <bean id="bannerService" class="cn.momia.service.base.banner.impl.BannerServiceImpl" parent="dbAccessService" />
+    <bean id="bannerService" class="cn.momia.service.promo.banner.impl.BannerServiceImpl" parent="dbAccessService" />
+    <bean id="feedbackService" class="cn.momia.service.base.feedback.impl.FeedbackServiceImpl" parent="dbAccessService" />
+    <bean id="promoService" class="cn.momia.service.promo.impl.PromoServiceFacadeImpl">
+        <property name="bannerService" ref="bannerService" />
+        <property name="couponService" ref="couponService" />
+    </bean>
 
     <bean id="baseProductService" class="cn.momia.service.base.product.base.impl.BaseProductServiceImpl" parent="dbAccessService" init-method="init" />
     <bean id="placeService" class="cn.momia.service.base.product.place.impl.PlaceServiceImpl" parent="dbAccessService" />
@@ -67,7 +72,6 @@
     <bean id="orderService" class="cn.momia.service.deal.order.impl.OrderServiceImpl" parent="dbAccessService" />
     <bean id="paymentService" class="cn.momia.service.deal.payment.impl.PaymentServiceImpl" parent="dbAccessService" />
 
-    <bean id="feedbackService" class="cn.momia.service.base.feedback.impl.FeedbackServiceImpl" parent="dbAccessService" />
 
     <bean id="couponService" class="cn.momia.service.promo.coupon.impl.CouponServiceImpl" parent="dbAccessService" />
 

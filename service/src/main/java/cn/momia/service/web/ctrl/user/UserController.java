@@ -7,9 +7,6 @@ import cn.momia.service.base.product.sku.Sku;
 import cn.momia.service.user.base.User;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
-import cn.momia.service.promo.coupon.Coupon;
-import cn.momia.service.promo.coupon.CouponService;
-import cn.momia.service.promo.coupon.UserCoupon;
 import cn.momia.service.user.participant.Participant;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -36,8 +33,6 @@ import java.util.Set;
 public class UserController extends UserRelatedController {
     @Autowired private OrderService orderService;
     @Autowired private ProductService productService;
-
-    @Autowired private CouponService couponService;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getUser(@RequestParam String utoken) {
@@ -132,36 +127,6 @@ public class UserController extends UserRelatedController {
         orderDetailJson.put("price", product.getMinPrice());
 
         return orderDetailJson;
-    }
-
-    @RequestMapping(value = "/coupon", method = RequestMethod.GET)
-    public ResponseMessage getCouponsOfUser(@RequestParam String utoken,
-                                            @RequestParam(value = "oid") long orderId,
-                                            @RequestParam int status,
-                                            @RequestParam int start,
-                                            @RequestParam int count) {
-        if (StringUtils.isBlank(utoken) || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
-
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
-
-        int totalCount = couponService.queryCountByUser(user.getId(), orderId, status);
-        List<UserCoupon> userCoupons = totalCount > 0 ? couponService.queryByUser(user.getId(), orderId, status, start, count) : new ArrayList<UserCoupon>();
-
-        List<Integer> couponIds = new ArrayList<Integer>();
-        for (UserCoupon userCoupon : userCoupons) couponIds.add(userCoupon.getCouponId());
-        Map<Integer, Coupon> couponsMap = couponService.getCoupons(couponIds);
-
-        return new ResponseMessage(buildCoupons(totalCount, userCoupons, couponsMap));
-    }
-
-    private JSONObject buildCoupons(int totalCount, List<UserCoupon> userCoupons, Map<Integer, Coupon> couponsMap) {
-        JSONObject couponsPackJson = new JSONObject();
-        couponsPackJson.put("totalCount", totalCount);
-        couponsPackJson.put("userCoupons", userCoupons);
-        couponsPackJson.put("coupons", couponsMap);
-
-        return couponsPackJson;
     }
 
     @RequestMapping(value = "/nickname", method = RequestMethod.PUT)
