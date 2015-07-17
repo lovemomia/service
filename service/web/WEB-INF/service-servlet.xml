@@ -10,7 +10,7 @@
 
     <context:component-scan base-package="cn.momia.common.web.controller" />
     <context:component-scan base-package="cn.momia.service.web.ctrl" />
-    <context:component-scan base-package="cn.momia.service.web.ctrl.base" />
+    <context:component-scan base-package="cn.momia.service.web.ctrl.product" />
     <context:component-scan base-package="cn.momia.service.web.ctrl.deal" />
 
     <mvc:annotation-driven>
