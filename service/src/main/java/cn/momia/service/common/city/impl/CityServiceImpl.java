@@ -1,8 +1,8 @@
-package cn.momia.service.base.city.impl;
+package cn.momia.service.common.city.impl;
 
 import cn.momia.service.common.DbAccessService;
-import cn.momia.service.base.city.City;
-import cn.momia.service.base.city.CityService;
+import cn.momia.service.common.city.City;
+import cn.momia.service.common.city.CityService;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;

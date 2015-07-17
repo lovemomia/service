@@ -20,7 +20,7 @@ public class AuthController extends UserRelatedController {
 
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     public ResponseMessage send(@RequestParam String mobile, @RequestParam String type) {
-        if (!commonService.sendCode(mobile, type)) return ResponseMessage.FAILED("发送短信验证码失败");
+        if (!commonServiceFacade.sendCode(mobile, type)) return ResponseMessage.FAILED("发送短信验证码失败");
         return ResponseMessage.SUCCESS;
     }
 
@@ -29,7 +29,7 @@ public class AuthController extends UserRelatedController {
                                     @RequestParam String mobile,
                                     @RequestParam String password,
                                     @RequestParam String code){
-        if (!commonService.verifyCode(mobile, code)) return ResponseMessage.FAILED("验证码不正确");
+        if (!commonServiceFacade.verifyCode(mobile, code)) return ResponseMessage.FAILED("验证码不正确");
 
         if (userServiceFacade.exists("mobile", mobile)) return ResponseMessage.FAILED("该手机号已经注册过");
         if (userServiceFacade.exists("nickName", nickName)) return ResponseMessage.FAILED("该昵称已存在");
@@ -56,7 +56,7 @@ public class AuthController extends UserRelatedController {
     public ResponseMessage loginByCode(@RequestParam String mobile, @RequestParam String code) {
         LOGGER.info("login by code: {}", mobile);
 
-        if (!commonService.verifyCode(mobile, code)) return ResponseMessage.FAILED("验证码不正确");
+        if (!commonServiceFacade.verifyCode(mobile, code)) return ResponseMessage.FAILED("验证码不正确");
 
         User user = userServiceFacade.getUserByMobile(mobile);
         if (!user.exists()) return ResponseMessage.FAILED("登录失败");
@@ -66,7 +66,7 @@ public class AuthController extends UserRelatedController {
 
     @RequestMapping(value = "/password", method = RequestMethod.PUT)
     public ResponseMessage updatePassword(@RequestParam String mobile, @RequestParam String password, @RequestParam String code) {
-        if (!commonService.verifyCode(mobile, code)) return ResponseMessage.FAILED("验证码不正确");
+        if (!commonServiceFacade.verifyCode(mobile, code)) return ResponseMessage.FAILED("验证码不正确");
 
         User user = userServiceFacade.updateUserPassword(mobile, password);
         if (!user.exists()) return ResponseMessage.FAILED("更改密码失败");

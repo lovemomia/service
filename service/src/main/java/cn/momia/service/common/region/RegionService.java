@@ -1,4 +1,4 @@
-package cn.momia.service.base.region;
+package cn.momia.service.common.region;
 
 import java.util.List;
 

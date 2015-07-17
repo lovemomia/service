@@ -1,7 +1,7 @@
-package cn.momia.service.base.region.impl;
+package cn.momia.service.common.region.impl;
 
-import cn.momia.service.base.region.Region;
-import cn.momia.service.base.region.RegionService;
+import cn.momia.service.common.region.Region;
+import cn.momia.service.common.region.RegionService;
 import cn.momia.service.common.DbAccessService;
 import org.springframework.jdbc.core.RowCallbackHandler;
 

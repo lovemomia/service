@@ -1,4 +1,4 @@
-package cn.momia.service.base.region;
+package cn.momia.service.common.region;
 
 public class Region {
     public static final Region NOT_EXIST_REGION = new Region();

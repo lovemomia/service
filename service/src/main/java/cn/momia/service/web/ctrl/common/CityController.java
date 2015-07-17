@@ -1,4 +1,4 @@
-package cn.momia.service.web.ctrl.base;
+package cn.momia.service.web.ctrl.common;
 
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.web.ctrl.AbstractController;
@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/")
-public class HealthController extends AbstractController {
+@RequestMapping("/city")
+public class CityController extends AbstractController {
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage health() {
-        return ResponseMessage.SUCCESS;
+    public ResponseMessage getAllCities() {
+        return new ResponseMessage(commonServiceFacade.getAllCities());
     }
 }

@@ -1,4 +1,4 @@
-package cn.momia.service.base.city;
+package cn.momia.service.common.city;
 
 public class City {
     public static final City NOT_EXIST_CITY = new City();

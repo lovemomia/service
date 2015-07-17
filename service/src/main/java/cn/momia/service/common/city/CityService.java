@@ -1,4 +1,4 @@
-package cn.momia.service.base.city;
+package cn.momia.service.common.city;
 
 import java.util.List;
 
