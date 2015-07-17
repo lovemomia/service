@@ -154,19 +154,19 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
     @Override
     public boolean updateChildName(long userId, long childId, String name) {
         if (userId <= 0 || childId <= 0 || StringUtils.isBlank(name)) return false;
-        return participantService.updateName(childId, name, userId);
+        return participantService.updateName(userId, childId, name);
     }
 
     @Override
     public boolean updateChildSex(long userId, long childId, String sex) {
         if (userId <= 0 || childId <= 0 || StringUtils.isBlank(sex)) return false;
-        return participantService.updateSex(childId, sex, userId);
+        return participantService.updateSex(userId, childId, sex);
     }
 
     @Override
     public boolean updateChildBirthday(long userId, long childId, Date birthday) {
         if (userId <= 0 || childId <= 0 || birthday == null) return false;
-        return participantService.updateBirthday(childId, birthday, userId);
+        return participantService.updateBirthday(userId, childId, birthday);
     }
 
     @Override
@@ -201,6 +201,6 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
     @Override
     public boolean deleteParticipant(long userId, long participantId) {
         if (userId <= 0 || participantId <= 0) return false;
-        return participantService.delete(participantId, userId);
+        return participantService.delete(userId, participantId);
     }
 }

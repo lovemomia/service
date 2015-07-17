@@ -52,45 +52,6 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
     }
 
     @Override
-    public boolean update(Participant participant) {
-        String sql = "UPDATE t_user_participant SET name=?, sex=?, birthday=?, idType=?, idNo=? WHERE id=? AND userId=?";
-
-        return update(sql, new Object[] { participant.getName(), participant.getSex(), participant.getBirthday(), participant.getIdType(), participant.getIdNo(), participant.getId(), participant.getUserId() });
-    }
-
-    private boolean update(String sql, Object[] args) {
-        return jdbcTemplate.update(sql, args) == 1;
-    }
-
-    @Override
-    public boolean updateName(long id, String name, long userId) {
-        String sql = "UPDATE t_user_participant SET name=? WHERE id=? AND userId=?";
-
-        return update(sql, new Object[] { name, id, userId });
-    }
-
-    @Override
-    public boolean updateSex(long id, String sex, long userId) {
-        String sql = "UPDATE t_user_participant SET sex=? WHERE id=? AND userId=?";
-
-        return update(sql, new Object[] { sex, id, userId });
-    }
-
-    @Override
-    public boolean updateBirthday(long id, Date birthday, long userId) {
-        String sql = "UPDATE t_user_participant SET birthday=? WHERE id=? AND userId=?";
-
-        return update(sql, new Object[] { birthday, id, userId });
-    }
-
-    @Override
-    public boolean delete(long id, long userId) {
-        String sql = "UPDATE t_user_participant SET status=0 WHERE id=? AND userId=?";
-
-        return update(sql, new Object[] { id, userId });
-    }
-
-    @Override
     public Participant get(long id) {
         String sql = "SELECT " + joinFields() + " FROM t_user_participant WHERE id=? AND status=1";
 
@@ -157,5 +118,44 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
         });
 
         return participants;
+    }
+
+    @Override
+    public boolean update(Participant participant) {
+        String sql = "UPDATE t_user_participant SET name=?, sex=?, birthday=?, idType=?, idNo=? WHERE id=? AND userId=?";
+
+        return update(sql, new Object[] { participant.getName(), participant.getSex(), participant.getBirthday(), participant.getIdType(), participant.getIdNo(), participant.getId(), participant.getUserId() });
+    }
+
+    private boolean update(String sql, Object[] args) {
+        return jdbcTemplate.update(sql, args) == 1;
+    }
+
+    @Override
+    public boolean updateName(long userId, long id, String name) {
+        String sql = "UPDATE t_user_participant SET name=? WHERE id=? AND userId=?";
+
+        return update(sql, new Object[] { name, id, userId });
+    }
+
+    @Override
+    public boolean updateSex(long userId, long id, String sex) {
+        String sql = "UPDATE t_user_participant SET sex=? WHERE id=? AND userId=?";
+
+        return update(sql, new Object[] { sex, id, userId });
+    }
+
+    @Override
+    public boolean updateBirthday(long userId, long id, Date birthday) {
+        String sql = "UPDATE t_user_participant SET birthday=? WHERE id=? AND userId=?";
+
+        return update(sql, new Object[] { birthday, id, userId });
+    }
+
+    @Override
+    public boolean delete(long userId, long id) {
+        String sql = "UPDATE t_user_participant SET status=0 WHERE id=? AND userId=?";
+
+        return update(sql, new Object[] { id, userId });
     }
 }

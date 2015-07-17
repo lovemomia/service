@@ -67,6 +67,19 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
+    public boolean validatePassword(String mobile, String password) {
+        String sql = "SELECT mobile, password FROM t_user WHERE mobile=? AND password=?";
+
+        return jdbcTemplate.query(sql, new Object[] { mobile, PasswordEncryptor.encrypt(mobile, password, SecretKey.getPasswordSecretKey()) }, new ResultSetExtractor<Boolean>() {
+            @Override
+            public Boolean extractData(ResultSet resultSet) throws SQLException, DataAccessException {
+                if (resultSet.next()) return true;
+                return false;
+            }
+        });
+    }
+
+    @Override
     public User get(long id) {
         if (id <= 0) return User.NOT_EXIST_USER;
 
@@ -161,47 +174,14 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
-    public User getByNickName(String nickName) {
-        String sql = "SELECT " + joinFields() + " FROM t_user WHERE nickName=?";
-
-        return jdbcTemplate.query(sql, new Object[]{nickName}, new ResultSetExtractor<User>() {
-            @Override
-            public User extractData(ResultSet rs) throws SQLException, DataAccessException {
-                if(rs.next()) return buildUser(rs);
-                return User.NOT_EXIST_USER;
-            }
-        });
-    }
-
-    @Override
-    public boolean validatePassword(String mobile, String password) {
-        String sql = "SELECT mobile, password FROM t_user WHERE mobile=? AND password=?";
-
-        return jdbcTemplate.query(sql, new Object[] { mobile, PasswordEncryptor.encrypt(mobile, password, SecretKey.getPasswordSecretKey()) }, new ResultSetExtractor<Boolean>() {
-            @Override
-            public Boolean extractData(ResultSet resultSet) throws SQLException, DataAccessException {
-                if (resultSet.next()) return true;
-                return false;
-            }
-        });
-    }
-
-    @Override
-    public boolean updateToken(long id, String token) {
-        String sql = "UPDATE t_user SET token=? WHERE id=?";
-
-        return update(sql, new Object[] { token, id });
-    }
-
-    private boolean update(String sql, Object[] args) {
-        return jdbcTemplate.update(sql, args) == 1;
-    }
-
-    @Override
     public boolean updateNickName(long id, String nickName) {
         String sql = "UPDATE t_user SET nickName=? WHERE id=?";
 
         return update(sql, new Object[] { nickName, id });
+    }
+
+    private boolean update(String sql, Object[] args) {
+        return jdbcTemplate.update(sql, args) == 1;
     }
 
     @Override
