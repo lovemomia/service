@@ -32,7 +32,7 @@ public class CouponController extends AbstractController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         Order order = orderService.get(orderId);
-        if (!order.exists()) return ResponseMessage.FAILED("无效的订单");
+        if (!order.exists() || order.isPayed() || order.getCustomerId() != user.getId()) return ResponseMessage.FAILED("无效的订单");
 
         UserCoupon userCoupon = promoServiceFacade.getUserCoupon(user.getId(), order.getId(), userCouponId);
         if (!userCoupon.exists()) return ResponseMessage.FAILED("无效的优惠券，或使用条件不满足");

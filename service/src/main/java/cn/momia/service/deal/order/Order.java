@@ -137,6 +137,10 @@ public class Order implements Serializable {
         return !this.equals(NOT_EXIST_ORDER);
     }
 
+    public boolean isPayed() {
+        return status >= Status.PAYED;
+    }
+
     public BigDecimal getTotalFee() {
         BigDecimal totalFee = new BigDecimal(0);
         for (OrderPrice price : prices) {

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/coupon")
+@RequestMapping("/v1/coupon")
 public class CouponV1Api extends AbstractV1Api {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage coupon(@RequestParam String utoken,
