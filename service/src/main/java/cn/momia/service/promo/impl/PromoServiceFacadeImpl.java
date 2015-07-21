@@ -32,6 +32,12 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
     }
 
     @Override
+    public long getUserRegisterCoupon(long userId) {
+        if (userId <= 0) return 0;
+        return couponService.getUserRegisterCoupon(userId);
+    }
+
+    @Override
     public UserCoupon getUserCoupon(long userId, long orderId, long userCouponId) {
         if (userId <= 0 || orderId <= 0 || userCouponId <= 0) return UserCoupon.NOT_EXIST_USER_COUPON;
         return couponService.getUserCoupon(userId, orderId, userCouponId);

@@ -12,6 +12,8 @@ import java.util.Map;
 public interface PromoServiceFacade {
     List<Banner> getBanners(int cityId, int count);
 
+    long getUserRegisterCoupon(long userId);
+
     UserCoupon getUserCoupon(long userId, long orderId, long userCouponId);
     Coupon getCoupon(int couponId);
     BigDecimal calcTotalFee(BigDecimal totalFee, Coupon coupon);

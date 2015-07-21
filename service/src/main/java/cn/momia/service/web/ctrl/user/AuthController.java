@@ -2,10 +2,8 @@ package cn.momia.service.web.ctrl.user;
 
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.user.base.User;
-import cn.momia.service.promo.coupon.CouponService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,8 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class AuthController extends UserRelatedController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthController.class);
-
-    @Autowired private CouponService couponService;
 
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     public ResponseMessage send(@RequestParam String mobile, @RequestParam String type) {
@@ -37,7 +33,7 @@ public class AuthController extends UserRelatedController {
         User user = userServiceFacade.register(nickName, mobile, password);
         if (!user.exists()) return ResponseMessage.FAILED("注册失败");
 
-        long userCouponId = couponService.getUserRegisterCoupon(user.getId());
+        long userCouponId = promoServiceFacade.getUserRegisterCoupon(user.getId());
 
         return new ResponseMessage(buildUserResponse(user, userCouponId));
     }
