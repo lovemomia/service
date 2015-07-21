@@ -146,7 +146,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     @Override
     public int queryCountByUser(long userId, long orderId, int status) {
         if (status == UserCoupon.Status.EXPIRED) {
-            String sql = "SELECT COUNT(1) FROM t_user_coupon WHERE userId=? AND status<>0 AND endTime<=NOW()";
+            String sql = "SELECT COUNT(1) FROM t_user_coupon WHERE userId=? AND status=? AND endTime<=NOW()";
 
             return jdbcTemplate.query(sql, new Object[] { userId, UserCoupon.Status.NOT_USED }, new ResultSetExtractor<Integer>() {
                 @Override
@@ -189,7 +189,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
         final List<UserCoupon> userCoupons = new ArrayList<UserCoupon>();
 
         if (status == UserCoupon.Status.EXPIRED) {
-            String sql = "SELECT " + joinUserCouponFields() + " FROM t_user_coupon WHERE userId=? AND status<>0 AND endTime<=NOW() ORDER BY addTime DESC LIMIT ?,?";
+            String sql = "SELECT " + joinUserCouponFields() + " FROM t_user_coupon WHERE userId=? AND status=? AND endTime<=NOW() ORDER BY addTime DESC LIMIT ?,?";
             jdbcTemplate.query(sql, new Object[] { userId, UserCoupon.Status.NOT_USED, start, count }, new RowCallbackHandler() {
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
