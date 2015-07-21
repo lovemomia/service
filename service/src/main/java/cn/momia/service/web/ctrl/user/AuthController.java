@@ -33,8 +33,7 @@ public class AuthController extends UserRelatedController {
         User user = userServiceFacade.register(nickName, mobile, password);
         if (!user.exists()) return ResponseMessage.FAILED("注册失败");
 
-        long userCouponId = promoServiceFacade.getUserRegisterCoupon(user.getId());
-        return new ResponseMessage(buildUserResponse(user, userCouponId));
+        return new ResponseMessage(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
