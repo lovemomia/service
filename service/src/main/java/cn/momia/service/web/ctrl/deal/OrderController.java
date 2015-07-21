@@ -37,10 +37,11 @@ public class OrderController extends AbstractController {
 
         long orderId = 0;
         try {
-            if (!checkOrder(order)) return ResponseMessage.FAILED("无效的订单");
+            Sku sku = productServiceFacade.getSku(order.getSkuId());
+            if (!checkOrder(order, sku)) return ResponseMessage.FAILED("无效的订单");
 
             processContacts(order.getCustomerId(), order.getContacts(), order.getMobile());
-            checkLimit(order.getCustomerId(), order.getSkuId(), order.getCount());
+            checkLimit(order.getCustomerId(), sku, order.getCount());
             increaseJoined(order.getProductId(), order.getCount());
 
             orderId = dealServiceFacade.placeOrder(order);
@@ -67,14 +68,13 @@ public class OrderController extends AbstractController {
         return productServiceFacade.lockStock(order.getProductId(), order.getSkuId(), order.getCount());
     }
 
-    private boolean checkOrder(Order order) {
+    private boolean checkOrder(Order order, Sku sku) {
         if (order.getCustomerId() <= 0 ||
                 order.getProductId() <= 0 ||
                 order.getSkuId() <= 0 ||
                 order.getPrices().isEmpty() ||
                 StringUtils.isBlank(order.getMobile())) return false;
 
-        Sku sku = productServiceFacade.getSku(order.getSkuId());
         for (OrderPrice price : order.getPrices()) {
             boolean found = false;
             List<SkuPrice> skuPrices = sku.getPrice(price.getAdult(), price.getChild());
@@ -104,13 +104,11 @@ public class OrderController extends AbstractController {
         }
     }
 
-    private void checkLimit(long customerId, long skuId, int count) throws OrderLimitException {
-        Sku sku = productServiceFacade.getSku(skuId);
-
+    private void checkLimit(long customerId, Sku sku, int count) throws OrderLimitException {
         int limit = sku.getLimit();
         if (limit <= 0) return;
 
-        dealServiceFacade.checkLimit(customerId, skuId, count, limit);
+        dealServiceFacade.checkLimit(customerId, sku.getId(), count, limit);
     }
 
     private void increaseJoined(long productId, int count) {
