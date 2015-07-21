@@ -132,8 +132,11 @@ public class UserController extends UserRelatedController {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        boolean successful = userServiceFacade.updateUserNickName(user.getId(), nickName);
-        if (!successful) return ResponseMessage.FAILED("更新用户昵称失败");
+        String originalNickName = user.getNickName();
+        if (StringUtils.isBlank(originalNickName) || !originalNickName.equals(nickName)) {
+            boolean successful = userServiceFacade.updateUserNickName(user.getId(), nickName);
+            if (!successful) return ResponseMessage.FAILED("更新用户昵称失败");
+        }
 
         user.setNickName(nickName);
         return new ResponseMessage(buildUserResponse(user));
