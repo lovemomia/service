@@ -73,7 +73,8 @@ public class OrderController extends AbstractController {
                 order.getProductId() <= 0 ||
                 order.getSkuId() <= 0 ||
                 order.getPrices().isEmpty() ||
-                StringUtils.isBlank(order.getMobile())) return false;
+                StringUtils.isBlank(order.getMobile()) ||
+                order.getProductId() != sku.getProductId()) return false;
 
         for (OrderPrice price : order.getPrices()) {
             boolean found = false;
