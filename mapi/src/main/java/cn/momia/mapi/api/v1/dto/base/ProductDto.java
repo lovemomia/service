@@ -25,6 +25,8 @@ public class ProductDto implements Dto {
     private JSONArray tags;
     @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date startTime;
     @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date endTime;
+    private int status;
+    private boolean opened = true;
 
     // extra info
     private List<String> imgs;
@@ -158,6 +160,22 @@ public class ProductDto implements Dto {
         this.endTime = endTime;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public boolean isOpened() {
+        return opened;
+    }
+
+    public void setOpened(boolean opened) {
+        this.opened = opened;
+    }
+
     public List<String> getImgs() {
         return imgs;
     }
@@ -193,6 +211,8 @@ public class ProductDto implements Dto {
         this.tags = productDto.tags;
         this.startTime = productDto.startTime;
         this.endTime = productDto.endTime;
+        this.status = productDto.status;
+        this.opened = productDto.opened;
 
         this.imgs = productDto.imgs;
         this.content = productDto.content;

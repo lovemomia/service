@@ -80,6 +80,10 @@ public class Product implements Serializable {
         return baseProduct.getEndTime();
     }
 
+    public int getStatus() {
+        return baseProduct.getStatus();
+    }
+
     public void setBaseProduct(BaseProduct baseProduct) {
         this.baseProduct = baseProduct;
     }

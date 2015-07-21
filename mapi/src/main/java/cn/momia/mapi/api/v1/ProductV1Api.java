@@ -107,7 +107,9 @@ public class ProductV1Api extends AbstractV1Api {
         return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {
             @Override
             public Dto apply(MomiaHttpResponseCollector collector) {
-                return new ProductDetailDto((JSONObject) collector.getResponse("product"), (JSONObject) collector.getResponse("customers"));
+                return new ProductDetailDto((JSONObject) collector.getResponse("product"),
+                        (JSONObject) collector.getResponse("customers"),
+                        (JSONArray) collector.getResponse("skus"));
             }
         });
     }
@@ -115,6 +117,7 @@ public class ProductV1Api extends AbstractV1Api {
     private List<MomiaHttpRequest> buildProductRequests(long productId) {
         List<MomiaHttpRequest> requests = new ArrayList<MomiaHttpRequest>();
         requests.add(buildProductRequest(productId));
+        requests.add(buildProductSkusRequest(productId));
         requests.add(buildProductCustomersRequest(productId));
 
         return requests;
@@ -122,6 +125,10 @@ public class ProductV1Api extends AbstractV1Api {
 
     private MomiaHttpRequest buildProductRequest(long productId) {
         return MomiaHttpRequest.GET("product", true, url("product", productId));
+    }
+
+    private MomiaHttpRequest buildProductSkusRequest(long productId) {
+        return MomiaHttpRequest.GET("skus", true, url("product", productId, "sku"));
     }
 
     private MomiaHttpRequest buildProductCustomersRequest(long productId) {
@@ -152,10 +159,6 @@ public class ProductV1Api extends AbstractV1Api {
         requests.add(buildUserRequest(utoken));
 
         return requests;
-    }
-
-    private MomiaHttpRequest buildProductSkusRequest(long productId) {
-        return MomiaHttpRequest.GET("skus", true, url("product", productId, "sku"));
     }
 
     private MomiaHttpRequest buildUserRequest(String utoken) {

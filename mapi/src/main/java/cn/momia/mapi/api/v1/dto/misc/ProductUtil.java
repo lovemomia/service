@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ProductUtil {
@@ -56,6 +57,11 @@ public class ProductUtil {
         product.setTags(productJson.getJSONArray("tags"));
         product.setStartTime(productJson.getDate("startTime"));
         product.setEndTime(productJson.getDate("endTime"));
+        product.setStatus(productJson.getInteger("status"));
+
+        if (product.getEndTime().before(new Date()) ||
+                product.isSoldOut() ||
+                product.getStatus() != 1) product.setOpened(false);
 
         if (extractExtraInfo) {
             product.setImgs(extractProductImgs(productJson));

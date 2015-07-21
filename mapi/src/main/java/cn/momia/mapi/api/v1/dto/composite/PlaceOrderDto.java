@@ -38,7 +38,7 @@ public class PlaceOrderDto implements Dto {
         ListDto skus = new ListDto();
         for (int i = 0; i < skusJson.size(); i++) {
             SkuDto skuDto = new SkuDto(skusJson.getJSONObject(i));
-            if (skuDto.getStartTime().before(new Date()) ||
+            if (skuDto.getEndTime().before(new Date()) ||
                     (skuDto.getType() != 1 && skuDto.getStock() <= 0)) continue;
             skus.add(skuDto);
         }

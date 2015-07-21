@@ -29,6 +29,7 @@ public class BaseProduct {
     private boolean soldOut;
     private Date startTime;
     private Date endTime;
+    private int status;
 
     public long getId() {
         return id;
@@ -148,6 +149,14 @@ public class BaseProduct {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     @Override
