@@ -24,9 +24,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class CouponServiceImpl extends DbAccessService implements CouponService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CouponServiceImpl.class);
@@ -71,8 +69,8 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     }
 
     @Override
-    public Map<Integer, Coupon> getCoupons(Collection<Integer> couponIds) {
-        final Map<Integer, Coupon> coupons = new HashMap<Integer, Coupon>();
+    public List<Coupon> getCoupons(Collection<Integer> couponIds) {
+        final List<Coupon> coupons = new ArrayList<Coupon>();
         if (couponIds == null || couponIds.isEmpty()) return coupons;
 
         String sql = "SELECT " + joinCouponFields() + " FROM t_coupon WHERE id IN(" + StringUtils.join(Sets.newHashSet(couponIds), ",") + ") AND status=1";
@@ -80,7 +78,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 Coupon coupon = buildCoupon(rs);
-                if (coupon.exists()) coupons.put(coupon.getId(), coupon);
+                if (coupon.exists()) coupons.add(coupon);
             }
         });
 

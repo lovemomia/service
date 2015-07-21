@@ -1,4 +1,4 @@
-package cn.momia.service.web.dto;
+package cn.momia.service.web.ctrl.product.dto;
 
 import java.io.Serializable;
 import java.util.List;

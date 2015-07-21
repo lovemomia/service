@@ -1,11 +1,11 @@
 package cn.momia.service.web.ctrl.product;
 
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.service.web.dto.Customers;
-import cn.momia.service.web.dto.Playmate;
+import cn.momia.service.web.ctrl.product.dto.Customers;
+import cn.momia.service.web.ctrl.product.dto.Playmate;
 import cn.momia.service.product.Product;
 import cn.momia.service.product.ProductQuery;
-import cn.momia.service.web.dto.SkuPlaymates;
+import cn.momia.service.web.ctrl.product.dto.SkuPlaymates;
 import cn.momia.service.product.sku.Sku;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;

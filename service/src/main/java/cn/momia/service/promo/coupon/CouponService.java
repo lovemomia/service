@@ -9,7 +9,7 @@ import java.util.Map;
 
 public interface CouponService extends Service {
     Coupon getCoupon(int couponId);
-    Map<Integer, Coupon> getCoupons(Collection<Integer> couponIds);
+    List<Coupon> getCoupons(Collection<Integer> couponIds);
     long getUserRegisterCoupon(long userId);
     int queryCountByUser(long userId, long orderId, int status);
     List<UserCoupon> queryByUser(long userId, long orderId, int status, int start, int count);
