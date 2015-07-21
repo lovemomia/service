@@ -53,6 +53,8 @@
     <bean id="commonService" class="cn.momia.service.common.impl.CommonServiceFacadeImpl">
         <property name="smsSender" ref="smsSender" />
         <property name="smsVerifier" ref="smsVerifier" />
+        <property name="cityService" ref="cityService" />
+        <property name="regionService" ref="regionService" />
         <property name="feedbackService" ref="feedbackService" />
     </bean>
 

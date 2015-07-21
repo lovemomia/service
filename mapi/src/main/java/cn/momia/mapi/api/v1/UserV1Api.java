@@ -119,7 +119,7 @@ public class UserV1Api extends AbstractV1Api {
                 .add("status", status)
                 .add("start", start)
                 .add("count", pageSize);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/coupon"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("coupon/user"), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override

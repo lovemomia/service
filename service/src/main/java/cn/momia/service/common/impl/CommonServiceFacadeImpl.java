@@ -1,6 +1,7 @@
 package cn.momia.service.common.impl;
 
 import cn.momia.common.misc.ValidateUtil;
+import cn.momia.common.web.exception.MomiaFailedException;
 import cn.momia.service.common.CommonServiceFacade;
 import cn.momia.service.common.city.City;
 import cn.momia.service.common.city.CityService;
@@ -74,6 +75,7 @@ public class CommonServiceFacadeImpl implements CommonServiceFacade {
 
     @Override
     public long addFeedback(String content, String email) {
+        if (content.length() > 480) throw new MomiaFailedException("反馈意见字数超出限制");
         if (StringUtils.isBlank(content) || StringUtils.isBlank(email)) return 0;
         return feedbackService.add(content, email);
     }

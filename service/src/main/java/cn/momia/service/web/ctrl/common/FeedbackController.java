@@ -11,8 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/feedback")
 public class FeedbackController extends AbstractController {
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseMessage addFeedback(@RequestParam String content,
-                                       @RequestParam String email) {
+    public ResponseMessage addFeedback(@RequestParam String content, @RequestParam String email) {
         long feedbackId = commonServiceFacade.addFeedback(content, email);
         if (feedbackId <= 0) return ResponseMessage.FAILED("提交反馈意见失败");
 

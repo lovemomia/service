@@ -13,5 +13,4 @@ public interface CommonServiceFacade {
     List<Region> getAllRegions();
 
     long addFeedback(String content, String email);
-
 }
