@@ -1,15 +1,16 @@
 package cn.momia.service.user.participant;
 
+import cn.momia.service.base.Service;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
-public interface ParticipantService {
+public interface ParticipantService extends Service {
     long add(Participant participant);
 
     Participant get(long id);
-    Map<Long, Participant> get(Collection<Long> ids);
+    List<Participant> get(Collection<Long> ids);
     List<Participant> getByUser(long userId);
 
     boolean update(Participant participant);

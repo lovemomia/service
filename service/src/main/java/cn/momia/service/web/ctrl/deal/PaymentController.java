@@ -5,11 +5,7 @@ import cn.momia.service.product.Product;
 import cn.momia.service.user.base.User;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
-import cn.momia.service.deal.payment.gateway.PaymentGateway;
-import cn.momia.service.deal.payment.gateway.PrepayParam;
 import cn.momia.service.deal.payment.gateway.PrepayResult;
-import cn.momia.service.deal.payment.gateway.factory.PaymentGatewayFactory;
-import cn.momia.service.deal.payment.gateway.factory.PrepayParamFactory;
 import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.UserCoupon;
 import cn.momia.service.web.ctrl.AbstractController;
@@ -23,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/payment")
@@ -59,11 +54,7 @@ public class PaymentController extends AbstractController {
             if (coupon.invalid()) return ResponseMessage.FAILED("无效的优惠券，或使用条件不满足");
         }
 
-        // TODO refactor
-        PaymentGateway gateway = PaymentGatewayFactory.create(payType);
-        Map<String, String> params = gateway.extractPrepayParams(request, order, product, coupon);
-        PrepayParam prepayParam = PrepayParamFactory.create(params, payType);
-        PrepayResult prepayResult = gateway.prepay(prepayParam);
+        PrepayResult prepayResult = dealServiceFacade.prepay(request, order, product, coupon, payType);
 
         if (!prepayResult.isSuccessful()) return ResponseMessage.FAILED;
         return new ResponseMessage(prepayResult);

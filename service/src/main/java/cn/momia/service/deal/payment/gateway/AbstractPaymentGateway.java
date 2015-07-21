@@ -59,11 +59,11 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
     protected abstract PrepayResult doPrepay(PrepayParam param);
 
     @Override
-    public CallbackResult callback(CallbackParam param) {
+    public boolean callback(CallbackParam param) {
         if (isPayedSuccessfully(param) && validateCallbackSign(param) && !finishPayment(param)) {
-            return buildFailCallbackResult();
+            return false;
         } else {
-            return buildSuccessCallbackResult();
+            return true;
         }
     }
 
@@ -115,8 +115,4 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
     }
 
     protected abstract Payment createPayment(CallbackParam param);
-
-    protected abstract CallbackResult buildFailCallbackResult();
-
-    protected abstract CallbackResult buildSuccessCallbackResult();
 }

@@ -5,21 +5,16 @@ import cn.momia.service.web.dto.Customers;
 import cn.momia.service.web.dto.Playmate;
 import cn.momia.service.product.Product;
 import cn.momia.service.product.ProductQuery;
-import cn.momia.service.product.ProductServiceFacade;
 import cn.momia.service.web.dto.SkuPlaymates;
 import cn.momia.service.product.sku.Sku;
 import cn.momia.service.user.base.User;
-import cn.momia.service.user.base.UserService;
 import cn.momia.service.user.participant.Participant;
-import cn.momia.service.user.participant.ParticipantService;
 import cn.momia.service.deal.order.Order;
-import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.web.ctrl.AbstractController;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,12 +34,6 @@ import java.util.Set;
 @RequestMapping("/product")
 public class ProductController extends AbstractController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductController.class);
-
-    @Autowired private ProductServiceFacade productServiceFacade;
-
-    @Autowired private OrderService orderService;
-    @Autowired private UserService userService;
-    @Autowired private ParticipantService participantService;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getProducts(@RequestParam(value = "city") int cityId,
@@ -125,19 +114,23 @@ public class ProductController extends AbstractController {
     public ResponseMessage getProductCustomersInfo(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
         if (id <= 0 || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
 
-        List<Order> orders = orderService.queryDistinctCustomerOrderByProduct(id, start, count);
+        List<Order> orders = dealServiceFacade.queryDistinctCustomerOrderByProduct(id, start, count);
         if (orders.isEmpty()) return new ResponseMessage(new Customers("目前还没有人参加", null));
 
         List<Long> customerIds = new ArrayList<Long>();
         for (Order order : orders) customerIds.add(order.getCustomerId());
-        Map<Long, User> customers = userService.get(customerIds);
+        List<User> customers = userServiceFacade.getUsers(customerIds);
+        Map<Long, User> customersMap = new HashMap<Long, User>();
+        for (User customer : customers) {
+            customersMap.put(customer.getId(), customer);
+        }
 
 //        int adultCount = 0;
 //        int childCount = 0;
         List<String > avatars = new ArrayList<String>();
         for (Order order : orders) {
             long customerId = order.getCustomerId();
-            User customer = customers.get(customerId);
+            User customer = customersMap.get(customerId);
             if (customer == null) continue;
 
 //            adultCount += order.getAdultCount();
@@ -200,8 +193,15 @@ public class ProductController extends AbstractController {
             customerParticipantsIds.addAll(orderParticipantIds);
         }
 
-        Map<Long, User> customersMap = userService.get(customerIds);
-        Map<Long, Participant> participantsMap = participantService.get(participantIds);
+        Map<Long, User> customersMap = new HashMap<Long, User>();
+        for (User customer : userServiceFacade.getUsers(customerIds)) {
+            customersMap.put(customer.getId(), customer);
+        }
+
+        Map<Long, Participant> participantsMap = new HashMap<Long, Participant>();
+        for (Participant participant : userServiceFacade.getParticipants(participantIds)) {
+            participantsMap.put(participant.getId(), participant);
+        }
 
         return new ResponseMessage(buildPlaymates(skus, skuOrdersMap, skuCustomerIdsMap, customerPrticipantsIdsMap, customersMap, participantsMap));
     }
@@ -225,7 +225,7 @@ public class ProductController extends AbstractController {
         }
 
         List<Order> result = new ArrayList<Order>();
-        List<Order> orders = orderService.queryAllCustomerOrderByProduct(id);
+        List<Order> orders = dealServiceFacade.queryAllCustomerOrderByProduct(id);
         for (Order order : orders) {
             if (skuIds.contains(order.getSkuId())) result.add(order);
         }

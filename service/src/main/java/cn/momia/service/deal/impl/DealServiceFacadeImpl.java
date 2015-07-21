@@ -7,9 +7,15 @@ import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.deal.payment.PaymentService;
 import cn.momia.service.deal.payment.gateway.CallbackParam;
 import cn.momia.service.deal.payment.gateway.PaymentGateway;
+import cn.momia.service.deal.payment.gateway.PrepayParam;
+import cn.momia.service.deal.payment.gateway.PrepayResult;
 import cn.momia.service.deal.payment.gateway.factory.CallbackParamFactory;
 import cn.momia.service.deal.payment.gateway.factory.PaymentGatewayFactory;
+import cn.momia.service.deal.payment.gateway.factory.PrepayParamFactory;
+import cn.momia.service.product.Product;
+import cn.momia.service.promo.coupon.Coupon;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +57,7 @@ public class DealServiceFacadeImpl implements DealServiceFacade {
     @Override
     public boolean deleteOrder(long userId, long orderId) {
         if (userId <= 0 || orderId <= 0) return false;
-        return orderService.delete(orderId, userId);
+        return orderService.delete(userId, orderId);
     }
 
     @Override
@@ -67,6 +73,16 @@ public class DealServiceFacadeImpl implements DealServiceFacade {
     }
 
     @Override
+    public List<Order> queryDistinctCustomerOrderByProduct(long productId, int start, int count) {
+        return orderService.queryDistinctCustomerOrderByProduct(productId, start, count);
+    }
+
+    @Override
+    public List<Order> queryAllCustomerOrderByProduct(long productId) {
+        return orderService.queryAllCustomerOrderByProduct(productId);
+    }
+
+    @Override
     public boolean prepayOrder(long orderId) {
         return orderService.prepay(orderId);
     }
@@ -77,16 +93,25 @@ public class DealServiceFacadeImpl implements DealServiceFacade {
     }
 
     @Override
-    public boolean callback(Map<String, String> params, int payType) {
-        CallbackParam callbackParam = CallbackParamFactory.create(params, payType);
+    public PrepayResult prepay(HttpServletRequest request, Order order, Product product, Coupon coupon, int payType) {
+        PaymentGateway gateway = PaymentGatewayFactory.create(payType);
+        Map<String, String> params = gateway.extractPrepayParams(request, order, product, coupon);
+        PrepayParam prepayParam = PrepayParamFactory.create(params, payType);
+
+        return gateway.prepay(prepayParam);
+    }
+
+    @Override
+    public boolean callback(Map<String, String> httpParams, int payType) {
+        CallbackParam callbackParam = CallbackParamFactory.create(httpParams, payType);
         PaymentGateway gateway = PaymentGatewayFactory.create(payType);
 
-        return gateway.callback(callbackParam).isSuccessful();
+        return gateway.callback(callbackParam);
     }
 
     @Override
     public boolean check(long userId, long orderId, long productId, long skuId) {
         if (userId <= 0 || orderId <= 0 || productId <= 0 || skuId <= 0) return false;
-        return orderService.check(orderId, userId, productId, skuId);
+        return orderService.check(userId, orderId, productId, skuId);
     }
 }

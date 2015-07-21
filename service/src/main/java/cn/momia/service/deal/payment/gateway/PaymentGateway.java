@@ -10,5 +10,5 @@ import java.util.Map;
 public interface PaymentGateway {
     Map<String,String> extractPrepayParams(HttpServletRequest request, Order order, Product product, Coupon coupon);
     PrepayResult prepay(PrepayParam param);
-    CallbackResult callback(CallbackParam param);
+    boolean callback(CallbackParam param);
 }

@@ -21,11 +21,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 public class UserServiceImpl extends DbAccessService implements UserService {
@@ -131,8 +131,8 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
-    public Map<Long, User> get(Collection<Long> ids) {
-        final Map<Long, User> users = new HashMap<Long, User>();
+    public List<User> get(Collection<Long> ids) {
+        final List<User> users = new ArrayList<User>();
         if (ids == null || ids.size() <= 0) return users;
 
         String sql = "SELECT " + joinFields() + " FROM t_user WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
@@ -140,7 +140,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 User user = buildUser(rs);
-                if (user.exists()) users.put(user.getId(), user);
+                if (user.exists()) users.add(user);
             }
         });
 

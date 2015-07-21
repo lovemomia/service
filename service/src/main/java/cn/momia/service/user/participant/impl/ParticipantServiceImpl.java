@@ -21,9 +21,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ParticipantServiceImpl extends DbAccessService implements ParticipantService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ParticipantServiceImpl.class);
@@ -87,8 +85,8 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
     }
 
     @Override
-    public Map<Long, Participant> get(Collection<Long> ids) {
-        final Map<Long, Participant> participants = new HashMap<Long, Participant>();
+    public List<Participant> get(Collection<Long> ids) {
+        final List<Participant> participants = new ArrayList<Participant>();
         if (ids == null || ids.size() <= 0) return participants;
 
         String sql = "SELECT " + joinFields() + " FROM t_user_participant WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
@@ -96,7 +94,7 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 Participant participant = buildParticipant(rs);
-                participants.put(participant.getId(), participant);
+                if (participant.exists()) participants.add(participant);
             }
         });
 

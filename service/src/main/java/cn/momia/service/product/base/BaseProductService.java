@@ -1,9 +1,11 @@
 package cn.momia.service.product.base;
 
+import cn.momia.service.base.Service;
+
 import java.util.Collection;
 import java.util.List;
 
-public interface BaseProductService {
+public interface BaseProductService extends Service {
     BaseProduct get(long id);
     List<BaseProduct> get(Collection<Long> ids);
     long queryCount(String query);

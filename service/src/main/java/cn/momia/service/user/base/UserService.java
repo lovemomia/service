@@ -1,18 +1,20 @@
 package cn.momia.service.user.base;
 
+import cn.momia.service.base.Service;
+
 import java.util.Collection;
 import java.util.Date;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
-public interface UserService {
+public interface UserService extends Service {
     boolean exists(String field, String value);
 
     long add(String nickName, String mobile, String password, String token);
     boolean validatePassword(String mobile, String password);
 
     User get(long id);
-    Map<Long, User> get(Collection<Long> ids);
+    List<User> get(Collection<Long> ids);
     User getByToken(String token);
     User getByMobile(String mobile);
 

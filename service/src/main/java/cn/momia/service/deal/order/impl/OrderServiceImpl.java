@@ -225,7 +225,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
-    public boolean delete(long id, long userId) {
+    public boolean delete(long userId, long id) {
         String sql = "UPDATE t_order SET status=0 WHERE id=? AND customerId=? AND (status=? OR status=?)";
         int updateCount = jdbcTemplate.update(sql, new Object[] { id, userId, Order.Status.NOT_PAYED, Order.Status.PRE_PAYED });
 
@@ -249,7 +249,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
-    public boolean check(long id, long userId, long productId, long skuId) {
+    public boolean check(long userId, long id, long productId, long skuId) {
         String sql = "SELECT status FROM t_order WHERE id=? AND customerId=? AND productId=? AND skuId=?";
         int status = jdbcTemplate.query(sql, new Object[] { id, userId, productId, skuId }, new ResultSetExtractor<Integer>() {
             @Override

@@ -8,7 +8,6 @@ import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
 import cn.momia.service.deal.payment.gateway.AbstractPaymentGateway;
 import cn.momia.service.deal.payment.gateway.CallbackParam;
-import cn.momia.service.deal.payment.gateway.CallbackResult;
 import cn.momia.service.deal.payment.gateway.PrepayParam;
 import cn.momia.service.deal.payment.gateway.PrepayResult;
 import cn.momia.service.promo.coupon.Coupon;
@@ -40,9 +39,6 @@ public class WechatpayGateway extends AbstractPaymentGateway {
 
     private static final DateFormat DATE_FORMATTER = new SimpleDateFormat("yyyyMMddHHmmss");
     private static final String SUCCESS = "SUCCESS";
-    private static final String OK = "OK";
-    private static final String FAIL = "FAIL";
-    private static final String ERROR = "ERROR";
 
     @Override
     public Map<String, String> extractPrepayParams(HttpServletRequest request, Order order, Product product, Coupon coupon) {
@@ -218,25 +214,5 @@ public class WechatpayGateway extends AbstractPaymentGateway {
         payment.setFee(new BigDecimal(param.get(WechatpayCallbackFields.TOTAL_FEE)).divide(new BigDecimal(100)));
 
         return payment;
-    }
-
-    @Override
-    protected CallbackResult buildFailCallbackResult() {
-        CallbackResult result = new CallbackResult();
-        result.setSuccessful(false);
-        result.add(WechatpayCallbackFields.RETURN_CODE, FAIL);
-        result.add(WechatpayCallbackFields.RETURN_MSG, ERROR);
-
-        return result;
-    }
-
-    @Override
-    protected CallbackResult buildSuccessCallbackResult() {
-        CallbackResult result = new CallbackResult();
-        result.setSuccessful(true);
-        result.add(WechatpayCallbackFields.RETURN_CODE, SUCCESS);
-        result.add(WechatpayCallbackFields.RETURN_MSG, OK);
-
-        return result;
     }
 }

@@ -88,9 +88,6 @@
         <property name="paymentService" ref="paymentService" />
     </bean>
 
-
-
-
     <bean id="abstractPaymentGateway" class="cn.momia.service.deal.payment.gateway.AbstractPaymentGateway" abstract="true">
         <property name="conf" ref="conf" />
         <property name="orderService" ref="orderService" />

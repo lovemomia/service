@@ -21,6 +21,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/v1/user")
 public class UserV1Api extends AbstractV1Api {
@@ -135,12 +138,18 @@ public class UserV1Api extends AbstractV1Api {
         int totalCount = userCouponsPackJson.getInteger("totalCount");
         userCoupons.setTotalCount(totalCount);
 
+        Map<Integer, JSONObject> couponsMap = new HashMap<Integer, JSONObject>();
+        JSONArray couponsJson = userCouponsPackJson.getJSONArray("coupons");
+        for (int i = 0; i < couponsJson.size(); i++) {
+            JSONObject couponJson = couponsJson.getJSONObject(i);
+            couponsMap.put(couponJson.getInteger("id"), couponJson);
+        }
+
         JSONArray userCouponsJson = userCouponsPackJson.getJSONArray("userCoupons");
-        JSONObject couponsJson = userCouponsPackJson.getJSONObject("coupons");
         for (int i = 0; i < userCouponsJson.size(); i++) {
             try {
                 JSONObject userCouponJson = userCouponsJson.getJSONObject(i);
-                JSONObject couponJson = couponsJson.getJSONObject(userCouponJson.getString("couponId"));
+                JSONObject couponJson = couponsMap.get(userCouponJson.getInteger("couponId"));
                 if (couponJson == null) continue;
 
                 userCoupons.add(new UserCouponDto(userCouponJson, couponJson));

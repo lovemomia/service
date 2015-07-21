@@ -1,8 +1,10 @@
 package cn.momia.service.deal.order;
 
+import cn.momia.service.base.Service;
+
 import java.util.List;
 
-public interface OrderService {
+public interface OrderService extends Service {
     long add(Order order);
     Order get(long id);
     long queryCountByUser(long userId, int status);
@@ -10,8 +12,8 @@ public interface OrderService {
     List<Order> queryByUserAndSku(long userId, long skuId);
     List<Order> queryAllCustomerOrderByProduct(long productId);
     List<Order> queryDistinctCustomerOrderByProduct(long productId, int start, int count);
-    boolean delete(long id, long userId);
+    boolean delete(long userId, long id);
     boolean prepay(long id);
     boolean pay(long id);
-    boolean check(long id, long userId, long productId, long skuId);
+    boolean check(long userId, long id, long productId, long skuId);
 }

@@ -5,7 +5,6 @@ import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
 import cn.momia.service.deal.payment.gateway.AbstractPaymentGateway;
 import cn.momia.service.deal.payment.gateway.CallbackParam;
-import cn.momia.service.deal.payment.gateway.CallbackResult;
 import cn.momia.service.deal.payment.gateway.PrepayParam;
 import cn.momia.service.deal.payment.gateway.PrepayResult;
 import cn.momia.service.promo.coupon.Coupon;
@@ -122,21 +121,5 @@ public class AlipayGateway extends AbstractPaymentGateway {
         payment.setFee(new BigDecimal(param.get(AlipayCallbackFields.TOTAL_FEE)));
 
         return payment;
-    }
-
-    @Override
-    protected CallbackResult buildFailCallbackResult() {
-        CallbackResult result = new CallbackResult();
-        result.setSuccessful(false);
-
-        return result;
-    }
-
-    @Override
-    protected CallbackResult buildSuccessCallbackResult() {
-        CallbackResult result = new CallbackResult();
-        result.setSuccessful(true);
-
-        return result;
     }
 }

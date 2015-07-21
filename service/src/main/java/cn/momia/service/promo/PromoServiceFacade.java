@@ -7,7 +7,6 @@ import cn.momia.service.promo.coupon.UserCoupon;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 public interface PromoServiceFacade {
     List<Banner> getBanners(int cityId, int count);
@@ -20,7 +19,7 @@ public interface PromoServiceFacade {
 
     int queryUserCouponCount(long userId, long orderId, int status);
     List<UserCoupon> queryUserCoupon(long userId, long orderId, int status, int start, int count);
-    Map<Integer, Coupon> getCoupons(Collection<Integer> couponIds);
+    List<Coupon> getCoupons(Collection<Integer> couponIds);
 
     UserCoupon getNotUsedUserCouponByOrder(long orderId);
     boolean lockUserCoupon(long userId, long orderId, long userCouponId);

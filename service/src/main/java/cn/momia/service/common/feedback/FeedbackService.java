@@ -1,5 +1,7 @@
 package cn.momia.service.common.feedback;
 
-public interface FeedbackService {
+import cn.momia.service.base.Service;
+
+public interface FeedbackService extends Service {
     long add(String content, String email);
 }

@@ -67,8 +67,11 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
     }
 
     @Override
-    public Map<Integer, Coupon> getCoupons(Collection<Integer> couponIds) {
-        return couponService.getCoupons(couponIds);
+    public List<Coupon> getCoupons(Collection<Integer> couponIds) {
+        List<Coupon> coupons = new ArrayList<Coupon>();
+        coupons.addAll(couponService.getCoupons(couponIds).values());
+
+        return coupons;
     }
 
     @Override

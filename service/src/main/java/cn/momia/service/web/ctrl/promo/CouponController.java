@@ -57,16 +57,16 @@ public class CouponController extends AbstractController {
 
         List<Integer> couponIds = new ArrayList<Integer>();
         for (UserCoupon userCoupon : userCoupons) couponIds.add(userCoupon.getCouponId());
-        Map<Integer, Coupon> couponsMap = promoServiceFacade.getCoupons(couponIds);
+        List<Coupon> coupons = promoServiceFacade.getCoupons(couponIds);
 
-        return new ResponseMessage(buildCoupons(totalCount, userCoupons, couponsMap));
+        return new ResponseMessage(buildCoupons(totalCount, userCoupons, coupons));
     }
 
-    private JSONObject buildCoupons(int totalCount, List<UserCoupon> userCoupons, Map<Integer, Coupon> couponsMap) {
+    private JSONObject buildCoupons(int totalCount, List<UserCoupon> userCoupons, List<Coupon> coupons) {
         JSONObject couponsPackJson = new JSONObject();
         couponsPackJson.put("totalCount", totalCount);
         couponsPackJson.put("userCoupons", userCoupons);
-        couponsPackJson.put("coupons", couponsMap);
+        couponsPackJson.put("coupons", coupons);
 
         return couponsPackJson;
     }
