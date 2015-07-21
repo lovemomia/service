@@ -2,7 +2,6 @@ package cn.momia.service.web.ctrl.user;
 
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.product.Product;
-import cn.momia.service.product.ProductServiceFacade;
 import cn.momia.service.product.sku.Sku;
 import cn.momia.service.user.base.User;
 import cn.momia.service.deal.order.Order;

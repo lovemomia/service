@@ -3,7 +3,6 @@ package cn.momia.service.web.ctrl.user;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;
-import cn.momia.service.web.ctrl.AbstractController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
