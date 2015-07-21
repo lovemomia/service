@@ -53,7 +53,7 @@ public class UserV1Api extends AbstractV1Api {
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
-                .add("status", status)
+                .add("status", status == -1 ? 1 : status)
                 .add("start", start)
                 .add("count", pageSize);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/order"), builder.build());
