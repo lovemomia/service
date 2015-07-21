@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/coupon")
@@ -30,10 +29,7 @@ public class CouponController extends AbstractController {
         Order order = dealServiceFacade.getOrder(orderId);
         if (!order.exists() || order.isPayed() || order.getCustomerId() != user.getId()) return ResponseMessage.FAILED("无效的订单");
 
-        UserCoupon userCoupon = promoServiceFacade.getUserCoupon(user.getId(), order.getId(), userCouponId);
-        if (!userCoupon.exists()) return ResponseMessage.FAILED("无效的优惠券，或使用条件不满足");
-
-        Coupon coupon = promoServiceFacade.getCoupon(userCoupon.getCouponId());
+        Coupon coupon = promoServiceFacade.getCoupon(user.getId(), order.getId(), userCouponId);
         if (!coupon.exists()) return ResponseMessage.FAILED("无效的优惠券，或使用条件不满足");
 
         BigDecimal totalFee = order.getTotalFee();

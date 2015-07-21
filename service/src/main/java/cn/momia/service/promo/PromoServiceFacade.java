@@ -13,8 +13,7 @@ public interface PromoServiceFacade {
 
     long getUserRegisterCoupon(long userId);
 
-    UserCoupon getUserCoupon(long userId, long orderId, long userCouponId);
-    Coupon getCoupon(int couponId);
+    Coupon getCoupon(long userId, long orderId, long userCouponId);
     BigDecimal calcTotalFee(BigDecimal totalFee, Coupon coupon);
 
     int queryUserCouponCount(long userId, long orderId, int status);

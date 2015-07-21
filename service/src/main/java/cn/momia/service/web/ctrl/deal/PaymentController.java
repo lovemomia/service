@@ -1,5 +1,6 @@
 package cn.momia.service.web.ctrl.deal;
 
+import cn.momia.common.web.exception.MomiaFailedException;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.product.Product;
 import cn.momia.service.user.base.User;
@@ -49,10 +50,7 @@ public class PaymentController extends AbstractController {
 
         Coupon coupon = Coupon.NOT_EXIST_COUPON;
         String userCouponIdStr = request.getParameter("coupon");
-        if (!StringUtils.isBlank(userCouponIdStr)) {
-            coupon = useCoupon(user.getId(), order, Long.valueOf(userCouponIdStr));
-            if (coupon.invalid()) return ResponseMessage.FAILED("无效的优惠券，或使用条件不满足");
-        }
+        if (!StringUtils.isBlank(userCouponIdStr)) coupon = useCoupon(user.getId(), order, Long.valueOf(userCouponIdStr));
 
         PrepayResult prepayResult = dealServiceFacade.prepay(request, order, product, coupon, payType);
 
@@ -64,10 +62,12 @@ public class PaymentController extends AbstractController {
         UserCoupon previousUserCoupon = promoServiceFacade.getNotUsedUserCouponByOrder(order.getId());
         if (userCouponId > 0) {
             if (previousUserCoupon.exists() && previousUserCoupon.getId() != userCouponId) releasePreviousUserCoupon(previousUserCoupon);
-            Coupon coupon = getCoupon(userId, order.getId(), userCouponId, order.getTotalFee());
+            Coupon coupon = promoServiceFacade.getCoupon(userId, order.getId(), userCouponId);
 
-            if (!coupon.exists()) return Coupon.INVALID_COUPON;
-            if (!promoServiceFacade.lockUserCoupon(userId, order.getId(), userCouponId)) return Coupon.INVALID_COUPON;
+            if (!coupon.exists() ||
+                    coupon.getConsumption().compareTo(order.getTotalFee()) > 0 ||
+                    !promoServiceFacade.lockUserCoupon(userId, order.getId(), userCouponId))
+                throw new MomiaFailedException("无效的优惠券，或使用条件不满足");
 
             return coupon;
         }
@@ -83,20 +83,6 @@ public class PaymentController extends AbstractController {
         } catch (Exception e) {
             LOGGER.error("fail to release user coupon: {}", previousUserCoupon.getId(), e);
         }
-    }
-
-    private Coupon getCoupon(long userId, long orderId, long userCouponId, BigDecimal totalFee) {
-        if (userCouponId <= 0) return Coupon.INVALID_COUPON;
-
-        UserCoupon userCoupon = promoServiceFacade.getUserCoupon(userId, orderId, userCouponId);
-        if (!userCoupon.exists()) return Coupon.INVALID_COUPON;
-
-        Coupon coupon = promoServiceFacade.getCoupon(userCoupon.getCouponId());
-        if (!coupon.exists()) return Coupon.INVALID_COUPON;
-
-        if (coupon.getConsumption().compareTo(totalFee) > 0) return Coupon.INVALID_COUPON;
-
-        return coupon;
     }
 
     @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)
@@ -121,8 +107,6 @@ public class PaymentController extends AbstractController {
         BigDecimal totalFee = order.getTotalFee();
         if (userCouponId != null && userCouponId > 0) {
             Coupon coupon = useCoupon(user.getId(), order, userCouponId);
-            if (coupon.invalid()) return ResponseMessage.FAILED("无效的优惠券，或使用条件不满足");
-
             totalFee = promoServiceFacade.calcTotalFee(totalFee, coupon);
         }
 

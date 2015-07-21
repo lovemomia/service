@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 public class PromoServiceFacadeImpl implements PromoServiceFacade {
     private BannerService bannerService;
@@ -38,15 +37,13 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
     }
 
     @Override
-    public UserCoupon getUserCoupon(long userId, long orderId, long userCouponId) {
-        if (userId <= 0 || orderId <= 0 || userCouponId <= 0) return UserCoupon.NOT_EXIST_USER_COUPON;
-        return couponService.getUserCoupon(userId, orderId, userCouponId);
-    }
+    public Coupon getCoupon(long userId, long orderId, long userCouponId) {
+        if (userId <= 0 || orderId <= 0 || userCouponId <= 0) return Coupon.NOT_EXIST_COUPON;
 
-    @Override
-    public Coupon getCoupon(int couponId) {
-        if (couponId <= 0) return Coupon.NOT_EXIST_COUPON;
-        return couponService.getCoupon(couponId);
+        UserCoupon userCoupon = couponService.getUserCoupon(userId, orderId, userCouponId);
+        if (!userCoupon.exists()) return Coupon.NOT_EXIST_COUPON;
+
+        return couponService.getCoupon(userCoupon.getCouponId());
     }
 
     @Override
