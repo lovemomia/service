@@ -56,7 +56,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, nickName);
                 ps.setString(2, mobile);
-                ps.setString(3, password);
+                ps.setString(3, PasswordEncryptor.encrypt(mobile, password, SecretKey.getPasswordSecretKey()));
                 ps.setString(4, token);
 
                 return ps;

@@ -34,7 +34,6 @@ public class AuthController extends UserRelatedController {
         if (!user.exists()) return ResponseMessage.FAILED("注册失败");
 
         long userCouponId = promoServiceFacade.getUserRegisterCoupon(user.getId());
-
         return new ResponseMessage(buildUserResponse(user, userCouponId));
     }
 
