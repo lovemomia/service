@@ -76,7 +76,10 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
 
     @Override
     public List<User> getUsers(Collection<Long> userIds) {
-        return (List<User>) userService.get(userIds).values();
+        List<User> users = new ArrayList<User>();
+        users.addAll(userService.get(userIds).values());
+
+        return users;
     }
 
     @Override
@@ -183,7 +186,10 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
 
     @Override
     public List<Participant> getParticipants(Collection<Long> participantIds) {
-        return (List<Participant>) participantService.get(participantIds).values();
+        List<Participant> participants = new ArrayList<Participant>();
+        participants.addAll(participantService.get(participantIds).values());
+
+        return participants;
     }
 
     @Override
