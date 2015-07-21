@@ -25,10 +25,10 @@ public class AuthController extends UserRelatedController {
                                     @RequestParam String mobile,
                                     @RequestParam String password,
                                     @RequestParam String code){
-        if (!commonServiceFacade.verifyCode(mobile, code)) return ResponseMessage.FAILED("验证码不正确");
-
         if (userServiceFacade.exists("mobile", mobile)) return ResponseMessage.FAILED("该手机号已经注册过");
         if (userServiceFacade.exists("nickName", nickName)) return ResponseMessage.FAILED("该昵称已存在");
+
+        if (!commonServiceFacade.verifyCode(mobile, code)) return ResponseMessage.FAILED("验证码不正确");
 
         User user = userServiceFacade.register(nickName, mobile, password);
         if (!user.exists()) return ResponseMessage.FAILED("注册失败");
