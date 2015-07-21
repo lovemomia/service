@@ -32,7 +32,6 @@ import java.util.Set;
 @RequestMapping("/user")
 public class UserController extends UserRelatedController {
     @Autowired private OrderService orderService;
-    @Autowired private ProductServiceFacade productServiceFacade;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getUser(@RequestParam String utoken) {

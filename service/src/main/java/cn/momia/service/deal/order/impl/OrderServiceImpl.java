@@ -116,7 +116,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public long queryCountByUser(long userId, int status) {
-        if (status == 0) {
+        if (status == 1) {
             String sql = "SELECT COUNT(1) FROM t_order WHERE customerId=? AND status<>0";
             return jdbcTemplate.query(sql, new Object[] { userId }, new ResultSetExtractor<Long>() {
                 @Override
@@ -147,7 +147,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     public List<Order> queryByUser(long userId, int status, int start, int count) {
         final List<Order> orders = new ArrayList<Order>();
 
-        if (status == 0) {
+        if (status == 1) {
             String sql = "SELECT " + joinFields() + " FROM t_order WHERE customerId=? AND status<>0 ORDER BY addTime DESC LIMIT ?,?";
             jdbcTemplate.query(sql, new Object[] { userId, start, count }, new RowCallbackHandler() {
                 @Override

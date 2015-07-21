@@ -13,6 +13,8 @@ public class ImageFile {
     public static String url(String path) {
         if (path == null || path.length() == 0) return "";
         if (path.startsWith("http://")) return path;
+        if (!path.startsWith("/")) path = "/" + path;
+
         return domain + path;
     }
 

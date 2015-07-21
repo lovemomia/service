@@ -14,10 +14,17 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class UserServiceFacadeImpl implements UserServiceFacade {
+    private static final Set<String> SEX = new HashSet<String>();
+    static {
+        SEX.add("男");
+        SEX.add("女");
+    }
+
     private UserService userService;
     private ParticipantService participantService;
 
@@ -102,7 +109,7 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
 
     @Override
     public boolean updateUserSex(long userId, String sex) {
-        if (StringUtils.isBlank(sex)) return false;
+        if (StringUtils.isBlank(sex) || !SEX.contains(sex)) return false;
         return userService.updateSex(userId, sex);
     }
 
@@ -162,7 +169,7 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
 
     @Override
     public boolean updateChildSex(long userId, long childId, String sex) {
-        if (userId <= 0 || childId <= 0 || StringUtils.isBlank(sex)) return false;
+        if (userId <= 0 || childId <= 0 || StringUtils.isBlank(sex) || !SEX.contains(sex)) return false;
         return participantService.updateSex(userId, childId, sex);
     }
 
@@ -181,7 +188,11 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
     @Override
     public Participant getParticipant(long userId, long participantId) {
         if (userId <= 0 || participantId <= 0) return Participant.NOT_EXIST_PARTICIPANT;
-        return participantService.get(participantId);
+
+        Participant participant = participantService.get(participantId);
+        if (!participant.exists() || participant.getUserId() != userId) return Participant.NOT_EXIST_PARTICIPANT;
+
+        return participant;
     }
 
     @Override
