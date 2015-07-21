@@ -6,6 +6,8 @@ import cn.momia.mapi.api.v1.dto.base.SkuDto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import java.util.Date;
+
 public class PlaceOrderDto implements Dto {
     private ContactsDto contacts;
     private ListDto skus;
@@ -35,7 +37,10 @@ public class PlaceOrderDto implements Dto {
     private ListDto getSkus(JSONArray skusJson) {
         ListDto skus = new ListDto();
         for (int i = 0; i < skusJson.size(); i++) {
-            skus.add(new SkuDto(skusJson.getJSONObject(i)));
+            SkuDto skuDto = new SkuDto(skusJson.getJSONObject(i));
+            if (skuDto.getStartTime().before(new Date()) ||
+                    (skuDto.getType() != 1 && skuDto.getStock() <= 0)) continue;
+            skus.add(skuDto);
         }
 
         return skus;

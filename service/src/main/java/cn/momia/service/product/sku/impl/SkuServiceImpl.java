@@ -25,7 +25,7 @@ import java.util.Map;
 
 public class SkuServiceImpl extends DbAccessService implements SkuService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SkuServiceImpl.class);
-    private static final String[] SKU_FIELDS = { "id", "productId", "`desc`", "`type`", "properties", "prices", "`limit`", "needRealName", "stock", "unlockedStock", "lockedStock" };
+    private static final String[] SKU_FIELDS = { "id", "productId", "`desc`", "`type`", "startTime", "endTime", "properties", "prices", "`limit`", "needRealName", "stock", "unlockedStock", "lockedStock" };
 
     @Override
     public Sku get(long id) {
@@ -51,8 +51,10 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
             sku.setProductId(rs.getLong("productId"));
             sku.setDesc(rs.getString("desc"));
             sku.setType(rs.getInt("type"));
-            sku.setProperties(parseProperties(sku.getId(), rs.getString("properties")));
-            sku.setPrices(parsePrices(sku.getId(), rs.getString("prices")));
+            sku.setStartTime(rs.getTimestamp("startTime"));
+            sku.setEndTime(rs.getTimestamp("endTime"));
+            sku.setProperties(parseProperties(rs.getString("properties")));
+            sku.setPrices(parsePrices(rs.getString("prices")));
             sku.setLimit(rs.getInt("limit"));
             sku.setNeedRealName(rs.getBoolean("needRealName"));
             sku.setStock(rs.getInt("stock"));
@@ -67,7 +69,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
         }
     }
 
-    private List<SkuProperty> parseProperties(long id, String propertiesJsonStr) {
+    private List<SkuProperty> parseProperties(String propertiesJsonStr) {
         List<SkuProperty> properties = new ArrayList<SkuProperty>();
         JSONArray propertiesJson = JSON.parseArray(propertiesJsonStr);
         for (int i = 0; i < propertiesJson.size(); i++) {
@@ -78,7 +80,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
         return properties;
     }
 
-    private List<SkuPrice> parsePrices(long id, String pricesJsonStr) {
+    private List<SkuPrice> parsePrices(String pricesJsonStr) {
         List<SkuPrice> prices = new ArrayList<SkuPrice>();
         JSONArray pricesJson = JSON.parseArray(pricesJsonStr);
         for (int i = 0; i < pricesJson.size(); i++) {
@@ -92,7 +94,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
     @Override
     public List<Sku> queryByProduct(long productId) {
         final List<Sku> skus = new ArrayList<Sku>();
-        String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId=? AND status=1";
+        String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId=? AND status=1 ORDER BY startTime ASC";
         jdbcTemplate.query(sql, new Object[] { productId }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -109,7 +111,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
         final Map<Long, List<Sku>> skusOfProducts = new HashMap<Long, List<Sku>>();
         if (productIds == null || productIds.isEmpty()) return skusOfProducts;
 
-        String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId IN (" + StringUtils.join(productIds, ",") + ") AND status=1";
+        String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId IN (" + StringUtils.join(productIds, ",") + ") AND status=1 ORDER BY startTime ASC";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {

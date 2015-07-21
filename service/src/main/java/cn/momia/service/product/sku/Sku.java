@@ -59,6 +59,8 @@ public class Sku implements Serializable {
     private long productId;
     private String desc;
     private int type;
+    private Date startTime;
+    private Date endTime;
     private List<SkuProperty> properties;
     private List<SkuPrice> prices;
     private int limit;
@@ -97,6 +99,22 @@ public class Sku implements Serializable {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
     public List<SkuProperty> getProperties() {
