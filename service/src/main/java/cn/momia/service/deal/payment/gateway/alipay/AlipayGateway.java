@@ -51,6 +51,11 @@ public class AlipayGateway extends AbstractPaymentGateway {
     }
 
     @Override
+    protected long getPrepayOutTradeNo(PrepayParam param) {
+        return Long.valueOf(param.get(AlipayPrepayFields.OUT_TRADE_NO));
+    }
+
+    @Override
     public PrepayResult doPrepay(PrepayParam param) {
         PrepayResult result = new PrepayResult();
         result.setSuccessful(param.get(AlipayPrepayFields.SIGN) != null);
@@ -98,6 +103,10 @@ public class AlipayGateway extends AbstractPaymentGateway {
         return successful;
     }
 
+    @Override
+    protected long getCallbackOutTradeNo(CallbackParam param) {
+        return Long.valueOf(param.get(AlipayCallbackFields.OUT_TRADE_NO));
+    }
 
     @Override
     protected Payment createPayment(CallbackParam param) {

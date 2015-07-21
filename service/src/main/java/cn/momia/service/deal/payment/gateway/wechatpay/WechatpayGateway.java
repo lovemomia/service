@@ -105,6 +105,11 @@ public class WechatpayGateway extends AbstractPaymentGateway {
     }
 
     @Override
+    protected long getPrepayOutTradeNo(PrepayParam param) {
+        return Long.valueOf(param.get(WechatpayPrepayFields.OUT_TRADE_NO));
+    }
+
+    @Override
     public PrepayResult doPrepay(PrepayParam param) {
         PrepayResult result = new PrepayResult();
 
@@ -187,6 +192,11 @@ public class WechatpayGateway extends AbstractPaymentGateway {
         if (!successful) LOGGER.warn("invalid sign, order id: {} ", param.get(WechatpayCallbackFields.OUT_TRADE_NO));
 
         return successful;
+    }
+
+    @Override
+    protected long getCallbackOutTradeNo(CallbackParam param) {
+        return Long.valueOf(param.get(WechatpayCallbackFields.OUT_TRADE_NO));
     }
 
     @Override

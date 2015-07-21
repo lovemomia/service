@@ -43,9 +43,11 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
 
     @Override
     public PrepayResult prepay(PrepayParam param) {
-        if (!orderService.prepay(Long.valueOf(param.get("out_trade_no")))) return buildFailPrepayResult();
+        if (!orderService.prepay(getPrepayOutTradeNo(param))) return buildFailPrepayResult();
         return doPrepay(param);
     }
+
+    protected abstract long getPrepayOutTradeNo(PrepayParam param);
 
     private PrepayResult buildFailPrepayResult() {
         PrepayResult result = new PrepayResult();
@@ -70,8 +72,8 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
     protected abstract boolean validateCallbackSign(CallbackParam param);
 
     private boolean finishPayment(CallbackParam param) {
+        long orderId = getCallbackOutTradeNo(param);
         try {
-            long orderId = Long.valueOf(param.get("out_trade_no"));
             Order order = orderService.get(orderId);
             if (!order.exists()) return false;
 
@@ -81,12 +83,14 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
             if (userCoupon.exists() && !couponService.useUserCoupon(order.getCustomerId(), order.getId(), userCoupon.getId())) return false;
             logPayment(param);
         } catch (Exception e) {
-            LOGGER.error("fail to pay order: {}", param.get("out_trade_no"), e);
+            LOGGER.error("fail to pay order: {}", orderId, e);
             return false;
         }
 
         return true;
     }
+
+    protected abstract long getCallbackOutTradeNo(CallbackParam param);
 
     private void logPayment(CallbackParam param) {
         try {
