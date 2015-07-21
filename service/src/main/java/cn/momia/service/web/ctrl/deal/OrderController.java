@@ -1,21 +1,19 @@
 package cn.momia.service.web.ctrl.deal;
 
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.service.product.ProductServiceFacade;
+import cn.momia.service.deal.exception.OrderLimitException;
+import cn.momia.service.product.Product;
 import cn.momia.service.product.sku.Sku;
 import cn.momia.service.product.sku.SkuPrice;
 import cn.momia.service.user.base.User;
-import cn.momia.service.user.base.UserService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderPrice;
-import cn.momia.service.deal.order.OrderService;
-import cn.momia.service.promo.coupon.CouponService;
 import cn.momia.service.web.ctrl.AbstractController;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,17 +21,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/order")
 public class OrderController extends AbstractController {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
-
-    @Autowired private OrderService orderService;
-    @Autowired private ProductServiceFacade productServiceFacade;
-    @Autowired private UserService userService;
-    @Autowired private CouponService couponService;
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage placeOrder(@RequestBody Order order) {
@@ -41,13 +37,13 @@ public class OrderController extends AbstractController {
 
         long orderId = 0;
         try {
-            if (!checkOrder(order)) return ResponseMessage.BAD_REQUEST;
+            if (!checkOrder(order)) return ResponseMessage.FAILED("无效的订单");
 
             processContacts(order.getCustomerId(), order.getContacts(), order.getMobile());
             checkLimit(order.getCustomerId(), order.getSkuId(), order.getCount());
             increaseJoined(order.getProductId(), order.getCount());
 
-            orderId = orderService.add(order);
+            orderId = dealServiceFacade.placeOrder(order);
             if (orderId > 0) {
                 order.setId(orderId);
                 JSONObject orderPackJson = new JSONObject();
@@ -65,6 +61,10 @@ public class OrderController extends AbstractController {
         }
 
         return ResponseMessage.FAILED("下单失败");
+    }
+
+    private boolean lockSku(Order order) {
+        return productServiceFacade.lockStock(order.getProductId(), order.getSkuId(), order.getCount());
     }
 
     private boolean checkOrder(Order order) {
@@ -91,42 +91,26 @@ public class OrderController extends AbstractController {
         return true;
     }
 
-    private boolean lockSku(Order order) {
-        return productServiceFacade.lockStock(order.getProductId(), order.getSkuId(), order.getCount());
-    }
-
     private void processContacts(long customerId, String contacts, String mobile) {
         try {
             if (StringUtils.isBlank(contacts)) return;
-            User user = userService.getByMobile(mobile);
+            User user = userServiceFacade.getUserByMobile(mobile);
             if (!user.exists()) return;
 
-            if (user.getId() == customerId && StringUtils.isBlank(user.getName()) && !contacts.equals(user.getNickName())) userService.updateName(user.getId(), contacts);
+            if (user.getId() == customerId && StringUtils.isBlank(user.getName()) && !contacts.equals(user.getNickName()))
+                userServiceFacade.updateUserName(user.getId(), contacts);
         } catch (Exception e) {
             LOGGER.warn("fail to process contacts, {}/{}", contacts, mobile);
         }
     }
 
     private void checkLimit(long customerId, long skuId, int count) throws OrderLimitException {
-        int limit;
-        try {
-            Sku sku = productServiceFacade.getSku(skuId);
+        Sku sku = productServiceFacade.getSku(skuId);
 
-            limit = sku.getLimit();
-            if (limit <= 0) return;
+        int limit = sku.getLimit();
+        if (limit <= 0) return;
 
-            List<Order> orders = orderService.queryByUserAndSku(customerId, skuId);
-            for (Order order : orders) {
-                if (!order.exists()) continue;
-                count += order.getCount();
-            }
-
-            if (count <= limit) return;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        throw new OrderLimitException(count - limit);
+        dealServiceFacade.checkLimit(customerId, skuId, count, limit);
     }
 
     private void increaseJoined(long productId, int count) {
@@ -143,45 +127,110 @@ public class OrderController extends AbstractController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseMessage deleteOrder(@RequestParam String utoken, @PathVariable long id) {
-        if (StringUtils.isBlank(utoken) || id <= 0) return ResponseMessage.BAD_REQUEST;
-
-        User user = userService.getByToken(utoken);
+        User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        Order order = orderService.get(id);
-        if (!order.exists()) return ResponseMessage.BAD_REQUEST;
+        Order order = dealServiceFacade.getOrder(id);
+        if (!order.exists() || order.getCustomerId() != user.getId()) return ResponseMessage.FAILED("无效的订单");
 
-        if (!orderService.delete(id, user.getId())) return ResponseMessage.FAILED("删除订单失败");
+        if (!dealServiceFacade.deleteOrder(user.getId(), id)) return ResponseMessage.FAILED("删除订单失败");
 
         // TODO 需要告警
         if (!unlockSku(order)) LOGGER.error("fail to unlock sku, skuId: {}, count: {}", new Object[] { order.getSkuId(), order.getCount() });
 
         int status = order.getStatus();
-        if (status == Order.Status.PRE_PAYED) {
-            releaseCoupon(order);
-        }
+        if (status == Order.Status.PRE_PAYED) releaseCoupon(order);
 
         return ResponseMessage.SUCCESS;
     }
 
     private void releaseCoupon(Order order) {
         try {
-            if (!couponService.releaseUserCoupon(order.getCustomerId(), order.getId()))
+            if (!promoServiceFacade.releaseUserCoupon(order.getCustomerId(), order.getId()))
                 LOGGER.error("fail to release coupon of order: {}", order.getId());
         } catch (Exception e) {
             LOGGER.error("fail to release coupon of order: {}", order.getId(), e);
         }
     }
 
-    private static class OrderLimitException extends Exception {
-        private int overCount;
+    @RequestMapping(value = "/user", method = RequestMethod.GET)
+    public ResponseMessage getOrdersOfUser(@RequestParam String utoken,
+                                           @RequestParam int status,
+                                           @RequestParam int start,
+                                           @RequestParam int count) {
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        public int getOverCount() {
-            return overCount;
+        long totalCount = dealServiceFacade.queryOrderCountByUser(user.getId(), status);
+        List<Order> orders = totalCount > 0 ? dealServiceFacade.queryOrderByUser(user.getId(), status, start, count) : new ArrayList<Order>();
+
+        List<Long> productIds = new ArrayList<Long>();
+        for (Order order : orders) productIds.add(order.getProductId());
+        List<Product> products = productIds.isEmpty() ? new ArrayList<Product>() : productServiceFacade.get(productIds);
+
+        return new ResponseMessage(buildUserOrders(totalCount, orders, products));
+    }
+
+    private JSONObject buildUserOrders(long totalCount, List<Order> orders, List<Product> products) {
+        Map<Long, Product> productMap = new HashMap<Long, Product>();
+        Map<Long, Sku> skuMap = new HashMap<Long, Sku>();
+        for (Product product : products) {
+            productMap.put(product.getId(), product);
+            for (Sku sku : product.getSkus()) {
+                skuMap.put(sku.getId(), sku);
+            }
         }
 
-        public OrderLimitException(int overCount) {
-            this.overCount = overCount;
+        JSONObject ordersPackJson = new JSONObject();
+        ordersPackJson.put("totalCount", totalCount);
+
+        JSONArray ordersJson = new JSONArray();
+        for (Order order : orders) {
+            JSONObject orderJson = new JSONObject();
+            orderJson.put("order", order);
+
+            Product product = productMap.get(order.getProductId());
+            if (product != null) {
+                orderJson.put("cover", product.getCover());
+                orderJson.put("title", product.getTitle());
+            }
+
+            Sku sku = skuMap.get(order.getSkuId());
+            if (sku != null) orderJson.put("time", sku.time());
+
+            ordersJson.add(orderJson);
         }
+        ordersPackJson.put("orders", ordersJson);
+
+        return ordersPackJson;
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public ResponseMessage getOrdersOfUser(@RequestParam String utoken,
+                                           @PathVariable(value = "id") long id,
+                                           @RequestParam(value = "pid") long productId) {
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        Order order = dealServiceFacade.getOrder(id);
+        Product product = productServiceFacade.get(productId);
+        if (!order.exists() ||
+                !product.exists() ||
+                order.getCustomerId() != user.getId() ||
+                order.getProductId() != product.getId()) return ResponseMessage.FAILED("无效的订单");
+
+        return new ResponseMessage(buildOrderDetail(order, product));
+    }
+
+    private JSONObject buildOrderDetail(Order order, Product product) {
+        JSONObject orderDetailJson = new JSONObject();
+        orderDetailJson.put("order", order);
+        orderDetailJson.put("cover", product.getCover());
+        orderDetailJson.put("title", product.getTitle());
+        orderDetailJson.put("scheduler", product.getScheduler());
+        orderDetailJson.put("address", product.getPlace().getAddress());
+        orderDetailJson.put("price", product.getMinPrice());
+
+        return orderDetailJson;
     }
 }

@@ -74,7 +74,6 @@
         <property name="skuService" ref="skuService" />
     </bean>
 
-
     <bean id="userService" class="cn.momia.service.user.base.impl.UserServiceImpl" parent="dbAccessService" />
     <bean id="participantService" class="cn.momia.service.user.participant.impl.ParticipantServiceImpl" parent="dbAccessService" />
     <bean id="userServiceFacade" class="cn.momia.service.user.impl.UserServiceFacadeImpl">
@@ -84,6 +83,10 @@
 
     <bean id="orderService" class="cn.momia.service.deal.order.impl.OrderServiceImpl" parent="dbAccessService" />
     <bean id="paymentService" class="cn.momia.service.deal.payment.impl.PaymentServiceImpl" parent="dbAccessService" />
+    <bean id="dealServiceFacade" class="cn.momia.service.deal.impl.DealServiceFacadeImpl">
+        <property name="orderService" ref="orderService" />
+        <property name="paymentService" ref="paymentService" />
+    </bean>
 
 
 

@@ -1,16 +1,9 @@
 package cn.momia.service.web.ctrl.user;
 
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.service.product.Product;
-import cn.momia.service.product.sku.Sku;
 import cn.momia.service.user.base.User;
-import cn.momia.service.deal.order.Order;
-import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.user.participant.Participant;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,112 +12,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @RestController
 @RequestMapping("/user")
 public class UserController extends UserRelatedController {
-    @Autowired private OrderService orderService;
-
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getUser(@RequestParam String utoken) {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         return new ResponseMessage(buildUserResponse(user));
-    }
-
-    @RequestMapping(value = "/order", method = RequestMethod.GET)
-    public ResponseMessage getOrdersOfUser(@RequestParam String utoken,
-                                           @RequestParam int status,
-                                           @RequestParam int start,
-                                           @RequestParam int count) {
-        if (StringUtils.isBlank(utoken) || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
-
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
-
-        long totalCount = orderService.queryCountByUser(user.getId(), status);
-        List<Order> orders = totalCount > 0 ? orderService.queryByUser(user.getId(), status, start, count) : new ArrayList<Order>();
-
-        List<Long> productIds = new ArrayList<Long>();
-        for (Order order : orders) {
-            productIds.add(order.getProductId());
-        }
-
-        List<Product> products = productIds.isEmpty() ? new ArrayList<Product>() : productServiceFacade.get(productIds);
-
-        return new ResponseMessage(buildUserOrders(totalCount, orders, products));
-    }
-
-    private JSONObject buildUserOrders(long totalCount, List<Order> orders, List<Product> products) {
-        Map<Long, Product> productMap = new HashMap<Long, Product>();
-        Map<Long, Sku> skuMap = new HashMap<Long, Sku>();
-        for (Product product : products) {
-            productMap.put(product.getId(), product);
-            for (Sku sku : product.getSkus()) {
-                skuMap.put(sku.getId(), sku);
-            }
-        }
-
-        JSONObject ordersPackJson = new JSONObject();
-        ordersPackJson.put("totalCount", totalCount);
-
-        JSONArray ordersJson = new JSONArray();
-        for (Order order : orders) {
-            JSONObject orderJson = new JSONObject();
-            orderJson.put("order", order);
-
-            Product product = productMap.get(order.getProductId());
-            if (product != null) {
-                orderJson.put("cover", product.getCover());
-                orderJson.put("title", product.getTitle());
-            }
-
-            Sku sku = skuMap.get(order.getSkuId());
-            if (sku != null) orderJson.put("time", sku.time());
-
-            ordersJson.add(orderJson);
-        }
-        ordersPackJson.put("orders", ordersJson);
-
-        return ordersPackJson;
-    }
-
-    @RequestMapping(value = "/order/{oid}", method = RequestMethod.GET)
-    public ResponseMessage getOrdersOfUser(@RequestParam String utoken,
-                                           @PathVariable(value = "oid") long orderId,
-                                           @RequestParam(value = "pid") long productId) {
-        if (StringUtils.isBlank(utoken) || orderId <= 0 || productId <= 0) return ResponseMessage.BAD_REQUEST;
-
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
-
-        Order order = orderService.get(orderId);
-        if (!order.exists()) return ResponseMessage.BAD_REQUEST;
-
-        Product product = productServiceFacade.get(productId);
-        if (!product.exists()) return ResponseMessage.BAD_REQUEST;
-
-        return new ResponseMessage(buildOrderDetail(order, product));
-    }
-
-    private JSONObject buildOrderDetail(Order order, Product product) {
-        JSONObject orderDetailJson = new JSONObject();
-        orderDetailJson.put("order", order);
-        orderDetailJson.put("cover", product.getCover());
-        orderDetailJson.put("title", product.getTitle());
-        orderDetailJson.put("scheduler", product.getScheduler());
-        orderDetailJson.put("address", product.getPlace().getAddress());
-        orderDetailJson.put("price", product.getMinPrice());
-
-        return orderDetailJson;
     }
 
     @RequestMapping(value = "/nickname", method = RequestMethod.PUT)

@@ -56,7 +56,7 @@ public class UserV1Api extends AbstractV1Api {
                 .add("status", status == -1 ? 1 : status)
                 .add("start", start)
                 .add("count", pageSize);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/order"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("order/user"), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
@@ -94,7 +94,7 @@ public class UserV1Api extends AbstractV1Api {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("pid", productId);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/order", orderId), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("order", orderId), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override

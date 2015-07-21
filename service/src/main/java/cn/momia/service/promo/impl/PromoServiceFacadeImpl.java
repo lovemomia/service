@@ -70,4 +70,25 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
     public Map<Integer, Coupon> getCoupons(Collection<Integer> couponIds) {
         return couponService.getCoupons(couponIds);
     }
+
+    @Override
+    public UserCoupon getNotUsedUserCouponByOrder(long orderId) {
+        return couponService.getNotUsedUserCouponByOrder(orderId);
+    }
+
+    @Override
+    public boolean lockUserCoupon(long userId, long orderId, long userCouponId) {
+        return couponService.lockUserCoupon(userId, orderId, userCouponId);
+    }
+
+    @Override
+    public boolean useUserCoupon(long userId, long orderId, long userCouponId) {
+        return couponService.useUserCoupon(userId, orderId, userCouponId);
+    }
+
+    @Override
+    public boolean releaseUserCoupon(long userId, long orderId) {
+        if (userId <= 0 || orderId <= 0) return true;
+        return couponService.releaseUserCoupon(userId, orderId);
+    }
 }

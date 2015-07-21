@@ -21,4 +21,9 @@ public interface PromoServiceFacade {
     int queryUserCouponCount(long userId, long orderId, int status);
     List<UserCoupon> queryUserCoupon(long userId, long orderId, int status, int start, int count);
     Map<Integer, Coupon> getCoupons(Collection<Integer> couponIds);
+
+    UserCoupon getNotUsedUserCouponByOrder(long orderId);
+    boolean lockUserCoupon(long userId, long orderId, long userCouponId);
+    boolean useUserCoupon(long userId, long orderId, long userCouponId);
+    boolean releaseUserCoupon(long userId, long orderId);
 }

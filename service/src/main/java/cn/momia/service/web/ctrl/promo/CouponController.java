@@ -3,12 +3,10 @@ package cn.momia.service.web.ctrl.promo;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.user.base.User;
 import cn.momia.service.deal.order.Order;
-import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.UserCoupon;
 import cn.momia.service.web.ctrl.AbstractController;
 import com.alibaba.fastjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,8 +20,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/coupon")
 public class CouponController extends AbstractController {
-    @Autowired private OrderService orderService;
-
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage coupon(@RequestParam String utoken,
                                   @RequestParam(value = "oid") long orderId,
@@ -31,7 +27,7 @@ public class CouponController extends AbstractController {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        Order order = orderService.get(orderId);
+        Order order = dealServiceFacade.getOrder(orderId);
         if (!order.exists() || order.isPayed() || order.getCustomerId() != user.getId()) return ResponseMessage.FAILED("无效的订单");
 
         UserCoupon userCoupon = promoServiceFacade.getUserCoupon(user.getId(), order.getId(), userCouponId);

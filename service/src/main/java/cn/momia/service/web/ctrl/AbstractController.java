@@ -3,6 +3,7 @@ package cn.momia.service.web.ctrl;
 import cn.momia.common.config.Configuration;
 import cn.momia.common.web.controller.BaseController;
 import cn.momia.service.common.CommonServiceFacade;
+import cn.momia.service.deal.DealServiceFacade;
 import cn.momia.service.product.ProductServiceFacade;
 import cn.momia.service.promo.PromoServiceFacade;
 import cn.momia.service.user.UserServiceFacade;
@@ -12,6 +13,7 @@ public abstract class AbstractController extends BaseController {
     @Autowired protected Configuration conf;
 
     @Autowired protected CommonServiceFacade commonServiceFacade;
+    @Autowired protected DealServiceFacade dealServiceFacade;
     @Autowired protected PromoServiceFacade promoServiceFacade;
     @Autowired protected ProductServiceFacade productServiceFacade;
     @Autowired protected UserServiceFacade userServiceFacade;

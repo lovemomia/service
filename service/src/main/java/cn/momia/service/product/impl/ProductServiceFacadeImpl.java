@@ -45,6 +45,8 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
     @Override
     public Product get(long id) {
+        if (id <= 0) return Product.NOT_EXIST_PRODUCT;
+
         BaseProduct baseProduct = baseProductService.get(id);
         if (!baseProduct.exists()) return Product.NOT_EXIST_PRODUCT;
 
