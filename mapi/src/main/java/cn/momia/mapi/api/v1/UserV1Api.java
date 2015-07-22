@@ -6,7 +6,6 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.OrderDto;
 import cn.momia.mapi.api.v1.dto.base.ParticipantDto;
-import cn.momia.mapi.api.v1.dto.base.UserCouponDto;
 import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import cn.momia.mapi.api.v1.dto.composite.PagedListDto;
 import cn.momia.mapi.api.v1.dto.base.UserDto;
@@ -20,9 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/user")
@@ -329,42 +325,6 @@ public class UserV1Api extends AbstractV1Api {
                 .add("count", pageSize);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("coupon/user"), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return buildUserCouponsDto((JSONObject) data, start, pageSize);
-            }
-        });
-    }
-
-    private Dto buildUserCouponsDto(JSONObject userCouponsPackJson, int start, int count) {
-        PagedListDto userCoupons = new PagedListDto();
-
-        int totalCount = userCouponsPackJson.getInteger("totalCount");
-        userCoupons.setTotalCount(totalCount);
-
-        Map<Integer, JSONObject> couponsMap = new HashMap<Integer, JSONObject>();
-        JSONArray couponsJson = userCouponsPackJson.getJSONArray("coupons");
-        for (int i = 0; i < couponsJson.size(); i++) {
-            JSONObject couponJson = couponsJson.getJSONObject(i);
-            couponsMap.put(couponJson.getInteger("id"), couponJson);
-        }
-
-        JSONArray userCouponsJson = userCouponsPackJson.getJSONArray("userCoupons");
-        for (int i = 0; i < userCouponsJson.size(); i++) {
-            try {
-                JSONObject userCouponJson = userCouponsJson.getJSONObject(i);
-                JSONObject couponJson = couponsMap.get(userCouponJson.getInteger("couponId"));
-                if (couponJson == null) continue;
-
-                userCoupons.add(new UserCouponDto(userCouponJson, couponJson));
-            } catch (Exception e) {
-                LOGGER.error("fail to parse user coupon: {}", userCouponsJson.getJSONObject(i), e);
-            }
-        }
-
-        if (start + count < totalCount) userCoupons.setNextIndex(start + count);
-
-        return userCoupons;
+        return executeRequest(request);
     }
 }

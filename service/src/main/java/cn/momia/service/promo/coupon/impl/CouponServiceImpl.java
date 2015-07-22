@@ -153,9 +153,18 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
                 }
             });
         } else if (status == UserCoupon.Status.NOT_USED && orderId > 0) {
-            String sql = "SELECT COUNT(1) FROM t_user_coupon WHERE userId=? AND (status=? OR (orderId=? AND status=?))";
+            String sql = "SELECT COUNT(1) FROM t_user_coupon WHERE userId=? AND ((status=? AND endTime>NOW()) OR (orderId=? AND status=?))";
 
             return jdbcTemplate.query(sql, new Object[] { userId, status, orderId, UserCoupon.Status.LOCKED }, new ResultSetExtractor<Integer>() {
+                @Override
+                public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
+                    return rs.next() ? rs.getInt(1) : 0;
+                }
+            });
+        } else if (status == UserCoupon.Status.NOT_USED) {
+            String sql = "SELECT COUNT(1) FROM t_user_coupon WHERE userId=? AND status=? AND endTime>NOW()";
+
+            return jdbcTemplate.query(sql, new Object[] { userId, status }, new ResultSetExtractor<Integer>() {
                 @Override
                 public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
                     return rs.next() ? rs.getInt(1) : 0;
@@ -192,16 +201,26 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
                     UserCoupon userCoupon = buildUserCoupon(rs);
+                    userCoupon.setStatus(UserCoupon.Status.EXPIRED);
                     if (userCoupon.exists()) userCoupons.add(userCoupon);
                 }
             });
         } else if (status == UserCoupon.Status.NOT_USED && orderId > 0) {
-            String sql = "SELECT " + joinUserCouponFields() + " FROM t_user_coupon WHERE userId=? AND (status=? OR (orderId=? AND status=?)) ORDER BY addTime DESC LIMIT ?,?";
+            String sql = "SELECT " + joinUserCouponFields() + " FROM t_user_coupon WHERE userId=? AND ((status=? AND endTime>NOW()) OR (orderId=? AND status=?)) ORDER BY addTime DESC LIMIT ?,?";
             jdbcTemplate.query(sql, new Object[] { userId, status, orderId, UserCoupon.Status.LOCKED, start, count }, new RowCallbackHandler() {
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
                     UserCoupon userCoupon = buildUserCoupon(rs);
                     userCoupon.setStatus(UserCoupon.Status.NOT_USED);
+                    if (userCoupon.exists()) userCoupons.add(userCoupon);
+                }
+            });
+        } else if (status == UserCoupon.Status.NOT_USED) {
+            String sql = "SELECT " + joinUserCouponFields() + " FROM t_user_coupon WHERE userId=? AND status=? AND endTime>NOW() ORDER BY addTime DESC LIMIT ?,?";
+            jdbcTemplate.query(sql, new Object[] { userId, status, start, count }, new RowCallbackHandler() {
+                @Override
+                public void processRow(ResultSet rs) throws SQLException {
+                    UserCoupon userCoupon = buildUserCoupon(rs);
                     if (userCoupon.exists()) userCoupons.add(userCoupon);
                 }
             });
@@ -220,6 +239,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
                     UserCoupon userCoupon = buildUserCoupon(rs);
+                    if (userCoupon.getStatus() == UserCoupon.Status.LOCKED)) userCoupon.setStatus(UserCoupon.Status.USED);
                     if (userCoupon.exists()) userCoupons.add(userCoupon);
                 }
             });
