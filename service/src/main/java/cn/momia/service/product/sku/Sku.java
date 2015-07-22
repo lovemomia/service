@@ -55,6 +55,20 @@ public class Sku implements Serializable {
         return times.get(0);
     }
 
+    public static List<Sku> filter(List<Sku> skus) {
+        List<Sku> filteredSkus = new ArrayList<Sku>();
+
+        Date today = new Date();
+        for (Sku sku : skus) {
+            if (sku.getOfflineTime().before(today) ||
+                    sku.getStartTime().before(today) ||
+                    (sku.getType() != 1 && sku.getUnlockedStock() <= 0)) continue;
+            filteredSkus.add(sku);
+        }
+
+        return filteredSkus;
+    }
+
     private long id;
     private long productId;
     private String desc;

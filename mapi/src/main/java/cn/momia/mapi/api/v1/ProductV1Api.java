@@ -128,9 +128,7 @@ public class ProductV1Api extends AbstractV1Api {
         return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {
             @Override
             public Dto apply(MomiaHttpResponseCollector collector) {
-                return new ProductDetailDto((JSONObject) collector.getResponse("product"),
-                        (JSONObject) collector.getResponse("customers"),
-                        (JSONArray) collector.getResponse("skus"));
+                return new ProductDetailDto((JSONObject) collector.getResponse("product"), (JSONObject) collector.getResponse("customers"));
             }
         });
     }
@@ -138,7 +136,6 @@ public class ProductV1Api extends AbstractV1Api {
     private List<MomiaHttpRequest> buildProductRequests(long productId) {
         List<MomiaHttpRequest> requests = new ArrayList<MomiaHttpRequest>();
         requests.add(buildProductRequest(productId));
-        requests.add(buildProductSkusRequest(productId));
         requests.add(buildProductCustomersRequest(productId));
 
         return requests;
@@ -146,10 +143,6 @@ public class ProductV1Api extends AbstractV1Api {
 
     private MomiaHttpRequest buildProductRequest(long productId) {
         return MomiaHttpRequest.GET("product", true, url("product", productId));
-    }
-
-    private MomiaHttpRequest buildProductSkusRequest(long productId) {
-        return MomiaHttpRequest.GET("skus", true, url("product", productId, "sku"));
     }
 
     private MomiaHttpRequest buildProductCustomersRequest(long productId) {
@@ -176,17 +169,21 @@ public class ProductV1Api extends AbstractV1Api {
 
     private List<MomiaHttpRequest> buildProductOrderRequests(long productId, String utoken) {
         List<MomiaHttpRequest> requests = new ArrayList<MomiaHttpRequest>();
+        requests.add(buildContactsRequest(utoken));
         requests.add(buildProductSkusRequest(productId));
-        requests.add(buildUserRequest(utoken));
 
         return requests;
     }
 
-    private MomiaHttpRequest buildUserRequest(String utoken) {
+    private MomiaHttpRequest buildContactsRequest(String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        MomiaHttpRequest request = MomiaHttpRequest.GET("contacts", true, url("user"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET("contacts", true, url("user/contacts"), builder.build());
 
         return request;
+    }
+
+    private MomiaHttpRequest buildProductSkusRequest(long productId) {
+        return MomiaHttpRequest.GET("skus", true, url("product", productId, "sku"));
     }
 
     @RequestMapping(value = "/playmate", method = RequestMethod.GET)

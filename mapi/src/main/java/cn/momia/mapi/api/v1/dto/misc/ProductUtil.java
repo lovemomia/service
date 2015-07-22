@@ -58,10 +58,11 @@ public class ProductUtil {
         product.setOnlineTime(productJson.getDate("onlineTime"));
         product.setOfflineTime(productJson.getDate("offlineTime"));
         product.setStatus(productJson.getInteger("status"));
+        product.setOpened(productJson.getBoolean("opened"));
 
-        if (product.getOfflineTime().before(new Date()) ||
-                product.isSoldOut() ||
-                product.getStatus() != 1) product.setOpened(false);
+//        if (product.getOfflineTime().before(new Date()) ||
+//                product.isSoldOut() ||
+//                product.getStatus() != 1) product.setOpened(false);
 
         if (extractExtraInfo) {
             product.setImgs(extractProductImgs(productJson));

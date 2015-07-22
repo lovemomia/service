@@ -1,5 +1,6 @@
 package cn.momia.service.web.ctrl.user.dto;
 
+import cn.momia.common.secret.MobileEncryptor;
 import cn.momia.common.web.img.ImageFile;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;
@@ -26,7 +27,7 @@ public class UserDto {
     }
 
     public String getMobile() {
-        return user.getMobile();
+        return MobileEncryptor.encrypt(user.getMobile());
     }
 
     public boolean isHasPassword() {

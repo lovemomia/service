@@ -84,6 +84,13 @@ public class Product implements Serializable {
         return baseProduct.getStatus();
     }
 
+    public boolean isOpened() {
+        Date today = new Date();
+        if (getOfflineTime().before(today) || isSoldOut() || getStatus() != 1) return false;
+
+        return !Sku.filter(skus).isEmpty();
+    }
+
     public void setBaseProduct(BaseProduct baseProduct) {
         this.baseProduct = baseProduct;
     }

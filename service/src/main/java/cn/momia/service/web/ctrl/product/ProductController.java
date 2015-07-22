@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -82,7 +83,7 @@ public class ProductController extends AbstractController {
     @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
     public ResponseMessage getProductSkus(@PathVariable long id) {
         List<Sku> skus = productServiceFacade.getSkus(id);
-        return new ResponseMessage(skus);
+        return new ResponseMessage(Sku.filter(skus));
     }
 
     @RequestMapping(value = "/{id}/customer", method = RequestMethod.GET)

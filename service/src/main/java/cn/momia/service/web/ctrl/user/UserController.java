@@ -3,6 +3,7 @@ package cn.momia.service.web.ctrl.user;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;
+import cn.momia.service.web.ctrl.user.dto.ContactsDto;
 import cn.momia.service.web.ctrl.user.dto.ParticipantDto;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -209,5 +210,13 @@ public class UserController extends UserRelatedController {
 
         Set<Long> childIds = user.getChildren();
         return new ResponseMessage(buildParticipantsResponse(userServiceFacade.getChildren(childIds)));
+    }
+
+    @RequestMapping(value = "/contacts", method = RequestMethod.GET)
+    public ResponseMessage getContacts(@RequestParam String utoken) {
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        return new ResponseMessage(new ContactsDto(user));
     }
 }
