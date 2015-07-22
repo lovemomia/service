@@ -169,6 +169,11 @@ public class Product implements Serializable {
         return miniPrice;
     }
 
+    public Date startTime(int month) {
+        // TODO
+        return null;
+    }
+
     public boolean invalid() {
         return !(baseProduct != null && baseProduct.exists() &&
                 imgs != null && !imgs.isEmpty() &&

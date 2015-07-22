@@ -4,14 +4,12 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.web.ctrl.product.dto.Customers;
 import cn.momia.service.web.ctrl.product.dto.Playmate;
 import cn.momia.service.product.Product;
-import cn.momia.service.product.ProductQuery;
 import cn.momia.service.web.ctrl.product.dto.SkuPlaymates;
 import cn.momia.service.product.sku.Sku;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.web.ctrl.AbstractController;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,12 +34,11 @@ public class ProductController extends AbstractController {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getProducts(@RequestParam(value = "city") int cityId,
                                        @RequestParam int start,
-                                       @RequestParam int count,
-                                       @RequestParam(required = false) String query) {
-        if (cityId < 0 || isInvalidLimit(start, count)) return new ResponseMessage(buildProductsPack(0, new ArrayList<Product>()));
+                                       @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return new ResponseMessage(buildProductsPack(0, new ArrayList<Product>()));
 
-        long totalCount = productServiceFacade.queryCount(new ProductQuery(cityId, query));
-        List<Product> products = totalCount > 0 ? productServiceFacade.query(start, count, new ProductQuery(cityId, query)) : new ArrayList<Product>();
+        long totalCount = productServiceFacade.queryCount(cityId);
+        List<Product> products = totalCount > 0 ? productServiceFacade.query(cityId, start, count) : new ArrayList<Product>();
 
         return new ResponseMessage(buildProductsPack(totalCount, products));
     }
@@ -60,34 +55,20 @@ public class ProductController extends AbstractController {
     public ResponseMessage getProductsByWeekend(@RequestParam(value = "city") int cityId,
                                                 @RequestParam int start,
                                                 @RequestParam int count) {
-        if (cityId < 0 || isInvalidLimit(start, count)) return new ResponseMessage(buildProductsPack(0, new ArrayList<Product>()));
+        if (isInvalidLimit(start, count)) return new ResponseMessage(buildProductsPack(0, new ArrayList<Product>()));
 
-        long totalCount = productServiceFacade.queryWeekendCount(new ProductQuery(cityId, ""));
-        List<Product> products = totalCount > 0 ? productServiceFacade.queryWeekend(start, count, new ProductQuery(cityId, "")) : new ArrayList<Product>();
+        long totalCount = productServiceFacade.queryCountByWeekend(cityId);
+        List<Product> products = totalCount > 0 ? productServiceFacade.queryByWeekend(cityId, start, count) : new ArrayList<Product>();
 
         return new ResponseMessage(buildProductsPack(totalCount, products));
     }
 
     @RequestMapping(value = "/month", method = RequestMethod.GET)
-    public ResponseMessage getProductsByMonth(@RequestParam(value = "city") int cityId,
-                                              @RequestParam int month) {
-        // TODO
-        if (cityId < 0) return ResponseMessage.BAD_REQUEST;
+    public ResponseMessage getProductsByMonth(@RequestParam(value = "city") int cityId, @RequestParam int month) {
+        long totalCount = productServiceFacade.queryCountByMonth(cityId, month);
+        List<Product> products = totalCount > 0 ? productServiceFacade.queryByMonth(cityId, month) : new ArrayList<Product>();
 
-        long totalCount = productServiceFacade.queryCount(new ProductQuery(cityId, ""));
-        List<Product> products = totalCount > 0 ? productServiceFacade.query(0, 100, new ProductQuery(cityId, "")) : new ArrayList<Product>();
-
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        JSONArray productsPackJson = new JSONArray();
-        for (Product product : products) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("date", df.format(product.getOnlineTime()));
-            jsonObject.put("product", product);
-
-            productsPackJson.add(jsonObject);
-        }
-
-        return new ResponseMessage(productsPackJson);
+        return new ResponseMessage(buildProductsPack(totalCount, products));
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)

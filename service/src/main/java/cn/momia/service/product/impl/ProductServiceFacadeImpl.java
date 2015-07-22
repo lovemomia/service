@@ -1,9 +1,9 @@
 package cn.momia.service.product.impl;
 
+import cn.momia.common.misc.TimeUtil;
 import cn.momia.service.base.DbAccessService;
 import cn.momia.service.product.Product;
 import cn.momia.service.product.ProductImage;
-import cn.momia.service.product.ProductQuery;
 import cn.momia.service.product.ProductServiceFacade;
 import cn.momia.service.product.base.BaseProduct;
 import cn.momia.service.product.base.BaseProductService;
@@ -150,23 +150,36 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     }
 
     @Override
-    public long queryCount(ProductQuery query) {
-        return baseProductService.queryCount(query.toString());
+    public long queryCount(int cityId) {
+        if (cityId < 0) return 0;
+        return baseProductService.queryCount(cityId);
     }
 
     @Override
-    public List<Product> query(int start, int count, ProductQuery query) {
-        return buildProducts(baseProductService.query(start, count, query.toString()));
+    public List<Product> query(int cityId, int start, int count) {
+        return buildProducts(baseProductService.query(cityId, start, count));
     }
 
     @Override
-    public long queryWeekendCount(ProductQuery query) {
-        return baseProductService.queryWeekendCount(query.toString());
+    public long queryCountByWeekend(int cityId) {
+        if (cityId < 0) return 0;
+        return baseProductService.queryCountByWeekend(cityId);
     }
 
     @Override
-    public List<Product> queryWeekend(int start, int count, ProductQuery query) {
-        return buildProducts(baseProductService.queryWeekend(start, count, query.toString()));
+    public List<Product> queryByWeekend(int cityId, int start, int count) {
+        return buildProducts(baseProductService.queryByWeekend(cityId, start, count));
+    }
+
+    @Override
+    public long queryCountByMonth(int cityId, int month) {
+        if (cityId < 0 || month <= 0 || month > 12) return 0;
+        return baseProductService.queryCountByMonth(cityId, TimeUtil.buildMonthStr(month), TimeUtil.buildNextMonthStr(month));
+    }
+
+    @Override
+    public List<Product> queryByMonth(int cityId, int month) {
+        return buildProducts(baseProductService.queryByMonth(cityId, TimeUtil.buildMonthStr(month), TimeUtil.buildNextMonthStr(month)));
     }
 
     @Override

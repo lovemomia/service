@@ -9,10 +9,12 @@ public interface BaseProductService extends Service {
     BaseProduct get(long id);
     List<BaseProduct> get(Collection<Long> ids);
 
-    long queryCount(String query);
-    List<BaseProduct> query(int start, int count, String query);
-    long queryWeekendCount(String query);
-    List<BaseProduct> queryWeekend(int start, int count, String query);
+    long queryCount(int cityId);
+    List<BaseProduct> query(int cityId, int start, int count);
+    long queryCountByWeekend(int cityId);
+    List<BaseProduct> queryByWeekend(int cityId, int start, int count);
+    long queryCountByMonth(int cityId, String currentMonth, String nextMonth);
+    List<BaseProduct> queryByMonth(int cityId, String currentMonth, String nextMonth);
 
     boolean join(long id, int count);
     boolean sold(long id, int count);

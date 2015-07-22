@@ -1,5 +1,6 @@
 package cn.momia.mapi.api.v1;
 
+import cn.momia.common.misc.TimeUtil;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
@@ -21,7 +22,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,28 +79,46 @@ public class ProductV1Api extends AbstractV1Api {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                return buildProductsDtoOfMonth((JSONArray) data);
+                return buildProductsDtoOfMonth((JSONObject) data, month);
             }
         });
     }
 
-    private Dto buildProductsDtoOfMonth(JSONArray productsPackJson) {
-        ListDto products = new ListDto();
-        Map<String, ProductsOfDayDto> productsOfDayDtoMap = new HashMap<String, ProductsOfDayDto>();
-        for (int i = 0; i < productsPackJson.size(); i++) {
-            JSONObject productPackJson = productsPackJson.getJSONObject(i);
-            String dateStr = productPackJson.getString("date");
-            ProductsOfDayDto productsOfDayDto = productsOfDayDtoMap.get(dateStr);
-            if (productsOfDayDto == null) {
-                productsOfDayDto = new ProductsOfDayDto();
-                products.add(productsOfDayDto);
-                productsOfDayDto.setDate(productPackJson.getDate("date"));
-                productsOfDayDtoMap.put(dateStr, productsOfDayDto);
-            }
-            productsOfDayDto.addProduct(ProductUtil.extractProductData(productPackJson.getJSONObject("product"), false));
-        }
+    private Dto buildProductsDtoOfMonth(JSONObject productsPackJson, int month) {
+        try {
+            ListDto products = new ListDto();
 
-        return products;
+            DateFormat monthFormat = new SimpleDateFormat("yyyy-MM");
+            DateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date currentMonth = monthFormat.parse(TimeUtil.buildMonthStr(month));
+            Date nextMonth = monthFormat.parse(TimeUtil.buildNextMonthStr(month));
+
+            Map<String, ProductsOfDayDto> productsOfDayDtoMap = new HashMap<String, ProductsOfDayDto>();
+            JSONArray productsJson = productsPackJson.getJSONArray("products");
+            for (int i = 0; i < productsJson.size(); i++) {
+                JSONObject productJson = productsJson.getJSONObject(i);
+                JSONArray skusJson = productJson.getJSONArray("skus");
+                for (int j = 0; j < skusJson.size(); j++) {
+                    JSONObject skuJson = skusJson.getJSONObject(j);
+                    Date startTime = skuJson.getDate("startTime");
+                    if (startTime.after(currentMonth) && startTime.before(nextMonth)) {
+                        String day = dayFormat.format(startTime);
+                        ProductsOfDayDto productsOfDayDto = productsOfDayDtoMap.get(day);
+                        if (productsOfDayDto == null) {
+                            productsOfDayDto = new ProductsOfDayDto();
+                            products.add(productsOfDayDto);
+                            productsOfDayDto.setDate(startTime);
+                            productsOfDayDtoMap.put(day, productsOfDayDto);
+                        }
+                        productsOfDayDto.addProduct(ProductUtil.extractProductData(productJson, false));
+                    }
+                }
+            }
+
+            return products;
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @RequestMapping(method = RequestMethod.GET)

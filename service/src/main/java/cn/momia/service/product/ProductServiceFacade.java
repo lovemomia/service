@@ -9,10 +9,12 @@ public interface ProductServiceFacade {
     Product get(long id);
     List<Product> get(Collection<Long> ids);
 
-    long queryCount(ProductQuery productQuery);
-    List<Product> query(int start, int count, ProductQuery query);
-    long queryWeekendCount(ProductQuery productQuery);
-    List<Product> queryWeekend(int start, int count, ProductQuery productQuery);
+    long queryCount(int cityId);
+    List<Product> query(int cityId, int start, int count);
+    long queryCountByWeekend(int cityId);
+    List<Product> queryByWeekend(int cityId, int start, int count);
+    long queryCountByMonth(int cityId, int month);
+    List<Product> queryByMonth(int cityId, int month);
 
     List<Sku> getSkus(long id);
     Sku getSku(long skuId);

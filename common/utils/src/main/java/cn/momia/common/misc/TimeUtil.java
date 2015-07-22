@@ -60,4 +60,25 @@ public class TimeUtil {
 
         return AM_PM[calendar.get(Calendar.AM_PM)];
     }
+
+    public static String buildMonthStr(int month) {
+        Calendar calendar = Calendar.getInstance();
+        int currentYear = calendar.get(Calendar.YEAR);
+        int currentMonth = calendar.get(Calendar.MONTH) + 1;
+
+        if (month < currentMonth) return String.format("%d-%02d", currentYear + 1, month);
+        return String.format("%d-%02d", currentYear, month);
+    }
+
+    public static String buildNextMonthStr(int month) {
+        Calendar calendar = Calendar.getInstance();
+        int currentYear = calendar.get(Calendar.YEAR);
+        int currentMonth = calendar.get(Calendar.MONTH) + 1;
+
+        int nextMonth = month + 1;
+        nextMonth = nextMonth > 12 ? nextMonth - 12 : nextMonth;
+
+        if (month < currentMonth || nextMonth < month) return String.format("%d-%02d", currentYear + 1, nextMonth);
+        return String.format("%d-%02d", currentYear, nextMonth);
+    }
 }

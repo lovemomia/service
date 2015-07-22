@@ -114,10 +114,10 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     }
 
     @Override
-    public long queryCount(String query) {
-        String sql = "SELECT COUNT(1) FROM t_product WHERE status=1 AND onlineTime<=NOW() AND offlineTime>NOW() AND " + query;
+    public long queryCount(int cityId) {
+        String sql = "SELECT COUNT(1) FROM t_product WHERE status=1 AND onlineTime<=NOW() AND offlineTime>NOW() AND (cityId=? OR cityId=0)";
 
-        return jdbcTemplate.query(sql, new ResultSetExtractor<Long>() {
+        return jdbcTemplate.query(sql, new Object[] { cityId }, new ResultSetExtractor<Long>() {
             @Override
             public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
                 return rs.next() ? rs.getLong(1) : 0;
@@ -126,11 +126,11 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     }
 
     @Override
-    public List<BaseProduct> query(int start, int count, String query) {
+    public List<BaseProduct> query(int cityId, int start, int count) {
         final List<BaseProduct> baseProducts = new ArrayList<BaseProduct>();
 
-        String sql = "SELECT " + joinFields() + " FROM t_product WHERE status=1 AND onlineTime<=NOW() AND offlineTime>NOW() AND " + query + " ORDER BY ordinal DESC, soldOut ASC, addTime DESC LIMIT ?,?";
-        jdbcTemplate.query(sql, new Object[] { start, count }, new RowCallbackHandler() {
+        String sql = "SELECT " + joinFields() + " FROM t_product WHERE status=1 AND onlineTime<=NOW() AND offlineTime>NOW() AND (cityId=? OR cityId=0) ORDER BY ordinal DESC, soldOut ASC, addTime DESC LIMIT ?,?";
+        jdbcTemplate.query(sql, new Object[] { cityId, start, count }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 BaseProduct baseProduct = buildBaseProduct(rs);
@@ -142,15 +142,15 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     }
 
     @Override
-    public long queryWeekendCount(String query) {
+    public long queryCountByWeekend(int cityId) {
         String sql = "SELECT COUNT(DISTINCT A.id) " +
                 "FROM t_product A INNER JOIN t_sku B ON A.id=B.productId " +
                 "WHERE A.status=1 AND A.onlineTime<=NOW() AND A.offlineTime>NOW() AND A.soldOut=0 " +
                 "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() " +
                 "AND (B.type=1 OR B.unlockedStock>0) AND B.onWeekend=1 " +
-                "AND " + query;
+                "AND (cityId=? OR cityId=0)";
 
-        return jdbcTemplate.query(sql, new ResultSetExtractor<Long>() {
+        return jdbcTemplate.query(sql, new Object[] { cityId }, new ResultSetExtractor<Long>() {
             @Override
             public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
                 return rs.next() ? rs.getLong(1) : 0;
@@ -159,15 +159,51 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     }
 
     @Override
-    public List<BaseProduct> queryWeekend(int start, int count, String query) {
+    public List<BaseProduct> queryByWeekend(int cityId, int start, int count) {
         String sql = "SELECT DISTINCT A.id " +
                 "FROM t_product A INNER JOIN t_sku B ON A.id=B.productId " +
                 "WHERE A.status=1 AND A.onlineTime<=NOW() AND A.offlineTime>NOW() AND A.soldOut=0 " +
                 "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() " +
                 "AND (B.type=1 OR B.unlockedStock>0) AND B.onWeekend=1 " +
-                "AND " + query + " ORDER BY B.startTime ASC LIMIT ?,?";
+                "AND (cityId=? OR cityId=0) ORDER BY B.startTime ASC LIMIT ?,?";
         final List<Long> ids = new ArrayList<Long>();
-        jdbcTemplate.query(sql, new Object[] { start, count }, new RowCallbackHandler() {
+        jdbcTemplate.query(sql, new Object[] { cityId, start, count }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                ids.add(rs.getLong("id"));
+            }
+        });
+
+        return get(ids);
+    }
+
+    @Override
+    public long queryCountByMonth(int cityId, String currentMonth, String nextMonth) {
+        String sql = "SELECT COUNT(DISTINCT A.id) " +
+                "FROM t_product A INNER JOIN t_sku B ON A.id=B.productId " +
+                "WHERE A.status=1 AND A.onlineTime<=NOW() AND A.offlineTime>NOW() AND A.soldOut=0 " +
+                "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() " +
+                "AND (B.type=1 OR B.unlockedStock>0) AND startTime>=? AND endTime<? " +
+                "AND (cityId=? OR cityId=0)";
+
+        return jdbcTemplate.query(sql, new Object[] { cityId, currentMonth, nextMonth }, new ResultSetExtractor<Long>() {
+            @Override
+            public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getLong(1) : 0;
+            }
+        });
+    }
+
+    @Override
+    public List<BaseProduct> queryByMonth(int cityId, String currentMonth, String nextMonth) {
+        String sql = "SELECT DISTINCT A.id " +
+                "FROM t_product A INNER JOIN t_sku B ON A.id=B.productId " +
+                "WHERE A.status=1 AND A.onlineTime<=NOW() AND A.offlineTime>NOW() AND A.soldOut=0 " +
+                "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() " +
+                "AND (B.type=1 OR B.unlockedStock>0) AND startTime>=? AND endTime<? " +
+                "AND (cityId=? OR cityId=0) ORDER BY B.startTime ASC";
+        final List<Long> ids = new ArrayList<Long>();
+        jdbcTemplate.query(sql, new Object[] { cityId, currentMonth, nextMonth }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 ids.add(rs.getLong("id"));
