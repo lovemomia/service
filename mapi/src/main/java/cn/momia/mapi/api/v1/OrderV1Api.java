@@ -3,11 +3,8 @@ package cn.momia.mapi.api.v1;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.v1.dto.base.Dto;
-import cn.momia.mapi.api.v1.dto.base.OrderDto;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,12 +22,7 @@ public class OrderV1Api extends AbstractV1Api {
         orderJson.put("customerId", getUserId(utoken));
         MomiaHttpRequest request = MomiaHttpRequest.POST(url("order"), orderJson.toString());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return new OrderDto((JSONObject) data);
-            }
-        });
+        return executeRequest(request);
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.POST)

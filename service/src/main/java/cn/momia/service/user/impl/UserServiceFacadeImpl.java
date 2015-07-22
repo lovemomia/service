@@ -10,6 +10,8 @@ import cn.momia.service.user.participant.Participant;
 import cn.momia.service.user.participant.ParticipantService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,6 +21,8 @@ import java.util.List;
 import java.util.Set;
 
 public class UserServiceFacadeImpl implements UserServiceFacade {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceFacadeImpl.class);
+
     private static final Set<String> SEX = new HashSet<String>();
     static {
         SEX.add("男");
@@ -141,6 +145,19 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
         if (user.exists() && !userService.updatePassword(user.getId(), mobile, password)) throw new MomiaFailedException("更改密码失败");
 
         return user;
+    }
+
+    @Override
+    public void processContacts(long userId, String mobile, String contacts) {
+        try {
+            if (StringUtils.isBlank(contacts)) return;
+            User user = getUserByMobile(mobile);
+            if (!user.exists()) return;
+
+            if (user.getId() == userId && StringUtils.isBlank(user.getName()) && !contacts.equals(user.getNickName())) updateUserName(user.getId(), contacts);
+        } catch (Exception e) {
+            LOGGER.warn("fail to process contacts, {}/{}", mobile, contacts);
+        }
     }
 
     @Override

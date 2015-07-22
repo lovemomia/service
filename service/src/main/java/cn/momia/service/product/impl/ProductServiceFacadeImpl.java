@@ -246,7 +246,19 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     @Override
     public boolean join(long id, int count) {
         if (id <= 0 || count <= 0) return true;
-        return baseProductService.join(id, count);
+
+        try {
+            if (!baseProductService.join(id, count)) {
+                LOGGER.error("fail to increased joined of product: {}", id);
+                return false;
+            }
+
+            return true;
+        } catch (Exception e) {
+            LOGGER.error("fail to increased joined of product: {}", id, e);
+        }
+
+        return false;
     }
 
     @Override

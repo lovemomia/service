@@ -1,12 +1,13 @@
 package cn.momia.service.promo.impl;
 
-import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.promo.banner.Banner;
 import cn.momia.service.promo.banner.BannerService;
 import cn.momia.service.promo.PromoServiceFacade;
 import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.CouponService;
 import cn.momia.service.promo.coupon.UserCoupon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -14,6 +15,8 @@ import java.util.Collection;
 import java.util.List;
 
 public class PromoServiceFacadeImpl implements PromoServiceFacade {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PromoServiceFacadeImpl.class);
+
     private static final int MAX_BANNER_COUNT = 20;
 
     private BannerService bannerService;
@@ -94,6 +97,18 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
     @Override
     public boolean releaseUserCoupon(long userId, long orderId) {
         if (userId <= 0 || orderId <= 0) return true;
-        return couponService.releaseUserCoupon(userId, orderId);
+
+        try {
+            if (!couponService.releaseUserCoupon(userId, orderId)) {
+                LOGGER.error("fail to release user coupon of order: {}", orderId);
+                return false;
+            }
+
+            return true;
+        } catch (Exception e) {
+            LOGGER.error("fail to release user coupon of order: {}", orderId, e);
+        }
+
+        return false;
     }
 }

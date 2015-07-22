@@ -19,7 +19,8 @@ public class CallbackController extends AbstractController {
     }
 
     private ResponseMessage callback(HttpServletRequest request, int payType) {
-        if (dealServiceFacade.callback(HttpUtil.extractParams(request.getParameterMap()), payType)) return ResponseMessage.SUCCESS;
+        if (dealServiceFacade.callback(HttpUtil.extractParams(request.getParameterMap()), payType))
+            return ResponseMessage.SUCCESS;
         return ResponseMessage.FAILED;
     }
 

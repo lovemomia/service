@@ -29,6 +29,8 @@ public interface UserServiceFacade {
     boolean updateUserChildren(long userId, Set<Long> children);
     User updateUserPassword(String mobile, String password);
 
+    void processContacts(long userId, String mobile, String contacts);
+
     // 孩子
     long addChild(Participant child);
     Participant getChild(long userId, long childId);

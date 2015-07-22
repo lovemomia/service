@@ -78,11 +78,7 @@ public class PaymentController extends AbstractController {
     }
 
     private void releasePreviousUserCoupon(UserCoupon previousUserCoupon) {
-        try {
-            promoServiceFacade.releaseUserCoupon(previousUserCoupon.getUserId(), previousUserCoupon.getOrderId());
-        } catch (Exception e) {
-            LOGGER.error("fail to release user coupon: {}", previousUserCoupon.getId(), e);
-        }
+        promoServiceFacade.releaseUserCoupon(previousUserCoupon.getUserId(), previousUserCoupon.getOrderId());
     }
 
     @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)

@@ -4,10 +4,8 @@ import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.v1.dto.base.Dto;
-import cn.momia.mapi.api.v1.dto.base.OrderDto;
 import cn.momia.mapi.api.v1.dto.base.ParticipantDto;
 import cn.momia.mapi.api.v1.dto.composite.ListDto;
-import cn.momia.mapi.api.v1.dto.composite.PagedListDto;
 import cn.momia.mapi.api.v1.dto.base.UserDto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -237,8 +235,7 @@ public class UserV1Api extends AbstractV1Api {
         ListDto children = new ListDto();
         for (int i = 0; i < childrenJson.size(); i++) {
             try {
-                JSONObject childJson = childrenJson.getJSONObject(i);
-                children.add(new ParticipantDto(childJson));
+                children.add(new ParticipantDto(childrenJson.getJSONObject(i)));
             } catch (Exception e) {
                 LOGGER.error("invalid child: {}", childrenJson);
             }
@@ -251,42 +248,16 @@ public class UserV1Api extends AbstractV1Api {
     public ResponseMessage getOrdersOfUser(@RequestParam String utoken,
                                            @RequestParam(defaultValue = "1") int status,
                                            @RequestParam final int start) {
-        final int pageSize = conf.getInt("Order.PageSize");
-        final int maxPageCount = conf.getInt("Order.MaxPageCount");
-        if (StringUtils.isBlank(utoken) || start < 0 || start > pageSize * maxPageCount) return new ResponseMessage(PagedListDto.EMPTY);
+        if (StringUtils.isBlank(utoken) || start < 0) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
-                .add("status", status == -1 ? 1 : status)
+                .add("status", status < 0 ? 1 : status)
                 .add("start", start)
-                .add("count", pageSize);
+                .add("count", conf.getInt("Order.PageSize"));
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("order/user"), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return buildOrdersDto((JSONObject) data, start, pageSize);
-            }
-        });
-    }
-
-    private Dto buildOrdersDto(JSONObject ordersPackJson, int start, int count) {
-        PagedListDto orders = new PagedListDto();
-
-        long totalCount = ordersPackJson.getLong("totalCount");
-        orders.setTotalCount(totalCount);
-
-        JSONArray ordersJson = ordersPackJson.getJSONArray("orders");
-        for (int i = 0; i < ordersJson.size(); i++) {
-            try {
-                orders.add(new OrderDto(ordersJson.getJSONObject(i), true));
-            } catch (Exception e) {
-                LOGGER.error("fail to parse order: {}", ordersJson.getJSONObject(i), e);
-            }
-        }
-        if (start + count < totalCount) orders.setNextIndex(start + count);
-
-        return orders;
+        return executeRequest(request);
     }
 
     @RequestMapping(value = "/order/detail", method = RequestMethod.GET)
@@ -300,12 +271,7 @@ public class UserV1Api extends AbstractV1Api {
                 .add("pid", productId);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("order", orderId), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return new OrderDto((JSONObject) data, true);
-            }
-        });
+        return executeRequest(request);
     }
 
     @RequestMapping(value = "/coupon", method = RequestMethod.GET)
@@ -313,16 +279,14 @@ public class UserV1Api extends AbstractV1Api {
                                             @RequestParam(value = "oid", defaultValue = "0") long orderId,
                                             @RequestParam(defaultValue = "0") int status,
                                             @RequestParam final int start) {
-        final int pageSize = conf.getInt("Coupon.PageSize");
-        final int maxPageCount = conf.getInt("Coupon.MaxPageCount");
-        if (StringUtils.isBlank(utoken) || start < 0 || start > pageSize * maxPageCount) return new ResponseMessage(PagedListDto.EMPTY);
+        if (StringUtils.isBlank(utoken) || orderId < 0 || status < 0 || start < 0) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("oid", orderId)
                 .add("status", status)
                 .add("start", start)
-                .add("count", pageSize);
+                .add("count", conf.getInt("Coupon.PageSize"));
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("coupon/user"), builder.build());
 
         return executeRequest(request);

@@ -39,6 +39,8 @@ public class DealServiceFacadeImpl implements DealServiceFacade {
 
     @Override
     public void checkLimit(long userId, long skuId, int count, int limit) throws OrderLimitException {
+        if (limit <= 0) return;
+
         List<Order> orders = orderService.queryByUserAndSku(userId, skuId);
         for (Order order : orders) {
             if (!order.exists()) continue;
