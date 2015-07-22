@@ -39,7 +39,7 @@ public class ProductV1Api extends AbstractV1Api {
                 .add("city", cityId)
                 .add("start", start)
                 .add("count", pageSize);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("product"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("product/weekend"), builder.build());
 
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
