@@ -60,7 +60,7 @@ public class WechatpayGateway extends AbstractPaymentGateway {
         params.put(WechatpayPrepayFields.NONCE_STR, WechatpayUtil.createNoncestr(32));
         params.put(WechatpayPrepayFields.BODY, product.getTitle());
         params.put(WechatpayPrepayFields.OUT_TRADE_NO, String.valueOf(order.getId()));
-        params.put(WechatpayPrepayFields.TOTAL_FEE, String.valueOf((int) (couponService.calcTotalFee(order.getTotalFee(), coupon).floatValue() * 100)));
+        params.put(WechatpayPrepayFields.TOTAL_FEE, String.valueOf((int) (promoServiceFacade.calcTotalFee(order.getTotalFee(), coupon).floatValue() * 100)));
         params.put(WechatpayPrepayFields.SPBILL_CREATE_IP, RequestUtil.getRemoteIp(request));
         params.put(WechatpayPrepayFields.NOTIFY_URL, conf.getString("Payment.Wechat.NotifyUrl"));
         params.put(WechatpayPrepayFields.TRADE_TYPE, tradeType);

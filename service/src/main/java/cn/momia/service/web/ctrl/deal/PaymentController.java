@@ -104,11 +104,11 @@ public class PaymentController extends AbstractController {
         if (userCouponId != null && userCouponId > 0) {
             Coupon coupon = useCoupon(user.getId(), order, userCouponId);
             totalFee = promoServiceFacade.calcTotalFee(totalFee, coupon);
+
+            if (coupon.exists() && !promoServiceFacade.useUserCoupon(user.getId(), orderId, userCouponId)) return ResponseMessage.FAILED("支付失败");
         }
 
         if (totalFee.compareTo(new BigDecimal(0)) != 0 ||
-                !promoServiceFacade.lockUserCoupon(user.getId(), orderId, userCouponId) ||
-                !promoServiceFacade.useUserCoupon(user.getId(), orderId, userCouponId) ||
                 !dealServiceFacade.prepayOrder(orderId) ||
                 !dealServiceFacade.payOrder(orderId)) return ResponseMessage.FAILED("支付失败");
 
