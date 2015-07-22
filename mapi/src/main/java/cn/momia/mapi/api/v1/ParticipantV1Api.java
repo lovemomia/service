@@ -4,7 +4,6 @@ import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.v1.dto.base.Dto;
-import cn.momia.mapi.api.v1.dto.base.ParticipantDto;
 import cn.momia.mapi.api.v1.dto.composite.ListDto;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;

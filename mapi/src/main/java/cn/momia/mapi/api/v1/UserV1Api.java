@@ -3,16 +3,8 @@ package cn.momia.mapi.api.v1;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.v1.dto.base.Dto;
-import cn.momia.mapi.api.v1.dto.base.ParticipantDto;
-import cn.momia.mapi.api.v1.dto.composite.ListDto;
-import cn.momia.mapi.api.v1.dto.base.UserDto;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,15 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/v1/user")
 public class UserV1Api extends AbstractV1Api {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserV1Api.class);
-
-    private static final Function<Object, Dto> userFunc = new Function<Object, Dto>() {
-        @Override
-        public Dto apply(Object data) {
-            return new UserDto((JSONObject) data);
-        }
-    };
-
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getUser(@RequestParam String utoken) {
         if (StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
@@ -37,7 +20,7 @@ public class UserV1Api extends AbstractV1Api {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("user"), builder.build());
 
-        return executeRequest(request, userFunc);
+        return executeRequest(request);
     }
 
     @RequestMapping(value = "/nickname", method = RequestMethod.POST)
@@ -49,7 +32,7 @@ public class UserV1Api extends AbstractV1Api {
                 .add("nickname", nickName);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(url("user/nickname"), builder.build());
 
-        return executeRequest(request, userFunc);
+        return executeRequest(request);
     }
 
     @RequestMapping(value = "/avatar", method = RequestMethod.POST)
@@ -61,7 +44,7 @@ public class UserV1Api extends AbstractV1Api {
                 .add("avatar", avatar);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(url("user/avatar"), builder.build());
 
-        return executeRequest(request, userFunc);
+        return executeRequest(request);
     }
 
     @RequestMapping(value = "/name", method = RequestMethod.POST)
@@ -73,7 +56,7 @@ public class UserV1Api extends AbstractV1Api {
                 .add("name", name);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(url("user/name"), builder.build());
 
-        return executeRequest(request, userFunc);
+        return executeRequest(request);
     }
 
     @RequestMapping(value = "/sex", method = RequestMethod.POST)
@@ -85,7 +68,7 @@ public class UserV1Api extends AbstractV1Api {
                 .add("sex", sex);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(url("user/sex"), builder.build());
 
-        return executeRequest(request, userFunc);
+        return executeRequest(request);
     }
 
     @RequestMapping(value = "/birthday", method = RequestMethod.POST)
@@ -97,7 +80,7 @@ public class UserV1Api extends AbstractV1Api {
                 .add("birthday", birthday);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(url("user/birthday"), builder.build());
 
-        return executeRequest(request, userFunc);
+        return executeRequest(request);
     }
 
     @RequestMapping(value = "/city", method = RequestMethod.POST)
@@ -109,7 +92,7 @@ public class UserV1Api extends AbstractV1Api {
                 .add("city", city);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(url("user/city"), builder.build());
 
-        return executeRequest(request, userFunc);
+        return executeRequest(request);
     }
 
     @RequestMapping(value = "/address", method = RequestMethod.POST)
@@ -121,7 +104,7 @@ public class UserV1Api extends AbstractV1Api {
                 .add("address", address);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(url("user/address"), builder.build());
 
-        return executeRequest(request, userFunc);
+        return executeRequest(request);
     }
 
     @RequestMapping(value = "/child", method = RequestMethod.POST)
@@ -133,7 +116,7 @@ public class UserV1Api extends AbstractV1Api {
         for (int i = 0; i < childrenJson.size(); i++) childrenJson.getJSONObject(i).put("userId", userId);
         MomiaHttpRequest request = MomiaHttpRequest.POST(url("user/child"), childrenJson.toString());
 
-        return executeRequest(request, userFunc);
+        return executeRequest(request);
     }
 
     @RequestMapping(value = "/child/name", method = RequestMethod.POST)
@@ -151,7 +134,7 @@ public class UserV1Api extends AbstractV1Api {
         ResponseMessage response = executeRequest(request);
         if (!response.successful()) return response;
 
-        return executeRequest(MomiaHttpRequest.GET(url("user"), new MomiaHttpParamBuilder().add("utoken", utoken).build()), userFunc);
+        return executeRequest(MomiaHttpRequest.GET(url("user"), new MomiaHttpParamBuilder().add("utoken", utoken).build()));
     }
 
 
@@ -170,7 +153,7 @@ public class UserV1Api extends AbstractV1Api {
         ResponseMessage response = executeRequest(request);
         if (!response.successful()) return response;
 
-        return executeRequest(MomiaHttpRequest.GET(url("user"), new MomiaHttpParamBuilder().add("utoken", utoken).build()), userFunc);
+        return executeRequest(MomiaHttpRequest.GET(url("user"), new MomiaHttpParamBuilder().add("utoken", utoken).build()));
     }
 
     @RequestMapping(value = "/child/birthday", method = RequestMethod.POST)
@@ -188,7 +171,7 @@ public class UserV1Api extends AbstractV1Api {
         ResponseMessage response = executeRequest(request);
         if (!response.successful()) return response;
 
-        return executeRequest(MomiaHttpRequest.GET(url("user"), new MomiaHttpParamBuilder().add("utoken", utoken).build()), userFunc);
+        return executeRequest(MomiaHttpRequest.GET(url("user"), new MomiaHttpParamBuilder().add("utoken", utoken).build()));
     }
 
     @RequestMapping(value = "/child/delete", method = RequestMethod.POST)
@@ -198,7 +181,7 @@ public class UserV1Api extends AbstractV1Api {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         MomiaHttpRequest request = MomiaHttpRequest.DELETE(url("user/child", childId), builder.build());
 
-        return executeRequest(request, userFunc);
+        return executeRequest(request);
     }
 
     @RequestMapping(value = "/child", method = RequestMethod.GET)
@@ -208,40 +191,17 @@ public class UserV1Api extends AbstractV1Api {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/child", childId), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return new ParticipantDto((JSONObject) data);
-            }
-        });
+        return executeRequest(request);
     }
 
     @RequestMapping(value = "/child/list", method = RequestMethod.GET)
     public ResponseMessage getChildren(@RequestParam String utoken) {
-        if(StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
+        if (StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/child"), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return buildChildrenDto((JSONArray) data);
-            }
-        });
-    }
-
-    private Dto buildChildrenDto(JSONArray childrenJson) {
-        ListDto children = new ListDto();
-        for (int i = 0; i < childrenJson.size(); i++) {
-            try {
-                children.add(new ParticipantDto(childrenJson.getJSONObject(i)));
-            } catch (Exception e) {
-                LOGGER.error("invalid child: {}", childrenJson);
-            }
-        }
-
-        return children;
+        return executeRequest(request);
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)

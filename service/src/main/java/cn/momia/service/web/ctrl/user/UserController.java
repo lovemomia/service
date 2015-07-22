@@ -3,6 +3,7 @@ package cn.momia.service.web.ctrl.user;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;
+import cn.momia.service.web.ctrl.user.dto.ParticipantDto;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -198,7 +199,7 @@ public class UserController extends UserRelatedController {
         Participant child = userServiceFacade.getChild(user.getId(), childId);
         if (!child.exists()) return ResponseMessage.FAILED("孩子不存在");
 
-        return new ResponseMessage(child);
+        return new ResponseMessage(new ParticipantDto(child));
     }
 
     @RequestMapping(value = "/child", method = RequestMethod.GET)
@@ -207,6 +208,6 @@ public class UserController extends UserRelatedController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         Set<Long> childIds = user.getChildren();
-        return new ResponseMessage(userServiceFacade.getChildren(childIds));
+        return new ResponseMessage(buildParticipantsResponse(userServiceFacade.getChildren(childIds)));
     }
 }

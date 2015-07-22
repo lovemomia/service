@@ -4,10 +4,6 @@ import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.common.misc.ValidateUtil;
-import cn.momia.mapi.api.v1.dto.base.Dto;
-import cn.momia.mapi.api.v1.dto.base.UserDto;
-import com.alibaba.fastjson.JSONObject;
-import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,13 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/v1/auth")
 public class AuthV1Api extends AbstractV1Api {
-    private static final Function<Object, Dto> userFunc = new Function<Object, Dto>() {
-        @Override
-        public Dto apply(Object data) {
-            return new UserDto((JSONObject) data, true);
-        }
-    };
-
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     public ResponseMessage send(@RequestParam String mobile, @RequestParam String type)  {
         if (ValidateUtil.isInvalidMobile(mobile) || ValidateUtil.notIn(type, "login", "register")) return ResponseMessage.BAD_REQUEST;
@@ -53,7 +42,7 @@ public class AuthV1Api extends AbstractV1Api {
                 .add("code", code);
         MomiaHttpRequest request = MomiaHttpRequest.POST(url("auth/register"), builder.build());
 
-        return executeRequest(request, userFunc);
+        return executeRequest(request);
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -65,7 +54,7 @@ public class AuthV1Api extends AbstractV1Api {
                 .add("password", password);
         MomiaHttpRequest request = MomiaHttpRequest.POST(url("auth/login"), builder.build());
 
-        return executeRequest(request, userFunc);
+        return executeRequest(request);
     }
 
     @RequestMapping(value = "/login/code", method = RequestMethod.POST)
@@ -77,7 +66,7 @@ public class AuthV1Api extends AbstractV1Api {
                 .add("code", code);
         MomiaHttpRequest request = MomiaHttpRequest.POST(url("auth/login/code"), builder.build());
 
-        return executeRequest(request, userFunc);
+        return executeRequest(request);
     }
 
     @RequestMapping(value = "/password", method = RequestMethod.POST)
@@ -90,6 +79,6 @@ public class AuthV1Api extends AbstractV1Api {
                 .add("code", code);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(url("auth/password"), builder.build());
 
-        return executeRequest(request, userFunc);
+        return executeRequest(request);
     }
 }
