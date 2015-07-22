@@ -27,6 +27,9 @@ public class ProductDetailDto extends ProductDto {
         ListDto skus = getSkus(skusJson);
         if (skus.size() <= 0) setOpened(false);
 
+        // 1.0版本根据soldOut来判断是否可以购买，为了兼容1.0版本
+        if (!isOpened()) setSoldOut(true);
+
         this.customers = processAvatars(customersJson);
         this.url = ProductUtil.buildUrl(getId());
     }

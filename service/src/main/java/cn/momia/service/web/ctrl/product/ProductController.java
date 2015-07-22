@@ -82,7 +82,7 @@ public class ProductController extends AbstractController {
         JSONArray productsPackJson = new JSONArray();
         for (Product product : products) {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("date", df.format(product.getStartTime()));
+            jsonObject.put("date", df.format(product.getOnlineTime()));
             jsonObject.put("product", product);
 
             productsPackJson.add(jsonObject);
@@ -93,20 +93,15 @@ public class ProductController extends AbstractController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseMessage getProduct(@PathVariable long id) {
-        if (id <= 0) return ResponseMessage.BAD_REQUEST;
-
         Product product = productServiceFacade.get(id);
-        if (!product.exists()) return ResponseMessage.BAD_REQUEST;
+        if (!product.exists()) return ResponseMessage.FAILED("活动不存在");
 
         return new ResponseMessage(product);
     }
 
     @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
     public ResponseMessage getProductSkus(@PathVariable long id) {
-        if (id <= 0) return ResponseMessage.BAD_REQUEST;
-
         List<Sku> skus = productServiceFacade.getSkus(id);
-
         return new ResponseMessage(skus);
     }
 
