@@ -41,7 +41,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
 
     @Override
     public BaseProduct get(long id) {
-        String sql = "SELECT " + joinFields() + " FROM t_product WHERE id=?";
+        String sql = "SELECT " + joinFields() + " FROM t_product WHERE id=? AND status<>0";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<BaseProduct>() {
             @Override
@@ -101,7 +101,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
         final List<BaseProduct> baseProducts = new ArrayList<BaseProduct>();
         if (ids == null || ids.isEmpty()) return baseProducts;
 
-        String sql = "SELECT " + joinFields() + " FROM t_product WHERE id IN (" + StringUtils.join(ids, ",") + ") ORDER BY addTime DESC";
+        String sql = "SELECT " + joinFields() + " FROM t_product WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status<>0 ORDER BY addTime DESC";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -115,7 +115,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
 
     @Override
     public long queryCount(String query) {
-        String sql = "SELECT COUNT(1) FROM t_product WHERE status=1 AND startTime<=NOW() AND endTime>=NOW() AND " + query;
+        String sql = "SELECT COUNT(1) FROM t_product WHERE status=1 AND onlineTime<=NOW() AND offlineTime>NOW() AND " + query;
 
         return jdbcTemplate.query(sql, new ResultSetExtractor<Long>() {
             @Override
@@ -129,7 +129,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     public List<BaseProduct> query(int start, int count, String query) {
         final List<BaseProduct> baseProducts = new ArrayList<BaseProduct>();
 
-        String sql = "SELECT " + joinFields() + " FROM t_product WHERE status=1 AND startTime<=NOW() AND endTime>=NOW() AND " + query + " ORDER BY ordinal DESC, soldOut ASC, addTime DESC LIMIT ?,?";
+        String sql = "SELECT " + joinFields() + " FROM t_product WHERE status=1 AND onlineTime<=NOW() AND offlineTime>NOW() AND " + query + " ORDER BY ordinal DESC, soldOut ASC, addTime DESC LIMIT ?,?";
         jdbcTemplate.query(sql, new Object[]{start, count}, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -143,34 +143,34 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
 
     @Override
     public boolean join(long id, int count) {
-        String sql = "UPDATE t_product SET joined=joined+? WHERE id=?";
+        String sql = "UPDATE t_product SET joined=joined+? WHERE id=? AND status<>0";
 
         return jdbcTemplate.update(sql, new Object[] { count, id }) == 1;
     }
 
     @Override
     public boolean sold(long id, int count) {
-        String sql = "UPDATE t_product SET sales=sales+? WHERE id=?";
+        String sql = "UPDATE t_product SET sales=sales+? WHERE id=? AND status<>0";
 
         return jdbcTemplate.update(sql, new Object[] { count, id }) == 1;
     }
 
     @Override
     public boolean soldOut(long id) {
-        String sql = "UPDATE t_product SET soldOut=1 WHERE id=?";
+        String sql = "UPDATE t_product SET soldOut=1 WHERE id=? AND status<>0";
 
         return jdbcTemplate.update(sql, new Object[] { id }) == 1;
     }
 
     @Override
     public void unSoldOut(long id) {
-        String sql = "UPDATE t_product SET soldOut=0 WHERE id=? AND soldOut=1";
+        String sql = "UPDATE t_product SET soldOut=0 WHERE id=? AND soldOut=1 AND status<>0";
         jdbcTemplate.update(sql, new Object[] { id });
     }
 
     @Override
     public void decreaseJoined(long id, int count) {
-        String sql = "UPDATE t_product SET joined=joined-? WHERE id=? AND joined>=?";
+        String sql = "UPDATE t_product SET joined=joined-? WHERE id=? AND joined>=? AND status<>0";
         jdbcTemplate.update(sql, new Object[] { count, id, count });
     }
 }
