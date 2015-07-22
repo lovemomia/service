@@ -55,11 +55,11 @@ public class ProductUtil {
         product.setAddress(placeJson.getString("address"));
         product.setPoi(StringUtils.join(new Object[] { placeJson.getDouble("lng"), placeJson.getDouble("lat") }, ":"));
         product.setTags(productJson.getJSONArray("tags"));
-        product.setStartTime(productJson.getDate("startTime"));
-        product.setEndTime(productJson.getDate("endTime"));
+        product.setOnlineTime(productJson.getDate("onlineTime"));
+        product.setOfflineTime(productJson.getDate("offlineTime"));
         product.setStatus(productJson.getInteger("status"));
 
-        if (product.getEndTime().before(new Date()) ||
+        if (product.getOfflineTime().before(new Date()) ||
                 product.isSoldOut() ||
                 product.getStatus() != 1) product.setOpened(false);
 

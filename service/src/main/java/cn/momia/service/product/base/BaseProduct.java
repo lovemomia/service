@@ -27,8 +27,8 @@ public class BaseProduct {
     private int joined;
     private int sales;
     private boolean soldOut;
-    private Date startTime;
-    private Date endTime;
+    private Date onlineTime;
+    private Date offlineTime;
     private int status;
 
     public long getId() {
@@ -135,20 +135,20 @@ public class BaseProduct {
         this.soldOut = soldOut;
     }
 
-    public Date getStartTime() {
-        return startTime;
+    public Date getOnlineTime() {
+        return onlineTime;
     }
 
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+    public void setOnlineTime(Date onlineTime) {
+        this.onlineTime = onlineTime;
     }
 
-    public Date getEndTime() {
-        return endTime;
+    public Date getOfflineTime() {
+        return offlineTime;
     }
 
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
+    public void setOfflineTime(Date offlineTime) {
+        this.offlineTime = offlineTime;
     }
 
     public int getStatus() {

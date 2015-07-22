@@ -31,7 +31,6 @@ public class ProductDetailDto extends ProductDto {
         this.url = ProductUtil.buildUrl(getId());
     }
 
-
     private ListDto getSkus(JSONArray skusJson) {
         ListDto skus = new ListDto();
         for (int i = 0; i < skusJson.size(); i++) {

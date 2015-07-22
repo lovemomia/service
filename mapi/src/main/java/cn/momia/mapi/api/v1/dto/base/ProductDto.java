@@ -23,8 +23,8 @@ public class ProductDto implements Dto {
     private String address;
     private String poi;
     private JSONArray tags;
-    @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date startTime;
-    @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date endTime;
+    @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date onlineTime;
+    @JSONField(format = "yyyy-MM-dd hh:mm:ss") private Date offlineTime;
     private int status;
     private boolean opened = true;
 
@@ -144,20 +144,20 @@ public class ProductDto implements Dto {
         this.tags = tags;
     }
 
-    public Date getStartTime() {
-        return startTime;
+    public Date getOnlineTime() {
+        return onlineTime;
     }
 
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+    public void setOnlineTime(Date onlineTime) {
+        this.onlineTime = onlineTime;
     }
 
-    public Date getEndTime() {
-        return endTime;
+    public Date getOfflineTime() {
+        return offlineTime;
     }
 
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
+    public void setOfflineTime(Date offlineTime) {
+        this.offlineTime = offlineTime;
     }
 
     public int getStatus() {
@@ -209,8 +209,8 @@ public class ProductDto implements Dto {
         this.address = productDto.address;
         this.poi = productDto.poi;
         this.tags = productDto.tags;
-        this.startTime = productDto.startTime;
-        this.endTime = productDto.endTime;
+        this.onlineTime = productDto.onlineTime;
+        this.offlineTime = productDto.offlineTime;
         this.status = productDto.status;
         this.opened = productDto.opened;
 

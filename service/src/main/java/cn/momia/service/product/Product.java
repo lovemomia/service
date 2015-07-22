@@ -72,12 +72,12 @@ public class Product implements Serializable {
         return baseProduct.isSoldOut();
     }
 
-    public Date getStartTime() {
-        return baseProduct.getStartTime();
+    public Date getOnlineTime() {
+        return baseProduct.getOnlineTime();
     }
 
-    public Date getEndTime() {
-        return baseProduct.getEndTime();
+    public Date getOfflineTime() {
+        return baseProduct.getOfflineTime();
     }
 
     public int getStatus() {
