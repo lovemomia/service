@@ -25,6 +25,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -112,6 +114,16 @@ public class ProductV1Api extends AbstractV1Api {
                     }
                 }
             }
+
+            Collections.sort(products, new Comparator<Object>() {
+                @Override
+                public int compare(Object o1, Object o2) {
+                    ProductsOfDayDto productsOfDayDto1 = (ProductsOfDayDto) o1;
+                    ProductsOfDayDto productsOfDayDto2 = (ProductsOfDayDto) o2;
+
+                    return productsOfDayDto1.getDate().compareTo(productsOfDayDto2.getDate());
+                }
+            });
 
             return products;
         } catch (ParseException e) {
