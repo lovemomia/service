@@ -183,10 +183,10 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
                 "FROM t_product A INNER JOIN t_sku B ON A.id=B.productId " +
                 "WHERE A.status=1 AND A.onlineTime<=NOW() AND A.offlineTime>NOW() AND A.soldOut=0 " +
                 "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() " +
-                "AND (B.type=1 OR B.unlockedStock>0) AND startTime>=? AND endTime<? " +
+                "AND (B.type=1 OR B.unlockedStock>0) AND B.startTime>=? AND B.endTime<? " +
                 "AND (cityId=? OR cityId=0)";
 
-        return jdbcTemplate.query(sql, new Object[] { cityId, currentMonth, nextMonth }, new ResultSetExtractor<Long>() {
+        return jdbcTemplate.query(sql, new Object[] { currentMonth, nextMonth, cityId }, new ResultSetExtractor<Long>() {
             @Override
             public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
                 return rs.next() ? rs.getLong(1) : 0;
@@ -200,10 +200,10 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
                 "FROM t_product A INNER JOIN t_sku B ON A.id=B.productId " +
                 "WHERE A.status=1 AND A.onlineTime<=NOW() AND A.offlineTime>NOW() AND A.soldOut=0 " +
                 "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() " +
-                "AND (B.type=1 OR B.unlockedStock>0) AND startTime>=? AND endTime<? " +
+                "AND (B.type=1 OR B.unlockedStock>0) AND B.startTime>=? AND B.endTime<? " +
                 "AND (cityId=? OR cityId=0) ORDER BY B.startTime ASC";
         final List<Long> ids = new ArrayList<Long>();
-        jdbcTemplate.query(sql, new Object[] { cityId, currentMonth, nextMonth }, new RowCallbackHandler() {
+        jdbcTemplate.query(sql, new Object[] { currentMonth, nextMonth, cityId }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 ids.add(rs.getLong("id"));
