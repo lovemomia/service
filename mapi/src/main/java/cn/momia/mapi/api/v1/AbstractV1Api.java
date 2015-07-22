@@ -13,7 +13,7 @@ public class AbstractV1Api extends AbstractApi {
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("user"), builder.build());
 
         ResponseMessage response = executeRequest(request);
-        if (response.successful()) return ((JSONObject) response.getData()).getJSONObject("user").getLong("id");
+        if (response.successful()) return ((JSONObject) response.getData()).getLong("id");
 
         throw new MomiaExpiredException();
     }

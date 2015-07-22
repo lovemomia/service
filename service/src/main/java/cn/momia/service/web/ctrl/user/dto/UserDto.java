@@ -13,6 +13,10 @@ public class UserDto {
     private User user;
     private List<ParticipantDto> participants = new ArrayList<ParticipantDto>();
 
+    public long getId() {
+        return user.getId();
+    }
+
     public String getToken() {
         return user.getToken();
     }

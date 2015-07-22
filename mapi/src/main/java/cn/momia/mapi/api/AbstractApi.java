@@ -43,6 +43,7 @@ public abstract class AbstractApi extends BaseController {
         MomiaHttpResponseCollector collector = requestExecutor.execute(requests);
 
         if (collector.notLogin()) return ResponseMessage.TOKEN_EXPIRED;
+        if (!collector.isSuccessful()) return ResponseMessage.FAILED;
         return new ResponseMessage(buildResponseData.apply(collector));
     }
 }
