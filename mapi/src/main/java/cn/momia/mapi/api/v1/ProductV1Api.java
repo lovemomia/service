@@ -5,13 +5,13 @@ import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.v1.dto.composite.ListDto;
-import cn.momia.mapi.api.v1.dto.composite.ProductsOfDayDto;
+import cn.momia.mapi.api.v1.dto.base.ListDto;
+import cn.momia.mapi.api.v1.dto.product.ProductsOfDayDto;
 import cn.momia.mapi.api.v1.dto.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.Dto;
-import cn.momia.mapi.api.v1.dto.composite.PagedListDto;
-import cn.momia.mapi.api.v1.dto.composite.ProductDetailDto;
-import cn.momia.mapi.api.v1.dto.composite.PlaceOrderDto;
+import cn.momia.mapi.api.v1.dto.base.PagedListDto;
+import cn.momia.mapi.api.v1.dto.product.ProductDetailDto;
+import cn.momia.mapi.api.v1.dto.product.PlaceOrderDto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
@@ -57,7 +57,6 @@ public class ProductV1Api extends AbstractV1Api {
         PagedListDto products = new PagedListDto();
 
         long totalCount = productsPackJson.getLong("totalCount");
-        products.setTotalCount(totalCount);
         if (start + count < totalCount) products.setNextIndex(start + count);
 
         JSONArray productsJson = productsPackJson.getJSONArray("products");

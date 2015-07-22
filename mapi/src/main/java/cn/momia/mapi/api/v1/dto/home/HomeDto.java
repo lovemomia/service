@@ -1,6 +1,7 @@
-package cn.momia.mapi.api.v1.dto.composite;
+package cn.momia.mapi.api.v1.dto.home;
 
 import cn.momia.mapi.api.v1.dto.base.Dto;
+import cn.momia.mapi.api.v1.dto.base.ListDto;
 
 public class HomeDto implements Dto {
     public static final HomeDto EMPTY = new HomeDto();

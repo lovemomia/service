@@ -1,7 +1,7 @@
-package cn.momia.mapi.api.v1.dto.composite;
+package cn.momia.mapi.api.v1.dto.product;
 
 import cn.momia.mapi.api.v1.dto.base.Dto;
-import cn.momia.mapi.api.v1.dto.base.ProductDto;
+import cn.momia.mapi.api.v1.dto.base.ListDto;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;

@@ -1,5 +1,6 @@
-package cn.momia.mapi.api.v1.dto.base;
+package cn.momia.mapi.api.v1.dto.deal;
 
+import cn.momia.mapi.api.v1.dto.base.Dto;
 import com.alibaba.fastjson.JSONObject;
 
 public class WechatpayPrepayDto implements Dto {

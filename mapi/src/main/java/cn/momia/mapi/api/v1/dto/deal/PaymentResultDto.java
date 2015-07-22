@@ -1,6 +1,7 @@
-package cn.momia.mapi.api.v1.dto.base;
+package cn.momia.mapi.api.v1.dto.deal;
 
 import cn.momia.common.web.img.ImageFile;
+import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.misc.ProductUtil;
 import com.alibaba.fastjson.JSONObject;
 

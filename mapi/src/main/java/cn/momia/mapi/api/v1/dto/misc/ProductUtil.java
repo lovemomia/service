@@ -1,8 +1,8 @@
 package cn.momia.mapi.api.v1.dto.misc;
 
 import cn.momia.common.config.Configuration;
-import cn.momia.mapi.api.v1.dto.base.ProductDto;
-import cn.momia.mapi.api.v1.dto.composite.ListDto;
+import cn.momia.mapi.api.v1.dto.product.ProductDto;
+import cn.momia.mapi.api.v1.dto.base.ListDto;
 import cn.momia.common.web.img.ImageFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;

@@ -1,5 +1,6 @@
-package cn.momia.mapi.api.v1.dto.base;
+package cn.momia.mapi.api.v1.dto.product;
 
+import cn.momia.mapi.api.v1.dto.base.Dto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.annotation.JSONField;
 
