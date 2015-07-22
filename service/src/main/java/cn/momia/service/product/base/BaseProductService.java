@@ -16,9 +16,9 @@ public interface BaseProductService extends Service {
     long queryCountByMonth(int cityId, String currentMonth, String nextMonth);
     List<BaseProduct> queryByMonth(int cityId, String currentMonth, String nextMonth);
 
-    boolean join(long id, int count);
-    boolean sold(long id, int count);
-    boolean soldOut(long id);
-    void unSoldOut(long id);
+    void join(long id, int count);
     void decreaseJoined(long id, int count);
+    void soldOut(long id);
+    void unSoldOut(long id);
+    boolean sold(long id, int count);
 }

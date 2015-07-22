@@ -200,9 +200,12 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
         boolean successful = skuService.lock(skuId, count);
         try {
-            if (successful && isSoldOut(id) && !baseProductService.soldOut(id)) LOGGER.error("fail to set sold out status of product: {}", id);
+            if (successful) {
+                if (isSoldOut(id)) baseProductService.soldOut(id);
+                baseProductService.join(id, count);
+            }
         } catch (Exception e) {
-            LOGGER.error("fail to set sold out status of product: {}", id, e);
+            LOGGER.error("fail to update sold out/joined status of product: {}", id, e);
         }
 
         return successful;
@@ -241,24 +244,6 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
         }
 
         return successful;
-    }
-
-    @Override
-    public boolean join(long id, int count) {
-        if (id <= 0 || count <= 0) return true;
-
-        try {
-            if (!baseProductService.join(id, count)) {
-                LOGGER.error("fail to increased joined of product: {}", id);
-                return false;
-            }
-
-            return true;
-        } catch (Exception e) {
-            LOGGER.error("fail to increased joined of product: {}", id, e);
-        }
-
-        return false;
     }
 
     @Override

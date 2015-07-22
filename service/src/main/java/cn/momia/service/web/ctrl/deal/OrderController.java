@@ -42,7 +42,6 @@ public class OrderController extends AbstractController {
         try {
             userServiceFacade.processContacts(order.getCustomerId(), order.getMobile(), order.getContacts());
             dealServiceFacade.checkLimit(order.getCustomerId(), sku.getId(), order.getCount(), sku.getLimit());
-            productServiceFacade.join(order.getProductId(), order.getCount());
 
             orderId = dealServiceFacade.placeOrder(order);
             if (orderId > 0) {

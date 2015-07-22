@@ -20,6 +20,5 @@ public interface ProductServiceFacade {
     Sku getSku(long skuId);
     boolean lockStock(long id, long skuId, int count);
     boolean unlockStock(long id, long skuId, int count);
-    boolean join(long id, int count);
     boolean sold(long id, int count);
 }

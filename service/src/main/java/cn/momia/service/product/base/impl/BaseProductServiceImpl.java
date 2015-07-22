@@ -214,24 +214,21 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     }
 
     @Override
-    public boolean join(long id, int count) {
+    public void join(long id, int count) {
         String sql = "UPDATE t_product SET joined=joined+? WHERE id=? AND status<>0";
-
-        return jdbcTemplate.update(sql, new Object[] { count, id }) == 1;
+        jdbcTemplate.update(sql, new Object[] { count, id });
     }
 
     @Override
-    public boolean sold(long id, int count) {
-        String sql = "UPDATE t_product SET sales=sales+? WHERE id=? AND status<>0";
-
-        return jdbcTemplate.update(sql, new Object[] { count, id }) == 1;
+    public void decreaseJoined(long id, int count) {
+        String sql = "UPDATE t_product SET joined=joined-? WHERE id=? AND joined>=? AND status<>0";
+        jdbcTemplate.update(sql, new Object[] { count, id, count });
     }
 
     @Override
-    public boolean soldOut(long id) {
+    public void soldOut(long id) {
         String sql = "UPDATE t_product SET soldOut=1 WHERE id=? AND status<>0";
-
-        return jdbcTemplate.update(sql, new Object[] { id }) == 1;
+        jdbcTemplate.update(sql, new Object[] { id });
     }
 
     @Override
@@ -241,8 +238,9 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     }
 
     @Override
-    public void decreaseJoined(long id, int count) {
-        String sql = "UPDATE t_product SET joined=joined-? WHERE id=? AND joined>=? AND status<>0";
-        jdbcTemplate.update(sql, new Object[] { count, id, count });
+    public boolean sold(long id, int count) {
+        String sql = "UPDATE t_product SET sales=sales+? WHERE id=? AND status<>0";
+
+        return jdbcTemplate.update(sql, new Object[] { count, id }) == 1;
     }
 }
