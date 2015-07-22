@@ -3,8 +3,17 @@ package cn.momia.service.web.ctrl.dto;
 public class PagedListDto {
     public static final PagedListDto EMPTY = new PagedListDto();
 
+    private long totalCount;
     private Integer nextIndex;
     private ListDto list = new ListDto();
+
+    public long getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(long totalCount) {
+        this.totalCount = totalCount;
+    }
 
     public Integer getNextIndex() {
         return nextIndex;

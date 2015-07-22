@@ -143,6 +143,7 @@ public class OrderController extends AbstractController {
 
         PagedListDto userOrdersDto = new PagedListDto();
 
+        userOrdersDto.setTotalCount(totalCount);
         if (start + count < totalCount && !isInvalidLimit(start + count, count)) userOrdersDto.setNextIndex(start + count);
 
         for (Order order : orders) {
