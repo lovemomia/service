@@ -86,11 +86,13 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
 
     @Override
     public boolean lockUserCoupon(long userId, long orderId, long userCouponId) {
+        if (userId <= 0 || orderId <= 0 || userCouponId <= 0) return true;
         return couponService.lockUserCoupon(userId, orderId, userCouponId);
     }
 
     @Override
     public boolean useUserCoupon(long userId, long orderId, long userCouponId) {
+        if (userId <= 0 || orderId <= 0 || userCouponId <= 0) return true;
         return couponService.useUserCoupon(userId, orderId, userCouponId);
     }
 

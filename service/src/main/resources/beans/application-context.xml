@@ -64,7 +64,7 @@
 
     <bean id="bannerService" class="cn.momia.service.promo.banner.impl.BannerServiceImpl" parent="dbAccessService" />
     <bean id="couponService" class="cn.momia.service.promo.coupon.impl.CouponServiceImpl" parent="dbAccessService" />
-    <bean id="promoService" class="cn.momia.service.promo.impl.PromoServiceFacadeImpl">
+    <bean id="promoServiceFacade" class="cn.momia.service.promo.impl.PromoServiceFacadeImpl">
         <property name="bannerService" ref="bannerService" />
         <property name="couponService" ref="couponService" />
     </bean>
@@ -94,10 +94,9 @@
 
     <bean id="abstractPaymentGateway" class="cn.momia.service.deal.payment.gateway.AbstractPaymentGateway" abstract="true">
         <property name="conf" ref="conf" />
-        <property name="orderService" ref="orderService" />
-        <property name="paymentService" ref="paymentService" />
+        <property name="dealServiceFacade" ref="dealServiceFacade" />
+        <property name="promoServiceFacade" ref="promoServiceFacade" />
         <property name="productServiceFacade" ref="productService" />
-        <property name="couponService" ref="couponService" />
     </bean>
 
     <bean id="alipay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">

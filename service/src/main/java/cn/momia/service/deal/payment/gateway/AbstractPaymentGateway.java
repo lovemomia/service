@@ -1,13 +1,12 @@
 package cn.momia.service.deal.payment.gateway;
 
 import cn.momia.common.config.Configuration;
+import cn.momia.service.deal.DealServiceFacade;
 import cn.momia.service.product.ProductServiceFacade;
 import cn.momia.service.deal.order.Order;
-import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.deal.payment.Payment;
-import cn.momia.service.deal.payment.PaymentService;
 import cn.momia.service.deal.payment.gateway.wechatpay.WechatpayCallbackFields;
-import cn.momia.service.promo.coupon.CouponService;
+import cn.momia.service.promo.PromoServiceFacade;
 import cn.momia.service.promo.coupon.UserCoupon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,34 +15,29 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPaymentGateway.class);
 
     protected Configuration conf;
-    protected OrderService orderService;
-    protected PaymentService paymentService;
+    protected DealServiceFacade dealServiceFacade;
+    protected PromoServiceFacade promoServiceFacade;
     protected ProductServiceFacade productServiceFacade;
-    protected CouponService couponService;
 
     public void setConf(Configuration conf) {
         this.conf = conf;
     }
 
-    public void setOrderService(OrderService orderService) {
-        this.orderService = orderService;
+    public void setDealServiceFacade(DealServiceFacade dealServiceFacade) {
+        this.dealServiceFacade = dealServiceFacade;
     }
 
-    public void setPaymentService(PaymentService paymentService) {
-        this.paymentService = paymentService;
+    public void setPromoServiceFacade(PromoServiceFacade promoServiceFacade) {
+        this.promoServiceFacade = promoServiceFacade;
     }
 
     public void setProductServiceFacade(ProductServiceFacade productServiceFacade) {
         this.productServiceFacade = productServiceFacade;
     }
 
-    public void setCouponService(CouponService couponService) {
-        this.couponService = couponService;
-    }
-
     @Override
     public PrepayResult prepay(PrepayParam param) {
-        if (!orderService.prepay(getPrepayOutTradeNo(param))) return buildFailPrepayResult();
+        if (!dealServiceFacade.prepayOrder(getPrepayOutTradeNo(param))) return buildFailPrepayResult();
         return doPrepay(param);
     }
 
@@ -74,13 +68,13 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
     private boolean finishPayment(CallbackParam param) {
         long orderId = getCallbackOutTradeNo(param);
         try {
-            Order order = orderService.get(orderId);
+            Order order = dealServiceFacade.getOrder(orderId);
             if (!order.exists()) return false;
 
-            if (!orderService.pay(orderId)) return false;
+            if (!dealServiceFacade.payOrder(orderId)) return false;
 
-            UserCoupon userCoupon = couponService.getNotUsedUserCouponByOrder(order.getId());
-            if (userCoupon.exists() && !couponService.useUserCoupon(order.getCustomerId(), order.getId(), userCoupon.getId())) return false;
+            UserCoupon userCoupon = promoServiceFacade.getNotUsedUserCouponByOrder(order.getId());
+            if (userCoupon.exists() && !promoServiceFacade.useUserCoupon(order.getCustomerId(), order.getId(), userCoupon.getId())) return false;
             logPayment(param);
         } catch (Exception e) {
             LOGGER.error("fail to pay order: {}", orderId, e);
@@ -94,13 +88,12 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
 
     private void logPayment(CallbackParam param) {
         try {
-            long paymentId = paymentService.add(createPayment(param));
-            if (paymentId <= 0) {
+            if (dealServiceFacade.logPayment(createPayment(param))) {
                 LOGGER.error("fail to log payment: {}", param);
                 return;
             }
 
-            Order order = orderService.get(Long.valueOf(param.get(WechatpayCallbackFields.OUT_TRADE_NO)));
+            Order order = dealServiceFacade.getOrder(Long.valueOf(param.get(WechatpayCallbackFields.OUT_TRADE_NO)));
             if (!order.exists()) {
                 LOGGER.error("invalid order: {}", order.getId());
                 return;

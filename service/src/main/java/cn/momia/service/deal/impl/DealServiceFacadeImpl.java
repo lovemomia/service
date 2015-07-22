@@ -4,6 +4,7 @@ import cn.momia.service.deal.DealServiceFacade;
 import cn.momia.service.deal.exception.OrderLimitException;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
+import cn.momia.service.deal.payment.Payment;
 import cn.momia.service.deal.payment.PaymentService;
 import cn.momia.service.deal.payment.gateway.CallbackParam;
 import cn.momia.service.deal.payment.gateway.PaymentGateway;
@@ -115,5 +116,11 @@ public class DealServiceFacadeImpl implements DealServiceFacade {
     public boolean check(long userId, long orderId, long productId, long skuId) {
         if (userId <= 0 || orderId <= 0 || productId <= 0 || skuId <= 0) return false;
         return orderService.check(userId, orderId, productId, skuId);
+    }
+
+    @Override
+    public boolean logPayment(Payment payment) {
+        if (payment == null) return true;
+        return paymentService.add(payment) > 0;
     }
 }
