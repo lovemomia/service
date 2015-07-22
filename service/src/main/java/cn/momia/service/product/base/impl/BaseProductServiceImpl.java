@@ -143,7 +143,12 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
 
     @Override
     public long queryWeekendCount(String query) {
-        String sql = "SELECT COUNT(DISTINCT A.id) FROM t_product A INNER JOIN t_sku B ON A.id=B.productId WHERE A.status=1 AND A.onlineTime<=NOW() AND A.offlineTime>NOW() AND B.onWeekend=1 AND " + query;
+        String sql = "SELECT COUNT(DISTINCT A.id) " +
+                "FROM t_product A INNER JOIN t_sku B ON A.id=B.productId " +
+                "WHERE A.status=1 AND A.onlineTime<=NOW() AND A.offlineTime>NOW() AND A.soldOut=0 " +
+                "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() " +
+                "AND (B.type=1 OR B.unlockedStock>0) AND B.onWeekend=1 " +
+                "AND " + query;
 
         return jdbcTemplate.query(sql, new ResultSetExtractor<Long>() {
             @Override
@@ -155,7 +160,12 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
 
     @Override
     public List<BaseProduct> queryWeekend(int start, int count, String query) {
-        String sql = "SELECT DISTINCT A.id FROM t_product A INNER JOIN t_sku B ON A.id=B.productId WHERE A.status=1 AND A.onlineTime<=NOW() AND A.offlineTime>NOW() AND B.onWeekend=1 AND " + query + " ORDER BY A.ordinal DESC, A.soldOut ASC, A.addTime DESC LIMIT ?,?";
+        String sql = "SELECT DISTINCT A.id " +
+                "FROM t_product A INNER JOIN t_sku B ON A.id=B.productId " +
+                "WHERE A.status=1 AND A.onlineTime<=NOW() AND A.offlineTime>NOW() AND A.soldOut=0 " +
+                "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() " +
+                "AND (B.type=1 OR B.unlockedStock>0) AND B.onWeekend=1 " +
+                "AND " + query + " ORDER BY B.startTime ASC LIMIT ?,?";
         final List<Long> ids = new ArrayList<Long>();
         jdbcTemplate.query(sql, new Object[] { start, count }, new RowCallbackHandler() {
             @Override
