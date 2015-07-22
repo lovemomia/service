@@ -130,7 +130,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
         final List<BaseProduct> baseProducts = new ArrayList<BaseProduct>();
 
         String sql = "SELECT " + joinFields() + " FROM t_product WHERE status=1 AND onlineTime<=NOW() AND offlineTime>NOW() AND " + query + " ORDER BY ordinal DESC, soldOut ASC, addTime DESC LIMIT ?,?";
-        jdbcTemplate.query(sql, new Object[]{start, count}, new RowCallbackHandler() {
+        jdbcTemplate.query(sql, new Object[] { start, count }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 BaseProduct baseProduct = buildBaseProduct(rs);
@@ -139,6 +139,32 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
         });
 
         return baseProducts;
+    }
+
+    @Override
+    public long queryWeekendCount(String query) {
+        String sql = "SELECT COUNT(DISTINCT A.id) FROM t_product A INNER JOIN t_sku B ON A.id=B.productId WHERE A.status=1 AND A.onlineTime<=NOW() AND A.offlineTime>NOW() AND B.onWeekend=1 AND " + query;
+
+        return jdbcTemplate.query(sql, new ResultSetExtractor<Long>() {
+            @Override
+            public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getLong(1) : 0;
+            }
+        });
+    }
+
+    @Override
+    public List<BaseProduct> queryWeekend(int start, int count, String query) {
+        String sql = "SELECT DISTINCT A.id FROM t_product A INNER JOIN t_sku B ON A.id=B.productId WHERE A.status=1 AND A.onlineTime<=NOW() AND A.offlineTime>NOW() AND B.onWeekend=1 AND " + query + " ORDER BY A.ordinal DESC, A.soldOut ASC, A.addTime DESC LIMIT ?,?";
+        final List<Long> ids = new ArrayList<Long>();
+        jdbcTemplate.query(sql, new Object[] { start, count }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                ids.add(rs.getLong("id"));
+            }
+        });
+
+        return get(ids);
     }
 
     @Override

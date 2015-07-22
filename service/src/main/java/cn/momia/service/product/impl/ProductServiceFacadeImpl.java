@@ -63,7 +63,7 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
         return product;
     }
 
-    public List<ProductImage> getProductImgs(long productId) {
+    private List<ProductImage> getProductImgs(long productId) {
         final List<ProductImage> imgs = new ArrayList<ProductImage>();
         String sql = "SELECT url, width, height FROM t_product_img WHERE productId=? AND status=1";
         jdbcTemplate.query(sql, new Object[] { productId }, new RowCallbackHandler() {
@@ -76,7 +76,7 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
         return imgs;
     }
 
-    public ProductImage buildImage(ResultSet rs) throws SQLException {
+    private ProductImage buildImage(ResultSet rs) throws SQLException {
         ProductImage img = new ProductImage();
         img.setUrl(rs.getString("url"));
         img.setWidth(rs.getInt("width"));
@@ -87,8 +87,9 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
     @Override
     public List<Product> get(Collection<Long> ids) {
-        List<BaseProduct> baseProducts = baseProductService.get(ids);
+        if (ids == null || ids.isEmpty()) return new ArrayList<Product>();
 
+        List<BaseProduct> baseProducts = baseProductService.get(ids);
         return buildProducts(baseProducts);
     }
 
@@ -155,9 +156,17 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
     @Override
     public List<Product> query(int start, int count, ProductQuery query) {
-        List<BaseProduct> baseProducts = baseProductService.query(start, count, query.toString());
+        return buildProducts(baseProductService.query(start, count, query.toString()));
+    }
 
-        return buildProducts(baseProducts);
+    @Override
+    public long queryWeekendCount(ProductQuery query) {
+        return baseProductService.queryWeekendCount(query.toString());
+    }
+
+    @Override
+    public List<Product> queryWeekend(int start, int count, ProductQuery query) {
+        return buildProducts(baseProductService.queryWeekend(start, count, query.toString()));
     }
 
     @Override
@@ -168,13 +177,15 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
     @Override
     public Sku getSku(long skuId) {
+        if (skuId <= 0) return Sku.NOT_EXIST_SKU;
         return skuService.get(skuId);
     }
 
     @Override
     public boolean lockStock(long id, long skuId, int count) {
-        boolean successful = skuService.lock(skuId, count);
+        if (id <= 0 || skuId <= 0 || count <= 0) return false;
 
+        boolean successful = skuService.lock(skuId, count);
         try {
             if (successful && isSoldOut(id) && !baseProductService.soldOut(id)) LOGGER.error("fail to set sold out status of product: {}", id);
         } catch (Exception e) {
@@ -185,6 +196,8 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     }
 
     private boolean isSoldOut(long id) {
+        if (id <= 0) return true;
+
         int unlockedStock = 0;
         List<Sku> skus = getSkus(id);
         for (Sku sku : skus) {
@@ -197,6 +210,8 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
     @Override
     public boolean unlockStock(long id, long skuId, int count) {
+        if (id <= 0 || skuId <= 0 || count <= 0) return true;
+
         try {
             baseProductService.unSoldOut(id);
         } catch (Exception e) {
@@ -217,11 +232,13 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
     @Override
     public boolean join(long id, int count) {
+        if (id <= 0 || count <= 0) return true;
         return baseProductService.join(id, count);
     }
 
     @Override
     public boolean sold(long id, int count) {
+        if (id <= 0 || count <= 0) return true;
         return baseProductService.sold(id, count);
     }
 }

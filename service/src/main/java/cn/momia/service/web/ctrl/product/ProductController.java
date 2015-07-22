@@ -40,33 +40,32 @@ public class ProductController extends AbstractController {
                                        @RequestParam int start,
                                        @RequestParam int count,
                                        @RequestParam(required = false) String query) {
-        if (cityId < 0 || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
+        if (cityId < 0 || isInvalidLimit(start, count)) return new ResponseMessage(buildProductsPack(0, new ArrayList<Product>()));
 
         long totalCount = productServiceFacade.queryCount(new ProductQuery(cityId, query));
         List<Product> products = totalCount > 0 ? productServiceFacade.query(start, count, new ProductQuery(cityId, query)) : new ArrayList<Product>();
 
+        return new ResponseMessage(buildProductsPack(totalCount, products));
+    }
+
+    private JSONObject buildProductsPack(long totalCount, List<Product> products) {
         JSONObject productsPackJson = new JSONObject();
         productsPackJson.put("totalCount", totalCount);
         productsPackJson.put("products", products);
 
-        return new ResponseMessage(productsPackJson);
+        return productsPackJson;
     }
 
     @RequestMapping(value = "/weekend", method = RequestMethod.GET)
     public ResponseMessage getProductsByWeekend(@RequestParam(value = "city") int cityId,
                                                 @RequestParam int start,
                                                 @RequestParam int count) {
-        // TODO
-        if (cityId < 0 || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
+        if (cityId < 0 || isInvalidLimit(start, count)) return new ResponseMessage(buildProductsPack(0, new ArrayList<Product>()));
 
-        long totalCount = productServiceFacade.queryCount(new ProductQuery(cityId, ""));
-        List<Product> products = totalCount > 0 ? productServiceFacade.query(start, count, new ProductQuery(cityId, "")) : new ArrayList<Product>();
+        long totalCount = productServiceFacade.queryWeekendCount(new ProductQuery(cityId, ""));
+        List<Product> products = totalCount > 0 ? productServiceFacade.queryWeekend(start, count, new ProductQuery(cityId, "")) : new ArrayList<Product>();
 
-        JSONObject productsPackJson = new JSONObject();
-        productsPackJson.put("totalCount", totalCount);
-        productsPackJson.put("products", products);
-
-        return new ResponseMessage(productsPackJson);
+        return new ResponseMessage(buildProductsPack(totalCount, products));
     }
 
     @RequestMapping(value = "/month", method = RequestMethod.GET)
