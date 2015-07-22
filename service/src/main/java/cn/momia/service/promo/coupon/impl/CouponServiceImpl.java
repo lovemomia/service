@@ -239,7 +239,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
                     UserCoupon userCoupon = buildUserCoupon(rs);
-                    if (userCoupon.getStatus() == UserCoupon.Status.LOCKED)) userCoupon.setStatus(UserCoupon.Status.USED);
+                    if (userCoupon.getStatus() == UserCoupon.Status.LOCKED) userCoupon.setStatus(UserCoupon.Status.USED);
                     if (userCoupon.exists()) userCoupons.add(userCoupon);
                 }
             });
