@@ -11,8 +11,6 @@ import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.UserCoupon;
 import cn.momia.service.web.ctrl.AbstractController;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,8 +22,6 @@ import java.math.BigDecimal;
 @RestController
 @RequestMapping("/payment")
 public class PaymentController extends AbstractController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PaymentController.class);
-
     @RequestMapping(value = "/prepay/alipay", method = RequestMethod.POST)
     public ResponseMessage prepayAlipay(HttpServletRequest request) {
         return prepay(request, Payment.Type.ALIPAY);
