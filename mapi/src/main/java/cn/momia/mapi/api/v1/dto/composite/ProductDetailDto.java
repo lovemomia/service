@@ -35,10 +35,12 @@ public class ProductDetailDto extends ProductDto {
     }
 
     private ListDto getSkus(JSONArray skusJson) {
+        Date today = new Date();
         ListDto skus = new ListDto();
         for (int i = 0; i < skusJson.size(); i++) {
             SkuDto skuDto = new SkuDto(skusJson.getJSONObject(i));
-            if (skuDto.getEndTime().before(new Date()) ||
+            if (skuDto.getOfflineTime().before(today) ||
+                    skuDto.getStartTime().before(today) ||
                     (skuDto.getType() != 1 && skuDto.getStock() <= 0)) continue;
             skus.add(skuDto);
         }

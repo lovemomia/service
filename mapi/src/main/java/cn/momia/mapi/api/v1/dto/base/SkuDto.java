@@ -21,6 +21,9 @@ public class SkuDto implements Dto {
     private BigDecimal minPrice;
     private String time;
     private JSONArray prices;
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss") private Date onlineTime;
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss") private Date offlineTime;
+    private boolean onWeekend;
 
     public long getProductId() {
         return productId;
@@ -70,6 +73,18 @@ public class SkuDto implements Dto {
         return prices;
     }
 
+    public Date getOnlineTime() {
+        return onlineTime;
+    }
+
+    public Date getOfflineTime() {
+        return offlineTime;
+    }
+
+    public boolean isOnWeekend() {
+        return onWeekend;
+    }
+
     public SkuDto(JSONObject skuJson) {
         this.productId = skuJson.getLong("productId");
         this.skuId = skuJson.getLong("id");
@@ -83,6 +98,9 @@ public class SkuDto implements Dto {
         this.minPrice = skuJson.getBigDecimal("minPrice");
         this.time = SkuUtil.getSkuTime(skuJson.getJSONArray("properties"));
         this.prices = skuJson.getJSONArray("prices");
+        this.onlineTime = skuJson.getDate("onlineTime");
+        this.offlineTime = skuJson.getDate("offlineTime");
+        this.onWeekend = skuJson.getBoolean("onWeekend");
 
         if (limit < 0) limit = type == 1 ? 1 : 0;
         if (stock < 0) stock = 0;

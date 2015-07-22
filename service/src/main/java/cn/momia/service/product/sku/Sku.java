@@ -68,6 +68,9 @@ public class Sku implements Serializable {
     private int stock;
     private int lockedStock;
     private int unlockedStock;
+    private Date onlineTime;
+    private Date offlineTime;
+    private boolean onWeekend;
 
     public long getId() {
         return id;
@@ -171,6 +174,30 @@ public class Sku implements Serializable {
 
     public void setUnlockedStock(int unlockedStock) {
         this.unlockedStock = unlockedStock;
+    }
+
+    public Date getOnlineTime() {
+        return onlineTime;
+    }
+
+    public void setOnlineTime(Date onlineTime) {
+        this.onlineTime = onlineTime;
+    }
+
+    public Date getOfflineTime() {
+        return offlineTime;
+    }
+
+    public void setOfflineTime(Date offlineTime) {
+        this.offlineTime = offlineTime;
+    }
+
+    public boolean isOnWeekend() {
+        return onWeekend;
+    }
+
+    public void setOnWeekend(boolean onWeekend) {
+        this.onWeekend = onWeekend;
     }
 
     @Override
