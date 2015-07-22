@@ -3,7 +3,7 @@ package cn.momia.service.web.ctrl.product.dto;
 import java.io.Serializable;
 import java.util.List;
 
-public class Customers implements Serializable {
+public class CustomersDto implements Serializable {
     private String text;
     private List<String> avatars;
 
@@ -15,7 +15,7 @@ public class Customers implements Serializable {
         return avatars;
     }
 
-    public Customers(String text, List<String> avatars) {
+    public CustomersDto(String text, List<String> avatars) {
         this.text = text;
         this.avatars = avatars;
     }

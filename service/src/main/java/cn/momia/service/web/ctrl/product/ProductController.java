@@ -1,10 +1,10 @@
 package cn.momia.service.web.ctrl.product;
 
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.service.web.ctrl.product.dto.Customers;
-import cn.momia.service.web.ctrl.product.dto.Playmate;
+import cn.momia.service.web.ctrl.product.dto.CustomersDto;
+import cn.momia.service.web.ctrl.product.dto.PlaymateDto;
 import cn.momia.service.product.Product;
-import cn.momia.service.web.ctrl.product.dto.SkuPlaymates;
+import cn.momia.service.web.ctrl.product.dto.SkuPlaymatesDto;
 import cn.momia.service.product.sku.Sku;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;
@@ -90,7 +90,7 @@ public class ProductController extends AbstractController {
         if (id <= 0 || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
 
         List<Order> orders = dealServiceFacade.queryDistinctCustomerOrderByProduct(id, start, count);
-        if (orders.isEmpty()) return new ResponseMessage(new Customers("目前还没有人参加", null));
+        if (orders.isEmpty()) return new ResponseMessage(new CustomersDto("目前还没有人参加", null));
 
         List<Long> customerIds = new ArrayList<Long>();
         for (Order order : orders) customerIds.add(order.getCustomerId());
@@ -119,7 +119,7 @@ public class ProductController extends AbstractController {
 //        else if (adultCount <= 0 && childCount > 0) builder.append(childCount).append("个孩子参加");
 //        else builder.append(childCount).append("个孩子，").append(adultCount).append("个大人参加");
 
-        return new ResponseMessage(new Customers("玩伴信息", avatars));
+        return new ResponseMessage(new CustomersDto("玩伴信息", avatars));
     }
 
     @RequestMapping(value = "/{id}/playmate", method = RequestMethod.GET)
@@ -208,16 +208,16 @@ public class ProductController extends AbstractController {
         return result;
     }
 
-    private List<SkuPlaymates> buildPlaymates(List<Sku> skus,
+    private List<SkuPlaymatesDto> buildPlaymates(List<Sku> skus,
                                               Map<Long, List<Order>> skuOrdersMap,
                                               Map<Long, Set<Long>> skuCustomerIdsMap,
                                               Map<Long, Set<Long>> customerPrticipantsIdsMap,
                                               Map<Long, User> customersMap,
                                               Map<Long, Participant> participantsMap) {
-        List<SkuPlaymates> skuPlaymates = new ArrayList<SkuPlaymates>();
+        List<SkuPlaymatesDto> skuPlaymates = new ArrayList<SkuPlaymatesDto>();
         for (Sku sku : skus) {
             try {
-                SkuPlaymates skuPlaymate = new SkuPlaymates();
+                SkuPlaymatesDto skuPlaymate = new SkuPlaymatesDto();
                 skuPlaymate.setTime(sku.time());
                 skuPlaymate.setJoined(formatJoined(skuOrdersMap.get(sku.getId())));
                 skuPlaymate.setPlaymates(extractPlayMates(sku.getId(), skuCustomerIdsMap, customerPrticipantsIdsMap, customersMap, participantsMap));
@@ -262,16 +262,16 @@ public class ProductController extends AbstractController {
         return builder.toString();
     }
 
-    private List<Playmate> extractPlayMates(long skuId,
+    private List<PlaymateDto> extractPlayMates(long skuId,
                                             Map<Long, Set<Long>> skuCustomerIdsMap,
                                             Map<Long, Set<Long>> customerPrticipantsIdsMap,
                                             Map<Long, User> customersMap,
                                             Map<Long, Participant> participantsMap) {
-        List<Playmate> playmates = new ArrayList<Playmate>();
+        List<PlaymateDto> playmates = new ArrayList<PlaymateDto>();
         Set<Long> customerIds = skuCustomerIdsMap.get(skuId);
         if (customerIds != null) {
             for (long customerId : customerIds) {
-                Playmate playmate = new Playmate();
+                PlaymateDto playmate = new PlaymateDto();
                 User customer = customersMap.get(customerId);
                 if (customer == null) continue;
                 playmate.setId(customer.getId());

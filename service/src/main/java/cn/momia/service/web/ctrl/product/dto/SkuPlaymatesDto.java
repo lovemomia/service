@@ -3,10 +3,10 @@ package cn.momia.service.web.ctrl.product.dto;
 import java.io.Serializable;
 import java.util.List;
 
-public class SkuPlaymates implements Serializable {
+public class SkuPlaymatesDto implements Serializable {
     private String time;
     private String joined;
-    private List<Playmate> playmates;
+    private List<PlaymateDto> playmates;
 
     public String getTime() {
         return time;
@@ -24,11 +24,11 @@ public class SkuPlaymates implements Serializable {
         this.joined = joined;
     }
 
-    public List<Playmate> getPlaymates() {
+    public List<PlaymateDto> getPlaymates() {
         return playmates;
     }
 
-    public void setPlaymates(List<Playmate> playmates) {
+    public void setPlaymates(List<PlaymateDto> playmates) {
         this.playmates = playmates;
     }
 }
