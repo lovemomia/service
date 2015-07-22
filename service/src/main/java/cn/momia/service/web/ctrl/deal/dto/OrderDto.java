@@ -1,9 +1,11 @@
 package cn.momia.service.web.ctrl.deal.dto;
 
+import cn.momia.common.web.img.ImageFile;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderPrice;
 import cn.momia.service.product.Product;
 import cn.momia.service.product.sku.Sku;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -68,6 +70,7 @@ public class OrderDto {
         return order.getMobile();
     }
 
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     public Date getAddTime() {
         return order.getAddTime();
     }
@@ -77,7 +80,7 @@ public class OrderDto {
     }
 
     public String getCover() {
-        return cover;
+        return ImageFile.url(cover);
     }
 
     public String getTitle() {
