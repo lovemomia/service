@@ -1,5 +1,6 @@
 package cn.momia.service.promo.impl;
 
+import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.promo.banner.Banner;
 import cn.momia.service.promo.banner.BannerService;
 import cn.momia.service.promo.PromoServiceFacade;
@@ -13,6 +14,8 @@ import java.util.Collection;
 import java.util.List;
 
 public class PromoServiceFacadeImpl implements PromoServiceFacade {
+    private static final int MAX_BANNER_COUNT = 20;
+
     private BannerService bannerService;
     private CouponService couponService;
 
@@ -26,7 +29,7 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
 
     @Override
     public List<Banner> getBanners(int cityId, int count) {
-        if (cityId < 0 || count <= 0) return new ArrayList<Banner>();
+        if (cityId < 0 || count <= 0 || count > MAX_BANNER_COUNT) return new ArrayList<Banner>();
         return bannerService.getBanners(cityId, count);
     }
 
@@ -44,6 +47,11 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
         if (!userCoupon.exists()) return Coupon.NOT_EXIST_COUPON;
 
         return couponService.getCoupon(userCoupon.getCouponId());
+    }
+
+    @Override
+    public boolean canUse(BigDecimal totalFee, Coupon coupon) {
+        return coupon.getConsumption().compareTo(totalFee) <= 0;
     }
 
     @Override

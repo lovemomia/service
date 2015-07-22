@@ -33,7 +33,7 @@ public class CouponController extends AbstractController {
         if (!coupon.exists()) return ResponseMessage.FAILED("无效的优惠券，或使用条件不满足");
 
         BigDecimal totalFee = order.getTotalFee();
-        if (coupon.getConsumption().compareTo(totalFee) > 0) return ResponseMessage.FAILED("使用条件不满足，无法使用");
+        if (promoServiceFacade.canUse(totalFee, coupon)) return ResponseMessage.FAILED("使用条件不满足，无法使用");
 
         return new ResponseMessage(promoServiceFacade.calcTotalFee(totalFee, coupon));
     }
@@ -49,7 +49,7 @@ public class CouponController extends AbstractController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         int totalCount = promoServiceFacade.queryUserCouponCount(user.getId(), orderId, status);
-        List<UserCoupon> userCoupons = totalCount > 0 ? promoServiceFacade.queryUserCoupon(user.getId(), orderId, status, start, count) : new ArrayList<UserCoupon>();
+        List<UserCoupon> userCoupons = promoServiceFacade.queryUserCoupon(user.getId(), orderId, status, start, count);
 
         List<Integer> couponIds = new ArrayList<Integer>();
         for (UserCoupon userCoupon : userCoupons) couponIds.add(userCoupon.getCouponId());

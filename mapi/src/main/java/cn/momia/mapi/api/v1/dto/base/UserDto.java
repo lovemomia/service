@@ -10,20 +10,6 @@ import com.alibaba.fastjson.annotation.JSONField;
 import java.util.Date;
 
 public class UserDto implements Dto {
-    public static class Other extends UserDto {
-        public Other(JSONObject userPackJson) {
-            super(userPackJson);
-        }
-
-        public String getToken() {
-            return "";
-        }
-
-        public String getAddress() {
-            return "";
-        }
-    }
-
     private String token;
     private String nickName;
     private String mobile;

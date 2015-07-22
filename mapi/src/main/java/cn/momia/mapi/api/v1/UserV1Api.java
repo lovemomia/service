@@ -46,123 +46,6 @@ public class UserV1Api extends AbstractV1Api {
         return executeRequest(request, userFunc);
     }
 
-    @RequestMapping(value = "/order", method = RequestMethod.GET)
-    public ResponseMessage getOrdersOfUser(@RequestParam String utoken,
-                                           @RequestParam(defaultValue = "1") int status,
-                                           @RequestParam final int start) {
-        final int pageSize = conf.getInt("Order.PageSize");
-        final int maxPageCount = conf.getInt("Order.MaxPageCount");
-        if (StringUtils.isBlank(utoken) || start < 0 || start > pageSize * maxPageCount) return new ResponseMessage(PagedListDto.EMPTY);
-
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("utoken", utoken)
-                .add("status", status == -1 ? 1 : status)
-                .add("start", start)
-                .add("count", pageSize);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("order/user"), builder.build());
-
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return buildOrdersDto((JSONObject) data, start, pageSize);
-            }
-        });
-    }
-
-    private Dto buildOrdersDto(JSONObject ordersPackJson, int start, int count) {
-        PagedListDto orders = new PagedListDto();
-
-        long totalCount = ordersPackJson.getLong("totalCount");
-        orders.setTotalCount(totalCount);
-
-        JSONArray ordersJson = ordersPackJson.getJSONArray("orders");
-        for (int i = 0; i < ordersJson.size(); i++) {
-            try {
-                orders.add(new OrderDto(ordersJson.getJSONObject(i), true));
-            } catch (Exception e) {
-                LOGGER.error("fail to parse order: {}", ordersJson.getJSONObject(i), e);
-            }
-        }
-        if (start + count < totalCount) orders.setNextIndex(start + count);
-
-        return orders;
-    }
-
-    @RequestMapping(value = "/order/detail", method = RequestMethod.GET)
-    public ResponseMessage getOrderDetailOfUser(@RequestParam String utoken,
-                                                @RequestParam(value = "oid") long orderId,
-                                                @RequestParam(value = "pid") long productId) {
-        if (StringUtils.isBlank(utoken) || orderId <= 0 || productId <= 0) return ResponseMessage.BAD_REQUEST;
-
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("utoken", utoken)
-                .add("pid", productId);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("order", orderId), builder.build());
-
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return new OrderDto((JSONObject) data, true);
-            }
-        });
-    }
-
-    @RequestMapping(value = "/coupon", method = RequestMethod.GET)
-    public ResponseMessage getCouponsOfUser(@RequestParam String utoken,
-                                            @RequestParam(value = "oid", defaultValue = "0") long orderId,
-                                            @RequestParam(defaultValue = "0") int status,
-                                            @RequestParam final int start) {
-        final int pageSize = conf.getInt("Coupon.PageSize");
-        final int maxPageCount = conf.getInt("Coupon.MaxPageCount");
-        if (StringUtils.isBlank(utoken) || start < 0 || start > pageSize * maxPageCount) return new ResponseMessage(PagedListDto.EMPTY);
-
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("utoken", utoken)
-                .add("oid", orderId)
-                .add("status", status)
-                .add("start", start)
-                .add("count", pageSize);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("coupon/user"), builder.build());
-
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return buildUserCouponsDto((JSONObject) data, start, pageSize);
-            }
-        });
-    }
-
-    private Dto buildUserCouponsDto(JSONObject userCouponsPackJson, int start, int count) {
-        PagedListDto userCoupons = new PagedListDto();
-
-        int totalCount = userCouponsPackJson.getInteger("totalCount");
-        userCoupons.setTotalCount(totalCount);
-
-        Map<Integer, JSONObject> couponsMap = new HashMap<Integer, JSONObject>();
-        JSONArray couponsJson = userCouponsPackJson.getJSONArray("coupons");
-        for (int i = 0; i < couponsJson.size(); i++) {
-            JSONObject couponJson = couponsJson.getJSONObject(i);
-            couponsMap.put(couponJson.getInteger("id"), couponJson);
-        }
-
-        JSONArray userCouponsJson = userCouponsPackJson.getJSONArray("userCoupons");
-        for (int i = 0; i < userCouponsJson.size(); i++) {
-            try {
-                JSONObject userCouponJson = userCouponsJson.getJSONObject(i);
-                JSONObject couponJson = couponsMap.get(userCouponJson.getInteger("couponId"));
-                if (couponJson == null) continue;
-
-                userCoupons.add(new UserCouponDto(userCouponJson, couponJson));
-            } catch (Exception e) {
-                LOGGER.error("fail to parse user coupon: {}", userCouponsJson.getJSONObject(i), e);
-            }
-        }
-
-        if (start + count < totalCount) userCoupons.setNextIndex(start + count);
-
-        return userCoupons;
-    }
-
     @RequestMapping(value = "/nickname", method = RequestMethod.POST)
     public ResponseMessage updateNickName(@RequestParam String utoken, @RequestParam(value = "nickname") String nickName) {
         if(StringUtils.isBlank(utoken) || StringUtils.isBlank(nickName)) return ResponseMessage.BAD_REQUEST;
@@ -366,5 +249,122 @@ public class UserV1Api extends AbstractV1Api {
         }
 
         return children;
+    }
+
+    @RequestMapping(value = "/order", method = RequestMethod.GET)
+    public ResponseMessage getOrdersOfUser(@RequestParam String utoken,
+                                           @RequestParam(defaultValue = "1") int status,
+                                           @RequestParam final int start) {
+        final int pageSize = conf.getInt("Order.PageSize");
+        final int maxPageCount = conf.getInt("Order.MaxPageCount");
+        if (StringUtils.isBlank(utoken) || start < 0 || start > pageSize * maxPageCount) return new ResponseMessage(PagedListDto.EMPTY);
+
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("status", status == -1 ? 1 : status)
+                .add("start", start)
+                .add("count", pageSize);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("order/user"), builder.build());
+
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                return buildOrdersDto((JSONObject) data, start, pageSize);
+            }
+        });
+    }
+
+    private Dto buildOrdersDto(JSONObject ordersPackJson, int start, int count) {
+        PagedListDto orders = new PagedListDto();
+
+        long totalCount = ordersPackJson.getLong("totalCount");
+        orders.setTotalCount(totalCount);
+
+        JSONArray ordersJson = ordersPackJson.getJSONArray("orders");
+        for (int i = 0; i < ordersJson.size(); i++) {
+            try {
+                orders.add(new OrderDto(ordersJson.getJSONObject(i), true));
+            } catch (Exception e) {
+                LOGGER.error("fail to parse order: {}", ordersJson.getJSONObject(i), e);
+            }
+        }
+        if (start + count < totalCount) orders.setNextIndex(start + count);
+
+        return orders;
+    }
+
+    @RequestMapping(value = "/order/detail", method = RequestMethod.GET)
+    public ResponseMessage getOrderDetailOfUser(@RequestParam String utoken,
+                                                @RequestParam(value = "oid") long orderId,
+                                                @RequestParam(value = "pid") long productId) {
+        if (StringUtils.isBlank(utoken) || orderId <= 0 || productId <= 0) return ResponseMessage.BAD_REQUEST;
+
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("pid", productId);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("order", orderId), builder.build());
+
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                return new OrderDto((JSONObject) data, true);
+            }
+        });
+    }
+
+    @RequestMapping(value = "/coupon", method = RequestMethod.GET)
+    public ResponseMessage getCouponsOfUser(@RequestParam String utoken,
+                                            @RequestParam(value = "oid", defaultValue = "0") long orderId,
+                                            @RequestParam(defaultValue = "0") int status,
+                                            @RequestParam final int start) {
+        final int pageSize = conf.getInt("Coupon.PageSize");
+        final int maxPageCount = conf.getInt("Coupon.MaxPageCount");
+        if (StringUtils.isBlank(utoken) || start < 0 || start > pageSize * maxPageCount) return new ResponseMessage(PagedListDto.EMPTY);
+
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("oid", orderId)
+                .add("status", status)
+                .add("start", start)
+                .add("count", pageSize);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("coupon/user"), builder.build());
+
+        return executeRequest(request, new Function<Object, Dto>() {
+            @Override
+            public Dto apply(Object data) {
+                return buildUserCouponsDto((JSONObject) data, start, pageSize);
+            }
+        });
+    }
+
+    private Dto buildUserCouponsDto(JSONObject userCouponsPackJson, int start, int count) {
+        PagedListDto userCoupons = new PagedListDto();
+
+        int totalCount = userCouponsPackJson.getInteger("totalCount");
+        userCoupons.setTotalCount(totalCount);
+
+        Map<Integer, JSONObject> couponsMap = new HashMap<Integer, JSONObject>();
+        JSONArray couponsJson = userCouponsPackJson.getJSONArray("coupons");
+        for (int i = 0; i < couponsJson.size(); i++) {
+            JSONObject couponJson = couponsJson.getJSONObject(i);
+            couponsMap.put(couponJson.getInteger("id"), couponJson);
+        }
+
+        JSONArray userCouponsJson = userCouponsPackJson.getJSONArray("userCoupons");
+        for (int i = 0; i < userCouponsJson.size(); i++) {
+            try {
+                JSONObject userCouponJson = userCouponsJson.getJSONObject(i);
+                JSONObject couponJson = couponsMap.get(userCouponJson.getInteger("couponId"));
+                if (couponJson == null) continue;
+
+                userCoupons.add(new UserCouponDto(userCouponJson, couponJson));
+            } catch (Exception e) {
+                LOGGER.error("fail to parse user coupon: {}", userCouponsJson.getJSONObject(i), e);
+            }
+        }
+
+        if (start + count < totalCount) userCoupons.setNextIndex(start + count);
+
+        return userCoupons;
     }
 }
