@@ -30,10 +30,6 @@ public class BaseProductDto extends MiniProductDto {
         return product.getScheduler();
     }
 
-    public String getCrowd() {
-        return product.getCrowd();
-    }
-
     public List<String> getTags() {
         return product.getTags();
     }
