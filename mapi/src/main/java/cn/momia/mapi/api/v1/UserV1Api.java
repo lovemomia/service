@@ -2,11 +2,10 @@ package cn.momia.mapi.api.v1;
 
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
+import cn.momia.common.web.img.ImageFile;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.v1.dto.base.Dto;
-import cn.momia.mapi.api.v1.dto.deal.OrderDetailDto;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +16,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/v1/user")
 public class UserV1Api extends AbstractV1Api {
+    protected Function<Object, Object> orderDetailFunc = new Function<Object, Object>() {
+        @Override
+        public Object apply(Object data) {
+            JSONObject orderDetailJson = (JSONObject) data;
+            orderDetailJson.put("cover", ImageFile.url(orderDetailJson.getString("cover")));
+
+            return orderDetailJson;
+        }
+    };
+
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getUser(@RequestParam String utoken) {
         if (StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
@@ -221,12 +230,7 @@ public class UserV1Api extends AbstractV1Api {
                 .add("count", conf.getInt("Order.PageSize"));
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("order/user"), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return JSON.toJavaObject((JSON) data, OrderDetailDto.class);
-            }
-        });
+        return executeRequest(request, orderDetailFunc);
     }
 
     @RequestMapping(value = "/order/detail", method = RequestMethod.GET)
@@ -240,12 +244,7 @@ public class UserV1Api extends AbstractV1Api {
                 .add("pid", productId);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("order", orderId), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return JSON.toJavaObject((JSON) data, OrderDetailDto.class);
-            }
-        });
+        return executeRequest(request, orderDetailFunc);
     }
 
     @RequestMapping(value = "/coupon", method = RequestMethod.GET)

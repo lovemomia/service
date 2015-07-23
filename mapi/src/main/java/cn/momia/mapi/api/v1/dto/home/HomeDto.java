@@ -1,7 +1,6 @@
 package cn.momia.mapi.api.v1.dto.home;
 
 import cn.momia.mapi.api.v1.dto.base.Dto;
-import cn.momia.mapi.api.v1.dto.misc.ProductUtil;
 import com.alibaba.fastjson.JSONArray;
 
 public class HomeDto implements Dto {

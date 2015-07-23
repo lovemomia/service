@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,9 +30,9 @@ public class HomeV1Api extends AbstractV1Api {
         final int count = conf.getInt("Home.PageSize");
         List<MomiaHttpRequest> requests = buildHomeRequests(cityId, start, count);
 
-        return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {
+        return executeRequests(requests, new Function<MomiaHttpResponseCollector, Object>() {
             @Override
-            public Dto apply(MomiaHttpResponseCollector collector) {
+            public Object apply(MomiaHttpResponseCollector collector) {
                 return buildHomeDto(collector, start, count, pageIndex);
             }
         });
@@ -68,7 +69,7 @@ public class HomeV1Api extends AbstractV1Api {
 
         if (pageIndex == 0) homeDto.setBanners((JSONArray) collector.getResponse("banners"));
 
-        JSONObject productsPackJson = (JSONObject) collector.getResponse("products");
+        JSONObject productsPackJson = (JSONObject) pagedProductFunc.apply(collector.getResponse("products"));
         homeDto.setProducts(productsPackJson.getJSONArray("list"));
 
         long totalCount = productsPackJson.getLong("totalCount");

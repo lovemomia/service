@@ -4,17 +4,14 @@ import cn.momia.common.misc.TimeUtil;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
+import cn.momia.common.web.img.ImageFile;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.v1.dto.base.ListDto;
-import cn.momia.mapi.api.v1.dto.product.BaseProductDto;
 import cn.momia.mapi.api.v1.dto.product.PlaymatesDto;
 import cn.momia.mapi.api.v1.dto.product.ProductsOfDayDto;
-import cn.momia.mapi.api.v1.dto.misc.ProductUtil;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.PagedListDto;
-import cn.momia.mapi.api.v1.dto.product.ProductDetailDto;
 import cn.momia.mapi.api.v1.dto.product.PlaceOrderDto;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
@@ -50,23 +47,7 @@ public class ProductV1Api extends AbstractV1Api {
                 .add("count", pageSize);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("product/weekend"), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return buildProductsDtoOfWeekend((JSONObject) data);
-            }
-        });
-    }
-
-    private Dto buildProductsDtoOfWeekend(JSONObject pagedProductsJson) {
-        PagedListDto productsDto = new PagedListDto();
-
-        productsDto.setTotalCount(pagedProductsJson.getLong("totalCount"));
-        productsDto.setNextIndex(pagedProductsJson.getInteger("nextIndex"));
-
-        productsDto.setList(ProductUtil.processImage(pagedProductsJson.getJSONArray("list")));
-
-        return productsDto;
+        return executeRequest(request, pagedProductFunc);
     }
 
     @RequestMapping(value = "/month", method = RequestMethod.GET)
@@ -78,9 +59,9 @@ public class ProductV1Api extends AbstractV1Api {
                 .add("month", month);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("product/month"), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
+        return executeRequest(request, new Function<Object, Object>() {
             @Override
-            public Dto apply(Object data) {
+            public Object apply(Object data) {
                 return buildProductsDtoOfMonth((JSONArray) data, month);
             }
         });
@@ -111,7 +92,7 @@ public class ProductV1Api extends AbstractV1Api {
                             productsOfDayDto.setDate(startTime);
                             productsOfDayDtoMap.put(day, productsOfDayDto);
                         }
-                        productsOfDayDto.addProduct(JSON.toJavaObject(productJson, BaseProductDto.class));
+                        productsOfDayDto.addProduct((JSONObject) productFunc.apply(productJson));
                     }
                 }
             }
@@ -138,17 +119,32 @@ public class ProductV1Api extends AbstractV1Api {
 
         List<MomiaHttpRequest> requests = buildProductRequests(id);
 
-        return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {
+        return executeRequests(requests, new Function<MomiaHttpResponseCollector, Object>() {
             @Override
-            public Dto apply(MomiaHttpResponseCollector collector) {
+            public Object apply(MomiaHttpResponseCollector collector) {
                 JSONObject productJson = (JSONObject) collector.getResponse("product");
                 JSONObject customersJson = (JSONObject) collector.getResponse("customers");
-                ProductDetailDto productDetailDto = JSONObject.toJavaObject(productJson, ProductDetailDto.class);
-                productDetailDto.setExtraInfo(productJson, customersJson);
 
-                return productDetailDto;
+                productJson.put("customers", processAvatars(customersJson));
+
+                boolean opened = productJson.getBoolean("opened");
+                if (!opened) productJson.put("soldOut", true);
+
+                return productJson;
             }
         });
+    }
+
+    private JSONObject processAvatars(JSONObject customersJson) {
+        JSONArray avatarsJson = customersJson.getJSONArray("avatars");
+        if (avatarsJson != null) {
+            for (int i = 0; i < avatarsJson.size(); i++) {
+                String avatar = avatarsJson.getString(i);
+                avatarsJson.set(i, ImageFile.url(avatar));
+            }
+        }
+
+        return customersJson;
     }
 
     private List<MomiaHttpRequest> buildProductRequests(long productId) {
@@ -177,9 +173,9 @@ public class ProductV1Api extends AbstractV1Api {
         
         List<MomiaHttpRequest> requests = buildProductOrderRequests(id, utoken);
 
-        return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {
+        return executeRequests(requests, new Function<MomiaHttpResponseCollector, Object>() {
             @Override
-            public Dto apply(MomiaHttpResponseCollector collector) {
+            public Object apply(MomiaHttpResponseCollector collector) {
                 return new PlaceOrderDto((JSONObject) collector.getResponse("contacts"), (JSONArray) collector.getResponse("skus"));
             }
         });
@@ -211,9 +207,9 @@ public class ProductV1Api extends AbstractV1Api {
                 .add("count", conf.getInt("Product.Playmate.MaxSkuCount"));
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("product", id, "playmate"), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
+        return executeRequest(request, new Function<Object, Object>() {
             @Override
-            public Dto apply(Object data) {
+            public Object apply(Object data) {
                 return new PlaymatesDto((JSONArray) data);
             }
         });

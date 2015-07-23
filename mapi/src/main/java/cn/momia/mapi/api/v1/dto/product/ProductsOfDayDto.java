@@ -2,6 +2,7 @@ package cn.momia.mapi.api.v1.dto.product;
 
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.ListDto;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
@@ -22,7 +23,7 @@ public class ProductsOfDayDto implements Dto {
         return products;
     }
 
-    public void addProduct(BaseProductDto productDto) {
-        if (!products.contains(productDto)) products.add(productDto);
+    public void addProduct(JSONObject productJson) {
+        if (!products.contains(productJson)) products.add(productJson);
     }
 }
