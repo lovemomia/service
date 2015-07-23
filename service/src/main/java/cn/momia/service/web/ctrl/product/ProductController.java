@@ -121,7 +121,7 @@ public class ProductController extends AbstractController {
                         }
                         BaseProductDto baseProductDto = new BaseProductDto(product);
                         baseProductDto.setScheduler(sku.time());
-                        if (productsOfDayDto.getProducts().size() < pageSize) productsOfDayDto.addProduct(new BaseProductDto(product));
+                        if (productsOfDayDto.getProducts().size() < pageSize) productsOfDayDto.addProduct(baseProductDto);
                     }
                 }
             }
