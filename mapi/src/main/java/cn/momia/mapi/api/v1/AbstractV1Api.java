@@ -66,14 +66,24 @@ public class AbstractV1Api extends AbstractApi {
         return contentJson;
     }
 
-    protected Function<Object, Object> pagedProductFunc = new Function<Object, Object>() {
+    protected Function<Object, Object> productsFunc = new Function<Object, Object>() {
         @Override
         public Object apply(Object data) {
-            JSONArray productsJson = ((JSONObject) data).getJSONArray("list");
+            JSONArray productsJson = (JSONArray) data;
             for (int i = 0; i < productsJson.size(); i++) {
                 JSONObject productJson = productsJson.getJSONObject(i);
                 productFunc.apply(productJson);
             }
+
+            return data;
+        }
+    };
+
+    protected Function<Object, Object> pagedProductsFunc = new Function<Object, Object>() {
+        @Override
+        public Object apply(Object data) {
+            JSONArray productsJson = ((JSONObject) data).getJSONArray("list");
+            productsFunc.apply(productsJson);
 
             return data;
         }

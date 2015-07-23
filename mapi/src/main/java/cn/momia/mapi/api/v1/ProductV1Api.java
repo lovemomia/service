@@ -1,6 +1,5 @@
 package cn.momia.mapi.api.v1;
 
-import cn.momia.common.misc.TimeUtil;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
@@ -8,8 +7,6 @@ import cn.momia.common.web.img.ImageFile;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.v1.dto.base.ListDto;
 import cn.momia.mapi.api.v1.dto.product.PlaymatesDto;
-import cn.momia.mapi.api.v1.dto.product.ProductsOfDayDto;
-import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.PagedListDto;
 import cn.momia.mapi.api.v1.dto.product.PlaceOrderDto;
 import com.alibaba.fastjson.JSONArray;
@@ -21,16 +18,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/product")
@@ -47,7 +36,7 @@ public class ProductV1Api extends AbstractV1Api {
                 .add("count", pageSize);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("product/weekend"), builder.build());
 
-        return executeRequest(request, pagedProductFunc);
+        return executeRequest(request, pagedProductsFunc);
     }
 
     @RequestMapping(value = "/month", method = RequestMethod.GET)
@@ -62,55 +51,14 @@ public class ProductV1Api extends AbstractV1Api {
         return executeRequest(request, new Function<Object, Object>() {
             @Override
             public Object apply(Object data) {
-                return buildProductsDtoOfMonth((JSONArray) data, month);
+                JSONArray groupedProductsJson = (JSONArray) data;
+                for (int i = 0; i < groupedProductsJson.size(); i++) {
+                    productsFunc.apply(groupedProductsJson.getJSONObject(i).getJSONArray("products"));
+                }
+
+                return data;
             }
         });
-    }
-
-    private Dto buildProductsDtoOfMonth(JSONArray productsJson, int month) {
-        try {
-            ListDto products = new ListDto();
-
-            DateFormat monthFormat = new SimpleDateFormat("yyyy-MM");
-            DateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date currentMonth = monthFormat.parse(TimeUtil.buildMonthStr(month));
-            Date nextMonth = monthFormat.parse(TimeUtil.buildNextMonthStr(month));
-
-            Map<String, ProductsOfDayDto> productsOfDayDtoMap = new HashMap<String, ProductsOfDayDto>();
-            for (int i = 0; i < productsJson.size(); i++) {
-                JSONObject productJson = productsJson.getJSONObject(i);
-                JSONArray skusJson = productJson.getJSONArray("skus");
-                for (int j = 0; j < skusJson.size(); j++) {
-                    JSONObject skuJson = skusJson.getJSONObject(j);
-                    Date startTime = skuJson.getDate("startTime");
-                    if (startTime.after(currentMonth) && startTime.before(nextMonth)) {
-                        String day = dayFormat.format(startTime);
-                        ProductsOfDayDto productsOfDayDto = productsOfDayDtoMap.get(day);
-                        if (productsOfDayDto == null) {
-                            productsOfDayDto = new ProductsOfDayDto();
-                            products.add(productsOfDayDto);
-                            productsOfDayDto.setDate(startTime);
-                            productsOfDayDtoMap.put(day, productsOfDayDto);
-                        }
-                        productsOfDayDto.addProduct((JSONObject) productFunc.apply(productJson));
-                    }
-                }
-            }
-
-            Collections.sort(products, new Comparator<Object>() {
-                @Override
-                public int compare(Object o1, Object o2) {
-                    ProductsOfDayDto productsOfDayDto1 = (ProductsOfDayDto) o1;
-                    ProductsOfDayDto productsOfDayDto2 = (ProductsOfDayDto) o2;
-
-                    return productsOfDayDto1.getDate().compareTo(productsOfDayDto2.getDate());
-                }
-            });
-
-            return products;
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @RequestMapping(method = RequestMethod.GET)

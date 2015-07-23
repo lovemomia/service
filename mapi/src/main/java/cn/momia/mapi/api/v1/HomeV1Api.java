@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,7 +68,7 @@ public class HomeV1Api extends AbstractV1Api {
 
         if (pageIndex == 0) homeDto.setBanners((JSONArray) collector.getResponse("banners"));
 
-        JSONObject productsPackJson = (JSONObject) pagedProductFunc.apply(collector.getResponse("products"));
+        JSONObject productsPackJson = (JSONObject) pagedProductsFunc.apply(collector.getResponse("products"));
         homeDto.setProducts(productsPackJson.getJSONArray("list"));
 
         long totalCount = productsPackJson.getLong("totalCount");

@@ -1,5 +1,7 @@
 package cn.momia.service.web.ctrl.product;
 
+import cn.momia.common.misc.TimeUtil;
+import cn.momia.common.web.exception.MomiaFailedException;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.web.ctrl.dto.ListDto;
 import cn.momia.service.web.ctrl.dto.PagedListDto;
@@ -8,6 +10,7 @@ import cn.momia.service.web.ctrl.product.dto.CustomersDto;
 import cn.momia.service.web.ctrl.product.dto.FullProductDto;
 import cn.momia.service.web.ctrl.product.dto.PlaymateDto;
 import cn.momia.service.product.Product;
+import cn.momia.service.web.ctrl.product.dto.ProductsOfDayDto;
 import cn.momia.service.web.ctrl.product.dto.SkuDto;
 import cn.momia.service.web.ctrl.product.dto.SkuPlaymatesDto;
 import cn.momia.service.product.sku.Sku;
@@ -23,7 +26,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -76,19 +85,58 @@ public class ProductController extends AbstractController {
 
     @RequestMapping(value = "/month", method = RequestMethod.GET)
     public ResponseMessage getProductsByMonth(@RequestParam(value = "city") int cityId, @RequestParam int month) {
-        long totalCount = productServiceFacade.queryCountByMonth(cityId, month);
         List<Product> products = productServiceFacade.queryByMonth(cityId, month);
 
-        return new ResponseMessage(buildProductsDtoByMonth(totalCount, products));
+        return new ResponseMessage(buildGroupedProductsDto(month, products));
     }
 
-    private ListDto buildProductsDtoByMonth(long totalCount, List<Product> products) {
-        ListDto productsDto = new ListDto();
-        for (Product product : products) {
-            productsDto.add(new BaseProductDto(product, true));
-        }
+    private ListDto buildGroupedProductsDto(int month, List<Product> products) {
+        try {
+            ListDto productsDto = new ListDto();
 
-        return productsDto;
+            DateFormat monthFormat = new SimpleDateFormat("yyyy-MM");
+            DateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+            Date now = new Date();
+            Date currentMonth = monthFormat.parse(TimeUtil.buildMonthStr(month));
+
+            Date start = now.before(currentMonth) ? currentMonth : now;
+            Date end = monthFormat.parse(TimeUtil.buildNextMonthStr(month));
+
+            Map<String, ProductsOfDayDto> productsOfDayDtoMap = new HashMap<String, ProductsOfDayDto>();
+            for (Product product : products) {
+                for (Sku sku : product.getSkus()) {
+                    Date startTime = sku.getStartTime();
+                    if (startTime.after(start) && startTime.before(end)) {
+                        String day = dayFormat.format(startTime);
+                        ProductsOfDayDto productsOfDayDto = productsOfDayDtoMap.get(day);
+                        if (productsOfDayDto == null) {
+                            productsOfDayDto = new ProductsOfDayDto();
+                            productsOfDayDtoMap.put(day, productsOfDayDto);
+
+                            productsOfDayDto.setDate(startTime);
+                            productsDto.add(productsOfDayDto);
+                        }
+                        productsOfDayDto.addProduct(new BaseProductDto(product));
+                    }
+                }
+            }
+
+            Collections.sort(productsDto, new Comparator<Object>() {
+                @Override
+                public int compare(Object o1, Object o2) {
+                    ProductsOfDayDto productsOfDayDto1 = (ProductsOfDayDto) o1;
+                    ProductsOfDayDto productsOfDayDto2 = (ProductsOfDayDto) o2;
+
+                    return productsOfDayDto1.getDate().compareTo(productsOfDayDto2.getDate());
+                }
+            });
+
+            return productsDto;
+
+        } catch (ParseException e) {
+            throw new MomiaFailedException("获取数据失败");
+        }
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
