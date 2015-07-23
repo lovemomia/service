@@ -119,6 +119,8 @@ public class ProductController extends AbstractController {
                             productsOfDayDto.setDate(startTime);
                             productsDto.add(productsOfDayDto);
                         }
+                        BaseProductDto baseProductDto = new BaseProductDto(product);
+                        baseProductDto.setScheduler(sku.time());
                         if (productsOfDayDto.getProducts().size() < pageSize) productsOfDayDto.addProduct(new BaseProductDto(product));
                     }
                 }

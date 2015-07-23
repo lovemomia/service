@@ -3,6 +3,7 @@ package cn.momia.service.web.ctrl.product.dto;
 import cn.momia.service.product.Product;
 import cn.momia.service.web.ctrl.dto.Dto;
 import cn.momia.service.web.ctrl.dto.ListDto;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -10,6 +11,8 @@ import java.util.List;
 public class BaseProductDto extends MiniProductDto implements Dto {
     private boolean withSku = false;
     private boolean favored = false;
+
+    private String scheduler;
 
     public boolean isFavored() {
         return favored;
@@ -28,7 +31,11 @@ public class BaseProductDto extends MiniProductDto implements Dto {
     }
 
     public String getScheduler() {
-        return product.getScheduler();
+        return StringUtils.isBlank(scheduler) ? product.getScheduler() : scheduler;
+    }
+
+    public void setScheduler(String scheduler) {
+        this.scheduler = scheduler;
     }
 
     public List<String> getTags() {
