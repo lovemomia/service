@@ -104,6 +104,7 @@ public class ProductController extends AbstractController {
             Date start = now.before(currentMonth) ? currentMonth : now;
             Date end = monthFormat.parse(TimeUtil.buildNextMonthStr(month));
 
+            int pageSize = conf.getInt("Product.Month.PageSize");
             Map<String, ProductsOfDayDto> productsOfDayDtoMap = new HashMap<String, ProductsOfDayDto>();
             for (Product product : products) {
                 for (Sku sku : product.getSkus()) {
@@ -118,7 +119,7 @@ public class ProductController extends AbstractController {
                             productsOfDayDto.setDate(startTime);
                             productsDto.add(productsOfDayDto);
                         }
-                        productsOfDayDto.addProduct(new BaseProductDto(product));
+                        if (productsOfDayDto.getProducts().size() < pageSize) productsOfDayDto.addProduct(new BaseProductDto(product));
                     }
                 }
             }
@@ -344,6 +345,7 @@ public class ProductController extends AbstractController {
                                             Map<Long, Set<Long>> customerPrticipantsIdsMap,
                                             Map<Long, User> customersMap,
                                             Map<Long, Participant> participantsMap) {
+        int pageSize = conf.getInt("Product.Playmate.PageSize");
         List<PlaymateDto> playmates = new ArrayList<PlaymateDto>();
         Set<Long> customerIds = skuCustomerIdsMap.get(skuId);
         if (customerIds != null) {
@@ -367,7 +369,7 @@ public class ProductController extends AbstractController {
                 }
                 playmate.setChildren(children);
 
-                playmates.add(playmate);
+                if (playmates.size() < pageSize) playmates.add(playmate);
             }
         }
 

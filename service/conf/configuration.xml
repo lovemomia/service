@@ -46,4 +46,13 @@
             <NotifyUrl>https://i.momia.cn/callback/wechatpay</NotifyUrl>
         </Wechat>
     </Payment>
+
+    <Product>
+        <Month>
+            <PageSize>10</PageSize>
+        </Month>
+        <Playmate>
+            <PageSize>10</PageSize>
+        </Playmate>
+    </Product>
 </Configuration>
