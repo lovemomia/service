@@ -1,10 +1,11 @@
 package cn.momia.service.web.ctrl.product.dto;
 
-import java.io.Serializable;
+import cn.momia.service.web.ctrl.dto.Dto;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomersDto implements Serializable {
+public class CustomersDto implements Dto {
     private String text;
     private List<String> avatars;
 

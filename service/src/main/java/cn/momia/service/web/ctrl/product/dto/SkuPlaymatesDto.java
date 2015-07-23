@@ -1,9 +1,10 @@
 package cn.momia.service.web.ctrl.product.dto;
 
-import java.io.Serializable;
+import cn.momia.service.web.ctrl.dto.Dto;
+
 import java.util.List;
 
-public class SkuPlaymatesDto implements Serializable {
+public class SkuPlaymatesDto implements Dto {
     private String time;
     private String joined;
     private List<PlaymateDto> playmates;

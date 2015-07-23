@@ -2,11 +2,12 @@ package cn.momia.service.web.ctrl.user.dto;
 
 import cn.momia.common.misc.AgeUtil;
 import cn.momia.service.user.participant.Participant;
+import cn.momia.service.web.ctrl.dto.Dto;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
 
-public class ParticipantDto {
+public class ParticipantDto implements Dto {
     private Participant participant;
     private boolean showId = false;
 

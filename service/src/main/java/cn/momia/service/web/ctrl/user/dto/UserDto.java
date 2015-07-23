@@ -3,13 +3,14 @@ package cn.momia.service.web.ctrl.user.dto;
 import cn.momia.common.secret.MobileEncryptor;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;
+import cn.momia.service.web.ctrl.dto.Dto;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class UserDto {
+public class UserDto implements Dto {
     private User user;
     private List<ParticipantDto> participants = new ArrayList<ParticipantDto>();
 

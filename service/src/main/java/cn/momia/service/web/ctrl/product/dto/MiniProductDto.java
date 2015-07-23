@@ -1,8 +1,9 @@
 package cn.momia.service.web.ctrl.product.dto;
 
 import cn.momia.service.product.Product;
+import cn.momia.service.web.ctrl.dto.Dto;
 
-public class MiniProductDto {
+public class MiniProductDto implements Dto {
     protected Product product;
 
     public long getId() {

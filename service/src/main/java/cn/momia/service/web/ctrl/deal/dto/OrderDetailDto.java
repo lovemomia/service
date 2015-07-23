@@ -2,10 +2,11 @@ package cn.momia.service.web.ctrl.deal.dto;
 
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.product.Product;
+import cn.momia.service.web.ctrl.dto.Dto;
 
 import java.math.BigDecimal;
 
-public class OrderDetailDto extends OrderDto {
+public class OrderDetailDto extends OrderDto implements Dto {
     private Product product;
 
     public String getCover() {

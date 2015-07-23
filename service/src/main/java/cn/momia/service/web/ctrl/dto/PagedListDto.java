@@ -1,6 +1,6 @@
 package cn.momia.service.web.ctrl.dto;
 
-public class PagedListDto {
+public class PagedListDto implements Dto {
     public static final PagedListDto EMPTY = new PagedListDto();
 
     private long totalCount;

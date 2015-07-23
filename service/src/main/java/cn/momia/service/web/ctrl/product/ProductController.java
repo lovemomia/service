@@ -49,7 +49,7 @@ public class ProductController extends AbstractController {
     public ResponseMessage getProducts(@RequestParam(value = "city") int cityId,
                                        @RequestParam int start,
                                        @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return new ResponseMessage(PagedListDto.EMPTY);
+        if (cityId < 0 || isInvalidLimit(start, count)) return new ResponseMessage(PagedListDto.EMPTY);
 
         long totalCount = productServiceFacade.queryCount(cityId);
         List<Product> products = productServiceFacade.query(cityId, start, count);
@@ -76,7 +76,7 @@ public class ProductController extends AbstractController {
     public ResponseMessage getProductsByWeekend(@RequestParam(value = "city") int cityId,
                                                 @RequestParam int start,
                                                 @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return new ResponseMessage(PagedListDto.EMPTY);
+        if (cityId <0 || isInvalidLimit(start, count)) return new ResponseMessage(PagedListDto.EMPTY);
 
         long totalCount = productServiceFacade.queryCountByWeekend(cityId);
         List<Product> products = productServiceFacade.queryByWeekend(cityId, start, count);

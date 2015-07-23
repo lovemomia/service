@@ -1,8 +1,9 @@
 package cn.momia.service.web.ctrl.user.dto;
 
 import cn.momia.service.user.base.User;
+import cn.momia.service.web.ctrl.dto.Dto;
 
-public class ContactsDto {
+public class ContactsDto implements Dto {
     private String name;
     private String mobile;
 

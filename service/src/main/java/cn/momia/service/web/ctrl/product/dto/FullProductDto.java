@@ -2,12 +2,13 @@ package cn.momia.service.web.ctrl.product.dto;
 
 import cn.momia.service.product.Product;
 import cn.momia.service.product.ProductImage;
+import cn.momia.service.web.ctrl.dto.Dto;
 import com.alibaba.fastjson.JSONArray;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FullProductDto extends BaseProductDto {
+public class FullProductDto extends BaseProductDto implements Dto {
     public String getCrowd() {
         return product.getCrowd();
     }

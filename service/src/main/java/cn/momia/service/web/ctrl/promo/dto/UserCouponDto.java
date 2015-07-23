@@ -1,11 +1,12 @@
 package cn.momia.service.web.ctrl.promo.dto;
 
+import cn.momia.service.web.ctrl.dto.Dto;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class UserCouponDto {
+public class UserCouponDto implements Dto {
     private long id;
     private int couponId;
     private int type;

@@ -3,13 +3,14 @@ package cn.momia.service.web.ctrl.deal.dto;
 import cn.momia.common.secret.MobileEncryptor;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderPrice;
+import cn.momia.service.web.ctrl.dto.Dto;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-public class OrderDto {
+public class OrderDto implements Dto {
     private Order order;
 
     public long getId() {
