@@ -43,10 +43,10 @@ public class AbstractV1Api extends AbstractApi {
         return conf.getString("Product.Url") + "?id=" + id;
     }
 
-    private static List<String> processImgs(JSONArray imgJson) {
+    private static List<String> processImgs(JSONArray imgsJson) {
         List<String> imgs = new ArrayList<String>();
-        for (int i = 0; i < imgJson.size(); i++) {
-            imgs.add(ImageFile.url(imgJson.getJSONObject(i).getString("url")));
+        for (int i = 0; i < imgsJson.size(); i++) {
+            imgs.add(ImageFile.url(imgsJson.getString(i)));
         }
 
         return imgs;

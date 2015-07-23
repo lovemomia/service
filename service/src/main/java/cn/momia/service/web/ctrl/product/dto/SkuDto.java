@@ -2,11 +2,23 @@ package cn.momia.service.web.ctrl.product.dto;
 
 import cn.momia.service.product.sku.Sku;
 import cn.momia.service.product.sku.SkuPrice;
+import cn.momia.service.web.ctrl.dto.ListDto;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public class SkuDto {
+    public static ListDto toSkusDto(List<Sku> skus) {
+        ListDto skusDto = new ListDto();
+
+        skus = Sku.filter(skus);
+        for (Sku sku : skus) {
+            skusDto.add(new SkuDto(sku));
+        }
+
+        return skusDto;
+    }
+
     private Sku sku;
 
     public long getProductId() {

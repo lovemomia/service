@@ -5,6 +5,7 @@ import cn.momia.service.web.ctrl.dto.ListDto;
 import cn.momia.service.web.ctrl.dto.PagedListDto;
 import cn.momia.service.web.ctrl.product.dto.BaseProductDto;
 import cn.momia.service.web.ctrl.product.dto.CustomersDto;
+import cn.momia.service.web.ctrl.product.dto.FullProductDto;
 import cn.momia.service.web.ctrl.product.dto.PlaymateDto;
 import cn.momia.service.product.Product;
 import cn.momia.service.web.ctrl.product.dto.SkuDto;
@@ -95,22 +96,13 @@ public class ProductController extends AbstractController {
         Product product = productServiceFacade.get(id);
         if (!product.exists()) return ResponseMessage.FAILED("活动不存在");
 
-        return new ResponseMessage(product);
+        return new ResponseMessage(new FullProductDto(product));
     }
 
     @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
     public ResponseMessage getProductSkus(@PathVariable long id) {
         List<Sku> skus = productServiceFacade.getSkus(id);
-        return new ResponseMessage(buildSkusDto(Sku.filter(skus)));
-    }
-
-    private ListDto buildSkusDto(List<Sku> skus) {
-        ListDto skusDto = new ListDto();
-        for (Sku sku : skus) {
-            skusDto.add(new SkuDto(sku));
-        }
-
-        return skusDto;
+        return new ResponseMessage(SkuDto.toSkusDto(skus));
     }
 
     @RequestMapping(value = "/{id}/customer", method = RequestMethod.GET)

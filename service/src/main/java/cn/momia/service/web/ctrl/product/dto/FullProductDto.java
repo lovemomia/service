@@ -22,4 +22,8 @@ public class FullProductDto extends BaseProductDto {
     public FullProductDto(Product product) {
         super(product);
     }
+
+    public FullProductDto(Product product, boolean withSku) {
+        super(product, withSku);
+    }
 }

@@ -1,10 +1,9 @@
 package cn.momia.service.web.ctrl.product.dto;
 
 import cn.momia.service.product.Product;
-import cn.momia.service.product.sku.Sku;
+import cn.momia.service.web.ctrl.dto.ListDto;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 public class BaseProductDto extends MiniProductDto {
     private boolean withSku = false;
@@ -46,8 +45,8 @@ public class BaseProductDto extends MiniProductDto {
         return product.isOpened();
     }
 
-    public List<Sku> getSkus() {
-        return withSku ? product.getSkus() : null;
+    public ListDto getSkus() {
+        return withSku ? SkuDto.toSkusDto(product.getSkus()) : null;
     }
 
     public BaseProductDto(Product product) {
