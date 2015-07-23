@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface ProductServiceFacade {
     Product get(long id);
+    Product get(long id, boolean mini);
     List<Product> get(Collection<Long> ids);
 
     long queryCount(int cityId);

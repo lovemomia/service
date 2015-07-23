@@ -10,6 +10,7 @@ import cn.momia.service.deal.payment.gateway.PrepayResult;
 import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.UserCoupon;
 import cn.momia.service.web.ctrl.AbstractController;
+import cn.momia.service.web.ctrl.product.dto.MiniProductDto;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -108,7 +109,7 @@ public class PaymentController extends AbstractController {
                 !dealServiceFacade.prepayOrder(orderId) ||
                 !dealServiceFacade.payOrder(orderId)) return ResponseMessage.FAILED("支付失败");
 
-        return new ResponseMessage(productServiceFacade.get(productId));
+        return new ResponseMessage(new MiniProductDto(productServiceFacade.get(productId, true)));
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.GET)
@@ -121,6 +122,6 @@ public class PaymentController extends AbstractController {
 
         if (!dealServiceFacade.check(user.getId(), orderId, productId, skuId)) return ResponseMessage.FAILED("支付失败");
 
-        return new ResponseMessage(productServiceFacade.get(productId));
+        return new ResponseMessage(new MiniProductDto(productServiceFacade.get(productId, true)));
     }
 }

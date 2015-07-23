@@ -26,7 +26,6 @@ public class Product implements Serializable {
     private List<Sku> skus;
 
     public long getId() {
-        if (baseProduct == null || !baseProduct.exists()) return 0;
         return baseProduct.getId();
     }
 
@@ -103,6 +102,14 @@ public class Product implements Serializable {
         this.imgs = imgs;
     }
 
+    public String getAddress() {
+        return this.place.getAddress();
+    }
+
+    public String getPoi() {
+        return this.place.getLng() + ":" + this.place.getLat();
+    }
+
     public Place getPlace() {
         return place;
     }
@@ -174,11 +181,6 @@ public class Product implements Serializable {
         }
 
         return miniPrice;
-    }
-
-    public Date startTime(int month) {
-        // TODO
-        return null;
     }
 
     public boolean invalid() {

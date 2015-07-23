@@ -45,6 +45,11 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
     @Override
     public Product get(long id) {
+        return get(id, false);
+    }
+
+    @Override
+    public Product get(long id, boolean mini) {
         if (id <= 0) return Product.NOT_EXIST_PRODUCT;
 
         BaseProduct baseProduct = baseProductService.get(id);
@@ -52,13 +57,16 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
         Product product = new Product();
         product.setBaseProduct(baseProduct);
-        product.setImgs(getProductImgs(baseProduct.getId()));
 
-        Place place = placeService.get(baseProduct.getPlaceId());
-        if (!place.exists()) return Product.NOT_EXIST_PRODUCT;
+        if (!mini) {
+            product.setImgs(getProductImgs(baseProduct.getId()));
 
-        product.setPlace(place);
-        product.setSkus(skuService.queryByProduct(baseProduct.getId()));
+            Place place = placeService.get(baseProduct.getPlaceId());
+            if (!place.exists()) return Product.NOT_EXIST_PRODUCT;
+
+            product.setPlace(place);
+            product.setSkus(skuService.queryByProduct(baseProduct.getId()));
+        }
 
         return product;
     }
