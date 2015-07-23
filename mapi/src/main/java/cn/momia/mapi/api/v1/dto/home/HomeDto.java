@@ -26,7 +26,7 @@ public class HomeDto implements Dto {
     }
 
     public void setProducts(JSONArray products) {
-        this.products = ProductUtil.processImage(products);
+        this.products = products;
     }
 
     public Integer getNextpage() {
