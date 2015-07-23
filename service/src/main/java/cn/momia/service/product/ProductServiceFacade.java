@@ -22,4 +22,7 @@ public interface ProductServiceFacade {
     boolean lockStock(long id, long skuId, int count);
     boolean unlockStock(long id, long skuId, int count);
     boolean sold(long id, int count);
+
+    boolean isFavoried(long userId, long id);
+    boolean favor(long userId, long id);
 }

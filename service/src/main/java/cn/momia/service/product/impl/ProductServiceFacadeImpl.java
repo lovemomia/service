@@ -7,6 +7,7 @@ import cn.momia.service.product.ProductImage;
 import cn.momia.service.product.ProductServiceFacade;
 import cn.momia.service.product.base.BaseProduct;
 import cn.momia.service.product.base.BaseProductService;
+import cn.momia.service.product.favorite.FavoriteService;
 import cn.momia.service.product.place.Place;
 import cn.momia.service.product.place.PlaceService;
 import cn.momia.service.product.sku.Sku;
@@ -31,6 +32,8 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     private PlaceService placeService;
     private SkuService skuService;
 
+    private FavoriteService favoriteService;
+
     public void setBaseProductService(BaseProductService baseProductService) {
         this.baseProductService = baseProductService;
     }
@@ -41,6 +44,10 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
     public void setSkuService(SkuService skuService) {
         this.skuService = skuService;
+    }
+
+    public void setFavoriteService(FavoriteService favoriteService) {
+        this.favoriteService = favoriteService;
     }
 
     @Override
@@ -258,5 +265,18 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     public boolean sold(long id, int count) {
         if (id <= 0 || count <= 0) return true;
         return baseProductService.sold(id, count);
+    }
+
+    @Override
+    public boolean isFavoried(long userId, long id) {
+        if (userId <= 0 || id <= 0) return false;
+        return favoriteService.isFavoried(userId, id);
+    }
+
+    @Override
+    public boolean favor(long userId, long id) {
+        if (userId <= 0 || id <= 0) return false;
+        if (isFavoried(userId, id)) return true;
+        return favoriteService.favor(userId, id);
     }
 }

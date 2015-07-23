@@ -133,7 +133,6 @@ public class ProductController extends AbstractController {
             });
 
             return productsDto;
-
         } catch (ParseException e) {
             throw new MomiaFailedException("获取数据失败");
         }
@@ -363,5 +362,14 @@ public class ProductController extends AbstractController {
         }
 
         return playmates;
+    }
+
+    @RequestMapping(value = "/{id}/favor", method = RequestMethod.POST)
+    public ResponseMessage favor(@RequestParam String utoken, @PathVariable long id){
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        if (!productServiceFacade.favor(user.getId(), id)) return ResponseMessage.FAILED("添加收藏失败");
+        return ResponseMessage.SUCCESS;
     }
 }
