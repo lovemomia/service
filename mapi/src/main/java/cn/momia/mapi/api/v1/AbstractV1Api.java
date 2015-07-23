@@ -21,7 +21,7 @@ public class AbstractV1Api extends AbstractApi {
             JSONObject userJson = (JSONObject) data;
             userJson.put("avatar", ImageFile.url(userJson.getString("avatar")));
 
-            return userJson;
+            return data;
         }
     };
 
@@ -35,7 +35,7 @@ public class AbstractV1Api extends AbstractApi {
             if (productJson.containsKey("imgs")) productJson.put("imgs", processImgs(productJson.getJSONArray("imgs")));
             if (productJson.containsKey("content")) productJson.put("content", processContent(productJson.getJSONArray("content")));
 
-            return productJson;
+            return data;
         }
     };
 

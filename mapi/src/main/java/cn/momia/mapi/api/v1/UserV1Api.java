@@ -22,7 +22,19 @@ public class UserV1Api extends AbstractV1Api {
             JSONObject orderDetailJson = (JSONObject) data;
             orderDetailJson.put("cover", ImageFile.url(orderDetailJson.getString("cover")));
 
-            return orderDetailJson;
+            return data;
+        }
+    };
+
+    protected Function<Object, Object> pagedOrdersFunc = new Function<Object, Object>() {
+        @Override
+        public Object apply(Object data) {
+            JSONArray ordersJson = ((JSONObject) data).getJSONArray("list");
+            for (int i = 0; i < ordersJson.size(); i++) {
+                orderDetailFunc.apply(ordersJson.getJSONObject(i));
+            }
+
+            return data;
         }
     };
 
@@ -230,7 +242,7 @@ public class UserV1Api extends AbstractV1Api {
                 .add("count", conf.getInt("Order.PageSize"));
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("order/user"), builder.build());
 
-        return executeRequest(request, orderDetailFunc);
+        return executeRequest(request, pagedOrdersFunc);
     }
 
     @RequestMapping(value = "/order/detail", method = RequestMethod.GET)
