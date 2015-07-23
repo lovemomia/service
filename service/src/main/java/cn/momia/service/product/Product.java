@@ -157,21 +157,21 @@ public class Product implements Serializable {
         }
         Collections.sort(times);
 
-        return format(times, skus.size());
+        return format(times);
     }
 
-    private String format(List<Date> times, int count) {
+    private String format(List<Date> times) {
         if (times.isEmpty()) return "";
         if (times.size() == 1) {
             Date start = times.get(0);
-            return DATE_FORMATTER.format(start) + " " + TimeUtil.getWeekDay(start) + " 共" + count + "场";
+            return DATE_FORMATTER.format(start) + " " + TimeUtil.getWeekDay(start);
         } else {
             Date start = times.get(0);
             Date end = times.get(times.size() - 1);
             if (TimeUtil.isSameDay(start, end)) {
-                return DATE_FORMATTER.format(start) + " " + TimeUtil.getWeekDay(start) + " 共" + count + "场";
+                return DATE_FORMATTER.format(start) + " " + TimeUtil.getWeekDay(start);
             } else {
-                return DATE_FORMATTER.format(start) + "-" + DATE_FORMATTER.format(end) + " " + TimeUtil.getWeekDay(start) + "-" + TimeUtil.getWeekDay(end) + " 共" + count + "场";
+                return DATE_FORMATTER.format(start) + "-" + DATE_FORMATTER.format(end) + " " + TimeUtil.getWeekDay(start) + "-" + TimeUtil.getWeekDay(end);
             }
         }
     }
