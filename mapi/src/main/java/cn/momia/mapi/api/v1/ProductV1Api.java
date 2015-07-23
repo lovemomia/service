@@ -62,10 +62,10 @@ public class ProductV1Api extends AbstractV1Api {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage getProduct(@RequestParam final long id) {
+    public ResponseMessage getProduct(@RequestParam(defaultValue = "") String utoken, @RequestParam final long id) {
         if (id <= 0) return ResponseMessage.BAD_REQUEST;
 
-        List<MomiaHttpRequest> requests = buildProductRequests(id);
+        List<MomiaHttpRequest> requests = buildProductRequests(utoken, id);
 
         return executeRequests(requests, new Function<MomiaHttpResponseCollector, Object>() {
             @Override
@@ -83,6 +83,28 @@ public class ProductV1Api extends AbstractV1Api {
         });
     }
 
+    private List<MomiaHttpRequest> buildProductRequests(String utoken, long productId) {
+        List<MomiaHttpRequest> requests = new ArrayList<MomiaHttpRequest>();
+        requests.add(buildProductRequest(utoken, productId));
+        requests.add(buildProductCustomersRequest(productId));
+
+        return requests;
+    }
+
+    private MomiaHttpRequest buildProductRequest(String utoken, long productId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+
+        return MomiaHttpRequest.GET("product", true, url("product", productId), builder.build());
+    }
+
+    private MomiaHttpRequest buildProductCustomersRequest(long productId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("start", 0)
+                .add("count", conf.getInt("Product.CustomerPageSize"));
+
+        return MomiaHttpRequest.GET("customers", false, url("product", productId, "customer"), builder.build());
+    }
+
     private JSONObject processAvatars(JSONObject customersJson) {
         JSONArray avatarsJson = customersJson.getJSONArray("avatars");
         if (avatarsJson != null) {
@@ -93,26 +115,6 @@ public class ProductV1Api extends AbstractV1Api {
         }
 
         return customersJson;
-    }
-
-    private List<MomiaHttpRequest> buildProductRequests(long productId) {
-        List<MomiaHttpRequest> requests = new ArrayList<MomiaHttpRequest>();
-        requests.add(buildProductRequest(productId));
-        requests.add(buildProductCustomersRequest(productId));
-
-        return requests;
-    }
-
-    private MomiaHttpRequest buildProductRequest(long productId) {
-        return MomiaHttpRequest.GET("product", true, url("product", productId));
-    }
-
-    private MomiaHttpRequest buildProductCustomersRequest(long productId) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("start", 0)
-                .add("count", conf.getInt("Product.CustomerPageSize"));
-
-        return MomiaHttpRequest.GET("customers", false, url("product", productId, "customer"), builder.build());
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)

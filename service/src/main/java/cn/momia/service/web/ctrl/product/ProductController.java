@@ -18,6 +18,7 @@ import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.web.ctrl.AbstractController;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -139,11 +140,20 @@ public class ProductController extends AbstractController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseMessage getProduct(@PathVariable long id) {
+    public ResponseMessage getProduct(@RequestParam(defaultValue = "") String utoken, @PathVariable long id) {
         Product product = productServiceFacade.get(id);
         if (!product.exists()) return ResponseMessage.FAILED("活动不存在");
 
-        return new ResponseMessage(new FullProductDto(product));
+        FullProductDto productDto = new FullProductDto(product);
+
+        if (!StringUtils.isBlank(utoken)) {
+            User user = userServiceFacade.getUserByToken(utoken);
+            if (user.exists()) {
+                productDto.setFavored(productServiceFacade.isFavoried(user.getId(), id));
+            }
+        }
+
+        return new ResponseMessage(productDto);
     }
 
     @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)

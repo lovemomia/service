@@ -8,6 +8,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FullProductDto extends BaseProductDto {
+    private boolean favored = false;
+
+    public boolean isFavored() {
+        return favored;
+    }
+
+    public void setFavored(boolean favored) {
+        this.favored = favored;
+    }
+
     public List<String> getImgs() {
         List<String> imgs = new ArrayList<String>();
         for (ProductImage productImage : product.getImgs()) imgs.add(productImage.getUrl());
