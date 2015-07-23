@@ -94,7 +94,7 @@
         <property name="conf" ref="conf" />
         <property name="dealServiceFacade" ref="dealServiceFacade" />
         <property name="promoServiceFacade" ref="promoServiceFacade" />
-        <property name="productServiceFacade" ref="productService" />
+        <property name="productServiceFacade" ref="productServiceFacade" />
     </bean>
 
     <bean id="alipay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
