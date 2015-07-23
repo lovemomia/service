@@ -1,5 +1,6 @@
 package cn.momia.mapi.api.v1.dto.product;
 
+import cn.momia.common.web.img.ImageFile;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.misc.ProductUtil;
 
@@ -18,7 +19,7 @@ public class MiniProductDto implements Dto {
     }
 
     public String getThumb() {
-        return thumb;
+        return ImageFile.url(thumb);
     }
 
     public void setThumb(String thumb) {

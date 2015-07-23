@@ -7,6 +7,7 @@ import cn.momia.service.web.ctrl.product.dto.BaseProductDto;
 import cn.momia.service.web.ctrl.product.dto.CustomersDto;
 import cn.momia.service.web.ctrl.product.dto.PlaymateDto;
 import cn.momia.service.product.Product;
+import cn.momia.service.web.ctrl.product.dto.SkuDto;
 import cn.momia.service.web.ctrl.product.dto.SkuPlaymatesDto;
 import cn.momia.service.product.sku.Sku;
 import cn.momia.service.user.base.User;
@@ -42,10 +43,10 @@ public class ProductController extends AbstractController {
         long totalCount = productServiceFacade.queryCount(cityId);
         List<Product> products = productServiceFacade.query(cityId, start, count);
 
-        return new ResponseMessage(buildProducts(totalCount, products, start, count));
+        return new ResponseMessage(buildProductsDto(totalCount, products, start, count));
     }
 
-    private PagedListDto buildProducts(long totalCount, List<Product> products, int start, int count) {
+    private PagedListDto buildProductsDto(long totalCount, List<Product> products, int start, int count) {
         PagedListDto productsDto = new PagedListDto();
 
         productsDto.setTotalCount(totalCount);
@@ -69,7 +70,7 @@ public class ProductController extends AbstractController {
         long totalCount = productServiceFacade.queryCountByWeekend(cityId);
         List<Product> products = productServiceFacade.queryByWeekend(cityId, start, count);
 
-        return new ResponseMessage(buildProducts(totalCount, products, start, count));
+        return new ResponseMessage(buildProductsDto(totalCount, products, start, count));
     }
 
     @RequestMapping(value = "/month", method = RequestMethod.GET)
@@ -77,7 +78,7 @@ public class ProductController extends AbstractController {
         long totalCount = productServiceFacade.queryCountByMonth(cityId, month);
         List<Product> products = productServiceFacade.queryByMonth(cityId, month);
 
-        return new ResponseMessage(buildProducts(totalCount, products, 0, 0));
+        return new ResponseMessage(buildProductsDto(totalCount, products, 0, 0));
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -91,7 +92,16 @@ public class ProductController extends AbstractController {
     @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
     public ResponseMessage getProductSkus(@PathVariable long id) {
         List<Sku> skus = productServiceFacade.getSkus(id);
-        return new ResponseMessage(Sku.filter(skus));
+        return new ResponseMessage(buildSkusDto(Sku.filter(skus)));
+    }
+
+    private ListDto buildSkusDto(List<Sku> skus) {
+        ListDto skusDto = new ListDto();
+        for (Sku sku : skus) {
+            skusDto.add(new SkuDto(sku));
+        }
+
+        return skusDto;
     }
 
     @RequestMapping(value = "/{id}/customer", method = RequestMethod.GET)
