@@ -372,4 +372,13 @@ public class ProductController extends AbstractController {
         if (!productServiceFacade.favor(user.getId(), id)) return ResponseMessage.FAILED("添加收藏失败");
         return ResponseMessage.SUCCESS;
     }
+
+    @RequestMapping(value = "/{id}/unfavor", method = RequestMethod.POST)
+    public ResponseMessage unFavor(@RequestParam String utoken, @PathVariable long id){
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        if (!productServiceFacade.unFavor(user.getId(), id)) return ResponseMessage.FAILED("取消收藏失败");
+        return ResponseMessage.SUCCESS;
+    }
 }

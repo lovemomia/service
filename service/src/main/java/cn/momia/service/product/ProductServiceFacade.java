@@ -25,4 +25,5 @@ public interface ProductServiceFacade {
 
     boolean isFavoried(long userId, long id);
     boolean favor(long userId, long id);
+    boolean unFavor(long userId, long id);
 }

@@ -170,4 +170,12 @@ public class ProductV1Api extends AbstractV1Api {
 
         return executeRequest(request);
     }
+
+    @RequestMapping(value = "/unfavor", method = RequestMethod.POST)
+    public ResponseMessage unFavor(@RequestParam String utoken, @RequestParam long id){
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("product", id, "unfavor"), builder.build());
+
+        return executeRequest(request);
+    }
 }
