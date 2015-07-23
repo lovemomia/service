@@ -122,7 +122,7 @@ public class ProductV1Api extends AbstractV1Api {
         return executeRequests(requests, new Function<MomiaHttpResponseCollector, Object>() {
             @Override
             public Object apply(MomiaHttpResponseCollector collector) {
-                JSONObject productJson = (JSONObject) collector.getResponse("product");
+                JSONObject productJson = (JSONObject) productFunc.apply(collector.getResponse("product"));
                 JSONObject customersJson = (JSONObject) collector.getResponse("customers");
 
                 productJson.put("customers", processAvatars(customersJson));

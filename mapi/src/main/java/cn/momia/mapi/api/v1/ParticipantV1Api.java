@@ -32,7 +32,7 @@ public class ParticipantV1Api extends AbstractV1Api {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("participant", id), builder.build());
 
-        return executeRequest(request, userFunc);
+        return executeRequest(request);
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
@@ -63,6 +63,6 @@ public class ParticipantV1Api extends AbstractV1Api {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("participant"), builder.build());
 
-        return executeRequest(request, userFunc);
+        return executeRequest(request);
     }
 }

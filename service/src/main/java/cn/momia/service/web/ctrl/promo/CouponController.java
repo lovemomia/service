@@ -36,7 +36,7 @@ public class CouponController extends AbstractController {
         if (!coupon.exists()) return ResponseMessage.FAILED("无效的优惠券，或使用条件不满足");
 
         BigDecimal totalFee = order.getTotalFee();
-        if (promoServiceFacade.canUse(totalFee, coupon)) return ResponseMessage.FAILED("使用条件不满足，无法使用");
+        if (!promoServiceFacade.canUse(totalFee, coupon)) return ResponseMessage.FAILED("使用条件不满足，无法使用");
 
         return new ResponseMessage(promoServiceFacade.calcTotalFee(totalFee, coupon));
     }
