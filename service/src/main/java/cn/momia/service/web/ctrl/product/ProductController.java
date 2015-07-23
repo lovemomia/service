@@ -78,7 +78,16 @@ public class ProductController extends AbstractController {
         long totalCount = productServiceFacade.queryCountByMonth(cityId, month);
         List<Product> products = productServiceFacade.queryByMonth(cityId, month);
 
-        return new ResponseMessage(buildProductsDto(totalCount, products, 0, 0));
+        return new ResponseMessage(buildProductsDtoByMonth(totalCount, products));
+    }
+
+    private ListDto buildProductsDtoByMonth(long totalCount, List<Product> products) {
+        ListDto productsDto = new ListDto();
+        for (Product product : products) {
+            productsDto.add(new BaseProductDto(product, true));
+        }
+
+        return productsDto;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)

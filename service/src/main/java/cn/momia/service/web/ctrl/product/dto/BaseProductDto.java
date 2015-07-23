@@ -1,10 +1,14 @@
 package cn.momia.service.web.ctrl.product.dto;
 
 import cn.momia.service.product.Product;
+import cn.momia.service.product.sku.Sku;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class BaseProductDto extends MiniProductDto {
+    private boolean withSku = false;
+
     public String getCover() {
         return product.getCover();
     }
@@ -42,7 +46,16 @@ public class BaseProductDto extends MiniProductDto {
         return product.isOpened();
     }
 
+    public List<Sku> getSkus() {
+        return withSku ? product.getSkus() : null;
+    }
+
     public BaseProductDto(Product product) {
         super(product);
+    }
+
+    public BaseProductDto(Product product, boolean withSku) {
+        this(product);
+        this.withSku = withSku;
     }
 }

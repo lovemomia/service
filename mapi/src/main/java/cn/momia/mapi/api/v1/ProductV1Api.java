@@ -81,12 +81,12 @@ public class ProductV1Api extends AbstractV1Api {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                return buildProductsDtoOfMonth((JSONObject) data, month);
+                return buildProductsDtoOfMonth((JSONArray) data, month);
             }
         });
     }
 
-    private Dto buildProductsDtoOfMonth(JSONObject productsPackJson, int month) {
+    private Dto buildProductsDtoOfMonth(JSONArray productsJson, int month) {
         try {
             ListDto products = new ListDto();
 
@@ -96,7 +96,6 @@ public class ProductV1Api extends AbstractV1Api {
             Date nextMonth = monthFormat.parse(TimeUtil.buildNextMonthStr(month));
 
             Map<String, ProductsOfDayDto> productsOfDayDtoMap = new HashMap<String, ProductsOfDayDto>();
-            JSONArray productsJson = productsPackJson.getJSONArray("products");
             for (int i = 0; i < productsJson.size(); i++) {
                 JSONObject productJson = productsJson.getJSONObject(i);
                 JSONArray skusJson = productJson.getJSONArray("skus");
