@@ -4,6 +4,7 @@ import cn.momia.service.product.Product;
 import cn.momia.service.web.ctrl.dto.ListDto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class BaseProductDto extends MiniProductDto {
     private boolean withSku = false;
@@ -31,6 +32,10 @@ public class BaseProductDto extends MiniProductDto {
 
     public String getCrowd() {
         return product.getCrowd();
+    }
+
+    public List<String> getTags() {
+        return product.getTags();
     }
 
     public String getRegion() {
