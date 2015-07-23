@@ -1,4 +1,4 @@
-package cn.momia.mapi.api.v1.dto.misc;
+package cn.momia.mapi.api.v1.dto.deal;
 
 // only used by wechat pay callback
 public class Xml {

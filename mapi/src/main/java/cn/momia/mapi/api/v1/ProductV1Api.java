@@ -162,4 +162,12 @@ public class ProductV1Api extends AbstractV1Api {
             }
         });
     }
+
+    @RequestMapping(value = "/favor", method = RequestMethod.POST)
+    public ResponseMessage favor(@RequestParam String utoken, @RequestParam long id){
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("product", id, "favor"), builder.build());
+
+        return executeRequest(request);
+    }
 }
