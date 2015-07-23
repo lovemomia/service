@@ -5,7 +5,6 @@ import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.img.ImageFile;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.v1.dto.product.PlaymatesDto;
 import cn.momia.mapi.api.v1.dto.product.PlaceOrderDto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -152,7 +151,17 @@ public class ProductV1Api extends AbstractV1Api {
         return executeRequest(request, new Function<Object, Object>() {
             @Override
             public Object apply(Object data) {
-                return new PlaymatesDto((JSONArray) data);
+                JSONArray skusPlaymatesJson = (JSONArray) data;
+                for (int i = 0; i < skusPlaymatesJson.size(); i++) {
+                    JSONObject skuPlaymatesJson = skusPlaymatesJson.getJSONObject(i);
+                    JSONArray playmatesJson = skuPlaymatesJson.getJSONArray("playmates");
+                    for (int j = 0; j < playmatesJson.size(); j++) {
+                        JSONObject playmateJson = playmatesJson.getJSONObject(j);
+                        playmateJson.put("avatar", ImageFile.url(playmateJson.getString("avatar")));
+                    }
+                }
+
+                return data;
             }
         });
     }
