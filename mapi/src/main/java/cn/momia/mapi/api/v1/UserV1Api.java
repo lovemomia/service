@@ -287,6 +287,6 @@ public class UserV1Api extends AbstractV1Api {
                 .add("count", conf.getInt("Favorite.PageSize"));
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/favorite"), builder.build());
 
-        return executeRequest(request);
+        return executeRequest(request, pagedProductsFunc);
     }
 }
