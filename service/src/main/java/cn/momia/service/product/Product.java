@@ -18,7 +18,12 @@ import java.util.List;
 public class Product implements Serializable {
     private static final DateFormat DATE_FORMATTER = new SimpleDateFormat("M月d日");
 
-    public static final Product NOT_EXIST_PRODUCT = new Product();
+    public static final Product NOT_EXIST_PRODUCT = new Product() {
+        @Override
+        public long getId() {
+            return 0;
+        }
+    };
 
     private BaseProduct baseProduct;
     private List<ProductImage> imgs;
