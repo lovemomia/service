@@ -29,6 +29,10 @@ public class BaseProductDto extends MiniProductDto {
         return product.getScheduler();
     }
 
+    public String getCrowd() {
+        return product.getCrowd();
+    }
+
     public String getRegion() {
         // TODO
         return null;

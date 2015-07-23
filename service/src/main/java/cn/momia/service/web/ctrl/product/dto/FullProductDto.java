@@ -8,10 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FullProductDto extends BaseProductDto {
-    public String getCrowd() {
-        return product.getCrowd();
-    }
-
     public List<String> getTags() {
         return product.getTags();
     }
