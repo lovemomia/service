@@ -1,7 +1,5 @@
 package cn.momia.service.web.ctrl.product.dto;
 
-import cn.momia.common.web.img.ImageFile;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +21,7 @@ public class CustomersDto implements Serializable {
         if (avatars != null) {
             this.avatars = new ArrayList<String>();
             for (String avatar : avatars) {
-                this.avatars.add(ImageFile.url(avatar));
+                this.avatars.add(avatar);
             }
         }
     }

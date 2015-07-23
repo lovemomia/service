@@ -1,7 +1,6 @@
 package cn.momia.service.web.ctrl.user.dto;
 
 import cn.momia.common.secret.MobileEncryptor;
-import cn.momia.common.web.img.ImageFile;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -35,7 +34,7 @@ public class UserDto {
     }
 
     public String getAvatar() {
-        return ImageFile.url(user.getAvatar());
+        return user.getAvatar();
     }
 
     public String getName() {

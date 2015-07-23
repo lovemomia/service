@@ -42,7 +42,7 @@ public class AuthV1Api extends AbstractV1Api {
                 .add("code", code);
         MomiaHttpRequest request = MomiaHttpRequest.POST(url("auth/register"), builder.build());
 
-        return executeRequest(request);
+        return executeRequest(request, userFunc);
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -54,7 +54,7 @@ public class AuthV1Api extends AbstractV1Api {
                 .add("password", password);
         MomiaHttpRequest request = MomiaHttpRequest.POST(url("auth/login"), builder.build());
 
-        return executeRequest(request);
+        return executeRequest(request, userFunc);
     }
 
     @RequestMapping(value = "/login/code", method = RequestMethod.POST)
@@ -66,7 +66,7 @@ public class AuthV1Api extends AbstractV1Api {
                 .add("code", code);
         MomiaHttpRequest request = MomiaHttpRequest.POST(url("auth/login/code"), builder.build());
 
-        return executeRequest(request);
+        return executeRequest(request, userFunc);
     }
 
     @RequestMapping(value = "/password", method = RequestMethod.POST)
@@ -79,6 +79,6 @@ public class AuthV1Api extends AbstractV1Api {
                 .add("code", code);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(url("auth/password"), builder.build());
 
-        return executeRequest(request);
+        return executeRequest(request, userFunc);
     }
 }

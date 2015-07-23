@@ -1,7 +1,5 @@
 package cn.momia.service.web.ctrl.product.dto;
 
-import cn.momia.common.web.img.ImageFile;
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -28,7 +26,7 @@ public class PlaymateDto implements Serializable {
     }
 
     public String getAvatar() {
-        return ImageFile.url(avatar);
+        return avatar;
     }
 
     public void setAvatar(String avatar) {

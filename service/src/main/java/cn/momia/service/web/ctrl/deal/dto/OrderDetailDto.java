@@ -32,6 +32,7 @@ public class OrderDetailDto extends OrderDto {
     public BigDecimal getPrice() {
         return product.getMinPrice();
     }
+
     public OrderDetailDto(Order order, Product product) {
         super(order);
         this.product = product;
