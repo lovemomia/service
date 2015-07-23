@@ -6,7 +6,6 @@ import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpRequestExecutor;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.v1.dto.base.Dto;
 import com.google.common.base.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,14 +35,14 @@ public abstract class AbstractApi extends BaseController {
         return executeRequest(request, null);
     }
 
-    protected ResponseMessage executeRequest(MomiaHttpRequest request, Function<Object, Dto> buildResponseData) {
+    protected ResponseMessage executeRequest(MomiaHttpRequest request, Function<Object, Object> buildResponseData) {
         ResponseMessage responseMessage = requestExecutor.execute(request);
 
         if (buildResponseData == null || !responseMessage.successful()) return responseMessage;
         return new ResponseMessage(buildResponseData.apply(responseMessage.getData()));
     }
 
-    protected ResponseMessage executeRequests(List<MomiaHttpRequest> requests, Function<MomiaHttpResponseCollector, Dto> buildResponseData) {
+    protected ResponseMessage executeRequests(List<MomiaHttpRequest> requests, Function<MomiaHttpResponseCollector, Object> buildResponseData) {
         MomiaHttpResponseCollector collector = requestExecutor.execute(requests);
 
         if (collector.notLogin()) return ResponseMessage.TOKEN_EXPIRED;
