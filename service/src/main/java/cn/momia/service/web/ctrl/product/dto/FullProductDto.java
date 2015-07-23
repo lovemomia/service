@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FullProductDto extends BaseProductDto {
+    public String getCrowd() {
+        return product.getCrowd();
+    }
+
     public List<String> getImgs() {
         List<String> imgs = new ArrayList<String>();
         for (ProductImage productImage : product.getImgs()) imgs.add(productImage.getUrl());
