@@ -5,9 +5,7 @@ import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.img.ImageFile;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.v1.dto.base.ListDto;
 import cn.momia.mapi.api.v1.dto.product.PlaymatesDto;
-import cn.momia.mapi.api.v1.dto.base.PagedListDto;
 import cn.momia.mapi.api.v1.dto.product.PlaceOrderDto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -26,8 +24,6 @@ import java.util.List;
 public class ProductV1Api extends AbstractV1Api {
     @RequestMapping(value = "/weekend", method = RequestMethod.GET)
     public ResponseMessage getProductsByWeekend(@RequestParam(value = "city") int cityId, @RequestParam int start) {
-        if (cityId < 0 || start < 0) return new ResponseMessage(PagedListDto.EMPTY);
-
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
                 .add("start", start)
@@ -39,8 +35,6 @@ public class ProductV1Api extends AbstractV1Api {
 
     @RequestMapping(value = "/month", method = RequestMethod.GET)
     public ResponseMessage getProductsByMonth(@RequestParam(value = "city") int cityId, @RequestParam int month) {
-        if (cityId < 0) return new ResponseMessage(ListDto.EMPTY);
-
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
                 .add("month", month);
