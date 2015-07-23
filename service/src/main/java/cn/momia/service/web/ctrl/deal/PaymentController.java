@@ -3,6 +3,7 @@ package cn.momia.service.web.ctrl.deal;
 import cn.momia.common.web.exception.MomiaFailedException;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.product.Product;
+import cn.momia.service.product.sku.Sku;
 import cn.momia.service.user.base.User;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.util.Date;
 
 @RestController
 @RequestMapping("/payment")
@@ -38,12 +40,14 @@ public class PaymentController extends AbstractController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         Order order = dealServiceFacade.getOrder(orderId);
-        Product product = productServiceFacade.get(productId);
         if (!order.exists() ||
-                !product.exists() ||
                 order.getCustomerId() != user.getId() ||
-                order.getProductId() != product.getId() ||
+                order.getProductId() != productId ||
                 order.getSkuId() != skuId) return ResponseMessage.FAILED("无效的订单");
+
+        Product product = productServiceFacade.get(order.getProductId(), true);
+        Sku sku = productServiceFacade.getSku(order.getSkuId());
+        if (!product.exists() || !sku.exists() || sku.closed(new Date())) return ResponseMessage.FAILED("无效的订单");
 
         Coupon coupon = Coupon.NOT_EXIST_COUPON;
         String userCouponIdStr = request.getParameter("coupon");
@@ -93,9 +97,14 @@ public class PaymentController extends AbstractController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         Order order = dealServiceFacade.getOrder(orderId);
-        if (!order.exists()) return ResponseMessage.FAILED("无效的订单");
+        if (!order.exists() ||
+                order.getCustomerId() != user.getId() ||
+                order.getProductId() != productId ||
+                order.getSkuId() != skuId) return ResponseMessage.FAILED("无效的订单");
 
-        if (order.getProductId() != productId || order.getSkuId() != skuId) return ResponseMessage.FAILED("无效的订单");
+        Product product = productServiceFacade.get(order.getProductId(), true);
+        Sku sku = productServiceFacade.getSku(order.getSkuId());
+        if (!product.exists() || !sku.exists() || sku.closed(new Date())) return ResponseMessage.FAILED("无效的订单");
 
         BigDecimal totalFee = order.getTotalFee();
         if (userCouponId != null && userCouponId > 0) {

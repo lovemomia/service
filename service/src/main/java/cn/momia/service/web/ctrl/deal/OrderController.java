@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +68,8 @@ public class OrderController extends AbstractController {
                 order.getSkuId() <= 0 ||
                 order.getPrices().isEmpty() ||
                 StringUtils.isBlank(order.getMobile()) ||
-                order.getProductId() != sku.getProductId()) return false;
+                order.getProductId() != sku.getProductId() ||
+                sku.closed(new Date())) return false;
 
         for (OrderPrice price : order.getPrices()) {
             boolean found = false;

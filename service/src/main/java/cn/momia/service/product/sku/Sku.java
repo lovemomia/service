@@ -66,9 +66,7 @@ public class Sku implements Serializable {
 
         Date today = new Date();
         for (Sku sku : skus) {
-            if (sku.getOfflineTime().before(today) ||
-                    sku.getStartTime().before(today) ||
-                    (sku.getType() != 1 && sku.getUnlockedStock() <= 0)) continue;
+            if (sku.closed(today)) continue;
             filteredSkus.add(sku);
         }
 
@@ -310,5 +308,13 @@ public class Sku implements Serializable {
         }
 
         return prices;
+    }
+
+    public boolean closed(Date today) {
+        if (offlineTime.before(today) ||
+                startTime.before(today) ||
+                (type != 1 && unlockedStock <= 0)) return true;
+
+        return false;
     }
 }
