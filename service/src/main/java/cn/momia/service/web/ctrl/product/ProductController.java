@@ -379,6 +379,9 @@ public class ProductController extends AbstractController {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
+        Product product = productServiceFacade.get(id, true);
+        if (!product.exists()) return ResponseMessage.FAILED("添加收藏失败");
+
         if (!productServiceFacade.favor(user.getId(), id)) return ResponseMessage.FAILED("添加收藏失败");
         return ResponseMessage.SUCCESS;
     }
