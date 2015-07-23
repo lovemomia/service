@@ -1,6 +1,9 @@
 package cn.momia.service.web.ctrl.product;
 
 import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.service.web.ctrl.dto.ListDto;
+import cn.momia.service.web.ctrl.dto.PagedListDto;
+import cn.momia.service.web.ctrl.product.dto.BaseProductDto;
 import cn.momia.service.web.ctrl.product.dto.CustomersDto;
 import cn.momia.service.web.ctrl.product.dto.PlaymateDto;
 import cn.momia.service.product.Product;
@@ -10,7 +13,6 @@ import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.web.ctrl.AbstractController;
-import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,40 +37,47 @@ public class ProductController extends AbstractController {
     public ResponseMessage getProducts(@RequestParam(value = "city") int cityId,
                                        @RequestParam int start,
                                        @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return new ResponseMessage(buildProductsPack(0, new ArrayList<Product>()));
+        if (isInvalidLimit(start, count)) return new ResponseMessage(PagedListDto.EMPTY);
 
         long totalCount = productServiceFacade.queryCount(cityId);
-        List<Product> products = totalCount > 0 ? productServiceFacade.query(cityId, start, count) : new ArrayList<Product>();
+        List<Product> products = productServiceFacade.query(cityId, start, count);
 
-        return new ResponseMessage(buildProductsPack(totalCount, products));
+        return new ResponseMessage(buildProducts(totalCount, products, start, count));
     }
 
-    private JSONObject buildProductsPack(long totalCount, List<Product> products) {
-        JSONObject productsPackJson = new JSONObject();
-        productsPackJson.put("totalCount", totalCount);
-        productsPackJson.put("products", products);
+    private PagedListDto buildProducts(long totalCount, List<Product> products, int start, int count) {
+        PagedListDto productsDto = new PagedListDto();
 
-        return productsPackJson;
+        productsDto.setTotalCount(totalCount);
+        if (start + count < totalCount) productsDto.setNextIndex(start + count);
+
+        ListDto baseProductsDto = new ListDto();
+        for (Product product : products) {
+            baseProductsDto.add(new BaseProductDto(product));
+        }
+        productsDto.addAll(baseProductsDto);
+
+        return productsDto;
     }
 
     @RequestMapping(value = "/weekend", method = RequestMethod.GET)
     public ResponseMessage getProductsByWeekend(@RequestParam(value = "city") int cityId,
                                                 @RequestParam int start,
                                                 @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return new ResponseMessage(buildProductsPack(0, new ArrayList<Product>()));
+        if (isInvalidLimit(start, count)) return new ResponseMessage(PagedListDto.EMPTY);
 
         long totalCount = productServiceFacade.queryCountByWeekend(cityId);
-        List<Product> products = totalCount > 0 ? productServiceFacade.queryByWeekend(cityId, start, count) : new ArrayList<Product>();
+        List<Product> products = productServiceFacade.queryByWeekend(cityId, start, count);
 
-        return new ResponseMessage(buildProductsPack(totalCount, products));
+        return new ResponseMessage(buildProducts(totalCount, products, start, count));
     }
 
     @RequestMapping(value = "/month", method = RequestMethod.GET)
     public ResponseMessage getProductsByMonth(@RequestParam(value = "city") int cityId, @RequestParam int month) {
         long totalCount = productServiceFacade.queryCountByMonth(cityId, month);
-        List<Product> products = totalCount > 0 ? productServiceFacade.queryByMonth(cityId, month) : new ArrayList<Product>();
+        List<Product> products = productServiceFacade.queryByMonth(cityId, month);
 
-        return new ResponseMessage(buildProductsPack(totalCount, products));
+        return new ResponseMessage(buildProducts(totalCount, products, 0, 0));
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)

@@ -4,16 +4,11 @@ import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.v1.dto.misc.ProductUtil;
-import cn.momia.mapi.api.v1.dto.home.BannerDto;
 import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.home.HomeDto;
-import cn.momia.mapi.api.v1.dto.base.ListDto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,8 +20,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/home")
 public class HomeV1Api extends AbstractV1Api {
-    private static final Logger LOGGER = LoggerFactory.getLogger(HomeV1Api.class);
-
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage home(@RequestParam(value = "pageindex") final int pageIndex,
                                 @RequestParam(value = "city") int cityId) {
@@ -73,29 +66,14 @@ public class HomeV1Api extends AbstractV1Api {
     private Dto buildHomeDto(MomiaHttpResponseCollector collector, int start, int count, int pageIndex) {
         HomeDto homeDto = new HomeDto();
 
-        if (start == 0) homeDto.setBanners(extractBannerData((JSONArray) collector.getResponse("banners")));
+        if (pageIndex == 0) homeDto.setBanners((JSONArray) collector.getResponse("banners"));
 
         JSONObject productsPackJson = (JSONObject) collector.getResponse("products");
-
-        JSONArray productsJson = productsPackJson.getJSONArray("products");
-        homeDto.setProducts(ProductUtil.extractProductsData(productsJson));
+        homeDto.setProducts(productsPackJson.getJSONArray("list"));
 
         long totalCount = productsPackJson.getLong("totalCount");
         if (start + count < totalCount) homeDto.setNextpage(pageIndex + 1);
 
         return homeDto;
-    }
-
-    private ListDto extractBannerData(JSONArray bannersJson) {
-        ListDto banners = new ListDto();
-        for (int i = 0; i < bannersJson.size(); i++) {
-            try {
-                banners.add(new BannerDto(bannersJson.getJSONObject(i)));
-            } catch (Exception e) {
-                LOGGER.error("fail to parser the {}th banner", i, e);
-            }
-        }
-
-        return banners;
     }
 }
