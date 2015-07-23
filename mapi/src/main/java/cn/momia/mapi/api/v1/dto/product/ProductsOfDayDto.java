@@ -22,7 +22,7 @@ public class ProductsOfDayDto implements Dto {
         return products;
     }
 
-    public void addProduct(ProductDto productDto) {
+    public void addProduct(BaseProductDto productDto) {
         if (!products.contains(productDto)) products.add(productDto);
     }
 }

@@ -6,6 +6,7 @@ import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.v1.dto.base.ListDto;
+import cn.momia.mapi.api.v1.dto.product.BaseProductDto;
 import cn.momia.mapi.api.v1.dto.product.PlaymatesDto;
 import cn.momia.mapi.api.v1.dto.product.ProductsOfDayDto;
 import cn.momia.mapi.api.v1.dto.misc.ProductUtil;
@@ -13,6 +14,7 @@ import cn.momia.mapi.api.v1.dto.base.Dto;
 import cn.momia.mapi.api.v1.dto.base.PagedListDto;
 import cn.momia.mapi.api.v1.dto.product.ProductDetailDto;
 import cn.momia.mapi.api.v1.dto.product.PlaceOrderDto;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
@@ -37,7 +39,7 @@ import java.util.Map;
 @RequestMapping("/v1/product")
 public class ProductV1Api extends AbstractV1Api {
     @RequestMapping(value = "/weekend", method = RequestMethod.GET)
-    public ResponseMessage getProductsByWeekend(@RequestParam(value = "city") final int cityId, @RequestParam final int start) {
+    public ResponseMessage getProductsByWeekend(@RequestParam(value = "city") int cityId, @RequestParam int start) {
         final int pageSize = conf.getInt("Product.PageSize");
         final int maxPageCount = conf.getInt("Product.MaxPageCount");
         if (cityId < 0 || start < 0 || start > pageSize * maxPageCount) return new ResponseMessage(PagedListDto.EMPTY);
@@ -51,25 +53,24 @@ public class ProductV1Api extends AbstractV1Api {
         return executeRequest(request, new Function<Object, Dto>() {
             @Override
             public Dto apply(Object data) {
-                return buildProductsDtoOfWeekend((JSONObject) data, start, pageSize);
+                return buildProductsDtoOfWeekend((JSONObject) data);
             }
         });
     }
 
-    private Dto buildProductsDtoOfWeekend(JSONObject productsPackJson, int start, int count) {
-        PagedListDto products = new PagedListDto();
+    private Dto buildProductsDtoOfWeekend(JSONObject pagedProductsJson) {
+        PagedListDto productsDto = new PagedListDto();
 
-        long totalCount = productsPackJson.getLong("totalCount");
-        if (start + count < totalCount) products.setNextIndex(start + count);
+        productsDto.setTotalCount(pagedProductsJson.getLong("totalCount"));
+        productsDto.setNextIndex(pagedProductsJson.getInteger("nextIndex"));
 
-        JSONArray productsJson = productsPackJson.getJSONArray("products");
-        products.addAll(ProductUtil.extractProductsData(productsJson));
+        productsDto.setList(ProductUtil.processImage(pagedProductsJson.getJSONArray("list")));
 
-        return products;
+        return productsDto;
     }
 
     @RequestMapping(value = "/month", method = RequestMethod.GET)
-    public ResponseMessage getProductsByMonth(@RequestParam(value = "city") final int cityId, @RequestParam final int month) {
+    public ResponseMessage getProductsByMonth(@RequestParam(value = "city") int cityId, @RequestParam final int month) {
         if (cityId < 0) return new ResponseMessage(ListDto.EMPTY);
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
@@ -111,7 +112,7 @@ public class ProductV1Api extends AbstractV1Api {
                             productsOfDayDto.setDate(startTime);
                             productsOfDayDtoMap.put(day, productsOfDayDto);
                         }
-                        productsOfDayDto.addProduct(ProductUtil.extractProductData(productJson, false));
+                        productsOfDayDto.addProduct(JSON.toJavaObject(productJson, BaseProductDto.class));
                     }
                 }
             }
@@ -141,7 +142,12 @@ public class ProductV1Api extends AbstractV1Api {
         return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {
             @Override
             public Dto apply(MomiaHttpResponseCollector collector) {
-                return new ProductDetailDto((JSONObject) collector.getResponse("product"), (JSONObject) collector.getResponse("customers"));
+                JSONObject productJson = (JSONObject) collector.getResponse("product");
+                JSONObject customersJson = (JSONObject) collector.getResponse("customers");
+                ProductDetailDto productDetailDto = JSONObject.toJavaObject(productJson, ProductDetailDto.class);
+                productDetailDto.setExtraInfo(productJson, customersJson);
+
+                return productDetailDto;
             }
         });
     }
