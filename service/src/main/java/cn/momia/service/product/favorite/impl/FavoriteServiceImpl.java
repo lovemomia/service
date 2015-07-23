@@ -4,9 +4,12 @@ import cn.momia.service.base.DbAccessService;
 import cn.momia.service.product.favorite.FavoriteService;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FavoriteServiceImpl extends DbAccessService implements FavoriteService {
     @Override
@@ -51,5 +54,31 @@ public class FavoriteServiceImpl extends DbAccessService implements FavoriteServ
         String sql = "UPDATE t_favorite SET status=0 WHERE userId=? AND productId=?";
 
         return jdbcTemplate.update(sql, new Object[] { userId, productId }) > 0;
+    }
+
+    @Override
+    public long queryCount(long userId) {
+        String sql = "SELECT COUNT(1) FROM t_favorite WHERE userId=? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[] { userId }, new ResultSetExtractor<Long>() {
+            @Override
+            public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getLong(1) : 0;
+            }
+        });
+    }
+
+    @Override
+    public List<Long> query(long userId, int start, int count) {
+        final List<Long> productIds = new ArrayList<Long>();
+        String sql = "SELECT productId FROM t_favorite WHERE userId=? AND status=1 ORDER BY addTime DESC LIMIT ?,?";
+        jdbcTemplate.query(sql, new Object[] { userId, start, count }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                productIds.add(rs.getLong("productId"));
+            }
+        });
+
+        return productIds;
     }
 }

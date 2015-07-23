@@ -1,8 +1,12 @@
 package cn.momia.service.web.ctrl.user;
 
 import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.service.product.Product;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;
+import cn.momia.service.web.ctrl.dto.ListDto;
+import cn.momia.service.web.ctrl.dto.PagedListDto;
+import cn.momia.service.web.ctrl.product.dto.BaseProductDto;
 import cn.momia.service.web.ctrl.user.dto.ContactsDto;
 import cn.momia.service.web.ctrl.user.dto.ParticipantDto;
 import org.apache.commons.lang3.StringUtils;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -218,5 +223,33 @@ public class UserController extends UserRelatedController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         return new ResponseMessage(new ContactsDto(user));
+    }
+
+    @RequestMapping(value = "/favorite", method = RequestMethod.GET)
+    public ResponseMessage getFavoritesOfUser(@RequestParam String utoken, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return new ResponseMessage(PagedListDto.EMPTY);
+
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        long totalCount = productServiceFacade.queryFavoritesCount(user.getId());
+        List<Product> products = productServiceFacade.queryFavorites(user.getId(), start, count);
+
+        return new ResponseMessage(buildFavoritessDto(totalCount, products, start, count));
+    }
+
+    private PagedListDto buildFavoritessDto(long totalCount, List<Product> products, int start, int count) {
+        PagedListDto favoritessDto = new PagedListDto();
+
+        favoritessDto.setTotalCount(totalCount);
+        if (start + count < totalCount) favoritessDto.setNextIndex(start + count);
+
+        ListDto baseProductsDto = new ListDto();
+        for (Product product : products) {
+            baseProductsDto.add(new BaseProductDto(product));
+        }
+        favoritessDto.addAll(baseProductsDto);
+
+        return favoritessDto;
     }
 }

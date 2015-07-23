@@ -27,12 +27,10 @@
     <Home>
         <BannerCount>3</BannerCount>
         <PageSize>10</PageSize>
-        <MaxPageCount>50</MaxPageCount>
     </Home>
 
     <Product>
         <PageSize>25</PageSize>
-        <MaxPageCount>50</MaxPageCount>
         <CustomerPageSize>6</CustomerPageSize>
         <Playmate>
             <MaxSkuCount>20</MaxSkuCount>
@@ -42,11 +40,13 @@
 
     <Order>
         <PageSize>20</PageSize>
-        <MaxPageCount>50</MaxPageCount>
     </Order>
 
     <Coupon>
         <PageSize>20</PageSize>
-        <MaxPageCount>50</MaxPageCount>
     </Coupon>
+
+    <Favorite>
+        <PageSize>20</PageSize>
+    </Favorite>
 </Configuration>

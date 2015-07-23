@@ -26,4 +26,7 @@ public interface ProductServiceFacade {
     boolean isFavoried(long userId, long id);
     boolean favor(long userId, long id);
     boolean unFavor(long userId, long id);
+
+    long queryFavoritesCount(long userId);
+    List<Product> queryFavorites(long userId, int start, int count);
 }

@@ -232,7 +232,7 @@ public class UserV1Api extends AbstractV1Api {
     @RequestMapping(value = "/order", method = RequestMethod.GET)
     public ResponseMessage getOrdersOfUser(@RequestParam String utoken,
                                            @RequestParam(defaultValue = "1") int status,
-                                           @RequestParam final int start) {
+                                           @RequestParam int start) {
         if (StringUtils.isBlank(utoken) || start < 0) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
@@ -263,7 +263,7 @@ public class UserV1Api extends AbstractV1Api {
     public ResponseMessage getCouponsOfUser(@RequestParam String utoken,
                                             @RequestParam(value = "oid", defaultValue = "0") long orderId,
                                             @RequestParam(defaultValue = "0") int status,
-                                            @RequestParam final int start) {
+                                            @RequestParam int start) {
         if (StringUtils.isBlank(utoken) || orderId < 0 || status < 0 || start < 0) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
@@ -273,6 +273,19 @@ public class UserV1Api extends AbstractV1Api {
                 .add("start", start)
                 .add("count", conf.getInt("Coupon.PageSize"));
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("coupon/user"), builder.build());
+
+        return executeRequest(request);
+    }
+
+    @RequestMapping(value = "/favorite", method = RequestMethod.GET)
+    public ResponseMessage getFavoritesOfUser(@RequestParam String utoken, @RequestParam int start) {
+        if (StringUtils.isBlank(utoken) || start < 0) return ResponseMessage.BAD_REQUEST;
+
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("start", start)
+                .add("count", conf.getInt("Favorite.PageSize"));
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/favorite"), builder.build());
 
         return executeRequest(request);
     }

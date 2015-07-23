@@ -26,21 +26,19 @@ import java.util.List;
 public class ProductV1Api extends AbstractV1Api {
     @RequestMapping(value = "/weekend", method = RequestMethod.GET)
     public ResponseMessage getProductsByWeekend(@RequestParam(value = "city") int cityId, @RequestParam int start) {
-        final int pageSize = conf.getInt("Product.PageSize");
-        final int maxPageCount = conf.getInt("Product.MaxPageCount");
-        if (cityId < 0 || start < 0 || start > pageSize * maxPageCount) return new ResponseMessage(PagedListDto.EMPTY);
+        if (cityId < 0 || start < 0) return new ResponseMessage(PagedListDto.EMPTY);
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
                 .add("start", start)
-                .add("count", pageSize);
+                .add("count", conf.getInt("Product.PageSize"));
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("product/weekend"), builder.build());
 
         return executeRequest(request, pagedProductsFunc);
     }
 
     @RequestMapping(value = "/month", method = RequestMethod.GET)
-    public ResponseMessage getProductsByMonth(@RequestParam(value = "city") int cityId, @RequestParam final int month) {
+    public ResponseMessage getProductsByMonth(@RequestParam(value = "city") int cityId, @RequestParam int month) {
         if (cityId < 0) return new ResponseMessage(ListDto.EMPTY);
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
@@ -62,7 +60,7 @@ public class ProductV1Api extends AbstractV1Api {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage getProduct(@RequestParam(defaultValue = "") String utoken, @RequestParam final long id) {
+    public ResponseMessage getProduct(@RequestParam(defaultValue = "") String utoken, @RequestParam long id) {
         if (id <= 0) return ResponseMessage.BAD_REQUEST;
 
         List<MomiaHttpRequest> requests = buildProductRequests(utoken, id);

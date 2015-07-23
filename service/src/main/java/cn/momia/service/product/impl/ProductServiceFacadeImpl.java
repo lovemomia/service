@@ -286,4 +286,17 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
         if (!isFavoried(userId, id)) return true;
         return favoriteService.unFavor(userId, id);
     }
+
+    @Override
+    public long queryFavoritesCount(long userId) {
+        if (userId <= 0) return 0;
+        return favoriteService.queryCount(userId);
+    }
+
+    @Override
+    public List<Product> queryFavorites(long userId, int start, int count) {
+        List<Long> productIds = favoriteService.query(userId, start, count);
+
+        return get(productIds);
+    }
 }
