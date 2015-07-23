@@ -168,7 +168,9 @@ public class WechatpayGateway extends AbstractPaymentGateway {
                 throw new RuntimeException("unsupported trade type: " + tradeType);
             }
         } else {
-            LOGGER.error("fail to prepay: {}/{}", params.get(WechatpayPrepayFields.RETURN_CODE), params.get(WechatpayPrepayFields.RETURN_MSG));
+            LOGGER.error("fail to prepay: {}/{}/{}", params.get(WechatpayPrepayFields.RETURN_CODE),
+                    params.get(WechatpayPrepayFields.RESULT_CODE),
+                    params.get(WechatpayPrepayFields.RETURN_MSG));
         }
     }
 
