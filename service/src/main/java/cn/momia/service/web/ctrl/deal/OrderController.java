@@ -9,6 +9,7 @@ import cn.momia.service.user.base.User;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderPrice;
 import cn.momia.service.web.ctrl.AbstractController;
+import cn.momia.service.web.ctrl.deal.dto.OrderDetailDto;
 import cn.momia.service.web.ctrl.deal.dto.OrderDto;
 import cn.momia.service.web.ctrl.dto.PagedListDto;
 import org.apache.commons.lang3.StringUtils;
@@ -133,13 +134,7 @@ public class OrderController extends AbstractController {
 
     private PagedListDto buildUserOrders(long totalCount, List<Order> orders, List<Product> products, int start, int count) {
         Map<Long, Product> productMap = new HashMap<Long, Product>();
-        Map<Long, Sku> skuMap = new HashMap<Long, Sku>();
-        for (Product product : products) {
-            productMap.put(product.getId(), product);
-            for (Sku sku : product.getSkus()) {
-                skuMap.put(sku.getId(), sku);
-            }
-        }
+        for (Product product : products) productMap.put(product.getId(), product);
 
         PagedListDto userOrdersDto = new PagedListDto();
 
@@ -149,10 +144,9 @@ public class OrderController extends AbstractController {
         for (Order order : orders) {
             try {
                 Product product = productMap.get(order.getProductId());
-                Sku sku = skuMap.get(order.getSkuId());
-                if (product == null || sku == null) continue;
+                if (product == null) continue;
 
-                userOrdersDto.add(new OrderDto(order, product, sku));
+                userOrdersDto.add(new OrderDetailDto(order, product));
             } catch (Exception e) {
                 LOGGER.error("fail to build order dto for order: {}", order.getId(), e);
             }
@@ -174,6 +168,6 @@ public class OrderController extends AbstractController {
                 order.getCustomerId() != user.getId() ||
                 order.getProductId() != product.getId()) return ResponseMessage.FAILED("无效的订单");
 
-        return new ResponseMessage(new OrderDto(order, product));
+        return new ResponseMessage(new OrderDetailDto(order, product));
     }
 }

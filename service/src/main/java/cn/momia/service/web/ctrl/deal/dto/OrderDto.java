@@ -1,10 +1,8 @@
 package cn.momia.service.web.ctrl.deal.dto;
 
-import cn.momia.common.web.img.ImageFile;
+import cn.momia.common.secret.MobileEncryptor;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderPrice;
-import cn.momia.service.product.Product;
-import cn.momia.service.product.sku.Sku;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.math.BigDecimal;
@@ -13,16 +11,6 @@ import java.util.List;
 
 public class OrderDto {
     private Order order;
-
-    // product info
-    private String cover;
-    private String title;
-    private String scheduler;
-    private String address;
-    private BigDecimal price;
-
-    // sku info
-    private String time;
 
     public long getId() {
         return order.getId();
@@ -67,7 +55,7 @@ public class OrderDto {
     }
 
     public String getMobile() {
-        return order.getMobile();
+        return MobileEncryptor.encrypt(order.getMobile());
     }
 
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
@@ -79,45 +67,7 @@ public class OrderDto {
         return order.getStatus();
     }
 
-    public String getCover() {
-        return ImageFile.url(cover);
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getScheduler() {
-        return scheduler;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
     public OrderDto(Order order) {
         this.order = order;
-    }
-
-    public OrderDto(Order order, Product product) {
-        this(order);
-        this.cover = product.getCover();
-        this.title = product.getTitle();
-        this.scheduler = product.getScheduler();
-        this.address = product.getPlace().getAddress();
-        this.price = product.getMinPrice();
-    }
-
-    public OrderDto(Order order, Product product, Sku sku) {
-        this(order, product);
-        this.time = sku.time();
     }
 }
