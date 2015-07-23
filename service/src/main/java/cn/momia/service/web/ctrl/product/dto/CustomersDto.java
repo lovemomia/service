@@ -20,9 +20,11 @@ public class CustomersDto implements Serializable {
 
     public CustomersDto(String text, List<String> avatars) {
         this.text = text;
-        this.avatars = new ArrayList<String>();
-        for (String avatar : avatars) {
-            this.avatars.add(ImageFile.url(avatar));
+        if (avatars != null) {
+            this.avatars = new ArrayList<String>();
+            for (String avatar : avatars) {
+                this.avatars.add(ImageFile.url(avatar));
+            }
         }
     }
 }
