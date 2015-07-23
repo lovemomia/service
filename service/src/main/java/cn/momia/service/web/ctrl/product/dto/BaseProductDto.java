@@ -7,6 +7,15 @@ import java.math.BigDecimal;
 
 public class BaseProductDto extends MiniProductDto {
     private boolean withSku = false;
+    private boolean favored = false;
+
+    public boolean isFavored() {
+        return favored;
+    }
+
+    public void setFavored(boolean favored) {
+        this.favored = favored;
+    }
 
     public String getCover() {
         return product.getCover();

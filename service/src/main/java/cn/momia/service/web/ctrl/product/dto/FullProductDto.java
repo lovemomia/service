@@ -8,14 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FullProductDto extends BaseProductDto {
-    private boolean favored = false;
-
-    public boolean isFavored() {
-        return favored;
+    public String getCrowd() {
+        return product.getCrowd();
     }
 
-    public void setFavored(boolean favored) {
-        this.favored = favored;
+    public List<String> getTags() {
+        return product.getTags();
     }
 
     public List<String> getImgs() {
