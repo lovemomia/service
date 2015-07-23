@@ -1,11 +1,14 @@
 package cn.momia.service.product.sku;
 
-import cn.momia.common.web.misc.SkuUtil;
 import cn.momia.common.misc.TimeUtil;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,6 +16,9 @@ import java.util.Date;
 import java.util.List;
 
 public class Sku implements Serializable {
+    private static final Splitter TIME_SPLITTER = Splitter.on("~").trimResults().omitEmptyStrings();
+    private static final DateFormat TIME_FORMATTER = new SimpleDateFormat("h:mm");
+
     public static class Type {
         public static final int NORMAL = 0;
         public static final int NO_CEILING = 1;
@@ -235,10 +241,44 @@ public class Sku implements Serializable {
 
     public String time() {
         for (SkuProperty property : properties) {
-            if ("time".equalsIgnoreCase(property.getName())) return SkuUtil.getSkuTime(property.getValue());
+            if ("time".equalsIgnoreCase(property.getName())) return getSkuTime(property.getValue());
         }
 
         return "";
+    }
+
+    private String getSkuTime(String timeValue) {
+        if (StringUtils.isBlank(timeValue)) return "";
+
+        List<String> timeStrs = Lists.newArrayList(TIME_SPLITTER.split(timeValue));
+        if (timeStrs.isEmpty()) return "";
+
+        Collections.sort(timeStrs);
+        List<Date> times = TimeUtil.castToDates(timeStrs);
+        if (times.isEmpty()) return "";
+
+        StringBuilder builder = new StringBuilder();
+
+        Date start = times.get(0);
+        Date end = times.get(timeStrs.size() - 1);
+        if (TimeUtil.isSameDay(start, end)) {
+            for (String timeStr : timeStrs) {
+                Date time = TimeUtil.castToDates(timeStr);
+                if (time != null) {
+                    builder.append(TimeUtil.buildDateWithWeekDay(time));
+                    if (timeStr.contains(":"))
+                        builder.append(TimeUtil.getAmPm(time))
+                                .append(TIME_FORMATTER.format(time));
+                    break;
+                }
+            }
+        } else {
+            builder.append(TimeUtil.buildDateWithWeekDay(start))
+                    .append("~")
+                    .append(TimeUtil.buildDateWithWeekDay(end));
+        }
+
+        return builder.toString();
     }
 
     public BigDecimal getMinPrice() {
@@ -256,7 +296,7 @@ public class Sku implements Serializable {
     public List<Date> startEndTimes() {
         for (SkuProperty property : properties) {
             if ("time".equalsIgnoreCase(property.getName())) {
-                return TimeUtil.castToDates(Lists.newArrayList(SkuUtil.TIME_SPLITTER.split(property.getValue())));
+                return TimeUtil.castToDates(Lists.newArrayList(TIME_SPLITTER.split(property.getValue())));
             }
         }
 
