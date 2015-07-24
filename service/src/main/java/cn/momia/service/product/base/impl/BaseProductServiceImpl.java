@@ -146,7 +146,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
         String sql = "SELECT COUNT(DISTINCT A.id) " +
                 "FROM t_product A INNER JOIN t_sku B ON A.id=B.productId " +
                 "WHERE A.status=1 AND A.onlineTime<=NOW() AND A.offlineTime>NOW() AND A.soldOut=0 " +
-                "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() " +
+                "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() AND B.startTime>NOW() " +
                 "AND (B.type=1 OR B.unlockedStock>0) AND B.onWeekend=1 " +
                 "AND (cityId=? OR cityId=0)";
 
@@ -163,7 +163,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
         String sql = "SELECT DISTINCT A.id " +
                 "FROM t_product A INNER JOIN t_sku B ON A.id=B.productId " +
                 "WHERE A.status=1 AND A.onlineTime<=NOW() AND A.offlineTime>NOW() AND A.soldOut=0 " +
-                "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() " +
+                "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() AND B.startTime>NOW() " +
                 "AND (B.type=1 OR B.unlockedStock>0) AND B.onWeekend=1 " +
                 "AND (cityId=? OR cityId=0) ORDER BY B.startTime ASC LIMIT ?,?";
         final List<Long> ids = new ArrayList<Long>();
@@ -182,7 +182,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
         String sql = "SELECT COUNT(DISTINCT A.id) " +
                 "FROM t_product A INNER JOIN t_sku B ON A.id=B.productId " +
                 "WHERE A.status=1 AND A.onlineTime<=NOW() AND A.offlineTime>NOW() AND A.soldOut=0 " +
-                "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() " +
+                "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() AND B.startTime>NOW() " +
                 "AND (B.type=1 OR B.unlockedStock>0) AND B.startTime>=? AND B.endTime<? " +
                 "AND (cityId=? OR cityId=0)";
 
@@ -199,7 +199,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
         String sql = "SELECT DISTINCT A.id " +
                 "FROM t_product A INNER JOIN t_sku B ON A.id=B.productId " +
                 "WHERE A.status=1 AND A.onlineTime<=NOW() AND A.offlineTime>NOW() AND A.soldOut=0 " +
-                "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() " +
+                "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() AND B.startTime>NOW() " +
                 "AND (B.type=1 OR B.unlockedStock>0) AND B.startTime>=? AND B.endTime<? " +
                 "AND (cityId=? OR cityId=0) ORDER BY B.startTime ASC";
         final List<Long> ids = new ArrayList<Long>();

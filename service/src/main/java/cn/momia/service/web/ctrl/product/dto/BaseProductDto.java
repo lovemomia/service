@@ -3,7 +3,6 @@ package cn.momia.service.web.ctrl.product.dto;
 import cn.momia.service.product.Product;
 import cn.momia.service.web.ctrl.dto.Dto;
 import cn.momia.service.web.ctrl.dto.ListDto;
-import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -31,7 +30,7 @@ public class BaseProductDto extends MiniProductDto implements Dto {
     }
 
     public String getScheduler() {
-        return StringUtils.isBlank(scheduler) ? product.getScheduler() : scheduler;
+        return scheduler == null ? product.getScheduler() : scheduler;
     }
 
     public void setScheduler(String scheduler) {

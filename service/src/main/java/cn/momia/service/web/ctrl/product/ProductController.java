@@ -81,7 +81,24 @@ public class ProductController extends AbstractController {
         long totalCount = productServiceFacade.queryCountByWeekend(cityId);
         List<Product> products = productServiceFacade.queryByWeekend(cityId, start, count);
 
-        return new ResponseMessage(buildProductsDto(totalCount, products, start, count));
+        return new ResponseMessage(buildWeekendProductsDto(totalCount, products, start, count));
+    }
+
+    private PagedListDto buildWeekendProductsDto(long totalCount, List<Product> products, int start, int count) {
+        PagedListDto productsDto = new PagedListDto();
+
+        productsDto.setTotalCount(totalCount);
+        if (start + count < totalCount) productsDto.setNextIndex(start + count);
+
+        ListDto baseProductsDto = new ListDto();
+        for (Product product : products) {
+            BaseProductDto baseProductDto = new BaseProductDto(product);
+            baseProductDto.setScheduler(product.weekendScheduler());
+            baseProductsDto.add(baseProductDto);
+        }
+        productsDto.addAll(baseProductsDto);
+
+        return productsDto;
     }
 
     @RequestMapping(value = "/month", method = RequestMethod.GET)

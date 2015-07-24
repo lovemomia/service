@@ -176,6 +176,33 @@ public class Product implements Serializable {
         }
     }
 
+    public String weekendScheduler() {
+        List<Date> times = new ArrayList<Date>();
+        Date today = new Date();
+        for (Sku sku : skus) {
+            if (sku.isOnWeekend() && !sku.closed(today)) times.addAll(sku.startEndTimes());
+        }
+        Collections.sort(times);
+
+        return formatWeekend(times);
+    }
+
+    private String formatWeekend(List<Date> times) {
+        if (times.isEmpty()) return "";
+        if (times.size() == 1) {
+            Date start = times.get(0);
+            return DATE_FORMATTER.format(start) + " " + TimeUtil.getWeekDay(start);
+        } else {
+            Date start = times.get(0);
+            Date end = times.get(times.size() - 1);
+            if (TimeUtil.isSameDay(start, end)) {
+                return DATE_FORMATTER.format(start) + " " + TimeUtil.getWeekDay(start);
+            } else {
+                return DATE_FORMATTER.format(start) + "-" + DATE_FORMATTER.format(end) + " 多个周末";
+            }
+        }
+    }
+
     public BigDecimal getMinPrice() {
         if(skus == null || skus.isEmpty()) return new BigDecimal(0);
 
