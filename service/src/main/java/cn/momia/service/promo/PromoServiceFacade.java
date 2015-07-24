@@ -11,7 +11,7 @@ import java.util.List;
 public interface PromoServiceFacade {
     List<Banner> getBanners(int cityId, int count);
 
-    long getUserRegisterCoupon(long userId);
+    void getUserRegisterCoupons(long userId);
 
     Coupon getCoupon(long userId, long orderId, long userCouponId);
     boolean canUse(BigDecimal totalFee, Coupon coupon);
