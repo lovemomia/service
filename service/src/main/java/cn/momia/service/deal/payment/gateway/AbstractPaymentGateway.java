@@ -5,7 +5,6 @@ import cn.momia.service.deal.DealServiceFacade;
 import cn.momia.service.product.ProductServiceFacade;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
-import cn.momia.service.deal.payment.gateway.wechatpay.WechatpayCallbackFields;
 import cn.momia.service.promo.PromoServiceFacade;
 import cn.momia.service.promo.coupon.UserCoupon;
 import org.slf4j.Logger;
@@ -93,7 +92,7 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
                 return;
             }
 
-            Order order = dealServiceFacade.getOrder(Long.valueOf(param.get(WechatpayCallbackFields.OUT_TRADE_NO)));
+            Order order = dealServiceFacade.getOrder(getCallbackOutTradeNo(param));
             if (!order.exists()) {
                 LOGGER.error("invalid order: {}", order.getId());
                 return;
