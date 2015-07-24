@@ -207,7 +207,7 @@ public class WechatpayGateway extends AbstractPaymentGateway {
     @Override
     protected Payment createPayment(CallbackParam param) {
         Payment payment = new Payment();
-        payment.setOrderId(Long.valueOf(param.get(WechatpayCallbackFields.OUT_TRADE_NO)));
+        payment.setOrderId(getCallbackOutTradeNo(param));
         payment.setPayer(param.get(WechatpayCallbackFields.OPEN_ID));
 
         Date finishTime;
