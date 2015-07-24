@@ -97,8 +97,8 @@ public class OrderCleaner {
 
     public boolean removeOrder(long id) {
         try {
-            String sql = "UPDATE t_order SET status=0 WHERE id=? AND status=?";
-            int updateCount = jdbcTemplate.update(sql, new Object[] { id, Order.Status.NOT_PAYED });
+            String sql = "UPDATE t_order SET status=0 WHERE id=? AND (status=? OR status=?)";
+            int updateCount = jdbcTemplate.update(sql, new Object[] { id, Order.Status.NOT_PAYED, Order.Status.PRE_PAYED });
 
             return updateCount == 1;
         } catch (Exception e) {
