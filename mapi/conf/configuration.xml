@@ -49,4 +49,15 @@
     <Favorite>
         <PageSize>20</PageSize>
     </Favorite>
+
+    <Feed>
+        <Detail>
+            <Comment>
+                <PageSize>3</PageSize>
+            </Comment>
+        </Detail>
+        <Comment>
+            <PageSize>20</PageSize>
+        </Comment>
+    </Feed>
 </Configuration>

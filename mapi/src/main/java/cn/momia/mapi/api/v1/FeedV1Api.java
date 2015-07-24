@@ -29,7 +29,7 @@ public class FeedV1Api extends AbstractV1Api {
                 JSONObject feedDetailJson = new JSONObject();
                 feedDetailJson.put("feed", feedFunc.apply(collector.getResponse("feed")));
                 feedDetailJson.put("product", productFunc.apply(collector.getResponse("product")));
-                feedDetailJson.put("comments", collector.getResponse("comments"));
+                feedDetailJson.put("comments", feedCommentsFunc.apply(collector.getResponse("comments")));
 
                 return feedDetailJson;
             }
@@ -56,6 +56,10 @@ public class FeedV1Api extends AbstractV1Api {
     }
 
     private MomiaHttpRequest buildFeedCommentsRequests(long feedId) {
-        return MomiaHttpRequest.GET("comments", false, url("feed", feedId, "comment"));
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("start", 0)
+                .add("count", conf.getInt("Feed.Detail.Comment.PageSize"));
+
+        return MomiaHttpRequest.GET("comments", true, url("feed", feedId, "comment"), builder.build());
     }
 }

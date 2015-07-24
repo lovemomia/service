@@ -6,6 +6,7 @@ import cn.momia.service.feed.FeedImage;
 import cn.momia.service.feed.FeedServiceFacade;
 import cn.momia.service.feed.base.BaseFeed;
 import cn.momia.service.feed.base.BaseFeedService;
+import cn.momia.service.feed.comment.FeedComment;
 import cn.momia.service.feed.comment.FeedCommentService;
 import cn.momia.service.feed.star.FeedStarService;
 import cn.momia.service.feed.topic.FeedTopic;
@@ -57,6 +58,13 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
         feed.setStarCount(feedStarService.getCount(baseFeed.getId()));
 
         return feed;
+    }
+
+    @Override
+    public List<FeedComment> getComments(long id, int start, int count) {
+        if (id <= 0 || start < 0 || count <= 0) return new ArrayList<FeedComment>();
+
+        return feedCommentService.get(id, start, count);
     }
 
     private List<FeedImage> getFeedImgs(long feedId) {
