@@ -10,6 +10,7 @@ import cn.momia.service.web.ctrl.product.dto.CustomersDto;
 import cn.momia.service.web.ctrl.product.dto.FullProductDto;
 import cn.momia.service.web.ctrl.product.dto.PlaymateDto;
 import cn.momia.service.product.Product;
+import cn.momia.service.web.ctrl.product.dto.ProductDto;
 import cn.momia.service.web.ctrl.product.dto.ProductsOfDayDto;
 import cn.momia.service.web.ctrl.product.dto.SkuDto;
 import cn.momia.service.web.ctrl.product.dto.SkuPlaymatesDto;
@@ -160,16 +161,18 @@ public class ProductController extends AbstractController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseMessage getProduct(@RequestParam(defaultValue = "") String utoken, @PathVariable long id) {
+    public ResponseMessage getProduct(@RequestParam(defaultValue = "") String utoken,
+                                      @PathVariable long id,
+                                      @RequestParam(defaultValue = "true") boolean full) {
         Product product = productServiceFacade.get(id);
         if (!product.exists()) return ResponseMessage.FAILED("活动不存在");
 
-        FullProductDto productDto = new FullProductDto(product);
+        ProductDto productDto = full ? new FullProductDto(product) : new BaseProductDto(product);
 
         if (!StringUtils.isBlank(utoken)) {
             User user = userServiceFacade.getUserByToken(utoken);
             if (user.exists()) {
-                productDto.setFavored(productServiceFacade.isFavoried(user.getId(), id));
+                ((BaseProductDto) productDto).setFavored(productServiceFacade.isFavoried(user.getId(), id));
             }
         }
 
@@ -311,21 +314,21 @@ public class ProductController extends AbstractController {
                                               Map<Long, Set<Long>> customerPrticipantsIdsMap,
                                               Map<Long, User> customersMap,
                                               Map<Long, Participant> participantsMap) {
-        List<SkuPlaymatesDto> skuPlaymates = new ArrayList<SkuPlaymatesDto>();
+        List<SkuPlaymatesDto> skusPlaymatesDto = new ArrayList<SkuPlaymatesDto>();
         for (Sku sku : skus) {
             try {
-                SkuPlaymatesDto skuPlaymate = new SkuPlaymatesDto();
-                skuPlaymate.setTime(sku.time());
-                skuPlaymate.setJoined(formatJoined(skuOrdersMap.get(sku.getId())));
-                skuPlaymate.setPlaymates(extractPlayMates(sku.getId(), skuCustomerIdsMap, customerPrticipantsIdsMap, customersMap, participantsMap));
+                SkuPlaymatesDto skuPlaymatesDto = new SkuPlaymatesDto();
+                skuPlaymatesDto.setTime(sku.time());
+                skuPlaymatesDto.setJoined(formatJoined(skuOrdersMap.get(sku.getId())));
+                skuPlaymatesDto.setPlaymates(extractPlayMates(sku.getId(), skuCustomerIdsMap, customerPrticipantsIdsMap, customersMap, participantsMap));
 
-                skuPlaymates.add(skuPlaymate);
+                skusPlaymatesDto.add(skuPlaymatesDto);
             } catch (Exception e) {
                 LOGGER.error("fail to build playmate for sku: {}", sku.getId(), e);
             }
         }
 
-        return skuPlaymates;
+        return skusPlaymatesDto;
     }
 
     private String formatJoined(List<Order> orders) {
@@ -365,16 +368,16 @@ public class ProductController extends AbstractController {
                                             Map<Long, User> customersMap,
                                             Map<Long, Participant> participantsMap) {
         int pageSize = conf.getInt("Product.Playmate.PageSize");
-        List<PlaymateDto> playmates = new ArrayList<PlaymateDto>();
+        List<PlaymateDto> playmatesDto = new ArrayList<PlaymateDto>();
         Set<Long> customerIds = skuCustomerIdsMap.get(skuId);
         if (customerIds != null) {
             for (long customerId : customerIds) {
-                PlaymateDto playmate = new PlaymateDto();
+                PlaymateDto playmateDto = new PlaymateDto();
                 User customer = customersMap.get(customerId);
                 if (customer == null) continue;
-                playmate.setId(customer.getId());
-                playmate.setNickName(customer.getNickName());
-                playmate.setAvatar(customer.getAvatar());
+                playmateDto.setId(customer.getId());
+                playmateDto.setNickName(customer.getNickName());
+                playmateDto.setAvatar(customer.getAvatar());
 
                 List<String> children = new ArrayList<String>();
                 Set<Long> customerPrticipantsIds = customerPrticipantsIdsMap.get(customerId);
@@ -386,13 +389,13 @@ public class ProductController extends AbstractController {
                         }
                     }
                 }
-                playmate.setChildren(children);
+                playmateDto.setChildren(children);
 
-                if (playmates.size() < pageSize) playmates.add(playmate);
+                if (playmatesDto.size() < pageSize) playmatesDto.add(playmateDto);
             }
         }
 
-        return playmates;
+        return playmatesDto;
     }
 
     @RequestMapping(value = "/{id}/favor", method = RequestMethod.POST)

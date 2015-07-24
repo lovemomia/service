@@ -25,6 +25,26 @@ public class AbstractV1Api extends AbstractApi {
         }
     };
 
+    protected Function<Object, Object> feedFunc = new Function<Object, Object>() {
+        @Override
+        public Object apply(Object data) {
+            JSONObject feedJson = (JSONObject) data;
+            feedJson.put("avatar", ImageFile.url(feedJson.getString("avatar")));
+            if (feedJson.containsKey("imgs")) feedJson.put("imgs", processImgs(feedJson.getJSONArray("imgs")));
+
+            return data;
+        }
+    };
+
+    private static List<String> processImgs(JSONArray imgsJson) {
+        List<String> imgs = new ArrayList<String>();
+        for (int i = 0; i < imgsJson.size(); i++) {
+            imgs.add(ImageFile.url(imgsJson.getString(i)));
+        }
+
+        return imgs;
+    }
+
     protected Function<Object, Object> productFunc = new Function<Object, Object>() {
         @Override
         public Object apply(Object data) {
@@ -41,15 +61,6 @@ public class AbstractV1Api extends AbstractApi {
 
     private String buildUrl(long id) {
         return conf.getString("Product.Url") + "?id=" + id;
-    }
-
-    private static List<String> processImgs(JSONArray imgsJson) {
-        List<String> imgs = new ArrayList<String>();
-        for (int i = 0; i < imgsJson.size(); i++) {
-            imgs.add(ImageFile.url(imgsJson.getString(i)));
-        }
-
-        return imgs;
     }
 
     private static JSONArray processContent(JSONArray contentJson) {
