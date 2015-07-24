@@ -171,8 +171,16 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
     }
 
     @Override
-    public List<Participant> getChildren(Collection<Long> childIds) {
-        return getParticipants(childIds);
+    public List<Participant> getChildren(long userId, Collection<Long> childIds) {
+        if (userId <= 0 || childIds.isEmpty()) return new ArrayList<Participant>();
+
+        List<Participant> children = getParticipants(childIds);
+        List<Participant> filteredChildren = new ArrayList<Participant>();
+        for (Participant child : children) {
+            if (child.getUserId() == userId) filteredChildren.add(child);
+        }
+
+        return filteredChildren;
     }
 
     @Override

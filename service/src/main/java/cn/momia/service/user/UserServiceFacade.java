@@ -34,7 +34,7 @@ public interface UserServiceFacade {
     // 孩子
     long addChild(Participant child);
     Participant getChild(long userId, long childId);
-    List<Participant> getChildren(Collection<Long> childIds);
+    List<Participant> getChildren(long userId, Collection<Long> childIds);
     boolean updateChildName(long userId, long childId, String name);
     boolean updateChildSex(long userId, long childId, String sex);
     boolean updateChildBirthday(long userId, long childId, Date birthday);
