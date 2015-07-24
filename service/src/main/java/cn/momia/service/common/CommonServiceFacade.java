@@ -9,7 +9,9 @@ public interface CommonServiceFacade {
     boolean sendCode(String mobile, String type);
     boolean verifyCode(String mobile, String code);
 
+    String getCityName(int cityId);
     List<City> getAllCities();
+    String gerRegionName(int regionId);
     List<Region> getAllRegions();
 
     long addFeedback(String content, String email);

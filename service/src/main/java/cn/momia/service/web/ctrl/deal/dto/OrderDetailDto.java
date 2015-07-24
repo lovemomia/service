@@ -1,5 +1,6 @@
 package cn.momia.service.web.ctrl.deal.dto;
 
+import cn.momia.service.common.MetaUtil;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.product.Product;
 import cn.momia.service.web.ctrl.dto.Dto;
@@ -22,8 +23,7 @@ public class OrderDetailDto extends OrderDto implements Dto {
     }
 
     public String getRegion() {
-        // TODO
-        return null;
+        return MetaUtil.getRegionName(product.getRegionId());
     }
 
     public String getAddress() {

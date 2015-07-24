@@ -50,12 +50,15 @@
     <bean id="cityService" class="cn.momia.service.common.city.impl.CityServiceImpl" parent="dbAccessService" init-method="init" />
     <bean id="regionService" class="cn.momia.service.common.region.impl.RegionServiceImpl" parent="dbAccessService" init-method="init" />
     <bean id="feedbackService" class="cn.momia.service.common.feedback.impl.FeedbackServiceImpl" parent="dbAccessService" />
-    <bean id="commonService" class="cn.momia.service.common.impl.CommonServiceFacadeImpl">
+    <bean id="commonServiceFacade" class="cn.momia.service.common.impl.CommonServiceFacadeImpl">
         <property name="smsSender" ref="smsSender" />
         <property name="smsVerifier" ref="smsVerifier" />
         <property name="cityService" ref="cityService" />
         <property name="regionService" ref="regionService" />
         <property name="feedbackService" ref="feedbackService" />
+    </bean>
+    <bean class="cn.momia.service.common.MetaUtil">
+        <property name="commonServiceFacade" ref="commonServiceFacade" />
     </bean>
 
     <bean id="bannerService" class="cn.momia.service.promo.banner.impl.BannerServiceImpl" parent="dbAccessService" />

@@ -64,8 +64,18 @@ public class CommonServiceFacadeImpl implements CommonServiceFacade {
     }
 
     @Override
+    public String getCityName(int cityId) {
+        return cityService.get(cityId).getName();
+    }
+
+    @Override
     public List<City> getAllCities() {
         return cityService.getAll();
+    }
+
+    @Override
+    public String gerRegionName(int regionId) {
+        return regionService.get(regionId).getName();
     }
 
     @Override

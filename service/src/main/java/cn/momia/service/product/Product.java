@@ -107,6 +107,10 @@ public class Product implements Serializable {
         this.imgs = imgs;
     }
 
+    public int getRegionId() {
+        return this.place.getRegionId();
+    }
+
     public String getAddress() {
         return this.place.getAddress();
     }
