@@ -25,10 +25,22 @@ public class AbstractV1Api extends AbstractApi {
         }
     };
 
+    protected Function<Object, Object> usersFunc = new Function<Object, Object>() {
+        @Override
+        public Object apply(Object data) {
+            JSONArray usersJson = ((JSONObject) data).getJSONArray("list");
+            for (int i = 0; i < usersJson.size(); i++) {
+                userFunc.apply(usersJson.getJSONObject(i));
+            }
+
+            return data;
+        }
+    };
+
     protected Function<Object, Object> feedCommentsFunc = new Function<Object, Object>() {
         @Override
         public Object apply(Object data) {
-            JSONArray feedCommentsJson = (JSONArray) data;
+            JSONArray feedCommentsJson = ((JSONObject) data).getJSONArray("list");
             for (int i = 0; i < feedCommentsJson.size(); i++) {
                 JSONObject feedCommentJson = feedCommentsJson.getJSONObject(i);
                 feedCommentJson.put("avatar", ImageFile.url(feedCommentJson.getString("avatar")));

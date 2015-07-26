@@ -2,6 +2,9 @@ package cn.momia.service.feed.star;
 
 import cn.momia.service.base.Service;
 
+import java.util.List;
+
 public interface FeedStarService extends Service {
-    int getCount(long feedId);
+    int queryUserCount(long feedId);
+    List<Long> queryUserIds(long id, int start, int count);
 }

@@ -54,17 +54,36 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
         feed.setBaseFeed(baseFeed);
         feed.setFeedTopic(feedTopic);
         feed.setImgs(getFeedImgs(id));
-        feed.setCommentCount(feedCommentService.getCount(baseFeed.getId()));
-        feed.setStarCount(feedStarService.getCount(baseFeed.getId()));
+        feed.setCommentCount(feedCommentService.queryCount(baseFeed.getId()));
+        feed.setStarCount(feedStarService.queryUserCount(baseFeed.getId()));
 
         return feed;
     }
 
     @Override
-    public List<FeedComment> getComments(long id, int start, int count) {
+    public long queryCommentsCount(long id) {
+        if (id <= 0) return 0;
+        return feedCommentService.queryCount(id);
+    }
+
+    @Override
+    public List<FeedComment> queryComments(long id, int start, int count) {
         if (id <= 0 || start < 0 || count <= 0) return new ArrayList<FeedComment>();
 
-        return feedCommentService.get(id, start, count);
+        return feedCommentService.query(id, start, count);
+    }
+
+    @Override
+    public long queryStaredUsersCount(long id) {
+        if (id <= 0) return 0;
+        return feedStarService.queryUserCount(id);
+    }
+
+    @Override
+    public List<Long> queryStaredUserIds(long id, int start, int count) {
+        if (id <= 0 || start < 0 || count <= 0) return new ArrayList<Long>();
+
+        return feedStarService.queryUserIds(id, start, count);
     }
 
     private List<FeedImage> getFeedImgs(long feedId) {

@@ -21,7 +21,7 @@ public class FeedCommentServiceImpl extends DbAccessService implements FeedComme
     private static final String[] FEED_COMMENT_FIELDS = { "id", "feedId", "userId", "content", "addTime" };
 
     @Override
-    public int getCount(long feedId) {
+    public int queryCount(long feedId) {
         String sql = "SELECT COUNT(1) FROM t_feed_comment WHERE feedId=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { feedId }, new ResultSetExtractor<Integer>() {
@@ -33,7 +33,7 @@ public class FeedCommentServiceImpl extends DbAccessService implements FeedComme
     }
 
     @Override
-    public List<FeedComment> get(long feedId, int start, int count) {
+    public List<FeedComment> query(long feedId, int start, int count) {
         final List<FeedComment> feedComments = new ArrayList<FeedComment>();
         String sql = "SELECT " + joinFields() + " FROM t_feed_comment WHERE feedId=? ORDER BY addTime DESC LIMIT ?,?";
         jdbcTemplate.query(sql, new Object[] { feedId, start, count }, new RowCallbackHandler() {

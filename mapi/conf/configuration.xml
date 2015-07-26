@@ -52,6 +52,9 @@
 
     <Feed>
         <Detail>
+            <Star>
+                <PageSize>5</PageSize>
+            </Star>
             <Comment>
                 <PageSize>3</PageSize>
             </Comment>

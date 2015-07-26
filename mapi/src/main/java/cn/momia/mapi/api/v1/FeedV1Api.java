@@ -29,6 +29,7 @@ public class FeedV1Api extends AbstractV1Api {
                 JSONObject feedDetailJson = new JSONObject();
                 feedDetailJson.put("feed", feedFunc.apply(collector.getResponse("feed")));
                 feedDetailJson.put("product", productFunc.apply(collector.getResponse("product")));
+                feedDetailJson.put("staredUsers", usersFunc.apply(collector.getResponse("star")));
                 feedDetailJson.put("comments", feedCommentsFunc.apply(collector.getResponse("comments")));
 
                 return feedDetailJson;
@@ -40,6 +41,7 @@ public class FeedV1Api extends AbstractV1Api {
         List<MomiaHttpRequest> requests = new ArrayList<MomiaHttpRequest>();
         requests.add(buildFeedRequest(feedId));
         requests.add(buildProductRequest(productId));
+        requests.add(buildStaredUsersRequest(feedId));
         requests.add(buildFeedCommentsRequests(feedId));
 
         return requests;
@@ -53,6 +55,14 @@ public class FeedV1Api extends AbstractV1Api {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("full", false);
 
         return MomiaHttpRequest.GET("product", true, url("product", productId), builder.build());
+    }
+
+    private MomiaHttpRequest buildStaredUsersRequest(long feedId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("start", 0)
+                .add("count", conf.getInt("Feed.Detail.Star.PageSize"));
+
+        return MomiaHttpRequest.GET("star", true, url("feed", feedId, "star"), builder.build());
     }
 
     private MomiaHttpRequest buildFeedCommentsRequests(long feedId) {
