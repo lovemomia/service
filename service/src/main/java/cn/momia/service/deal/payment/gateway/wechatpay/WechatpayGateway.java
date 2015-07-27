@@ -37,7 +37,8 @@ import java.util.Map;
 public class WechatpayGateway extends AbstractPaymentGateway {
     private static final Logger LOGGER = LoggerFactory.getLogger(WechatpayGateway.class);
 
-    private static final DateFormat DATE_FORMATTER = new SimpleDateFormat("yyyyMMddHHmmss");
+    private static final String DATE_FORMAT_STR = "yyyyMMddHHmmss";
+    private static final DateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT_STR);
     private static final String SUCCESS = "SUCCESS";
 
     @Override
@@ -59,7 +60,7 @@ public class WechatpayGateway extends AbstractPaymentGateway {
 
         params.put(WechatpayPrepayFields.NONCE_STR, WechatpayUtil.createNoncestr(32));
         params.put(WechatpayPrepayFields.BODY, product.getTitle());
-        params.put(WechatpayPrepayFields.OUT_TRADE_NO, String.valueOf(order.getId()));
+        params.put(WechatpayPrepayFields.OUT_TRADE_NO, formatOutTradeNo(order.getId()));
         params.put(WechatpayPrepayFields.TOTAL_FEE, String.valueOf((int) (promoServiceFacade.calcTotalFee(order.getTotalFee(), coupon).floatValue() * 100)));
         params.put(WechatpayPrepayFields.SPBILL_CREATE_IP, RequestUtil.getRemoteIp(request));
         params.put(WechatpayPrepayFields.NOTIFY_URL, conf.getString("Payment.Wechat.NotifyUrl"));
@@ -68,6 +69,10 @@ public class WechatpayGateway extends AbstractPaymentGateway {
         params.put(WechatpayPrepayFields.SIGN, WechatpayUtil.sign(params, tradeType));
 
         return params;
+    }
+
+    private String formatOutTradeNo(long orderId) {
+        return orderId + DATE_FORMATTER.format(new Date());
     }
 
     private String getJsApiOpenId(String code) {
@@ -102,7 +107,8 @@ public class WechatpayGateway extends AbstractPaymentGateway {
 
     @Override
     protected long getPrepayOutTradeNo(PrepayParam param) {
-        return Long.valueOf(param.get(WechatpayPrepayFields.OUT_TRADE_NO));
+        String outTradeNo = param.get(WechatpayPrepayFields.OUT_TRADE_NO);
+        return Long.valueOf(outTradeNo.substring(0, outTradeNo.length() - DATE_FORMAT_STR.length()));
     }
 
     @Override
@@ -194,13 +200,14 @@ public class WechatpayGateway extends AbstractPaymentGateway {
 
     @Override
     protected long getCallbackOutTradeNo(CallbackParam param) {
-        return Long.valueOf(param.get(WechatpayCallbackFields.OUT_TRADE_NO));
+        String outTradeNo = param.get(WechatpayCallbackFields.OUT_TRADE_NO);
+        return Long.valueOf(outTradeNo.substring(0, outTradeNo.length() - DATE_FORMAT_STR.length()));
     }
 
     @Override
     protected Payment createPayment(CallbackParam param) {
         Payment payment = new Payment();
-        payment.setOrderId(Long.valueOf(param.get(WechatpayCallbackFields.OUT_TRADE_NO)));
+        payment.setOrderId(getCallbackOutTradeNo(param));
         payment.setPayer(param.get(WechatpayCallbackFields.OPEN_ID));
 
         Date finishTime;

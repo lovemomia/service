@@ -42,7 +42,7 @@ public class UserController extends UserRelatedController {
         String originalNickName = user.getNickName();
         if (StringUtils.isBlank(originalNickName) || !originalNickName.equals(nickName)) {
             boolean successful = userServiceFacade.updateUserNickName(user.getId(), nickName);
-            if (!successful) return ResponseMessage.FAILED("更新用户昵称失败");
+            if (!successful) return ResponseMessage.FAILED("更新失败，昵称已存在");
         }
 
         user.setNickName(nickName);
@@ -214,7 +214,7 @@ public class UserController extends UserRelatedController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         Set<Long> childIds = user.getChildren();
-        return new ResponseMessage(buildParticipantsResponse(userServiceFacade.getChildren(childIds)));
+        return new ResponseMessage(buildParticipantsResponse(userServiceFacade.getChildren(user.getId(), childIds)));
     }
 
     @RequestMapping(value = "/contacts", method = RequestMethod.GET)
@@ -235,21 +235,21 @@ public class UserController extends UserRelatedController {
         long totalCount = productServiceFacade.queryFavoritesCount(user.getId());
         List<Product> products = productServiceFacade.queryFavorites(user.getId(), start, count);
 
-        return new ResponseMessage(buildFavoritessDto(totalCount, products, start, count));
+        return new ResponseMessage(buildFavoritesDto(totalCount, products, start, count));
     }
 
-    private PagedListDto buildFavoritessDto(long totalCount, List<Product> products, int start, int count) {
-        PagedListDto favoritessDto = new PagedListDto();
+    private PagedListDto buildFavoritesDto(long totalCount, List<Product> products, int start, int count) {
+        PagedListDto favoritesDto = new PagedListDto();
 
-        favoritessDto.setTotalCount(totalCount);
-        if (start + count < totalCount) favoritessDto.setNextIndex(start + count);
+        favoritesDto.setTotalCount(totalCount);
+        if (start + count < totalCount) favoritesDto.setNextIndex(start + count);
 
         ListDto baseProductsDto = new ListDto();
         for (Product product : products) {
             baseProductsDto.add(new BaseProductDto(product));
         }
-        favoritessDto.addAll(baseProductsDto);
+        favoritesDto.addAll(baseProductsDto);
 
-        return favoritessDto;
+        return favoritesDto;
     }
 }
