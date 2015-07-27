@@ -5,13 +5,13 @@ import cn.momia.service.user.participant.Participant;
 import cn.momia.service.web.ctrl.AbstractController;
 import cn.momia.service.web.ctrl.dto.ListDto;
 import cn.momia.service.web.ctrl.user.dto.ParticipantDto;
-import cn.momia.service.web.ctrl.user.dto.UserDto;
+import cn.momia.service.web.ctrl.user.dto.FullUserDto;
 
 import java.util.List;
 
 public abstract class UserRelatedController extends AbstractController {
-    protected UserDto buildUserResponse(User user) {
-        return new UserDto(user, userServiceFacade.getChildren(user.getId(), user.getChildren()));
+    protected FullUserDto buildUserResponse(User user) {
+        return new FullUserDto(user, userServiceFacade.getChildren(user.getId(), user.getChildren()));
     }
 
     protected ListDto buildParticipantsResponse(List<Participant> participants) {

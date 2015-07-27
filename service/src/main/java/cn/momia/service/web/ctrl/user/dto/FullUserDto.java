@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class UserDto extends MiniUserDto {
+public class FullUserDto extends MiniUserDto {
     private List<ParticipantDto> children = new ArrayList<ParticipantDto>();
 
     public String getToken() {
@@ -49,7 +49,7 @@ public class UserDto extends MiniUserDto {
         return children;
     }
 
-    public UserDto(User user, List<Participant> children) {
+    public FullUserDto(User user, List<Participant> children) {
         super(user);
         for (Participant child : children) {
             this.children.add(new ParticipantDto(child));
