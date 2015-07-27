@@ -4,9 +4,11 @@ import cn.momia.service.base.DbAccessService;
 import cn.momia.service.feed.star.FeedStarService;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FeedStarServiceImpl extends DbAccessService implements FeedStarService {
@@ -23,7 +25,17 @@ public class FeedStarServiceImpl extends DbAccessService implements FeedStarServ
     }
 
     @Override
-    public List<Long> queryUserIds(long id, int start, int count) {
-        return null;
+    public List<Long> queryUserIds(long feedId, int start, int count) {
+        final List<Long> userIds = new ArrayList<Long>();
+        String sql = "SELECT userId FROM t_feed_star WHERE feedId=? AND status=1 LIMIT ?,?";
+        jdbcTemplate.query(sql, new Object[] { feedId, start, count }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                long userId = rs.getLong("userId");
+                if (userId > 0) userIds.add(userId);
+            }
+        });
+
+        return userIds;
     }
 }
