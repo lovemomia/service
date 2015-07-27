@@ -6,6 +6,10 @@ import cn.momia.service.web.ctrl.dto.Dto;
 public class MiniUserDto implements Dto {
     protected User user;
 
+    public long getId() {
+        return user.getId();
+    }
+
     public String getNickName() {
         return user.getNickName();
     }

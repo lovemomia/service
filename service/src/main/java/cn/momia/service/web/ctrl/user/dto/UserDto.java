@@ -10,11 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 public class UserDto extends MiniUserDto {
-    private List<ParticipantDto> participants = new ArrayList<ParticipantDto>();
-
-    public long getId() {
-        return user.getId();
-    }
+    private List<ParticipantDto> children = new ArrayList<ParticipantDto>();
 
     public String getToken() {
         return user.getToken();
@@ -50,13 +46,13 @@ public class UserDto extends MiniUserDto {
     }
 
     public List<ParticipantDto> getChildren() {
-        return participants;
+        return children;
     }
 
-    public UserDto(User user, List<Participant> participants) {
+    public UserDto(User user, List<Participant> children) {
         super(user);
-        for (Participant participant : participants) {
-            this.participants.add(new ParticipantDto(participant));
+        for (Participant child : children) {
+            this.children.add(new ParticipantDto(child));
         }
     }
 }
