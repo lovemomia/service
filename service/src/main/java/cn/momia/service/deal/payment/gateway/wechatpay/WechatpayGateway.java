@@ -3,18 +3,16 @@ package cn.momia.service.deal.payment.gateway.wechatpay;
 import cn.momia.common.misc.XmlUtil;
 import cn.momia.common.web.misc.RequestUtil;
 import cn.momia.common.web.secret.SecretKey;
-import cn.momia.service.base.product.Product;
+import cn.momia.service.product.Product;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
 import cn.momia.service.deal.payment.gateway.AbstractPaymentGateway;
 import cn.momia.service.deal.payment.gateway.CallbackParam;
-import cn.momia.service.deal.payment.gateway.CallbackResult;
 import cn.momia.service.deal.payment.gateway.PrepayParam;
 import cn.momia.service.deal.payment.gateway.PrepayResult;
 import cn.momia.service.promo.coupon.Coupon;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.util.TypeUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
@@ -39,11 +37,9 @@ import java.util.Map;
 public class WechatpayGateway extends AbstractPaymentGateway {
     private static final Logger LOGGER = LoggerFactory.getLogger(WechatpayGateway.class);
 
-    private static final DateFormat DATE_FORMATTER = new SimpleDateFormat("yyyyMMddHHmmss");
+    private static final String DATE_FORMAT_STR = "yyyyMMddHHmmss";
+    private static final DateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT_STR);
     private static final String SUCCESS = "SUCCESS";
-    private static final String OK = "OK";
-    private static final String FAIL = "FAIL";
-    private static final String ERROR = "ERROR";
 
     @Override
     public Map<String, String> extractPrepayParams(HttpServletRequest request, Order order, Product product, Coupon coupon) {
@@ -64,8 +60,8 @@ public class WechatpayGateway extends AbstractPaymentGateway {
 
         params.put(WechatpayPrepayFields.NONCE_STR, WechatpayUtil.createNoncestr(32));
         params.put(WechatpayPrepayFields.BODY, product.getTitle());
-        params.put(WechatpayPrepayFields.OUT_TRADE_NO, String.valueOf(order.getId()));
-        params.put(WechatpayPrepayFields.TOTAL_FEE, String.valueOf((int) (couponService.calcTotalFee(order.getTotalFee(), coupon).floatValue() * 100)));
+        params.put(WechatpayPrepayFields.OUT_TRADE_NO, formatOutTradeNo(order.getId()));
+        params.put(WechatpayPrepayFields.TOTAL_FEE, String.valueOf((int) (promoServiceFacade.calcTotalFee(order.getTotalFee(), coupon).floatValue() * 100)));
         params.put(WechatpayPrepayFields.SPBILL_CREATE_IP, RequestUtil.getRemoteIp(request));
         params.put(WechatpayPrepayFields.NOTIFY_URL, conf.getString("Payment.Wechat.NotifyUrl"));
         params.put(WechatpayPrepayFields.TRADE_TYPE, tradeType);
@@ -73,6 +69,10 @@ public class WechatpayGateway extends AbstractPaymentGateway {
         params.put(WechatpayPrepayFields.SIGN, WechatpayUtil.sign(params, tradeType));
 
         return params;
+    }
+
+    private String formatOutTradeNo(long orderId) {
+        return orderId + DATE_FORMATTER.format(new Date());
     }
 
     private String getJsApiOpenId(String code) {
@@ -103,6 +103,12 @@ public class WechatpayGateway extends AbstractPaymentGateway {
         } catch (Exception e) {
             throw new RuntimeException("fail to get openid");
         }
+    }
+
+    @Override
+    protected long getPrepayOutTradeNo(PrepayParam param) {
+        String outTradeNo = param.get(WechatpayPrepayFields.OUT_TRADE_NO);
+        return Long.valueOf(outTradeNo.substring(0, outTradeNo.length() - DATE_FORMAT_STR.length()));
     }
 
     @Override
@@ -168,7 +174,9 @@ public class WechatpayGateway extends AbstractPaymentGateway {
                 throw new RuntimeException("unsupported trade type: " + tradeType);
             }
         } else {
-            LOGGER.error("fail to prepay: {}/{}", params.get(WechatpayPrepayFields.RETURN_CODE), params.get(WechatpayPrepayFields.RETURN_MSG));
+            LOGGER.error("fail to prepay: {}/{}/{}", params.get(WechatpayPrepayFields.RETURN_CODE),
+                    params.get(WechatpayPrepayFields.RESULT_CODE),
+                    params.get(WechatpayPrepayFields.RETURN_MSG));
         }
     }
 
@@ -191,9 +199,15 @@ public class WechatpayGateway extends AbstractPaymentGateway {
     }
 
     @Override
+    protected long getCallbackOutTradeNo(CallbackParam param) {
+        String outTradeNo = param.get(WechatpayCallbackFields.OUT_TRADE_NO);
+        return Long.valueOf(outTradeNo.substring(0, outTradeNo.length() - DATE_FORMAT_STR.length()));
+    }
+
+    @Override
     protected Payment createPayment(CallbackParam param) {
         Payment payment = new Payment();
-        payment.setOrderId(Long.valueOf(param.get(WechatpayCallbackFields.OUT_TRADE_NO)));
+        payment.setOrderId(getCallbackOutTradeNo(param));
         payment.setPayer(param.get(WechatpayCallbackFields.OPEN_ID));
 
         Date finishTime;
@@ -209,25 +223,5 @@ public class WechatpayGateway extends AbstractPaymentGateway {
         payment.setFee(new BigDecimal(param.get(WechatpayCallbackFields.TOTAL_FEE)).divide(new BigDecimal(100)));
 
         return payment;
-    }
-
-    @Override
-    protected CallbackResult buildFailCallbackResult() {
-        CallbackResult result = new CallbackResult();
-        result.setSuccessful(false);
-        result.add(WechatpayCallbackFields.RETURN_CODE, FAIL);
-        result.add(WechatpayCallbackFields.RETURN_MSG, ERROR);
-
-        return result;
-    }
-
-    @Override
-    protected CallbackResult buildSuccessCallbackResult() {
-        CallbackResult result = new CallbackResult();
-        result.setSuccessful(true);
-        result.add(WechatpayCallbackFields.RETURN_CODE, SUCCESS);
-        result.add(WechatpayCallbackFields.RETURN_MSG, OK);
-
-        return result;
     }
 }

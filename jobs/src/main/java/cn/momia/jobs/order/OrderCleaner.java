@@ -97,8 +97,8 @@ public class OrderCleaner {
 
     public boolean removeOrder(long id) {
         try {
-            String sql = "UPDATE t_order SET status=0 WHERE id=? AND status=?";
-            int updateCount = jdbcTemplate.update(sql, new Object[] { id, Order.Status.NOT_PAYED });
+            String sql = "UPDATE t_order SET status=0 WHERE id=? AND (status=? OR status=?)";
+            int updateCount = jdbcTemplate.update(sql, new Object[] { id, Order.Status.NOT_PAYED, Order.Status.PRE_PAYED });
 
             return updateCount == 1;
         } catch (Exception e) {
@@ -116,6 +116,7 @@ public class OrderCleaner {
     private void unlockOrder(Order order) {
         try {
             unSoldOut(order.getProductId());
+            releaseUserCoupon(order.getCustomerId(), order.getId());
 
             long skuId = order.getSkuId();
             int count = order.getCount();
@@ -125,6 +126,15 @@ public class OrderCleaner {
             }
         } catch (Exception e) {
             LOGGER.error("fail to unlock order: {}", order.getId(), e);
+        }
+    }
+
+    private void releaseUserCoupon(long userId, long orderId) {
+        try {
+            String sql = "UPDATE t_user_coupon SET orderId=0, status=? WHERE userId=? AND orderId=? AND (status=? OR status=?)";
+            jdbcTemplate.update(sql, new Object[] { 1, userId, orderId, 1, 4 });
+        } catch (Exception e) {
+            LOGGER.error("fail to release user coupon of order: {}", orderId, e);
         }
     }
 

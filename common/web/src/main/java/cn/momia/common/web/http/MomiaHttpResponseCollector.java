@@ -1,5 +1,7 @@
 package cn.momia.common.web.http;
 
+import cn.momia.common.web.response.ErrorCode;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,6 +45,10 @@ public class MomiaHttpResponseCollector {
 
     public Object getResponse(String name) {
         return responses.get(name);
+    }
+
+    public boolean notLogin() {
+        return errnos.contains(ErrorCode.TOKEN_EXPIRED);
     }
 
     @Override

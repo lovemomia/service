@@ -39,44 +39,65 @@
     </bean>
 
     <!-- Service -->
-    <bean id="dbAccessService" class="cn.momia.service.common.DbAccessService" abstract="true">
+    <bean id="dbAccessService" class="cn.momia.service.base.DbAccessService" abstract="true">
         <property name="jdbcTemplate" ref="jdbcTemplate" />
     </bean>
 
-    <bean id="bannerService" class="cn.momia.service.base.banner.impl.BannerServiceImpl" parent="dbAccessService" />
+    <bean id="smsSender" class="cn.momia.service.common.sms.impl.LuosimaoSmsSender" parent="dbAccessService" init-method="init">
+        <property name="conf" ref="conf" />
+    </bean>
+    <bean id="smsVerifier" class="cn.momia.service.common.sms.SmsVerifier" parent="dbAccessService" />
+    <bean id="cityService" class="cn.momia.service.common.city.impl.CityServiceImpl" parent="dbAccessService" init-method="init" />
+    <bean id="regionService" class="cn.momia.service.common.region.impl.RegionServiceImpl" parent="dbAccessService" init-method="init" />
+    <bean id="feedbackService" class="cn.momia.service.common.feedback.impl.FeedbackServiceImpl" parent="dbAccessService" />
+    <bean id="commonServiceFacade" class="cn.momia.service.common.impl.CommonServiceFacadeImpl">
+        <property name="smsSender" ref="smsSender" />
+        <property name="smsVerifier" ref="smsVerifier" />
+        <property name="cityService" ref="cityService" />
+        <property name="regionService" ref="regionService" />
+        <property name="feedbackService" ref="feedbackService" />
+    </bean>
+    <bean class="cn.momia.service.common.MetaUtil">
+        <property name="commonServiceFacade" ref="commonServiceFacade" />
+    </bean>
 
-    <bean id="baseProductService" class="cn.momia.service.base.product.base.impl.BaseProductServiceImpl" parent="dbAccessService" init-method="init" />
-    <bean id="placeService" class="cn.momia.service.base.product.place.impl.PlaceServiceImpl" parent="dbAccessService" />
-    <bean id="skuService" class="cn.momia.service.base.product.sku.impl.SkuServiceImpl" parent="dbAccessService" />
-    <bean id="productService" class="cn.momia.service.base.product.impl.ProductServiceImpl" parent="dbAccessService">
+    <bean id="bannerService" class="cn.momia.service.promo.banner.impl.BannerServiceImpl" parent="dbAccessService" />
+    <bean id="couponService" class="cn.momia.service.promo.coupon.impl.CouponServiceImpl" parent="dbAccessService" />
+    <bean id="promoServiceFacade" class="cn.momia.service.promo.impl.PromoServiceFacadeImpl">
+        <property name="bannerService" ref="bannerService" />
+        <property name="couponService" ref="couponService" />
+    </bean>
+
+    <bean id="baseProductService" class="cn.momia.service.product.base.impl.BaseProductServiceImpl" parent="dbAccessService" init-method="init" />
+    <bean id="placeService" class="cn.momia.service.product.place.impl.PlaceServiceImpl" parent="dbAccessService" />
+    <bean id="skuService" class="cn.momia.service.product.sku.impl.SkuServiceImpl" parent="dbAccessService" />
+    <bean id="favoriteService" class="cn.momia.service.product.favorite.impl.FavoriteServiceImpl" parent="dbAccessService" />
+    <bean id="productServiceFacade" class="cn.momia.service.product.impl.ProductServiceFacadeImpl" parent="dbAccessService">
         <property name="baseProductService" ref="baseProductService" />
         <property name="placeService" ref="placeService" />
         <property name="skuService" ref="skuService" />
+        <property name="favoriteService" ref="favoriteService" />
     </bean>
 
-    <bean id="cityService" class="cn.momia.service.base.city.impl.CityServiceImpl" parent="dbAccessService" init-method="init" />
-    <bean id="regionService" class="cn.momia.service.base.region.impl.RegionServiceImpl" parent="dbAccessService" init-method="init" />
-    <bean id="participantService" class="cn.momia.service.base.user.participant.impl.ParticipantServiceImpl" parent="dbAccessService" />
-    <bean id="userService" class="cn.momia.service.base.user.impl.UserServiceImpl" parent="dbAccessService" />
+    <bean id="userService" class="cn.momia.service.user.base.impl.UserServiceImpl" parent="dbAccessService" />
+    <bean id="participantService" class="cn.momia.service.user.participant.impl.ParticipantServiceImpl" parent="dbAccessService" />
+    <bean id="userServiceFacade" class="cn.momia.service.user.impl.UserServiceFacadeImpl">
+        <property name="userService" ref="userService" />
+        <property name="participantService" ref="participantService" />
+    </bean>
 
     <bean id="orderService" class="cn.momia.service.deal.order.impl.OrderServiceImpl" parent="dbAccessService" />
     <bean id="paymentService" class="cn.momia.service.deal.payment.impl.PaymentServiceImpl" parent="dbAccessService" />
-
-    <bean id="feedbackService" class="cn.momia.service.base.feedback.impl.FeedbackServiceImpl" parent="dbAccessService" />
-
-    <bean id="couponService" class="cn.momia.service.promo.coupon.impl.CouponServiceImpl" parent="dbAccessService" />
-
-    <bean id="smsSender" class="cn.momia.service.sms.impl.LuosimaoSmsSender" parent="dbAccessService" init-method="init">
-        <property name="conf" ref="conf" />
+    <bean id="dealServiceFacade" class="cn.momia.service.deal.impl.DealServiceFacadeImpl">
+        <property name="orderService" ref="orderService" />
+        <property name="paymentService" ref="paymentService" />
     </bean>
-    <bean id="smsVerifier" class="cn.momia.service.sms.SmsVerifier" parent="dbAccessService" />
 
     <bean id="abstractPaymentGateway" class="cn.momia.service.deal.payment.gateway.AbstractPaymentGateway" abstract="true">
         <property name="conf" ref="conf" />
-        <property name="orderService" ref="orderService" />
-        <property name="paymentService" ref="paymentService" />
-        <property name="productService" ref="productService" />
-        <property name="couponService" ref="couponService" />
+        <property name="dealServiceFacade" ref="dealServiceFacade" />
+        <property name="promoServiceFacade" ref="promoServiceFacade" />
+        <property name="productServiceFacade" ref="productServiceFacade" />
     </bean>
 
     <bean id="alipay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">

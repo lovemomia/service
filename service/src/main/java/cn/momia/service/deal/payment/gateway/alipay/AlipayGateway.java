@@ -1,11 +1,10 @@
 package cn.momia.service.deal.payment.gateway.alipay;
 
-import cn.momia.service.base.product.Product;
+import cn.momia.service.product.Product;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
 import cn.momia.service.deal.payment.gateway.AbstractPaymentGateway;
 import cn.momia.service.deal.payment.gateway.CallbackParam;
-import cn.momia.service.deal.payment.gateway.CallbackResult;
 import cn.momia.service.deal.payment.gateway.PrepayParam;
 import cn.momia.service.deal.payment.gateway.PrepayResult;
 import cn.momia.service.promo.coupon.Coupon;
@@ -41,13 +40,18 @@ public class AlipayGateway extends AbstractPaymentGateway {
         params.put(AlipayPrepayFields.SUBJECT, product.getTitle());
         params.put(AlipayPrepayFields.PAYMENT_TYPE, "1");
         params.put(AlipayPrepayFields.SELLER_ID, conf.getString("Payment.Ali.Partner"));
-        params.put(AlipayPrepayFields.TOTAL_FEE, String.valueOf(couponService.calcTotalFee(order.getTotalFee(), coupon).floatValue()));
+        params.put(AlipayPrepayFields.TOTAL_FEE, String.valueOf(promoServiceFacade.calcTotalFee(order.getTotalFee(), coupon).floatValue()));
         params.put(AlipayPrepayFields.BODY, product.getTitle());
         params.put(AlipayPrepayFields.IT_B_PAY, "30m");
         params.put(AlipayPrepayFields.SHOW_URL, "m.duolaqinzi.com");
         params.put(AlipayPrepayFields.SIGN, AlipayUtil.sign(params));
 
         return params;
+    }
+
+    @Override
+    protected long getPrepayOutTradeNo(PrepayParam param) {
+        return Long.valueOf(param.get(AlipayPrepayFields.OUT_TRADE_NO));
     }
 
     @Override
@@ -98,6 +102,10 @@ public class AlipayGateway extends AbstractPaymentGateway {
         return successful;
     }
 
+    @Override
+    protected long getCallbackOutTradeNo(CallbackParam param) {
+        return Long.valueOf(param.get(AlipayCallbackFields.OUT_TRADE_NO));
+    }
 
     @Override
     protected Payment createPayment(CallbackParam param) {
@@ -113,21 +121,5 @@ public class AlipayGateway extends AbstractPaymentGateway {
         payment.setFee(new BigDecimal(param.get(AlipayCallbackFields.TOTAL_FEE)));
 
         return payment;
-    }
-
-    @Override
-    protected CallbackResult buildFailCallbackResult() {
-        CallbackResult result = new CallbackResult();
-        result.setSuccessful(false);
-
-        return result;
-    }
-
-    @Override
-    protected CallbackResult buildSuccessCallbackResult() {
-        CallbackResult result = new CallbackResult();
-        result.setSuccessful(true);
-
-        return result;
     }
 }

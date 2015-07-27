@@ -1,14 +1,15 @@
 package cn.momia.service.promo.coupon;
 
+import cn.momia.service.base.Service;
+
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
-public interface CouponService {
+public interface CouponService extends Service {
     Coupon getCoupon(int couponId);
-    Map<Integer, Coupon> getCoupons(Collection<Integer> couponIds);
-    long getUserRegisterCoupon(long userId);
+    List<Coupon> getCoupons(Collection<Integer> couponIds);
+    void getUserRegisterCoupons(long userId);
     int queryCountByUser(long userId, long orderId, int status);
     List<UserCoupon> queryByUser(long userId, long orderId, int status, int start, int count);
     boolean lockUserCoupon(long userId, long orderId, long userCouponId);

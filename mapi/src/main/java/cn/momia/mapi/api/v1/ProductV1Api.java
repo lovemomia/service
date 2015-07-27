@@ -3,13 +3,9 @@ package cn.momia.mapi.api.v1;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
+import cn.momia.common.web.img.ImageFile;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.v1.dto.base.PlaymatesDto;
-import cn.momia.mapi.api.v1.dto.misc.ProductUtil;
-import cn.momia.mapi.api.v1.dto.base.Dto;
-import cn.momia.mapi.api.v1.dto.composite.PagedListDto;
-import cn.momia.mapi.api.v1.dto.composite.ProductDetailDto;
-import cn.momia.mapi.api.v1.dto.composite.PlaceOrderDto;
+import cn.momia.mapi.api.v1.dto.product.PlaceOrderDto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
@@ -25,67 +21,71 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/product")
 public class ProductV1Api extends AbstractV1Api {
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public ResponseMessage getProducts(@RequestParam(value = "city") final int cityId,
-                                       @RequestParam final int start,
-                                       @RequestParam final int count,
-                                       @RequestParam(required = false) String query) {
-        final int maxPageCount = conf.getInt("Product.MaxPageCount");
-        final int pageSize = conf.getInt("Product.PageSize");
-        if (cityId < 0 || start < 0 || count <= 0 || start > maxPageCount * pageSize) return ResponseMessage.BAD_REQUEST;
-
+    @RequestMapping(value = "/weekend", method = RequestMethod.GET)
+    public ResponseMessage getProductsByWeekend(@RequestParam(value = "city") int cityId, @RequestParam int start) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
                 .add("start", start)
-                .add("count", count)
-                .add("query", query);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("product"), builder.build());
+                .add("count", conf.getInt("Product.PageSize"));
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("product/weekend"), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
-            @Override
-            public Dto apply(Object data) {
-                return buildProductsDto((JSONObject) data, start, count);
-            }
-        });
+        return executeRequest(request, pagedProductsFunc);
     }
 
-    private Dto buildProductsDto(JSONObject productsPackJson, int start, int count) {
-        PagedListDto products = new PagedListDto();
+    @RequestMapping(value = "/month", method = RequestMethod.GET)
+    public ResponseMessage getProductsByMonth(@RequestParam(value = "city") int cityId, @RequestParam int month) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("city", cityId)
+                .add("month", month);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("product/month"), builder.build());
 
-        long totalCount = productsPackJson.getLong("totalCount");
-        products.setTotalCount(totalCount);
-        if (start + count < totalCount) products.setNextIndex(start + count);
+        return executeRequest(request, new Function<Object, Object>() {
+            @Override
+            public Object apply(Object data) {
+                JSONArray groupedProductsJson = (JSONArray) data;
+                for (int i = 0; i < groupedProductsJson.size(); i++) {
+                    productsFunc.apply(groupedProductsJson.getJSONObject(i).getJSONArray("products"));
+                }
 
-        JSONArray productsJson = productsPackJson.getJSONArray("products");
-        products.addAll(ProductUtil.extractProductsData(productsJson));
-
-        return products;
+                return data;
+            }
+        });
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage getProduct(@RequestParam final long id) {
+    public ResponseMessage getProduct(@RequestParam(defaultValue = "") String utoken, @RequestParam long id) {
         if (id <= 0) return ResponseMessage.BAD_REQUEST;
 
-        List<MomiaHttpRequest> requests = buildProductRequests(id);
+        List<MomiaHttpRequest> requests = buildProductRequests(utoken, id);
 
-        return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {
+        return executeRequests(requests, new Function<MomiaHttpResponseCollector, Object>() {
             @Override
-            public Dto apply(MomiaHttpResponseCollector collector) {
-                return new ProductDetailDto((JSONObject) collector.getResponse("product"), (JSONObject) collector.getResponse("customers"));
+            public Object apply(MomiaHttpResponseCollector collector) {
+                JSONObject productJson = (JSONObject) productFunc.apply(collector.getResponse("product"));
+                JSONObject customersJson = (JSONObject) collector.getResponse("customers");
+
+                productJson.put("customers", processAvatars(customersJson));
+
+                boolean opened = productJson.getBoolean("opened");
+                if (!opened) productJson.put("soldOut", true);
+
+                return productJson;
             }
         });
     }
 
-    private List<MomiaHttpRequest> buildProductRequests(long productId) {
+    private List<MomiaHttpRequest> buildProductRequests(String utoken, long productId) {
         List<MomiaHttpRequest> requests = new ArrayList<MomiaHttpRequest>();
-        requests.add(buildProductRequest(productId));
+        requests.add(buildProductRequest(utoken, productId));
         requests.add(buildProductCustomersRequest(productId));
 
         return requests;
     }
 
-    private MomiaHttpRequest buildProductRequest(long productId) {
-        return MomiaHttpRequest.GET("product", true, baseServiceUrl("product", productId));
+    private MomiaHttpRequest buildProductRequest(String utoken, long productId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+
+        return MomiaHttpRequest.GET("product", true, url("product", productId), builder.build());
     }
 
     private MomiaHttpRequest buildProductCustomersRequest(long productId) {
@@ -93,7 +93,19 @@ public class ProductV1Api extends AbstractV1Api {
                 .add("start", 0)
                 .add("count", conf.getInt("Product.CustomerPageSize"));
 
-        return MomiaHttpRequest.GET("customers", false, baseServiceUrl("product", productId, "customer"), builder.build());
+        return MomiaHttpRequest.GET("customers", false, url("product", productId, "customer"), builder.build());
+    }
+
+    private JSONObject processAvatars(JSONObject customersJson) {
+        JSONArray avatarsJson = customersJson.getJSONArray("avatars");
+        if (avatarsJson != null) {
+            for (int i = 0; i < avatarsJson.size(); i++) {
+                String avatar = avatarsJson.getString(i);
+                avatarsJson.set(i, ImageFile.url(avatar));
+            }
+        }
+
+        return customersJson;
     }
 
     @RequestMapping(value = "/order", method = RequestMethod.GET)
@@ -102,9 +114,9 @@ public class ProductV1Api extends AbstractV1Api {
         
         List<MomiaHttpRequest> requests = buildProductOrderRequests(id, utoken);
 
-        return executeRequests(requests, new Function<MomiaHttpResponseCollector, Dto>() {
+        return executeRequests(requests, new Function<MomiaHttpResponseCollector, Object>() {
             @Override
-            public Dto apply(MomiaHttpResponseCollector collector) {
+            public Object apply(MomiaHttpResponseCollector collector) {
                 return new PlaceOrderDto((JSONObject) collector.getResponse("contacts"), (JSONArray) collector.getResponse("skus"));
             }
         });
@@ -112,21 +124,21 @@ public class ProductV1Api extends AbstractV1Api {
 
     private List<MomiaHttpRequest> buildProductOrderRequests(long productId, String utoken) {
         List<MomiaHttpRequest> requests = new ArrayList<MomiaHttpRequest>();
+        requests.add(buildContactsRequest(utoken));
         requests.add(buildProductSkusRequest(productId));
-        requests.add(buildUserRequest(utoken));
 
         return requests;
     }
 
-    private MomiaHttpRequest buildProductSkusRequest(long productId) {
-        return MomiaHttpRequest.GET("skus", true, baseServiceUrl("product", productId, "sku"));
-    }
-
-    private MomiaHttpRequest buildUserRequest(String utoken) {
+    private MomiaHttpRequest buildContactsRequest(String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        MomiaHttpRequest request = MomiaHttpRequest.GET("contacts", true, baseServiceUrl("user"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET("contacts", true, url("user/contacts"), builder.build());
 
         return request;
+    }
+
+    private MomiaHttpRequest buildProductSkusRequest(long productId) {
+        return MomiaHttpRequest.GET("skus", true, url("product", productId, "sku"));
     }
 
     @RequestMapping(value = "/playmate", method = RequestMethod.GET)
@@ -134,13 +146,39 @@ public class ProductV1Api extends AbstractV1Api {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", 0)
                 .add("count", conf.getInt("Product.Playmate.MaxSkuCount"));
-        MomiaHttpRequest request = MomiaHttpRequest.GET(baseServiceUrl("product", id, "playmate"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("product", id, "playmate"), builder.build());
 
-        return executeRequest(request, new Function<Object, Dto>() {
+        return executeRequest(request, new Function<Object, Object>() {
             @Override
-            public Dto apply(Object data) {
-                return new PlaymatesDto((JSONArray) data);
+            public Object apply(Object data) {
+                JSONArray skusPlaymatesJson = (JSONArray) data;
+                for (int i = 0; i < skusPlaymatesJson.size(); i++) {
+                    JSONObject skuPlaymatesJson = skusPlaymatesJson.getJSONObject(i);
+                    JSONArray playmatesJson = skuPlaymatesJson.getJSONArray("playmates");
+                    for (int j = 0; j < playmatesJson.size(); j++) {
+                        JSONObject playmateJson = playmatesJson.getJSONObject(j);
+                        playmateJson.put("avatar", ImageFile.url(playmateJson.getString("avatar")));
+                    }
+                }
+
+                return data;
             }
         });
+    }
+
+    @RequestMapping(value = "/favor", method = RequestMethod.POST)
+    public ResponseMessage favor(@RequestParam String utoken, @RequestParam long id){
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("product", id, "favor"), builder.build());
+
+        return executeRequest(request);
+    }
+
+    @RequestMapping(value = "/unfavor", method = RequestMethod.POST)
+    public ResponseMessage unFavor(@RequestParam String utoken, @RequestParam long id){
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("product", id, "unfavor"), builder.build());
+
+        return executeRequest(request);
     }
 }

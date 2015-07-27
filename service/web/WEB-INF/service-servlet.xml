@@ -10,8 +10,11 @@
 
     <context:component-scan base-package="cn.momia.common.web.controller" />
     <context:component-scan base-package="cn.momia.service.web.ctrl" />
-    <context:component-scan base-package="cn.momia.service.web.ctrl.base" />
+    <context:component-scan base-package="cn.momia.service.web.ctrl.common" />
     <context:component-scan base-package="cn.momia.service.web.ctrl.deal" />
+    <context:component-scan base-package="cn.momia.service.web.ctrl.product" />
+    <context:component-scan base-package="cn.momia.service.web.ctrl.promo" />
+    <context:component-scan base-package="cn.momia.service.web.ctrl.user" />
 
     <mvc:annotation-driven>
         <mvc:message-converters register-defaults="true">

@@ -11,6 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class RegionV1Api extends AbstractV1Api {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getAllRegions() {
-        return executeRequest(MomiaHttpRequest.GET(baseServiceUrl("region")));
+        return executeRequest(MomiaHttpRequest.GET(url("region")));
     }
 }

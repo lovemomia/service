@@ -11,7 +11,6 @@ public class Order implements Serializable {
     public static final Splitter PARTICIPANTS_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
 
     public static class Status {
-        public static final int ALL = -1;
         public static final int DELETED = 0;
         public static final int NOT_PAYED = 1; // 已下单未付款
         public static final int PRE_PAYED = 2; // 准备付款
@@ -136,6 +135,10 @@ public class Order implements Serializable {
 
     public boolean exists() {
         return !this.equals(NOT_EXIST_ORDER);
+    }
+
+    public boolean isPayed() {
+        return status >= Status.PAYED;
     }
 
     public BigDecimal getTotalFee() {
