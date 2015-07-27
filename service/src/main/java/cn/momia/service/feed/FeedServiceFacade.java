@@ -10,4 +10,7 @@ public interface FeedServiceFacade {
     List<FeedComment> queryComments(long id, int start, int count);
     long queryStaredUsersCount(long id);
     List<Long> queryStaredUserIds(long id, int start, int count);
+
+    long queryCountByTopic(long topicId);
+    List<Feed> queryByTopic(long topicId, int start, int count);
 }

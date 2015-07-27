@@ -83,4 +83,26 @@ public class FeedController extends AbstractController {
 
         return new ResponseMessage(feedCommentsDto);
     }
+
+    @RequestMapping(value = "/topic", method = RequestMethod.GET)
+    public ResponseMessage feedTopic(@RequestParam(value = "tid") long topicId, @RequestParam int start, @RequestParam int count) {
+        if (topicId <= 0 || isInvalidLimit(start, count)) return new ResponseMessage(PagedListDto.EMPTY);
+
+        long totalCount = feedServiceFacade.queryCountByTopic(topicId);
+        List<Feed> feeds = feedServiceFacade.queryByTopic(topicId, start, count);
+
+        PagedListDto feedsDto = new PagedListDto();
+
+        feedsDto.setTotalCount(totalCount);
+        if (start + count < totalCount) feedsDto.setNextIndex(start + count);
+
+        for (Feed feed : feeds) {
+            User user = userServiceFacade.getUser(feed.getUserId());
+            if (!user.exists()) continue;
+
+            feedsDto.add(new FeedDto(feed, user, userServiceFacade.getChildren(user.getId(), user.getChildren())));
+        }
+
+        return new ResponseMessage(feedsDto);
+    }
 }

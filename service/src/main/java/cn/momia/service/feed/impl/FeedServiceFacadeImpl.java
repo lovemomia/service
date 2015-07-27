@@ -47,13 +47,17 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
         BaseFeed baseFeed = baseFeedService.get(id);
         if (!baseFeed.exists()) return Feed.NOT_EXIST_FEED;
 
+        return buildFeed(baseFeed);
+    }
+
+    private Feed buildFeed(BaseFeed baseFeed) {
         FeedTopic feedTopic = feedTopicService.get(baseFeed.getTopicId());
         if (!feedTopic.exists()) return Feed.NOT_EXIST_FEED;
 
         Feed feed = new Feed();
         feed.setBaseFeed(baseFeed);
         feed.setFeedTopic(feedTopic);
-        feed.setImgs(getFeedImgs(id));
+        feed.setImgs(getFeedImgs(baseFeed.getId()));
         feed.setCommentCount(feedCommentService.queryCount(baseFeed.getId()));
         feed.setStarCount(feedStarService.queryUserCount(baseFeed.getId()));
 
@@ -106,5 +110,25 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
         img.setHeight(rs.getInt("height"));
 
         return img;
+    }
+
+    @Override
+    public long queryCountByTopic(long topicId) {
+        if (topicId <= 0) return 0;
+        return baseFeedService.queryCountByTopic(topicId);
+    }
+
+    @Override
+    public List<Feed> queryByTopic(long topicId, int start, int count) {
+        if (topicId <= 0 || start < 0 || count <= 0) return new ArrayList<Feed>();
+        List<BaseFeed> baseFeeds = baseFeedService.queryByTopic(topicId, start, count);
+
+        List<Feed> feeds = new ArrayList<Feed>();
+        for (BaseFeed baseFeed : baseFeeds) {
+            Feed feed = buildFeed(baseFeed);
+            if (feed.exists()) feeds.add(feed);
+        }
+        
+        return feeds;
     }
 }

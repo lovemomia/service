@@ -24,6 +24,14 @@ public class FeedDto {
         return feed.getType();
     }
 
+    public long getTopicId() {
+        return feed.getTopicId();
+    }
+
+    public long getTpoicProductId() {
+        return feed.getTpoicProductId();
+    }
+
     public String getTopic() {
         return feed.getTopic();
     }

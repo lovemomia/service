@@ -8,9 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedService {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseFeedServiceImpl.class);
@@ -51,5 +54,32 @@ public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedServ
             LOGGER.error("fail to build base feed: {}", rs.getLong("id"), e);
             return BaseFeed.INVALID_BASE_FEED;
         }
+    }
+
+    @Override
+    public long queryCountByTopic(long topicId) {
+        String sql = "SELECT COUNT(1) FROM t_feed WHERE topicId=? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[] { topicId }, new ResultSetExtractor<Long>() {
+            @Override
+            public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getLong(1) : 0;
+            }
+        });
+    }
+
+    @Override
+    public List<BaseFeed> queryByTopic(long topicId, int start, int count) {
+        final List<BaseFeed> baseFeeds = new ArrayList<BaseFeed>();
+        String sql = "SELECT " + joinFields() + " FROM t_feed WHERE topicId=? AND status=1 ORDER BY addTime DESC LIMIT ?,?";
+        jdbcTemplate.query(sql, new Object[] { topicId, start, count }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                BaseFeed baseFeed = buildBaseFeed(rs);
+                if (baseFeed.exists()) baseFeeds.add(baseFeed);
+            }
+        });
+
+        return baseFeeds;
     }
 }

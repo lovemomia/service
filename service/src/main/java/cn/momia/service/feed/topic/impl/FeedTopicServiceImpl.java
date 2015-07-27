@@ -15,7 +15,7 @@ import java.sql.SQLException;
 public class FeedTopicServiceImpl extends DbAccessService implements FeedTopicService {
     private static final Logger LOGGER = LoggerFactory.getLogger(FeedTopicServiceImpl.class);
 
-    private static final String[] BASE_FEED_FIELDS = { "id", "title" };
+    private static final String[] BASE_FEED_FIELDS = { "id", "title", "productId" };
 
     @Override
     public FeedTopic get(long id) {
@@ -39,6 +39,7 @@ public class FeedTopicServiceImpl extends DbAccessService implements FeedTopicSe
             FeedTopic feedTopic = new FeedTopic();
             feedTopic.setId(rs.getLong("id"));
             feedTopic.setTitle(rs.getString("title"));
+            feedTopic.setProductId(rs.getLong("productId"));
 
             return feedTopic;
         } catch (Exception e) {

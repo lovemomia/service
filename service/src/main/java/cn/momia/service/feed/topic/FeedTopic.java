@@ -10,6 +10,7 @@ public class FeedTopic {
 
     private long id;
     private String title;
+    private long productId;
 
     public long getId() {
         return id;
@@ -25,6 +26,14 @@ public class FeedTopic {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(long productId) {
+        this.productId = productId;
     }
 
     @Override

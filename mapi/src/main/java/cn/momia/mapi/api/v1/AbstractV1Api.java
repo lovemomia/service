@@ -70,6 +70,19 @@ public class AbstractV1Api extends AbstractApi {
         return imgs;
     }
 
+    protected Function<Object, Object> feedsFunc = new Function<Object, Object>() {
+        @Override
+        public Object apply(Object data) {
+            JSONArray feedsJson = ((JSONObject) data).getJSONArray("list");
+            for (int i = 0; i < feedsJson.size(); i++) {
+                JSONObject feedJson = feedsJson.getJSONObject(i);
+                feedFunc.apply(feedJson);
+            }
+
+            return data;
+        }
+    };
+
     protected Function<Object, Object> productFunc = new Function<Object, Object>() {
         @Override
         public Object apply(Object data) {

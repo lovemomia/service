@@ -44,6 +44,14 @@ public class Feed {
         return baseFeed.getUserId();
     }
 
+    public long getTopicId() {
+        return feedTopic.getId();
+    }
+
+    public long getTpoicProductId() {
+        return feedTopic.getProductId();
+    }
+
     public String getTopic() {
         return feedTopic.getTitle();
     }

@@ -62,5 +62,6 @@
         <Comment>
             <PageSize>20</PageSize>
         </Comment>
+        <PageSize>10</PageSize>
     </Feed>
 </Configuration>
