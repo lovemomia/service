@@ -34,6 +34,10 @@ public class OrderDetailDto extends OrderDto implements Dto {
         return product.getMinPrice();
     }
 
+    public String getTime() {
+        return product.skuTime(getSkuId());
+    }
+
     public OrderDetailDto(Order order, Product product) {
         super(order);
         this.product = product;

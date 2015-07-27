@@ -225,4 +225,12 @@ public class Product implements Serializable {
                 place != null && place.exists() &&
                 skus != null && !skus.isEmpty());
     }
+
+    public String skuTime(long skuId) {
+        for (Sku sku : skus) {
+            if (sku.getId() == skuId) return sku.time();
+        }
+
+        return "";
+    }
 }
