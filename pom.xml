@@ -18,6 +18,7 @@
         <module>jobs</module>
         <module>mapi</module>
         <module>service</module>
+        <module>service-promo</module>
         <module>service-user</module>
     </modules>
 </project>

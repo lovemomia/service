@@ -5,35 +5,33 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cn.momia</groupId>
-    <artifactId>duola-service</artifactId>
+    <artifactId>duola-service-promo</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>Momia Service</name>
+    <name>Momia Service Promo</name>
     <url>http://www.momia.cn</url>
 
     <dependencies>
+        <!-- Logger -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.6</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Momia -->
         <dependency>
             <groupId>cn.momia</groupId>
-            <artifactId>common-web</artifactId>
+            <artifactId>common-utils</artifactId>
             <version>1.0.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>cn.momia</groupId>
-            <artifactId>duola-service-promo</artifactId>
+            <artifactId>common-service</artifactId>
             <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.momia</groupId>
-            <artifactId>duola-service-user</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>1.19</version>
         </dependency>
 
         <!-- Test -->
@@ -56,25 +54,6 @@
                     <target>1.6</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2.1</version>
-                <configuration>
-                    <descriptors>
-                        <descriptor>assembly.xml</descriptor>
-                    </descriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
