@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthV1Api extends AbstractV1Api {
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     public ResponseMessage send(@RequestParam String mobile, @RequestParam String type)  {
-        if (ValidateUtil.isInvalidMobile(mobile) || ValidateUtil.notIn(type, "login", "register")) return ResponseMessage.BAD_REQUEST;
+        if (ValidateUtil.isInvalidMobile(mobile) || isInvalidType(type)) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("mobile", mobile)
@@ -23,6 +23,10 @@ public class AuthV1Api extends AbstractV1Api {
         MomiaHttpRequest request = MomiaHttpRequest.POST(url("auth/send"), builder.build());
 
         return executeRequest(request);
+    }
+
+    boolean isInvalidType(String type) {
+        return !"login".equals(type) && !"register".equals(type);
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)

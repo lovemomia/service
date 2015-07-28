@@ -11,13 +11,4 @@ public class ValidateUtil {
         if (StringUtils.isBlank(mobile)) return true;
         return !MOBILE_PATTERN.matcher(mobile).find();
     }
-
-    public static boolean notIn(String value, String ... args) {
-        if (StringUtils.isBlank(value)) return true;
-        for (String arg : args) {
-            if (value.equals(arg)) return false;
-        }
-
-        return true;
-    }
 }
