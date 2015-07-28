@@ -1,7 +1,7 @@
 package cn.momia.common.web.controller;
 
-import cn.momia.common.web.exception.MomiaExpiredException;
-import cn.momia.common.web.exception.MomiaFailedException;
+import cn.momia.common.service.exception.MomiaExpiredException;
+import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.common.web.response.ErrorCode;
 import cn.momia.common.web.response.ResponseMessage;
 import org.slf4j.Logger;

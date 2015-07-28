@@ -1,6 +1,6 @@
 package cn.momia.service.web.ctrl.deal;
 
-import cn.momia.common.web.exception.MomiaFailedException;
+import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.product.Product;
 import cn.momia.service.product.sku.Sku;

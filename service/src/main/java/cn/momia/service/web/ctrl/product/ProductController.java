@@ -1,7 +1,7 @@
 package cn.momia.service.web.ctrl.product;
 
 import cn.momia.common.misc.TimeUtil;
-import cn.momia.common.web.exception.MomiaFailedException;
+import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.web.ctrl.dto.ListDto;
 import cn.momia.service.web.ctrl.dto.PagedListDto;

@@ -1,7 +1,7 @@
 package cn.momia.service.common.sms.impl;
 
 import cn.momia.common.config.Configuration;
-import cn.momia.common.web.exception.MomiaFailedException;
+import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.service.base.DbAccessService;
 import cn.momia.service.common.sms.SmsSender;
 import org.apache.commons.lang3.StringUtils;
