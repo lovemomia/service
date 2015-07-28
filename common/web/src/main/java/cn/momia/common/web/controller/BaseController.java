@@ -23,7 +23,7 @@ public abstract class BaseController {
         } else if (exception instanceof MissingServletRequestParameterException) {
             return ResponseMessage.BAD_REQUEST;
         } else {
-            return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "500 internal server error");
+            return new ResponseMessage(ErrorCode.INTERNAL_SERVER_ERROR, "服务器内部错误");
         }
     }
 }
