@@ -16,8 +16,8 @@ public abstract class AbstractController extends BaseController {
     @Autowired protected CommonServiceFacade commonServiceFacade;
     @Autowired protected DealServiceFacade dealServiceFacade;
     @Autowired protected FeedServiceFacade feedServiceFacade;
-    @Autowired protected PromoServiceFacade promoServiceFacade;
     @Autowired protected ProductServiceFacade productServiceFacade;
+    @Autowired protected PromoServiceFacade promoServiceFacade;
     @Autowired protected UserServiceFacade userServiceFacade;
 
     protected boolean isInvalidLimit(int start, int count) {

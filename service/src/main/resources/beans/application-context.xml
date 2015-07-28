@@ -72,13 +72,6 @@
         <property name="feedStarService" ref="feedStarService" />
     </bean>
 
-    <bean id="bannerService" class="cn.momia.service.promo.banner.impl.BannerServiceImpl" parent="dbAccessService" />
-    <bean id="couponService" class="cn.momia.service.promo.coupon.impl.CouponServiceImpl" parent="dbAccessService" />
-    <bean id="promoServiceFacade" class="cn.momia.service.promo.impl.PromoServiceFacadeImpl">
-        <property name="bannerService" ref="bannerService" />
-        <property name="couponService" ref="couponService" />
-    </bean>
-
     <bean id="baseProductService" class="cn.momia.service.product.base.impl.BaseProductServiceImpl" parent="dbAccessService" init-method="init" />
     <bean id="placeService" class="cn.momia.service.product.place.impl.PlaceServiceImpl" parent="dbAccessService" />
     <bean id="skuService" class="cn.momia.service.product.sku.impl.SkuServiceImpl" parent="dbAccessService" />
@@ -88,6 +81,13 @@
         <property name="placeService" ref="placeService" />
         <property name="skuService" ref="skuService" />
         <property name="favoriteService" ref="favoriteService" />
+    </bean>
+
+    <bean id="bannerService" class="cn.momia.service.promo.banner.impl.BannerServiceImpl" parent="dbAccessService" />
+    <bean id="couponService" class="cn.momia.service.promo.coupon.impl.CouponServiceImpl" parent="dbAccessService" />
+    <bean id="promoServiceFacade" class="cn.momia.service.promo.impl.PromoServiceFacadeImpl">
+        <property name="bannerService" ref="bannerService" />
+        <property name="couponService" ref="couponService" />
     </bean>
 
     <bean id="userService" class="cn.momia.service.user.base.impl.UserServiceImpl" parent="dbAccessService" />

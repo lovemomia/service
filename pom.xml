@@ -18,6 +18,9 @@
         <module>jobs</module>
         <module>mapi</module>
         <module>service</module>
+        <module>service-common</module>
+        <module>service-feed</module>
+        <module>service-product</module>
         <module>service-promo</module>
         <module>service-user</module>
     </modules>
