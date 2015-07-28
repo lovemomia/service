@@ -1,4 +1,6 @@
-package cn.momia.service.common;
+package cn.momia.service.web.util;
+
+import cn.momia.service.common.CommonServiceFacade;
 
 public class MetaUtil {
     private static CommonServiceFacade commonServiceFacade;

@@ -1,6 +1,6 @@
 package cn.momia.service.product.favorite.impl;
 
-import cn.momia.service.base.DbAccessService;
+import cn.momia.common.service.impl.DbAccessService;
 import cn.momia.service.product.favorite.FavoriteService;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;

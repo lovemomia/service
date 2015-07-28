@@ -1,6 +1,6 @@
 package cn.momia.service.common.sms;
 
-import cn.momia.service.base.DbAccessService;
+import cn.momia.common.service.impl.DbAccessService;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 

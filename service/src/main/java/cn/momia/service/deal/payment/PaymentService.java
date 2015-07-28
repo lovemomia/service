@@ -1,6 +1,6 @@
 package cn.momia.service.deal.payment;
 
-import cn.momia.service.base.Service;
+import cn.momia.common.service.Service;
 
 public interface PaymentService extends Service {
     long add(Payment payment);

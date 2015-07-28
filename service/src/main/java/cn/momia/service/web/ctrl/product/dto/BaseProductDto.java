@@ -1,6 +1,6 @@
 package cn.momia.service.web.ctrl.product.dto;
 
-import cn.momia.service.common.MetaUtil;
+import cn.momia.service.web.util.MetaUtil;
 import cn.momia.service.product.Product;
 import cn.momia.service.web.ctrl.dto.Dto;
 import cn.momia.service.web.ctrl.dto.ListDto;

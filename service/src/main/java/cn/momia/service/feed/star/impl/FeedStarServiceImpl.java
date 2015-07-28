@@ -1,6 +1,6 @@
 package cn.momia.service.feed.star.impl;
 
-import cn.momia.service.base.DbAccessService;
+import cn.momia.common.service.impl.DbAccessService;
 import cn.momia.service.feed.star.FeedStarService;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;

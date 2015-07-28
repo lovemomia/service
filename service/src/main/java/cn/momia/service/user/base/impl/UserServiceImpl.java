@@ -2,7 +2,7 @@ package cn.momia.service.user.base.impl;
 
 import cn.momia.common.secret.PasswordEncryptor;
 import cn.momia.common.service.secret.SecretKey;
-import cn.momia.service.base.DbAccessService;
+import cn.momia.common.service.impl.DbAccessService;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
 import com.google.common.base.Splitter;

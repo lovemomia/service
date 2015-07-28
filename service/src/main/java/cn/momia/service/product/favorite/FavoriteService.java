@@ -1,6 +1,6 @@
 package cn.momia.service.product.favorite;
 
-import cn.momia.service.base.Service;
+import cn.momia.common.service.Service;
 
 import java.util.List;
 

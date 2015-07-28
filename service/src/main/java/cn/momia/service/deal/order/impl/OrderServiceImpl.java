@@ -1,6 +1,6 @@
 package cn.momia.service.deal.order.impl;
 
-import cn.momia.service.base.DbAccessService;
+import cn.momia.common.service.impl.DbAccessService;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderPrice;
 import cn.momia.service.deal.order.OrderService;

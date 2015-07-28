@@ -39,7 +39,7 @@
     </bean>
 
     <!-- Service -->
-    <bean id="dbAccessService" class="cn.momia.service.base.DbAccessService" abstract="true">
+    <bean id="dbAccessService" class="cn.momia.common.service.impl.DbAccessService" abstract="true">
         <property name="jdbcTemplate" ref="jdbcTemplate" />
     </bean>
 
@@ -57,7 +57,7 @@
         <property name="regionService" ref="regionService" />
         <property name="feedbackService" ref="feedbackService" />
     </bean>
-    <bean class="cn.momia.service.common.MetaUtil">
+    <bean class="cn.momia.service.web.util.MetaUtil">
         <property name="commonServiceFacade" ref="commonServiceFacade" />
     </bean>
 

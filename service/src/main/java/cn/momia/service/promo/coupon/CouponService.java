@@ -1,6 +1,6 @@
 package cn.momia.service.promo.coupon;
 
-import cn.momia.service.base.Service;
+import cn.momia.common.service.Service;
 
 import java.math.BigDecimal;
 import java.util.Collection;

@@ -1,6 +1,6 @@
 package cn.momia.service.product.base;
 
-import cn.momia.service.base.Service;
+import cn.momia.common.service.Service;
 
 import java.util.Collection;
 import java.util.List;

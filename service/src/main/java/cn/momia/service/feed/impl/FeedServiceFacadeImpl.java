@@ -1,6 +1,6 @@
 package cn.momia.service.feed.impl;
 
-import cn.momia.service.base.DbAccessService;
+import cn.momia.common.service.impl.DbAccessService;
 import cn.momia.service.feed.Feed;
 import cn.momia.service.feed.FeedImage;
 import cn.momia.service.feed.FeedServiceFacade;
