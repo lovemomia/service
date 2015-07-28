@@ -49,9 +49,9 @@ public class PaymentController extends AbstractController {
         Sku sku = productServiceFacade.getSku(order.getSkuId());
         if (!product.exists() || !sku.exists() || sku.closed(new Date())) return ResponseMessage.FAILED("无效的订单");
 
-        Coupon coupon = Coupon.NOT_EXIST_COUPON;
         String userCouponIdStr = request.getParameter("coupon");
-        if (!StringUtils.isBlank(userCouponIdStr)) coupon = useCoupon(user.getId(), order, Long.valueOf(userCouponIdStr));
+        long userCouponId = StringUtils.isBlank(userCouponIdStr) ? 0 : Long.valueOf(userCouponIdStr);
+        Coupon coupon = useCoupon(user.getId(), order, userCouponId);
 
         PrepayResult prepayResult = dealServiceFacade.prepay(request, order, product, coupon, payType);
 
