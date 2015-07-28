@@ -5,7 +5,6 @@ import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
 import cn.momia.common.web.img.ImageFile;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.mapi.api.v1.dto.product.PlaceOrderDto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Function;
@@ -62,9 +61,8 @@ public class ProductV1Api extends AbstractV1Api {
             @Override
             public Object apply(MomiaHttpResponseCollector collector) {
                 JSONObject productJson = (JSONObject) productFunc.apply(collector.getResponse("product"));
-                JSONObject customersJson = (JSONObject) collector.getResponse("customers");
-
-                productJson.put("customers", processAvatars(customersJson));
+                
+                productJson.put("customers", processAvatars((JSONObject) collector.getResponse("customers")));
 
                 boolean opened = productJson.getBoolean("opened");
                 if (!opened) productJson.put("soldOut", true);
@@ -112,12 +110,16 @@ public class ProductV1Api extends AbstractV1Api {
     public ResponseMessage getProductOrder(@RequestParam String utoken, @RequestParam long id) {
         if(StringUtils.isBlank(utoken) || id <= 0) return ResponseMessage.BAD_REQUEST;
         
-        List<MomiaHttpRequest> requests = buildProductOrderRequests(id, utoken);
+        final List<MomiaHttpRequest> requests = buildProductOrderRequests(id, utoken);
 
         return executeRequests(requests, new Function<MomiaHttpResponseCollector, Object>() {
             @Override
             public Object apply(MomiaHttpResponseCollector collector) {
-                return new PlaceOrderDto((JSONObject) collector.getResponse("contacts"), (JSONArray) collector.getResponse("skus"));
+                JSONObject placeOrderJson = new JSONObject();
+                placeOrderJson.put("contacts", collector.getResponse("contacts"));
+                placeOrderJson.put("skus", collector.getResponse("skus"));
+
+                return placeOrderJson;
             }
         });
     }

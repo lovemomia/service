@@ -25,7 +25,7 @@ public class AbstractV1Api extends AbstractApi {
         }
     };
 
-    protected Function<Object, Object> usersFunc = new Function<Object, Object>() {
+    protected Function<Object, Object> pagedUsersFunc = new Function<Object, Object>() {
         @Override
         public Object apply(Object data) {
             JSONArray usersJson = ((JSONObject) data).getJSONArray("list");
@@ -37,7 +37,7 @@ public class AbstractV1Api extends AbstractApi {
         }
     };
 
-    protected Function<Object, Object> feedCommentsFunc = new Function<Object, Object>() {
+    protected Function<Object, Object> pagedFeedCommentsFunc = new Function<Object, Object>() {
         @Override
         public Object apply(Object data) {
             JSONArray feedCommentsJson = ((JSONObject) data).getJSONArray("list");
@@ -70,7 +70,7 @@ public class AbstractV1Api extends AbstractApi {
         return imgs;
     }
 
-    protected Function<Object, Object> feedsFunc = new Function<Object, Object>() {
+    protected Function<Object, Object> pagedFeedsFunc = new Function<Object, Object>() {
         @Override
         public Object apply(Object data) {
             JSONArray feedsJson = ((JSONObject) data).getJSONArray("list");

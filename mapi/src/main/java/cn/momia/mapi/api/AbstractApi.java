@@ -21,14 +21,11 @@ public abstract class AbstractApi extends BaseController {
 
     protected String url(Object... paths) {
         // TODO 根据paths判断使用哪个service
-        return serviceUrl(conf.getString("Service.Base"), paths);
-    }
-
-    private String serviceUrl(String service, Object... paths) {
-        StringBuilder urlBuilder = new StringBuilder().append(service);
+        StringBuilder urlBuilder = new StringBuilder().append(conf.getString("Service.Base"));
         for (Object path : paths) urlBuilder.append("/").append(path);
 
         return urlBuilder.toString();
+
     }
 
     protected ResponseMessage executeRequest(MomiaHttpRequest request) {
@@ -47,7 +44,7 @@ public abstract class AbstractApi extends BaseController {
 
         if (collector.notLogin()) return ResponseMessage.TOKEN_EXPIRED;
         if (!collector.isSuccessful()) {
-            LOGGER.error("fail to execute requests: {}", collector.getExceptions());
+            LOGGER.error("fail to execute requests: {}, exceptions: {}", requests, collector.getExceptions());
             return ResponseMessage.FAILED;
         }
 
