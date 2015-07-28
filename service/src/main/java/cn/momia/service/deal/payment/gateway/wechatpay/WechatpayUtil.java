@@ -1,6 +1,6 @@
 package cn.momia.service.deal.payment.gateway.wechatpay;
 
-import cn.momia.common.web.secret.SecretKey;
+import cn.momia.common.service.secret.SecretKey;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 

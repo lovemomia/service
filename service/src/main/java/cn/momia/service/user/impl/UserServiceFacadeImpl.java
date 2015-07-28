@@ -2,7 +2,7 @@ package cn.momia.service.user.impl;
 
 import cn.momia.common.misc.ValidateUtil;
 import cn.momia.common.web.exception.MomiaFailedException;
-import cn.momia.common.web.secret.SecretKey;
+import cn.momia.common.service.secret.SecretKey;
 import cn.momia.service.user.UserServiceFacade;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;

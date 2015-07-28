@@ -1,7 +1,7 @@
 package cn.momia.service.user.base.impl;
 
 import cn.momia.common.secret.PasswordEncryptor;
-import cn.momia.common.web.secret.SecretKey;
+import cn.momia.common.service.secret.SecretKey;
 import cn.momia.service.base.DbAccessService;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;

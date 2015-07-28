@@ -20,6 +20,13 @@
             <version>4.1.6.RELEASE</version>
         </dependency>
 
+        <!-- Momia -->
+        <dependency>
+            <groupId>cn.momia</groupId>
+            <artifactId>common-utils</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.testng</groupId>

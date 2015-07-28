@@ -1,4 +1,4 @@
-package cn.momia.common.web.secret;
+package cn.momia.common.service.secret;
 
 import cn.momia.common.config.Configuration;
 import org.apache.commons.lang3.StringUtils;

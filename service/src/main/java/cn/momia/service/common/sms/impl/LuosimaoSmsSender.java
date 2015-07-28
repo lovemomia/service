@@ -1,6 +1,6 @@
 package cn.momia.service.common.sms.impl;
 
-import cn.momia.common.web.secret.SecretKey;
+import cn.momia.common.service.secret.SecretKey;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.sun.jersey.api.client.Client;

@@ -2,7 +2,7 @@ package cn.momia.service.deal.payment.gateway.wechatpay;
 
 import cn.momia.common.misc.XmlUtil;
 import cn.momia.common.web.misc.RequestUtil;
-import cn.momia.common.web.secret.SecretKey;
+import cn.momia.common.service.secret.SecretKey;
 import cn.momia.service.product.Product;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;

@@ -1,6 +1,6 @@
 package cn.momia.service.deal.payment.gateway.alipay;
 
-import cn.momia.common.web.secret.SecretKey;
+import cn.momia.common.service.secret.SecretKey;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
