@@ -14,22 +14,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/v1/leader")
 public class LeaderV1Api extends AbstractV1Api {
-    @RequestMapping(value = "/info", method = RequestMethod.GET)
-    public ResponseMessage getLeaderInfo(@RequestParam String utoken) {
-        if (StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
-
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("leader"), builder.build());
-
-        return executeRequest(request);
-    }
-
     @RequestMapping(value = "/status", method = RequestMethod.GET)
     public ResponseMessage getLeaderStatus(@RequestParam String utoken) {
         if (StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("leader/status"), builder.build());
+
+        return executeRequest(request);
+    }
+
+    @RequestMapping(value = "/info", method = RequestMethod.GET)
+    public ResponseMessage getLeaderInfo(@RequestParam String utoken) {
+        if (StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
+
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("leader"), builder.build());
 
         return executeRequest(request);
     }

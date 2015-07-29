@@ -5,6 +5,7 @@ import cn.momia.service.user.base.User;
 import cn.momia.service.user.leader.Leader;
 import cn.momia.service.web.ctrl.user.dto.LeaderDto;
 import cn.momia.service.web.ctrl.user.dto.LeaderStatusDto;
+import com.alibaba.fastjson.JSON;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,6 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/leader")
 public class LeaderController extends UserRelatedController {
+    @RequestMapping(value = "/status", method = RequestMethod.GET)
+    public ResponseMessage getLeaderStatus(@RequestParam String utoken) {
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        return new ResponseMessage(new LeaderStatusDto(userServiceFacade.getLeaderInfo(user.getId()), JSON.parseArray(userServiceFacade.getLeaderDesc())));
+    }
+
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getLeaderInfo(@RequestParam String utoken) {
         User user = userServiceFacade.getUserByToken(utoken);
@@ -23,14 +32,6 @@ public class LeaderController extends UserRelatedController {
         if (!leader.exists()) return ResponseMessage.FAILED("您还没申请成为领队");
 
         return new ResponseMessage(new LeaderDto(leader));
-    }
-
-    @RequestMapping(value = "/status", method = RequestMethod.GET)
-    public ResponseMessage getLeaderStatus(@RequestParam String utoken) {
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
-
-        return new ResponseMessage(new LeaderStatusDto(userServiceFacade.getLeaderInfo(user.getId())));
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")

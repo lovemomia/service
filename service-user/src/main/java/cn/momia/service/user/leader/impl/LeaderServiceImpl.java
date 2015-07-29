@@ -24,6 +24,18 @@ public class LeaderServiceImpl extends DbAccessService implements LeaderService 
     private static final String[] LEADER_FIELDS = { "id", "userId", "name", "mobile", "cityId", "regionId", "address", "career", "intro", "msg", "status" };
 
     @Override
+    public String getDesc() {
+        String sql = "SELECT `desc` FROM t_user_leader_desc WHERE status=1 ORDER BY addTime DESC LIMIT 1";
+
+        return jdbcTemplate.query(sql, new ResultSetExtractor<String>() {
+            @Override
+            public String extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getString(1) : "";
+            }
+        });
+    }
+
+    @Override
     public Leader getByUser(long userId) {
         String sql = "SELECT " + joinFields() + " FROM t_user_leader WHERE userId=? LIMIT 1";
 

@@ -249,6 +249,11 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
     }
 
     @Override
+    public String getLeaderDesc() {
+        return leaderService.getDesc();
+    }
+
+    @Override
     public Leader getLeaderInfo(long userId) {
         if (userId <= 0) return Leader.NOT_EXIST_LEADER;
         return leaderService.getByUser(userId);
