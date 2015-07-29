@@ -2,6 +2,7 @@ package cn.momia.service.deal.impl;
 
 import cn.momia.service.deal.DealServiceFacade;
 import cn.momia.service.deal.exception.OrderLimitException;
+import cn.momia.service.deal.gateway.CallbackResult;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.deal.payment.Payment;
@@ -105,7 +106,7 @@ public class DealServiceFacadeImpl implements DealServiceFacade {
     }
 
     @Override
-    public boolean callback(Map<String, String> httpParams, int payType) {
+    public CallbackResult callback(Map<String, String> httpParams, int payType) {
         CallbackParam callbackParam = CallbackParamFactory.create(httpParams, payType);
         PaymentGateway gateway = PaymentGatewayFactory.create(payType);
 

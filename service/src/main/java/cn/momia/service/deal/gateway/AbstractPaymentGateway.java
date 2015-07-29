@@ -4,7 +4,6 @@ import cn.momia.common.config.Configuration;
 import cn.momia.service.deal.DealServiceFacade;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
-import cn.momia.service.promo.coupon.UserCoupon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,12 +39,17 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
     protected abstract PrepayResult doPrepay(PrepayParam param);
 
     @Override
-    public boolean callback(CallbackParam param) {
+    public CallbackResult callback(CallbackParam param) {
+        CallbackResult result = new CallbackResult();
+        result.add("orderId", String.valueOf(getCallbackOutTradeNo(param)));
+
         if (isPayedSuccessfully(param) && validateCallbackSign(param) && !finishPayment(param)) {
-            return false;
+            result.setSuccessful(false);
         } else {
-            return true;
+            result.setSuccessful(true);
         }
+
+        return result;
     }
 
     protected abstract boolean isPayedSuccessfully(CallbackParam param);
@@ -56,12 +60,12 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
         long orderId = getCallbackOutTradeNo(param);
         try {
             Order order = dealServiceFacade.getOrder(orderId);
-            if (!order.exists()) return false;
+            // 这段逻辑返回true看似有点反常
+            // 因为当订单无效或payOrder返回false(代表之前已经完成过付款)时
+            // 如果返回false，第三方支付系统会认为通知失败进而多次尝试通知，而实际是不需要的
+            // 只有写入数据库时抛了异常才是需要重试的
+            if (!order.exists() || !dealServiceFacade.payOrder(orderId)) return true;
 
-            if (!dealServiceFacade.payOrder(orderId)) return false;
-
-            UserCoupon userCoupon = promoServiceFacade.getNotUsedUserCouponByOrder(order.getId());
-            if (userCoupon.exists() && !promoServiceFacade.useUserCoupon(order.getCustomerId(), order.getId(), userCoupon.getId())) return false;
             logPayment(param);
         } catch (Exception e) {
             LOGGER.error("fail to pay order: {}", orderId, e);
@@ -75,20 +79,8 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
 
     private void logPayment(CallbackParam param) {
         try {
-            if (dealServiceFacade.logPayment(createPayment(param))) {
+            if (!dealServiceFacade.logPayment(createPayment(param)))
                 LOGGER.error("fail to log payment: {}", param);
-                return;
-            }
-
-            Order order = dealServiceFacade.getOrder(getCallbackOutTradeNo(param));
-            if (!order.exists()) {
-                LOGGER.error("invalid order: {}", order.getId());
-                return;
-            }
-
-            if (!productServiceFacade.sold(order.getProductId(), order.getCount())) {
-                LOGGER.error("fail to log sales of order: {}", order.getId());
-            }
         } catch (Exception e) {
             LOGGER.error("fail to log payment: {}", param, e);
         }
