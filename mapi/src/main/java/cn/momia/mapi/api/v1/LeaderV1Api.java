@@ -35,7 +35,7 @@ public class LeaderV1Api extends AbstractV1Api {
     }
 
     @RequestMapping(value = "/apply", method = RequestMethod.POST)
-    public ResponseMessage applyLeader(@RequestParam String utoken, @RequestParam String leader) {
+    public ResponseMessage addLeaderInfo(@RequestParam String utoken, @RequestParam String leader) {
         if (StringUtils.isBlank(utoken) || StringUtils.isBlank(leader)) return ResponseMessage.BAD_REQUEST;
 
         JSONObject leaderJson = JSON.parseObject(leader);
@@ -46,7 +46,7 @@ public class LeaderV1Api extends AbstractV1Api {
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public ResponseMessage updateLeader(@RequestParam String utoken, @RequestParam String leader) {
+    public ResponseMessage updateLeaderInfo(@RequestParam String utoken, @RequestParam String leader) {
         if (StringUtils.isBlank(utoken) || StringUtils.isBlank(leader)) return ResponseMessage.BAD_REQUEST;
 
         JSONObject leaderJson = JSON.parseObject(leader);
@@ -57,7 +57,7 @@ public class LeaderV1Api extends AbstractV1Api {
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
-    public ResponseMessage deleteLeader(@RequestParam String utoken) {
+    public ResponseMessage deleteLeaderInfo(@RequestParam String utoken) {
         if (StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);

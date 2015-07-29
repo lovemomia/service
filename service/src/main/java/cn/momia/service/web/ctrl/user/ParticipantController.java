@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ParticipantController extends UserRelatedController {
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage addParticipant(@RequestBody Participant participant) {
-        long participantId = userServiceFacade.addParticipant(participant);
-        if(participantId <= 0) return ResponseMessage.FAILED("添加出行人失败");
-
+        if(!userServiceFacade.addParticipant(participant)) return ResponseMessage.FAILED("添加出行人失败");
         return ResponseMessage.SUCCESS;
     }
 
@@ -35,9 +33,7 @@ public class ParticipantController extends UserRelatedController {
 
     @RequestMapping(method = RequestMethod.PUT, consumes = "application/json")
     public ResponseMessage updateParticipantName(@RequestBody Participant participant) {
-        boolean successful = userServiceFacade.updateParticipant(participant);
-        if (!successful) return ResponseMessage.FAILED("更新出行人失败");
-
+        if (!userServiceFacade.updateParticipant(participant)) return ResponseMessage.FAILED("更新出行人失败");
         return ResponseMessage.SUCCESS;
     }
 

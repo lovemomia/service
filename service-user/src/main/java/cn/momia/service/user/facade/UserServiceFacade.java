@@ -1,6 +1,7 @@
 package cn.momia.service.user.facade;
 
 import cn.momia.service.user.base.User;
+import cn.momia.service.user.leader.Leader;
 import cn.momia.service.user.participant.Participant;
 
 import java.util.Collection;
@@ -40,10 +41,15 @@ public interface UserServiceFacade {
     boolean updateChildBirthday(long userId, long childId, Date birthday);
 
     // 出行人
-    long addParticipant(Participant participant);
+    boolean addParticipant(Participant participant);
     Participant getParticipant(long userId, long participantId);
     List<Participant> getParticipants(Collection<Long> participantIds);
     List<Participant> getParticipantsByUser(long userId);
     boolean updateParticipant(Participant participant);
     boolean deleteParticipant(long userId, long participantId);
+
+    Leader getLeaderInfo(long userId);
+    boolean addLeaderInfo(Leader leader);
+    boolean updateLeaderInfo(Leader leader);
+    boolean deleteLeaderInfo(long userId);
 }

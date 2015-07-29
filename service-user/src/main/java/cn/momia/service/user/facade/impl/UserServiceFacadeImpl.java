@@ -6,6 +6,8 @@ import cn.momia.common.service.secret.SecretKey;
 import cn.momia.service.user.facade.UserServiceFacade;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
+import cn.momia.service.user.leader.Leader;
+import cn.momia.service.user.leader.LeaderService;
 import cn.momia.service.user.participant.Participant;
 import cn.momia.service.user.participant.ParticipantService;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -31,6 +33,7 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
 
     private UserService userService;
     private ParticipantService participantService;
+    private LeaderService leaderService;
 
     public void setUserService(UserService userService) {
         this.userService = userService;
@@ -38,6 +41,10 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
 
     public void setParticipantService(ParticipantService participantService) {
         this.participantService = participantService;
+    }
+
+    public void setLeaderService(LeaderService leaderService) {
+        this.leaderService = leaderService;
     }
 
     @Override
@@ -162,7 +169,8 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
 
     @Override
     public long addChild(Participant child) {
-        return addParticipant(child);
+        if (child.isInvalid()) return 0;
+        return participantService.add(child);
     }
 
     @Override
@@ -202,9 +210,9 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
     }
 
     @Override
-    public long addParticipant(Participant participant) {
-        if (participant.isInvalid()) return 0;
-        return participantService.add(participant);
+    public boolean addParticipant(Participant participant) {
+        if (participant.isInvalid()) return false;
+        return participantService.add(participant) > 0;
     }
 
     @Override
@@ -238,5 +246,32 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
     public boolean deleteParticipant(long userId, long participantId) {
         if (userId <= 0 || participantId <= 0) return false;
         return participantService.delete(userId, participantId);
+    }
+
+    @Override
+    public Leader getLeaderInfo(long userId) {
+        if (userId <= 0) return Leader.NOT_EXIST_LEADER;
+        return leaderService.getByUser(userId);
+    }
+
+    @Override
+    public boolean addLeaderInfo(Leader leader) {
+        if (leader.isInvalid()) return false;
+
+        Leader leaderInfoOfUser = leaderService.getByUser(leader.getUserId());
+        if (leaderInfoOfUser.exists()) return leaderService.reapply(leader);
+        return leaderService.add(leader) > 0;
+    }
+
+    @Override
+    public boolean updateLeaderInfo(Leader leader) {
+        if (leader.isInvalid()) return false;
+        return leaderService.update(leader);
+    }
+
+    @Override
+    public boolean deleteLeaderInfo(long userId) {
+        if (userId <= 0) return false;
+        return leaderService.deleteByUser(userId);
     }
 }
