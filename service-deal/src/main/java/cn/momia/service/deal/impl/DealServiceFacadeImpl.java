@@ -118,6 +118,7 @@ public class DealServiceFacadeImpl implements DealServiceFacade {
     @Override
     public boolean logPayment(Payment payment) {
         if (payment == null) return true;
+        if (paymentService.getByOrder(payment.getOrderId()).exists()) return true;
         return paymentService.add(payment) > 0;
     }
 }
