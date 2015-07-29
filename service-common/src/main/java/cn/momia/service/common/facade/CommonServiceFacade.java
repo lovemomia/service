@@ -1,4 +1,4 @@
-package cn.momia.service.common;
+package cn.momia.service.common.facade;
 
 import cn.momia.service.common.city.City;
 import cn.momia.service.common.region.Region;

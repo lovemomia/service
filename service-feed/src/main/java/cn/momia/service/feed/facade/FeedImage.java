@@ -1,4 +1,4 @@
-package cn.momia.service.feed;
+package cn.momia.service.feed.facade;
 
 public class FeedImage {
     private String url;

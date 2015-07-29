@@ -1,8 +1,8 @@
-package cn.momia.service.promo.impl;
+package cn.momia.service.promo.facade.impl;
 
 import cn.momia.service.promo.banner.Banner;
 import cn.momia.service.promo.banner.BannerService;
-import cn.momia.service.promo.PromoServiceFacade;
+import cn.momia.service.promo.facade.PromoServiceFacade;
 import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.CouponService;
 import cn.momia.service.promo.coupon.UserCoupon;

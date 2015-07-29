@@ -2,12 +2,12 @@ package cn.momia.service.web.ctrl;
 
 import cn.momia.common.config.Configuration;
 import cn.momia.common.web.controller.BaseController;
-import cn.momia.service.common.CommonServiceFacade;
-import cn.momia.service.deal.DealServiceFacade;
-import cn.momia.service.feed.FeedServiceFacade;
-import cn.momia.service.product.ProductServiceFacade;
-import cn.momia.service.promo.PromoServiceFacade;
-import cn.momia.service.user.UserServiceFacade;
+import cn.momia.service.common.facade.CommonServiceFacade;
+import cn.momia.service.deal.facade.DealServiceFacade;
+import cn.momia.service.feed.facade.FeedServiceFacade;
+import cn.momia.service.product.facade.ProductServiceFacade;
+import cn.momia.service.promo.facade.PromoServiceFacade;
+import cn.momia.service.user.facade.UserServiceFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractController extends BaseController {

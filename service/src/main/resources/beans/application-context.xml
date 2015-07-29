@@ -50,7 +50,7 @@
     <bean id="cityService" class="cn.momia.service.common.city.impl.CityServiceImpl" parent="dbAccessService" init-method="init" />
     <bean id="regionService" class="cn.momia.service.common.region.impl.RegionServiceImpl" parent="dbAccessService" init-method="init" />
     <bean id="feedbackService" class="cn.momia.service.common.feedback.impl.FeedbackServiceImpl" parent="dbAccessService" />
-    <bean id="commonServiceFacade" class="cn.momia.service.common.impl.CommonServiceFacadeImpl">
+    <bean id="commonServiceFacade" class="cn.momia.service.common.facade.impl.CommonServiceFacadeImpl">
         <property name="smsSender" ref="smsSender" />
         <property name="smsVerifier" ref="smsVerifier" />
         <property name="cityService" ref="cityService" />
@@ -65,7 +65,7 @@
     <bean id="feedTopicService" class="cn.momia.service.feed.topic.impl.FeedTopicServiceImpl" parent="dbAccessService" />
     <bean id="feedCommentService" class="cn.momia.service.feed.comment.impl.FeedCommentServiceImpl" parent="dbAccessService" />
     <bean id="feedStarService" class="cn.momia.service.feed.star.impl.FeedStarServiceImpl" parent="dbAccessService" />
-    <bean id="feedServiceFacade" class="cn.momia.service.feed.impl.FeedServiceFacadeImpl" parent="dbAccessService">
+    <bean id="feedServiceFacade" class="cn.momia.service.feed.facade.impl.FeedServiceFacadeImpl" parent="dbAccessService">
         <property name="baseFeedService" ref="baseFeedService" />
         <property name="feedTopicService" ref="feedTopicService" />
         <property name="feedCommentService" ref="feedCommentService" />
@@ -76,7 +76,7 @@
     <bean id="placeService" class="cn.momia.service.product.place.impl.PlaceServiceImpl" parent="dbAccessService" />
     <bean id="skuService" class="cn.momia.service.product.sku.impl.SkuServiceImpl" parent="dbAccessService" />
     <bean id="favoriteService" class="cn.momia.service.product.favorite.impl.FavoriteServiceImpl" parent="dbAccessService" />
-    <bean id="productServiceFacade" class="cn.momia.service.product.impl.ProductServiceFacadeImpl" parent="dbAccessService">
+    <bean id="productServiceFacade" class="cn.momia.service.product.facade.impl.ProductServiceFacadeImpl" parent="dbAccessService">
         <property name="baseProductService" ref="baseProductService" />
         <property name="placeService" ref="placeService" />
         <property name="skuService" ref="skuService" />
@@ -85,21 +85,21 @@
 
     <bean id="bannerService" class="cn.momia.service.promo.banner.impl.BannerServiceImpl" parent="dbAccessService" />
     <bean id="couponService" class="cn.momia.service.promo.coupon.impl.CouponServiceImpl" parent="dbAccessService" />
-    <bean id="promoServiceFacade" class="cn.momia.service.promo.impl.PromoServiceFacadeImpl">
+    <bean id="promoServiceFacade" class="cn.momia.service.promo.facade.impl.PromoServiceFacadeImpl">
         <property name="bannerService" ref="bannerService" />
         <property name="couponService" ref="couponService" />
     </bean>
 
     <bean id="userService" class="cn.momia.service.user.base.impl.UserServiceImpl" parent="dbAccessService" />
     <bean id="participantService" class="cn.momia.service.user.participant.impl.ParticipantServiceImpl" parent="dbAccessService" />
-    <bean id="userServiceFacade" class="cn.momia.service.user.impl.UserServiceFacadeImpl">
+    <bean id="userServiceFacade" class="cn.momia.service.user.facade.impl.UserServiceFacadeImpl">
         <property name="userService" ref="userService" />
         <property name="participantService" ref="participantService" />
     </bean>
 
     <bean id="orderService" class="cn.momia.service.deal.order.impl.OrderServiceImpl" parent="dbAccessService" />
     <bean id="paymentService" class="cn.momia.service.deal.payment.impl.PaymentServiceImpl" parent="dbAccessService" />
-    <bean id="dealServiceFacade" class="cn.momia.service.deal.impl.DealServiceFacadeImpl">
+    <bean id="dealServiceFacade" class="cn.momia.service.deal.facade.impl.DealServiceFacadeImpl">
         <property name="orderService" ref="orderService" />
         <property name="paymentService" ref="paymentService" />
     </bean>

@@ -1,4 +1,4 @@
-package cn.momia.service.user;
+package cn.momia.service.user.facade;
 
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;

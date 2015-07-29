@@ -1,7 +1,7 @@
 package cn.momia.service.web.ctrl.user;
 
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.service.product.Product;
+import cn.momia.service.product.facade.Product;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;
 import cn.momia.service.web.ctrl.dto.ListDto;

@@ -1,4 +1,4 @@
-package cn.momia.service.feed;
+package cn.momia.service.feed.facade;
 
 import cn.momia.service.feed.base.BaseFeed;
 import cn.momia.service.feed.topic.FeedTopic;

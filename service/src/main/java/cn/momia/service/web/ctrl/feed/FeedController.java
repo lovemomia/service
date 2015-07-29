@@ -1,7 +1,7 @@
 package cn.momia.service.web.ctrl.feed;
 
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.service.feed.Feed;
+import cn.momia.service.feed.facade.Feed;
 import cn.momia.service.feed.comment.FeedComment;
 import cn.momia.service.user.base.User;
 import cn.momia.service.web.ctrl.AbstractController;

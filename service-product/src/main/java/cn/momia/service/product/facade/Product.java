@@ -1,4 +1,4 @@
-package cn.momia.service.product;
+package cn.momia.service.product.facade;
 
 import cn.momia.common.misc.TimeUtil;
 import cn.momia.service.product.base.BaseProduct;

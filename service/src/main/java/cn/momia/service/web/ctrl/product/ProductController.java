@@ -9,7 +9,7 @@ import cn.momia.service.web.ctrl.product.dto.BaseProductDto;
 import cn.momia.service.web.ctrl.product.dto.CustomersDto;
 import cn.momia.service.web.ctrl.product.dto.FullProductDto;
 import cn.momia.service.web.ctrl.product.dto.PlaymateDto;
-import cn.momia.service.product.Product;
+import cn.momia.service.product.facade.Product;
 import cn.momia.service.web.ctrl.product.dto.ProductDto;
 import cn.momia.service.web.ctrl.product.dto.ProductsOfDayDto;
 import cn.momia.service.web.ctrl.product.dto.SkuDto;

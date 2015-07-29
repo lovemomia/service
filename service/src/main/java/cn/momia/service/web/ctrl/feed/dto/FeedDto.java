@@ -1,7 +1,7 @@
 package cn.momia.service.web.ctrl.feed.dto;
 
-import cn.momia.service.feed.Feed;
-import cn.momia.service.feed.FeedImage;
+import cn.momia.service.feed.facade.Feed;
+import cn.momia.service.feed.facade.FeedImage;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;
 import cn.momia.service.web.ctrl.user.dto.ParticipantDto;

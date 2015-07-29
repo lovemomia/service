@@ -1,10 +1,10 @@
-package cn.momia.service.product.impl;
+package cn.momia.service.product.facade.impl;
 
 import cn.momia.common.misc.TimeUtil;
 import cn.momia.common.service.impl.DbAccessService;
-import cn.momia.service.product.Product;
-import cn.momia.service.product.ProductImage;
-import cn.momia.service.product.ProductServiceFacade;
+import cn.momia.service.product.facade.Product;
+import cn.momia.service.product.facade.ProductImage;
+import cn.momia.service.product.facade.ProductServiceFacade;
 import cn.momia.service.product.base.BaseProduct;
 import cn.momia.service.product.base.BaseProductService;
 import cn.momia.service.product.favorite.FavoriteService;

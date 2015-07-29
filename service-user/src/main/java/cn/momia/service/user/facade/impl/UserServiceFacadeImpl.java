@@ -1,9 +1,9 @@
-package cn.momia.service.user.impl;
+package cn.momia.service.user.facade.impl;
 
 import cn.momia.common.misc.ValidateUtil;
 import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.common.service.secret.SecretKey;
-import cn.momia.service.user.UserServiceFacade;
+import cn.momia.service.user.facade.UserServiceFacade;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
 import cn.momia.service.user.participant.Participant;

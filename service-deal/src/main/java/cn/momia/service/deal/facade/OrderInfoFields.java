@@ -1,4 +1,4 @@
-package cn.momia.service.deal;
+package cn.momia.service.deal.facade;
 
 public class OrderInfoFields {
     public static final String ORDER_ID = "orderId";

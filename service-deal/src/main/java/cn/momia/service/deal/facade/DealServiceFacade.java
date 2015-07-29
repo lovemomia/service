@@ -1,4 +1,4 @@
-package cn.momia.service.deal;
+package cn.momia.service.deal.facade;
 
 import cn.momia.service.deal.exception.OrderLimitException;
 import cn.momia.service.deal.gateway.CallbackResult;

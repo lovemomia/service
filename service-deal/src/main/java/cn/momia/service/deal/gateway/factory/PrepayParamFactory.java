@@ -3,7 +3,7 @@ package cn.momia.service.deal.gateway.factory;
 import cn.momia.common.config.Configuration;
 import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.common.service.secret.SecretKey;
-import cn.momia.service.deal.OrderInfoFields;
+import cn.momia.service.deal.facade.OrderInfoFields;
 import cn.momia.service.deal.gateway.PrepayParam;
 import cn.momia.service.deal.gateway.alipay.AlipayPrepayFields;
 import cn.momia.service.deal.gateway.alipay.AlipayUtil;

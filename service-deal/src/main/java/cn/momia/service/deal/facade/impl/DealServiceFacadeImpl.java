@@ -1,6 +1,6 @@
-package cn.momia.service.deal.impl;
+package cn.momia.service.deal.facade.impl;
 
-import cn.momia.service.deal.DealServiceFacade;
+import cn.momia.service.deal.facade.DealServiceFacade;
 import cn.momia.service.deal.exception.OrderLimitException;
 import cn.momia.service.deal.gateway.CallbackResult;
 import cn.momia.service.deal.order.Order;

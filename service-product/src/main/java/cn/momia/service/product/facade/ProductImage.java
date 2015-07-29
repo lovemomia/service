@@ -1,4 +1,4 @@
-package cn.momia.service.product;
+package cn.momia.service.product.facade;
 
 import java.io.Serializable;
 

@@ -1,7 +1,7 @@
 package cn.momia.service.deal.gateway;
 
 import cn.momia.common.config.Configuration;
-import cn.momia.service.deal.DealServiceFacade;
+import cn.momia.service.deal.facade.DealServiceFacade;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
 import org.slf4j.Logger;

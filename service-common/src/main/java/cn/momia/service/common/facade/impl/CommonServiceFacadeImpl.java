@@ -1,8 +1,8 @@
-package cn.momia.service.common.impl;
+package cn.momia.service.common.facade.impl;
 
 import cn.momia.common.misc.ValidateUtil;
 import cn.momia.common.service.exception.MomiaFailedException;
-import cn.momia.service.common.CommonServiceFacade;
+import cn.momia.service.common.facade.CommonServiceFacade;
 import cn.momia.service.common.city.City;
 import cn.momia.service.common.city.CityService;
 import cn.momia.service.common.feedback.FeedbackService;

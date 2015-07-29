@@ -1,6 +1,6 @@
 package cn.momia.service.web.ctrl.product.dto;
 
-import cn.momia.service.product.Product;
+import cn.momia.service.product.facade.Product;
 
 public class MiniProductDto implements ProductDto {
     protected Product product;
