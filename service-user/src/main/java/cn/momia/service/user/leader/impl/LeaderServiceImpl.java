@@ -30,7 +30,8 @@ public class LeaderServiceImpl extends DbAccessService implements LeaderService 
         return jdbcTemplate.query(sql, new Object[] { userId }, new ResultSetExtractor<Leader>() {
             @Override
             public Leader extractData(ResultSet rs) throws SQLException, DataAccessException {
-                return buildLeader(rs);
+                if (rs.next()) return buildLeader(rs);
+                return Leader.NOT_EXIST_LEADER;
             }
         });
     }

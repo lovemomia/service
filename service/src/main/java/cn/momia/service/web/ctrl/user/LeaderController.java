@@ -19,7 +19,10 @@ public class LeaderController extends UserRelatedController {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        return new ResponseMessage(new LeaderDto(userServiceFacade.getLeaderInfo(user.getId())));
+        Leader leader = userServiceFacade.getLeaderInfo(user.getId());
+        if (!leader.exists()) return ResponseMessage.FAILED("您还没申请成为领队");
+
+        return new ResponseMessage(new LeaderDto(leader));
     }
 
     @RequestMapping(value = "/status", method = RequestMethod.GET)
