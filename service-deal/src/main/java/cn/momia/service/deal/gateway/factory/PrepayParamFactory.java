@@ -75,7 +75,7 @@ public class PrepayParamFactory {
                 prepayParam.add(WechatpayPrepayFields.NOTIFY_URL, conf.getString("Payment.Wechat.NotifyUrl"));
                 prepayParam.add(WechatpayPrepayFields.TRADE_TYPE, tradeType);
                 prepayParam.add(WechatpayPrepayFields.TIME_EXPIRE, DATE_FORMATTER.format(new Date(System.currentTimeMillis() + 30 * 60 * 1000)));
-                prepayParam.add(WechatpayPrepayFields.SIGN, WechatpayUtil.sign(params, tradeType));
+                prepayParam.add(WechatpayPrepayFields.SIGN, WechatpayUtil.sign(prepayParam.getAll(), tradeType));
 
                 break;
             default: throw new MomiaFailedException("无效的支付类型: " + payType);
