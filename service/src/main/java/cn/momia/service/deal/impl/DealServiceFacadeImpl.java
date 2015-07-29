@@ -14,10 +14,7 @@ import cn.momia.service.deal.gateway.PrepayResult;
 import cn.momia.service.deal.gateway.factory.CallbackParamFactory;
 import cn.momia.service.deal.gateway.factory.PaymentGatewayFactory;
 import cn.momia.service.deal.gateway.factory.PrepayParamFactory;
-import cn.momia.service.product.Product;
-import cn.momia.service.promo.coupon.Coupon;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -97,17 +94,16 @@ public class DealServiceFacadeImpl implements DealServiceFacade {
     }
 
     @Override
-    public PrepayResult prepay(HttpServletRequest request, Order order, Product product, Coupon coupon, int payType) {
-        PaymentGateway gateway = PaymentGatewayFactory.create(payType);
-        Map<String, String> params = gateway.extractPrepayParams(request, order, product, coupon);
+    public PrepayResult prepay(Map<String, String> params, int payType) {
         PrepayParam prepayParam = PrepayParamFactory.create(params, payType);
+        PaymentGateway gateway = PaymentGatewayFactory.create(payType);
 
         return gateway.prepay(prepayParam);
     }
 
     @Override
-    public CallbackResult callback(Map<String, String> httpParams, int payType) {
-        CallbackParam callbackParam = CallbackParamFactory.create(httpParams, payType);
+    public CallbackResult callback(Map<String, String> params, int payType) {
+        CallbackParam callbackParam = CallbackParamFactory.create(params, payType);
         PaymentGateway gateway = PaymentGatewayFactory.create(payType);
 
         return gateway.callback(callbackParam);

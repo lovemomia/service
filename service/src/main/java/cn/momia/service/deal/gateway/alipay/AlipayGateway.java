@@ -3,11 +3,8 @@ package cn.momia.service.deal.gateway.alipay;
 import cn.momia.service.deal.gateway.AbstractPaymentGateway;
 import cn.momia.service.deal.gateway.CallbackParam;
 import cn.momia.service.deal.gateway.PrepayResult;
-import cn.momia.service.product.Product;
-import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
 import cn.momia.service.deal.gateway.PrepayParam;
-import cn.momia.service.promo.coupon.Coupon;
 import com.alibaba.fastjson.util.TypeUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -18,36 +15,11 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 public class AlipayGateway extends AbstractPaymentGateway {
     private static final Logger LOGGER = LoggerFactory.getLogger(AlipayGateway.class);
-
-    @Override
-    public Map<String, String> extractPrepayParams(HttpServletRequest request, Order order, Product product, Coupon coupon) {
-        Map<String, String> params = new HashMap<String, String>();
-
-        params.put(AlipayPrepayFields.SERVICE, "mobile.securitypay.pay");
-        params.put(AlipayPrepayFields.PARTNER, conf.getString("Payment.Ali.Partner"));
-        params.put(AlipayPrepayFields.INPUT_CHARSET, "utf-8");
-        params.put(AlipayPrepayFields.SIGN_TYPE, "RSA");
-        params.put(AlipayPrepayFields.NOTIFY_URL, conf.getString("Payment.Ali.NotifyUrl"));
-        params.put(AlipayPrepayFields.OUT_TRADE_NO, String.valueOf(order.getId()));
-        params.put(AlipayPrepayFields.SUBJECT, product.getTitle());
-        params.put(AlipayPrepayFields.PAYMENT_TYPE, "1");
-        params.put(AlipayPrepayFields.SELLER_ID, conf.getString("Payment.Ali.Partner"));
-        params.put(AlipayPrepayFields.TOTAL_FEE, String.valueOf(promoServiceFacade.calcTotalFee(order.getTotalFee(), coupon).floatValue()));
-        params.put(AlipayPrepayFields.BODY, product.getTitle());
-        params.put(AlipayPrepayFields.IT_B_PAY, "30m");
-        params.put(AlipayPrepayFields.SHOW_URL, "m.duolaqinzi.com");
-        params.put(AlipayPrepayFields.SIGN, AlipayUtil.sign(params));
-
-        return params;
-    }
 
     @Override
     protected long getPrepayOutTradeNo(PrepayParam param) {

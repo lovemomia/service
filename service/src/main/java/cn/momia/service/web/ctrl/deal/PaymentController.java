@@ -1,7 +1,10 @@
 package cn.momia.service.web.ctrl.deal;
 
+import cn.momia.common.misc.HttpUtil;
 import cn.momia.common.service.exception.MomiaFailedException;
+import cn.momia.common.web.misc.RequestUtil;
 import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.service.deal.gateway.OrderInfoFields;
 import cn.momia.service.product.Product;
 import cn.momia.service.product.sku.Sku;
 import cn.momia.service.user.base.User;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/payment")
@@ -53,7 +57,8 @@ public class PaymentController extends AbstractController {
         long userCouponId = StringUtils.isBlank(userCouponIdStr) ? 0 : Long.valueOf(userCouponIdStr);
         Coupon coupon = useCoupon(user.getId(), order, userCouponId);
 
-        PrepayResult prepayResult = dealServiceFacade.prepay(request, order, product, coupon, payType);
+        Map<String, String> orderInfo = extraOrderInfo(request, order, product, coupon, payType);
+        PrepayResult prepayResult = dealServiceFacade.prepay(orderInfo, payType);
 
         if (!prepayResult.isSuccessful()) return ResponseMessage.FAILED;
         return new ResponseMessage(prepayResult);
@@ -80,6 +85,22 @@ public class PaymentController extends AbstractController {
 
     private void releasePreviousUserCoupon(UserCoupon previousUserCoupon) {
         promoServiceFacade.releaseUserCoupon(previousUserCoupon.getUserId(), previousUserCoupon.getOrderId());
+    }
+
+    private Map<String, String> extraOrderInfo(HttpServletRequest request, Order order, Product product, Coupon coupon, int payType) {
+        Map<String, String> orderInfo = HttpUtil.extractParams(request.getParameterMap());
+        orderInfo.put(OrderInfoFields.ORDER_ID, String.valueOf(order.getId()));
+        orderInfo.put(OrderInfoFields.PRODUCT_ID, String.valueOf(product.getId()));
+        orderInfo.put(OrderInfoFields.PRODUCT_TITLE, product.getTitle());
+
+        if (payType == Payment.Type.WECHATPAY)
+            orderInfo.put(OrderInfoFields.TOTAL_FEE, String.valueOf((int) (promoServiceFacade.calcTotalFee(order.getTotalFee(), coupon).floatValue() * 100)));
+        else
+            orderInfo.put(OrderInfoFields.TOTAL_FEE, String.valueOf(promoServiceFacade.calcTotalFee(order.getTotalFee(), coupon)));
+
+        orderInfo.put(OrderInfoFields.USER_IP, RequestUtil.getRemoteIp(request));
+
+        return orderInfo;
     }
 
     @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)

@@ -1,22 +1,14 @@
 package cn.momia.service.deal.gateway.wechatpay;
 
 import cn.momia.common.misc.XmlUtil;
-import cn.momia.common.web.misc.RequestUtil;
-import cn.momia.common.service.secret.SecretKey;
 import cn.momia.service.deal.gateway.AbstractPaymentGateway;
 import cn.momia.service.deal.gateway.CallbackParam;
 import cn.momia.service.deal.gateway.PrepayParam;
 import cn.momia.service.deal.gateway.PrepayResult;
-import cn.momia.service.product.Product;
-import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
-import cn.momia.service.promo.coupon.Coupon;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
@@ -25,13 +17,11 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 public class WechatpayGateway extends AbstractPaymentGateway {
@@ -40,70 +30,6 @@ public class WechatpayGateway extends AbstractPaymentGateway {
     private static final String DATE_FORMAT_STR = "yyyyMMddHHmmss";
     private static final DateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT_STR);
     private static final String SUCCESS = "SUCCESS";
-
-    @Override
-    public Map<String, String> extractPrepayParams(HttpServletRequest request, Order order, Product product, Coupon coupon) {
-        Map<String, String> params = new HashMap<String, String>();
-        Map<String, String[]> httpParams = request.getParameterMap();
-        String tradeType = httpParams.get(WechatpayPrepayFields.TRADE_TYPE)[0];
-        if (tradeType.equals("APP")) {
-            params.put(WechatpayPrepayFields.APPID, conf.getString("Payment.Wechat.AppAppId"));
-            params.put(WechatpayPrepayFields.PRODUCT_ID, String.valueOf(product.getId()));
-            params.put(WechatpayPrepayFields.MCH_ID, conf.getString("Payment.Wechat.AppMchId"));
-        } else if (tradeType.equals("JSAPI")) {
-            params.put(WechatpayPrepayFields.APPID, conf.getString("Payment.Wechat.JsApiAppId"));
-            params.put(WechatpayPrepayFields.OPENID, getJsApiOpenId(httpParams.get(WechatpayPrepayFields.CODE)[0]));
-            params.put(WechatpayPrepayFields.MCH_ID, conf.getString("Payment.Wechat.JsApiMchId"));
-        } else {
-            throw new RuntimeException("not supported trade type: " + tradeType);
-        }
-
-        params.put(WechatpayPrepayFields.NONCE_STR, WechatpayUtil.createNoncestr(32));
-        params.put(WechatpayPrepayFields.BODY, product.getTitle());
-        params.put(WechatpayPrepayFields.OUT_TRADE_NO, formatOutTradeNo(order.getId()));
-        params.put(WechatpayPrepayFields.TOTAL_FEE, String.valueOf((int) (promoServiceFacade.calcTotalFee(order.getTotalFee(), coupon).floatValue() * 100)));
-        params.put(WechatpayPrepayFields.SPBILL_CREATE_IP, RequestUtil.getRemoteIp(request));
-        params.put(WechatpayPrepayFields.NOTIFY_URL, conf.getString("Payment.Wechat.NotifyUrl"));
-        params.put(WechatpayPrepayFields.TRADE_TYPE, tradeType);
-        params.put(WechatpayPrepayFields.TIME_EXPIRE, DATE_FORMATTER.format(new Date(System.currentTimeMillis() + 30 * 60 * 1000)));
-        params.put(WechatpayPrepayFields.SIGN, WechatpayUtil.sign(params, tradeType));
-
-        return params;
-    }
-
-    private String formatOutTradeNo(long orderId) {
-        return orderId + DATE_FORMATTER.format(new Date());
-    }
-
-    private String getJsApiOpenId(String code) {
-        try {
-            HttpClient httpClient = HttpClients.createDefault();
-            StringBuilder urlBuilder = new StringBuilder();
-            urlBuilder.append(conf.getString("Payment.Wechat.AccessTokenService"))
-                    .append("?")
-                    .append("appid=").append(conf.getString("Payment.Wechat.JsApiAppId"))
-                    .append("&")
-                    .append("secret=").append(SecretKey.get("wechatpayJsApiKey"))
-                    .append("&")
-                    .append("code=").append(code)
-                    .append("&")
-                    .append("grant_type=authorization_code");
-            HttpGet request = new HttpGet(urlBuilder.toString());
-            HttpResponse response = httpClient.execute(request);
-            if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                throw new RuntimeException("fail to execute request: " + request);
-            }
-
-            String entity = EntityUtils.toString(response.getEntity());
-            JSONObject resultJson = JSON.parseObject(entity);
-
-            if (resultJson.containsKey("openid")) return resultJson.getString("openid");
-
-            throw new RuntimeException("fail to get openid");
-        } catch (Exception e) {
-            throw new RuntimeException("fail to get openid");
-        }
-    }
 
     @Override
     protected long getPrepayOutTradeNo(PrepayParam param) {
