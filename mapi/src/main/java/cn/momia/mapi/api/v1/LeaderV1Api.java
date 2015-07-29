@@ -2,9 +2,11 @@ package cn.momia.mapi.api.v1;
 
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
+import cn.momia.common.web.img.ImageFile;
 import cn.momia.common.web.response.ResponseMessage;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,7 +23,15 @@ public class LeaderV1Api extends AbstractV1Api {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("leader/status"), builder.build());
 
-        return executeRequest(request);
+        return executeRequest(request, new Function<Object, Object>() {
+            @Override
+            public Object apply(Object data) {
+                JSONObject statusDescJson = ((JSONObject) data).getJSONObject("desc");
+                statusDescJson.put("image", ImageFile.url(statusDescJson.getString("image")));
+
+                return data;
+            }
+        });
     }
 
     @RequestMapping(value = "/info", method = RequestMethod.GET)

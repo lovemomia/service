@@ -1,11 +1,11 @@
 package cn.momia.service.web.ctrl.user.dto;
 
 import cn.momia.service.user.leader.Leader;
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 public class LeaderStatusDto {
     private Leader leader;
-    private JSONArray desc;
+    private JSONObject desc;
 
     public int getStatus() {
         return leader.getStatus();
@@ -15,11 +15,11 @@ public class LeaderStatusDto {
         return leader.getMsg();
     }
 
-    public JSONArray getDesc() {
+    public JSONObject getDesc() {
         return desc;
     }
 
-    public LeaderStatusDto(Leader leader, JSONArray desc) {
+    public LeaderStatusDto(Leader leader, JSONObject desc) {
         this.leader = leader;
         this.desc = desc;
     }

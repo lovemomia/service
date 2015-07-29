@@ -20,7 +20,7 @@ public class LeaderController extends UserRelatedController {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        return new ResponseMessage(new LeaderStatusDto(userServiceFacade.getLeaderInfo(user.getId()), JSON.parseArray(userServiceFacade.getLeaderDesc())));
+        return new ResponseMessage(new LeaderStatusDto(userServiceFacade.getLeaderInfo(user.getId()), JSON.parseObject(userServiceFacade.getLeaderDesc())));
     }
 
     @RequestMapping(method = RequestMethod.GET)
