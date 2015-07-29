@@ -4,7 +4,7 @@ import cn.momia.common.misc.HttpUtil;
 import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.common.web.misc.RequestUtil;
 import cn.momia.common.web.response.ResponseMessage;
-import cn.momia.service.deal.gateway.OrderInfoFields;
+import cn.momia.service.deal.OrderInfoFields;
 import cn.momia.service.product.Product;
 import cn.momia.service.product.sku.Sku;
 import cn.momia.service.user.base.User;
