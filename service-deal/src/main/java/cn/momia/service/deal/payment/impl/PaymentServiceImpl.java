@@ -19,6 +19,7 @@ import java.sql.Timestamp;
 
 public class PaymentServiceImpl extends DbAccessService implements PaymentService {
     private static final String[] PAYMENT_FIELDS = { "id", "orderId", "payer", "finishTime", "payType", "tradeNo", "fee" };
+
     @Override
     public long add(final Payment payment) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
