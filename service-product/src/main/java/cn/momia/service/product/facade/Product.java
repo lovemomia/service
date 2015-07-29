@@ -233,4 +233,22 @@ public class Product implements Serializable {
 
         return "";
     }
+
+    public boolean isFinished() {
+        Date now = new Date();
+        for (Sku sku : skus) {
+            if (sku.getStartTime().after(now)) return false;
+        }
+
+        return true;
+    }
+
+    public boolean isEnd() {
+        Date now = new Date();
+        for (Sku sku : skus) {
+            if (sku.getOfflineTime().after(now)) return false;
+        }
+
+        return true;
+    }
 }

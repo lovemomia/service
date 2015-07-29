@@ -115,7 +115,9 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
 
     @Override
     public long queryCount(int cityId) {
-        String sql = "SELECT COUNT(1) FROM t_product WHERE status=1 AND onlineTime<=NOW() AND offlineTime>NOW() AND (cityId=? OR cityId=0)";
+        String sql = "SELECT COUNT(1) FROM t_product WHERE status=1 " +
+                "AND onlineTime<=NOW() AND offlineTime>NOW() " +
+                "AND (cityId=? OR cityId=0)";
 
         return jdbcTemplate.query(sql, new Object[] { cityId }, new ResultSetExtractor<Long>() {
             @Override
@@ -129,7 +131,10 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     public List<BaseProduct> query(int cityId, int start, int count) {
         final List<BaseProduct> baseProducts = new ArrayList<BaseProduct>();
 
-        String sql = "SELECT " + joinFields() + " FROM t_product WHERE status=1 AND onlineTime<=NOW() AND offlineTime>NOW() AND (cityId=? OR cityId=0) ORDER BY ordinal DESC, soldOut ASC, addTime DESC LIMIT ?,?";
+        String sql = "SELECT " + joinFields() + " FROM t_product WHERE status=1 " +
+                "AND onlineTime<=NOW() AND offlineTime>NOW() " +
+                "AND (cityId=? OR cityId=0) " +
+                "ORDER BY ordinal DESC, soldOut ASC, addTime DESC LIMIT ?,?";
         jdbcTemplate.query(sql, new Object[] { cityId, start, count }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -146,7 +151,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
         String sql = "SELECT COUNT(DISTINCT A.id) " +
                 "FROM t_product A INNER JOIN t_sku B ON A.id=B.productId " +
                 "WHERE A.status=1 AND A.onlineTime<=NOW() AND A.offlineTime>NOW() AND A.soldOut=0 " +
-                "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() AND B.startTime>NOW() " +
+                "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() " +
                 "AND (B.type=1 OR B.unlockedStock>0) AND B.onWeekend=1 " +
                 "AND (cityId=? OR cityId=0)";
 
@@ -163,9 +168,10 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
         String sql = "SELECT DISTINCT A.id " +
                 "FROM t_product A INNER JOIN t_sku B ON A.id=B.productId " +
                 "WHERE A.status=1 AND A.onlineTime<=NOW() AND A.offlineTime>NOW() AND A.soldOut=0 " +
-                "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() AND B.startTime>NOW() " +
+                "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() " +
                 "AND (B.type=1 OR B.unlockedStock>0) AND B.onWeekend=1 " +
-                "AND (cityId=? OR cityId=0) ORDER BY B.startTime ASC LIMIT ?,?";
+                "AND (cityId=? OR cityId=0) " +
+                "ORDER BY B.startTime ASC LIMIT ?,?";
         final List<Long> ids = new ArrayList<Long>();
         jdbcTemplate.query(sql, new Object[] { cityId, start, count }, new RowCallbackHandler() {
             @Override
@@ -182,7 +188,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
         String sql = "SELECT COUNT(DISTINCT A.id) " +
                 "FROM t_product A INNER JOIN t_sku B ON A.id=B.productId " +
                 "WHERE A.status=1 AND A.onlineTime<=NOW() AND A.offlineTime>NOW() AND A.soldOut=0 " +
-                "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() AND B.startTime>NOW() " +
+                "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() " +
                 "AND (B.type=1 OR B.unlockedStock>0) AND B.startTime>=? AND B.endTime<? " +
                 "AND (cityId=? OR cityId=0)";
 
@@ -199,7 +205,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
         String sql = "SELECT DISTINCT A.id " +
                 "FROM t_product A INNER JOIN t_sku B ON A.id=B.productId " +
                 "WHERE A.status=1 AND A.onlineTime<=NOW() AND A.offlineTime>NOW() AND A.soldOut=0 " +
-                "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() AND B.startTime>NOW() " +
+                "AND B.status=1 AND B.onlineTime<=NOW() AND B.offlineTime>NOW() " +
                 "AND (B.type=1 OR B.unlockedStock>0) AND B.startTime>=? AND B.endTime<? " +
                 "AND (cityId=? OR cityId=0) ORDER BY B.startTime ASC";
         final List<Long> ids = new ArrayList<Long>();

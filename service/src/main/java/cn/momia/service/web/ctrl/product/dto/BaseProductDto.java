@@ -9,6 +9,13 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class BaseProductDto extends MiniProductDto implements Dto {
+    private static final int STATUS_DELETED = 0;
+    private static final int STATUS_NORMAL = 1;
+    private static final int STATUS_OFFLINE = 2;
+    private static final int STATUS_END = 3;
+    private static final int STATUS_SOLDOUT = 4;
+    private static final int STATUS_FINISHED = 5;
+
     private boolean withSku = false;
     private boolean favored = false;
 
@@ -68,6 +75,14 @@ public class BaseProductDto extends MiniProductDto implements Dto {
 
     public ListDto getSkus() {
         return withSku ? SkuDto.toSkusDto(product.getSkus()) : null;
+    }
+
+    public int getStatus() {
+        if (product.isFinished()) return STATUS_FINISHED;
+        if (product.isSoldOut()) return STATUS_SOLDOUT;
+        if (product.isEnd()) return STATUS_END;
+
+        return product.getStatus();
     }
 
     public BaseProductDto(Product product) {
