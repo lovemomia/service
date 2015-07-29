@@ -2,8 +2,6 @@ package cn.momia.service.deal.gateway.alipay;
 
 import cn.momia.common.service.secret.SecretKey;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -13,9 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public class AlipayUtil {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AlipayUtil.class);
-
-    public static String sign(Map<String, String> params) {
+    public static String sign(Map<String, String> params, String type) {
         List<String> kvs = new ArrayList<String>();
         kvs.add(AlipayPrepayFields.PARTNER + "=\"" + params.get(AlipayPrepayFields.PARTNER) + "\"");
         kvs.add(AlipayPrepayFields.SELLER_ID + "=\"" + params.get(AlipayPrepayFields.SELLER_ID) + "\"");
@@ -29,6 +25,8 @@ public class AlipayUtil {
         kvs.add(AlipayPrepayFields.INPUT_CHARSET + "=\"" + params.get(AlipayPrepayFields.INPUT_CHARSET) + "\"");
         kvs.add(AlipayPrepayFields.IT_B_PAY + "=\"" + params.get(AlipayPrepayFields.IT_B_PAY) + "\"");
         kvs.add(AlipayPrepayFields.SHOW_URL + "=\"" + params.get(AlipayPrepayFields.SHOW_URL) + "\"");
+
+        if (!type.equalsIgnoreCase("app")) Collections.sort(kvs);
 
         try {
             return URLEncoder.encode(RSA.sign(StringUtils.join(kvs, "&"), SecretKey.get("alipayPrivateKey"), "utf-8"), "utf-8");

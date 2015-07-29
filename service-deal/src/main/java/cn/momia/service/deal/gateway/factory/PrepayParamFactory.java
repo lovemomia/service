@@ -37,7 +37,10 @@ public class PrepayParamFactory {
         PrepayParam prepayParam = createPrepayParam(payType);
         switch (payType) {
             case Payment.Type.ALIPAY:
-                prepayParam.add(AlipayPrepayFields.SERVICE, "mobile.securitypay.pay");
+                String type = params.get("type");
+                if (type.equalsIgnoreCase("app")) prepayParam.add(AlipayPrepayFields.SERVICE, "mobile.securitypay.pay");
+                else prepayParam.add(AlipayPrepayFields.SERVICE, "alipay.wap.create.direct.pay.by.user");
+
                 prepayParam.add(AlipayPrepayFields.PARTNER, conf.getString("Payment.Ali.Partner"));
                 prepayParam.add(AlipayPrepayFields.INPUT_CHARSET, "utf-8");
                 prepayParam.add(AlipayPrepayFields.SIGN_TYPE, "RSA");
@@ -50,7 +53,7 @@ public class PrepayParamFactory {
                 prepayParam.add(AlipayPrepayFields.BODY, params.get(OrderInfoFields.PRODUCT_TITLE));
                 prepayParam.add(AlipayPrepayFields.IT_B_PAY, "30m");
                 prepayParam.add(AlipayPrepayFields.SHOW_URL, "m.duolaqinzi.com");
-                prepayParam.add(AlipayPrepayFields.SIGN, AlipayUtil.sign(prepayParam.getAll()));
+                prepayParam.add(AlipayPrepayFields.SIGN, AlipayUtil.sign(prepayParam.getAll(), type));
 
                 break;
             case Payment.Type.WECHATPAY:

@@ -21,6 +21,7 @@ public class PaymentV1Api extends AbstractV1Api {
                                         @RequestParam(value = "oid") long orderId,
                                         @RequestParam(value = "pid") long productId,
                                         @RequestParam(value = "sid") long skuId,
+                                        @RequestParam(defaultValue = "app") String type,
                                         @RequestParam(required = false) Long coupon) {
         if (StringUtils.isBlank(utoken) ||
                 orderId <= 0 ||
@@ -31,7 +32,8 @@ public class PaymentV1Api extends AbstractV1Api {
                 .add("utoken", utoken)
                 .add("oid", orderId)
                 .add("pid", productId)
-                .add("sid", skuId);
+                .add("sid", skuId)
+                .add("type", type);
         if (coupon != null && coupon > 0) builder.add("coupon", coupon);
         MomiaHttpRequest request = MomiaHttpRequest.POST(url("payment/prepay/alipay"), builder.build());
 
