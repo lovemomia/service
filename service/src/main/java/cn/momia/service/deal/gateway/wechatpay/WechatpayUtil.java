@@ -1,4 +1,4 @@
-package cn.momia.service.deal.payment.gateway.wechatpay;
+package cn.momia.service.deal.gateway.wechatpay;
 
 import cn.momia.common.service.secret.SecretKey;
 import org.apache.commons.codec.digest.DigestUtils;

@@ -1,4 +1,4 @@
-package cn.momia.service.deal.payment.gateway.wechatpay;
+package cn.momia.service.deal.gateway.wechatpay;
 
 public class WechatpayCallbackFields {
     public static final String RETURN_CODE = "return_code";

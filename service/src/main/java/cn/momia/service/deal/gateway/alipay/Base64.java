@@ -1,4 +1,4 @@
-package cn.momia.service.deal.payment.gateway.alipay;
+package cn.momia.service.deal.gateway.alipay;
 
 public final class Base64 {
 

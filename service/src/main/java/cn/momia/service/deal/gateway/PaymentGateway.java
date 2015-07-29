@@ -1,4 +1,4 @@
-package cn.momia.service.deal.payment.gateway;
+package cn.momia.service.deal.gateway;
 
 import cn.momia.service.product.Product;
 import cn.momia.service.deal.order.Order;

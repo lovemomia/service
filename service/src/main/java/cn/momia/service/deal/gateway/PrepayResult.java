@@ -1,4 +1,4 @@
-package cn.momia.service.deal.payment.gateway;
+package cn.momia.service.deal.gateway;
 
 public class PrepayResult extends MapWrapper {
     private boolean successful;

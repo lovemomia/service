@@ -1,4 +1,4 @@
-package cn.momia.service.deal.payment.gateway.wechatpay;
+package cn.momia.service.deal.gateway.wechatpay;
 
 public class WechatpayPrepayFields {
     public static final String APPID = "appid"; //微信公众号id

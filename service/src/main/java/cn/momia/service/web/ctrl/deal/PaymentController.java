@@ -7,7 +7,7 @@ import cn.momia.service.product.sku.Sku;
 import cn.momia.service.user.base.User;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
-import cn.momia.service.deal.payment.gateway.PrepayResult;
+import cn.momia.service.deal.gateway.PrepayResult;
 import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.UserCoupon;
 import cn.momia.service.web.ctrl.AbstractController;

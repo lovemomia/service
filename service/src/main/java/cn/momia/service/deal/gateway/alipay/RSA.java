@@ -1,4 +1,4 @@
-package cn.momia.service.deal.payment.gateway.alipay;
+package cn.momia.service.deal.gateway.alipay;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

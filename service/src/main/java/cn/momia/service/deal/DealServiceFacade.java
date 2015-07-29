@@ -3,7 +3,7 @@ package cn.momia.service.deal;
 import cn.momia.service.deal.exception.OrderLimitException;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
-import cn.momia.service.deal.payment.gateway.PrepayResult;
+import cn.momia.service.deal.gateway.PrepayResult;
 import cn.momia.service.product.Product;
 import cn.momia.service.promo.coupon.Coupon;
 

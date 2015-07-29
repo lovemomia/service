@@ -1,4 +1,4 @@
-package cn.momia.service.deal.payment.gateway.alipay;
+package cn.momia.service.deal.gateway.alipay;
 
 public class AlipayCallbackFields {
     public static final String NOTIFY_TIME = "notify_time";//通知时间

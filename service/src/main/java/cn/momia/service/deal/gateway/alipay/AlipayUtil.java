@@ -1,4 +1,4 @@
-package cn.momia.service.deal.payment.gateway.alipay;
+package cn.momia.service.deal.gateway.alipay;
 
 import cn.momia.common.service.secret.SecretKey;
 import org.apache.commons.lang3.StringUtils;

@@ -1,12 +1,12 @@
-package cn.momia.service.deal.payment.gateway.alipay;
+package cn.momia.service.deal.gateway.alipay;
 
+import cn.momia.service.deal.gateway.AbstractPaymentGateway;
+import cn.momia.service.deal.gateway.CallbackParam;
+import cn.momia.service.deal.gateway.PrepayResult;
 import cn.momia.service.product.Product;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
-import cn.momia.service.deal.payment.gateway.AbstractPaymentGateway;
-import cn.momia.service.deal.payment.gateway.CallbackParam;
-import cn.momia.service.deal.payment.gateway.PrepayParam;
-import cn.momia.service.deal.payment.gateway.PrepayResult;
+import cn.momia.service.deal.gateway.PrepayParam;
 import cn.momia.service.promo.coupon.Coupon;
 import com.alibaba.fastjson.util.TypeUtils;
 import org.apache.http.HttpResponse;

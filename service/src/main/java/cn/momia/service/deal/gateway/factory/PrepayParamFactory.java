@@ -1,6 +1,6 @@
-package cn.momia.service.deal.payment.gateway.factory;
+package cn.momia.service.deal.gateway.factory;
 
-import cn.momia.service.deal.payment.gateway.PrepayParam;
+import cn.momia.service.deal.gateway.PrepayParam;
 
 import java.util.Map;
 

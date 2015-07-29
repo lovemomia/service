@@ -1,11 +1,9 @@
-package cn.momia.service.deal.payment.gateway;
+package cn.momia.service.deal.gateway;
 
 import cn.momia.common.config.Configuration;
 import cn.momia.service.deal.DealServiceFacade;
-import cn.momia.service.product.ProductServiceFacade;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
-import cn.momia.service.promo.PromoServiceFacade;
 import cn.momia.service.promo.coupon.UserCoupon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +13,6 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
 
     protected Configuration conf;
     protected DealServiceFacade dealServiceFacade;
-    protected PromoServiceFacade promoServiceFacade;
-    protected ProductServiceFacade productServiceFacade;
 
     public void setConf(Configuration conf) {
         this.conf = conf;
@@ -24,14 +20,6 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
 
     public void setDealServiceFacade(DealServiceFacade dealServiceFacade) {
         this.dealServiceFacade = dealServiceFacade;
-    }
-
-    public void setPromoServiceFacade(PromoServiceFacade promoServiceFacade) {
-        this.promoServiceFacade = promoServiceFacade;
-    }
-
-    public void setProductServiceFacade(ProductServiceFacade productServiceFacade) {
-        this.productServiceFacade = productServiceFacade;
     }
 
     @Override

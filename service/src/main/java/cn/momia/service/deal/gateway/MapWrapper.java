@@ -1,4 +1,4 @@
-package cn.momia.service.deal.payment.gateway;
+package cn.momia.service.deal.gateway;
 
 import java.util.HashMap;
 import java.util.Map;
