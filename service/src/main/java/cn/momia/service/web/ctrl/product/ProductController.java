@@ -94,7 +94,7 @@ public class ProductController extends AbstractController {
         ListDto baseProductsDto = new ListDto();
         for (Product product : products) {
             BaseProductDto baseProductDto = new BaseProductDto(product);
-            baseProductDto.setScheduler(product.weekendScheduler());
+            baseProductDto.setScheduler(product.getWeekendScheduler());
             baseProductsDto.add(baseProductDto);
         }
         productsDto.addAll(baseProductsDto);
@@ -138,7 +138,7 @@ public class ProductController extends AbstractController {
                             productsDto.add(productsOfDayDto);
                         }
                         BaseProductDto baseProductDto = new BaseProductDto(product);
-                        baseProductDto.setScheduler(sku.time());
+                        baseProductDto.setScheduler(sku.getTime());
                         if (productsOfDayDto.getProducts().size() < pageSize) productsOfDayDto.addProduct(baseProductDto);
                     }
                 }
@@ -318,7 +318,7 @@ public class ProductController extends AbstractController {
         for (Sku sku : skus) {
             try {
                 SkuPlaymatesDto skuPlaymatesDto = new SkuPlaymatesDto();
-                skuPlaymatesDto.setTime(sku.time());
+                skuPlaymatesDto.setTime(sku.getTime());
                 skuPlaymatesDto.setJoined(formatJoined(skuOrdersMap.get(sku.getId())));
                 skuPlaymatesDto.setPlaymates(extractPlayMates(sku.getId(), skuCustomerIdsMap, customerPrticipantsIdsMap, customersMap, participantsMap));
 

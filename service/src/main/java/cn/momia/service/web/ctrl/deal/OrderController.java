@@ -69,7 +69,7 @@ public class OrderController extends AbstractController {
                 order.getPrices().isEmpty() ||
                 StringUtils.isBlank(order.getMobile()) ||
                 order.getProductId() != sku.getProductId() ||
-                sku.closed(new Date())) return false;
+                sku.isClosed(new Date())) return false;
 
         for (OrderPrice price : order.getPrices()) {
             boolean found = false;

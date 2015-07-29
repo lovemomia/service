@@ -57,7 +57,7 @@ public class SkuDto implements Dto {
     }
 
     public String getTime() {
-        return sku.time();
+        return sku.getTime();
     }
 
     public List<SkuPrice> getPrices() {

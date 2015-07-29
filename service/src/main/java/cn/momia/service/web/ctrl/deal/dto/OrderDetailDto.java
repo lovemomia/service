@@ -35,7 +35,7 @@ public class OrderDetailDto extends OrderDto implements Dto {
     }
 
     public String getTime() {
-        return product.skuTime(getSkuId());
+        return product.getSkuTime(getSkuId());
     }
 
     public OrderDetailDto(Order order, Product product) {

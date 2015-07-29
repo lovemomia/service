@@ -51,7 +51,7 @@ public class PaymentController extends AbstractController {
 
         Product product = productServiceFacade.get(order.getProductId(), true);
         Sku sku = productServiceFacade.getSku(order.getSkuId());
-        if (!product.exists() || !sku.exists() || sku.closed(new Date())) return ResponseMessage.FAILED("无效的订单");
+        if (!product.exists() || !sku.exists() || sku.isClosed(new Date())) return ResponseMessage.FAILED("无效的订单");
 
         String userCouponIdStr = request.getParameter("coupon");
         long userCouponId = StringUtils.isBlank(userCouponIdStr) ? 0 : Long.valueOf(userCouponIdStr);
@@ -125,7 +125,7 @@ public class PaymentController extends AbstractController {
 
         Product product = productServiceFacade.get(order.getProductId(), true);
         Sku sku = productServiceFacade.getSku(order.getSkuId());
-        if (!product.exists() || !sku.exists() || sku.closed(new Date())) return ResponseMessage.FAILED("无效的订单");
+        if (!product.exists() || !sku.exists() || sku.isClosed(new Date())) return ResponseMessage.FAILED("无效的订单");
 
         BigDecimal totalFee = order.getTotalFee();
         if (userCouponId != null && userCouponId > 0) {

@@ -157,7 +157,7 @@ public class Product implements Serializable {
     public String getScheduler() {
         List<Date> times = new ArrayList<Date>();
         for (Sku sku : skus) {
-            times.addAll(sku.startEndTimes());
+            times.addAll(sku.getStartEndTimes());
         }
         Collections.sort(times);
 
@@ -180,11 +180,11 @@ public class Product implements Serializable {
         }
     }
 
-    public String weekendScheduler() {
+    public String getWeekendScheduler() {
         List<Date> times = new ArrayList<Date>();
         Date today = new Date();
         for (Sku sku : skus) {
-            if (sku.isOnWeekend() && !sku.closed(today)) times.addAll(sku.startEndTimes());
+            if (sku.isOnWeekend() && !sku.isClosed(today)) times.addAll(sku.getStartEndTimes());
         }
         Collections.sort(times);
 
@@ -219,16 +219,16 @@ public class Product implements Serializable {
         return miniPrice;
     }
 
-    public boolean invalid() {
+    public boolean isInvalid() {
         return !(baseProduct != null && baseProduct.exists() &&
                 imgs != null && !imgs.isEmpty() &&
                 place != null && place.exists() &&
                 skus != null && !skus.isEmpty());
     }
 
-    public String skuTime(long skuId) {
+    public String getSkuTime(long skuId) {
         for (Sku sku : skus) {
-            if (sku.getId() == skuId) return sku.time();
+            if (sku.getId() == skuId) return sku.getTime();
         }
 
         return "";

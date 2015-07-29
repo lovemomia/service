@@ -132,7 +132,7 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
             product.setPlace(placeOfProducts.get(baseProduct.getPlaceId()));
             product.setSkus(skusOfProducts.get(baseProduct.getId()));
 
-            if (!product.invalid()) products.add(product);
+            if (!product.isInvalid()) products.add(product);
         }
 
         return products;

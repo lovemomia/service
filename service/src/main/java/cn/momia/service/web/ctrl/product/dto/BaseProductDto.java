@@ -79,8 +79,9 @@ public class BaseProductDto extends MiniProductDto implements Dto {
 
     public int getStatus() {
         if (product.isFinished()) return STATUS_FINISHED;
-        if (product.isSoldOut()) return STATUS_SOLDOUT;
         if (product.isEnd()) return STATUS_END;
+
+        if (product.isOpened()) return STATUS_SOLDOUT;
 
         return product.getStatus();
     }

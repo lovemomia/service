@@ -54,7 +54,7 @@ public class Sku implements Serializable {
     }
 
     private Date startTime() {
-        List<Date> times = startEndTimes();
+        List<Date> times = getStartEndTimes();
         if (times.isEmpty()) return null;
 
         Collections.sort(times);
@@ -66,7 +66,7 @@ public class Sku implements Serializable {
 
         Date today = new Date();
         for (Sku sku : skus) {
-            if (sku.closed(today)) continue;
+            if (sku.isClosed(today)) continue;
             filteredSkus.add(sku);
         }
 
@@ -237,15 +237,15 @@ public class Sku implements Serializable {
         return !this.equals(NOT_EXIST_SKU);
     }
 
-    public String time() {
+    public String getTime() {
         for (SkuProperty property : properties) {
-            if ("time".equalsIgnoreCase(property.getName())) return getSkuTime(property.getValue());
+            if ("time".equalsIgnoreCase(property.getName())) return formatTime(property.getValue());
         }
 
         return "";
     }
 
-    private String getSkuTime(String timeValue) {
+    private String formatTime(String timeValue) {
         if (StringUtils.isBlank(timeValue)) return "";
 
         List<String> timeStrs = Lists.newArrayList(TIME_SPLITTER.split(timeValue));
@@ -291,7 +291,7 @@ public class Sku implements Serializable {
         return minPrice;
     }
 
-    public List<Date> startEndTimes() {
+    public List<Date> getStartEndTimes() {
         for (SkuProperty property : properties) {
             if ("time".equalsIgnoreCase(property.getName())) {
                 return TimeUtil.castToDates(Lists.newArrayList(TIME_SPLITTER.split(property.getValue())));
@@ -310,7 +310,7 @@ public class Sku implements Serializable {
         return prices;
     }
 
-    public boolean closed(Date today) {
+    public boolean isClosed(Date today) {
         if (offlineTime.before(today) ||
                 startTime.before(today) ||
                 (type != 1 && unlockedStock <= 0)) return true;
