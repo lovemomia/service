@@ -80,7 +80,7 @@ public class LeaderServiceImpl extends DbAccessService implements LeaderService 
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO t_user_leader(userId, name, mobile, cityId, regionId, address, career, intro, addTime) VALUES(?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO t_user_leader(userId, name, mobile, cityId, regionId, address, career, intro, status, addTime) VALUES(?, ?, ?, ?, ?, ?, ?, ?, 2, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setLong(1, leader.getUserId());
                 ps.setString(2, leader.getName());
@@ -100,7 +100,7 @@ public class LeaderServiceImpl extends DbAccessService implements LeaderService 
 
     @Override
     public boolean update(Leader leader) {
-        String sql = "UPDATE t_user_leader SET name=?, mobile=?, cityId=?, regionId=?, address=?, career=?, intro=?, status=1 WHERE userId=?";
+        String sql = "UPDATE t_user_leader SET name=?, mobile=?, cityId=?, regionId=?, address=?, career=?, intro=?, status=2 WHERE userId=?";
 
         return jdbcTemplate.update(sql, new Object[] { leader.getName(),
                 leader.getMobile(),
