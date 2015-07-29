@@ -26,6 +26,11 @@
         </dependency>
         <dependency>
             <groupId>cn.momia</groupId>
+            <artifactId>duola-service-deal</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.momia</groupId>
             <artifactId>duola-service-feed</artifactId>
             <version>1.0.0</version>
         </dependency>

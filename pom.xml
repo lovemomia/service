@@ -19,6 +19,7 @@
         <module>mapi</module>
         <module>service</module>
         <module>service-common</module>
+        <module>service-deal</module>
         <module>service-feed</module>
         <module>service-product</module>
         <module>service-promo</module>
