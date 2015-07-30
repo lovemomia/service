@@ -109,13 +109,25 @@ public class UserV1Api extends AbstractV1Api {
     }
 
     @RequestMapping(value = "/city", method = RequestMethod.POST)
-    public ResponseMessage updateCity(@RequestParam String utoken, @RequestParam int city) {
-        if(StringUtils.isBlank(utoken) || city <= 0) return ResponseMessage.BAD_REQUEST;
+    public ResponseMessage updateCity(@RequestParam String utoken, @RequestParam(value = "city") int cityId) {
+        if(StringUtils.isBlank(utoken) || cityId <= 0) return ResponseMessage.BAD_REQUEST;
 
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
-                .add("city", city);
+                .add("city", cityId);
         MomiaHttpRequest request = MomiaHttpRequest.PUT(url("user/city"), builder.build());
+
+        return executeRequest(request, userFunc);
+    }
+
+    @RequestMapping(value = "/region", method = RequestMethod.POST)
+    public ResponseMessage updateRegion(@RequestParam String utoken, @RequestParam(value = "region") int regionId) {
+        if(StringUtils.isBlank(utoken) || regionId <= 0) return ResponseMessage.BAD_REQUEST;
+
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("region", regionId);
+        MomiaHttpRequest request = MomiaHttpRequest.PUT(url("user/region"), builder.build());
 
         return executeRequest(request, userFunc);
     }

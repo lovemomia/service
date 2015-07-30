@@ -86,7 +86,7 @@ public class UserController extends UserRelatedController {
     }
 
     @RequestMapping(value = "/birthday", method = RequestMethod.PUT)
-    public ResponseMessage updateDesc(@RequestParam String utoken, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date birthday) {
+    public ResponseMessage updateBirthday(@RequestParam String utoken, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date birthday) {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
@@ -98,14 +98,26 @@ public class UserController extends UserRelatedController {
     }
 
     @RequestMapping(value = "/city", method = RequestMethod.PUT)
-    public ResponseMessage updateDesc(@RequestParam String utoken, @RequestParam int city) {
+    public ResponseMessage updateCity(@RequestParam String utoken, @RequestParam(value = "city") int cityId) {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        boolean successful = userServiceFacade.updateUserCityId(user.getId(), city);
+        boolean successful = userServiceFacade.updateUserCityId(user.getId(), cityId);
         if (!successful) return ResponseMessage.FAILED("更新用户城市失败");
 
-        user.setCity(city);
+        user.setCityId(cityId);
+        return new ResponseMessage(buildUserResponse(user));
+    }
+
+    @RequestMapping(value = "/region", method = RequestMethod.PUT)
+    public ResponseMessage updateRegion(@RequestParam String utoken, @RequestParam(value = "region") int regionId) {
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        boolean successful = userServiceFacade.updateUserRegionId(user.getId(), regionId);
+        if (!successful) return ResponseMessage.FAILED("更新用户所在区域失败");
+
+        user.setRegionId(regionId);
         return new ResponseMessage(buildUserResponse(user));
     }
 

@@ -26,6 +26,7 @@ public interface UserServiceFacade {
     boolean updateUserSex(long userId, String sex);
     boolean updateUserBirthday(long userId, Date birthday);
     boolean updateUserCityId(long userId, int cityId);
+    boolean updateUserRegionId(long userId, int regionId);
     boolean updateUserAddress(long userId, String address);
     boolean updateUserChildren(long userId, Set<Long> children);
     User updateUserPassword(String mobile, String password);

@@ -134,6 +134,12 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
     }
 
     @Override
+    public boolean updateUserRegionId(long userId, int regionId) {
+        if (regionId < 0) return false;
+        return userService.updateRegionId(userId, regionId);
+    }
+
+    @Override
     public boolean updateUserAddress(long userId, String address) {
         if (StringUtils.isBlank(address)) return false;
         return userService.updateAddress(userId, address);

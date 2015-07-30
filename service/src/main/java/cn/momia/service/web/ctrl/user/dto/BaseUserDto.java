@@ -32,8 +32,12 @@ public class BaseUserDto extends MiniUserDto {
         return user.getBirthday();
     }
 
-    public int getCity() {
-        return user.getCity();
+    public int getCityId() {
+        return user.getCityId();
+    }
+
+    public int getRegionId() {
+        return user.getRegionId();
     }
 
     public String getAddress() {

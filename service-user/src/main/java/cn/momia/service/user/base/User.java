@@ -28,7 +28,8 @@ public class User implements Serializable {
     private String name;
     private String sex;
     private Date birthday;
-    private int city;
+    private int cityId;
+    private int regionId;
     private String address;
     private Set<Long> children;
 
@@ -104,12 +105,20 @@ public class User implements Serializable {
         this.birthday = birthday;
     }
 
-    public int getCity() {
-        return city;
+    public int getCityId() {
+        return cityId;
     }
 
-    public void setCity(int city) {
-        this.city = city;
+    public void setCityId(int cityId) {
+        this.cityId = cityId;
+    }
+
+    public int getRegionId() {
+        return regionId;
+    }
+
+    public void setRegionId(int regionId) {
+        this.regionId = regionId;
     }
 
     public String getAddress() {

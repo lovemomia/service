@@ -32,7 +32,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private static final Splitter CHILDREN_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
-    private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "password", "avatar", "name", "sex", "birthday", "cityId", "address", "children" };
+    private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "password", "avatar", "name", "sex", "birthday", "cityId", "regionId", "address", "children" };
 
     @Override
     public boolean exists(String field, String value) {
@@ -110,7 +110,8 @@ public class UserServiceImpl extends DbAccessService implements UserService {
             user.setName(rs.getString("name"));
             user.setSex(rs.getString("sex"));
             user.setBirthday(rs.getDate("birthday"));
-            user.setCity(rs.getInt("cityId"));
+            user.setCityId(rs.getInt("cityId"));
+            user.setRegionId(rs.getInt("regionId"));
             user.setAddress(rs.getString("address"));
             user.setChildren(parseChildren(rs.getString("children")));
 
@@ -217,6 +218,13 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         String sql = "UPDATE t_user SET `cityId`=? WHERE id=?";
 
         return update(sql, new Object[] { cityId, id });
+    }
+
+    @Override
+    public boolean updateRegionId(long id, int regionId) {
+        String sql = "UPDATE t_user SET `regionId`=? WHERE id=?";
+
+        return update(sql, new Object[] { regionId, id });
     }
 
     @Override
