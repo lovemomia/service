@@ -28,8 +28,11 @@ public class LeaderV1Api extends AbstractV1Api {
         return executeRequest(request, new Function<Object, Object>() {
             @Override
             public Object apply(Object data) {
-                JSONObject statusDescJson = ((JSONObject) data).getJSONObject("desc");
-                statusDescJson.put("image", ImageFile.url(statusDescJson.getString("image")));
+                JSONObject leaderApplyJson = (JSONObject) data;
+                if (leaderApplyJson.containsKey("desc")) {
+                    JSONObject statusDescJson = leaderApplyJson.getJSONObject("desc");
+                    statusDescJson.put("image", ImageFile.url(statusDescJson.getString("image")));
+                }
 
                 return data;
             }
