@@ -13,18 +13,19 @@ import java.util.Map;
 public class AlipayUtil {
     public static String sign(Map<String, String> params, String type) {
         List<String> kvs = new ArrayList<String>();
-        kvs.add(AlipayPrepayFields.PARTNER + "=\"" + params.get(AlipayPrepayFields.PARTNER) + "\"");
-        kvs.add(AlipayPrepayFields.SELLER_ID + "=\"" + params.get(AlipayPrepayFields.SELLER_ID) + "\"");
-        kvs.add(AlipayPrepayFields.OUT_TRADE_NO + "=\"" + params.get(AlipayPrepayFields.OUT_TRADE_NO) + "\"");
-        kvs.add(AlipayPrepayFields.SUBJECT + "=\"" + params.get(AlipayPrepayFields.SUBJECT) + "\"");
-        kvs.add(AlipayPrepayFields.BODY + "=\"" + params.get(AlipayPrepayFields.BODY) + "\"");
-        kvs.add(AlipayPrepayFields.TOTAL_FEE + "=\"" + params.get(AlipayPrepayFields.TOTAL_FEE) + "\"");
-        kvs.add(AlipayPrepayFields.NOTIFY_URL + "=\"" + params.get(AlipayPrepayFields.NOTIFY_URL) + "\"");
-        kvs.add(AlipayPrepayFields.SERVICE + "=\"" + params.get(AlipayPrepayFields.SERVICE) + "\"");
-        kvs.add(AlipayPrepayFields.PAYMENT_TYPE + "=\"" + params.get(AlipayPrepayFields.PAYMENT_TYPE) + "\"");
-        kvs.add(AlipayPrepayFields.INPUT_CHARSET + "=\"" + params.get(AlipayPrepayFields.INPUT_CHARSET) + "\"");
-        kvs.add(AlipayPrepayFields.IT_B_PAY + "=\"" + params.get(AlipayPrepayFields.IT_B_PAY) + "\"");
-        kvs.add(AlipayPrepayFields.SHOW_URL + "=\"" + params.get(AlipayPrepayFields.SHOW_URL) + "\"");
+        String quote = type.equalsIgnoreCase("app") ? "\"" : "";
+        kvs.add(AlipayPrepayFields.PARTNER + "=" + quote + params.get(AlipayPrepayFields.PARTNER) + quote);
+        kvs.add(AlipayPrepayFields.SELLER_ID + "=" + quote + params.get(AlipayPrepayFields.SELLER_ID) + quote);
+        kvs.add(AlipayPrepayFields.OUT_TRADE_NO + "=" + quote + params.get(AlipayPrepayFields.OUT_TRADE_NO) + quote);
+        kvs.add(AlipayPrepayFields.SUBJECT + "=" + quote + params.get(AlipayPrepayFields.SUBJECT) + quote);
+        kvs.add(AlipayPrepayFields.BODY + "=" + quote + params.get(AlipayPrepayFields.BODY) + quote);
+        kvs.add(AlipayPrepayFields.TOTAL_FEE + "=" + quote + params.get(AlipayPrepayFields.TOTAL_FEE) + quote);
+        kvs.add(AlipayPrepayFields.NOTIFY_URL + "=" + quote + params.get(AlipayPrepayFields.NOTIFY_URL) + quote);
+        kvs.add(AlipayPrepayFields.SERVICE + "=" + quote + params.get(AlipayPrepayFields.SERVICE) + quote);
+        kvs.add(AlipayPrepayFields.PAYMENT_TYPE + "=" + quote + params.get(AlipayPrepayFields.PAYMENT_TYPE) + quote);
+        kvs.add(AlipayPrepayFields.INPUT_CHARSET + "=" + quote + params.get(AlipayPrepayFields.INPUT_CHARSET) + quote);
+        kvs.add(AlipayPrepayFields.IT_B_PAY + "=" + quote + params.get(AlipayPrepayFields.IT_B_PAY) + quote);
+        kvs.add(AlipayPrepayFields.SHOW_URL + "=" + quote + params.get(AlipayPrepayFields.SHOW_URL) + quote);
 
         if (!type.equalsIgnoreCase("app")) Collections.sort(kvs);
 
@@ -49,5 +50,4 @@ public class AlipayUtil {
 
         return RSA.verify(StringUtils.join(kvs, "&"), returnedSign, SecretKey.get("alipayPublicKey"), "utf-8");
     }
-
 }
