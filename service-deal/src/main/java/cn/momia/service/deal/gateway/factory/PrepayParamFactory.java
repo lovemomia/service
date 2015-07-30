@@ -53,7 +53,7 @@ public class PrepayParamFactory {
                 prepayParam.add(AlipayPrepayFields.BODY, params.get(OrderInfoFields.PRODUCT_TITLE));
                 prepayParam.add(AlipayPrepayFields.IT_B_PAY, "30m");
                 prepayParam.add(AlipayPrepayFields.SHOW_URL, "m.duolaqinzi.com");
-                prepayParam.add(AlipayPrepayFields.SIGN, AlipayUtil.sign(prepayParam.getAll(), type));
+                prepayParam.add(AlipayPrepayFields.SIGN, AlipayUtil.sign(prepayParam.getAll(), type, Long.valueOf(params.get(OrderInfoFields.PRODUCT_ID))));
 
                 break;
             case Payment.Type.WECHATPAY:

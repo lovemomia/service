@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public class AlipayUtil {
-    public static String sign(Map<String, String> params, String type) {
+    public static String sign(Map<String, String> params, String type, long productId) {
         List<String> kvs = new ArrayList<String>();
         String quote = type.equalsIgnoreCase("app") ? "\"" : "";
         kvs.add(AlipayPrepayFields.PARTNER + "=" + quote + params.get(AlipayPrepayFields.PARTNER) + quote);
@@ -26,6 +26,7 @@ public class AlipayUtil {
         kvs.add(AlipayPrepayFields.INPUT_CHARSET + "=" + quote + params.get(AlipayPrepayFields.INPUT_CHARSET) + quote);
         kvs.add(AlipayPrepayFields.IT_B_PAY + "=" + quote + params.get(AlipayPrepayFields.IT_B_PAY) + quote);
         kvs.add(AlipayPrepayFields.SHOW_URL + "=" + quote + params.get(AlipayPrepayFields.SHOW_URL) + quote);
+        if (type.equalsIgnoreCase("wap")) kvs.add(AlipayPrepayFields.RETURN_URL + "=" + "http://m.duolaqinzi.com/m/product?id=" + productId); // TODO config url
 
         if (!type.equalsIgnoreCase("app")) Collections.sort(kvs);
 

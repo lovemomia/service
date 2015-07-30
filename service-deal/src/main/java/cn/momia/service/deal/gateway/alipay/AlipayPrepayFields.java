@@ -15,4 +15,5 @@ public class AlipayPrepayFields {
     public static final String BODY = "body";
     public static final String IT_B_PAY = "it_b_pay";
     public static final String SHOW_URL = "show_url";
+    public static final String RETURN_URL = "return_url";
 }
