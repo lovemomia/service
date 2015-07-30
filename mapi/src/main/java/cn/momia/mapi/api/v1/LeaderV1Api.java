@@ -23,7 +23,7 @@ public class LeaderV1Api extends AbstractV1Api {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("pid", productId);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("leader/status"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("leader/apply"), builder.build());
 
         return executeRequest(request, new Function<Object, Object>() {
             @Override
