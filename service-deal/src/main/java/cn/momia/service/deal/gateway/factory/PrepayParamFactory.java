@@ -2,7 +2,6 @@ package cn.momia.service.deal.gateway.factory;
 
 import cn.momia.common.service.config.Configuration;
 import cn.momia.common.service.exception.MomiaFailedException;
-import cn.momia.common.service.secret.SecretKey;
 import cn.momia.service.deal.facade.OrderInfoFields;
 import cn.momia.service.deal.gateway.PrepayParam;
 import cn.momia.service.deal.gateway.alipay.AlipayPrepayFields;
@@ -94,7 +93,7 @@ public class PrepayParamFactory {
                     .append("?")
                     .append("appid=").append(Configuration.getString("Payment.Wechat.JsApiAppId"))
                     .append("&")
-                    .append("secret=").append(SecretKey.get("wechatpayJsApiKey"))
+                    .append("secret=").append(Configuration.getSecretKey("wechatpayJsApiKey"))
                     .append("&")
                     .append("code=").append(code)
                     .append("&")

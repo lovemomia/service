@@ -1,6 +1,6 @@
 package cn.momia.mapi.web.filter;
 
-import cn.momia.common.service.secret.SecretKey;
+import cn.momia.common.service.config.Configuration;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -98,7 +98,7 @@ public class ValidationFilter implements Filter {
             kvs.add(key + "=" + value);
         }
         Collections.sort(kvs);
-        kvs.add("key=" + SecretKey.get());
+        kvs.add("key=" + Configuration.getSecretKey());
 
         String sign = httpRequest.getParameter("sign");
 

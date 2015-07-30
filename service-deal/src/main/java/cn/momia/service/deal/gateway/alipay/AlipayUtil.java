@@ -1,6 +1,6 @@
 package cn.momia.service.deal.gateway.alipay;
 
-import cn.momia.common.service.secret.SecretKey;
+import cn.momia.common.service.config.Configuration;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -31,7 +31,7 @@ public class AlipayUtil {
         if (!type.equalsIgnoreCase("app")) Collections.sort(kvs);
 
         try {
-            return URLEncoder.encode(RSA.sign(StringUtils.join(kvs, "&"), SecretKey.get("alipayPrivateKey"), "utf-8"), "utf-8");
+            return URLEncoder.encode(RSA.sign(StringUtils.join(kvs, "&"), Configuration.getSecretKey("alipayPrivateKey"), "utf-8"), "utf-8");
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
@@ -49,6 +49,6 @@ public class AlipayUtil {
 
         String returnedSign = params.get(AlipayCallbackFields.SIGN);
 
-        return RSA.verify(StringUtils.join(kvs, "&"), returnedSign, SecretKey.get("alipayPublicKey"), "utf-8");
+        return RSA.verify(StringUtils.join(kvs, "&"), returnedSign, Configuration.getSecretKey("alipayPublicKey"), "utf-8");
     }
 }

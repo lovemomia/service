@@ -1,15 +1,16 @@
 package cn.momia.common.web.config;
 
 import cn.momia.common.service.config.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.XMLConfiguration;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class ConfigurationTest {
     @Test
-    public void testGetValue() {
+    public void testGetValue() throws ConfigurationException {
         Configuration conf = new Configuration();
-        conf.setFileName("conf/configuration-test.xml");
-        conf.init();
+        conf.setXmlConf(new XMLConfiguration("conf/configuration-test.xml"));
 
         Assert.assertTrue(conf.getBoolean("Boolean"));
         Assert.assertEquals(conf.getInt("Integer"), 10);

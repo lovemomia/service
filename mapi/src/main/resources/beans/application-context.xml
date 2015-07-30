@@ -4,13 +4,17 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="conf" class="cn.momia.common.service.config.Configuration" init-method="init">
+    <bean id="conf" class="org.apache.commons.configuration.XMLConfiguration" init-method="load">
         <property name="fileName" value="conf/configuration.xml" />
     </bean>
 
-    <bean class="cn.momia.common.web.config.XmlPropertyPlaceholderConfigurer" depends-on="conf" />
+    <bean class="cn.momia.common.service.config.XmlPropertyPlaceholderConfigurer">
+        <property name="conf" ref="conf" />
+    </bean>
 
-    <bean class="cn.momia.common.web.logger.LoggerConfigurer" init-method="init" depends-on="conf" />
+    <bean class="cn.momia.common.web.logger.LoggerConfigurer" init-method="init">
+        <property name="conf" ref="conf" />
+    </bean>
 
     <bean class="cn.momia.common.web.img.ImageFile">
         <property name="domain" value="${Image.Domain}" />
@@ -33,8 +37,13 @@
         <property name="dataSource" ref="dataSource" />
     </bean>
 
-    <bean class="cn.momia.common.service.secret.SecretKey" init-method="init" depends-on="conf">
+    <bean class="cn.momia.common.service.config.SecretKey" init-method="init">
+        <property name="biz" value="${Server.Biz}" />
         <property name="jdbcTemplate" ref="jdbcTemplate" />
+    </bean>
+
+    <bean class="cn.momia.common.service.config.Configuration">
+        <property name="xmlConf" ref="conf" />
     </bean>
 
     <bean id="requestExecutor" class="cn.momia.common.web.http.MomiaHttpRequestExecutor" />

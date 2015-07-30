@@ -1,8 +1,8 @@
 package cn.momia.service.user.facade.impl;
 
 import cn.momia.common.misc.ValidateUtil;
+import cn.momia.common.service.config.Configuration;
 import cn.momia.common.service.exception.MomiaFailedException;
-import cn.momia.common.service.secret.SecretKey;
 import cn.momia.service.user.facade.UserServiceFacade;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
@@ -63,7 +63,7 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
     }
 
     private String generateToken(String mobile) {
-        return DigestUtils.md5Hex(StringUtils.join(new String[] { mobile, new Date().toString(), SecretKey.get() }, "|"));
+        return DigestUtils.md5Hex(StringUtils.join(new String[] { mobile, new Date().toString(), Configuration.getSecretKey() }, "|"));
     }
 
     @Override

@@ -1,7 +1,7 @@
 package cn.momia.service.user.base.impl;
 
 import cn.momia.common.secret.PasswordEncryptor;
-import cn.momia.common.service.secret.SecretKey;
+import cn.momia.common.service.config.Configuration;
 import cn.momia.common.service.impl.DbAccessService;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
@@ -56,7 +56,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, nickName);
                 ps.setString(2, mobile);
-                ps.setString(3, PasswordEncryptor.encrypt(mobile, password, SecretKey.getPasswordSecretKey()));
+                ps.setString(3, PasswordEncryptor.encrypt(mobile, password, Configuration.getPasswordSecretKey()));
                 ps.setString(4, token);
 
                 return ps;
@@ -70,7 +70,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     public boolean validatePassword(String mobile, String password) {
         String sql = "SELECT mobile, password FROM t_user WHERE mobile=? AND password=?";
 
-        return jdbcTemplate.query(sql, new Object[] { mobile, PasswordEncryptor.encrypt(mobile, password, SecretKey.getPasswordSecretKey()) }, new ResultSetExtractor<Boolean>() {
+        return jdbcTemplate.query(sql, new Object[] { mobile, PasswordEncryptor.encrypt(mobile, password, Configuration.getPasswordSecretKey()) }, new ResultSetExtractor<Boolean>() {
             @Override
             public Boolean extractData(ResultSet resultSet) throws SQLException, DataAccessException {
                 if (resultSet.next()) return true;
@@ -245,6 +245,6 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     public boolean updatePassword(long id, String mobile, String password) {
         String sql = "UPDATE t_user SET password=? WHERE id=?";
 
-        return update(sql, new Object[] { PasswordEncryptor.encrypt(mobile, password, SecretKey.getPasswordSecretKey()), id });
+        return update(sql, new Object[] { PasswordEncryptor.encrypt(mobile, password, Configuration.getPasswordSecretKey()), id });
     }
 }

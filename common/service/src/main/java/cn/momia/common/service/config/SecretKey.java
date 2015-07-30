@@ -1,6 +1,5 @@
-package cn.momia.common.service.secret;
+package cn.momia.common.service.config;
 
-import cn.momia.common.service.config.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -17,6 +16,10 @@ public class SecretKey
 
     private JdbcTemplate jdbcTemplate;
 
+    public void setBiz(String biz) {
+        SecretKey.biz = biz;
+    }
+
     public void setJdbcTemplate(JdbcTemplate jdbcTemplate)
     {
         this.jdbcTemplate = jdbcTemplate;
@@ -24,8 +27,6 @@ public class SecretKey
 
     public void init()
     {
-        biz = Configuration.getString("Server.Biz");
-
         String sql = "SELECT biz, `key` FROM t_secret WHERE status=1 ORDER BY updateTime ASC";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override

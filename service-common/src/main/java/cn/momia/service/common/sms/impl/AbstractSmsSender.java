@@ -19,13 +19,6 @@ import java.util.concurrent.TimeUnit;
 public abstract class AbstractSmsSender extends DbAccessService implements SmsSender {
     private ExecutorService executorService;
 
-    public void init() {
-        int corePoolSize = Configuration.getInt("Sms.CorePoolSize");
-        int maxPoolSize = Configuration.getInt("Sms.MaxPoolSize");
-        int queueSize = Configuration.getInt("Sms.QueueSize");
-        executorService = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 5, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(queueSize));
-    }
-
     @Override
     public boolean send(String mobile, String type) {
         if(StringUtils.equals(type, "login") && !userExists(mobile)) throw new MomiaFailedException("用户不存在，请先注册");
@@ -113,6 +106,8 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
     }
 
     private void sendAsync(final String mobile, final String code) {
+        if (executorService == null) initExecutorService();
+
         executorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -121,6 +116,15 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
                 }
             }
         });
+    }
+
+    private synchronized void initExecutorService() {
+        if (executorService != null) return;
+
+        int corePoolSize = Configuration.getInt("Sms.CorePoolSize");
+        int maxPoolSize = Configuration.getInt("Sms.MaxPoolSize");
+        int queueSize = Configuration.getInt("Sms.QueueSize");
+        executorService = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 5, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(queueSize));
     }
 
     protected abstract boolean doSend(String mobile, String code);
