@@ -11,7 +11,9 @@ import java.util.List;
 
 public abstract class UserRelatedController extends AbstractController {
     protected FullUserDto buildUserResponse(User user) {
-        return new FullUserDto(user, userServiceFacade.getChildren(user.getId(), user.getChildren()));
+        return new FullUserDto(user,
+                userServiceFacade.getChildren(user.getId(), user.getChildren()),
+                userServiceFacade.getLeaderInfo(user.getId()));
     }
 
     protected ListDto buildParticipantsResponse(List<Participant> participants) {

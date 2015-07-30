@@ -17,10 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/leader")
 public class LeaderV1Api extends AbstractV1Api {
     @RequestMapping(value = "/apply", method = RequestMethod.GET)
-    public ResponseMessage applyLeader(@RequestParam String utoken) {
+    public ResponseMessage applyLeader(@RequestParam String utoken, @RequestParam(value = "pid") long productId) {
         if (StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
 
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("pid", productId);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("leader/status"), builder.build());
 
         return executeRequest(request, new Function<Object, Object>() {

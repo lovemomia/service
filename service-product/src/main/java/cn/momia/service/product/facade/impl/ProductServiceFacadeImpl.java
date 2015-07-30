@@ -211,6 +211,18 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     }
 
     @Override
+    public List<Sku> getSkusWithoutLeader(long productId) {
+        if (productId <= 0) return new ArrayList<Sku>();
+        List<Sku> skus = Sku.filter(skuService.queryByProduct(productId));
+        List<Sku> skusWithoutLeader = new ArrayList<Sku>();
+        for (Sku sku : skus) {
+            if (!sku.hasLeader()) skusWithoutLeader.add(sku);
+        }
+
+        return skusWithoutLeader;
+    }
+
+    @Override
     public boolean lockStock(long id, long skuId, int count) {
         if (id <= 0 || skuId <= 0 || count <= 0) return false;
 

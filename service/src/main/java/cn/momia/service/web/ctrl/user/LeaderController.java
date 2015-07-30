@@ -4,7 +4,8 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.leader.Leader;
 import cn.momia.service.web.ctrl.user.dto.LeaderDto;
-import cn.momia.service.web.ctrl.user.dto.LeaderStatusDto;
+import cn.momia.service.web.ctrl.user.dto.LeaderApplyDto;
+import cn.momia.service.web.ctrl.user.dto.LeaderSkuDto;
 import com.alibaba.fastjson.JSON;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,11 +17,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/leader")
 public class LeaderController extends UserRelatedController {
     @RequestMapping(value = "/apply", method = RequestMethod.GET)
-    public ResponseMessage applyLeader(@RequestParam String utoken) {
+    public ResponseMessage applyLeader(@RequestParam String utoken, @RequestParam(value = "pid") long productId) {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        return new ResponseMessage(new LeaderStatusDto(userServiceFacade.getLeaderInfo(user.getId()), JSON.parseObject(userServiceFacade.getLeaderDesc())));
+        Leader leader = userServiceFacade.getLeaderInfo(user.getId());
+        if (leader.getStatus() == Leader.Status.PASSED) {
+            return new ResponseMessage(new LeaderApplyDto(leader, LeaderSkuDto.toLeaderSkusDto(productServiceFacade.getSkusWithoutLeader(productId))));
+        } else {
+            return new ResponseMessage(new LeaderApplyDto(leader, JSON.parseObject(userServiceFacade.getLeaderDesc())));
+        }
     }
 
     @RequestMapping(method = RequestMethod.GET)

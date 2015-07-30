@@ -4,6 +4,13 @@ import cn.momia.common.misc.ValidateUtil;
 import org.apache.commons.lang3.StringUtils;
 
 public class Leader {
+    public static class Status {
+        public static final int DELETED = 0;
+        public static final int PASSED = 1;
+        public static final int AUDITING = 2;
+        public static final int REJECTED = 3;
+    }
+
     public static final Leader NOT_EXIST_LEADER = new Leader();
     public static final Leader INVALID_LEADER = new Leader();
     static {

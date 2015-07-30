@@ -25,7 +25,7 @@ import java.util.Map;
 
 public class SkuServiceImpl extends DbAccessService implements SkuService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SkuServiceImpl.class);
-    private static final String[] SKU_FIELDS = { "id", "productId", "`desc`", "`type`", "startTime", "endTime", "properties", "prices", "`limit`", "needRealName", "stock", "unlockedStock", "lockedStock", "onlineTime", "offlineTime", "onWeekend" };
+    private static final String[] SKU_FIELDS = { "id", "productId", "`desc`", "`type`", "startTime", "endTime", "properties", "prices", "`limit`", "needRealName", "stock", "unlockedStock", "lockedStock", "onlineTime", "offlineTime", "onWeekend", "leaderId" };
 
     @Override
     public Sku get(long id) {
@@ -63,6 +63,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
             sku.setOnlineTime(rs.getTimestamp("onlineTime"));
             sku.setOfflineTime(rs.getTimestamp("offlineTime"));
             sku.setOnWeekend(rs.getBoolean("onWeekend"));
+            sku.setLeaderId(rs.getLong("leaderId"));
 
             return sku;
         }
