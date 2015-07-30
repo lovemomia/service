@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/leader")
 public class LeaderController extends UserRelatedController {
-    @RequestMapping(value = "/status", method = RequestMethod.GET)
-    public ResponseMessage getLeaderStatus(@RequestParam String utoken) {
+    @RequestMapping(value = "/apply", method = RequestMethod.GET)
+    public ResponseMessage applyLeader(@RequestParam String utoken) {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
