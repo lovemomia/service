@@ -41,10 +41,10 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
     }
 
     @Override
-    public Feed get(long id) {
-        if (id <= 0) return Feed.NOT_EXIST_FEED;
+    public Feed get(long feedId) {
+        if (feedId <= 0) return Feed.NOT_EXIST_FEED;
 
-        BaseFeed baseFeed = baseFeedService.get(id);
+        BaseFeed baseFeed = baseFeedService.get(feedId);
         if (!baseFeed.exists()) return Feed.NOT_EXIST_FEED;
 
         return buildFeed(baseFeed);
@@ -65,29 +65,29 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
     }
 
     @Override
-    public long queryCommentsCount(long id) {
-        if (id <= 0) return 0;
-        return feedCommentService.queryCount(id);
+    public long queryCommentsCount(long feedId) {
+        if (feedId <= 0) return 0;
+        return feedCommentService.queryCount(feedId);
     }
 
     @Override
-    public List<FeedComment> queryComments(long id, int start, int count) {
-        if (id <= 0 || start < 0 || count <= 0) return new ArrayList<FeedComment>();
+    public List<FeedComment> queryComments(long feedId, int start, int count) {
+        if (feedId <= 0 || start < 0 || count <= 0) return new ArrayList<FeedComment>();
 
-        return feedCommentService.query(id, start, count);
+        return feedCommentService.query(feedId, start, count);
     }
 
     @Override
-    public long queryStaredUsersCount(long id) {
-        if (id <= 0) return 0;
-        return feedStarService.queryUserCount(id);
+    public long queryStaredUsersCount(long feedId) {
+        if (feedId <= 0) return 0;
+        return feedStarService.queryUserCount(feedId);
     }
 
     @Override
-    public List<Long> queryStaredUserIds(long id, int start, int count) {
-        if (id <= 0 || start < 0 || count <= 0) return new ArrayList<Long>();
+    public List<Long> queryStaredUserIds(long feedId, int start, int count) {
+        if (feedId <= 0 || start < 0 || count <= 0) return new ArrayList<Long>();
 
-        return feedStarService.queryUserIds(id, start, count);
+        return feedStarService.queryUserIds(feedId, start, count);
     }
 
     private List<FeedImage> getFeedImgs(long feedId) {

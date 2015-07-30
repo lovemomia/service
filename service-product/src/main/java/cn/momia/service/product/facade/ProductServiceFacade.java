@@ -6,9 +6,9 @@ import java.util.Collection;
 import java.util.List;
 
 public interface ProductServiceFacade {
-    Product get(long id);
-    Product get(long id, boolean mini);
-    List<Product> get(Collection<Long> ids);
+    Product get(long productId);
+    Product get(long productId, boolean mini);
+    List<Product> get(Collection<Long> productIds);
 
     long queryCount(int cityId);
     List<Product> query(int cityId, int start, int count);
@@ -17,16 +17,16 @@ public interface ProductServiceFacade {
     long queryCountByMonth(int cityId, int month);
     List<Product> queryByMonth(int cityId, int month);
 
-    List<Sku> getSkus(long id);
+    List<Sku> getSkus(long productId);
     Sku getSku(long skuId);
     List<Sku> getSkusWithoutLeader(long productId);
-    boolean lockStock(long id, long skuId, int count);
-    boolean unlockStock(long id, long skuId, int count);
-    boolean sold(long id, int count);
+    boolean lockStock(long productId, long skuId, int count);
+    boolean unlockStock(long productId, long skuId, int count);
+    boolean sold(long productId, int count);
 
-    boolean isFavoried(long userId, long id);
-    boolean favor(long userId, long id);
-    boolean unFavor(long userId, long id);
+    boolean isFavoried(long userId, long productId);
+    boolean favor(long userId, long productId);
+    boolean unFavor(long userId, long productId);
 
     long queryFavoritesCount(long userId);
     List<Product> queryFavorites(long userId, int start, int count);

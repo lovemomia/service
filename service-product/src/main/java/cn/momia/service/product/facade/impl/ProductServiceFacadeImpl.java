@@ -51,15 +51,15 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     }
 
     @Override
-    public Product get(long id) {
-        return get(id, false);
+    public Product get(long productId) {
+        return get(productId, false);
     }
 
     @Override
-    public Product get(long id, boolean mini) {
-        if (id <= 0) return Product.NOT_EXIST_PRODUCT;
+    public Product get(long productId, boolean mini) {
+        if (productId <= 0) return Product.NOT_EXIST_PRODUCT;
 
-        BaseProduct baseProduct = baseProductService.get(id);
+        BaseProduct baseProduct = baseProductService.get(productId);
         if (!baseProduct.exists()) return Product.NOT_EXIST_PRODUCT;
 
         Product product = new Product();
@@ -101,10 +101,10 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     }
 
     @Override
-    public List<Product> get(Collection<Long> ids) {
-        if (ids == null || ids.isEmpty()) return new ArrayList<Product>();
+    public List<Product> get(Collection<Long> productIds) {
+        if (productIds == null || productIds.isEmpty()) return new ArrayList<Product>();
 
-        List<BaseProduct> baseProducts = baseProductService.get(ids);
+        List<BaseProduct> baseProducts = baseProductService.get(productIds);
         return buildProducts(baseProducts);
     }
 
@@ -199,9 +199,9 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     }
 
     @Override
-    public List<Sku> getSkus(long id) {
-        if (id <= 0) return new ArrayList<Sku>();
-        return skuService.queryByProduct(id);
+    public List<Sku> getSkus(long productId) {
+        if (productId <= 0) return new ArrayList<Sku>();
+        return skuService.queryByProduct(productId);
     }
 
     @Override
@@ -223,17 +223,17 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     }
 
     @Override
-    public boolean lockStock(long id, long skuId, int count) {
-        if (id <= 0 || skuId <= 0 || count <= 0) return false;
+    public boolean lockStock(long productId, long skuId, int count) {
+        if (productId <= 0 || skuId <= 0 || count <= 0) return false;
 
         boolean successful = skuService.lock(skuId, count);
         try {
             if (successful) {
-                if (isSoldOut(id)) baseProductService.soldOut(id);
-                baseProductService.join(id, count);
+                if (isSoldOut(productId)) baseProductService.soldOut(productId);
+                baseProductService.join(productId, count);
             }
         } catch (Exception e) {
-            LOGGER.error("fail to update sold out/joined status of product: {}", id, e);
+            LOGGER.error("fail to update sold out/joined status of product: {}", productId, e);
         }
 
         return successful;
@@ -253,21 +253,21 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     }
 
     @Override
-    public boolean unlockStock(long id, long skuId, int count) {
-        if (id <= 0 || skuId <= 0 || count <= 0) return true;
+    public boolean unlockStock(long productId, long skuId, int count) {
+        if (productId <= 0 || skuId <= 0 || count <= 0) return true;
 
         try {
-            baseProductService.unSoldOut(id);
+            baseProductService.unSoldOut(productId);
         } catch (Exception e) {
-            LOGGER.error("fail to set sold out status of product: {}", id, e);
+            LOGGER.error("fail to set sold out status of product: {}", productId, e);
         }
 
         boolean successful = skuService.unlock(skuId, count);
         if (successful) {
             try {
-                baseProductService.decreaseJoined(id, count);
+                baseProductService.decreaseJoined(productId, count);
             } catch (Exception e) {
-                LOGGER.error("fail to decrease joined of product: {}", id, e);
+                LOGGER.error("fail to decrease joined of product: {}", productId, e);
             }
         }
 
@@ -275,29 +275,29 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     }
 
     @Override
-    public boolean sold(long id, int count) {
-        if (id <= 0 || count <= 0) return true;
-        return baseProductService.sold(id, count);
+    public boolean sold(long productId, int count) {
+        if (productId <= 0 || count <= 0) return true;
+        return baseProductService.sold(productId, count);
     }
 
     @Override
-    public boolean isFavoried(long userId, long id) {
-        if (userId <= 0 || id <= 0) return false;
-        return favoriteService.isFavoried(userId, id);
+    public boolean isFavoried(long userId, long productId) {
+        if (userId <= 0 || productId <= 0) return false;
+        return favoriteService.isFavoried(userId, productId);
     }
 
     @Override
-    public boolean favor(long userId, long id) {
-        if (userId <= 0 || id <= 0) return false;
-        if (isFavoried(userId, id)) return true;
-        return favoriteService.favor(userId, id);
+    public boolean favor(long userId, long productId) {
+        if (userId <= 0 || productId <= 0) return false;
+        if (isFavoried(userId, productId)) return true;
+        return favoriteService.favor(userId, productId);
     }
 
     @Override
-    public boolean unFavor(long userId, long id) {
-        if (userId <= 0 || id <= 0) return true;
-        if (!isFavoried(userId, id)) return true;
-        return favoriteService.unFavor(userId, id);
+    public boolean unFavor(long userId, long productId) {
+        if (userId <= 0 || productId <= 0) return true;
+        if (!isFavoried(userId, productId)) return true;
+        return favoriteService.unFavor(userId, productId);
     }
 
     @Override
