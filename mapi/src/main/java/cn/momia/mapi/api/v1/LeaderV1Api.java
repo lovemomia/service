@@ -44,7 +44,7 @@ public class LeaderV1Api extends AbstractV1Api {
         return executeRequest(request);
     }
 
-    @RequestMapping(value = "/apply", method = RequestMethod.POST)
+    @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public ResponseMessage addLeaderInfo(@RequestParam String utoken, @RequestParam String leader) {
         if (StringUtils.isBlank(utoken) || StringUtils.isBlank(leader)) return ResponseMessage.BAD_REQUEST;
 
