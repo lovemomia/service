@@ -19,6 +19,7 @@ public class AlipayPrepayDto implements Dto {
     private String body;
     private String it_b_pay;
     private String show_url;
+    private String return_url;
 
     public boolean isSuccessful() {
         return successful;
@@ -80,6 +81,10 @@ public class AlipayPrepayDto implements Dto {
         return show_url;
     }
 
+    public String getReturn_url() {
+        return return_url;
+    }
+
     public AlipayPrepayDto(JSONObject prepayJson) {
         this.successful = prepayJson.getBoolean("successful");
         if (this.successful) {
@@ -98,6 +103,7 @@ public class AlipayPrepayDto implements Dto {
             this.body = paramJson.getString("body");
             this.it_b_pay = paramJson.getString("it_b_pay");
             this.show_url = paramJson.getString("show_url");
+            this.return_url = paramJson.getString("return_url");
         }
     }
 }
