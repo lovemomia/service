@@ -1,6 +1,7 @@
 package cn.momia.service.web.ctrl.product;
 
 import cn.momia.common.misc.TimeUtil;
+import cn.momia.common.service.config.Configuration;
 import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.web.ctrl.dto.ListDto;
@@ -122,7 +123,7 @@ public class ProductController extends AbstractController {
             Date start = now.before(currentMonth) ? currentMonth : now;
             Date end = monthFormat.parse(TimeUtil.buildNextMonthStr(month));
 
-            int pageSize = conf.getInt("Product.Month.PageSize");
+            int pageSize = Configuration.getInt("Product.Month.PageSize");
             Map<String, ProductsOfDayDto> productsOfDayDtoMap = new HashMap<String, ProductsOfDayDto>();
             for (Product product : products) {
                 for (Sku sku : product.getSkus()) {
@@ -367,7 +368,7 @@ public class ProductController extends AbstractController {
                                             Map<Long, Set<Long>> customerPrticipantsIdsMap,
                                             Map<Long, User> customersMap,
                                             Map<Long, Participant> participantsMap) {
-        int pageSize = conf.getInt("Product.Playmate.PageSize");
+        int pageSize = Configuration.getInt("Product.Playmate.PageSize");
         List<PlaymateDto> playmatesDto = new ArrayList<PlaymateDto>();
         Set<Long> customerIds = skuCustomerIdsMap.get(skuId);
         if (customerIds != null) {

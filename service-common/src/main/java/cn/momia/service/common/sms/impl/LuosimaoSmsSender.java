@@ -1,5 +1,6 @@
 package cn.momia.service.common.sms.impl;
 
+import cn.momia.common.service.config.Configuration;
 import cn.momia.common.service.secret.SecretKey;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -21,7 +22,7 @@ public class LuosimaoSmsSender extends AbstractSmsSender {
         try {
             Client client = Client.create();
             client.addFilter(new HTTPBasicAuthFilter("api", SecretKey.get("luosimao")));
-            WebResource webResource = client.resource(conf.getString("Sms.Luosimao.Service"));
+            WebResource webResource = client.resource(Configuration.getString("Sms.Luosimao.Service"));
             MultivaluedMapImpl formData = new MultivaluedMapImpl();
             formData.add("mobile", mobile);
             formData.add("message", "验证码：" + code + "，30分钟内有效【哆啦亲子】");

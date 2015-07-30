@@ -1,5 +1,6 @@
 package cn.momia.image.upload.impl;
 
+import cn.momia.common.service.config.Configuration;
 import cn.momia.image.upload.Image;
 import cn.momia.image.upload.ImageUploadResult;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -56,7 +57,7 @@ public class LocalImageUploaderImpl extends AbstractImageUploader {
 
     private String getImageFullPath(String relativePath)
     {
-        return StringUtils.join(new String[] { conf.getString("Image.Upload.Local.Dir"), relativePath }, File.separator);
+        return StringUtils.join(new String[] { Configuration.getString("Image.Upload.Local.Dir"), relativePath }, File.separator);
     }
 
     private void prepareOutputDir(File outputFile)

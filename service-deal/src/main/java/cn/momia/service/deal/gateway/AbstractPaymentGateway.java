@@ -1,6 +1,5 @@
 package cn.momia.service.deal.gateway;
 
-import cn.momia.common.config.Configuration;
 import cn.momia.service.deal.facade.DealServiceFacade;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
@@ -10,12 +9,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractPaymentGateway implements PaymentGateway {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPaymentGateway.class);
 
-    protected Configuration conf;
     protected DealServiceFacade dealServiceFacade;
-
-    public void setConf(Configuration conf) {
-        this.conf = conf;
-    }
 
     public void setDealServiceFacade(DealServiceFacade dealServiceFacade) {
         this.dealServiceFacade = dealServiceFacade;

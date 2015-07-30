@@ -1,5 +1,6 @@
 package cn.momia.service.deal.gateway.alipay;
 
+import cn.momia.common.service.config.Configuration;
 import cn.momia.service.deal.gateway.AbstractPaymentGateway;
 import cn.momia.service.deal.gateway.CallbackParam;
 import cn.momia.service.deal.gateway.PrepayResult;
@@ -47,8 +48,8 @@ public class AlipayGateway extends AbstractPaymentGateway {
     }
 
     private boolean verifyResponse(String notifyId) {
-        String partner = conf.getString("Payment.Ali.Partner");
-        String verifyUrl = conf.getString("Payment.Ali.VerifyUrl") + "partner=" + partner + "&notify_id=" + notifyId;
+        String partner = Configuration.getString("Payment.Ali.Partner");
+        String verifyUrl = Configuration.getString("Payment.Ali.VerifyUrl") + "partner=" + partner + "&notify_id=" + notifyId;
 
         try {
             HttpClient httpClient = HttpClients.createDefault();

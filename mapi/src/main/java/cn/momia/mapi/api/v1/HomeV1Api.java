@@ -1,5 +1,6 @@
 package cn.momia.mapi.api.v1;
 
+import cn.momia.common.service.config.Configuration;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
@@ -25,8 +26,8 @@ public class HomeV1Api extends AbstractV1Api {
                                 @RequestParam(value = "city") int cityId) {
         if (pageIndex < 0 || cityId < 0) return new ResponseMessage(HomeDto.EMPTY);
 
-        final int start = pageIndex * conf.getInt("Home.PageSize");
-        final int count = conf.getInt("Home.PageSize");
+        final int start = pageIndex * Configuration.getInt("Home.PageSize");
+        final int count = Configuration.getInt("Home.PageSize");
         List<MomiaHttpRequest> requests = buildHomeRequests(cityId, start, count);
 
         return executeRequests(requests, new Function<MomiaHttpResponseCollector, Object>() {
@@ -46,7 +47,7 @@ public class HomeV1Api extends AbstractV1Api {
     }
 
     private MomiaHttpRequest buildBannersRequest(int cityId) {
-        int count = conf.getInt("Home.BannerCount");
+        int count = Configuration.getInt("Home.BannerCount");
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
                 .add("count", count);

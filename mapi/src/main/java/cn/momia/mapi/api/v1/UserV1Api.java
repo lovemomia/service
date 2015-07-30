@@ -1,5 +1,6 @@
 package cn.momia.mapi.api.v1;
 
+import cn.momia.common.service.config.Configuration;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.img.ImageFile;
@@ -251,7 +252,7 @@ public class UserV1Api extends AbstractV1Api {
                 .add("utoken", utoken)
                 .add("status", status < 0 ? 1 : status)
                 .add("start", start)
-                .add("count", conf.getInt("Order.PageSize"));
+                .add("count", Configuration.getInt("Order.PageSize"));
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("order/user"), builder.build());
 
         return executeRequest(request, pagedOrdersFunc);
@@ -283,7 +284,7 @@ public class UserV1Api extends AbstractV1Api {
                 .add("oid", orderId)
                 .add("status", status)
                 .add("start", start)
-                .add("count", conf.getInt("Coupon.PageSize"));
+                .add("count", Configuration.getInt("Coupon.PageSize"));
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("coupon/user"), builder.build());
 
         return executeRequest(request);
@@ -296,7 +297,7 @@ public class UserV1Api extends AbstractV1Api {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("start", start)
-                .add("count", conf.getInt("Favorite.PageSize"));
+                .add("count", Configuration.getInt("Favorite.PageSize"));
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/favorite"), builder.build());
 
         return executeRequest(request, pagedProductsFunc);

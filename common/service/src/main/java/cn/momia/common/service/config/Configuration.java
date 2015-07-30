@@ -1,17 +1,16 @@
-package cn.momia.common.config.impl;
+package cn.momia.common.service.config;
 
-import cn.momia.common.config.Configuration;
 import cn.momia.common.fs.FileUtil;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 
 // adapter of XMLConfiguration in commons-configuration
-public class XmlConfiguration implements Configuration {
-    private String fileName;
-    private XMLConfiguration xmlConf;
+public class Configuration {
+    private static String fileName;
+    private static XMLConfiguration xmlConf;
 
     public void setFileName(String fileName) {
-        this.fileName = fileName;
+        Configuration.fileName = fileName;
     }
 
     public void init() {
@@ -23,18 +22,15 @@ public class XmlConfiguration implements Configuration {
         }
     }
 
-    @Override
-    public void add(String key, String value) {
+    public static void add(String key, String value) {
         xmlConf.addProperty(key, value);
     }
 
-    @Override
-    public void update(String key, String value) {
+    public static void update(String key, String value) {
         xmlConf.setProperty(key, value);
     }
 
-    @Override
-    public void reload() {
+    public static void reload() {
         try {
             XMLConfiguration newConf = new XMLConfiguration();
             newConf.load(FileUtil.openFileInputStream(fileName));
@@ -45,38 +41,31 @@ public class XmlConfiguration implements Configuration {
         }
     }
 
-    @Override
-    public boolean contains(String key) {
+    public static boolean contains(String key) {
         return xmlConf.containsKey(key);
     }
 
-    @Override
-    public boolean getBoolean(String key) {
+    public static boolean getBoolean(String key) {
         return xmlConf.getBoolean(key);
     }
 
-    @Override
-    public int getInt(String key) {
+    public static int getInt(String key) {
         return xmlConf.getInt(key);
     }
 
-    @Override
-    public long getLong(String key) {
+    public static long getLong(String key) {
         return xmlConf.getLong(key);
     }
 
-    @Override
-    public float getFloat(String key) {
+    public static float getFloat(String key) {
         return xmlConf.getFloat(key);
     }
 
-    @Override
-    public double getDouble(String key) {
+    public static double getDouble(String key) {
         return xmlConf.getDouble(key);
     }
 
-    @Override
-    public String getString(String key) {
+    public static String getString(String key) {
         return xmlConf.getString(key);
     }
 }

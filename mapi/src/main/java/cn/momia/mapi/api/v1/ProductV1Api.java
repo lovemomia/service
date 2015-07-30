@@ -1,5 +1,6 @@
 package cn.momia.mapi.api.v1;
 
+import cn.momia.common.service.config.Configuration;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
@@ -25,7 +26,7 @@ public class ProductV1Api extends AbstractV1Api {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
                 .add("start", start)
-                .add("count", conf.getInt("Product.PageSize"));
+                .add("count", Configuration.getInt("Product.PageSize"));
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("product/weekend"), builder.build());
 
         return executeRequest(request, pagedProductsFunc);
@@ -89,7 +90,7 @@ public class ProductV1Api extends AbstractV1Api {
     private MomiaHttpRequest buildProductCustomersRequest(long productId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", 0)
-                .add("count", conf.getInt("Product.CustomerPageSize"));
+                .add("count", Configuration.getInt("Product.CustomerPageSize"));
 
         return MomiaHttpRequest.GET("customers", false, url("product", productId, "customer"), builder.build());
     }
@@ -147,7 +148,7 @@ public class ProductV1Api extends AbstractV1Api {
     public ResponseMessage getProductPlaymates(@RequestParam long id) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", 0)
-                .add("count", conf.getInt("Product.Playmate.MaxSkuCount"));
+                .add("count", Configuration.getInt("Product.Playmate.MaxSkuCount"));
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("product", id, "playmate"), builder.build());
 
         return executeRequest(request, new Function<Object, Object>() {

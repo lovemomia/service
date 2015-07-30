@@ -1,5 +1,6 @@
 package cn.momia.image.upload.impl;
 
+import cn.momia.common.service.config.Configuration;
 import cn.momia.image.upload.Image;
 import cn.momia.image.upload.ImageUploadResult;
 import com.aliyun.oss.OSSClient;
@@ -18,12 +19,12 @@ public class OssImageUploaderImpl extends AbstractImageUploader {
     private String bucketName;
 
     public void init() {
-        String AccessId = conf.getString("Oss.AccessId");
-        String AccessKey = conf.getString("Oss.AccessKey");
-        String EndPoint = conf.getString("Oss.EndPoint");
+        String AccessId = Configuration.getString("Oss.AccessId");
+        String AccessKey = Configuration.getString("Oss.AccessKey");
+        String EndPoint = Configuration.getString("Oss.EndPoint");
         ossClient = new OSSClient(EndPoint, AccessId, AccessKey);
 
-        bucketName = conf.getString("Oss.BucketName");
+        bucketName = Configuration.getString("Oss.BucketName");
         if (!ossClient.doesBucketExist(bucketName)) {
             throw new RuntimeException("bucket: " + bucketName + " does not exist");
         }

@@ -1,6 +1,7 @@
 package cn.momia.service.deal.gateway.wechatpay;
 
 import cn.momia.common.misc.XmlUtil;
+import cn.momia.common.service.config.Configuration;
 import cn.momia.service.deal.gateway.AbstractPaymentGateway;
 import cn.momia.service.deal.gateway.CallbackParam;
 import cn.momia.service.deal.gateway.PrepayParam;
@@ -60,7 +61,7 @@ public class WechatpayGateway extends AbstractPaymentGateway {
     }
 
     private HttpPost createRequest(PrepayParam param) {
-        HttpPost httpPost = new HttpPost(conf.getString("Payment.Wechat.PrepayService"));
+        HttpPost httpPost = new HttpPost(Configuration.getString("Payment.Wechat.PrepayService"));
         httpPost.addHeader(HTTP.CONTENT_TYPE, "application/xml");
         StringEntity entity = new StringEntity(XmlUtil.paramsToXml(param.getAll()), "UTF-8");
         entity.setContentType("application/xml");
@@ -82,15 +83,15 @@ public class WechatpayGateway extends AbstractPaymentGateway {
             if (!WechatpayUtil.validateSign(params, tradeType)) throw new RuntimeException("fail to prepay, invalid sign");
 
             if (tradeType.equals("APP")) {
-                result.add(WechatpayPrepayFields.PREPAY_RESULT_APP_APPID, conf.getString("Payment.Wechat.AppAppId"));
-                result.add(WechatpayPrepayFields.PREPAY_RESULT_APP_PARTNERID, conf.getString("Payment.Wechat.AppMchId"));
+                result.add(WechatpayPrepayFields.PREPAY_RESULT_APP_APPID, Configuration.getString("Payment.Wechat.AppAppId"));
+                result.add(WechatpayPrepayFields.PREPAY_RESULT_APP_PARTNERID, Configuration.getString("Payment.Wechat.AppMchId"));
                 result.add(WechatpayPrepayFields.PREPAY_RESULT_APP_PREPAYID, params.get(WechatpayPrepayFields.PREPAY_ID));
                 result.add(WechatpayPrepayFields.PREPAY_RESULT_APP_PACKAGE, "Sign=WXPay");
                 result.add(WechatpayPrepayFields.PREPAY_RESULT_APP_NONCE_STR, WechatpayUtil.createNoncestr(32));
                 result.add(WechatpayPrepayFields.PREPAY_RESULT_APP_TIMESTAMP, String.valueOf(new Date().getTime()).substring(0, 10));
                 result.add(WechatpayPrepayFields.PREPAY_RESULT_APP_SIGN, WechatpayUtil.sign(result.getAll(), tradeType));
             } else if (tradeType.equals("JSAPI")) {
-                result.add(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_APPID, conf.getString("Payment.Wechat.JsApiAppId"));
+                result.add(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_APPID, Configuration.getString("Payment.Wechat.JsApiAppId"));
                 result.add(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_PACKAGE, "prepay_id=" + params.get(WechatpayPrepayFields.PREPAY_ID));
                 result.add(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_NONCE_STR, WechatpayUtil.createNoncestr(32));
                 result.add(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_TIMESTAMP, String.valueOf(new Date().getTime()).substring(0, 10));

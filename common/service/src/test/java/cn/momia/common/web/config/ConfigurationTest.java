@@ -1,12 +1,13 @@
-package cn.momia.common.config.impl;
+package cn.momia.common.web.config;
 
+import cn.momia.common.service.config.Configuration;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class XmlConfigurationTest {
+public class ConfigurationTest {
     @Test
     public void testGetValue() {
-        XmlConfiguration conf = new XmlConfiguration();
+        Configuration conf = new Configuration();
         conf.setFileName("conf/configuration-test.xml");
         conf.init();
 

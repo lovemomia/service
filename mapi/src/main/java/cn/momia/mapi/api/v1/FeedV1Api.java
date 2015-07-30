@@ -1,5 +1,6 @@
 package cn.momia.mapi.api.v1;
 
+import cn.momia.common.service.config.Configuration;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpResponseCollector;
@@ -69,7 +70,7 @@ public class FeedV1Api extends AbstractV1Api {
     private MomiaHttpRequest buildStaredUsersRequest(long feedId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", 0)
-                .add("count", conf.getInt("Feed.Detail.Star.PageSize"));
+                .add("count", Configuration.getInt("Feed.Detail.Star.PageSize"));
 
         return MomiaHttpRequest.GET("star", true, url("feed", feedId, "star"), builder.build());
     }
@@ -77,7 +78,7 @@ public class FeedV1Api extends AbstractV1Api {
     private MomiaHttpRequest buildFeedCommentsRequests(long feedId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", 0)
-                .add("count", conf.getInt("Feed.Detail.Comment.PageSize"));
+                .add("count", Configuration.getInt("Feed.Detail.Comment.PageSize"));
 
         return MomiaHttpRequest.GET("comments", true, url("feed", feedId, "comment"), builder.build());
     }
@@ -112,7 +113,7 @@ public class FeedV1Api extends AbstractV1Api {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("tid", topicId)
                 .add("start", start)
-                .add("count", conf.getInt("Feed.PageSize"));
+                .add("count", Configuration.getInt("Feed.PageSize"));
 
         return MomiaHttpRequest.GET("feeds", true, url("feed/topic"), builder.build());
     }

@@ -1,6 +1,6 @@
 package cn.momia.service.deal.gateway.factory;
 
-import cn.momia.common.config.Configuration;
+import cn.momia.common.service.config.Configuration;
 import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.common.service.secret.SecretKey;
 import cn.momia.service.deal.facade.OrderInfoFields;
@@ -27,12 +27,6 @@ import java.util.Map;
 public class PrepayParamFactory {
     private static final DateFormat DATE_FORMATTER = new SimpleDateFormat("yyyyMMddHHmmss");
 
-    private static Configuration conf;
-
-    public void setConf(Configuration conf) {
-        PrepayParamFactory.conf = conf;
-    }
-
     public static PrepayParam create(Map<String, String> params, int payType) {
         PrepayParam prepayParam = createPrepayParam(payType);
         switch (payType) {
@@ -41,14 +35,14 @@ public class PrepayParamFactory {
                 if (type.equalsIgnoreCase("app")) prepayParam.add(AlipayPrepayFields.SERVICE, "mobile.securitypay.pay");
                 else prepayParam.add(AlipayPrepayFields.SERVICE, "alipay.wap.create.direct.pay.by.user");
 
-                prepayParam.add(AlipayPrepayFields.PARTNER, conf.getString("Payment.Ali.Partner"));
+                prepayParam.add(AlipayPrepayFields.PARTNER, Configuration.getString("Payment.Ali.Partner"));
                 prepayParam.add(AlipayPrepayFields.INPUT_CHARSET, "utf-8");
                 prepayParam.add(AlipayPrepayFields.SIGN_TYPE, "RSA");
-                prepayParam.add(AlipayPrepayFields.NOTIFY_URL, conf.getString("Payment.Ali.NotifyUrl"));
+                prepayParam.add(AlipayPrepayFields.NOTIFY_URL, Configuration.getString("Payment.Ali.NotifyUrl"));
                 prepayParam.add(AlipayPrepayFields.OUT_TRADE_NO, params.get(OrderInfoFields.ORDER_ID));
                 prepayParam.add(AlipayPrepayFields.SUBJECT, params.get(OrderInfoFields.PRODUCT_TITLE));
                 prepayParam.add(AlipayPrepayFields.PAYMENT_TYPE, "1");
-                prepayParam.add(AlipayPrepayFields.SELLER_ID, conf.getString("Payment.Ali.Partner"));
+                prepayParam.add(AlipayPrepayFields.SELLER_ID, Configuration.getString("Payment.Ali.Partner"));
                 prepayParam.add(AlipayPrepayFields.TOTAL_FEE, params.get(OrderInfoFields.TOTAL_FEE));
                 prepayParam.add(AlipayPrepayFields.BODY, params.get(OrderInfoFields.PRODUCT_TITLE));
                 prepayParam.add(AlipayPrepayFields.IT_B_PAY, "30m");
@@ -60,13 +54,13 @@ public class PrepayParamFactory {
             case Payment.Type.WECHATPAY:
                 String tradeType = params.get(WechatpayPrepayFields.TRADE_TYPE);
                 if (tradeType.equals("APP")) {
-                    prepayParam.add(WechatpayPrepayFields.APPID, conf.getString("Payment.Wechat.AppAppId"));
+                    prepayParam.add(WechatpayPrepayFields.APPID, Configuration.getString("Payment.Wechat.AppAppId"));
                     prepayParam.add(WechatpayPrepayFields.PRODUCT_ID, params.get(OrderInfoFields.PRODUCT_ID));
-                    prepayParam.add(WechatpayPrepayFields.MCH_ID, conf.getString("Payment.Wechat.AppMchId"));
+                    prepayParam.add(WechatpayPrepayFields.MCH_ID, Configuration.getString("Payment.Wechat.AppMchId"));
                 } else if (tradeType.equals("JSAPI")) {
-                    prepayParam.add(WechatpayPrepayFields.APPID, conf.getString("Payment.Wechat.JsApiAppId"));
+                    prepayParam.add(WechatpayPrepayFields.APPID, Configuration.getString("Payment.Wechat.JsApiAppId"));
                     prepayParam.add(WechatpayPrepayFields.OPENID, getJsApiOpenId(params.get(WechatpayPrepayFields.CODE)));
-                    prepayParam.add(WechatpayPrepayFields.MCH_ID, conf.getString("Payment.Wechat.JsApiMchId"));
+                    prepayParam.add(WechatpayPrepayFields.MCH_ID, Configuration.getString("Payment.Wechat.JsApiMchId"));
                 } else {
                     throw new RuntimeException("not supported trade type: " + tradeType);
                 }
@@ -76,7 +70,7 @@ public class PrepayParamFactory {
                 prepayParam.add(WechatpayPrepayFields.OUT_TRADE_NO, params.get(OrderInfoFields.ORDER_ID) + DATE_FORMATTER.format(new Date()));
                 prepayParam.add(WechatpayPrepayFields.TOTAL_FEE, params.get(OrderInfoFields.TOTAL_FEE));
                 prepayParam.add(WechatpayPrepayFields.SPBILL_CREATE_IP, params.get(OrderInfoFields.USER_IP));
-                prepayParam.add(WechatpayPrepayFields.NOTIFY_URL, conf.getString("Payment.Wechat.NotifyUrl"));
+                prepayParam.add(WechatpayPrepayFields.NOTIFY_URL, Configuration.getString("Payment.Wechat.NotifyUrl"));
                 prepayParam.add(WechatpayPrepayFields.TRADE_TYPE, tradeType);
                 prepayParam.add(WechatpayPrepayFields.TIME_EXPIRE, DATE_FORMATTER.format(new Date(System.currentTimeMillis() + 30 * 60 * 1000)));
                 prepayParam.add(WechatpayPrepayFields.SIGN, WechatpayUtil.sign(prepayParam.getAll(), tradeType));
@@ -96,9 +90,9 @@ public class PrepayParamFactory {
         try {
             HttpClient httpClient = HttpClients.createDefault();
             StringBuilder urlBuilder = new StringBuilder();
-            urlBuilder.append(conf.getString("Payment.Wechat.AccessTokenService"))
+            urlBuilder.append(Configuration.getString("Payment.Wechat.AccessTokenService"))
                     .append("?")
-                    .append("appid=").append(conf.getString("Payment.Wechat.JsApiAppId"))
+                    .append("appid=").append(Configuration.getString("Payment.Wechat.JsApiAppId"))
                     .append("&")
                     .append("secret=").append(SecretKey.get("wechatpayJsApiKey"))
                     .append("&")

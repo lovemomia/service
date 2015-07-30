@@ -4,17 +4,13 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="conf" class="cn.momia.common.config.impl.XmlConfiguration" init-method="init">
+    <bean id="conf" class="cn.momia.common.service.config.Configuration" init-method="init">
         <property name="fileName" value="conf/configuration.xml" />
     </bean>
 
-    <bean class="cn.momia.common.web.config.XmlPropertyPlaceholderConfigurer">
-        <property name="conf" ref="conf" />
-    </bean>
+    <bean class="cn.momia.common.web.config.XmlPropertyPlaceholderConfigurer" depends-on="conf" />
 
-    <bean class="cn.momia.common.web.logger.LoggerConfigurer" init-method="init">
-        <property name="conf" ref="conf" />
-    </bean>
+    <bean class="cn.momia.common.web.logger.LoggerConfigurer" init-method="init" depends-on="conf" />
 
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
         <property name="driverClass" value="com.mysql.jdbc.Driver" />
@@ -33,8 +29,7 @@
         <property name="dataSource" ref="dataSource" />
     </bean>
 
-    <bean class="cn.momia.common.service.secret.SecretKey" init-method="init">
-        <property name="conf" ref="conf" />
+    <bean class="cn.momia.common.service.secret.SecretKey" init-method="init" depends-on="conf">
         <property name="jdbcTemplate" ref="jdbcTemplate" />
     </bean>
 
@@ -43,9 +38,7 @@
         <property name="jdbcTemplate" ref="jdbcTemplate" />
     </bean>
 
-    <bean id="smsSender" class="cn.momia.service.common.sms.impl.LuosimaoSmsSender" parent="dbAccessService" init-method="init">
-        <property name="conf" ref="conf" />
-    </bean>
+    <bean id="smsSender" class="cn.momia.service.common.sms.impl.LuosimaoSmsSender" parent="dbAccessService" init-method="init" depends-on="conf" />
     <bean id="smsVerifier" class="cn.momia.service.common.sms.SmsVerifier" parent="dbAccessService" />
     <bean id="cityService" class="cn.momia.service.common.city.impl.CityServiceImpl" parent="dbAccessService" init-method="init" />
     <bean id="regionService" class="cn.momia.service.common.region.impl.RegionServiceImpl" parent="dbAccessService" init-method="init" />
@@ -107,7 +100,6 @@
     </bean>
 
     <bean id="abstractPaymentGateway" class="cn.momia.service.deal.gateway.AbstractPaymentGateway" abstract="true">
-        <property name="conf" ref="conf" />
         <property name="dealServiceFacade" ref="dealServiceFacade" />
     </bean>
 
@@ -134,7 +126,5 @@
         </property>
     </bean>
 
-    <bean class="cn.momia.service.deal.gateway.factory.PrepayParamFactory">
-        <property name="conf" ref="conf" />
-    </bean>
+    <bean class="cn.momia.service.deal.gateway.factory.PrepayParamFactory" />
 </beans>

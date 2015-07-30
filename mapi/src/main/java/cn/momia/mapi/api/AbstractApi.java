@@ -1,6 +1,6 @@
 package cn.momia.mapi.api;
 
-import cn.momia.common.config.Configuration;
+import cn.momia.common.service.config.Configuration;
 import cn.momia.common.web.controller.BaseController;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.http.MomiaHttpRequestExecutor;
@@ -16,12 +16,11 @@ import java.util.List;
 public abstract class AbstractApi extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractApi.class);
 
-    @Autowired protected Configuration conf;
     @Autowired protected MomiaHttpRequestExecutor requestExecutor;
 
     protected String url(Object... paths) {
         // TODO 根据paths判断使用哪个service
-        StringBuilder urlBuilder = new StringBuilder().append(conf.getString("Service.Base"));
+        StringBuilder urlBuilder = new StringBuilder().append(Configuration.getString("Service.Base"));
         for (Object path : paths) urlBuilder.append("/").append(path);
 
         return urlBuilder.toString();

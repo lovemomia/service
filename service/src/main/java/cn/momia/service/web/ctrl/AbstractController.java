@@ -1,6 +1,6 @@
 package cn.momia.service.web.ctrl;
 
-import cn.momia.common.config.Configuration;
+import cn.momia.common.service.config.Configuration;
 import cn.momia.common.web.controller.BaseController;
 import cn.momia.service.common.facade.CommonServiceFacade;
 import cn.momia.service.deal.facade.DealServiceFacade;
@@ -11,8 +11,6 @@ import cn.momia.service.user.facade.UserServiceFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractController extends BaseController {
-    @Autowired protected Configuration conf;
-
     @Autowired protected CommonServiceFacade commonServiceFacade;
     @Autowired protected DealServiceFacade dealServiceFacade;
     @Autowired protected FeedServiceFacade feedServiceFacade;
@@ -21,8 +19,8 @@ public abstract class AbstractController extends BaseController {
     @Autowired protected UserServiceFacade userServiceFacade;
 
     protected boolean isInvalidLimit(int start, int count) {
-        int maxPage = conf.getInt("Limit.MaxPage");
-        int maxPageSize = conf.getInt("Limit.MaxPageSize");
+        int maxPage = Configuration.getInt("Limit.MaxPage");
+        int maxPageSize = Configuration.getInt("Limit.MaxPageSize");
 
         return start < 0 || count <= 0 || start > maxPage * maxPageSize || count > maxPageSize;
     }

@@ -1,5 +1,6 @@
 package cn.momia.mapi.api.v1;
 
+import cn.momia.common.service.config.Configuration;
 import cn.momia.common.service.exception.MomiaExpiredException;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
@@ -98,7 +99,7 @@ public class AbstractV1Api extends AbstractApi {
     };
 
     private String buildUrl(long id) {
-        return conf.getString("Product.Url") + "?id=" + id;
+        return Configuration.getString("Product.Url") + "?id=" + id;
     }
 
     private static JSONArray processContent(JSONArray contentJson) {

@@ -1,6 +1,6 @@
 package cn.momia.service.common.sms.impl;
 
-import cn.momia.common.config.Configuration;
+import cn.momia.common.service.config.Configuration;
 import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.common.service.impl.DbAccessService;
 import cn.momia.service.common.sms.SmsSender;
@@ -19,16 +19,10 @@ import java.util.concurrent.TimeUnit;
 public abstract class AbstractSmsSender extends DbAccessService implements SmsSender {
     private ExecutorService executorService;
 
-    protected Configuration conf;
-
-    public void setConf(Configuration conf) {
-        this.conf = conf;
-    }
-
     public void init() {
-        int corePoolSize = conf.getInt("Sms.CorePoolSize");
-        int maxPoolSize = conf.getInt("Sms.MaxPoolSize");
-        int queueSize = conf.getInt("Sms.QueueSize");
+        int corePoolSize = Configuration.getInt("Sms.CorePoolSize");
+        int maxPoolSize = Configuration.getInt("Sms.MaxPoolSize");
+        int queueSize = Configuration.getInt("Sms.QueueSize");
         executorService = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 5, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(queueSize));
     }
 
