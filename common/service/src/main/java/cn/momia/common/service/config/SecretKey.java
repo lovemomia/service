@@ -11,13 +11,13 @@ import java.util.Map;
 
 public class SecretKey
 {
-    private static String biz;
-    private static Map<String, String> keys = new HashMap<String, String>();
-
+    private String biz;
     private JdbcTemplate jdbcTemplate;
 
+    private Map<String, String> keys = new HashMap<String, String>();
+
     public void setBiz(String biz) {
-        SecretKey.biz = biz;
+        this.biz = biz;
     }
 
     public void setJdbcTemplate(JdbcTemplate jdbcTemplate)
@@ -39,16 +39,16 @@ public class SecretKey
         if (StringUtils.isBlank(getPasswordSecretKey())) throw new RuntimeException("password secret key is empty");
     }
 
-    public static String get()
+    public String get()
     {
         return keys.get(biz);
     }
 
-    public static String get(String biz) {
+    public String get(String biz) {
         return keys.get(biz);
     }
 
-    public static String getPasswordSecretKey() {
+    public String getPasswordSecretKey() {
         return keys.get("password");
     }
 }

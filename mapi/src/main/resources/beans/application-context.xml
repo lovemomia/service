@@ -37,13 +37,14 @@
         <property name="dataSource" ref="dataSource" />
     </bean>
 
-    <bean class="cn.momia.common.service.config.SecretKey" init-method="init">
+    <bean id="secretKey" class="cn.momia.common.service.config.SecretKey" init-method="init">
         <property name="biz" value="${Server.Biz}" />
         <property name="jdbcTemplate" ref="jdbcTemplate" />
     </bean>
 
     <bean class="cn.momia.common.service.config.Configuration">
         <property name="xmlConf" ref="conf" />
+        <property name="secretKey" ref="secretKey" />
     </bean>
 
     <bean id="requestExecutor" class="cn.momia.common.web.http.MomiaHttpRequestExecutor" />

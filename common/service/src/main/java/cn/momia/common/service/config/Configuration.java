@@ -4,9 +4,14 @@ import org.apache.commons.configuration.XMLConfiguration;
 
 public class Configuration {
     private static XMLConfiguration xmlConf;
+    private static SecretKey secretKey;
 
     public void setXmlConf(XMLConfiguration xmlConf) {
         Configuration.xmlConf = xmlConf;
+    }
+
+    public void setSecretKey(SecretKey secretKey) {
+        Configuration.secretKey = secretKey;
     }
 
     public static boolean getBoolean(String key) {
@@ -35,14 +40,14 @@ public class Configuration {
 
     public static String getSecretKey()
     {
-        return SecretKey.get();
+        return secretKey.get();
     }
 
     public static String getSecretKey(String biz) {
-        return SecretKey.get(biz);
+        return secretKey.get(biz);
     }
 
     public static String getPasswordSecretKey() {
-        return SecretKey.get("password");
+        return secretKey.get("password");
     }
 }
