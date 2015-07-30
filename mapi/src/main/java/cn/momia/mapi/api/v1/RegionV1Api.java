@@ -13,4 +13,9 @@ public class RegionV1Api extends AbstractV1Api {
     public ResponseMessage getAllRegions() {
         return executeRequest(MomiaHttpRequest.GET(url("region")));
     }
+
+    @RequestMapping(value = "/district/tree", method = RequestMethod.GET)
+    public ResponseMessage getDistrictTree() {
+        return executeRequest(MomiaHttpRequest.GET(url("region/district/tree")));
+    }
 }
