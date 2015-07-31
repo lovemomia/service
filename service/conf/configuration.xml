@@ -30,6 +30,11 @@
         </Tongqu>
     </Database>
 
+    <Wap>
+        <Domain>m.duolaqinzi.com</Domain>
+        <ProductUrl>http://m.duolaqinzi.com/m/product</ProductUrl>
+    </Wap>
+
     <Payment>
         <Ali>
             <Partner>2088911944697039</Partner>

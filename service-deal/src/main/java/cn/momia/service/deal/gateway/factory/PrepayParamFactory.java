@@ -11,6 +11,7 @@ import cn.momia.service.deal.gateway.wechatpay.WechatpayUtil;
 import cn.momia.service.deal.payment.Payment;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
@@ -45,8 +46,8 @@ public class PrepayParamFactory {
                 prepayParam.add(AlipayPrepayFields.TOTAL_FEE, params.get(OrderInfoFields.TOTAL_FEE));
                 prepayParam.add(AlipayPrepayFields.BODY, params.get(OrderInfoFields.PRODUCT_TITLE));
                 prepayParam.add(AlipayPrepayFields.IT_B_PAY, "30m");
-                prepayParam.add(AlipayPrepayFields.SHOW_URL, "m.duolaqinzi.com");
-                if (type.equalsIgnoreCase("wap")) prepayParam.add(AlipayPrepayFields.RETURN_URL, "http://m.duolaqinzi.com/m/product?id=" + params.get(OrderInfoFields.PRODUCT_ID));
+                prepayParam.add(AlipayPrepayFields.SHOW_URL, Configuration.getString("Wap.Domain"));
+                if (type.equalsIgnoreCase("wap")) prepayParam.add(AlipayPrepayFields.RETURN_URL, buildProductUrl(params));
                 prepayParam.add(AlipayPrepayFields.SIGN, AlipayUtil.sign(prepayParam.getAll(), type));
 
                 break;
@@ -83,6 +84,14 @@ public class PrepayParamFactory {
 
     private static PrepayParam createPrepayParam(int payType) {
         return new PrepayParam();
+    }
+
+    private static String buildProductUrl(Map<String, String> params) {
+        String url = Configuration.getString("Wap.ProductUrl") + "?id=" + params.get(OrderInfoFields.PRODUCT_ID);
+        String utoken = params.get(OrderInfoFields.UTOKEN);
+        if (!StringUtils.isBlank(utoken)) url += "&utoken=" + utoken;
+
+        return url;
     }
 
     private static String getJsApiOpenId(String code) {

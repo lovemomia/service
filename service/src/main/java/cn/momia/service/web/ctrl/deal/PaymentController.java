@@ -57,7 +57,7 @@ public class PaymentController extends AbstractController {
         long userCouponId = StringUtils.isBlank(userCouponIdStr) ? 0 : Long.valueOf(userCouponIdStr);
         Coupon coupon = useCoupon(user.getId(), order, userCouponId);
 
-        Map<String, String> orderInfo = extraOrderInfo(request, order, product, coupon, payType);
+        Map<String, String> orderInfo = extraOrderInfo(request, user, order, product, coupon, payType);
         PrepayResult prepayResult = dealServiceFacade.prepay(orderInfo, payType);
 
         if (!prepayResult.isSuccessful()) return ResponseMessage.FAILED;
@@ -87,7 +87,7 @@ public class PaymentController extends AbstractController {
         promoServiceFacade.releaseUserCoupon(previousUserCoupon.getUserId(), previousUserCoupon.getOrderId());
     }
 
-    private Map<String, String> extraOrderInfo(HttpServletRequest request, Order order, Product product, Coupon coupon, int payType) {
+    private Map<String, String> extraOrderInfo(HttpServletRequest request, User user, Order order, Product product, Coupon coupon, int payType) {
         Map<String, String> orderInfo = HttpUtil.extractParams(request.getParameterMap());
         orderInfo.put(OrderInfoFields.ORDER_ID, String.valueOf(order.getId()));
         orderInfo.put(OrderInfoFields.PRODUCT_ID, String.valueOf(product.getId()));
@@ -99,6 +99,7 @@ public class PaymentController extends AbstractController {
             orderInfo.put(OrderInfoFields.TOTAL_FEE, String.valueOf(promoServiceFacade.calcTotalFee(order.getTotalFee(), coupon)));
 
         orderInfo.put(OrderInfoFields.USER_IP, RequestUtil.getRemoteIp(request));
+        orderInfo.put(OrderInfoFields.UTOKEN, user.getToken());
 
         return orderInfo;
     }
