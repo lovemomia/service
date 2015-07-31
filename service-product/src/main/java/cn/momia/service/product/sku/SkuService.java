@@ -13,4 +13,7 @@ public interface SkuService extends Service {
     boolean addLeader(long userId, long productId, long id);
     boolean lock(long id, int count);
     boolean unlock(long id, int count);
+
+    long queryCountOfLedSkus(long userId);
+    List<Sku> queryLedSkus(long userId, int start, int count);
 }

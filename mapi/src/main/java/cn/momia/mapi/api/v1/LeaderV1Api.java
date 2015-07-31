@@ -1,5 +1,6 @@
 package cn.momia.mapi.api.v1;
 
+import cn.momia.common.service.config.Configuration;
 import cn.momia.common.web.http.MomiaHttpParamBuilder;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
@@ -57,5 +58,18 @@ public class LeaderV1Api extends AbstractV1Api {
         MomiaHttpRequest request = MomiaHttpRequest.DELETE(url("leader"), builder.build());
 
         return executeRequest(request);
+    }
+
+    @RequestMapping(value = "/product", method = RequestMethod.GET)
+    public ResponseMessage getLedProducts(@RequestParam String utoken, @RequestParam int start) {
+        if (StringUtils.isBlank(utoken) || start < 0) return ResponseMessage.BAD_REQUEST;
+
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("start", start)
+                .add("count", Configuration.getInt("Leader.Product.PageSize"));
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("leader/product"), builder.build());
+
+        return executeRequest(request, pagedProductsFunc);
     }
 }

@@ -64,11 +64,7 @@ public class CouponController extends AbstractController {
     }
 
     private PagedListDto buildUserCoupons(int totalCount, List<UserCoupon> userCoupons, List<Coupon> coupons, int start, int count) {
-        PagedListDto userCouponsDto = new PagedListDto();
-
-        userCouponsDto.setTotalCount(totalCount);
-        if (start + count < totalCount && !isInvalidLimit(start + count, count)) userCouponsDto.setNextIndex(start + count);
-
+        PagedListDto userCouponsDto = new PagedListDto(totalCount, start, count);
         Map<Integer, Coupon> couponsMap = new HashMap<Integer, Coupon>();
         for (Coupon coupon : coupons) couponsMap.put(coupon.getId(), coupon);
 

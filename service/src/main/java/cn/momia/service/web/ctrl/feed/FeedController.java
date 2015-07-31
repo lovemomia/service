@@ -44,10 +44,7 @@ public class FeedController extends AbstractController {
         List<Long> userIds = feedServiceFacade.queryStaredUserIds(id, start, count);
         List<User> users = userServiceFacade.getUsers(userIds);
 
-        PagedListDto staredUsersDto = new PagedListDto();
-        staredUsersDto.setTotalCount(totalCount);
-        if (start + count < totalCount) staredUsersDto.setNextIndex(start + count);
-
+        PagedListDto staredUsersDto = new PagedListDto(totalCount, start, count);
         for (User user : users) {
             staredUsersDto.add(new MiniUserDto(user));
         }
@@ -70,10 +67,7 @@ public class FeedController extends AbstractController {
         Map<Long, User> usersMap = new HashMap<Long, User>();
         for (User user : users) usersMap.put(user.getId(), user);
 
-        PagedListDto feedCommentsDto = new PagedListDto();
-        feedCommentsDto.setTotalCount(totalCount);
-        if (start + count < totalCount) feedCommentsDto.setNextIndex(start + count);
-
+        PagedListDto feedCommentsDto = new PagedListDto(totalCount, start, count);
         for (FeedComment comment : comments) {
             User user = usersMap.get(comment.getUserId());
             if (user == null) continue;
@@ -91,11 +85,7 @@ public class FeedController extends AbstractController {
         long totalCount = feedServiceFacade.queryCountByTopic(topicId);
         List<Feed> feeds = feedServiceFacade.queryByTopic(topicId, start, count);
 
-        PagedListDto feedsDto = new PagedListDto();
-
-        feedsDto.setTotalCount(totalCount);
-        if (start + count < totalCount) feedsDto.setNextIndex(start + count);
-
+        PagedListDto feedsDto = new PagedListDto(totalCount, start, count);
         for (Feed feed : feeds) {
             User user = userServiceFacade.getUser(feed.getUserId());
             if (!user.exists()) continue;

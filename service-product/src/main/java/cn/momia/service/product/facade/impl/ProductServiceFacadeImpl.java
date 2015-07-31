@@ -199,6 +199,18 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     }
 
     @Override
+    public long queryCountOfLedSkus(long userId) {
+        if (userId <= 0) return 0;
+        return skuService.queryCountOfLedSkus(userId);
+    }
+
+    @Override
+    public List<Sku> queryLedSkus(long userId, int start, int count) {
+        if (userId <= 0 || start < 0 || count <= 0) return new ArrayList<Sku>();
+        return skuService.queryLedSkus(userId, start, count);
+    }
+
+    @Override
     public List<Sku> getSkus(long productId) {
         if (productId <= 0) return new ArrayList<Sku>();
         return skuService.queryByProduct(productId);

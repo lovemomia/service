@@ -251,11 +251,7 @@ public class UserController extends UserRelatedController {
     }
 
     private PagedListDto buildFavoritesDto(long totalCount, List<Product> products, int start, int count) {
-        PagedListDto favoritesDto = new PagedListDto();
-
-        favoritesDto.setTotalCount(totalCount);
-        if (start + count < totalCount) favoritesDto.setNextIndex(start + count);
-
+        PagedListDto favoritesDto = new PagedListDto(totalCount, start, count);
         ListDto baseProductsDto = new ListDto();
         for (Product product : products) {
             baseProductsDto.add(new BaseProductDto(product));

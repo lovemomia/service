@@ -1,8 +1,12 @@
 package cn.momia.service.web.ctrl.user;
 
 import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.service.product.facade.Product;
+import cn.momia.service.product.sku.Sku;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.leader.Leader;
+import cn.momia.service.web.ctrl.dto.PagedListDto;
+import cn.momia.service.web.ctrl.product.dto.BaseProductDto;
 import cn.momia.service.web.ctrl.user.dto.LeaderDto;
 import cn.momia.service.web.ctrl.user.dto.LeaderStatusDto;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,6 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/leader")
@@ -65,5 +74,33 @@ public class LeaderController extends UserRelatedController {
 
         if (!userServiceFacade.deleteLeaderInfo(user.getId())) return ResponseMessage.FAILED("删除领队信息失败");
         return ResponseMessage.SUCCESS;
+    }
+
+    @RequestMapping(value = "/product", method = RequestMethod.GET)
+    public ResponseMessage getLedProducts(@RequestParam String utoken, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return new ResponseMessage(PagedListDto.EMPTY);
+
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        long totalCount = productServiceFacade.queryCountOfLedSkus(user.getId());
+        List<Sku> ledSkus = productServiceFacade.queryLedSkus(user.getId(), start, count);
+
+        List<Long> productIds = new ArrayList<Long>();
+        Map<Long, Sku> skusMap = new HashMap<Long, Sku>();
+        for (Sku sku : ledSkus) {
+            productIds.add(sku.getProductId());
+            skusMap.put(sku.getProductId(), sku);
+        }
+
+        List<Product> products = productServiceFacade.get(productIds);
+        PagedListDto productsDto = new PagedListDto(totalCount, start, count);
+        for (Product product : products) {
+            BaseProductDto baseProductDto = new BaseProductDto(product, false);
+            baseProductDto.setScheduler(skusMap.get(product.getId()).getTime());
+            productsDto.add(baseProductDto);
+        }
+
+        return new ResponseMessage(productsDto);
     }
 }

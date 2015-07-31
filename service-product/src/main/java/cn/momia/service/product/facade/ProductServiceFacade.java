@@ -17,6 +17,9 @@ public interface ProductServiceFacade {
     long queryCountByMonth(int cityId, int month);
     List<Product> queryByMonth(int cityId, int month);
 
+    long queryCountOfLedSkus(long userId);
+    List<Sku> queryLedSkus(long userId, int start, int count);
+
     List<Sku> getSkus(long productId);
     Sku getSku(long skuId);
     List<Sku> getSkusWithoutLeader(long productId);

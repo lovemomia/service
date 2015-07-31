@@ -68,4 +68,10 @@
         </Comment>
         <PageSize>10</PageSize>
     </Feed>
+
+    <Leader>
+        <Product>
+            <PageSize>20</PageSize>
+        </Product>
+    </Leader>
 </Configuration>

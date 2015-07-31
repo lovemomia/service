@@ -60,11 +60,7 @@ public class ProductController extends AbstractController {
     }
 
     private PagedListDto buildProductsDto(long totalCount, List<Product> products, int start, int count) {
-        PagedListDto productsDto = new PagedListDto();
-
-        productsDto.setTotalCount(totalCount);
-        if (start + count < totalCount) productsDto.setNextIndex(start + count);
-
+        PagedListDto productsDto = new PagedListDto(totalCount, start, count);
         ListDto baseProductsDto = new ListDto();
         for (Product product : products) {
             baseProductsDto.add(new BaseProductDto(product));
@@ -87,11 +83,7 @@ public class ProductController extends AbstractController {
     }
 
     private PagedListDto buildWeekendProductsDto(long totalCount, List<Product> products, int start, int count) {
-        PagedListDto productsDto = new PagedListDto();
-
-        productsDto.setTotalCount(totalCount);
-        if (start + count < totalCount) productsDto.setNextIndex(start + count);
-
+        PagedListDto productsDto = new PagedListDto(totalCount, start, count);
         ListDto baseProductsDto = new ListDto();
         for (Product product : products) {
             BaseProductDto baseProductDto = new BaseProductDto(product);

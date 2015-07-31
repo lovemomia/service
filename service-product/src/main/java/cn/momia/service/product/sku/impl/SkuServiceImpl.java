@@ -172,4 +172,31 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
 
         return updateCount == 1;
     }
+
+    @Override
+    public long queryCountOfLedSkus(long userId) {
+        String sql = "SELECT COUNT(1) FROM t_sku WHERE leaderUserId=? AND status=1 AND startTime>NOW()";
+
+        return jdbcTemplate.query(sql, new Object[] { userId }, new ResultSetExtractor<Long>() {
+            @Override
+            public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getLong(1) : 0;
+            }
+        });
+    }
+
+    @Override
+    public List<Sku> queryLedSkus(long userId, int start, int count) {
+        final List<Sku> skus = new ArrayList<Sku>();
+        String sql = "SELECT " + joinFields() + " FROM t_sku WHERE leaderUserId=? AND status=1 AND startTime>NOW() ORDER BY startTime ASC LIMIT ?,?";
+        jdbcTemplate.query(sql, new Object[] { userId, start, count }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                Sku sku = buildSku(rs);
+                if (sku.exists()) skus.add(sku);
+            }
+        });
+
+        return skus;
+    }
 }

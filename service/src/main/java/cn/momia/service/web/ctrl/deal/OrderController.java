@@ -138,11 +138,7 @@ public class OrderController extends AbstractController {
         Map<Long, Product> productMap = new HashMap<Long, Product>();
         for (Product product : products) productMap.put(product.getId(), product);
 
-        PagedListDto userOrdersDto = new PagedListDto();
-
-        userOrdersDto.setTotalCount(totalCount);
-        if (start + count < totalCount && !isInvalidLimit(start + count, count)) userOrdersDto.setNextIndex(start + count);
-
+        PagedListDto userOrdersDto = new PagedListDto(totalCount, start, count);
         for (Order order : orders) {
             try {
                 Product product = productMap.get(order.getProductId());
