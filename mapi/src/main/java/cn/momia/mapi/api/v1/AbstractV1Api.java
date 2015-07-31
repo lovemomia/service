@@ -21,7 +21,6 @@ public class AbstractV1Api extends AbstractApi {
         public Object apply(Object data) {
             JSONObject userJson = (JSONObject) data;
             userJson.put("avatar", ImageFile.url(userJson.getString("avatar")));
-            if (Configuration.getBoolean("Leader.Show")) userJson.put("showLeader", true);
 
             return data;
         }

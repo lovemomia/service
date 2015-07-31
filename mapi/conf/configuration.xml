@@ -24,6 +24,10 @@
         <Base>http://localhost:7070</Base>
     </Service>
 
+    <AppConf>
+        <ShowLeader>true</ShowLeader>
+    </AppConf>
+
     <Home>
         <BannerCount>3</BannerCount>
         <PageSize>10</PageSize>
@@ -64,8 +68,4 @@
         </Comment>
         <PageSize>10</PageSize>
     </Feed>
-
-    <Leader>
-        <Show>true</Show>
-    </Leader>
 </Configuration>
