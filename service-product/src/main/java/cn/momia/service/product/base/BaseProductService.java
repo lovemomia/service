@@ -15,6 +15,8 @@ public interface BaseProductService extends Service {
     List<BaseProduct> queryByWeekend(int cityId, int start, int count);
     long queryCountByMonth(int cityId, String currentMonth, String nextMonth);
     List<BaseProduct> queryByMonth(int cityId, String currentMonth, String nextMonth);
+    long queryCountNeedLeader(int cityId);
+    List<BaseProduct> queryNeedLeader(int cityId, int start, int count);
 
     void join(long id, int count);
     void decreaseJoined(long id, int count);

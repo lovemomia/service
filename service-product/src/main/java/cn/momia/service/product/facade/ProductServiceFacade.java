@@ -16,6 +16,8 @@ public interface ProductServiceFacade {
     List<Product> queryByWeekend(int cityId, int start, int count);
     long queryCountByMonth(int cityId, int month);
     List<Product> queryByMonth(int cityId, int month);
+    long queryCountNeedLeader(int cityId);
+    List<Product> queryNeedLeader(int cityId, int start, int count);
 
     long queryCountOfLedSkus(long userId);
     List<Sku> queryLedSkus(long userId, int start, int count);

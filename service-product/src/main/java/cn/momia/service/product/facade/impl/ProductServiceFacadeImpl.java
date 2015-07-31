@@ -199,6 +199,17 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     }
 
     @Override
+    public long queryCountNeedLeader(int cityId) {
+        if (cityId < 0) return 0;
+        return baseProductService.queryCountNeedLeader(cityId);
+    }
+
+    @Override
+    public List<Product> queryNeedLeader(int cityId, int start, int count) {
+        return buildProducts(baseProductService.queryNeedLeader(cityId, start, count));
+    }
+
+    @Override
     public long queryCountOfLedSkus(long userId) {
         if (userId <= 0) return 0;
         return skuService.queryCountOfLedSkus(userId);

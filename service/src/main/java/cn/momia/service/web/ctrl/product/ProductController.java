@@ -153,6 +153,18 @@ public class ProductController extends AbstractController {
         }
     }
 
+    @RequestMapping(value = "/leader", method = RequestMethod.GET)
+    public ResponseMessage getProductsNeedLeader(@RequestParam(value = "city") int cityId,
+                                                 @RequestParam int start,
+                                                 @RequestParam int count) {
+        if (cityId < 0 || isInvalidLimit(start, count)) return new ResponseMessage(PagedListDto.EMPTY);
+
+        long totalCount = productServiceFacade.queryCountNeedLeader(cityId);
+        List<Product> products = productServiceFacade.queryNeedLeader(cityId, start, count);
+
+        return new ResponseMessage(buildProductsDto(totalCount, products, start, count));
+    }
+
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseMessage getProduct(@RequestParam(defaultValue = "") String utoken,
                                       @PathVariable long id,
