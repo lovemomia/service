@@ -90,6 +90,7 @@ public class Sku implements Serializable {
     private Date onlineTime;
     private Date offlineTime;
     private boolean onWeekend;
+    private boolean needLeader;
     private long leaderUserId;
 
     public long getId() {
@@ -226,6 +227,14 @@ public class Sku implements Serializable {
 
     public void setOnWeekend(boolean onWeekend) {
         this.onWeekend = onWeekend;
+    }
+
+    public boolean isNeedLeader() {
+        return needLeader;
+    }
+
+    public void setNeedLeader(boolean needLeader) {
+        this.needLeader = needLeader;
     }
 
     public long getLeaderUserId() {

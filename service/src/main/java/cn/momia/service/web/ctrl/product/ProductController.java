@@ -178,6 +178,18 @@ public class ProductController extends AbstractController {
         return new ResponseMessage(SkuDto.toSkusDto(skus));
     }
 
+    @RequestMapping(value = "/{id}/sku/leader", method = RequestMethod.GET)
+    public ResponseMessage getProductSkusWithLeaders(@PathVariable long id) {
+        List<Sku> skus = Sku.filter(productServiceFacade.getSkus(id));
+
+        ListDto skusDto = new ListDto();
+        for (Sku sku : skus) {
+            skusDto.add(new SkuDto(sku, userServiceFacade.getLeaderInfo(sku.getLeaderUserId())));
+        }
+
+        return new ResponseMessage(skusDto);
+    }
+
     @RequestMapping(value = "/{id}/customer", method = RequestMethod.GET)
     public ResponseMessage getProductCustomersInfo(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
         if (id <= 0 || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
