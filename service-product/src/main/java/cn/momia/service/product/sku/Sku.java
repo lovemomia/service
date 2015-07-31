@@ -64,9 +64,9 @@ public class Sku implements Serializable {
     public static List<Sku> filter(List<Sku> skus) {
         List<Sku> filteredSkus = new ArrayList<Sku>();
 
-        Date today = new Date();
+        Date now = new Date();
         for (Sku sku : skus) {
-            if (sku.isClosed(today)) continue;
+            if (sku.isClosed(now)) continue;
             filteredSkus.add(sku);
         }
 
@@ -77,6 +77,7 @@ public class Sku implements Serializable {
     private long productId;
     private String desc;
     private int type;
+    private boolean anyTime;
     private Date startTime;
     private Date endTime;
     private List<SkuProperty> properties;
@@ -121,6 +122,14 @@ public class Sku implements Serializable {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public boolean isAnyTime() {
+        return anyTime;
+    }
+
+    public void setAnyTime(boolean anyTime) {
+        this.anyTime = anyTime;
     }
 
     public Date getStartTime() {
@@ -319,9 +328,9 @@ public class Sku implements Serializable {
         return prices;
     }
 
-    public boolean isClosed(Date today) {
-        if (offlineTime.before(today) ||
-                startTime.before(today) ||
+    public boolean isClosed(Date now) {
+        if (offlineTime.before(now) ||
+                (startTime.before(now) && !anyTime) ||
                 (type != 1 && unlockedStock <= 0)) return true;
 
         return false;
