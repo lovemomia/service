@@ -1,6 +1,6 @@
 package cn.momia.service.product.sku;
 
-import cn.momia.common.misc.TimeUtil;
+import cn.momia.common.service.util.TimeUtil;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;

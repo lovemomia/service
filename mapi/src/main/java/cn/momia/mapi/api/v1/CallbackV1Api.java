@@ -1,10 +1,10 @@
 package cn.momia.mapi.api.v1;
 
-import cn.momia.common.misc.HttpUtil;
+import cn.momia.common.service.util.HttpUtil;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.v1.dto.deal.Xml;
-import cn.momia.common.misc.XmlUtil;
+import cn.momia.common.service.util.XmlUtil;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package cn.momia.common.misc;
+package cn.momia.common.service.util;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;

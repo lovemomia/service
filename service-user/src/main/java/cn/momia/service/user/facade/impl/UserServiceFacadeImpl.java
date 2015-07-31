@@ -1,6 +1,6 @@
 package cn.momia.service.user.facade.impl;
 
-import cn.momia.common.misc.ValidateUtil;
+import cn.momia.common.service.util.ValidateUtil;
 import cn.momia.common.service.config.Configuration;
 import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.service.user.facade.UserServiceFacade;

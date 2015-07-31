@@ -1,4 +1,4 @@
-package cn.momia.common.secret;
+package cn.momia.common.service.util;
 
 import org.apache.commons.codec.binary.Base64;
 

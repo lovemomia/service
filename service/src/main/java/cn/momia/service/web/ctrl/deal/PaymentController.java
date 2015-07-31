@@ -1,6 +1,6 @@
 package cn.momia.service.web.ctrl.deal;
 
-import cn.momia.common.misc.HttpUtil;
+import cn.momia.common.service.util.HttpUtil;
 import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.common.web.misc.RequestUtil;
 import cn.momia.common.web.response.ResponseMessage;

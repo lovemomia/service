@@ -1,6 +1,6 @@
 package cn.momia.service.web.ctrl.user.dto;
 
-import cn.momia.common.secret.MobileEncryptor;
+import cn.momia.common.service.util.MobileEncryptor;
 import cn.momia.service.user.leader.Leader;
 import cn.momia.service.web.util.MetaUtil;
 

@@ -1,6 +1,6 @@
 package cn.momia.service.user.participant;
 
-import cn.momia.common.misc.AgeUtil;
+import cn.momia.common.service.util.AgeUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;

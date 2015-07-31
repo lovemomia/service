@@ -1,6 +1,6 @@
 package cn.momia.service.deal.gateway.wechatpay;
 
-import cn.momia.common.misc.XmlUtil;
+import cn.momia.common.service.util.XmlUtil;
 import cn.momia.common.service.config.Configuration;
 import cn.momia.service.deal.gateway.AbstractPaymentGateway;
 import cn.momia.service.deal.gateway.CallbackParam;

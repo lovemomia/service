@@ -1,4 +1,4 @@
-package cn.momia.common.web.config;
+package cn.momia.common.service.config;
 
 import cn.momia.common.service.config.Configuration;
 import org.apache.commons.configuration.ConfigurationException;

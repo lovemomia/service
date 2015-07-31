@@ -1,6 +1,6 @@
 package cn.momia.service.user.base.impl;
 
-import cn.momia.common.secret.PasswordEncryptor;
+import cn.momia.common.service.util.PasswordEncryptor;
 import cn.momia.common.service.config.Configuration;
 import cn.momia.common.service.impl.DbAccessService;
 import cn.momia.service.user.base.User;

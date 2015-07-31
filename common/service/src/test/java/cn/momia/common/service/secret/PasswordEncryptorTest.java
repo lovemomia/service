@@ -1,5 +1,6 @@
-package cn.momia.common.secret;
+package cn.momia.common.service.secret;
 
+import cn.momia.common.service.util.PasswordEncryptor;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

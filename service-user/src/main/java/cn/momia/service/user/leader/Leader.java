@@ -1,6 +1,6 @@
 package cn.momia.service.user.leader;
 
-import cn.momia.common.misc.ValidateUtil;
+import cn.momia.common.service.util.ValidateUtil;
 import org.apache.commons.lang3.StringUtils;
 
 public class Leader {

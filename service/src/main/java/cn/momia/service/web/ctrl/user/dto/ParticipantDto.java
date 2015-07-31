@@ -1,6 +1,6 @@
 package cn.momia.service.web.ctrl.user.dto;
 
-import cn.momia.common.misc.AgeUtil;
+import cn.momia.common.service.util.AgeUtil;
 import cn.momia.service.user.participant.Participant;
 import cn.momia.service.web.ctrl.dto.Dto;
 import com.alibaba.fastjson.annotation.JSONField;

@@ -1,6 +1,6 @@
 package cn.momia.service.web.ctrl.product;
 
-import cn.momia.common.misc.TimeUtil;
+import cn.momia.common.service.util.TimeUtil;
 import cn.momia.common.service.config.Configuration;
 import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.common.web.response.ResponseMessage;

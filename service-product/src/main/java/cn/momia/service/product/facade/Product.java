@@ -1,6 +1,6 @@
 package cn.momia.service.product.facade;
 
-import cn.momia.common.misc.TimeUtil;
+import cn.momia.common.service.util.TimeUtil;
 import cn.momia.service.product.base.BaseProduct;
 import cn.momia.service.product.place.Place;
 import cn.momia.service.product.sku.Sku;

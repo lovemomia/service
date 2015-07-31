@@ -1,6 +1,4 @@
-package cn.momia.common.secret;
-
-import cn.momia.common.misc.ValidateUtil;
+package cn.momia.common.service.util;
 
 public class MobileEncryptor {
     public static String encrypt(String mobile) {

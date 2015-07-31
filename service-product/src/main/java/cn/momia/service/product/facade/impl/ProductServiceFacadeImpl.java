@@ -1,6 +1,6 @@
 package cn.momia.service.product.facade.impl;
 
-import cn.momia.common.misc.TimeUtil;
+import cn.momia.common.service.util.TimeUtil;
 import cn.momia.common.service.impl.DbAccessService;
 import cn.momia.service.product.facade.Product;
 import cn.momia.service.product.facade.ProductImage;

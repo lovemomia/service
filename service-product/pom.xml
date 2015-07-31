@@ -24,12 +24,6 @@
         <!-- Momia -->
         <dependency>
             <groupId>cn.momia</groupId>
-            <artifactId>common-utils</artifactId>
-            <version>1.0.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>cn.momia</groupId>
             <artifactId>common-service</artifactId>
             <version>1.0.0</version>
             <scope>provided</scope>

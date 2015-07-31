@@ -1,6 +1,6 @@
 package cn.momia.service.web.ctrl.deal.dto;
 
-import cn.momia.common.secret.MobileEncryptor;
+import cn.momia.common.service.util.MobileEncryptor;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderPrice;
 import cn.momia.service.web.ctrl.dto.Dto;
