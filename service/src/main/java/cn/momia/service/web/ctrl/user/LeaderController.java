@@ -18,7 +18,7 @@ public class LeaderController extends UserRelatedController {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        if (productServiceFacade.addSkuLeader(user.getId(), productId, skuId)) return ResponseMessage.FAILED("申请失败，已经有人在您前面申请");
+        if (!productServiceFacade.addSkuLeader(user.getId(), productId, skuId)) return ResponseMessage.FAILED("申请失败，已经有人在您前面申请");
         return ResponseMessage.SUCCESS;
     }
 
