@@ -25,7 +25,7 @@ import java.util.Map;
 
 public class SkuServiceImpl extends DbAccessService implements SkuService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SkuServiceImpl.class);
-    private static final String[] SKU_FIELDS = { "id", "productId", "`desc`", "`type`", "anyTime", "startTime", "endTime", "properties", "prices", "`limit`", "needRealName", "stock", "unlockedStock", "lockedStock", "onlineTime", "offlineTime", "onWeekend", "leaderId" };
+    private static final String[] SKU_FIELDS = { "id", "productId", "`desc`", "`type`", "anyTime", "startTime", "endTime", "properties", "prices", "`limit`", "needRealName", "stock", "unlockedStock", "lockedStock", "onlineTime", "offlineTime", "onWeekend", "leaderUserId" };
 
     @Override
     public Sku get(long id) {
@@ -64,7 +64,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
             sku.setOnlineTime(rs.getTimestamp("onlineTime"));
             sku.setOfflineTime(rs.getTimestamp("offlineTime"));
             sku.setOnWeekend(rs.getBoolean("onWeekend"));
-            sku.setLeaderId(rs.getLong("leaderId"));
+            sku.setLeaderUserId(rs.getLong("leaderUserId"));
 
             return sku;
         }
@@ -136,7 +136,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
 
     @Override
     public boolean addLeader(long userId, long productId, long id) {
-        String sql = "UPDATE t_sku SET leaderId=? WHERE id=? AND productId=? AND status=1 AND leaderId<= 0";
+        String sql = "UPDATE t_sku SET leaderUserId=? WHERE id=? AND productId=? AND status=1 AND leaderUserId<= 0";
 
         return jdbcTemplate.update(sql, new Object[] { userId, id, productId }) == 1;
     }
