@@ -52,6 +52,17 @@ public class ProductV1Api extends AbstractV1Api {
         });
     }
 
+    @RequestMapping(value = "/leader", method = RequestMethod.GET)
+    public ResponseMessage getProductsNeedLeader(@RequestParam(value = "city") int cityId, @RequestParam int start) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("city", cityId)
+                .add("start", start)
+                .add("count", Configuration.getInt("Product.PageSize"));
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("product/leader"), builder.build());
+
+        return executeRequest(request, pagedProductsFunc);
+    }
+
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getProduct(@RequestParam(defaultValue = "") String utoken, @RequestParam long id) {
         if (id <= 0) return ResponseMessage.BAD_REQUEST;
