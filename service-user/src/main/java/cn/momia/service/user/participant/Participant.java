@@ -1,6 +1,6 @@
 package cn.momia.service.user.participant;
 
-import cn.momia.common.service.util.AgeUtil;
+import cn.momia.common.service.util.TimeUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -102,17 +102,17 @@ public class Participant implements Serializable {
     }
 
     public boolean adult() {
-        return AgeUtil.isAdult(this.birthday);
+        return TimeUtil.isAdult(this.birthday);
     }
 
     public boolean child() {
-        return AgeUtil.isChild(this.birthday);
+        return TimeUtil.isChild(this.birthday);
     }
 
     public String desc() {
-        if (AgeUtil.isAdult(this.birthday)) return "成人";
+        if (TimeUtil.isAdult(this.birthday)) return "成人";
 
-        int age = AgeUtil.getAge(this.birthday);
+        int age = TimeUtil.getAge(this.birthday);
         String ageStr = age <= 0 ? "不到1" : String.valueOf(age);
 
         if (!("男".equals(this.sex) || "女".equals(this.sex))) return "孩子" + ageStr + "岁";

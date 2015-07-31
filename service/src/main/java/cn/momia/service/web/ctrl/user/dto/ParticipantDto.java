@@ -1,6 +1,6 @@
 package cn.momia.service.web.ctrl.user.dto;
 
-import cn.momia.common.service.util.AgeUtil;
+import cn.momia.common.service.util.TimeUtil;
 import cn.momia.service.user.participant.Participant;
 import cn.momia.service.web.ctrl.dto.Dto;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -28,7 +28,7 @@ public class ParticipantDto implements Dto {
         return participant.getBirthday();
     }
 
-    public String getType() { return AgeUtil.isAdult(participant.getBirthday()) ? "成人" : "儿童"; }
+    public String getType() { return TimeUtil.isAdult(participant.getBirthday()) ? "成人" : "儿童"; }
 
     public Integer getIdType() {
         return showId ? participant.getIdType() : null;
