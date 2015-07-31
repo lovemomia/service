@@ -189,13 +189,13 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     @Override
     public long queryCountByMonth(int cityId, int month) {
         if (cityId < 0 || month <= 0 || month > 12) return 0;
-        return baseProductService.queryCountByMonth(cityId, TimeUtil.buildMonthStr(month), TimeUtil.buildNextMonthStr(month));
+        return baseProductService.queryCountByMonth(cityId, TimeUtil.formatMonth(month), TimeUtil.formatNextMonth(month));
     }
 
     @Override
     public List<Product> queryByMonth(int cityId, int month) {
         if (cityId < 0 || month <= 0 || month > 12) return new ArrayList<Product>();
-        return buildProducts(baseProductService.queryByMonth(cityId, TimeUtil.buildMonthStr(month), TimeUtil.buildNextMonthStr(month)));
+        return buildProducts(baseProductService.queryByMonth(cityId, TimeUtil.formatMonth(month), TimeUtil.formatNextMonth(month)));
     }
 
     @Override

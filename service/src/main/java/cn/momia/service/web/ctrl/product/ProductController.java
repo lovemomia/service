@@ -110,10 +110,10 @@ public class ProductController extends AbstractController {
             DateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
 
             Date now = new Date();
-            Date currentMonth = monthFormat.parse(TimeUtil.buildMonthStr(month));
+            Date currentMonth = monthFormat.parse(TimeUtil.formatMonth(month));
 
             Date start = now.before(currentMonth) ? currentMonth : now;
-            Date end = monthFormat.parse(TimeUtil.buildNextMonthStr(month));
+            Date end = monthFormat.parse(TimeUtil.formatNextMonth(month));
 
             int pageSize = Configuration.getInt("Product.Month.PageSize");
             Map<String, ProductsOfDayDto> productsOfDayDtoMap = new HashMap<String, ProductsOfDayDto>();

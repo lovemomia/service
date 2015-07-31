@@ -290,7 +290,7 @@ public class Sku implements Serializable {
             for (String timeStr : timeStrs) {
                 Date time = TimeUtil.castToDates(timeStr);
                 if (time != null) {
-                    builder.append(TimeUtil.buildDateWithWeekDay(time));
+                    builder.append(TimeUtil.formatDateWithWeekDay(time));
                     if (timeStr.contains(":"))
                         builder.append(TimeUtil.getAmPm(time))
                                 .append(TIME_FORMATTER.format(time));
@@ -298,9 +298,9 @@ public class Sku implements Serializable {
                 }
             }
         } else {
-            builder.append(TimeUtil.buildDateWithWeekDay(start))
+            builder.append(TimeUtil.formatDateWithWeekDay(start))
                     .append("~")
-                    .append(TimeUtil.buildDateWithWeekDay(end));
+                    .append(TimeUtil.formatDateWithWeekDay(end));
         }
 
         return builder.toString();

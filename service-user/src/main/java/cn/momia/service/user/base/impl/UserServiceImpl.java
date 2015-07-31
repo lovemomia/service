@@ -1,11 +1,11 @@
 package cn.momia.service.user.base.impl;
 
-import cn.momia.common.service.util.PasswordEncryptor;
 import cn.momia.common.service.config.Configuration;
 import cn.momia.common.service.impl.DbAccessService;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
 import com.google.common.base.Splitter;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
+import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -56,7 +57,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, nickName);
                 ps.setString(2, mobile);
-                ps.setString(3, PasswordEncryptor.encrypt(mobile, password, Configuration.getPasswordSecretKey()));
+                ps.setString(3, encryptPassword(mobile, password, Configuration.getPasswordSecretKey()));
                 ps.setString(4, token);
 
                 return ps;
@@ -66,11 +67,25 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         return keyHolder.getKey().longValue();
     }
 
+    public String encryptPassword(String mobile, String password, String secretKey) {
+        try {
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            byte[] encryptedBytes = md5.digest((mobile + "|" + password + "|" + secretKey).getBytes("UTF-8"));
+
+            Base64 base64 = new Base64();
+            byte[] encryptedBase64 = base64.encode(encryptedBytes);
+
+            return new String(encryptedBase64);
+        } catch (Exception e) {
+            throw new RuntimeException("fail to excrypt password of user: " + mobile, e);
+        }
+    }
+
     @Override
     public boolean validatePassword(String mobile, String password) {
         String sql = "SELECT mobile, password FROM t_user WHERE mobile=? AND password=?";
 
-        return jdbcTemplate.query(sql, new Object[] { mobile, PasswordEncryptor.encrypt(mobile, password, Configuration.getPasswordSecretKey()) }, new ResultSetExtractor<Boolean>() {
+        return jdbcTemplate.query(sql, new Object[] { mobile, encryptPassword(mobile, password, Configuration.getPasswordSecretKey()) }, new ResultSetExtractor<Boolean>() {
             @Override
             public Boolean extractData(ResultSet resultSet) throws SQLException, DataAccessException {
                 if (resultSet.next()) return true;
@@ -245,6 +260,6 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     public boolean updatePassword(long id, String mobile, String password) {
         String sql = "UPDATE t_user SET password=? WHERE id=?";
 
-        return update(sql, new Object[] { PasswordEncryptor.encrypt(mobile, password, Configuration.getPasswordSecretKey()), id });
+        return update(sql, new Object[] { encryptPassword(mobile, password, Configuration.getPasswordSecretKey()), id });
     }
 }

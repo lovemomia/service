@@ -33,7 +33,7 @@ public class TimeUtil {
         return times;
     }
 
-    public static String buildDateWithWeekDay(Date time) {
+    public static String formatDateWithWeekDay(Date time) {
         StringBuilder builder = new StringBuilder();
         builder.append(DATE_FORMATTER.format(time))
                 .append("(")
@@ -61,7 +61,7 @@ public class TimeUtil {
         return AM_PM[calendar.get(Calendar.AM_PM)];
     }
 
-    public static String buildMonthStr(int month) {
+    public static String formatMonth(int month) {
         Calendar calendar = Calendar.getInstance();
         int currentYear = calendar.get(Calendar.YEAR);
         int currentMonth = calendar.get(Calendar.MONTH) + 1;
@@ -70,7 +70,7 @@ public class TimeUtil {
         return String.format("%d-%02d", currentYear, month);
     }
 
-    public static String buildNextMonthStr(int month) {
+    public static String formatNextMonth(int month) {
         Calendar calendar = Calendar.getInstance();
         int currentYear = calendar.get(Calendar.YEAR);
         int currentMonth = calendar.get(Calendar.MONTH) + 1;
