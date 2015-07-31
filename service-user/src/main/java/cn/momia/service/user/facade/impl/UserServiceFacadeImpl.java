@@ -1,6 +1,6 @@
 package cn.momia.service.user.facade.impl;
 
-import cn.momia.common.service.util.ValidateUtil;
+import cn.momia.common.service.util.MobileUtil;
 import cn.momia.common.service.config.Configuration;
 import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.service.user.facade.UserServiceFacade;
@@ -55,7 +55,7 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
     @Override
     public User register(String nickName, String mobile, String password) {
         if (StringUtils.isBlank(nickName) ||
-                ValidateUtil.isInvalidMobile(mobile) ||
+                MobileUtil.isInvalidMobile(mobile) ||
                 StringUtils.isBlank(password)) return User.NOT_EXIST_USER;
 
         long userId = userService.add(nickName, mobile, password, generateToken(mobile));
@@ -68,7 +68,7 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
 
     @Override
     public User login(String mobile, String password) {
-        if (ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(password)) return User.NOT_EXIST_USER;
+        if (MobileUtil.isInvalidMobile(mobile) || StringUtils.isBlank(password)) return User.NOT_EXIST_USER;
         if (!userService.validatePassword(mobile, password)) return User.NOT_EXIST_USER;
 
         return userService.getByMobile(mobile);
@@ -88,7 +88,7 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
 
     @Override
     public User getUserByMobile(String mobile) {
-        if (ValidateUtil.isInvalidMobile(mobile)) return User.NOT_EXIST_USER;
+        if (MobileUtil.isInvalidMobile(mobile)) return User.NOT_EXIST_USER;
         return userService.getByMobile(mobile);
     }
 
@@ -152,7 +152,7 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
 
     @Override
     public User updateUserPassword(String mobile, String password) {
-        if (ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(password)) return User.NOT_EXIST_USER;
+        if (MobileUtil.isInvalidMobile(mobile) || StringUtils.isBlank(password)) return User.NOT_EXIST_USER;
 
         User user = userService.getByMobile(mobile);
         if (user.exists() && !userService.updatePassword(user.getId(), mobile, password)) throw new MomiaFailedException("更改密码失败");

@@ -1,6 +1,5 @@
 package cn.momia.service.web.ctrl.deal;
 
-import cn.momia.common.service.util.HttpUtil;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.deal.gateway.CallbackResult;
 import cn.momia.service.deal.order.Order;
@@ -26,7 +25,7 @@ public class CallbackController extends AbstractController {
     }
 
     private ResponseMessage callback(HttpServletRequest request, int payType) {
-        CallbackResult result = dealServiceFacade.callback(HttpUtil.extractParams(request.getParameterMap()), payType);
+        CallbackResult result = dealServiceFacade.callback(extractParams(request.getParameterMap()), payType);
         if (result.isSuccessful()) {
             long orderId = Long.valueOf(result.get("orderId"));
             Order order = dealServiceFacade.getOrder(orderId);

@@ -1,6 +1,6 @@
 package cn.momia.service.common.facade.impl;
 
-import cn.momia.common.service.util.ValidateUtil;
+import cn.momia.common.service.util.MobileUtil;
 import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.service.common.facade.CommonServiceFacade;
 import cn.momia.service.common.city.City;
@@ -47,7 +47,7 @@ public class CommonServiceFacadeImpl implements CommonServiceFacade {
 
     @Override
     public boolean sendCode(String mobile, String type) {
-        if (ValidateUtil.isInvalidMobile(mobile) || isInvalidType(type)) return false;
+        if (MobileUtil.isInvalidMobile(mobile) || isInvalidType(type)) return false;
 
         return smsSender.send(mobile, type);
     }
@@ -58,7 +58,7 @@ public class CommonServiceFacadeImpl implements CommonServiceFacade {
 
     @Override
     public boolean verifyCode(String mobile, String code) {
-        if (ValidateUtil.isInvalidMobile(mobile) || StringUtils.isBlank(code)) return false;
+        if (MobileUtil.isInvalidMobile(mobile) || StringUtils.isBlank(code)) return false;
 
         return smsVerifier.verify(mobile, code);
     }

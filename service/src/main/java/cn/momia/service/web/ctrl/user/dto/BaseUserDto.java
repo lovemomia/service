@@ -1,6 +1,6 @@
 package cn.momia.service.web.ctrl.user.dto;
 
-import cn.momia.common.service.util.MobileEncryptor;
+import cn.momia.common.service.util.MobileUtil;
 import cn.momia.service.user.base.User;
 import com.alibaba.fastjson.annotation.JSONField;
 
@@ -12,7 +12,7 @@ public class BaseUserDto extends MiniUserDto {
     }
 
     public String getMobile() {
-        return MobileEncryptor.encrypt(user.getMobile());
+        return MobileUtil.encrypt(user.getMobile());
     }
 
     public boolean isHasPassword() {

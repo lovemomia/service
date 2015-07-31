@@ -1,6 +1,6 @@
 package cn.momia.service.web.ctrl.deal.dto;
 
-import cn.momia.common.service.util.MobileEncryptor;
+import cn.momia.common.service.util.MobileUtil;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderPrice;
 import cn.momia.service.web.ctrl.dto.Dto;
@@ -56,7 +56,7 @@ public class OrderDto implements Dto {
     }
 
     public String getMobile() {
-        return MobileEncryptor.encrypt(order.getMobile());
+        return MobileUtil.encrypt(order.getMobile());
     }
 
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")

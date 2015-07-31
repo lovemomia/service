@@ -1,6 +1,5 @@
 package cn.momia.service.web.ctrl.deal;
 
-import cn.momia.common.service.util.HttpUtil;
 import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.common.web.misc.RequestUtil;
 import cn.momia.common.web.response.ResponseMessage;
@@ -88,7 +87,7 @@ public class PaymentController extends AbstractController {
     }
 
     private Map<String, String> extraOrderInfo(HttpServletRequest request, User user, Order order, Product product, Coupon coupon, int payType) {
-        Map<String, String> orderInfo = HttpUtil.extractParams(request.getParameterMap());
+        Map<String, String> orderInfo = extractParams(request.getParameterMap());
         orderInfo.put(OrderInfoFields.ORDER_ID, String.valueOf(order.getId()));
         orderInfo.put(OrderInfoFields.PRODUCT_ID, String.valueOf(product.getId()));
         orderInfo.put(OrderInfoFields.PRODUCT_TITLE, product.getTitle());

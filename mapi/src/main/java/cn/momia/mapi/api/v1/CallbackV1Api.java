@@ -1,6 +1,5 @@
 package cn.momia.mapi.api.v1;
 
-import cn.momia.common.service.util.HttpUtil;
 import cn.momia.common.web.http.MomiaHttpRequest;
 import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.mapi.api.v1.dto.deal.Xml;
@@ -23,7 +22,7 @@ public class CallbackV1Api extends AbstractV1Api {
     @RequestMapping(value = "/alipay", method = RequestMethod.POST, produces = "text/plain")
     public String alipayCallback(HttpServletRequest request) {
         try {
-            Map<String, String> params = HttpUtil.extractParams(request.getParameterMap());
+            Map<String, String> params = extractParams(request.getParameterMap());
             ResponseMessage response = executeRequest(MomiaHttpRequest.POST(url("callback/alipay"), params));
             if (response.successful()) return "success";
         } catch (Exception e) {
