@@ -64,4 +64,8 @@
         </Comment>
         <PageSize>10</PageSize>
     </Feed>
+
+    <Leader>
+        <Show>true</Show>
+    </Leader>
 </Configuration>
