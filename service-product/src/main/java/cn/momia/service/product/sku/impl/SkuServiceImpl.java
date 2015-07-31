@@ -135,6 +135,13 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
     }
 
     @Override
+    public boolean addLeader(long userId, long productId, long id) {
+        String sql = "UPDATE t_sku SET leaderId=? WHERE id=? AND productId=? AND status=1 AND leaderId<= 0";
+
+        return jdbcTemplate.update(sql, new Object[] { userId, id, productId }) == 1;
+    }
+
+    @Override
     public boolean lock(long id, int count) {
         if (isNoCeiling(id)) return true;
 

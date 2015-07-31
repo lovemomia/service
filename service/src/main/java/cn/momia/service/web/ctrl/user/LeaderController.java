@@ -4,9 +4,6 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.leader.Leader;
 import cn.momia.service.web.ctrl.user.dto.LeaderDto;
-import cn.momia.service.web.ctrl.user.dto.LeaderApplyDto;
-import cn.momia.service.web.ctrl.user.dto.LeaderSkuDto;
-import com.alibaba.fastjson.JSON;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,17 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/leader")
 public class LeaderController extends UserRelatedController {
-    @RequestMapping(value = "/apply", method = RequestMethod.GET)
-    public ResponseMessage applyLeader(@RequestParam String utoken, @RequestParam(value = "pid") long productId) {
+    @RequestMapping(value = "/apply", method = RequestMethod.POST)
+    public ResponseMessage applyLeader(@RequestParam String utoken, @RequestParam(value = "pid") long productId, @RequestParam(value = "sid") long skuId) {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        Leader leader = userServiceFacade.getLeaderInfo(user.getId());
-        if (leader.getStatus() == Leader.Status.PASSED) {
-            return new ResponseMessage(new LeaderApplyDto(leader, LeaderSkuDto.toLeaderSkusDto(productServiceFacade.getSkusWithoutLeader(productId))));
-        } else {
-            return new ResponseMessage(new LeaderApplyDto(leader, JSON.parseObject(userServiceFacade.getLeaderDesc())));
-        }
+        if (productServiceFacade.addSkuLeader(user.getId(), productId, skuId)) return ResponseMessage.FAILED("申请失败，已经有人在您前面申请");
+        return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -35,14 +28,14 @@ public class LeaderController extends UserRelatedController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         Leader leader = userServiceFacade.getLeaderInfo(user.getId());
-        if (!leader.exists()) return ResponseMessage.FAILED("您还没申请成为领队");
+        if (!leader.exists()) return ResponseMessage.FAILED("您还没注册为领队");
 
         return new ResponseMessage(new LeaderDto(leader));
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage addLeaderInfo(@RequestBody Leader leader) {
-        if (!userServiceFacade.addLeaderInfo(leader)) return ResponseMessage.FAILED("申请成为领队失败");
+        if (!userServiceFacade.addLeaderInfo(leader)) return ResponseMessage.FAILED("注册领队失败");
         return ResponseMessage.SUCCESS;
     }
 
@@ -57,7 +50,7 @@ public class LeaderController extends UserRelatedController {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        if (userServiceFacade.deleteLeaderInfo(user.getId())) return ResponseMessage.FAILED("删除领队信息失败");
+        if (!userServiceFacade.deleteLeaderInfo(user.getId())) return ResponseMessage.FAILED("删除领队信息失败");
         return ResponseMessage.SUCCESS;
     }
 }

@@ -223,6 +223,12 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     }
 
     @Override
+    public boolean addSkuLeader(long userId, long productId, long skuId) {
+        if (userId <= 0 || productId <= 0 || skuId <= 0) return false;
+        return skuService.addLeader(userId, productId, skuId);
+    }
+
+    @Override
     public boolean lockStock(long productId, long skuId, int count) {
         if (productId <= 0 || skuId <= 0 || count <= 0) return false;
 

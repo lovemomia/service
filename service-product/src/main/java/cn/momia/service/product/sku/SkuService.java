@@ -10,6 +10,7 @@ public interface SkuService extends Service {
     Sku get(long id);
     List<Sku> queryByProduct(long productId);
     Map<Long, List<Sku>> queryByProducts(Collection<Long> productIds);
+    boolean addLeader(long userId, long productId, long id);
     boolean lock(long id, int count);
     boolean unlock(long id, int count);
 }
