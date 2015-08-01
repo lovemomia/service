@@ -32,6 +32,11 @@ public class BaseUserDto extends MiniUserDto {
         return user.getBirthday();
     }
 
+    @Deprecated
+    public int getCity() {
+        return getCityId();
+    }
+
     public int getCityId() {
         return user.getCityId();
     }
