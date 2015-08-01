@@ -40,12 +40,12 @@ public class LoggingFilter implements Filter
         });
     }
 
-    private Map<String, String[]> filterParams(Map<String, String[]> parameterMap) {
-        Map<String, String[]> filteredMap = new HashMap<String, String[]>();
+    private Map<String, String> filterParams(Map<String, String[]> parameterMap) {
+        Map<String, String> filteredMap = new HashMap<String, String>();
         for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
             String key = entry.getKey();
-            if ("password".equalsIgnoreCase(key)) filteredMap.put(key, new String[] { "******" });
-            else filteredMap.put(key, entry.getValue());
+            if ("password".equalsIgnoreCase(key)) filteredMap.put(key, "******");
+            else filteredMap.put(key, entry.getValue()[0]);
         }
 
         return filteredMap;
