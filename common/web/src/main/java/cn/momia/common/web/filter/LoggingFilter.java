@@ -12,6 +12,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoggingFilter implements Filter
 {
@@ -33,9 +35,20 @@ public class LoggingFilter implements Filter
                 end - start,
                 httpRequest.getContentType(),
                 httpRequest.getHeader("user-agent"),
-                httpRequest.getParameterMap(),
+                filterParams(httpRequest.getParameterMap()),
                 RequestUtil.getRemoteIp(httpRequest)
         });
+    }
+
+    private Map<String, String[]> filterParams(Map<String, String[]> parameterMap) {
+        Map<String, String[]> filteredMap = new HashMap<String, String[]>();
+        for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
+            String key = entry.getKey();
+            if ("password".equalsIgnoreCase(key)) filteredMap.put(key, new String[] { "******" });
+            else filteredMap.put(key, entry.getValue());
+        }
+
+        return filteredMap;
     }
 
     @Override
