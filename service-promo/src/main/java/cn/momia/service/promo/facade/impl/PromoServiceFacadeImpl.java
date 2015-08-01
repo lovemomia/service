@@ -101,6 +101,9 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
         if (userId <= 0 || orderId <= 0) return true;
 
         try {
+            UserCoupon userCoupon = couponService.getNotUsedUserCouponByOrder(orderId);
+            if (!userCoupon.exists() || userCoupon.getUserId() != userId) return true;
+
             if (!couponService.releaseUserCoupon(userId, orderId)) {
                 LOGGER.error("fail to release user coupon of order: {}", orderId);
                 return false;
