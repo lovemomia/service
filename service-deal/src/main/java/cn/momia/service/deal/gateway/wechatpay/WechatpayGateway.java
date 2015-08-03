@@ -40,7 +40,8 @@ public class WechatpayGateway extends AbstractPaymentGateway {
 
     @Override
     public PrepayResult doPrepay(PrepayParam param) {
-        PrepayResult result = new PrepayResult();
+        String tradeType = param.get(WechatpayPrepayFields.TRADE_TYPE);
+        PrepayResult result = "APP".equalsIgnoreCase(tradeType) ? new WechatpayPrepayResult.App() : new WechatpayPrepayResult.JsApi();
 
         try {
             HttpClient httpClient = HttpClients.createDefault();
