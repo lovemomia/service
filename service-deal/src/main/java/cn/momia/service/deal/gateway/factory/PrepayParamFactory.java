@@ -32,8 +32,8 @@ public class PrepayParamFactory {
         switch (payType) {
             case Payment.Type.ALIPAY:
                 String type = params.get("type");
-                if (type.equalsIgnoreCase("app")) prepayParam.add(AlipayPrepayFields.SERVICE, "mobile.securitypay.pay");
-                else prepayParam.add(AlipayPrepayFields.SERVICE, "alipay.wap.create.direct.pay.by.user");
+                if (type.equalsIgnoreCase("app")) prepayParam.add(AlipayPrepayFields.SERVICE, Configuration.getString("Payment.Ali.AppService"));
+                else prepayParam.add(AlipayPrepayFields.SERVICE, Configuration.getString("Payment.Ali.WapService"));
 
                 prepayParam.add(AlipayPrepayFields.PARTNER, Configuration.getString("Payment.Ali.Partner"));
                 prepayParam.add(AlipayPrepayFields.INPUT_CHARSET, "utf-8");
