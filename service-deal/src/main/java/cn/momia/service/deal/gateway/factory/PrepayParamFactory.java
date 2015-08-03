@@ -5,7 +5,6 @@ import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.service.deal.facade.OrderInfoFields;
 import cn.momia.service.deal.gateway.PrepayParam;
 import cn.momia.service.deal.gateway.alipay.AlipayPrepayFields;
-import cn.momia.service.deal.gateway.alipay.AlipayUtil;
 import cn.momia.service.deal.gateway.wechatpay.WechatpayPrepayFields;
 import cn.momia.service.deal.gateway.wechatpay.WechatpayUtil;
 import cn.momia.service.deal.payment.Payment;
@@ -32,24 +31,12 @@ public class PrepayParamFactory {
         switch (payType) {
             case Payment.Type.ALIPAY:
                 String type = params.get("type");
-                if (type.equalsIgnoreCase("app")) prepayParam.add(AlipayPrepayFields.SERVICE, Configuration.getString("Payment.Ali.AppService"));
-                else prepayParam.add(AlipayPrepayFields.SERVICE, Configuration.getString("Payment.Ali.WapService"));
-
-                prepayParam.add(AlipayPrepayFields.PARTNER, Configuration.getString("Payment.Ali.Partner"));
-                prepayParam.add(AlipayPrepayFields.INPUT_CHARSET, "utf-8");
-                prepayParam.add(AlipayPrepayFields.SIGN_TYPE, "RSA");
-                prepayParam.add(AlipayPrepayFields.NOTIFY_URL, Configuration.getString("Payment.Ali.NotifyUrl"));
+                prepayParam.add(AlipayPrepayFields.TYPE, type);
                 prepayParam.add(AlipayPrepayFields.OUT_TRADE_NO, params.get(OrderInfoFields.ORDER_ID));
                 prepayParam.add(AlipayPrepayFields.SUBJECT, params.get(OrderInfoFields.PRODUCT_TITLE));
-                prepayParam.add(AlipayPrepayFields.PAYMENT_TYPE, "1");
-                prepayParam.add(AlipayPrepayFields.SELLER_ID, Configuration.getString("Payment.Ali.Partner"));
                 prepayParam.add(AlipayPrepayFields.TOTAL_FEE, params.get(OrderInfoFields.TOTAL_FEE));
                 prepayParam.add(AlipayPrepayFields.BODY, params.get(OrderInfoFields.PRODUCT_TITLE));
-                prepayParam.add(AlipayPrepayFields.IT_B_PAY, "30m");
-                prepayParam.add(AlipayPrepayFields.SHOW_URL, Configuration.getString("Wap.Domain"));
-                if (type.equalsIgnoreCase("wap")) prepayParam.add(AlipayPrepayFields.RETURN_URL, buildProductUrl(params));
-                prepayParam.add(AlipayPrepayFields.SIGN, AlipayUtil.sign(prepayParam.getAll(), type));
-
+                if ("wap".equalsIgnoreCase(type)) prepayParam.add(AlipayPrepayFields.RETURN_URL, buildProductUrl(params));
                 break;
             case Payment.Type.WECHATPAY:
                 String tradeType = params.get(WechatpayPrepayFields.TRADE_TYPE);

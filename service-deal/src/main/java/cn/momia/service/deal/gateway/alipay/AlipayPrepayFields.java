@@ -1,6 +1,8 @@
 package cn.momia.service.deal.gateway.alipay;
 
 public class AlipayPrepayFields {
+    public static final String TYPE = "type";
+
     public static final String SERVICE = "service";
     public static final String PARTNER = "partner";
     public static final String INPUT_CHARSET = "_input_charset";
