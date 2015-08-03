@@ -12,7 +12,7 @@
         <property name="conf" ref="conf" />
     </bean>
 
-    <bean class="cn.momia.common.web.logger.LoggerConfigurer" init-method="init">
+    <bean class="cn.momia.common.service.config.LoggerConfigurer" init-method="init">
         <property name="conf" ref="conf" />
     </bean>
 

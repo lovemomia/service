@@ -1,4 +1,4 @@
-package cn.momia.common.web.logger;
+package cn.momia.common.service.config;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
