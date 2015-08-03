@@ -63,6 +63,43 @@ public class ProductV1Api extends AbstractV1Api {
         return executeRequest(request, pagedProductsFunc);
     }
 
+
+    @RequestMapping(value = "/sku/leader", method = RequestMethod.GET)
+    public ResponseMessage getProductSkusNeedLeader(@RequestParam(value = "pid") long productId) {
+        if (productId <= 0) return ResponseMessage.BAD_REQUEST;
+
+        List<MomiaHttpRequest> requests = buildRequests(productId);
+
+        return executeRequests(requests, new Function<MomiaHttpResponseCollector, Object>() {
+            @Override
+            public Object apply(MomiaHttpResponseCollector collector) {
+                JSONObject productSkusJson = new JSONObject();
+                productSkusJson.put("product", productFunc.apply(collector.getResponse("product")));
+                productSkusJson.put("skus", collector.getResponse("skus"));
+
+                return productSkusJson;
+            }
+        });
+    }
+
+    private List<MomiaHttpRequest> buildRequests(long productId) {
+        List<MomiaHttpRequest> requests = new ArrayList<MomiaHttpRequest>();
+        requests.add(buildProductRequest(productId));
+        requests.add(buildNeedLeaderSkusRequest(productId));
+
+        return requests;
+    }
+
+    private MomiaHttpRequest buildProductRequest(long productId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("full", false);
+
+        return MomiaHttpRequest.GET("product", true, url("product", productId), builder.build());
+    }
+
+    private MomiaHttpRequest buildNeedLeaderSkusRequest(long productId) {
+        return MomiaHttpRequest.GET("skus", true, url("product", productId, "sku/leader"));
+    }
+
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getProduct(@RequestParam(defaultValue = "") String utoken, @RequestParam long id) {
         if (id <= 0) return ResponseMessage.BAD_REQUEST;
