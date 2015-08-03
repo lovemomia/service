@@ -1,6 +1,6 @@
 package cn.momia.service.web.ctrl.user;
 
-import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.service.web.response.ResponseMessage;
 import cn.momia.service.product.facade.Product;
 import cn.momia.service.product.sku.Sku;
 import cn.momia.service.user.base.User;
@@ -28,7 +28,7 @@ public class LeaderController extends UserRelatedController {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        return new ResponseMessage(new LeaderStatusDto(userServiceFacade.getLeaderInfo(user.getId())));
+        return ResponseMessage.SUCCESS(new LeaderStatusDto(userServiceFacade.getLeaderInfo(user.getId())));
     }
 
     @RequestMapping(value = "/apply", method = RequestMethod.POST)
@@ -52,7 +52,7 @@ public class LeaderController extends UserRelatedController {
         Leader leader = userServiceFacade.getLeaderInfo(user.getId());
         if (!leader.exists()) return ResponseMessage.FAILED("您还没注册为领队");
 
-        return new ResponseMessage(new LeaderDto(leader));
+        return ResponseMessage.SUCCESS(new LeaderDto(leader));
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
@@ -78,7 +78,7 @@ public class LeaderController extends UserRelatedController {
 
     @RequestMapping(value = "/product", method = RequestMethod.GET)
     public ResponseMessage getLedProducts(@RequestParam String utoken, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return new ResponseMessage(PagedListDto.EMPTY);
+        if (isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
 
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
@@ -105,6 +105,6 @@ public class LeaderController extends UserRelatedController {
             productsDto.add(baseProductDto);
         }
 
-        return new ResponseMessage(productsDto);
+        return ResponseMessage.SUCCESS(productsDto);
     }
 }

@@ -1,6 +1,6 @@
 package cn.momia.service.web.ctrl.deal;
 
-import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.service.web.response.ResponseMessage;
 import cn.momia.service.deal.gateway.CallbackResult;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;

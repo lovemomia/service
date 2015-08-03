@@ -30,7 +30,7 @@
         <!-- Momia -->
         <dependency>
             <groupId>cn.momia</groupId>
-            <artifactId>common-service</artifactId>
+            <artifactId>duola-common</artifactId>
             <version>1.0.0</version>
             <scope>provided</scope>
         </dependency>

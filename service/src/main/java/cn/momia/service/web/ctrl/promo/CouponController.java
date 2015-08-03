@@ -1,6 +1,6 @@
 package cn.momia.service.web.ctrl.promo;
 
-import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.service.web.response.ResponseMessage;
 import cn.momia.service.user.base.User;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.promo.coupon.Coupon;
@@ -38,7 +38,7 @@ public class CouponController extends AbstractController {
         BigDecimal totalFee = order.getTotalFee();
         if (!promoServiceFacade.canUse(totalFee, coupon)) return ResponseMessage.FAILED("使用条件不满足，无法使用");
 
-        return new ResponseMessage(promoServiceFacade.calcTotalFee(totalFee, coupon));
+        return ResponseMessage.SUCCESS(promoServiceFacade.calcTotalFee(totalFee, coupon));
     }
 
 
@@ -48,7 +48,7 @@ public class CouponController extends AbstractController {
                                             @RequestParam int status,
                                             @RequestParam int start,
                                             @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return new ResponseMessage(PagedListDto.EMPTY);
+        if (isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
 
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
@@ -60,7 +60,7 @@ public class CouponController extends AbstractController {
         for (UserCoupon userCoupon : userCoupons) couponIds.add(userCoupon.getCouponId());
         List<Coupon> coupons = promoServiceFacade.getCoupons(couponIds);
 
-        return new ResponseMessage(buildUserCoupons(totalCount, userCoupons, coupons, start, count));
+        return ResponseMessage.SUCCESS(buildUserCoupons(totalCount, userCoupons, coupons, start, count));
     }
 
     private PagedListDto buildUserCoupons(int totalCount, List<UserCoupon> userCoupons, List<Coupon> coupons, int start, int count) {

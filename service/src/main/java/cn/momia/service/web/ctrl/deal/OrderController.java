@@ -1,6 +1,6 @@
 package cn.momia.service.web.ctrl.deal;
 
-import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.service.web.response.ResponseMessage;
 import cn.momia.service.deal.exception.OrderLimitException;
 import cn.momia.service.product.facade.Product;
 import cn.momia.service.product.sku.Sku;
@@ -47,7 +47,7 @@ public class OrderController extends AbstractController {
             orderId = dealServiceFacade.placeOrder(order);
             if (orderId > 0) {
                 order.setId(orderId);
-                return new ResponseMessage(new OrderDto(order));
+                return ResponseMessage.SUCCESS(new OrderDto(order));
             }
         } catch (OrderLimitException e) {
             return ResponseMessage.FAILED("本单有限购，您已超出购买限额");
@@ -109,7 +109,7 @@ public class OrderController extends AbstractController {
                                            @RequestParam int status,
                                            @RequestParam int start,
                                            @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return new ResponseMessage(PagedListDto.EMPTY);
+        if (isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
 
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
@@ -121,7 +121,7 @@ public class OrderController extends AbstractController {
         for (Order order : orders) productIds.add(order.getProductId());
         List<Product> products = productServiceFacade.get(productIds);
 
-        return new ResponseMessage(buildUserOrders(totalCount, orders, products, start, count));
+        return ResponseMessage.SUCCESS(buildUserOrders(totalCount, orders, products, start, count));
     }
 
     private PagedListDto buildUserOrders(long totalCount, List<Order> orders, List<Product> products, int start, int count) {
@@ -156,6 +156,6 @@ public class OrderController extends AbstractController {
                 order.getCustomerId() != user.getId() ||
                 order.getProductId() != product.getId()) return ResponseMessage.FAILED("无效的订单");
 
-        return new ResponseMessage(new OrderDetailDto(order, product));
+        return ResponseMessage.SUCCESS(new OrderDetailDto(order, product));
     }
 }

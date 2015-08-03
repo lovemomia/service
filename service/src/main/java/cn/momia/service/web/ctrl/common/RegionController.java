@@ -1,6 +1,6 @@
 package cn.momia.service.web.ctrl.common;
 
-import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.service.web.response.ResponseMessage;
 import cn.momia.service.common.city.City;
 import cn.momia.service.common.region.Region;
 import cn.momia.service.web.ctrl.AbstractController;
@@ -20,7 +20,7 @@ import java.util.Map;
 public class RegionController extends AbstractController {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getAllCities() {
-        return new ResponseMessage(commonServiceFacade.getAllRegions());
+        return ResponseMessage.SUCCESS(commonServiceFacade.getAllRegions());
     }
 
     @RequestMapping(value = "/district/tree", method = RequestMethod.GET)
@@ -49,6 +49,6 @@ public class RegionController extends AbstractController {
             treeJson.add(cityDistrictsJson);
         }
 
-        return new ResponseMessage(treeJson);
+        return ResponseMessage.SUCCESS(treeJson);
     }
 }

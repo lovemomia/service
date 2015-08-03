@@ -1,6 +1,6 @@
-package cn.momia.common.web.filter;
+package cn.momia.service.web.filter;
 
-import cn.momia.common.web.misc.RequestUtil;
+import cn.momia.service.web.util.RequestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,16 +15,15 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LoggingFilter implements Filter
-{
+public class LoggingFilter implements Filter {
     private static final Logger REQUEST_LOGGER = LoggerFactory.getLogger("REQUEST");
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {}
+    public void init(FilterConfig filterConfig) throws ServletException {
+    }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
-    {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         long start = System.currentTimeMillis();
         chain.doFilter(request, response);
         long end = System.currentTimeMillis();
@@ -52,5 +51,6 @@ public class LoggingFilter implements Filter
     }
 
     @Override
-    public void destroy() {}
+    public void destroy() {
+    }
 }

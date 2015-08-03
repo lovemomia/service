@@ -1,6 +1,6 @@
 package cn.momia.service.web.ctrl.user;
 
-import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.service.web.response.ResponseMessage;
 import cn.momia.service.product.facade.Product;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;
@@ -31,7 +31,7 @@ public class UserController extends UserRelatedController {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        return new ResponseMessage(buildUserResponse(user));
+        return ResponseMessage.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/nickname", method = RequestMethod.PUT)
@@ -46,7 +46,7 @@ public class UserController extends UserRelatedController {
         }
 
         user.setNickName(nickName);
-        return new ResponseMessage(buildUserResponse(user));
+        return ResponseMessage.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/avatar", method = RequestMethod.PUT)
@@ -58,7 +58,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return ResponseMessage.FAILED("更新用户头像失败");
 
         user.setAvatar(avatar);
-        return new ResponseMessage(buildUserResponse(user));
+        return ResponseMessage.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/name", method = RequestMethod.PUT)
@@ -70,7 +70,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return ResponseMessage.FAILED("更新用户名字失败");
 
         user.setName(name);
-        return new ResponseMessage(buildUserResponse(user));
+        return ResponseMessage.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/sex", method = RequestMethod.PUT)
@@ -82,7 +82,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return ResponseMessage.FAILED("更新用户性别失败");
 
         user.setSex(sex);
-        return new ResponseMessage(buildUserResponse(user));
+        return ResponseMessage.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/birthday", method = RequestMethod.PUT)
@@ -94,7 +94,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return ResponseMessage.FAILED("更新用户生日失败");
 
         user.setBirthday(birthday);
-        return new ResponseMessage(buildUserResponse(user));
+        return ResponseMessage.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/city", method = RequestMethod.PUT)
@@ -106,7 +106,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return ResponseMessage.FAILED("更新用户城市失败");
 
         user.setCityId(cityId);
-        return new ResponseMessage(buildUserResponse(user));
+        return ResponseMessage.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/region", method = RequestMethod.PUT)
@@ -118,7 +118,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return ResponseMessage.FAILED("更新用户所在区域失败");
 
         user.setRegionId(regionId);
-        return new ResponseMessage(buildUserResponse(user));
+        return ResponseMessage.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/address", method = RequestMethod.PUT)
@@ -130,7 +130,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return ResponseMessage.FAILED("更新用户地址失败");
 
         user.setAddress(address);
-        return new ResponseMessage(buildUserResponse(user));
+        return ResponseMessage.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/child", method = RequestMethod.POST, consumes = "application/json")
@@ -152,7 +152,7 @@ public class UserController extends UserRelatedController {
         user.getChildren().addAll(childIds);
         if (!userServiceFacade.updateUserChildren(userId, user.getChildren())) return ResponseMessage.FAILED("添加孩子信息失败");
 
-        return new ResponseMessage(buildUserResponse(user));
+        return ResponseMessage.SUCCESS(buildUserResponse(user));
     }
 
 
@@ -203,7 +203,7 @@ public class UserController extends UserRelatedController {
         user.getChildren().remove(childId);
         if (!userServiceFacade.updateUserChildren(user.getId(), user.getChildren())) return ResponseMessage.FAILED("删除孩子信息失败");
 
-        return new ResponseMessage(buildUserResponse(user));
+        return ResponseMessage.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/child/{cid}", method = RequestMethod.GET)
@@ -217,7 +217,7 @@ public class UserController extends UserRelatedController {
         Participant child = userServiceFacade.getChild(user.getId(), childId);
         if (!child.exists()) return ResponseMessage.FAILED("孩子不存在");
 
-        return new ResponseMessage(new ParticipantDto(child));
+        return ResponseMessage.SUCCESS(new ParticipantDto(child));
     }
 
     @RequestMapping(value = "/child", method = RequestMethod.GET)
@@ -226,7 +226,7 @@ public class UserController extends UserRelatedController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         Set<Long> childIds = user.getChildren();
-        return new ResponseMessage(buildParticipantsResponse(userServiceFacade.getChildren(user.getId(), childIds)));
+        return ResponseMessage.SUCCESS(buildParticipantsResponse(userServiceFacade.getChildren(user.getId(), childIds)));
     }
 
     @RequestMapping(value = "/contacts", method = RequestMethod.GET)
@@ -234,12 +234,12 @@ public class UserController extends UserRelatedController {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        return new ResponseMessage(new ContactsDto(user));
+        return ResponseMessage.SUCCESS(new ContactsDto(user));
     }
 
     @RequestMapping(value = "/favorite", method = RequestMethod.GET)
     public ResponseMessage getFavoritesOfUser(@RequestParam String utoken, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return new ResponseMessage(PagedListDto.EMPTY);
+        if (isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
 
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
@@ -247,7 +247,7 @@ public class UserController extends UserRelatedController {
         long totalCount = productServiceFacade.queryFavoritesCount(user.getId());
         List<Product> products = productServiceFacade.queryFavorites(user.getId(), start, count);
 
-        return new ResponseMessage(buildFavoritesDto(totalCount, products, start, count));
+        return ResponseMessage.SUCCESS(buildFavoritesDto(totalCount, products, start, count));
     }
 
     private PagedListDto buildFavoritesDto(long totalCount, List<Product> products, int start, int count) {

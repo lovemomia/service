@@ -1,8 +1,8 @@
 package cn.momia.service.web.ctrl.deal;
 
 import cn.momia.common.service.exception.MomiaFailedException;
-import cn.momia.common.web.misc.RequestUtil;
-import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.service.web.util.RequestUtil;
+import cn.momia.service.web.response.ResponseMessage;
 import cn.momia.service.deal.facade.OrderInfoFields;
 import cn.momia.service.product.facade.Product;
 import cn.momia.service.product.sku.Sku;
@@ -60,7 +60,7 @@ public class PaymentController extends AbstractController {
         PrepayResult prepayResult = dealServiceFacade.prepay(orderInfo, payType);
 
         if (!prepayResult.isSuccessful()) return ResponseMessage.FAILED;
-        return new ResponseMessage(prepayResult);
+        return ResponseMessage.SUCCESS(prepayResult);
     }
 
     private Coupon useCoupon(long userId, Order order, long userCouponId) {
@@ -139,7 +139,7 @@ public class PaymentController extends AbstractController {
                 !dealServiceFacade.prepayOrder(orderId) ||
                 !dealServiceFacade.payOrder(orderId)) return ResponseMessage.FAILED("支付失败");
 
-        return new ResponseMessage(new MiniProductDto(productServiceFacade.get(productId, true)));
+        return ResponseMessage.SUCCESS(new MiniProductDto(productServiceFacade.get(productId, true)));
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.GET)
@@ -152,6 +152,6 @@ public class PaymentController extends AbstractController {
 
         if (!dealServiceFacade.check(user.getId(), orderId, productId, skuId)) return ResponseMessage.FAILED("支付失败");
 
-        return new ResponseMessage(new MiniProductDto(productServiceFacade.get(productId, true)));
+        return ResponseMessage.SUCCESS(new MiniProductDto(productServiceFacade.get(productId, true)));
     }
 }

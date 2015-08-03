@@ -49,8 +49,6 @@ public interface UserServiceFacade {
     boolean updateParticipant(Participant participant);
     boolean deleteParticipant(long userId, long participantId);
 
-    String getLeaderDesc();
-
     Leader getLeaderInfo(long userId);
     boolean addLeaderInfo(Leader leader);
     boolean updateLeaderInfo(Leader leader);

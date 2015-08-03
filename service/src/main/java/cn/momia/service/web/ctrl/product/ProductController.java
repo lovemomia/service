@@ -3,7 +3,7 @@ package cn.momia.service.web.ctrl.product;
 import cn.momia.common.service.util.TimeUtil;
 import cn.momia.common.service.config.Configuration;
 import cn.momia.common.service.exception.MomiaFailedException;
-import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.service.web.response.ResponseMessage;
 import cn.momia.service.web.ctrl.dto.ListDto;
 import cn.momia.service.web.ctrl.dto.PagedListDto;
 import cn.momia.service.web.ctrl.product.dto.BaseProductDto;
@@ -52,12 +52,12 @@ public class ProductController extends AbstractController {
     public ResponseMessage getProducts(@RequestParam(value = "city") int cityId,
                                        @RequestParam int start,
                                        @RequestParam int count) {
-        if (cityId < 0 || isInvalidLimit(start, count)) return new ResponseMessage(PagedListDto.EMPTY);
+        if (cityId < 0 || isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
 
         long totalCount = productServiceFacade.queryCount(cityId);
         List<Product> products = productServiceFacade.query(cityId, start, count);
 
-        return new ResponseMessage(buildProductsDto(totalCount, products, start, count));
+        return ResponseMessage.SUCCESS(buildProductsDto(totalCount, products, start, count));
     }
 
     private PagedListDto buildProductsDto(long totalCount, List<Product> products, int start, int count) {
@@ -75,12 +75,12 @@ public class ProductController extends AbstractController {
     public ResponseMessage getProductsByWeekend(@RequestParam(value = "city") int cityId,
                                                 @RequestParam int start,
                                                 @RequestParam int count) {
-        if (cityId <0 || isInvalidLimit(start, count)) return new ResponseMessage(PagedListDto.EMPTY);
+        if (cityId <0 || isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
 
         long totalCount = productServiceFacade.queryCountByWeekend(cityId);
         List<Product> products = productServiceFacade.queryByWeekend(cityId, start, count);
 
-        return new ResponseMessage(buildWeekendProductsDto(totalCount, products, start, count));
+        return ResponseMessage.SUCCESS(buildWeekendProductsDto(totalCount, products, start, count));
     }
 
     private PagedListDto buildWeekendProductsDto(long totalCount, List<Product> products, int start, int count) {
@@ -100,7 +100,7 @@ public class ProductController extends AbstractController {
     public ResponseMessage getProductsByMonth(@RequestParam(value = "city") int cityId, @RequestParam int month) {
         List<Product> products = productServiceFacade.queryByMonth(cityId, month);
 
-        return new ResponseMessage(buildGroupedProductsDto(month, products));
+        return ResponseMessage.SUCCESS(buildGroupedProductsDto(month, products));
     }
 
     private ListDto buildGroupedProductsDto(int month, List<Product> products) {
@@ -158,12 +158,12 @@ public class ProductController extends AbstractController {
     public ResponseMessage getProductsNeedLeader(@RequestParam(value = "city") int cityId,
                                                  @RequestParam int start,
                                                  @RequestParam int count) {
-        if (cityId < 0 || isInvalidLimit(start, count)) return new ResponseMessage(PagedListDto.EMPTY);
+        if (cityId < 0 || isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
 
         long totalCount = productServiceFacade.queryCountNeedLeader(cityId);
         List<Product> products = productServiceFacade.queryNeedLeader(cityId, start, count);
 
-        return new ResponseMessage(buildProductsDto(totalCount, products, start, count));
+        return ResponseMessage.SUCCESS(buildProductsDto(totalCount, products, start, count));
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -182,13 +182,13 @@ public class ProductController extends AbstractController {
             }
         }
 
-        return new ResponseMessage(productDto);
+        return ResponseMessage.SUCCESS(productDto);
     }
 
     @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
     public ResponseMessage getProductSkus(@PathVariable long id) {
         List<Sku> skus = productServiceFacade.getSkus(id);
-        return new ResponseMessage(buildSkusDto(skus));
+        return ResponseMessage.SUCCESS(buildSkusDto(skus));
     }
 
     private ListDto buildSkusDto(List<Sku> skus) {
@@ -211,7 +211,7 @@ public class ProductController extends AbstractController {
             skusDto.add(new BaseSkuDto(sku, userServiceFacade.getLeaderInfo(sku.getLeaderUserId())));
         }
 
-        return new ResponseMessage(skusDto);
+        return ResponseMessage.SUCCESS(skusDto);
     }
 
     @RequestMapping(value = "/{id}/customer", method = RequestMethod.GET)
@@ -219,7 +219,7 @@ public class ProductController extends AbstractController {
         if (id <= 0 || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
 
         List<Order> orders = dealServiceFacade.queryDistinctCustomerOrderByProduct(id, start, count);
-        if (orders.isEmpty()) return new ResponseMessage(new CustomersDto("目前还没有人参加", null));
+        if (orders.isEmpty()) return ResponseMessage.SUCCESS(new CustomersDto("目前还没有人参加", null));
 
         List<Long> customerIds = new ArrayList<Long>();
         for (Order order : orders) customerIds.add(order.getCustomerId());
@@ -248,7 +248,7 @@ public class ProductController extends AbstractController {
 //        else if (adultCount <= 0 && childCount > 0) builder.append(childCount).append("个孩子参加");
 //        else builder.append(childCount).append("个孩子，").append(adultCount).append("个大人参加");
 
-        return new ResponseMessage(new CustomersDto("玩伴信息", avatars));
+        return ResponseMessage.SUCCESS(new CustomersDto("玩伴信息", avatars));
     }
 
     @RequestMapping(value = "/{id}/playmate", method = RequestMethod.GET)
@@ -307,7 +307,7 @@ public class ProductController extends AbstractController {
             participantsMap.put(participant.getId(), participant);
         }
 
-        return new ResponseMessage(buildPlaymates(skus, skuOrdersMap, skuCustomerIdsMap, customerPrticipantsIdsMap, customersMap, participantsMap));
+        return ResponseMessage.SUCCESS(buildPlaymates(skus, skuOrdersMap, skuCustomerIdsMap, customerPrticipantsIdsMap, customersMap, participantsMap));
     }
 
     private List<Sku> extractSkus(long id, int start, int count) {

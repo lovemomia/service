@@ -1,4 +1,4 @@
-package cn.momia.common.web.misc;
+package cn.momia.service.web.util;
 
 import org.apache.commons.lang3.StringUtils;
 

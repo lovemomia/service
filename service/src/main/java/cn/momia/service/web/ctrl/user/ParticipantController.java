@@ -1,6 +1,6 @@
 package cn.momia.service.web.ctrl.user;
 
-import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.service.web.response.ResponseMessage;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;
 import cn.momia.service.web.ctrl.user.dto.ParticipantDto;
@@ -28,7 +28,7 @@ public class ParticipantController extends UserRelatedController {
         Participant participant = userServiceFacade.getParticipant(user.getId(), id);
         if (!participant.exists()) return ResponseMessage.FAILED("出行人不存在");
 
-        return new ResponseMessage(new ParticipantDto(participant, true));
+        return ResponseMessage.SUCCESS(new ParticipantDto(participant, true));
     }
 
     @RequestMapping(method = RequestMethod.PUT, consumes = "application/json")
@@ -53,6 +53,6 @@ public class ParticipantController extends UserRelatedController {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        return new ResponseMessage(buildParticipantsResponse(userServiceFacade.getParticipantsByUser(user.getId())));
+        return ResponseMessage.SUCCESS(buildParticipantsResponse(userServiceFacade.getParticipantsByUser(user.getId())));
     }
 }

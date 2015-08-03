@@ -1,6 +1,6 @@
 package cn.momia.service.web.ctrl.feed;
 
-import cn.momia.common.web.response.ResponseMessage;
+import cn.momia.service.web.response.ResponseMessage;
 import cn.momia.service.feed.facade.Feed;
 import cn.momia.service.feed.comment.FeedComment;
 import cn.momia.service.user.base.User;
@@ -31,15 +31,15 @@ public class FeedController extends AbstractController {
         User user = userServiceFacade.getUser(feed.getUserId());
         if (!user.exists()) return ResponseMessage.FAILED("无效的Feed");
 
-        return new ResponseMessage(new FeedDto(feed, user, userServiceFacade.getChildren(user.getId(), user.getChildren())));
+        return ResponseMessage.SUCCESS(new FeedDto(feed, user, userServiceFacade.getChildren(user.getId(), user.getChildren())));
     }
 
     @RequestMapping(value = "/{id}/star", method = RequestMethod.GET)
     public ResponseMessage getFeedStaredUsers(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return new ResponseMessage(PagedListDto.EMPTY);
+        if (isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
 
         long totalCount = feedServiceFacade.queryStaredUsersCount(id);
-        if (totalCount <= 0) return new ResponseMessage(PagedListDto.EMPTY);
+        if (totalCount <= 0) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
 
         List<Long> userIds = feedServiceFacade.queryStaredUserIds(id, start, count);
         List<User> users = userServiceFacade.getUsers(userIds);
@@ -49,15 +49,15 @@ public class FeedController extends AbstractController {
             staredUsersDto.add(new MiniUserDto(user));
         }
 
-        return new ResponseMessage(staredUsersDto);
+        return ResponseMessage.SUCCESS(staredUsersDto);
     }
 
     @RequestMapping(value = "/{id}/comment", method = RequestMethod.GET)
     public ResponseMessage getFeedComments(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return new ResponseMessage(PagedListDto.EMPTY);
+        if (isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
 
         long totalCount = feedServiceFacade.queryCommentsCount(id);
-        if (totalCount <= 0) return new ResponseMessage(PagedListDto.EMPTY);
+        if (totalCount <= 0) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
 
         List<FeedComment> comments = feedServiceFacade.queryComments(id, start, count);
 
@@ -75,12 +75,12 @@ public class FeedController extends AbstractController {
             feedCommentsDto.add(new FeedCommentDto(comment, user));
         }
 
-        return new ResponseMessage(feedCommentsDto);
+        return ResponseMessage.SUCCESS(feedCommentsDto);
     }
 
     @RequestMapping(value = "/topic", method = RequestMethod.GET)
     public ResponseMessage feedTopic(@RequestParam(value = "tid") long topicId, @RequestParam int start, @RequestParam int count) {
-        if (topicId <= 0 || isInvalidLimit(start, count)) return new ResponseMessage(PagedListDto.EMPTY);
+        if (topicId <= 0 || isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
 
         long totalCount = feedServiceFacade.queryCountByTopic(topicId);
         List<Feed> feeds = feedServiceFacade.queryByTopic(topicId, start, count);
@@ -93,6 +93,6 @@ public class FeedController extends AbstractController {
             feedsDto.add(new FeedDto(feed, user, userServiceFacade.getChildren(user.getId(), user.getChildren())));
         }
 
-        return new ResponseMessage(feedsDto);
+        return ResponseMessage.SUCCESS(feedsDto);
     }
 }
