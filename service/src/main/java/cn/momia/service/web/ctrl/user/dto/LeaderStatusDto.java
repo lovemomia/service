@@ -10,7 +10,7 @@ public class LeaderStatusDto {
     }
 
     public String getMsg() {
-        return leader.getMsg();
+        return getStatus() == Leader.Status.REJECTED ? leader.getMsg() : null;
     }
 
     public LeaderStatusDto(Leader leader) {

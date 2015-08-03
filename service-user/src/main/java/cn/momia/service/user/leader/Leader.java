@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class Leader {
     public static class Status {
-        public static final int DELETED = 0;
+        public static final int NOTEXIST = 0;
         public static final int PASSED = 1;
         public static final int AUDITING = 2;
         public static final int REJECTED = 3;
