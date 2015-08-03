@@ -31,10 +31,6 @@ public class BaseSkuDto implements Dto {
         return limit < 0 ? (getType() == 1 ? 1 : 0) : limit;
     }
 
-    public boolean isNeedRealName() {
-        return sku.isNeedRealName();
-    }
-
     public int getStock() {
         int stock = sku.getUnlockedStock();
         return stock < 0 ? 0 : stock;
