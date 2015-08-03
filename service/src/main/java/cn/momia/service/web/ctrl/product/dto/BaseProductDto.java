@@ -1,5 +1,6 @@
 package cn.momia.service.web.ctrl.product.dto;
 
+import cn.momia.service.product.sku.Sku;
 import cn.momia.service.web.util.MetaUtil;
 import cn.momia.service.product.facade.Product;
 import cn.momia.service.web.ctrl.dto.Dto;
@@ -74,7 +75,18 @@ public class BaseProductDto extends MiniProductDto implements Dto {
     }
 
     public ListDto getSkus() {
-        return withSku ? SkuDto.toSkusDto(product.getSkus()) : null;
+        return withSku ? buildSkusDto(product.getSkus()) : null;
+    }
+
+    private ListDto buildSkusDto(List<Sku> skus) {
+        ListDto skusDto = new ListDto();
+
+        skus = Sku.filter(skus);
+        for (Sku sku : skus) {
+            skusDto.add(new FullSkuDto(sku));
+        }
+
+        return skusDto;
     }
 
     public int getStatus() {

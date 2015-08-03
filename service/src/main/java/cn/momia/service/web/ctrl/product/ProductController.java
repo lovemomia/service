@@ -7,13 +7,14 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.web.ctrl.dto.ListDto;
 import cn.momia.service.web.ctrl.dto.PagedListDto;
 import cn.momia.service.web.ctrl.product.dto.BaseProductDto;
+import cn.momia.service.web.ctrl.product.dto.BaseSkuDto;
 import cn.momia.service.web.ctrl.product.dto.CustomersDto;
 import cn.momia.service.web.ctrl.product.dto.FullProductDto;
 import cn.momia.service.web.ctrl.product.dto.PlaymateDto;
 import cn.momia.service.product.facade.Product;
 import cn.momia.service.web.ctrl.product.dto.ProductDto;
 import cn.momia.service.web.ctrl.product.dto.ProductsOfDayDto;
-import cn.momia.service.web.ctrl.product.dto.SkuDto;
+import cn.momia.service.web.ctrl.product.dto.FullSkuDto;
 import cn.momia.service.web.ctrl.product.dto.SkuPlaymatesDto;
 import cn.momia.service.product.sku.Sku;
 import cn.momia.service.user.base.User;
@@ -187,7 +188,18 @@ public class ProductController extends AbstractController {
     @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
     public ResponseMessage getProductSkus(@PathVariable long id) {
         List<Sku> skus = productServiceFacade.getSkus(id);
-        return new ResponseMessage(SkuDto.toSkusDto(skus));
+        return new ResponseMessage(buildSkusDto(skus));
+    }
+
+    private ListDto buildSkusDto(List<Sku> skus) {
+        ListDto skusDto = new ListDto();
+
+        skus = Sku.filter(skus);
+        for (Sku sku : skus) {
+            skusDto.add(new FullSkuDto(sku));
+        }
+
+        return skusDto;
     }
 
     @RequestMapping(value = "/{id}/sku/leader", method = RequestMethod.GET)
@@ -196,7 +208,7 @@ public class ProductController extends AbstractController {
 
         ListDto skusDto = new ListDto();
         for (Sku sku : skus) {
-            skusDto.add(new SkuDto(sku, userServiceFacade.getLeaderInfo(sku.getLeaderUserId())));
+            skusDto.add(new BaseSkuDto(sku, userServiceFacade.getLeaderInfo(sku.getLeaderUserId())));
         }
 
         return new ResponseMessage(skusDto);
