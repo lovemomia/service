@@ -101,7 +101,7 @@ public class LeaderController extends UserRelatedController {
             if (product == null) continue;
 
             BaseProductDto baseProductDto = new BaseProductDto(product, false);
-            baseProductDto.setScheduler(sku.getTime());
+            baseProductDto.setScheduler(sku.getFormatedTime());
             productsDto.add(baseProductDto);
         }
 

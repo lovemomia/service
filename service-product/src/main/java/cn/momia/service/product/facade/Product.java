@@ -228,7 +228,7 @@ public class Product implements Serializable {
 
     public String getSkuTime(long skuId) {
         for (Sku sku : skus) {
-            if (sku.getId() == skuId) return sku.getTime();
+            if (sku.getId() == skuId) return sku.getFormatedTime();
         }
 
         return "";

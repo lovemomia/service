@@ -4,7 +4,6 @@ import cn.momia.common.web.response.ResponseMessage;
 import cn.momia.service.deal.exception.OrderLimitException;
 import cn.momia.service.product.facade.Product;
 import cn.momia.service.product.sku.Sku;
-import cn.momia.service.product.sku.SkuPrice;
 import cn.momia.service.user.base.User;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderPrice;
@@ -72,16 +71,7 @@ public class OrderController extends AbstractController {
                 sku.isClosed(new Date())) return false;
 
         for (OrderPrice price : order.getPrices()) {
-            boolean found = false;
-            List<SkuPrice> skuPrices = sku.getPrice(price.getAdult(), price.getChild());
-            for (SkuPrice skuPrice : skuPrices) {
-                if (price.getPrice().compareTo(skuPrice.getPrice()) == 0) {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) return false;
+            if (!sku.findPrice(price.getAdult(), price.getChild(), price.getPrice())) return false;
         }
 
         return true;

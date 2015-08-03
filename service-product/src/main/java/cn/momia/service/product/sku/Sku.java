@@ -264,7 +264,11 @@ public class Sku implements Serializable {
         return !this.equals(NOT_EXIST_SKU);
     }
 
-    public String getTime() {
+    public boolean hasLeader() {
+        return leaderUserId > 0;
+    }
+
+    public String getFormatedTime() {
         for (SkuProperty property : properties) {
             if ("time".equalsIgnoreCase(property.getName())) return formatTime(property.getValue());
         }
@@ -288,7 +292,7 @@ public class Sku implements Serializable {
         Date end = times.get(timeStrs.size() - 1);
         if (TimeUtil.isSameDay(start, end)) {
             for (String timeStr : timeStrs) {
-                Date time = TimeUtil.castToDates(timeStr);
+                Date time = TimeUtil.castToDate(timeStr);
                 if (time != null) {
                     builder.append(TimeUtil.formatDateWithWeekDay(time));
                     if (timeStr.contains(":"))
@@ -328,15 +332,6 @@ public class Sku implements Serializable {
         return new ArrayList<Date>();
     }
 
-    public List<SkuPrice> getPrice(int adult, int child) {
-        List<SkuPrice> prices = new ArrayList<SkuPrice>();
-        for (SkuPrice price : this.prices) {
-            if (price.getAdult() == adult && price.getChild() == child) prices.add(price);
-        }
-
-        return prices;
-    }
-
     public boolean isClosed(Date now) {
         if (offlineTime.before(now) ||
                 (startTime.before(now) && !anyTime) ||
@@ -345,7 +340,13 @@ public class Sku implements Serializable {
         return false;
     }
 
-    public boolean hasLeader() {
-        return leaderUserId > 0;
+    public boolean findPrice(int adult, int child, BigDecimal price) {
+        for (SkuPrice skuPrice : this.prices) {
+            if (skuPrice.getAdult() == adult &&
+                    skuPrice.getChild() == child &&
+                    skuPrice.getPrice().compareTo(price) == 0) return true;
+        }
+
+        return false;
     }
 }

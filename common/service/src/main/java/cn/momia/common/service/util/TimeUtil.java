@@ -15,22 +15,22 @@ public class TimeUtil {
     private static final String[] WEEK_DAYS = { "周日", "周一", "周二", "周三", "周四", "周五", "周六" };
     private static final String[] AM_PM = { "上午", "下午" };
 
-    public static Date castToDates(String timeStr) {
+    public static List<Date> castToDates(List<String> timeStrs) {
+        List<Date> times = new ArrayList<Date>();
+        for (String timeStr : timeStrs) {
+            Date time = castToDate(timeStr);
+            if (time != null) times.add(time);
+        }
+
+        return times;
+    }
+
+    public static Date castToDate(String timeStr) {
         try {
             return TypeUtils.castToDate(timeStr);
         } catch (Exception e) {
             return null;
         }
-    }
-
-    public static List<Date> castToDates(List<String> timeStrs) {
-        List<Date> times = new ArrayList<Date>();
-        for (String timeStr : timeStrs) {
-            Date time = castToDates(timeStr);
-            if (time != null) times.add(time);
-        }
-
-        return times;
     }
 
     public static String formatDateWithWeekDay(Date time) {

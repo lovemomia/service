@@ -41,7 +41,7 @@ public class BaseSkuDto implements Dto {
     }
 
     public String getTime() {
-        return sku.getTime();
+        return sku.getFormatedTime();
     }
 
     public boolean isHasLeader() {
