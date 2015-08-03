@@ -87,17 +87,21 @@ public class LeaderController extends UserRelatedController {
         List<Sku> ledSkus = productServiceFacade.queryLedSkus(user.getId(), start, count);
 
         List<Long> productIds = new ArrayList<Long>();
-        Map<Long, Sku> skusMap = new HashMap<Long, Sku>();
-        for (Sku sku : ledSkus) {
-            productIds.add(sku.getProductId());
-            skusMap.put(sku.getProductId(), sku);
-        }
+        for (Sku sku : ledSkus) productIds.add(sku.getProductId());
 
         List<Product> products = productServiceFacade.get(productIds);
-        PagedListDto productsDto = new PagedListDto(totalCount, start, count);
+        Map<Long, Product> productsMap = new HashMap<Long, Product>();
         for (Product product : products) {
+            productsMap.put(product.getId(), product);
+        }
+
+        PagedListDto productsDto = new PagedListDto(totalCount, start, count);
+        for (Sku sku : ledSkus) {
+            Product product = productsMap.get(sku.getProductId());
+            if (product == null) continue;
+
             BaseProductDto baseProductDto = new BaseProductDto(product, false);
-            baseProductDto.setScheduler(skusMap.get(product.getId()).getTime());
+            baseProductDto.setScheduler(sku.getTime());
             productsDto.add(baseProductDto);
         }
 
