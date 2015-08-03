@@ -18,7 +18,7 @@ public class MapWrapper {
         this.params = params;
     }
 
-    public Map<String, String> getAll() {
+    public Map<String, String> all() {
         return params;
     }
 }

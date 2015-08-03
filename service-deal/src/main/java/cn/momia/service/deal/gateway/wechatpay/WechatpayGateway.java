@@ -63,7 +63,7 @@ public class WechatpayGateway extends AbstractPaymentGateway {
     private HttpPost createRequest(PrepayParam param) {
         HttpPost httpPost = new HttpPost(Configuration.getString("Payment.Wechat.PrepayService"));
         httpPost.addHeader(HTTP.CONTENT_TYPE, "application/xml");
-        StringEntity entity = new StringEntity(XmlUtil.paramsToXml(param.getAll()), "UTF-8");
+        StringEntity entity = new StringEntity(XmlUtil.paramsToXml(param.all()), "UTF-8");
         entity.setContentType("application/xml");
         entity.setContentEncoding("UTF-8");
         httpPost.setEntity(entity);
@@ -89,14 +89,14 @@ public class WechatpayGateway extends AbstractPaymentGateway {
                 result.add(WechatpayPrepayFields.PREPAY_RESULT_APP_PACKAGE, "Sign=WXPay");
                 result.add(WechatpayPrepayFields.PREPAY_RESULT_APP_NONCE_STR, WechatpayUtil.createNoncestr(32));
                 result.add(WechatpayPrepayFields.PREPAY_RESULT_APP_TIMESTAMP, String.valueOf(new Date().getTime()).substring(0, 10));
-                result.add(WechatpayPrepayFields.PREPAY_RESULT_APP_SIGN, WechatpayUtil.sign(result.getAll(), tradeType));
+                result.add(WechatpayPrepayFields.PREPAY_RESULT_APP_SIGN, WechatpayUtil.sign(result.all(), tradeType));
             } else if (tradeType.equals("JSAPI")) {
                 result.add(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_APPID, Configuration.getString("Payment.Wechat.JsApiAppId"));
                 result.add(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_PACKAGE, "prepay_id=" + params.get(WechatpayPrepayFields.PREPAY_ID));
                 result.add(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_NONCE_STR, WechatpayUtil.createNoncestr(32));
                 result.add(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_TIMESTAMP, String.valueOf(new Date().getTime()).substring(0, 10));
                 result.add(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_SIGN_TYPE, "MD5");
-                result.add(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_PAY_SIGN, WechatpayUtil.sign(result.getAll(), tradeType));
+                result.add(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_PAY_SIGN, WechatpayUtil.sign(result.all(), tradeType));
             } else {
                 throw new RuntimeException("unsupported trade type: " + tradeType);
             }
@@ -119,7 +119,7 @@ public class WechatpayGateway extends AbstractPaymentGateway {
     @Override
     protected boolean validateCallbackSign(CallbackParam param) {
         String tradeType = param.get(WechatpayPrepayFields.TRADE_TYPE);
-        boolean successful = WechatpayUtil.validateSign(param.getAll(), tradeType);
+        boolean successful = WechatpayUtil.validateSign(param.all(), tradeType);
         if (!successful) LOGGER.warn("invalid sign, order id: {} ", param.get(WechatpayCallbackFields.OUT_TRADE_NO));
 
         return successful;

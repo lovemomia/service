@@ -49,7 +49,7 @@ public class AlipayGateway extends AbstractPaymentGateway {
         result.add(AlipayPrepayFields.IT_B_PAY, "30m");
         result.add(AlipayPrepayFields.SHOW_URL, Configuration.getString("Wap.Domain"));
         if ("wap".equalsIgnoreCase(type)) result.add(AlipayPrepayFields.RETURN_URL, param.get(AlipayPrepayFields.RETURN_URL));
-        result.add(AlipayPrepayFields.SIGN, AlipayUtil.sign(result.getAll(), type));
+        result.add(AlipayPrepayFields.SIGN, AlipayUtil.sign(result.all(), type));
 
         result.setSuccessful(!StringUtils.isBlank(result.get(AlipayPrepayFields.SIGN)));
 
@@ -89,7 +89,7 @@ public class AlipayGateway extends AbstractPaymentGateway {
 
     @Override
     protected boolean validateCallbackSign(CallbackParam param) {
-        boolean successful = AlipayUtil.validateSign(param.getAll());
+        boolean successful = AlipayUtil.validateSign(param.all());
         if (!successful) LOGGER.warn("invalid sign, order id: {} ", param.get(AlipayCallbackFields.OUT_TRADE_NO));
 
         return successful;
