@@ -183,8 +183,10 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
                     UserCoupon userCoupon = buildUserCoupon(rs);
-                    userCoupon.setStatus(UserCoupon.Status.EXPIRED);
-                    if (userCoupon.exists()) userCoupons.add(userCoupon);
+                    if (userCoupon.exists()) {
+                        userCoupon.setStatus(UserCoupon.Status.EXPIRED);
+                        userCoupons.add(userCoupon);
+                    }
                 }
             });
         } else if (status == UserCoupon.Status.NOT_USED && orderId > 0) {
@@ -193,8 +195,10 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
                     UserCoupon userCoupon = buildUserCoupon(rs);
-                    userCoupon.setStatus(UserCoupon.Status.NOT_USED);
-                    if (userCoupon.exists()) userCoupons.add(userCoupon);
+                    if (userCoupon.exists()) {
+                        userCoupon.setStatus(UserCoupon.Status.NOT_USED);
+                        userCoupons.add(userCoupon);
+                    }
                 }
             });
         } else if (status == UserCoupon.Status.NOT_USED) {
@@ -221,8 +225,11 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
                     UserCoupon userCoupon = buildUserCoupon(rs);
-                    if (userCoupon.getStatus() == UserCoupon.Status.LOCKED) userCoupon.setStatus(UserCoupon.Status.USED);
-                    if (userCoupon.exists()) userCoupons.add(userCoupon);
+                    if (userCoupon.exists()) {
+                        if (userCoupon.getStatus() != UserCoupon.Status.USED && userCoupon.isExpired()) userCoupon.setStatus(UserCoupon.Status.EXPIRED);
+                        if (userCoupon.getStatus() == UserCoupon.Status.LOCKED) userCoupon.setStatus(UserCoupon.Status.USED);
+                        userCoupons.add(userCoupon);
+                    }
                 }
             });
         }
