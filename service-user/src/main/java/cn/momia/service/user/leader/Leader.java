@@ -141,8 +141,8 @@ public class Leader {
         return userId <= 0 ||
                 StringUtils.isBlank(name) ||
                 MobileUtil.isInvalidMobile(mobile) ||
-                cityId <= 0 ||
-                regionId <= 0 ||
+//                cityId <= 0 ||
+//                regionId <= 0 ||
                 StringUtils.isBlank(address) ||
                 StringUtils.isBlank(career) ||
                 StringUtils.isBlank(intro);
