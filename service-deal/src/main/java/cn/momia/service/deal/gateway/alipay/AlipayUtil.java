@@ -1,6 +1,7 @@
 package cn.momia.service.deal.gateway.alipay;
 
 import cn.momia.common.service.config.Configuration;
+import cn.momia.service.deal.gateway.TradeSourceType;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -11,24 +12,25 @@ import java.util.List;
 import java.util.Map;
 
 public class AlipayUtil {
-    public static String sign(Map<String, String> params, String type) {
+    public static String sign(Map<String, String> params, int tradeSourceType) {
         List<String> kvs = new ArrayList<String>();
-        String quote = type.equalsIgnoreCase("app") ? "\"" : "";
-        kvs.add(AlipayPrepayFields.PARTNER + "=" + quote + params.get(AlipayPrepayFields.PARTNER) + quote);
-        kvs.add(AlipayPrepayFields.SELLER_ID + "=" + quote + params.get(AlipayPrepayFields.SELLER_ID) + quote);
-        kvs.add(AlipayPrepayFields.OUT_TRADE_NO + "=" + quote + params.get(AlipayPrepayFields.OUT_TRADE_NO) + quote);
-        kvs.add(AlipayPrepayFields.SUBJECT + "=" + quote + params.get(AlipayPrepayFields.SUBJECT) + quote);
-        kvs.add(AlipayPrepayFields.BODY + "=" + quote + params.get(AlipayPrepayFields.BODY) + quote);
-        kvs.add(AlipayPrepayFields.TOTAL_FEE + "=" + quote + params.get(AlipayPrepayFields.TOTAL_FEE) + quote);
-        kvs.add(AlipayPrepayFields.NOTIFY_URL + "=" + quote + params.get(AlipayPrepayFields.NOTIFY_URL) + quote);
-        kvs.add(AlipayPrepayFields.SERVICE + "=" + quote + params.get(AlipayPrepayFields.SERVICE) + quote);
-        kvs.add(AlipayPrepayFields.PAYMENT_TYPE + "=" + quote + params.get(AlipayPrepayFields.PAYMENT_TYPE) + quote);
-        kvs.add(AlipayPrepayFields.INPUT_CHARSET + "=" + quote + params.get(AlipayPrepayFields.INPUT_CHARSET) + quote);
-        kvs.add(AlipayPrepayFields.IT_B_PAY + "=" + quote + params.get(AlipayPrepayFields.IT_B_PAY) + quote);
-        kvs.add(AlipayPrepayFields.SHOW_URL + "=" + quote + params.get(AlipayPrepayFields.SHOW_URL) + quote);
-        if (type.equalsIgnoreCase("wap")) kvs.add(AlipayPrepayFields.RETURN_URL + "=" + quote + params.get(AlipayPrepayFields.RETURN_URL) + quote);
-
-        if (!type.equalsIgnoreCase("app")) Collections.sort(kvs);
+        String quote = TradeSourceType.isFromApp(tradeSourceType) ? "\"" : "";
+        kvs.add(AlipayPrepayResult.Field.PARTNER + "=" + quote + params.get(AlipayPrepayResult.Field.PARTNER) + quote);
+        kvs.add(AlipayPrepayResult.Field.SELLER_ID + "=" + quote + params.get(AlipayPrepayResult.Field.SELLER_ID) + quote);
+        kvs.add(AlipayPrepayResult.Field.OUT_TRADE_NO + "=" + quote + params.get(AlipayPrepayResult.Field.OUT_TRADE_NO) + quote);
+        kvs.add(AlipayPrepayResult.Field.SUBJECT + "=" + quote + params.get(AlipayPrepayResult.Field.SUBJECT) + quote);
+        kvs.add(AlipayPrepayResult.Field.BODY + "=" + quote + params.get(AlipayPrepayResult.Field.BODY) + quote);
+        kvs.add(AlipayPrepayResult.Field.TOTAL_FEE + "=" + quote + params.get(AlipayPrepayResult.Field.TOTAL_FEE) + quote);
+        kvs.add(AlipayPrepayResult.Field.NOTIFY_URL + "=" + quote + params.get(AlipayPrepayResult.Field.NOTIFY_URL) + quote);
+        kvs.add(AlipayPrepayResult.Field.SERVICE + "=" + quote + params.get(AlipayPrepayResult.Field.SERVICE) + quote);
+        kvs.add(AlipayPrepayResult.Field.PAYMENT_TYPE + "=" + quote + params.get(AlipayPrepayResult.Field.PAYMENT_TYPE) + quote);
+        kvs.add(AlipayPrepayResult.Field.INPUT_CHARSET + "=" + quote + params.get(AlipayPrepayResult.Field.INPUT_CHARSET) + quote);
+        kvs.add(AlipayPrepayResult.Field.IT_B_PAY + "=" + quote + params.get(AlipayPrepayResult.Field.IT_B_PAY) + quote);
+        kvs.add(AlipayPrepayResult.Field.SHOW_URL + "=" + quote + params.get(AlipayPrepayResult.Field.SHOW_URL) + quote);
+        if (TradeSourceType.isFromWap(tradeSourceType)) {
+            kvs.add(AlipayPrepayResult.Field.RETURN_URL + "=" + quote + params.get(AlipayPrepayResult.Field.RETURN_URL) + quote);
+            Collections.sort(kvs);
+        }
 
         try {
             return URLEncoder.encode(RSA.sign(StringUtils.join(kvs, "&"), Configuration.getSecretKey("alipayPrivateKey"), "utf-8"), "utf-8");
@@ -42,7 +44,7 @@ public class AlipayUtil {
         for (Map.Entry<String, String> entry : params.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
-            if (key.equalsIgnoreCase(AlipayPrepayFields.SIGN_TYPE) || key.equalsIgnoreCase(AlipayPrepayFields.SIGN) || StringUtils.isBlank(value)) continue;
+            if (key.equalsIgnoreCase(AlipayPrepayResult.Field.SIGN_TYPE) || key.equalsIgnoreCase(AlipayPrepayResult.Field.SIGN) || StringUtils.isBlank(value)) continue;
             kvs.add(key + "=" + value);
         }
         Collections.sort(kvs);

@@ -4,58 +4,77 @@ import cn.momia.service.deal.gateway.PrepayResult;
 
 public class WechatpayPrepayResult extends PrepayResult {
     public static class App extends WechatpayPrepayResult {
+        public static class Field {
+            public static final String APPID = "appid";
+            public static final String PARTNERID = "partnerid";
+            public static final String PREPAYID = "prepayid";
+            public static final String PACKAGE = "package";
+            public static final String NONCE_STR = "noncestr";
+            public static final String TIMESTAMP = "timestamp";
+            public static final String SIGN = "sign";
+        }
+
         public String getAppid() {
-            return get(WechatpayPrepayFields.PREPAY_RESULT_APP_APPID);
+            return get(Field.APPID);
         }
 
         public String getPartnerid() {
-            return get(WechatpayPrepayFields.PREPAY_RESULT_APP_PARTNERID);
+            return get(Field.PARTNERID);
         }
 
         public String getPrepayid() {
-            return get(WechatpayPrepayFields.PREPAY_RESULT_APP_PREPAYID);
+            return get(Field.PREPAYID);
         }
 
         public String getPackage_app() {
-            return get(WechatpayPrepayFields.PREPAY_RESULT_APP_PACKAGE);
+            return get(Field.PACKAGE);
         }
 
         public String getNoncestr() {
-            return get(WechatpayPrepayFields.PREPAY_RESULT_APP_NONCE_STR);
+            return get(Field.NONCE_STR);
         }
 
         public String getTimestamp() {
-            return get(WechatpayPrepayFields.PREPAY_RESULT_APP_TIMESTAMP);
+            return get(Field.TIMESTAMP);
         }
 
         public String getSign() {
-            return get(WechatpayPrepayFields.PREPAY_RESULT_APP_SIGN);
+            return get(Field.SIGN);
         }
     }
 
     public static class JsApi extends WechatpayPrepayResult {
+        public static class Field {
+            public static final String APPID = "appId";
+            public static final String PACKAGE = "package";
+            public static final String NONCE_STR = "nonceStr";
+            public static final String TIMESTAMP = "timeStamp";
+            public static final String SIGN_TYPE = "signType";
+            public static final String PAY_SIGN = "paySign";
+        }
+
         public String getAppId() {
-            return get(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_APPID);
+            return get(Field.APPID);
         }
 
         public String getPrepayId() {
-            return get(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_PACKAGE);
+            return get(Field.PACKAGE);
         }
 
         public String getNonceStr() {
-            return get(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_NONCE_STR);
+            return get(Field.NONCE_STR);
         }
 
         public String getTimeStamp() {
-            return get(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_TIMESTAMP);
+            return get(Field.TIMESTAMP);
         }
 
         public String getSignType() {
-            return get(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_SIGN_TYPE);
+            return get(Field.SIGN_TYPE);
         }
 
         public String getPaySign() {
-            return get(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_PAY_SIGN);
+            return get(Field.PAY_SIGN);
         }
     }
 }

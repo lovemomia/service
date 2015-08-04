@@ -1,11 +1,13 @@
 package cn.momia.service.deal.gateway.wechatpay;
 
+import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.common.service.util.XmlUtil;
 import cn.momia.common.service.config.Configuration;
 import cn.momia.service.deal.gateway.AbstractPaymentGateway;
 import cn.momia.service.deal.gateway.CallbackParam;
 import cn.momia.service.deal.gateway.PrepayParam;
 import cn.momia.service.deal.gateway.PrepayResult;
+import cn.momia.service.deal.gateway.TradeSourceType;
 import cn.momia.service.deal.payment.Payment;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -40,8 +42,7 @@ public class WechatpayGateway extends AbstractPaymentGateway {
 
     @Override
     public PrepayResult doPrepay(PrepayParam param) {
-        String tradeType = param.get(WechatpayPrepayFields.TRADE_TYPE);
-        PrepayResult result = "APP".equalsIgnoreCase(tradeType) ? new WechatpayPrepayResult.App() : new WechatpayPrepayResult.JsApi();
+        PrepayResult result = TradeSourceType.isFromApp(param.getTradeSourceType()) ? new WechatpayPrepayResult.App() : new WechatpayPrepayResult.JsApi();
 
         try {
             HttpClient httpClient = HttpClients.createDefault();
@@ -52,7 +53,7 @@ public class WechatpayGateway extends AbstractPaymentGateway {
             }
 
             String entity = EntityUtils.toString(response.getEntity(), "UTF-8");
-            processResponseEntity(result, entity, param.get(WechatpayPrepayFields.TRADE_TYPE));
+            processResponseEntity(result, entity, param.getTradeSourceType());
         } catch (Exception e) {
             LOGGER.error("fail to prepay", e);
             result.setSuccessful(false);
@@ -72,7 +73,7 @@ public class WechatpayGateway extends AbstractPaymentGateway {
         return httpPost;
     }
 
-    private void processResponseEntity(PrepayResult result, String entity, String tradeType) {
+    private void processResponseEntity(PrepayResult result, String entity, int tradeSourceType) {
         Map<String, String> params = XmlUtil.xmlToParams(entity);
         String return_code = params.get(WechatpayPrepayFields.RETURN_CODE);
         String result_code = params.get(WechatpayPrepayFields.RESULT_CODE);
@@ -81,25 +82,25 @@ public class WechatpayGateway extends AbstractPaymentGateway {
         result.setSuccessful(successful);
 
         if (successful) {
-            if (!WechatpayUtil.validateSign(params, tradeType)) throw new RuntimeException("fail to prepay, invalid sign");
+            if (!WechatpayUtil.validateSign(params, tradeSourceType)) throw new RuntimeException("fail to prepay, invalid sign");
 
-            if (tradeType.equals("APP")) {
-                result.add(WechatpayPrepayFields.PREPAY_RESULT_APP_APPID, Configuration.getString("Payment.Wechat.AppAppId"));
-                result.add(WechatpayPrepayFields.PREPAY_RESULT_APP_PARTNERID, Configuration.getString("Payment.Wechat.AppMchId"));
-                result.add(WechatpayPrepayFields.PREPAY_RESULT_APP_PREPAYID, params.get(WechatpayPrepayFields.PREPAY_ID));
-                result.add(WechatpayPrepayFields.PREPAY_RESULT_APP_PACKAGE, "Sign=WXPay");
-                result.add(WechatpayPrepayFields.PREPAY_RESULT_APP_NONCE_STR, WechatpayUtil.createNoncestr(32));
-                result.add(WechatpayPrepayFields.PREPAY_RESULT_APP_TIMESTAMP, String.valueOf(new Date().getTime()).substring(0, 10));
-                result.add(WechatpayPrepayFields.PREPAY_RESULT_APP_SIGN, WechatpayUtil.sign(result.all(), tradeType));
-            } else if (tradeType.equals("JSAPI")) {
-                result.add(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_APPID, Configuration.getString("Payment.Wechat.JsApiAppId"));
-                result.add(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_PACKAGE, "prepay_id=" + params.get(WechatpayPrepayFields.PREPAY_ID));
-                result.add(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_NONCE_STR, WechatpayUtil.createNoncestr(32));
-                result.add(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_TIMESTAMP, String.valueOf(new Date().getTime()).substring(0, 10));
-                result.add(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_SIGN_TYPE, "MD5");
-                result.add(WechatpayPrepayFields.PREPAY_RESULT_JSAPI_PAY_SIGN, WechatpayUtil.sign(result.all(), tradeType));
+            if (TradeSourceType.isFromApp(tradeSourceType)) {
+                result.add(WechatpayPrepayResult.App.Field.APPID, Configuration.getString("Payment.Wechat.AppAppId"));
+                result.add(WechatpayPrepayResult.App.Field.PARTNERID, Configuration.getString("Payment.Wechat.AppMchId"));
+                result.add(WechatpayPrepayResult.App.Field.PREPAYID, params.get(WechatpayPrepayFields.PREPAY_ID));
+                result.add(WechatpayPrepayResult.App.Field.PACKAGE, "Sign=WXPay");
+                result.add(WechatpayPrepayResult.App.Field.NONCE_STR, WechatpayUtil.createNoncestr(32));
+                result.add(WechatpayPrepayResult.App.Field.TIMESTAMP, String.valueOf(new Date().getTime()).substring(0, 10));
+                result.add(WechatpayPrepayResult.App.Field.SIGN, WechatpayUtil.sign(result.all(), tradeSourceType));
+            } else if (TradeSourceType.isFromWap(tradeSourceType)) {
+                result.add(WechatpayPrepayResult.JsApi.Field.APPID, Configuration.getString("Payment.Wechat.JsApiAppId"));
+                result.add(WechatpayPrepayResult.JsApi.Field.PACKAGE, "prepay_id=" + params.get(WechatpayPrepayFields.PREPAY_ID));
+                result.add(WechatpayPrepayResult.JsApi.Field.NONCE_STR, WechatpayUtil.createNoncestr(32));
+                result.add(WechatpayPrepayResult.JsApi.Field.TIMESTAMP, String.valueOf(new Date().getTime()).substring(0, 10));
+                result.add(WechatpayPrepayResult.JsApi.Field.SIGN_TYPE, "MD5");
+                result.add(WechatpayPrepayResult.JsApi.Field.PAY_SIGN, WechatpayUtil.sign(result.all(), tradeSourceType));
             } else {
-                throw new RuntimeException("unsupported trade type: " + tradeType);
+                throw new RuntimeException("unsupported trade source type: " + tradeSourceType);
             }
         } else {
             LOGGER.error("fail to prepay: {}/{}/{}", params.get(WechatpayPrepayFields.RETURN_CODE),
@@ -120,7 +121,12 @@ public class WechatpayGateway extends AbstractPaymentGateway {
     @Override
     protected boolean validateCallbackSign(CallbackParam param) {
         String tradeType = param.get(WechatpayPrepayFields.TRADE_TYPE);
-        boolean successful = WechatpayUtil.validateSign(param.all(), tradeType);
+        int tradeSourceType;
+        if ("APP".equalsIgnoreCase(tradeType)) tradeSourceType = TradeSourceType.APP;
+        else if ("JSAPI".equalsIgnoreCase(tradeType)) tradeSourceType = TradeSourceType.WAP;
+        else throw new MomiaFailedException("invalid trade type: " + tradeType);
+
+        boolean successful = WechatpayUtil.validateSign(param.all(), tradeSourceType);
         if (!successful) LOGGER.warn("invalid sign, order id: {} ", param.get(WechatpayCallbackFields.OUT_TRADE_NO));
 
         return successful;

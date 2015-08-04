@@ -4,6 +4,7 @@ import cn.momia.common.service.config.Configuration;
 import cn.momia.service.deal.gateway.AbstractPaymentGateway;
 import cn.momia.service.deal.gateway.CallbackParam;
 import cn.momia.service.deal.gateway.PrepayResult;
+import cn.momia.service.deal.gateway.TradeSourceType;
 import cn.momia.service.deal.payment.Payment;
 import cn.momia.service.deal.gateway.PrepayParam;
 import com.alibaba.fastjson.util.TypeUtils;
@@ -25,33 +26,35 @@ public class AlipayGateway extends AbstractPaymentGateway {
 
     @Override
     protected long getPrepayOutTradeNo(PrepayParam param) {
-        return Long.valueOf(param.get(AlipayPrepayFields.OUT_TRADE_NO));
+        return Long.valueOf(param.get(AlipayPrepayResult.Field.OUT_TRADE_NO));
     }
 
     @Override
     public PrepayResult doPrepay(PrepayParam param) {
         PrepayResult result = new AlipayPrepayResult();
 
-        String type = param.get(AlipayPrepayFields.TYPE);
+        if (TradeSourceType.isFromApp(param.getTradeSourceType())) {
+            result.add(AlipayPrepayResult.Field.SERVICE, Configuration.getString("Payment.Ali.AppService"));
+        } else if (TradeSourceType.isFromWap(param.getTradeSourceType())) {
+            result.add(AlipayPrepayResult.Field.SERVICE, Configuration.getString("Payment.Ali.WapService"));
+            result.add(AlipayPrepayResult.Field.RETURN_URL, param.get(AlipayPrepayResult.Field.RETURN_URL));
+        }
 
-        if ("app".equalsIgnoreCase(type)) result.add(AlipayPrepayFields.SERVICE, Configuration.getString("Payment.Ali.AppService"));
-        else result.add(AlipayPrepayFields.SERVICE, Configuration.getString("Payment.Ali.WapService"));
-        result.add(AlipayPrepayFields.PARTNER, Configuration.getString("Payment.Ali.Partner"));
-        result.add(AlipayPrepayFields.INPUT_CHARSET, "utf-8");
-        result.add(AlipayPrepayFields.SIGN_TYPE, "RSA");
-        result.add(AlipayPrepayFields.NOTIFY_URL, Configuration.getString("Payment.Ali.NotifyUrl"));
-        result.add(AlipayPrepayFields.OUT_TRADE_NO, param.get(AlipayPrepayFields.OUT_TRADE_NO));
-        result.add(AlipayPrepayFields.SUBJECT, param.get(AlipayPrepayFields.SUBJECT));
-        result.add(AlipayPrepayFields.PAYMENT_TYPE, "1");
-        result.add(AlipayPrepayFields.SELLER_ID, Configuration.getString("Payment.Ali.Partner"));
-        result.add(AlipayPrepayFields.TOTAL_FEE, param.get(AlipayPrepayFields.TOTAL_FEE));
-        result.add(AlipayPrepayFields.BODY, param.get(AlipayPrepayFields.BODY));
-        result.add(AlipayPrepayFields.IT_B_PAY, "30m");
-        result.add(AlipayPrepayFields.SHOW_URL, Configuration.getString("Wap.Domain"));
-        if ("wap".equalsIgnoreCase(type)) result.add(AlipayPrepayFields.RETURN_URL, param.get(AlipayPrepayFields.RETURN_URL));
-        result.add(AlipayPrepayFields.SIGN, AlipayUtil.sign(result.all(), type));
+        result.add(AlipayPrepayResult.Field.PARTNER, Configuration.getString("Payment.Ali.Partner"));
+        result.add(AlipayPrepayResult.Field.INPUT_CHARSET, "utf-8");
+        result.add(AlipayPrepayResult.Field.SIGN_TYPE, "RSA");
+        result.add(AlipayPrepayResult.Field.NOTIFY_URL, Configuration.getString("Payment.Ali.NotifyUrl"));
+        result.add(AlipayPrepayResult.Field.OUT_TRADE_NO, param.get(AlipayPrepayResult.Field.OUT_TRADE_NO));
+        result.add(AlipayPrepayResult.Field.SUBJECT, param.get(AlipayPrepayResult.Field.SUBJECT));
+        result.add(AlipayPrepayResult.Field.PAYMENT_TYPE, "1");
+        result.add(AlipayPrepayResult.Field.SELLER_ID, Configuration.getString("Payment.Ali.Partner"));
+        result.add(AlipayPrepayResult.Field.TOTAL_FEE, param.get(AlipayPrepayResult.Field.TOTAL_FEE));
+        result.add(AlipayPrepayResult.Field.BODY, param.get(AlipayPrepayResult.Field.BODY));
+        result.add(AlipayPrepayResult.Field.IT_B_PAY, "30m");
+        result.add(AlipayPrepayResult.Field.SHOW_URL, Configuration.getString("Wap.Domain"));
+        result.add(AlipayPrepayResult.Field.SIGN, AlipayUtil.sign(result.all(), param.getTradeSourceType()));
 
-        result.setSuccessful(!StringUtils.isBlank(result.get(AlipayPrepayFields.SIGN)));
+        result.setSuccessful(!StringUtils.isBlank(result.get(AlipayPrepayResult.Field.SIGN)));
 
         return result;
     }

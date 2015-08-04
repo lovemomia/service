@@ -4,7 +4,8 @@ import cn.momia.common.service.config.Configuration;
 import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.service.deal.facade.OrderInfoFields;
 import cn.momia.service.deal.gateway.PrepayParam;
-import cn.momia.service.deal.gateway.alipay.AlipayPrepayFields;
+import cn.momia.service.deal.gateway.TradeSourceType;
+import cn.momia.service.deal.gateway.alipay.AlipayPrepayResult;
 import cn.momia.service.deal.gateway.wechatpay.WechatpayPrepayFields;
 import cn.momia.service.deal.gateway.wechatpay.WechatpayUtil;
 import cn.momia.service.deal.payment.Payment;
@@ -31,25 +32,30 @@ public class PrepayParamFactory {
         switch (payType) {
             case Payment.Type.ALIPAY:
                 String type = params.get("type");
-                prepayParam.add(AlipayPrepayFields.TYPE, type);
-                prepayParam.add(AlipayPrepayFields.OUT_TRADE_NO, params.get(OrderInfoFields.ORDER_ID));
-                prepayParam.add(AlipayPrepayFields.SUBJECT, params.get(OrderInfoFields.PRODUCT_TITLE));
-                prepayParam.add(AlipayPrepayFields.TOTAL_FEE, params.get(OrderInfoFields.TOTAL_FEE));
-                prepayParam.add(AlipayPrepayFields.BODY, params.get(OrderInfoFields.PRODUCT_TITLE));
-                if ("wap".equalsIgnoreCase(type)) prepayParam.add(AlipayPrepayFields.RETURN_URL, buildProductUrl(params));
+                if ("app".equalsIgnoreCase(type)) prepayParam.setTradeSourceType(TradeSourceType.APP);
+                else if ("wap".equalsIgnoreCase(type)) prepayParam.setTradeSourceType(TradeSourceType.WAP);
+                else throw new MomiaFailedException("not supported type: " + type);
+
+                prepayParam.add(AlipayPrepayResult.Field.OUT_TRADE_NO, params.get(OrderInfoFields.ORDER_ID));
+                prepayParam.add(AlipayPrepayResult.Field.SUBJECT, params.get(OrderInfoFields.PRODUCT_TITLE));
+                prepayParam.add(AlipayPrepayResult.Field.TOTAL_FEE, params.get(OrderInfoFields.TOTAL_FEE));
+                prepayParam.add(AlipayPrepayResult.Field.BODY, params.get(OrderInfoFields.PRODUCT_TITLE));
+                prepayParam.add(AlipayPrepayResult.Field.RETURN_URL, buildProductUrl(params));
                 break;
             case Payment.Type.WECHATPAY:
-                String tradeType = params.get(WechatpayPrepayFields.TRADE_TYPE);
-                if (tradeType.equals("APP")) {
+                String tradeType = params.get("trade_type");
+                if ("APP".equals(tradeType)) {
+                    prepayParam.setTradeSourceType(TradeSourceType.APP);
                     prepayParam.add(WechatpayPrepayFields.APPID, Configuration.getString("Payment.Wechat.AppAppId"));
                     prepayParam.add(WechatpayPrepayFields.PRODUCT_ID, params.get(OrderInfoFields.PRODUCT_ID));
                     prepayParam.add(WechatpayPrepayFields.MCH_ID, Configuration.getString("Payment.Wechat.AppMchId"));
-                } else if (tradeType.equals("JSAPI")) {
+                } else if ("JSAPI".equals(tradeType)) {
+                    prepayParam.setTradeSourceType(TradeSourceType.WAP);
                     prepayParam.add(WechatpayPrepayFields.APPID, Configuration.getString("Payment.Wechat.JsApiAppId"));
                     prepayParam.add(WechatpayPrepayFields.OPENID, getJsApiOpenId(params.get(WechatpayPrepayFields.CODE)));
                     prepayParam.add(WechatpayPrepayFields.MCH_ID, Configuration.getString("Payment.Wechat.JsApiMchId"));
                 } else {
-                    throw new RuntimeException("not supported trade type: " + tradeType);
+                    throw new MomiaFailedException("not supported trade type: " + tradeType);
                 }
 
                 prepayParam.add(WechatpayPrepayFields.NONCE_STR, WechatpayUtil.createNoncestr(32));
@@ -60,7 +66,7 @@ public class PrepayParamFactory {
                 prepayParam.add(WechatpayPrepayFields.NOTIFY_URL, Configuration.getString("Payment.Wechat.NotifyUrl"));
                 prepayParam.add(WechatpayPrepayFields.TRADE_TYPE, tradeType);
                 prepayParam.add(WechatpayPrepayFields.TIME_EXPIRE, DATE_FORMATTER.format(new Date(System.currentTimeMillis() + 30 * 60 * 1000)));
-                prepayParam.add(WechatpayPrepayFields.SIGN, WechatpayUtil.sign(prepayParam.all(), tradeType));
+                prepayParam.add(WechatpayPrepayFields.SIGN, WechatpayUtil.sign(prepayParam.all(), prepayParam.getTradeSourceType()));
 
                 break;
             default: throw new MomiaFailedException("无效的支付类型: " + payType);

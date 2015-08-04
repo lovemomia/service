@@ -1,6 +1,7 @@
 package cn.momia.service.deal.gateway.wechatpay;
 
 import cn.momia.common.service.config.Configuration;
+import cn.momia.service.deal.gateway.TradeSourceType;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,7 +24,7 @@ public class WechatpayUtil {
         return builder.toString();
     }
 
-    public static String sign(Map<String, String> params, String tradeType) {
+    public static String sign(Map<String, String> params, int tradeSourceType) {
         List<String> kvs = new ArrayList<String>();
         for (Entry<String, String> entry : params.entrySet()) {
             String key = entry.getKey();
@@ -32,15 +33,15 @@ public class WechatpayUtil {
             kvs.add(key + "=" + value);
         }
         Collections.sort(kvs);
-        kvs.add("key=" + (tradeType.equalsIgnoreCase("APP") ? Configuration.getSecretKey("wechatpayApp") : Configuration.getSecretKey("wechatpayJsApi")));
+        kvs.add("key=" + (TradeSourceType.isFromApp(tradeSourceType) ? Configuration.getSecretKey("wechatpayApp") : Configuration.getSecretKey("wechatpayJsApi")));
 
         String s = StringUtils.join(kvs, "&");
         return DigestUtils.md5Hex(s).toUpperCase();
     }
 
-    public static boolean validateSign(Map<String, String> params, String tradeType) {
+    public static boolean validateSign(Map<String, String> params, int tradeSourceType) {
         String returnedSign = params.get(WechatpayPrepayFields.SIGN);
-        String generatedSign = sign(params, tradeType);
+        String generatedSign = sign(params, tradeSourceType);
 
         return generatedSign.equals(returnedSign);
     }
