@@ -1,6 +1,7 @@
 package cn.momia.service.user.base.impl;
 
 import cn.momia.common.service.config.Configuration;
+import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.common.service.impl.DbAccessService;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
@@ -77,7 +78,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
             return new String(encryptedBase64);
         } catch (Exception e) {
-            throw new RuntimeException("fail to excrypt password of user: " + mobile, e);
+            throw new MomiaFailedException("fail to excrypt password of user: " + mobile, e);
         }
     }
 

@@ -1,6 +1,7 @@
 package cn.momia.service.deal.gateway.alipay;
 
 import cn.momia.common.service.config.Configuration;
+import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.service.deal.gateway.AbstractPaymentGateway;
 import cn.momia.service.deal.gateway.CallbackParam;
 import cn.momia.service.deal.gateway.PrepayResult;
@@ -79,7 +80,7 @@ public class AlipayGateway extends AbstractPaymentGateway {
             HttpGet request = new HttpGet(verifyUrl);
             HttpResponse response = httpClient.execute(request);
             if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                throw new RuntimeException("fail to execute request: " + request);
+                throw new MomiaFailedException("fail to execute request: " + request);
             }
 
             String entity = EntityUtils.toString(response.getEntity());

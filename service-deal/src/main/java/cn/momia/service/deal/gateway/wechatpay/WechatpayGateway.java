@@ -49,7 +49,7 @@ public class WechatpayGateway extends AbstractPaymentGateway {
             HttpPost request = createRequest(param);
             HttpResponse response = httpClient.execute(request);
             if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                throw new RuntimeException("fail to execute request: " + request);
+                throw new MomiaFailedException("fail to execute request: " + request);
             }
 
             String entity = EntityUtils.toString(response.getEntity(), "UTF-8");
@@ -82,7 +82,7 @@ public class WechatpayGateway extends AbstractPaymentGateway {
         result.setSuccessful(successful);
 
         if (successful) {
-            if (!WechatpayUtil.validateSign(params, tradeSourceType)) throw new RuntimeException("fail to prepay, invalid sign");
+            if (!WechatpayUtil.validateSign(params, tradeSourceType)) throw new MomiaFailedException("fail to prepay, invalid sign");
 
             if (TradeSourceType.isFromApp(tradeSourceType)) {
                 result.add(WechatpayPrepayResult.App.Field.APPID, Configuration.getString("Payment.Wechat.AppAppId"));
@@ -100,7 +100,7 @@ public class WechatpayGateway extends AbstractPaymentGateway {
                 result.add(WechatpayPrepayResult.JsApi.Field.SIGN_TYPE, "MD5");
                 result.add(WechatpayPrepayResult.JsApi.Field.PAY_SIGN, WechatpayUtil.sign(result.all(), tradeSourceType));
             } else {
-                throw new RuntimeException("unsupported trade source type: " + tradeSourceType);
+                throw new MomiaFailedException("unsupported trade source type: " + tradeSourceType);
             }
         } else {
             LOGGER.error("fail to prepay: {}/{}/{}", params.get(WechatpayPrepayFields.RETURN_CODE),

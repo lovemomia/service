@@ -103,7 +103,7 @@ public class PrepayParamFactory {
             HttpGet request = new HttpGet(urlBuilder.toString());
             HttpResponse response = httpClient.execute(request);
             if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                throw new RuntimeException("fail to execute request: " + request);
+                throw new MomiaFailedException("fail to execute request: " + request);
             }
 
             String entity = EntityUtils.toString(response.getEntity());
@@ -111,9 +111,9 @@ public class PrepayParamFactory {
 
             if (resultJson.containsKey("openid")) return resultJson.getString("openid");
 
-            throw new RuntimeException("fail to get openid");
+            throw new MomiaFailedException("fail to get openid");
         } catch (Exception e) {
-            throw new RuntimeException("fail to get openid");
+            throw new MomiaFailedException("fail to get openid");
         }
     }
 }

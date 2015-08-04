@@ -6,4 +6,8 @@ public class MomiaException extends RuntimeException {
     public MomiaException(String msg) {
         super(msg);
     }
+
+    public MomiaException(String msg, Throwable t) {
+        super(msg, t);
+    }
 }

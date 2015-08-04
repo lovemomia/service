@@ -1,5 +1,6 @@
 package cn.momia.service.deal.gateway.factory;
 
+import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.service.deal.gateway.PaymentGateway;
 
 import java.util.Map;
@@ -13,7 +14,7 @@ public class PaymentGatewayFactory {
 
     public static PaymentGateway create(int payType) {
         PaymentGateway paymentGateway = prototypes.get(payType);
-        if (paymentGateway == null) throw new RuntimeException("invalid pay type: " + payType);
+        if (paymentGateway == null) throw new MomiaFailedException("invalid pay type: " + payType);
 
         return paymentGateway;
     }
