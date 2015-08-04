@@ -37,6 +37,8 @@ public class CallbackController extends AbstractController {
             return ResponseMessage.SUCCESS;
         }
 
+        LOGGER.error("fail to finish payment for order: {}", result.getOrderId());
+
         return ResponseMessage.FAILED;
     }
 
