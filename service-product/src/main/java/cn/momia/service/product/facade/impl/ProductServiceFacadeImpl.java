@@ -1,5 +1,6 @@
 package cn.momia.service.product.facade.impl;
 
+import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.common.service.util.TimeUtil;
 import cn.momia.common.service.impl.DbAccessService;
 import cn.momia.service.product.facade.Product;
@@ -21,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -248,6 +250,10 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     @Override
     public boolean addSkuLeader(long userId, long productId, long skuId) {
         if (userId <= 0 || productId <= 0 || skuId <= 0) return false;
+
+        Sku sku = skuService.get(skuId);
+        if (sku.isClosed(new Date()) || !sku.isNeedLeader()) throw new MomiaFailedException("活动已结束或不需要领队");
+
         return skuService.addLeader(userId, productId, skuId);
     }
 

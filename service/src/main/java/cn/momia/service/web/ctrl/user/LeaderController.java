@@ -57,13 +57,13 @@ public class LeaderController extends UserRelatedController {
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage addLeaderInfo(@RequestBody Leader leader) {
-        if (!userServiceFacade.addLeaderInfo(leader)) return ResponseMessage.FAILED("注册领队失败");
+        if (!userServiceFacade.addLeaderInfo(leader)) return ResponseMessage.FAILED("注册领队失败，参数不完整");
         return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(method = RequestMethod.PUT, consumes = "application/json")
     public ResponseMessage updateLeaderInfo(@RequestBody Leader leader) {
-        if (!userServiceFacade.updateLeaderInfo(leader)) return ResponseMessage.FAILED("更新领队信息失败");
+        if (!userServiceFacade.updateLeaderInfo(leader)) return ResponseMessage.FAILED("更新领队信息失败，参数不完整");
         return ResponseMessage.SUCCESS;
     }
 
