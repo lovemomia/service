@@ -135,15 +135,15 @@ public class UserController extends UserRelatedController {
 
     @RequestMapping(value = "/child", method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage addChild(@RequestBody Participant[] children) {
+        for(Participant child : children) if (child.isInvalid()) return ResponseMessage.FAILED("添加孩子信息失败");
+
         long userId = 0;
         Set<Long> childIds = new HashSet<Long>();
         for(Participant child : children) {
-            if (child.isInvalid()) continue;
-
             userId = child.getUserId();
-
             long childId = userServiceFacade.addChild(child);
-            if (childId > 0) childIds.add(childId);
+            if (childId <= 0) return ResponseMessage.FAILED("添加孩子信息失败");
+            childIds.add(childId);
         }
 
         User user = userServiceFacade.getUser(userId);
@@ -163,8 +163,8 @@ public class UserController extends UserRelatedController {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        boolean successful = userServiceFacade.updateChildName(user.getId(), childId, name);
-        if (!successful) return ResponseMessage.FAILED("更新孩子姓名失败");
+        if (!user.getChildren().contains(childId) ||
+                !userServiceFacade.updateChildName(user.getId(), childId, name)) return ResponseMessage.FAILED("更新孩子姓名失败");
 
         return ResponseMessage.SUCCESS;
     }
@@ -176,8 +176,8 @@ public class UserController extends UserRelatedController {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        boolean successful = userServiceFacade.updateChildSex(user.getId(), childId, sex);
-        if (!successful) return ResponseMessage.FAILED("更新孩子性别失败");
+        if (!user.getChildren().contains(childId) ||
+                !userServiceFacade.updateChildSex(user.getId(), childId, sex)) return ResponseMessage.FAILED("更新孩子性别失败");
 
         return ResponseMessage.SUCCESS;
     }
@@ -189,8 +189,8 @@ public class UserController extends UserRelatedController {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        boolean successful = userServiceFacade.updateChildBirthday(user.getId(), childId, birthday);
-        if (!successful) return ResponseMessage.FAILED("更新孩子生日失败");
+        if (!user.getChildren().contains(childId) ||
+                !userServiceFacade.updateChildBirthday(user.getId(), childId, birthday)) return ResponseMessage.FAILED("更新孩子生日失败");
 
         return ResponseMessage.SUCCESS;
     }

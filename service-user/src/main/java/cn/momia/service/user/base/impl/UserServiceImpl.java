@@ -140,8 +140,10 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     private Set<Long> parseChildren(String children) {
         Set<Long> childrenIds = new HashSet<Long>();
-        for (String childId : CHILDREN_SPLITTER.split(children)) {
-            childrenIds.add(Long.valueOf(childId));
+        if (!StringUtils.isBlank(children)) {
+            for (String childId : CHILDREN_SPLITTER.split(children)) {
+                childrenIds.add(Long.valueOf(childId));
+            }
         }
 
         return childrenIds;
