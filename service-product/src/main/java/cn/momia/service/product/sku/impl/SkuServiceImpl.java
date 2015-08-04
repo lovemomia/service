@@ -29,7 +29,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
 
     @Override
     public Sku get(long id) {
-        String sql = "SELECT " + joinFields() + " FROM t_sku WHERE id=? AND status=1";
+        String sql = "SELECT " + joinFields() + " FROM t_sku WHERE id=? AND status<>0";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Sku>() {
             @Override
