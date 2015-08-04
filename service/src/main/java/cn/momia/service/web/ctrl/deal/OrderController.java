@@ -1,5 +1,6 @@
 package cn.momia.service.web.ctrl.deal;
 
+import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.service.web.response.ResponseMessage;
 import cn.momia.service.deal.exception.OrderLimitException;
 import cn.momia.service.product.facade.Product;
@@ -35,7 +36,7 @@ public class OrderController extends AbstractController {
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage placeOrder(@RequestBody Order order) {
         Sku sku = productServiceFacade.getSku(order.getSkuId());
-        if (!checkOrder(order, sku)) return ResponseMessage.FAILED("无效的订单");
+        checkOrder(order, sku);
 
         if (!lockSku(order)) return ResponseMessage.FAILED("库存不足");
 
@@ -61,20 +62,21 @@ public class OrderController extends AbstractController {
         return ResponseMessage.FAILED("下单失败");
     }
 
-    private boolean checkOrder(Order order, Sku sku) {
+    private void checkOrder(Order order, Sku sku) {
         if (order.getCustomerId() <= 0 ||
                 order.getProductId() <= 0 ||
                 order.getSkuId() <= 0 ||
                 order.getPrices().isEmpty() ||
                 StringUtils.isBlank(order.getMobile()) ||
-                order.getProductId() != sku.getProductId() ||
-                sku.isClosed(new Date())) return false;
+                !sku.exists() ||
+                sku.getProductId() != order.getProductId() ||
+                sku.isClosed(new Date()))  throw new MomiaFailedException("无效的订单，活动已结束或下线");
+
+        if (sku.isNeedRealName() && (order.getParticipants() == null || order.getParticipants().isEmpty())) throw new MomiaFailedException("无效的订单，缺少出行人");
 
         for (OrderPrice price : order.getPrices()) {
-            if (!sku.findPrice(price.getAdult(), price.getChild(), price.getPrice())) return false;
+            if (!sku.findPrice(price.getAdult(), price.getChild(), price.getPrice())) throw new MomiaFailedException("无效的订单，套餐不正确");
         }
-
-        return true;
     }
 
     private boolean lockSku(Order order) {
