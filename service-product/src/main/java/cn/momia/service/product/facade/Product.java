@@ -182,9 +182,8 @@ public class Product implements Serializable {
 
     public String getWeekendScheduler() {
         List<Date> times = new ArrayList<Date>();
-        Date now = new Date();
         for (Sku sku : skus) {
-            if (sku.isOnWeekend() && !sku.isClosed(now)) times.addAll(sku.getStartEndTimes());
+            if (sku.isOnWeekend()) times.addAll(sku.getStartEndTimes());
         }
         Collections.sort(times);
 
