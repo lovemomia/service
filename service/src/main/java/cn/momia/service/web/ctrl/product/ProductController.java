@@ -413,8 +413,8 @@ public class ProductController extends AbstractController {
                 if (customerPrticipantsIds != null) {
                     for (long participantId : customerPrticipantsIds) {
                         Participant participant = participantsMap.get(participantId);
-                        if (participant != null && participant.child()) {
-                            children.add(participant.desc());
+                        if (participant != null && participant.isChild()) {
+                            children.add(participant.getDesc());
                         }
                     }
                 }

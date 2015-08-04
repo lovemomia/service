@@ -5,8 +5,16 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Participant implements Serializable {
+    private static final Set<String> SEX = new HashSet<String>();
+    static {
+        SEX.add("男");
+        SEX.add("女");
+    }
+
     public static final Participant NOT_EXIST_PARTICIPANT = new Participant();
     public static final Participant INVALID_PARTICIPANT = new Participant();
     static {
@@ -98,18 +106,18 @@ public class Participant implements Serializable {
     }
 
     public boolean isInvalid() {
-        return userId <= 0 || StringUtils.isBlank(name) || StringUtils.isBlank(sex) || birthday == null;
+        return userId <= 0 || StringUtils.isBlank(name) || !SEX.contains(sex) || birthday == null;
     }
 
-    public boolean adult() {
+    public boolean isAdult() {
         return TimeUtil.isAdult(this.birthday);
     }
 
-    public boolean child() {
+    public boolean isChild() {
         return TimeUtil.isChild(this.birthday);
     }
 
-    public String desc() {
+    public String getDesc() {
         if (TimeUtil.isAdult(this.birthday)) return "成人";
 
         int age = TimeUtil.getAge(this.birthday);

@@ -205,7 +205,7 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
 
     @Override
     public boolean updateChildSex(long userId, long childId, String sex) {
-        if (userId <= 0 || childId <= 0 || StringUtils.isBlank(sex) || !SEX.contains(sex)) return false;
+        if (userId <= 0 || childId <= 0 || !SEX.contains(sex)) return false;
         return participantService.updateSex(userId, childId, sex);
     }
 
