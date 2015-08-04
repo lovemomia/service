@@ -27,7 +27,7 @@ public class CallbackController extends AbstractController {
     private ResponseMessage callback(HttpServletRequest request, int payType) {
         CallbackResult result = dealServiceFacade.callback(extractParams(request.getParameterMap()), payType);
         if (result.isSuccessful()) {
-            long orderId = Long.valueOf(result.get("orderId"));
+            long orderId = result.getOrderId();
             Order order = dealServiceFacade.getOrder(orderId);
             if (order.exists()) {
                 updateUserCoupon(order);

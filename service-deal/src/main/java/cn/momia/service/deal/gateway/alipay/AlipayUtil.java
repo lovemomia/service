@@ -40,7 +40,7 @@ public class AlipayUtil {
         }
     }
 
-    public static boolean validateSign(Map<String, String> params) {
+    public static boolean validateSign(Map<String, String> params, String sign) {
         List<String> kvs = new ArrayList<String>();
         for (Map.Entry<String, String> entry : params.entrySet()) {
             String key = entry.getKey();
@@ -50,8 +50,6 @@ public class AlipayUtil {
         }
         Collections.sort(kvs);
 
-        String returnedSign = params.get(AlipayCallbackFields.SIGN);
-
-        return RSA.verify(StringUtils.join(kvs, "&"), returnedSign, Configuration.getSecretKey("alipayPublicKey"), "utf-8");
+        return RSA.verify(StringUtils.join(kvs, "&"), sign, Configuration.getSecretKey("alipayPublicKey"), "utf-8");
     }
 }

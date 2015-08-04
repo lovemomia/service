@@ -1,6 +1,6 @@
 package cn.momia.service.deal.gateway;
 
-public class PrepayParam extends MapWrapper {
+public abstract class PrepayParam extends MapWrapper {
     private int tradeSourceType;
 
     public int getTradeSourceType() {
@@ -10,4 +10,6 @@ public class PrepayParam extends MapWrapper {
     public void setTradeSourceType(int tradeSourceType) {
         this.tradeSourceType = tradeSourceType;
     }
+
+    public abstract long getOrderId();
 }

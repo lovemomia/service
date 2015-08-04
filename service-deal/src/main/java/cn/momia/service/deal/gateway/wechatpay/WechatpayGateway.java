@@ -4,7 +4,6 @@ import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.common.service.util.XmlUtil;
 import cn.momia.common.service.config.Configuration;
 import cn.momia.service.deal.gateway.AbstractPaymentGateway;
-import cn.momia.service.deal.gateway.CallbackParam;
 import cn.momia.service.deal.gateway.PrepayParam;
 import cn.momia.service.deal.gateway.PrepayResult;
 import cn.momia.service.deal.gateway.TradeSourceType;
@@ -20,25 +19,13 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
 public class WechatpayGateway extends AbstractPaymentGateway {
     private static final Logger LOGGER = LoggerFactory.getLogger(WechatpayGateway.class);
 
-    private static final String DATE_FORMAT_STR = "yyyyMMddHHmmss";
-    private static final DateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT_STR);
     private static final String SUCCESS = "SUCCESS";
-
-    @Override
-    protected long getPrepayOutTradeNo(PrepayParam param) {
-        String outTradeNo = param.get(WechatpayPrepayFields.OUT_TRADE_NO);
-        return Long.valueOf(outTradeNo.substring(0, outTradeNo.length() - DATE_FORMAT_STR.length()));
-    }
 
     @Override
     public PrepayResult doPrepay(PrepayParam param) {
@@ -109,53 +96,9 @@ public class WechatpayGateway extends AbstractPaymentGateway {
         }
     }
 
-    @Override
-    protected boolean isPayedSuccessfully(CallbackParam param) {
-        String return_code = param.get(WechatpayCallbackFields.RETURN_CODE);
-        String result_code = param.get(WechatpayCallbackFields.RESULT_CODE);
-
-        return return_code != null && return_code.equalsIgnoreCase(SUCCESS) &&
-                result_code != null && result_code.equalsIgnoreCase(SUCCESS);
-    }
 
     @Override
-    protected boolean validateCallbackSign(CallbackParam param) {
-        String tradeType = param.get(WechatpayPrepayFields.TRADE_TYPE);
-        int tradeSourceType;
-        if ("APP".equalsIgnoreCase(tradeType)) tradeSourceType = TradeSourceType.APP;
-        else if ("JSAPI".equalsIgnoreCase(tradeType)) tradeSourceType = TradeSourceType.WAP;
-        else throw new MomiaFailedException("invalid trade type: " + tradeType);
-
-        boolean successful = WechatpayUtil.validateSign(param.all(), tradeSourceType);
-        if (!successful) LOGGER.warn("invalid sign, order id: {} ", param.get(WechatpayCallbackFields.OUT_TRADE_NO));
-
-        return successful;
-    }
-
-    @Override
-    protected long getCallbackOutTradeNo(CallbackParam param) {
-        String outTradeNo = param.get(WechatpayCallbackFields.OUT_TRADE_NO);
-        return Long.valueOf(outTradeNo.substring(0, outTradeNo.length() - DATE_FORMAT_STR.length()));
-    }
-
-    @Override
-    protected Payment createPayment(CallbackParam param) {
-        Payment payment = new Payment();
-        payment.setOrderId(getCallbackOutTradeNo(param));
-        payment.setPayer(param.get(WechatpayCallbackFields.OPEN_ID));
-
-        Date finishTime;
-        try {
-            finishTime = DATE_FORMATTER.parse(param.get(WechatpayCallbackFields.TIME_END));
-        } catch (ParseException e) {
-            finishTime = new Date();
-        }
-        payment.setFinishTime(finishTime == null ? new Date() : finishTime);
-
-        payment.setPayType(Payment.Type.WECHATPAY);
-        payment.setTradeNo(param.get(WechatpayCallbackFields.TRANSACTION_ID));
-        payment.setFee(new BigDecimal(param.get(WechatpayCallbackFields.TOTAL_FEE)).divide(new BigDecimal(100)));
-
-        return payment;
+    protected int getPayType() {
+        return Payment.Type.WECHATPAY;
     }
 }

@@ -17,11 +17,9 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
 
     @Override
     public PrepayResult prepay(PrepayParam param) {
-        if (!dealServiceFacade.prepayOrder(getPrepayOutTradeNo(param))) return buildFailPrepayResult();
+        if (!dealServiceFacade.prepayOrder(param.getOrderId())) return buildFailPrepayResult();
         return doPrepay(param);
     }
-
-    protected abstract long getPrepayOutTradeNo(PrepayParam param);
 
     private PrepayResult buildFailPrepayResult() {
         PrepayResult result = new PrepayResult();
@@ -35,23 +33,16 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
     @Override
     public CallbackResult callback(CallbackParam param) {
         CallbackResult result = new CallbackResult();
-        result.add("orderId", String.valueOf(getCallbackOutTradeNo(param)));
+        result.setOrderId(param.getOrderId());
 
-        if (isPayedSuccessfully(param) && validateCallbackSign(param) && !finishPayment(param)) {
-            result.setSuccessful(false);
-        } else {
-            result.setSuccessful(true);
-        }
+        if (param.isPayedSuccessfully() && !finishPayment(param)) result.setSuccessful(false);
+        else result.setSuccessful(true);
 
         return result;
     }
 
-    protected abstract boolean isPayedSuccessfully(CallbackParam param);
-
-    protected abstract boolean validateCallbackSign(CallbackParam param);
-
     private boolean finishPayment(CallbackParam param) {
-        long orderId = getCallbackOutTradeNo(param);
+        long orderId = param.getOrderId();
         try {
             Order order = dealServiceFacade.getOrder(orderId);
             // 这段逻辑返回true看似有点反常
@@ -69,8 +60,6 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
         return true;
     }
 
-    protected abstract long getCallbackOutTradeNo(CallbackParam param);
-
     private void logPayment(CallbackParam param) {
         try {
             if (!dealServiceFacade.logPayment(createPayment(param)))
@@ -80,5 +69,17 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
         }
     }
 
-    protected abstract Payment createPayment(CallbackParam param);
+    private Payment createPayment(CallbackParam param) {
+        Payment payment = new Payment();
+        payment.setOrderId(param.getOrderId());
+        payment.setPayer(param.getPayer());
+        payment.setFinishTime(param.getFinishTime());
+        payment.setPayType(getPayType());
+        payment.setTradeNo(param.getTradeNo());
+        payment.setFee(param.getTotalFee());
+
+        return payment;
+    }
+
+    protected abstract int getPayType();
 }
