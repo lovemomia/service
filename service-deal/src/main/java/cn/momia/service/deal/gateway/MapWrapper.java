@@ -1,5 +1,7 @@
 package cn.momia.service.deal.gateway;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +20,8 @@ public class MapWrapper {
         this.params = params;
     }
 
-    public Map<String, String> all() {
+    @JSONField(serialize = false)
+    public Map<String, String> getAll() {
         return params;
     }
 }

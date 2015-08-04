@@ -17,15 +17,8 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
 
     @Override
     public PrepayResult prepay(PrepayParam param) {
-        if (!dealServiceFacade.prepayOrder(param.getOrderId())) return buildFailPrepayResult();
+        if (!dealServiceFacade.prepayOrder(param.getOrderId())) return PrepayResult.FAILED;
         return doPrepay(param);
-    }
-
-    private PrepayResult buildFailPrepayResult() {
-        PrepayResult result = new PrepayResult();
-        result.setSuccessful(false);
-
-        return result;
     }
 
     protected abstract PrepayResult doPrepay(PrepayParam param);

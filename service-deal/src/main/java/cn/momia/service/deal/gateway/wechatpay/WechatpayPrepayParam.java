@@ -4,7 +4,7 @@ import cn.momia.common.service.config.Configuration;
 import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.service.deal.facade.OrderInfoFields;
 import cn.momia.service.deal.gateway.PrepayParam;
-import cn.momia.service.deal.gateway.TradeSourceType;
+import cn.momia.service.deal.gateway.ClientType;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpResponse;
@@ -20,40 +20,57 @@ import java.util.Date;
 import java.util.Map;
 
 public class WechatpayPrepayParam extends PrepayParam {
+    private static class Field {
+        public static final String APPID = "appid"; //微信公众号id
+        public static final String MCH_ID = "mch_id"; //商户id
+        public static final String NONCE_STR = "nonce_str"; //随机字符串
+        public static final String SIGN = "sign"; //签名
+        public static final String BODY = "body"; //商品描述
+        public static final String OUT_TRADE_NO = "out_trade_no"; //商户订单号
+        public static final String TOTAL_FEE = "total_fee"; //总金额
+        public static final String SPBILL_CREATE_IP = "spbill_create_ip"; //终端IP
+        public static final String NOTIFY_URL = "notify_url"; //通知地址
+        public static final String PRODUCT_ID = "product_id"; //通知地址
+        public static final String OPENID = "openid"; //通知地址
+        public static final String TRADE_TYPE = "trade_type";
+        public static final String TIME_EXPIRE = "time_expire";
+        public static final String CODE = "code";
+    }
+
     private static final String DATE_FORMAT_STR = "yyyyMMddHHmmss";
     private static final DateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT_STR);
 
     @Override
     public long getOrderId() {
-        String outTradeNo = get(WechatpayPrepayFields.OUT_TRADE_NO);
+        String outTradeNo = get(Field.OUT_TRADE_NO);
         return Long.valueOf(outTradeNo.substring(0, outTradeNo.length() - DATE_FORMAT_STR.length()));
     }
 
     public WechatpayPrepayParam(Map<String, String> params) {
         String tradeType = params.get("trade_type");
         if ("APP".equals(tradeType)) {
-            setTradeSourceType(TradeSourceType.APP);
-            add(WechatpayPrepayFields.APPID, Configuration.getString("Payment.Wechat.AppAppId"));
-            add(WechatpayPrepayFields.PRODUCT_ID, params.get(OrderInfoFields.PRODUCT_ID));
-            add(WechatpayPrepayFields.MCH_ID, Configuration.getString("Payment.Wechat.AppMchId"));
+            setClientType(ClientType.APP);
+            add(Field.APPID, Configuration.getString("Payment.Wechat.AppAppId"));
+            add(Field.PRODUCT_ID, params.get(OrderInfoFields.PRODUCT_ID));
+            add(Field.MCH_ID, Configuration.getString("Payment.Wechat.AppMchId"));
         } else if ("JSAPI".equals(tradeType)) {
-            setTradeSourceType(TradeSourceType.WAP);
-            add(WechatpayPrepayFields.APPID, Configuration.getString("Payment.Wechat.JsApiAppId"));
-            add(WechatpayPrepayFields.OPENID, getJsApiOpenId(params.get(WechatpayPrepayFields.CODE)));
-            add(WechatpayPrepayFields.MCH_ID, Configuration.getString("Payment.Wechat.JsApiMchId"));
+            setClientType(ClientType.WAP);
+            add(Field.APPID, Configuration.getString("Payment.Wechat.JsApiAppId"));
+            add(Field.OPENID, getJsApiOpenId(params.get(Field.CODE)));
+            add(Field.MCH_ID, Configuration.getString("Payment.Wechat.JsApiMchId"));
         } else {
             throw new MomiaFailedException("not supported trade type: " + tradeType);
         }
 
-        add(WechatpayPrepayFields.NONCE_STR, WechatpayUtil.createNoncestr(32));
-        add(WechatpayPrepayFields.BODY, params.get(OrderInfoFields.PRODUCT_TITLE));
-        add(WechatpayPrepayFields.OUT_TRADE_NO, params.get(OrderInfoFields.ORDER_ID) + DATE_FORMATTER.format(new Date()));
-        add(WechatpayPrepayFields.TOTAL_FEE, params.get(OrderInfoFields.TOTAL_FEE));
-        add(WechatpayPrepayFields.SPBILL_CREATE_IP, params.get(OrderInfoFields.USER_IP));
-        add(WechatpayPrepayFields.NOTIFY_URL, Configuration.getString("Payment.Wechat.NotifyUrl"));
-        add(WechatpayPrepayFields.TRADE_TYPE, tradeType);
-        add(WechatpayPrepayFields.TIME_EXPIRE, DATE_FORMATTER.format(new Date(System.currentTimeMillis() + 30 * 60 * 1000)));
-        add(WechatpayPrepayFields.SIGN, WechatpayUtil.sign(all(), getTradeSourceType()));
+        add(Field.NONCE_STR, WechatpayUtil.createNoncestr(32));
+        add(Field.BODY, params.get(OrderInfoFields.PRODUCT_TITLE));
+        add(Field.OUT_TRADE_NO, params.get(OrderInfoFields.ORDER_ID) + DATE_FORMATTER.format(new Date()));
+        add(Field.TOTAL_FEE, params.get(OrderInfoFields.TOTAL_FEE));
+        add(Field.SPBILL_CREATE_IP, params.get(OrderInfoFields.USER_IP));
+        add(Field.NOTIFY_URL, Configuration.getString("Payment.Wechat.NotifyUrl"));
+        add(Field.TRADE_TYPE, tradeType);
+        add(Field.TIME_EXPIRE, DATE_FORMATTER.format(new Date(System.currentTimeMillis() + 30 * 60 * 1000)));
+        add(Field.SIGN, WechatpayUtil.sign(getAll(), getClientType()));
     }
 
     private static String getJsApiOpenId(String code) {

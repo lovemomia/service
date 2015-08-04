@@ -3,7 +3,7 @@ package cn.momia.service.deal.gateway.wechatpay;
 import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.service.deal.gateway.CallbackParam;
 import cn.momia.service.deal.gateway.MapWrapper;
-import cn.momia.service.deal.gateway.TradeSourceType;
+import cn.momia.service.deal.gateway.ClientType;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -46,12 +46,12 @@ public class WechatpayCallbackParam extends MapWrapper implements CallbackParam 
 
     private boolean validateCallbackSign() {
         String tradeType = get(Field.TRADE_TYPE);
-        int tradeSourceType;
-        if ("APP".equalsIgnoreCase(tradeType)) tradeSourceType = TradeSourceType.APP;
-        else if ("JSAPI".equalsIgnoreCase(tradeType)) tradeSourceType = TradeSourceType.WAP;
+        int clientType;
+        if ("APP".equalsIgnoreCase(tradeType)) clientType = ClientType.APP;
+        else if ("JSAPI".equalsIgnoreCase(tradeType)) clientType = ClientType.WAP;
         else throw new MomiaFailedException("invalid trade type: " + tradeType);
 
-        return WechatpayUtil.validateSign(all(), tradeSourceType);
+        return WechatpayUtil.validateSign(getAll(), clientType);
     }
 
     @Override

@@ -4,7 +4,7 @@ import cn.momia.common.service.config.Configuration;
 import cn.momia.common.service.exception.MomiaFailedException;
 import cn.momia.service.deal.facade.OrderInfoFields;
 import cn.momia.service.deal.gateway.PrepayParam;
-import cn.momia.service.deal.gateway.TradeSourceType;
+import cn.momia.service.deal.gateway.ClientType;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
@@ -38,8 +38,8 @@ public class AlipayPrepayParam extends PrepayParam {
 
     public AlipayPrepayParam(Map<String, String> params) {
         String type = params.get("type");
-        if ("app".equalsIgnoreCase(type)) setTradeSourceType(TradeSourceType.APP);
-        else if ("wap".equalsIgnoreCase(type)) setTradeSourceType(TradeSourceType.WAP);
+        if ("app".equalsIgnoreCase(type)) setClientType(ClientType.APP);
+        else if ("wap".equalsIgnoreCase(type)) setClientType(ClientType.WAP);
         else throw new MomiaFailedException("not supported type: " + type);
 
         this.outTradeNo = params.get(OrderInfoFields.ORDER_ID);

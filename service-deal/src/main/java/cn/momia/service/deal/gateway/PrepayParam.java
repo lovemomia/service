@@ -1,14 +1,14 @@
 package cn.momia.service.deal.gateway;
 
 public abstract class PrepayParam extends MapWrapper {
-    private int tradeSourceType;
+    private int clientType;
 
-    public int getTradeSourceType() {
-        return tradeSourceType;
+    public int getClientType() {
+        return clientType;
     }
 
-    public void setTradeSourceType(int tradeSourceType) {
-        this.tradeSourceType = tradeSourceType;
+    public void setClientType(int clientType) {
+        this.clientType = clientType;
     }
 
     public abstract long getOrderId();

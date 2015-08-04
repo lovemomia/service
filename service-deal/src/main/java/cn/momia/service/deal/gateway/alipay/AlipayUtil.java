@@ -2,7 +2,7 @@ package cn.momia.service.deal.gateway.alipay;
 
 import cn.momia.common.service.config.Configuration;
 import cn.momia.common.service.exception.MomiaFailedException;
-import cn.momia.service.deal.gateway.TradeSourceType;
+import cn.momia.service.deal.gateway.ClientType;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 public class AlipayUtil {
-    public static String sign(Map<String, String> params, int tradeSourceType) {
+    public static String sign(Map<String, String> params, int clientType) {
         List<String> kvs = new ArrayList<String>();
-        String quote = TradeSourceType.isFromApp(tradeSourceType) ? "\"" : "";
+        String quote = ClientType.isFromApp(clientType) ? "\"" : "";
         kvs.add(AlipayPrepayResult.Field.PARTNER + "=" + quote + params.get(AlipayPrepayResult.Field.PARTNER) + quote);
         kvs.add(AlipayPrepayResult.Field.SELLER_ID + "=" + quote + params.get(AlipayPrepayResult.Field.SELLER_ID) + quote);
         kvs.add(AlipayPrepayResult.Field.OUT_TRADE_NO + "=" + quote + params.get(AlipayPrepayResult.Field.OUT_TRADE_NO) + quote);
@@ -28,7 +28,7 @@ public class AlipayUtil {
         kvs.add(AlipayPrepayResult.Field.INPUT_CHARSET + "=" + quote + params.get(AlipayPrepayResult.Field.INPUT_CHARSET) + quote);
         kvs.add(AlipayPrepayResult.Field.IT_B_PAY + "=" + quote + params.get(AlipayPrepayResult.Field.IT_B_PAY) + quote);
         kvs.add(AlipayPrepayResult.Field.SHOW_URL + "=" + quote + params.get(AlipayPrepayResult.Field.SHOW_URL) + quote);
-        if (TradeSourceType.isFromWap(tradeSourceType)) {
+        if (ClientType.isFromWap(clientType)) {
             kvs.add(AlipayPrepayResult.Field.RETURN_URL + "=" + quote + params.get(AlipayPrepayResult.Field.RETURN_URL) + quote);
             Collections.sort(kvs);
         }

@@ -37,7 +37,7 @@ public class AlipayCallbackParam extends MapWrapper implements CallbackParam {
             String notifyId = get(Field.NOTIFY_ID);
             if (notifyId == null || !verifyResponse(notifyId)) return false;
 
-            return AlipayUtil.validateSign(all(), get(Field.SIGN));
+            return AlipayUtil.validateSign(getAll(), get(Field.SIGN));
         } catch (Exception e) {
             return false;
         }
