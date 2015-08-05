@@ -26,8 +26,8 @@ public interface ProductServiceFacade {
     Sku getSku(long skuId);
     List<Sku> getSkusWithoutLeader(long productId);
     boolean addSkuLeader(long userId, long productId, long skuId);
-    boolean lockStock(long productId, long skuId, int count);
-    boolean unlockStock(long productId, long skuId, int count);
+    boolean lockStock(long productId, long skuId, int count, int joined);
+    boolean unlockStock(long productId, long skuId, int count, int joined);
     boolean sold(long productId, int count);
 
     boolean isFavoried(long userId, long productId);

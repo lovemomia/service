@@ -177,4 +177,8 @@ public class Order implements Serializable {
 
         return count;
     }
+
+    public int getJoinedCount() {
+        return getAdultCount() + getChildCount();
+    }
 }

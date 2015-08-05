@@ -258,14 +258,14 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     }
 
     @Override
-    public boolean lockStock(long productId, long skuId, int count) {
+    public boolean lockStock(long productId, long skuId, int count, int joined) {
         if (productId <= 0 || skuId <= 0 || count <= 0) return false;
 
         boolean successful = skuService.lock(skuId, count);
         try {
             if (successful) {
                 if (isSoldOut(productId)) baseProductService.soldOut(productId);
-                baseProductService.join(productId, count);
+                baseProductService.join(productId, joined);
             }
         } catch (Exception e) {
             LOGGER.error("fail to update sold out/joined status of product: {}", productId, e);
@@ -288,7 +288,7 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     }
 
     @Override
-    public boolean unlockStock(long productId, long skuId, int count) {
+    public boolean unlockStock(long productId, long skuId, int count, int joined) {
         if (productId <= 0 || skuId <= 0 || count <= 0) return true;
 
         try {
@@ -300,7 +300,7 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
         boolean successful = skuService.unlock(skuId, count);
         if (successful) {
             try {
-                baseProductService.decreaseJoined(productId, count);
+                baseProductService.decreaseJoined(productId, joined);
             } catch (Exception e) {
                 LOGGER.error("fail to decrease joined of product: {}", productId, e);
             }

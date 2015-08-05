@@ -80,11 +80,11 @@ public class OrderController extends AbstractController {
     }
 
     private boolean lockSku(Order order) {
-        return productServiceFacade.lockStock(order.getProductId(), order.getSkuId(), order.getCount());
+        return productServiceFacade.lockStock(order.getProductId(), order.getSkuId(), order.getCount(), order.getJoinedCount());
     }
 
     private boolean unlockSku(Order order) {
-        return productServiceFacade.unlockStock(order.getProductId(), order.getSkuId(), order.getCount());
+        return productServiceFacade.unlockStock(order.getProductId(), order.getSkuId(), order.getCount(), order.getJoinedCount());
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
