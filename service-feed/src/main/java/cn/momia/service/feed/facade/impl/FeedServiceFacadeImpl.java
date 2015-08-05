@@ -10,6 +10,7 @@ import cn.momia.service.feed.comment.FeedComment;
 import cn.momia.service.feed.comment.FeedCommentService;
 import cn.momia.service.feed.star.FeedStarService;
 import cn.momia.service.feed.topic.FeedTopicService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;
@@ -141,5 +142,17 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
         }
         
         return feeds;
+    }
+
+    @Override
+    public boolean addComment(long userId, long feedId, String content) {
+        if (userId <= 0 || feedId <= 0 || StringUtils.isBlank(content)) return false;
+        return feedCommentService.add(userId, feedId, content);
+    }
+
+    @Override
+    public boolean deleteComment(long userId, long feedId, long commentId) {
+        if (userId <= 0 || feedId <= 0 || commentId <= 0) return false;
+        return feedCommentService.delete(userId, feedId, commentId);
     }
 }

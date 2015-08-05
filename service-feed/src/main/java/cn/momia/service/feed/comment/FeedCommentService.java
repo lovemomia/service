@@ -5,6 +5,8 @@ import cn.momia.common.service.Service;
 import java.util.List;
 
 public interface FeedCommentService extends Service {
+    boolean add(long userId, long feedId, String content);
+    boolean delete(long userId, long feedId, long commentId);
     int queryCount(long feedId);
     List<FeedComment> query(long feedId, int start, int count);
 }

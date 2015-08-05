@@ -132,4 +132,42 @@ public class FeedController extends AbstractController {
 
         return ResponseMessage.SUCCESS(buildFeedsDto(feeds, totalCount, start, count));
     }
+
+    @RequestMapping(value = "/{id}/comment", method = RequestMethod.POST)
+    public ResponseMessage addComment(@RequestParam String utoken, @PathVariable long id, @RequestParam String content) {
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        if (!feedServiceFacade.addComment(user.getId(), id, content)) return ResponseMessage.FAILED("发表评论失败");
+        return ResponseMessage.SUCCESS;
+    }
+
+    @RequestMapping(value = "/{id}/comment", method = RequestMethod.DELETE)
+    public ResponseMessage deleteComment(@RequestParam String utoken, @PathVariable long id, @RequestParam(value = "cmid") long commentId) {
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        if (!feedServiceFacade.deleteComment(user.getId(), id, commentId)) return ResponseMessage.FAILED("删除评论失败");
+        return ResponseMessage.SUCCESS;
+    }
+
+    @RequestMapping(value = "/star", method = RequestMethod.POST)
+    public ResponseMessage star(@RequestParam String utoken, @RequestParam(value = "fid") long feedId) {
+        return null;
+    }
+
+    @RequestMapping(value = "/unstar", method = RequestMethod.POST)
+    public ResponseMessage unstar(@RequestParam String utoken, @RequestParam(value = "fid") long feedId) {
+        return null;
+    }
+
+    @RequestMapping(value = "/feed/add", method = RequestMethod.POST)
+    public ResponseMessage addFeed(@RequestParam String utoken, @RequestParam String feed) {
+        return null;
+    }
+
+    @RequestMapping(value = "/feed/delete", method = RequestMethod.POST)
+    public ResponseMessage deleteFeed(@RequestParam String utoken, @RequestParam(value = "fid") long feedId) {
+        return null;
+    }
 }
