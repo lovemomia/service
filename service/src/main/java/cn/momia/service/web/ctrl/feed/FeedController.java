@@ -23,6 +23,24 @@ import java.util.Map;
 @RestController
 @RequestMapping("/feed")
 public class FeedController extends AbstractController {
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseMessage getFeeds(@RequestParam String utoken, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
+
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        long totalCount = feedServiceFacade.queryFollowedCountByUser(user.getId());
+        List<Feed> feeds = feedServiceFacade.queryFollowedByUser(user.getId(), start, count);
+
+        PagedListDto feedsDto = new PagedListDto(totalCount, start, count);
+        for (Feed feed : feeds) {
+            feedsDto.add(new FeedDto(feed, user, userServiceFacade.getChildren(user.getId(), user.getChildren())));
+        }
+
+        return ResponseMessage.SUCCESS(feedsDto);
+    }
+
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseMessage getFeed(@PathVariable long id) {
         Feed feed = feedServiceFacade.get(id);

@@ -57,6 +57,44 @@ public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedServ
     }
 
     @Override
+    public long queryFollowedCountByUser(long userId) {
+        String sql = "SELECT COUNT(1) FROM t_feed_follow WHERE userId=? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[] { userId }, new ResultSetExtractor<Long>() {
+            @Override
+            public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getLong(1) : 0;
+            }
+        });
+    }
+
+    @Override
+    public List<BaseFeed> queryFollowedByUser(long userId, int start, int count) {
+        final List<Long> feedIds = new ArrayList<Long>();
+        String queryIdsSql = "SELECT feedId FROM t_feed_follow WHERE userId=? AND status=1 ORDER BY addTime DESC LIMIT ?,?";
+        jdbcTemplate.query(queryIdsSql, new Object[] { userId, start, count }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                feedIds.add(rs.getLong("feedId"));
+            }
+        });
+
+        if (feedIds.isEmpty()) return new ArrayList<BaseFeed>();
+
+        final List<BaseFeed> baseFeeds = new ArrayList<BaseFeed>();
+        String sql = "SELECT " + joinFields() + " FROM t_feed WHERE id IN(" + StringUtils.join(feedIds, ",") + ") AND status=1";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                BaseFeed baseFeed = buildBaseFeed(rs);
+                if (baseFeed.exists()) baseFeeds.add(baseFeed);
+            }
+        });
+
+        return baseFeeds;
+    }
+
+    @Override
     public long queryCountByTopic(long topicId) {
         String sql = "SELECT COUNT(1) FROM t_feed WHERE topicId=? AND status=1";
 

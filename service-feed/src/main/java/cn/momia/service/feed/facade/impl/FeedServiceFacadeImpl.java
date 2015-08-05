@@ -50,6 +50,24 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
         return buildFeed(baseFeed);
     }
 
+    @Override
+    public long queryFollowedCountByUser(long userId) {
+        if (userId <= 0) return 0;
+        return baseFeedService.queryFollowedCountByUser(userId);
+    }
+
+    @Override
+    public List<Feed> queryFollowedByUser(long userId, int start, int count) {
+        if (userId <= 0 || start < 0 || count <= 0) return new ArrayList<Feed>();
+        List<BaseFeed> baseFeeds = baseFeedService.queryFollowedByUser(userId, start, count);
+        List<Feed> feeds = new ArrayList<Feed>();
+        for (BaseFeed baseFeed : baseFeeds) {
+            feeds.add(buildFeed(baseFeed));
+        }
+
+        return feeds;
+    }
+
     private Feed buildFeed(BaseFeed baseFeed) {
         FeedTopic feedTopic = feedTopicService.get(baseFeed.getTopicId());
         if (!feedTopic.exists()) return Feed.NOT_EXIST_FEED;
