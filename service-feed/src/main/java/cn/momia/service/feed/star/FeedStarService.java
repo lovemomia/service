@@ -5,6 +5,8 @@ import cn.momia.common.service.Service;
 import java.util.List;
 
 public interface FeedStarService extends Service {
+    boolean isStared(long userId, long feedId);
+
     boolean add(long userId, long feedId);
     boolean delete(long userId, long feedId);
 

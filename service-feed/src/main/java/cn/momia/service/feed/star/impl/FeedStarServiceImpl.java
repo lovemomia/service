@@ -13,6 +13,18 @@ import java.util.List;
 
 public class FeedStarServiceImpl extends DbAccessService implements FeedStarService {
     @Override
+    public boolean isStared(long userId, long feedId) {
+        String sql = "SELECT COUNT(1) FROM t_feed_star WHERE userId=? AND feedId=? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[] { userId, feedId }, new ResultSetExtractor<Boolean>() {
+            @Override
+            public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getInt(1) > 0 : false;
+            }
+        });
+    }
+
+    @Override
     public boolean add(long userId, long feedId) {
         long id = getId(userId, feedId);
         if (id > 0) {

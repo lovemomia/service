@@ -15,6 +15,7 @@ public class FeedDto {
     private Feed feed;
     private User user;
     private List<Participant> children;
+    private boolean stared;
 
     public long getId() {
         return feed.getId();
@@ -85,9 +86,18 @@ public class FeedDto {
         return childrenDto;
     }
 
+    public boolean isStared() {
+        return stared;
+    }
+
     public FeedDto(Feed feed, User user, List<Participant> children) {
         this.feed = feed;
         this.user = user;
         this.children = children;
+    }
+
+    public FeedDto(Feed feed, User user, List<Participant> children, boolean stared) {
+        this(feed, user, children);
+        this.stared = stared;
     }
 }

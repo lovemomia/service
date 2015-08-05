@@ -28,4 +28,6 @@ public interface FeedServiceFacade {
 
     void increaseStarCount(long feedId);
     void decreaseStarCount(long feedId);
+
+    boolean isStared(long userId, long feedId);
 }

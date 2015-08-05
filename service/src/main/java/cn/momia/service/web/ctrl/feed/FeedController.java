@@ -10,6 +10,7 @@ import cn.momia.service.web.ctrl.dto.PagedListDto;
 import cn.momia.service.web.ctrl.feed.dto.FeedCommentDto;
 import cn.momia.service.web.ctrl.feed.dto.FeedDto;
 import cn.momia.service.web.ctrl.user.dto.MiniUserDto;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -69,14 +70,20 @@ public class FeedController extends AbstractController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseMessage getFeed(@PathVariable long id) {
+    public ResponseMessage getFeed(@RequestParam String utoken, @PathVariable long id) {
         Feed feed = feedServiceFacade.get(id);
         if (!feed.exists()) return ResponseMessage.FAILED("无效的Feed");
 
-        User user = userServiceFacade.getUser(feed.getUserId());
-        if (!user.exists()) return ResponseMessage.FAILED("无效的Feed");
+        User feedUser = userServiceFacade.getUser(feed.getUserId());
+        if (!feedUser.exists()) return ResponseMessage.FAILED("无效的Feed");
 
-        return ResponseMessage.SUCCESS(new FeedDto(feed, user, userServiceFacade.getChildren(user.getId(), user.getChildren())));
+        boolean stared = false;
+        if (!StringUtils.isBlank(utoken)) {
+            User user = userServiceFacade.getUserByToken(utoken);
+            if (user.exists()) stared = feedServiceFacade.isStared(user.getId(), id);
+        }
+
+        return ResponseMessage.SUCCESS(new FeedDto(feed, feedUser, userServiceFacade.getChildren(feedUser.getId(), feedUser.getChildren()), stared));
     }
 
     @RequestMapping(value = "/{id}/star", method = RequestMethod.GET)
