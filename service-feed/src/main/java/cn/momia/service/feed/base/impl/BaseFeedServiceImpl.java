@@ -124,4 +124,16 @@ public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedServ
 
         return baseFeeds;
     }
+
+    @Override
+    public void increaseCommentCount(long id) {
+        String sql = "UPDATE t_feed SET commentCount=CommentCount+1 WHERE id=?";
+        jdbcTemplate.update(sql, new Object[] { id });
+    }
+
+    @Override
+    public void decreaseCommentCount(long id) {
+        String sql = "UPDATE t_feed SET commentCount=CommentCount-1 WHERE id=? AND commentCount>=1";
+        jdbcTemplate.update(sql, new Object[] { id });
+    }
 }

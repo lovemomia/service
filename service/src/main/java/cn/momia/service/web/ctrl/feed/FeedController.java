@@ -139,6 +139,9 @@ public class FeedController extends AbstractController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         if (!feedServiceFacade.addComment(user.getId(), id, content)) return ResponseMessage.FAILED("发表评论失败");
+
+        feedServiceFacade.increaseCommentCount(id);
+
         return ResponseMessage.SUCCESS;
     }
 
@@ -148,6 +151,9 @@ public class FeedController extends AbstractController {
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
         if (!feedServiceFacade.deleteComment(user.getId(), id, commentId)) return ResponseMessage.FAILED("删除评论失败");
+
+        feedServiceFacade.decreaseCommentCount(id);
+
         return ResponseMessage.SUCCESS;
     }
 

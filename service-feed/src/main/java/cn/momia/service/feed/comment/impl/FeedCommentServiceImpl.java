@@ -29,7 +29,7 @@ public class FeedCommentServiceImpl extends DbAccessService implements FeedComme
 
     @Override
     public boolean delete(long userId, long feedId, long commentId) {
-        String sql = "UPDATE t_feed_comment SET status=0 WHERE id=? AND userId=? AND feedId=?";
+        String sql = "UPDATE t_feed_comment SET status=0 WHERE id=? AND userId=? AND feedId=? AND status=1";
 
         return jdbcTemplate.update(sql, new Object[] { commentId, userId, feedId }) == 1;
     }

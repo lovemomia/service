@@ -19,4 +19,7 @@ public interface FeedServiceFacade {
 
     boolean addComment(long userId, long feedId, String content);
     boolean deleteComment(long userId, long feedId, long commentId);
+
+    void increaseCommentCount(long feedId);
+    void decreaseCommentCount(long feedId);
 }

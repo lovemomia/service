@@ -12,4 +12,7 @@ public interface BaseFeedService extends Service {
 
     long queryCountByTopic(long topicId);
     List<BaseFeed> queryByTopic(long topicId, int start, int count);
+
+    void increaseCommentCount(long id);
+    void decreaseCommentCount(long id);
 }
