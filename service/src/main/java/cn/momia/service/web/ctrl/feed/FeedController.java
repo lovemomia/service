@@ -157,23 +157,43 @@ public class FeedController extends AbstractController {
         return ResponseMessage.SUCCESS;
     }
 
-    @RequestMapping(value = "/star", method = RequestMethod.POST)
-    public ResponseMessage star(@RequestParam String utoken, @RequestParam(value = "fid") long feedId) {
-        return null;
+    @RequestMapping(value = "/{id}/star", method = RequestMethod.POST)
+    public ResponseMessage star(@RequestParam String utoken, @PathVariable long id) {
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        if (!feedServiceFacade.star(user.getId(), id)) return ResponseMessage.FAILED("赞失败");
+
+        feedServiceFacade.increaseStarCount(id);
+
+        return ResponseMessage.SUCCESS;
     }
 
-    @RequestMapping(value = "/unstar", method = RequestMethod.POST)
-    public ResponseMessage unstar(@RequestParam String utoken, @RequestParam(value = "fid") long feedId) {
-        return null;
+    @RequestMapping(value = "/{id}/unstar", method = RequestMethod.DELETE)
+    public ResponseMessage unstar(@RequestParam String utoken, @PathVariable long id) {
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        if (!feedServiceFacade.unstar(user.getId(), id)) return ResponseMessage.FAILED("取消赞失败");
+
+        feedServiceFacade.decreaseStarCount(id);
+
+        return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/feed/add", method = RequestMethod.POST)
     public ResponseMessage addFeed(@RequestParam String utoken, @RequestParam String feed) {
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
         return null;
     }
 
     @RequestMapping(value = "/feed/delete", method = RequestMethod.POST)
-    public ResponseMessage deleteFeed(@RequestParam String utoken, @RequestParam(value = "fid") long feedId) {
+    public ResponseMessage deleteFeed(@RequestParam String utoken, @PathVariable long id) {
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
         return null;
     }
 }

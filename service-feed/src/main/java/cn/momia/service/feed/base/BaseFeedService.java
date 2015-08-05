@@ -15,4 +15,7 @@ public interface BaseFeedService extends Service {
 
     void increaseCommentCount(long id);
     void decreaseCommentCount(long id);
+
+    void increaseStarCount(long id);
+    void decreaseStarCount(long id);
 }

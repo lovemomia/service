@@ -30,11 +30,11 @@ public class FavoriteServiceImpl extends DbAccessService implements FavoriteServ
         if (id > 0) {
             String sql = "UPDATE t_favorite SET status=1 WHERE id=? AND userId=? AND productId=?";
 
-            return jdbcTemplate.update(sql, new Object[] { id, userId, productId }) > 0;
+            return jdbcTemplate.update(sql, new Object[] { id, userId, productId }) == 1;
         } else {
             String sql = "INSERT INTO t_favorite(userId, productId, addTime) VALUES (?, ?, NOW())";
 
-            return jdbcTemplate.update(sql, new Object[] { userId, productId }) > 0;
+            return jdbcTemplate.update(sql, new Object[] { userId, productId }) == 1;
         }
     }
 

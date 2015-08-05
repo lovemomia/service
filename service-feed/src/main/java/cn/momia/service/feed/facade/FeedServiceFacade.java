@@ -22,4 +22,10 @@ public interface FeedServiceFacade {
 
     void increaseCommentCount(long feedId);
     void decreaseCommentCount(long feedId);
+
+    boolean star(long userId, long feedId);
+    boolean unstar(long userId, long feedId);
+
+    void increaseStarCount(long feedId);
+    void decreaseStarCount(long feedId);
 }

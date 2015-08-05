@@ -167,4 +167,28 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
         if (feedId <= 0) return;
         baseFeedService.decreaseCommentCount(feedId);
     }
+
+    @Override
+    public boolean star(long userId, long feedId) {
+        if (userId <= 0 || feedId <= 0) return false;
+        return feedStarService.add(userId, feedId);
+    }
+
+    @Override
+    public boolean unstar(long userId, long feedId) {
+        if (userId <= 0 || feedId <= 0) return false;
+        return feedStarService.delete(userId, feedId);
+    }
+
+    @Override
+    public void increaseStarCount(long feedId) {
+        if (feedId <= 0) return;
+        baseFeedService.increaseStarCount(feedId);
+    }
+
+    @Override
+    public void decreaseStarCount(long feedId) {
+        if (feedId <= 0) return;
+        baseFeedService.decreaseStarCount(feedId);
+    }
 }

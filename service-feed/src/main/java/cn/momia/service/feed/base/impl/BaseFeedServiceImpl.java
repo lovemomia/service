@@ -136,4 +136,16 @@ public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedServ
         String sql = "UPDATE t_feed SET commentCount=CommentCount-1 WHERE id=? AND commentCount>=1";
         jdbcTemplate.update(sql, new Object[] { id });
     }
+
+    @Override
+    public void increaseStarCount(long id) {
+        String sql = "UPDATE t_feed SET starCount=starCount+1 WHERE id=?";
+        jdbcTemplate.update(sql, new Object[] { id });
+    }
+
+    @Override
+    public void decreaseStarCount(long id) {
+        String sql = "UPDATE t_feed SET starCount=starCount-1 WHERE id=? AND commentCount>=1";
+        jdbcTemplate.update(sql, new Object[] { id });
+    }
 }
