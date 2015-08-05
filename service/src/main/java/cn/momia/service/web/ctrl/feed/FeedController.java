@@ -40,7 +40,7 @@ public class FeedController extends AbstractController {
     }
 
     private PagedListDto buildFeedsDto(List<Feed> feeds, long totalCount, @RequestParam int start, @RequestParam int count) {
-        List<Long> userIds = new ArrayList<Long>();
+        Set<Long> userIds = new HashSet<Long>();
         for (Feed feed : feeds) userIds.add(feed.getUserId());
         List<User> users = userServiceFacade.getUsers(userIds);
         Map<Long, User> usersMap = new HashMap<Long, User>();
