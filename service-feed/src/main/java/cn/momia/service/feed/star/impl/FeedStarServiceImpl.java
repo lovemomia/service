@@ -2,6 +2,7 @@ package cn.momia.service.feed.star.impl;
 
 import cn.momia.common.service.impl.DbAccessService;
 import cn.momia.service.feed.star.FeedStarService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -9,6 +10,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class FeedStarServiceImpl extends DbAccessService implements FeedStarService {
@@ -22,6 +24,20 @@ public class FeedStarServiceImpl extends DbAccessService implements FeedStarServ
                 return rs.next() ? rs.getInt(1) > 0 : false;
             }
         });
+    }
+
+    @Override
+    public List<Long> queryStaredFeeds(long userId, Collection<Long> feedIds) {
+        final List<Long> staredFeedIds = new ArrayList<Long>();
+        String sql = "SELECT feedId FROM t_feed_star WHERE userId=? AND feedId IN(" + StringUtils.join(feedIds, ",") + ") AND status=1";
+        jdbcTemplate.query(sql, new Object[] { userId }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                staredFeedIds.add(rs.getLong("feedId"));
+            }
+        });
+
+        return staredFeedIds;
     }
 
     @Override

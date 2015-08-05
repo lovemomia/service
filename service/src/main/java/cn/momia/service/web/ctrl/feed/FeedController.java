@@ -37,10 +37,20 @@ public class FeedController extends AbstractController {
         long totalCount = feedServiceFacade.queryFollowedCountByUser(user.getId());
         List<Feed> feeds = feedServiceFacade.queryFollowedByUser(user.getId(), start, count);
 
-        return ResponseMessage.SUCCESS(buildFeedsDto(feeds, totalCount, start, count));
+        return ResponseMessage.SUCCESS(buildFeedsDto(utoken, feeds, totalCount, start, count));
     }
 
-    private PagedListDto buildFeedsDto(List<Feed> feeds, long totalCount, @RequestParam int start, @RequestParam int count) {
+    private PagedListDto buildFeedsDto(String utoken, List<Feed> feeds, long totalCount, @RequestParam int start, @RequestParam int count) {
+        Set<Long> staredFeedIds = new HashSet<Long>();
+        if (!StringUtils.isBlank(utoken)) {
+            User user = userServiceFacade.getUserByToken(utoken);
+            if (user.exists()) {
+                Set<Long> feedIds = new HashSet<Long>();
+                for (Feed feed : feeds) feedIds.add(feed.getId());
+                staredFeedIds.addAll(feedServiceFacade.queryStaredFeeds(user.getId(), feedIds));
+            }
+        }
+
         Set<Long> userIds = new HashSet<Long>();
         for (Feed feed : feeds) userIds.add(feed.getUserId());
         List<User> users = userServiceFacade.getUsers(userIds);
@@ -64,7 +74,7 @@ public class FeedController extends AbstractController {
                 if (child != null) userChildren.add(child);
             }
 
-            feedsDto.add(new FeedDto(feed, user, userChildren));
+            feedsDto.add(new FeedDto(feed, user, userChildren, staredFeedIds.contains(feed.getId())));
         }
         return feedsDto;
     }
@@ -131,13 +141,16 @@ public class FeedController extends AbstractController {
     }
 
     @RequestMapping(value = "/topic", method = RequestMethod.GET)
-    public ResponseMessage feedTopic(@RequestParam(value = "tid") long topicId, @RequestParam int start, @RequestParam int count) {
+    public ResponseMessage feedTopic(@RequestParam String utoken,
+                                     @RequestParam(value = "tid") long topicId,
+                                     @RequestParam int start,
+                                     @RequestParam int count) {
         if (topicId <= 0 || isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
 
         long totalCount = feedServiceFacade.queryCountByTopic(topicId);
         List<Feed> feeds = feedServiceFacade.queryByTopic(topicId, start, count);
 
-        return ResponseMessage.SUCCESS(buildFeedsDto(feeds, totalCount, start, count));
+        return ResponseMessage.SUCCESS(buildFeedsDto(utoken, feeds, totalCount, start, count));
     }
 
     @RequestMapping(value = "/{id}/comment", method = RequestMethod.POST)

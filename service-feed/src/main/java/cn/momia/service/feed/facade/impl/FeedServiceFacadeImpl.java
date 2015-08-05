@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class FeedServiceFacadeImpl extends DbAccessService implements FeedServiceFacade {
@@ -196,5 +197,11 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
     public boolean isStared(long userId, long feedId) {
         if (userId <= 0 || feedId <= 0) return false;
         return feedStarService.isStared(userId, feedId);
+    }
+
+    @Override
+    public List<Long> queryStaredFeeds(long userId, Collection<Long> feedIds) {
+        if (userId <= 0 || feedIds == null || feedIds.isEmpty()) return new ArrayList<Long>();
+        return feedStarService.queryStaredFeeds(userId, feedIds);
     }
 }

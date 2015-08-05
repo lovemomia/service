@@ -2,6 +2,7 @@ package cn.momia.service.feed.facade;
 
 import cn.momia.service.feed.comment.FeedComment;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface FeedServiceFacade {
@@ -30,4 +31,5 @@ public interface FeedServiceFacade {
     void decreaseStarCount(long feedId);
 
     boolean isStared(long userId, long feedId);
+    List<Long> queryStaredFeeds(long userId, Collection<Long> feedIds);
 }
