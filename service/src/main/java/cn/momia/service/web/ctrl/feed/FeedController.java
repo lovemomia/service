@@ -1,5 +1,6 @@
 package cn.momia.service.web.ctrl.feed;
 
+import cn.momia.service.user.participant.Participant;
 import cn.momia.service.web.response.ResponseMessage;
 import cn.momia.service.feed.facade.Feed;
 import cn.momia.service.feed.comment.FeedComment;
@@ -17,8 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/feed")
@@ -33,12 +36,36 @@ public class FeedController extends AbstractController {
         long totalCount = feedServiceFacade.queryFollowedCountByUser(user.getId());
         List<Feed> feeds = feedServiceFacade.queryFollowedByUser(user.getId(), start, count);
 
+        return ResponseMessage.SUCCESS(buildFeedsDto(feeds, totalCount, start, count));
+    }
+
+    private PagedListDto buildFeedsDto(List<Feed> feeds, long totalCount, @RequestParam int start, @RequestParam int count) {
+        List<Long> userIds = new ArrayList<Long>();
+        for (Feed feed : feeds) userIds.add(feed.getUserId());
+        List<User> users = userServiceFacade.getUsers(userIds);
+        Map<Long, User> usersMap = new HashMap<Long, User>();
+        for (User user : users) usersMap.put(user.getId(), user);
+
+        Set<Long> childIds = new HashSet<Long>();
+        for (User user : users) childIds.addAll(user.getChildren());
+        List<Participant> children = userServiceFacade.getParticipants(childIds);
+        Map<Long, Participant> childrenMap = new HashMap<Long, Participant>();
+        for (Participant child : children) childrenMap.put(child.getId(), child);
+
         PagedListDto feedsDto = new PagedListDto(totalCount, start, count);
         for (Feed feed : feeds) {
-            feedsDto.add(new FeedDto(feed, user, userServiceFacade.getChildren(user.getId(), user.getChildren())));
-        }
+            User user = usersMap.get(feed.getUserId());
+            if (user == null) continue;
 
-        return ResponseMessage.SUCCESS(feedsDto);
+            List<Participant> userChildren = new ArrayList<Participant>();
+            for (long childId : user.getChildren()) {
+                Participant child = childrenMap.get(childId);
+                if (child != null) userChildren.add(child);
+            }
+
+            feedsDto.add(new FeedDto(feed, user, userChildren));
+        }
+        return feedsDto;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -103,14 +130,6 @@ public class FeedController extends AbstractController {
         long totalCount = feedServiceFacade.queryCountByTopic(topicId);
         List<Feed> feeds = feedServiceFacade.queryByTopic(topicId, start, count);
 
-        PagedListDto feedsDto = new PagedListDto(totalCount, start, count);
-        for (Feed feed : feeds) {
-            User user = userServiceFacade.getUser(feed.getUserId());
-            if (!user.exists()) continue;
-
-            feedsDto.add(new FeedDto(feed, user, userServiceFacade.getChildren(user.getId(), user.getChildren())));
-        }
-
-        return ResponseMessage.SUCCESS(feedsDto);
+        return ResponseMessage.SUCCESS(buildFeedsDto(feeds, totalCount, start, count));
     }
 }
