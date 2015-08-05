@@ -1,7 +1,6 @@
 package cn.momia.service.feed.facade;
 
 import cn.momia.service.feed.base.BaseFeed;
-import cn.momia.service.feed.topic.FeedTopic;
 
 import java.util.Date;
 import java.util.List;
@@ -15,17 +14,10 @@ public class Feed {
     };
 
     private BaseFeed baseFeed;
-    private FeedTopic feedTopic;
     private List<FeedImage> imgs;
-    private int commentCount;
-    private int starCount;
 
     public void setBaseFeed(BaseFeed baseFeed) {
         this.baseFeed = baseFeed;
-    }
-
-    public void setFeedTopic(FeedTopic feedTopic) {
-        this.feedTopic = feedTopic;
     }
 
     public void setImgs(List<FeedImage> imgs) {
@@ -45,15 +37,15 @@ public class Feed {
     }
 
     public long getTopicId() {
-        return feedTopic.getId();
+        return baseFeed.getTopicId();
     }
 
     public long getTpoicProductId() {
-        return feedTopic.getProductId();
+        return baseFeed.getProductId();
     }
 
     public String getTopic() {
-        return feedTopic.getTitle();
+        return baseFeed.getTopic();
     }
 
     public List<FeedImage> getImgs() {
@@ -73,19 +65,11 @@ public class Feed {
     }
 
     public int getCommentCount() {
-        return commentCount;
-    }
-
-    public void setCommentCount(int commentCount) {
-        this.commentCount = commentCount;
+        return baseFeed.getCommentCount();
     }
 
     public int getStarCount() {
-        return starCount;
-    }
-
-    public void setStarCount(int starCount) {
-        this.starCount = starCount;
+        return baseFeed.getStarCount();
     }
 
     @Override

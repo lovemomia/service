@@ -18,7 +18,7 @@ import java.util.List;
 public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedService {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseFeedServiceImpl.class);
 
-    private static final String[] BASE_FEED_FIELDS = { "id", "type", "userId", "topicId", "content", "lng", "lat", "addTime" };
+    private static final String[] BASE_FEED_FIELDS = { "id", "type", "userId", "productId", "topicId", "topic", "content", "lng", "lat", "commentCount", "starCount", "addTime" };
 
     @Override
     public BaseFeed get(long id) {
@@ -43,10 +43,14 @@ public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedServ
             baseFeed.setId(rs.getLong("id"));
             baseFeed.setType(rs.getInt("type"));
             baseFeed.setUserId(rs.getLong("userId"));
+            baseFeed.setProductId(rs.getLong("productId"));
             baseFeed.setTopicId(rs.getLong("topicId"));
+            baseFeed.setTopic(rs.getString("topic"));
             baseFeed.setContent(rs.getString("content"));
             baseFeed.setLng(rs.getDouble("lng"));
             baseFeed.setLat(rs.getLong("lat"));
+            baseFeed.setCommentCount(rs.getInt("commentCount"));
+            baseFeed.setStarCount(rs.getInt("starCount"));
             baseFeed.setAddTime(rs.getTimestamp("addTime"));
 
             return baseFeed;

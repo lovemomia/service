@@ -9,7 +9,6 @@ import cn.momia.service.feed.base.BaseFeedService;
 import cn.momia.service.feed.comment.FeedComment;
 import cn.momia.service.feed.comment.FeedCommentService;
 import cn.momia.service.feed.star.FeedStarService;
-import cn.momia.service.feed.topic.FeedTopic;
 import cn.momia.service.feed.topic.FeedTopicService;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
@@ -50,6 +49,36 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
         return buildFeed(baseFeed);
     }
 
+    private Feed buildFeed(BaseFeed baseFeed) {
+        Feed feed = new Feed();
+        feed.setBaseFeed(baseFeed);
+        feed.setImgs(getFeedImgs(baseFeed.getId()));
+
+        return feed;
+    }
+
+    private List<FeedImage> getFeedImgs(long feedId) {
+        final List<FeedImage> imgs = new ArrayList<FeedImage>();
+        String sql = "SELECT url, width, height FROM t_feed_img WHERE feedId=? AND status=1";
+        jdbcTemplate.query(sql, new Object[] { feedId }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                imgs.add(buildImage(rs));
+            }
+        });
+
+        return imgs;
+    }
+
+    private FeedImage buildImage(ResultSet rs) throws SQLException {
+        FeedImage img = new FeedImage();
+        img.setUrl(rs.getString("url"));
+        img.setWidth(rs.getInt("width"));
+        img.setHeight(rs.getInt("height"));
+
+        return img;
+    }
+
     @Override
     public long queryFollowedCountByUser(long userId) {
         if (userId <= 0) return 0;
@@ -66,20 +95,6 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
         }
 
         return feeds;
-    }
-
-    private Feed buildFeed(BaseFeed baseFeed) {
-        FeedTopic feedTopic = feedTopicService.get(baseFeed.getTopicId());
-        if (!feedTopic.exists()) return Feed.NOT_EXIST_FEED;
-
-        Feed feed = new Feed();
-        feed.setBaseFeed(baseFeed);
-        feed.setFeedTopic(feedTopic);
-        feed.setImgs(getFeedImgs(baseFeed.getId()));
-        feed.setCommentCount(feedCommentService.queryCount(baseFeed.getId()));
-        feed.setStarCount(feedStarService.queryUserCount(baseFeed.getId()));
-
-        return feed;
     }
 
     @Override
@@ -106,28 +121,6 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
         if (feedId <= 0 || start < 0 || count <= 0) return new ArrayList<Long>();
 
         return feedStarService.queryUserIds(feedId, start, count);
-    }
-
-    private List<FeedImage> getFeedImgs(long feedId) {
-        final List<FeedImage> imgs = new ArrayList<FeedImage>();
-        String sql = "SELECT url, width, height FROM t_feed_img WHERE feedId=? AND status=1";
-        jdbcTemplate.query(sql, new Object[] { feedId }, new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                imgs.add(buildImage(rs));
-            }
-        });
-
-        return imgs;
-    }
-
-    private FeedImage buildImage(ResultSet rs) throws SQLException {
-        FeedImage img = new FeedImage();
-        img.setUrl(rs.getString("url"));
-        img.setWidth(rs.getInt("width"));
-        img.setHeight(rs.getInt("height"));
-
-        return img;
     }
 
     @Override

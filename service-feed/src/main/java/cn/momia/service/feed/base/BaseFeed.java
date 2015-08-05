@@ -13,10 +13,14 @@ public class BaseFeed {
     private long id;
     private int type;
     private long userId;
+    private long productId;
     private long topicId;
+    private String topic;
     private String content;
     private double lng;
     private double lat;
+    private int commentCount;
+    private int starCount;
     private Date addTime;
 
     public long getId() {
@@ -43,12 +47,28 @@ public class BaseFeed {
         this.userId = userId;
     }
 
+    public long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(long productId) {
+        this.productId = productId;
+    }
+
     public long getTopicId() {
         return topicId;
     }
 
     public void setTopicId(long topicId) {
         this.topicId = topicId;
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
     }
 
     public String getContent() {
@@ -73,6 +93,22 @@ public class BaseFeed {
 
     public void setLat(double lat) {
         this.lat = lat;
+    }
+
+    public int getCommentCount() {
+        return commentCount;
+    }
+
+    public void setCommentCount(int commentCount) {
+        this.commentCount = commentCount;
+    }
+
+    public int getStarCount() {
+        return starCount;
+    }
+
+    public void setStarCount(int starCount) {
+        this.starCount = starCount;
     }
 
     public Date getAddTime() {
