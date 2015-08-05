@@ -143,7 +143,7 @@ public class Leader {
                 MobileUtil.isInvalidMobile(mobile) ||
 //                cityId <= 0 ||
 //                regionId <= 0 ||
-                StringUtils.isBlank(address) ||
+//                StringUtils.isBlank(address) ||
                 StringUtils.isBlank(career) ||
                 StringUtils.isBlank(intro);
     }
