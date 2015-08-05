@@ -255,10 +255,10 @@ public class ProductController extends AbstractController {
     public ResponseMessage getProductPlaymates(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
         if (id <= 0 || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
 
-        List<Sku> skus = extractSkus(id, start, count);
+        List<Sku> skus = querySkus(id, start, count);
         if (skus.isEmpty()) return ResponseMessage.EMPTY_ARRAY;
 
-        List<Order> orders = extractOrders(id, skus);
+        List<Order> orders = queryOrders(id, skus);
         if (orders.isEmpty()) return ResponseMessage.EMPTY_ARRAY;
 
         Map<Long, List<Order>> skuOrdersMap = new HashMap<Long, List<Order>>();
@@ -310,7 +310,7 @@ public class ProductController extends AbstractController {
         return ResponseMessage.SUCCESS(buildPlaymates(skus, skuOrdersMap, skuCustomerIdsMap, customerPrticipantsIdsMap, customersMap, participantsMap));
     }
 
-    private List<Sku> extractSkus(long id, int start, int count) {
+    private List<Sku> querySkus(long id, int start, int count) {
         List<Sku> skus = productServiceFacade.getSkus(id);
         skus = Sku.sortByStartTime(skus);
 
@@ -322,7 +322,7 @@ public class ProductController extends AbstractController {
         return result;
     }
 
-    private List<Order> extractOrders(long id, List<Sku> skus) {
+    private List<Order> queryOrders(long id, List<Sku> skus) {
         Set<Long> skuIds = new HashSet<Long>();
         for (Sku sku : skus) {
             skuIds.add(sku.getId());

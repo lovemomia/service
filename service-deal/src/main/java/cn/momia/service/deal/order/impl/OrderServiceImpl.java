@@ -196,9 +196,9 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public List<Order> queryAllCustomerOrderByProduct(long productId) {
-        String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status=?";
+        String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status<>0";
         final List<Order> orders = new ArrayList<Order>();
-        jdbcTemplate.query(sql, new Object[] { productId, Order.Status.PAYED }, new RowCallbackHandler() {
+        jdbcTemplate.query(sql, new Object[] { productId/*, Order.Status.PAYED*/ }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 Order order = buildOrder(rs);
@@ -211,9 +211,9 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public List<Order> queryDistinctCustomerOrderByProduct(long productId, int start, int count) {
-        String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status=? GROUP BY customerId LIMIT ?,?";
+        String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status<>0 GROUP BY customerId LIMIT ?,?";
         final List<Order> orders = new ArrayList<Order>();
-        jdbcTemplate.query(sql, new Object[] { productId, Order.Status.PAYED, start, count }, new RowCallbackHandler() {
+        jdbcTemplate.query(sql, new Object[] { productId/*, Order.Status.PAYED*/, start, count }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 Order order = buildOrder(rs);
