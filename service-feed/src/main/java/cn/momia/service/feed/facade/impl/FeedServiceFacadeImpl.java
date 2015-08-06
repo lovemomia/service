@@ -82,6 +82,12 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
     }
 
     @Override
+    public boolean deleteFeed(long userId, long feedId) {
+        if (userId <= 0 || feedId <= 0) return false;
+        return baseFeedService.delete(userId, feedId);
+    }
+
+    @Override
     public long queryFollowedCountByUser(long userId) {
         if (userId <= 0) return 0;
         return baseFeedService.queryFollowedCountByUser(userId);

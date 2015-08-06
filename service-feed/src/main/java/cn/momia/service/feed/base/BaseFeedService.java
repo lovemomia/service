@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface BaseFeedService extends Service {
     BaseFeed get(long id);
+    boolean delete(long userId, long id);
 
     long queryFollowedCountByUser(long userId);
     List<BaseFeed> queryFollowedByUser(long userId, int start, int count);

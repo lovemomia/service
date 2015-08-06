@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface FeedServiceFacade {
     Feed get(long feedId);
+    boolean deleteFeed(long userId, long feedId);
     long queryFollowedCountByUser(long userId);
     List<Feed> queryFollowedByUser(long userId, int start, int count);
 

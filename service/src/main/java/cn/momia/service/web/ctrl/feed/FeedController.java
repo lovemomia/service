@@ -201,7 +201,7 @@ public class FeedController extends AbstractController {
         return ResponseMessage.SUCCESS;
     }
 
-    @RequestMapping(value = "/feed/add", method = RequestMethod.POST)
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
     public ResponseMessage addFeed(@RequestParam String utoken, @RequestParam String feed) {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
@@ -209,11 +209,12 @@ public class FeedController extends AbstractController {
         return null;
     }
 
-    @RequestMapping(value = "/feed/delete", method = RequestMethod.POST)
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseMessage deleteFeed(@RequestParam String utoken, @PathVariable long id) {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 
-        return null;
+        if (!feedServiceFacade.deleteFeed(user.getId(), id)) return ResponseMessage.FAILED("删除Feed失败");
+        return ResponseMessage.SUCCESS;
     }
 }

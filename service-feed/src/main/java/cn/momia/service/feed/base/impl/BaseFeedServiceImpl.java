@@ -61,6 +61,13 @@ public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedServ
     }
 
     @Override
+    public boolean delete(long userId, long id) {
+        String sql = "UPDATE t_feed SET status=0 WHERE id=? AND userId=?";
+
+        return jdbcTemplate.update(sql, new Object[] { id, userId }) == 1;
+    }
+
+    @Override
     public long queryFollowedCountByUser(long userId) {
         String sql = "SELECT COUNT(1) FROM t_feed_follow WHERE userId=? AND status=1";
 
