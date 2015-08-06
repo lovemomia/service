@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 public interface FeedServiceFacade {
-    boolean addFeed(Feed feed);
+    long addFeed(Feed feed);
     void pushFeed(long feedId, Collection<Long> followedIds);
     Feed getFeed(long feedId);
     boolean deleteFeed(long userId, long feedId);

@@ -46,18 +46,19 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
     }
 
     @Override
-    public boolean addFeed(Feed feed) {
-        if (feed.isInvalid()) return false;
-        if (!baseFeedService.add(feed.getBaseFeed())) return false;
+    public long addFeed(Feed feed) {
+        if (feed.isInvalid()) return 0;
+        long feedId = baseFeedService.add(feed.getBaseFeed());
+        if (feedId <= 0) return 0;
 
-        addFeedImgs(feed.getId(), feed.getImgs());
+        addFeedImgs(feedId, feed.getImgs());
 
-        return true;
+        return feedId;
     }
 
     private void addFeedImgs(long feedId, List<FeedImage> imgs) {
         try {
-            String sql = "INSERT INTO t_feed_img(feedId, url, width, height) VALUES (?, ?, ?, ?, NOW())";
+            String sql = "INSERT INTO t_feed_img(feedId, url, width, height, addTime) VALUES (?, ?, ?, ?, NOW())";
             List<Object[]> args = new ArrayList<Object[]>();
             for (FeedImage img : imgs) {
                 args.add(new Object[] { feedId, img.getUrl(), img.getWidth(), img.getHeight() });

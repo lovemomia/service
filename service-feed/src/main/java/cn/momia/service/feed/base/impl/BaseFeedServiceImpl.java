@@ -7,11 +7,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,17 +27,27 @@ public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedServ
     private static final String[] BASE_FEED_FIELDS = { "id", "`type`", "userId", "productId", "topicId", "topic", "content", "lng", "lat", "commentCount", "starCount", "addTime" };
 
     @Override
-    public boolean add(BaseFeed baseFeed) {
-        String sql = "INSERT INTO t_feed(`type`, userId, productId, topicId, topic, content, lng, lat, addTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+    public long add(final BaseFeed baseFeed) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                String sql = "INSERT INTO t_feed(`type`, userId, productId, topicId, topic, content, lng, lat, addTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+                PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ps.setInt(1, baseFeed.getType());
+                ps.setLong(2, baseFeed.getUserId());
+                ps.setLong(3, baseFeed.getProductId());
+                ps.setLong(4, baseFeed.getTopicId());
+                ps.setString(5, baseFeed.getTopic());
+                ps.setString(6, baseFeed.getContent());
+                ps.setDouble(7, baseFeed.getLng());
+                ps.setDouble(8, baseFeed.getLat());
 
-        return jdbcTemplate.update(sql, new Object[] { baseFeed.getType(),
-                baseFeed.getUserId(),
-                baseFeed.getProductId(),
-                baseFeed.getTopicId(),
-                baseFeed.getTopic(),
-                baseFeed.getContent(),
-                baseFeed.getLng(),
-                baseFeed.getLat() }) == 1;
+                return ps;
+            }
+        }, keyHolder);
+
+        return keyHolder.getKey().longValue();
     }
 
     @Override

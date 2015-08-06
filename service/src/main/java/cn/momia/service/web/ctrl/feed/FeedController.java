@@ -86,11 +86,12 @@ public class FeedController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage addFeed(@RequestBody Feed feed) {
-        if (!feedServiceFacade.addFeed(feed)) return ResponseMessage.FAILED("发表Feed失败");
+        long feedId = feedServiceFacade.addFeed(feed);
+        if (feedId <= 0) return ResponseMessage.FAILED("发表Feed失败");
         try {
             // TODO 异步推送
             List<Long> followedIds = userServiceFacade.getFollowedIds(feed.getUserId());
-            feedServiceFacade.pushFeed(feed.getId(), followedIds);
+            feedServiceFacade.pushFeed(feedId, followedIds);
         } catch (Exception e) {
             LOGGER.error("fail to push feed: {}", feed.getId());
         }
