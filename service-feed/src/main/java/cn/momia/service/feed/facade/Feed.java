@@ -16,8 +16,16 @@ public class Feed {
     private BaseFeed baseFeed;
     private List<FeedImage> imgs;
 
+    public BaseFeed getBaseFeed() {
+        return baseFeed;
+    }
+
     public void setBaseFeed(BaseFeed baseFeed) {
         this.baseFeed = baseFeed;
+    }
+
+    public List<FeedImage> getImgs() {
+        return imgs;
     }
 
     public void setImgs(List<FeedImage> imgs) {
@@ -46,10 +54,6 @@ public class Feed {
 
     public String getTopic() {
         return baseFeed.getTopic();
-    }
-
-    public List<FeedImage> getImgs() {
-        return imgs;
     }
 
     public String getContent() {
@@ -89,5 +93,9 @@ public class Feed {
 
     public boolean exists() {
         return !this.equals(NOT_EXIST_FEED);
+    }
+
+    public boolean isInvalid() {
+        return baseFeed == null || baseFeed.isInvalid();
     }
 }

@@ -18,7 +18,21 @@ import java.util.List;
 public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedService {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseFeedServiceImpl.class);
 
-    private static final String[] BASE_FEED_FIELDS = { "id", "type", "userId", "productId", "topicId", "topic", "content", "lng", "lat", "commentCount", "starCount", "addTime" };
+    private static final String[] BASE_FEED_FIELDS = { "id", "`type`", "userId", "productId", "topicId", "topic", "content", "lng", "lat", "commentCount", "starCount", "addTime" };
+
+    @Override
+    public boolean add(BaseFeed baseFeed) {
+        String sql = "INSERT INTO t_feed(`type`, userId, productId, topicId, topic, content, lng, lat, addTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+
+        return jdbcTemplate.update(sql, new Object[] { baseFeed.getType(),
+                baseFeed.getUserId(),
+                baseFeed.getProductId(),
+                baseFeed.getTopicId(),
+                baseFeed.getTopic(),
+                baseFeed.getContent(),
+                baseFeed.getLng(),
+                baseFeed.getLat() }) == 1;
+    }
 
     @Override
     public BaseFeed get(long id) {

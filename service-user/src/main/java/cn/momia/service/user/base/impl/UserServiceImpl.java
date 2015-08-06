@@ -265,4 +265,18 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
         return update(sql, new Object[] { encryptPassword(mobile, password, Configuration.getPasswordSecretKey()), id });
     }
+
+    @Override
+    public List<Long> getFollowedIds(long id) {
+        final List<Long> followedIds = new ArrayList<Long>();
+        String sql = "SELECT followedId FROM t_user_follow WHERE userId=? AND status=1";
+        jdbcTemplate.query(sql, new Object[] { id }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                followedIds.add(rs.getLong("followedId"));
+            }
+        });
+
+        return followedIds;
+    }
 }

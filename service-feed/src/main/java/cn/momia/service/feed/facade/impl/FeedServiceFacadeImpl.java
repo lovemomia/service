@@ -11,6 +11,8 @@ import cn.momia.service.feed.comment.FeedCommentService;
 import cn.momia.service.feed.star.FeedStarService;
 import cn.momia.service.feed.topic.FeedTopicService;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;
@@ -20,6 +22,8 @@ import java.util.Collection;
 import java.util.List;
 
 public class FeedServiceFacadeImpl extends DbAccessService implements FeedServiceFacade {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FeedServiceFacadeImpl.class);
+
     private BaseFeedService baseFeedService;
     private FeedTopicService feedTopicService;
     private FeedCommentService feedCommentService;
@@ -42,7 +46,41 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
     }
 
     @Override
-    public Feed get(long feedId) {
+    public boolean addFeed(Feed feed) {
+        if (feed.isInvalid()) return false;
+        if (!baseFeedService.add(feed.getBaseFeed())) return false;
+
+        addFeedImgs(feed.getId(), feed.getImgs());
+
+        return true;
+    }
+
+    private void addFeedImgs(long feedId, List<FeedImage> imgs) {
+        try {
+            String sql = "INSERT INTO t_feed_img(feedId, url, width, height) VALUES (?, ?, ?, ?, NOW())";
+            List<Object[]> args = new ArrayList<Object[]>();
+            for (FeedImage img : imgs) {
+                args.add(new Object[] { feedId, img.getUrl(), img.getWidth(), img.getHeight() });
+            }
+            jdbcTemplate.batchUpdate(sql, args);
+        } catch (Exception e) {
+            LOGGER.error("fail to add image for feed: {}", feedId, e);
+        }
+    }
+
+    @Override
+    public void pushFeed(long feedId, Collection<Long> followedIds) {
+        if (feedId <= 0 || followedIds == null || followedIds.isEmpty()) return;
+        String sql = "INSERT INTO t_feed_follow(userId, feedId, addTime) VALUES (?, ?, NOW())";
+        List<Object[]> args = new ArrayList<Object[]>();
+        for (long followedId : followedIds) {
+            args.add(new Object[] { followedId, feedId });
+        }
+        jdbcTemplate.batchUpdate(sql, args);
+    }
+
+    @Override
+    public Feed getFeed(long feedId) {
         if (feedId <= 0) return Feed.NOT_EXIST_FEED;
 
         BaseFeed baseFeed = baseFeedService.get(feedId);

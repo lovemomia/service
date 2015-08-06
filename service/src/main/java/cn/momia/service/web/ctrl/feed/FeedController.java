@@ -11,7 +11,10 @@ import cn.momia.service.web.ctrl.feed.dto.FeedCommentDto;
 import cn.momia.service.web.ctrl.feed.dto.FeedDto;
 import cn.momia.service.web.ctrl.user.dto.MiniUserDto;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,6 +30,8 @@ import java.util.Set;
 @RestController
 @RequestMapping("/feed")
 public class FeedController extends AbstractController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FeedController.class);
+
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage getFeeds(@RequestParam String utoken, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
@@ -79,9 +84,23 @@ public class FeedController extends AbstractController {
         return feedsDto;
     }
 
+    @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
+    public ResponseMessage addFeed(@RequestBody Feed feed) {
+        if (!feedServiceFacade.addFeed(feed)) return ResponseMessage.FAILED("发表Feed失败");
+        try {
+            // TODO 异步推送
+            List<Long> followedIds = userServiceFacade.getFollowedIds(feed.getUserId());
+            feedServiceFacade.pushFeed(feed.getId(), followedIds);
+        } catch (Exception e) {
+            LOGGER.error("fail to push feed: {}", feed.getId());
+        }
+
+        return ResponseMessage.SUCCESS;
+    }
+
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseMessage getFeed(@RequestParam String utoken, @PathVariable long id) {
-        Feed feed = feedServiceFacade.get(id);
+        Feed feed = feedServiceFacade.getFeed(id);
         if (!feed.exists()) return ResponseMessage.FAILED("无效的Feed");
 
         User feedUser = userServiceFacade.getUser(feed.getUserId());
@@ -94,6 +113,15 @@ public class FeedController extends AbstractController {
         }
 
         return ResponseMessage.SUCCESS(new FeedDto(feed, feedUser, userServiceFacade.getChildren(feedUser.getId(), feedUser.getChildren()), stared));
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    public ResponseMessage deleteFeed(@RequestParam String utoken, @PathVariable long id) {
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        if (!feedServiceFacade.deleteFeed(user.getId(), id)) return ResponseMessage.FAILED("删除Feed失败");
+        return ResponseMessage.SUCCESS;
     }
 
     @RequestMapping(value = "/{id}/star", method = RequestMethod.GET)
@@ -198,23 +226,6 @@ public class FeedController extends AbstractController {
 
         feedServiceFacade.decreaseStarCount(id);
 
-        return ResponseMessage.SUCCESS;
-    }
-
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public ResponseMessage addFeed(@RequestParam String utoken, @RequestParam String feed) {
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
-
-        return null;
-    }
-
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseMessage deleteFeed(@RequestParam String utoken, @PathVariable long id) {
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
-
-        if (!feedServiceFacade.deleteFeed(user.getId(), id)) return ResponseMessage.FAILED("删除Feed失败");
         return ResponseMessage.SUCCESS;
     }
 }

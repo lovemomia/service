@@ -53,4 +53,6 @@ public interface UserServiceFacade {
     boolean addLeaderInfo(Leader leader);
     boolean updateLeaderInfo(Leader leader);
     boolean deleteLeaderInfo(long userId);
+
+    List<Long> getFollowedIds(long userId);
 }

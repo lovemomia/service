@@ -5,6 +5,7 @@ import cn.momia.common.service.Service;
 import java.util.List;
 
 public interface BaseFeedService extends Service {
+    boolean add(BaseFeed baseFeed);
     BaseFeed get(long id);
     boolean delete(long userId, long id);
 

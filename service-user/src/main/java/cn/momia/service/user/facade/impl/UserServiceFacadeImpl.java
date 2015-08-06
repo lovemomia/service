@@ -280,4 +280,10 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
         if (userId <= 0) return false;
         return leaderService.deleteByUser(userId);
     }
+
+    @Override
+    public List<Long> getFollowedIds(long userId) {
+        if (userId <= 0) return new ArrayList<Long>();
+        return userService.getFollowedIds(userId);
+    }
 }

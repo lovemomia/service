@@ -15,8 +15,8 @@ public class BaseFeed {
     private long userId;
     private long productId;
     private long topicId;
-    private String topic;
-    private String content;
+    private String topic = "";
+    private String content = "";
     private double lng;
     private double lat;
     private int commentCount;
@@ -136,5 +136,9 @@ public class BaseFeed {
 
     public boolean exists() {
         return !this.equals(NOT_EXIST_BASE_FEED);
+    }
+
+    public boolean isInvalid() {
+        return type < 0 || userId <= 0;
     }
 }

@@ -28,4 +28,6 @@ public interface UserService extends Service {
     boolean updateAddress(long id, String address);
     boolean updateChildren(long id, Set<Long> children);
     boolean updatePassword(long id, String mobile, String password);
+
+    List<Long> getFollowedIds(long id);
 }
