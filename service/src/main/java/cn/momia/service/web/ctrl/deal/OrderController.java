@@ -147,8 +147,8 @@ public class OrderController extends AbstractController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseMessage getOrderOfUser(@RequestParam String utoken,
-                                           @PathVariable(value = "id") long id,
-                                           @RequestParam(value = "pid") long productId) {
+                                          @PathVariable(value = "id") long id,
+                                          @RequestParam(value = "pid") long productId) {
         User user = userServiceFacade.getUserByToken(utoken);
         if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
 

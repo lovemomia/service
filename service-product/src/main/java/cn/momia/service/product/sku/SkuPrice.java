@@ -11,6 +11,7 @@ public class SkuPrice implements Serializable {
     private int adult;
     private int child;
     private BigDecimal price;
+    private BigDecimal origin;
     private String unit;
     private String desc;
 
@@ -26,6 +27,10 @@ public class SkuPrice implements Serializable {
         return price;
     }
 
+    public BigDecimal getOrigin() {
+        return origin;
+    }
+
     public String getUnit() {
         return unit;
     }
@@ -38,6 +43,7 @@ public class SkuPrice implements Serializable {
         this.adult = priceJson.containsKey("adult") ? priceJson.getInteger("adult") : 0;
         this.child = priceJson.containsKey("child") ? priceJson.getInteger("child") : 0;
         this.price = priceJson.getBigDecimal("price");
+        this.origin = priceJson.containsKey("origin") ? priceJson.getBigDecimal("origin") : new BigDecimal(0);
         this.unit = UNIT[priceJson.getInteger("unit")];
         this.desc = priceJson.containsKey("desc") ? priceJson.getString("desc") : null;
     }

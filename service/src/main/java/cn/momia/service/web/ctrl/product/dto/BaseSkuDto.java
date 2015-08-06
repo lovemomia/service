@@ -40,6 +40,10 @@ public class BaseSkuDto implements Dto {
         return sku.getMinPrice();
     }
 
+    public BigDecimal getMinOriginalPrice() {
+        return sku.getMinOriginalPrice();
+    }
+
     public String getTime() {
         return sku.getFormatedTime();
     }

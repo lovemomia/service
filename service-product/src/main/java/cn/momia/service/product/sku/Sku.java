@@ -322,6 +322,22 @@ public class Sku implements Serializable {
         return minPrice;
     }
 
+    public BigDecimal getMinOriginalPrice() {
+        if (prices == null || prices.isEmpty()) return new BigDecimal(0);
+
+        SkuPrice minSkuPrice = null;
+        BigDecimal minPrice = new BigDecimal(Float.MAX_VALUE);
+        for (SkuPrice skuPrice : prices) {
+            BigDecimal price = skuPrice.getPrice();
+            if (price.compareTo(minPrice) <= 0) {
+                minSkuPrice = skuPrice;
+                minPrice = price;
+            }
+        }
+
+        return minSkuPrice == null ? new BigDecimal(0) : minSkuPrice.getOrigin();
+    }
+
     public List<Date> getStartEndTimes() {
         for (SkuProperty property : properties) {
             if ("time".equalsIgnoreCase(property.getName())) {
