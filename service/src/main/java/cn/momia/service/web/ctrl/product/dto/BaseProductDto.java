@@ -66,6 +66,10 @@ public class BaseProductDto extends MiniProductDto implements Dto {
         return product.getMinPrice();
     }
 
+    public BigDecimal getOriginalPrice() {
+        return product.getMinOriginalPrice();
+    }
+
     public boolean isSoldOut() {
         return product.isSoldOut();
     }

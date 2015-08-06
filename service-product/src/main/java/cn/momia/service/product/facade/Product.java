@@ -218,6 +218,22 @@ public class Product implements Serializable {
         return miniPrice;
     }
 
+    public BigDecimal getMinOriginalPrice() {
+        if(skus == null || skus.isEmpty()) return new BigDecimal(0);
+
+        Sku minPriceSku = null;
+        BigDecimal miniPrice = new BigDecimal(Float.MAX_VALUE);
+        for (Sku sku : skus) {
+            BigDecimal price = sku.getMinPrice();
+            if (price.compareTo(miniPrice) <= 0) {
+                minPriceSku = sku;
+                miniPrice = price;
+            }
+        }
+
+        return minPriceSku == null ? new BigDecimal(0) : minPriceSku.getMinOriginalPrice();
+    }
+
     public boolean isInvalid() {
         return !(baseProduct != null && baseProduct.exists() &&
                 imgs != null && !imgs.isEmpty() &&
