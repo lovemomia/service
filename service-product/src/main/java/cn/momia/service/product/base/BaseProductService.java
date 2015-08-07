@@ -8,6 +8,7 @@ import java.util.List;
 public interface BaseProductService extends Service {
     BaseProduct get(long id);
     List<BaseProduct> get(Collection<Long> ids);
+    String getDetail(long id);
 
     long queryCount(int cityId);
     List<BaseProduct> query(int cityId, int start, int count);

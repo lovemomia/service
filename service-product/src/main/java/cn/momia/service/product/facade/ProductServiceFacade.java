@@ -9,6 +9,7 @@ public interface ProductServiceFacade {
     Product get(long productId);
     Product get(long productId, boolean mini);
     List<Product> get(Collection<Long> productIds);
+    String getDetail(long productId);
 
     long queryCount(int cityId);
     List<Product> query(int cityId, int start, int count);

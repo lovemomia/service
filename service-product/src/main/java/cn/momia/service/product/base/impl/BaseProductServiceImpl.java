@@ -114,6 +114,19 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     }
 
     @Override
+    public String getDetail(long id) {
+        String sql = "SELECT detail FROM t_product WHERE id=? AND status<>0";
+
+        return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<String>() {
+            @Override
+            public String extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (rs.next()) return rs.getString("detail");
+                return "";
+            }
+        });
+    }
+
+    @Override
     public long queryCount(int cityId) {
         String sql = "SELECT COUNT(1) FROM t_product WHERE status=1 " +
                 "AND onlineTime<=NOW() AND offlineTime>NOW() " +

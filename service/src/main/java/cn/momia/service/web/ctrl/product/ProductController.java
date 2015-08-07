@@ -21,6 +21,7 @@ import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.web.ctrl.AbstractController;
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -183,6 +184,13 @@ public class ProductController extends AbstractController {
         }
 
         return ResponseMessage.SUCCESS(productDto);
+    }
+
+    @RequestMapping(value = "/{id}/detail", method = RequestMethod.GET)
+    public ResponseMessage getProductDetail(@PathVariable long id) {
+        String productDetail = productServiceFacade.getDetail(id);
+        if (StringUtils.isBlank(productDetail)) return ResponseMessage.FAILED("活动详情不存在");
+        return ResponseMessage.SUCCESS(JSON.parseArray(productDetail));
     }
 
     @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)

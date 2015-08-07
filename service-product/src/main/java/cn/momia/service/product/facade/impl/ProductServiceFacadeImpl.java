@@ -167,6 +167,12 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     }
 
     @Override
+    public String getDetail(long productId) {
+        if (productId <= 0) return "";
+        return baseProductService.getDetail(productId);
+    }
+
+    @Override
     public long queryCount(int cityId) {
         if (cityId < 0) return 0;
         return baseProductService.queryCount(cityId);
