@@ -78,6 +78,10 @@ public class BaseProductDto extends MiniProductDto implements Dto {
         return product.isOpened();
     }
 
+    public String getCrowd() {
+        return product.getCrowd();
+    }
+
     public ListDto getSkus() {
         return withSku ? buildSkusDto(product.getSkus()) : null;
     }
