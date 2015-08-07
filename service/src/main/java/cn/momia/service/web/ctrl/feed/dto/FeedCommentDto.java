@@ -10,6 +10,10 @@ public class FeedCommentDto {
     private FeedComment comment;
     private User user;
 
+    public long getId() {
+        return comment.getId();
+    }
+
     public String getContent() {
         return comment.getContent();
     }
