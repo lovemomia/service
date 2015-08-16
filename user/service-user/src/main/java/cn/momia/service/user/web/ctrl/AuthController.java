@@ -1,6 +1,6 @@
 package cn.momia.service.user.web.ctrl;
 
-import cn.momia.service.common.api.CommonServiceApi;
+import cn.momia.api.common.CommonServiceApi;
 import cn.momia.service.base.web.response.ResponseMessage;
 import cn.momia.service.user.base.User;
 import org.springframework.beans.factory.annotation.Autowired;

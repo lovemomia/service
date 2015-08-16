@@ -1,17 +1,20 @@
 package cn.momia.service.deal.web.ctrl;
 
 import cn.momia.api.base.exception.MomiaFailedException;
+import cn.momia.service.base.web.ctrl.AbstractController;
+import cn.momia.service.deal.facade.DealServiceFacade;
 import cn.momia.service.deal.facade.OrderInfoFields;
 import cn.momia.service.deal.gateway.PrepayResult;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
 import cn.momia.service.deal.web.util.RequestUtil;
-import cn.momia.service.product.api.ProductServiceApi;
-import cn.momia.service.product.api.product.Product;
-import cn.momia.service.product.api.sku.Sku;
+import cn.momia.api.product.ProductServiceApi;
+import cn.momia.api.product.Product;
+import cn.momia.api.product.sku.Sku;
 import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.UserCoupon;
 import cn.momia.service.base.web.response.ResponseMessage;
+import cn.momia.service.promo.facade.PromoServiceFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,12 +24,27 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/payment")
 public class PaymentController extends AbstractController {
+    @Autowired private DealServiceFacade dealServiceFacade;
+    @Autowired private PromoServiceFacade promoServiceFacade;
+
     @Autowired private ProductServiceApi productServiceApi;
+
+    private static Map<String, String> extractParams(Map<String, String[]> httpParams) {
+        Map<String, String> params = new HashMap<String, String>();
+        for (Map.Entry<String, String[]> entry : httpParams.entrySet()) {
+            String[] values = entry.getValue();
+            if (values.length <= 0) continue;
+            params.put(entry.getKey(), entry.getValue()[0]);
+        }
+
+        return params;
+    }
 
     @RequestMapping(value = "/prepay/alipay", method = RequestMethod.POST)
     public ResponseMessage prepayAlipay(HttpServletRequest request) {

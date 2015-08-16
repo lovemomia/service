@@ -1,6 +1,7 @@
 package cn.momia.api.base;
 
-import cn.momia.api.base.exception.MomiaException;
+import cn.momia.api.base.exception.MomiaExpiredException;
+import cn.momia.api.base.exception.MomiaFailedException;
 import cn.momia.api.base.http.MomiaHttpRequest;
 import cn.momia.api.base.http.MomiaHttpResponse;
 import com.alibaba.fastjson.JSON;
@@ -34,7 +35,8 @@ public abstract class ServiceApi {
             if (!checkResponseStatus(response)) throw new RuntimeException("fail to execute request: " + request);;
 
             MomiaHttpResponse momiaHttpResponse = buildResponse(response);
-            if (!momiaHttpResponse.isSuccessful()) throw new MomiaException(momiaHttpResponse.getErrmsg());
+            if (momiaHttpResponse.isTokenExpired()) throw new MomiaExpiredException();
+            if (!momiaHttpResponse.isSuccessful()) throw new MomiaFailedException(momiaHttpResponse.getErrmsg());
 
             return momiaHttpResponse.getData();
         } catch (IOException e) {

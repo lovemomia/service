@@ -2,7 +2,7 @@ package cn.momia.service.feed.web.ctrl.dto;
 
 import cn.momia.service.feed.facade.Feed;
 import cn.momia.service.feed.facade.FeedImage;
-import cn.momia.service.user.api.user.User;
+import cn.momia.api.user.User;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.ArrayList;

@@ -1,7 +1,7 @@
 package cn.momia.service.product.web.ctrl.dto;
 
 import cn.momia.service.product.sku.Sku;
-import cn.momia.service.user.api.leader.Leader;
+import cn.momia.api.user.leader.Leader;
 import cn.momia.service.base.web.ctrl.dto.Dto;
 import org.apache.commons.lang3.StringUtils;
 

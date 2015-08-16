@@ -28,8 +28,6 @@ public abstract class AbstractController {
             return ResponseMessage.FAILED(exception.getMessage());
         } else if (exception instanceof MomiaExpiredException) {
             return ResponseMessage.TOKEN_EXPIRED;
-        } else if (exception instanceof MomiaException) {
-            return ResponseMessage.FAILED(exception.getMessage());
         } else {
             throw exception;
         }

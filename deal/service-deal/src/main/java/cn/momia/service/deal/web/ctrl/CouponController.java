@@ -1,11 +1,15 @@
 package cn.momia.service.deal.web.ctrl;
 
+import cn.momia.service.base.web.ctrl.AbstractController;
+import cn.momia.service.deal.facade.DealServiceFacade;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.web.ctrl.dto.UserCouponDto;
 import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.UserCoupon;
 import cn.momia.service.base.web.ctrl.dto.PagedListDto;
 import cn.momia.service.base.web.response.ResponseMessage;
+import cn.momia.service.promo.facade.PromoServiceFacade;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +24,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("/coupon")
 public class CouponController extends AbstractController {
+    @Autowired private DealServiceFacade dealServiceFacade;
+    @Autowired private PromoServiceFacade promoServiceFacade;
+
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage coupon(@RequestParam(value = "uid") long userId,
                                   @RequestParam(value = "oid") long orderId,

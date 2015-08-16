@@ -1,11 +1,14 @@
 package cn.momia.service.deal.web.ctrl;
 
+import cn.momia.service.base.web.ctrl.AbstractController;
+import cn.momia.service.deal.facade.DealServiceFacade;
 import cn.momia.service.deal.gateway.CallbackResult;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
-import cn.momia.service.product.api.ProductServiceApi;
+import cn.momia.api.product.ProductServiceApi;
 import cn.momia.service.promo.coupon.UserCoupon;
 import cn.momia.service.base.web.response.ResponseMessage;
+import cn.momia.service.promo.facade.PromoServiceFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +17,28 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/callback")
 public class CallbackController extends AbstractController {
     private static final Logger LOGGER = LoggerFactory.getLogger(CallbackController.class);
 
+    @Autowired private DealServiceFacade dealServiceFacade;
+    @Autowired private PromoServiceFacade promoServiceFacade;
     @Autowired private ProductServiceApi productServiceApi;
+
+    private static Map<String, String> extractParams(Map<String, String[]> httpParams) {
+        Map<String, String> params = new HashMap<String, String>();
+        for (Map.Entry<String, String[]> entry : httpParams.entrySet()) {
+            String[] values = entry.getValue();
+            if (values.length <= 0) continue;
+            params.put(entry.getKey(), entry.getValue()[0]);
+        }
+
+        return params;
+    }
 
     @RequestMapping(value = "/alipay", method = RequestMethod.POST)
     public ResponseMessage alipayCallback(HttpServletRequest request) {

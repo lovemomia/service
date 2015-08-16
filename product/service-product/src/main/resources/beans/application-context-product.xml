@@ -63,7 +63,7 @@
         <property name="favoriteService" ref="favoriteService" />
     </bean>
 
-    <bean id="userServiceApi" class="cn.momia.service.user.api.UserServiceApi" init-method="init">
+    <bean id="userServiceApi" class="cn.momia.api.user.UserServiceApi" init-method="init">
         <property name="service" value="${Service.User}" />
     </bean>
 </beans>

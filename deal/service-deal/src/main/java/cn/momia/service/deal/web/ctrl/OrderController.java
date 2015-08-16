@@ -4,22 +4,25 @@ import cn.momia.service.base.config.Configuration;
 import cn.momia.service.base.util.MobileUtil;
 import cn.momia.api.base.exception.MomiaFailedException;
 import cn.momia.service.base.util.TimeUtil;
+import cn.momia.service.base.web.ctrl.AbstractController;
 import cn.momia.service.deal.exception.OrderLimitException;
+import cn.momia.service.deal.facade.DealServiceFacade;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderPrice;
 import cn.momia.service.deal.web.ctrl.dto.OrderDetailDto;
 import cn.momia.service.deal.web.ctrl.dto.OrderDto;
 import cn.momia.service.deal.web.ctrl.dto.PlaymateDto;
 import cn.momia.service.deal.web.ctrl.dto.SkuPlaymatesDto;
-import cn.momia.service.product.api.ProductServiceApi;
-import cn.momia.service.product.api.product.Product;
-import cn.momia.service.product.api.sku.Sku;
-import cn.momia.service.user.api.UserServiceApi;
-import cn.momia.service.user.api.participant.Participant;
-import cn.momia.service.user.api.user.User;
+import cn.momia.api.product.ProductServiceApi;
+import cn.momia.api.product.Product;
+import cn.momia.api.product.sku.Sku;
+import cn.momia.api.user.UserServiceApi;
+import cn.momia.api.user.participant.Participant;
+import cn.momia.api.user.User;
 import cn.momia.service.base.web.ctrl.dto.ListDto;
 import cn.momia.service.base.web.ctrl.dto.PagedListDto;
 import cn.momia.service.base.web.response.ResponseMessage;
+import cn.momia.service.promo.facade.PromoServiceFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +44,9 @@ import java.util.Set;
 @RequestMapping("/order")
 public class OrderController extends AbstractController {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
+
+    @Autowired private DealServiceFacade dealServiceFacade;
+    @Autowired private PromoServiceFacade promoServiceFacade;
 
     @Autowired private ProductServiceApi productServiceApi;
     @Autowired private UserServiceApi userServiceApi;

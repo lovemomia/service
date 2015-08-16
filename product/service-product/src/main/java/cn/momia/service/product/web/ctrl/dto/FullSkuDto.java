@@ -2,7 +2,7 @@ package cn.momia.service.product.web.ctrl.dto;
 
 import cn.momia.service.product.sku.Sku;
 import cn.momia.service.product.sku.SkuPrice;
-import cn.momia.service.user.api.leader.Leader;
+import cn.momia.api.user.leader.Leader;
 
 import java.util.List;
 
