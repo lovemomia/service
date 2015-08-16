@@ -58,7 +58,7 @@ public class FeedServiceApi extends ServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
                 .add("count", count);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("feed", feedId, "comment"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("feed", feedId, "comment/list"), builder.build());
 
         return JSON.toJavaObject((JSON) executeRequest(request), PagedFeedComments.class);
     }
@@ -72,10 +72,8 @@ public class FeedServiceApi extends ServiceApi {
     }
 
     public void deleteComment(long userId, long feedId, long commentId) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("uid", userId)
-                .add("cmid", commentId);
-        MomiaHttpRequest request = MomiaHttpRequest.DELETE(url("feed", feedId, "comment"), builder.build());
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+        MomiaHttpRequest request = MomiaHttpRequest.DELETE(url("feed", feedId, "comment", commentId), builder.build());
         executeRequest(request);
     }
 
@@ -87,7 +85,7 @@ public class FeedServiceApi extends ServiceApi {
 
     public void unstar(long userId, long feedId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
-        MomiaHttpRequest request = MomiaHttpRequest.DELETE(url("feed", feedId, "unstar"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("feed", feedId, "unstar"), builder.build());
         executeRequest(request);
     }
 
@@ -95,7 +93,7 @@ public class FeedServiceApi extends ServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
                 .add("count", count);
-        MomiaHttpRequest request = MomiaHttpRequest.GET("star", true, url("feed", feedId, "star"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("feed", feedId, "star/list"), builder.build());
 
         return JSON.toJavaObject((JSON) executeRequest(request), PagedFeedStars.class);
     }

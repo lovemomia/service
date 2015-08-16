@@ -89,6 +89,7 @@ public class FeedController extends AbstractController {
         try {
             // TODO 异步推送
             List<Long> followedIds = feedServiceFacade.getFollowedIds(feed.getUserId());
+            followedIds.add(feed.getUserId());
             feedServiceFacade.pushFeed(feedId, followedIds);
         } catch (Exception e) {
             LOGGER.error("fail to push feed: {}", feed.getId());

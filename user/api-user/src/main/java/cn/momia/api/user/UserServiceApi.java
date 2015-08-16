@@ -173,9 +173,8 @@ public class UserServiceApi extends ServiceApi {
         public User updateChildName(String utoken, long childId, String name) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("utoken", utoken)
-                    .add("cid", childId)
                     .add("name", name);
-            MomiaHttpRequest request = MomiaHttpRequest.PUT(url("user/child/name"), builder.build());
+            MomiaHttpRequest request = MomiaHttpRequest.PUT(url("user/child", childId, "name"), builder.build());
 
             return JSON.toJavaObject((JSON) executeRequest(request), User.class);
         }
@@ -183,9 +182,8 @@ public class UserServiceApi extends ServiceApi {
         public User updateChildSex(String utoken, long childId, String sex) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("utoken", utoken)
-                    .add("cid", childId)
                     .add("sex", sex);
-            MomiaHttpRequest request = MomiaHttpRequest.PUT(url("user/child/sex"), builder.build());
+            MomiaHttpRequest request = MomiaHttpRequest.PUT(url("user/child", childId, "sex"), builder.build());
 
             return JSON.toJavaObject((JSON) executeRequest(request), User.class);
         }
@@ -193,9 +191,8 @@ public class UserServiceApi extends ServiceApi {
         public User updateChildBirthday(String utoken, long childId, Date birthday) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("utoken", utoken)
-                    .add("cid", childId)
                     .add("birthday", DATE_FORMAT.format(birthday));
-            MomiaHttpRequest request = MomiaHttpRequest.PUT(url("user/child/birthday"), builder.build());
+            MomiaHttpRequest request = MomiaHttpRequest.PUT(url("user/child", childId, "birthday"), builder.build());
 
             return JSON.toJavaObject((JSON) executeRequest(request), User.class);
         }

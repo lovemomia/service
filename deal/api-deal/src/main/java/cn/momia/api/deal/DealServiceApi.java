@@ -171,7 +171,7 @@ public class DealServiceApi extends ServiceApi {
                     .add("coupon", coupon);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("coupon"), builder.build());
 
-            return new BigDecimal((String) executeRequest(request));
+            return new BigDecimal(String.valueOf(executeRequest(request)));
         }
     }
 }

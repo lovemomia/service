@@ -7,7 +7,7 @@ import java.util.Date;
 public class FeedComment {
     private long id;
     private String content;
-    @JSONField(format = "yyyy-MM-dd HH:mm") private Date addTime;
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss") private Date addTime;
     private String avatar;
     private String nickName;
 

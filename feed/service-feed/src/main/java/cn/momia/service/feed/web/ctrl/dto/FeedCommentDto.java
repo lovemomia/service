@@ -18,7 +18,7 @@ public class FeedCommentDto {
         return comment.getContent();
     }
 
-    @JSONField(format = "yyyy-MM-dd HH:mm")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     public Date getAddTime() {
         return comment.getAddTime();
     }

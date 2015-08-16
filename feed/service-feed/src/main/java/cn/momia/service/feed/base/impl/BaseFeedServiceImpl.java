@@ -3,6 +3,7 @@ package cn.momia.service.feed.base.impl;
 import cn.momia.service.base.impl.DbAccessService;
 import cn.momia.service.feed.base.BaseFeed;
 import cn.momia.service.feed.base.BaseFeedService;
+import cn.momia.service.feed.facade.Feed;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedService {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseFeedServiceImpl.class);
@@ -146,7 +149,15 @@ public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedServ
             }
         });
 
-        return baseFeeds;
+        Map<Long, BaseFeed> baseFeedsMap = new HashMap<Long, BaseFeed>();
+        for (BaseFeed baseFeed : baseFeeds) baseFeedsMap.put(baseFeed.getId(), baseFeed);
+        List<BaseFeed> sortedBaseFeeds = new ArrayList<BaseFeed>();
+        for (Long feedId : feedIds) {
+            BaseFeed baseFeed = baseFeedsMap.get(feedId);
+            if (baseFeed != null) sortedBaseFeeds.add(baseFeed);
+        }
+
+        return sortedBaseFeeds;
     }
 
     @Override

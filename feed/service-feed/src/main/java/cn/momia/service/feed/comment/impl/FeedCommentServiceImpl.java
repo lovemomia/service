@@ -49,7 +49,7 @@ public class FeedCommentServiceImpl extends DbAccessService implements FeedComme
     @Override
     public List<FeedComment> query(long feedId, int start, int count) {
         final List<FeedComment> feedComments = new ArrayList<FeedComment>();
-        String sql = "SELECT " + joinFields() + " FROM t_feed_comment WHERE feedId=? ORDER BY addTime DESC LIMIT ?,?";
+        String sql = "SELECT " + joinFields() + " FROM t_feed_comment WHERE feedId=? AND status=1 ORDER BY addTime DESC LIMIT ?,?";
         jdbcTemplate.query(sql, new Object[] { feedId, start, count }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
