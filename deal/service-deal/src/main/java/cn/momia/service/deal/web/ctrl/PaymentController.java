@@ -63,7 +63,7 @@ public class PaymentController extends AbstractController {
                 order.getProductId() != productId ||
                 order.getSkuId() != skuId) return ResponseMessage.FAILED("订单数据有问题，无效的订单");
 
-        Product product = productServiceApi.PRODUCT.get(productId, false);
+        Product product = productServiceApi.PRODUCT.get(productId, Product.Type.MINI);
         Sku sku = productServiceApi.SKU.get(productId, skuId);
         if (!product.exists() || !sku.exists() || sku.isClosed()) return ResponseMessage.FAILED("活动已结束或下线，不能再付款");
 
@@ -136,7 +136,7 @@ public class PaymentController extends AbstractController {
 
         if (order.isPayed()) return ResponseMessage.SUCCESS;
 
-        Product product = productServiceApi.PRODUCT.get(productId, false);
+        Product product = productServiceApi.PRODUCT.get(productId, Product.Type.MINI);
         Sku sku = productServiceApi.SKU.get(productId, skuId);
         if (!product.exists() || !sku.exists() || sku.isClosed()) return ResponseMessage.FAILED("活动已结束或下线，不能再付款");
 

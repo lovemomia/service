@@ -113,8 +113,8 @@ public class ProductServiceApi extends ServiceApi {
             return JSON.toJavaObject((JSON) executeRequest(request), PagedProducts.class);
         }
 
-        public Product get(long productId, boolean full) {
-            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("full", full);
+        public Product get(long productId, int type) {
+            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("type", type);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("product", productId), builder.build());
 
             return JSON.toJavaObject((JSON) executeRequest(request), Product.class);

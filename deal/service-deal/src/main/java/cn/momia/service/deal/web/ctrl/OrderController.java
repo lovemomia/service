@@ -161,7 +161,7 @@ public class OrderController extends AbstractController {
                                   @PathVariable(value = "id") long id,
                                   @RequestParam(value = "pid") long productId) {
         Order order = dealServiceFacade.getOrder(id);
-        Product product = productServiceApi.PRODUCT.get(productId, false);
+        Product product = productServiceApi.PRODUCT.get(productId, Product.Type.BASE_WITH_SKU);
         if (!order.exists() || !product.exists() ||
                 order.getCustomerId() != userId ||
                 order.getProductId() != product.getId()) return ResponseMessage.FAILED("无效的订单");

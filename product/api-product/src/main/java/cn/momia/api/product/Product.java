@@ -7,6 +7,13 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class Product {
+    public static class Type {
+        public static final int MINI = 1;
+        public static final int BASE = 2;
+        public static final int BASE_WITH_SKU = 3;
+        public static final int FULL = 4;
+    }
+
     private long id;
     private String thumb;
     private String title;

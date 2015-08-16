@@ -11,6 +11,7 @@ import cn.momia.service.product.web.ctrl.dto.BaseProductDto;
 import cn.momia.service.product.web.ctrl.dto.BaseSkuDto;
 import cn.momia.service.product.web.ctrl.dto.FullProductDto;
 import cn.momia.service.product.web.ctrl.dto.FullSkuDto;
+import cn.momia.service.product.web.ctrl.dto.MiniProductDto;
 import cn.momia.service.product.web.ctrl.dto.ProductDto;
 import cn.momia.service.product.web.ctrl.dto.ProductsOfDayDto;
 import cn.momia.api.user.UserServiceApi;
@@ -193,11 +194,23 @@ public class ProductController extends AbstractController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseMessage get(@PathVariable long id, @RequestParam(defaultValue = "true") boolean full) {
+    public ResponseMessage get(@PathVariable long id, @RequestParam(defaultValue = "" + Product.Type.BASE) int type) {
         Product product = productServiceFacade.get(id);
         if (!product.exists()) return ResponseMessage.FAILED("活动不存在");
 
-        ProductDto productDto = full ? new FullProductDto(product) : new BaseProductDto(product, true);
+        ProductDto productDto = null;
+        switch (type) {
+            case Product.Type.MINI:
+                productDto = new MiniProductDto(product);
+                break;
+            case Product.Type.BASE_WITH_SKU:
+                productDto = new BaseProductDto(product, true);
+                break;
+            case Product.Type.FULL:
+                productDto = new FullProductDto(product);
+                break;
+            default: productDto = new BaseProductDto((product));
+        }
         return ResponseMessage.SUCCESS(productDto);
     }
 

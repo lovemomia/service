@@ -16,6 +16,13 @@ import java.util.Date;
 import java.util.List;
 
 public class Product implements Serializable {
+    public static class Type {
+        public static final int MINI = 1;
+        public static final int BASE = 2;
+        public static final int BASE_WITH_SKU = 3;
+        public static final int FULL = 4;
+    }
+
     private static final DateFormat DATE_FORMATTER = new SimpleDateFormat("M月d日");
 
     public static final Product NOT_EXIST_PRODUCT = new Product() {
