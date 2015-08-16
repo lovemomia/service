@@ -5,6 +5,12 @@ import java.util.Date;
 import java.util.Set;
 
 public class User implements Serializable {
+    public static class Type {
+        public static final int MINI = 1;
+        public static final int BASE = 2;
+        public static final int FULL = 3;
+    }
+
     public static final User NOT_EXIST_USER = new User();
     public static final User INVALID_USER = new User();
     public static final User DUPLICATE_USER = new User() {

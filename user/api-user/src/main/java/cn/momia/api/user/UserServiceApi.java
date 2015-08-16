@@ -225,7 +225,7 @@ public class UserServiceApi extends ServiceApi {
             return JSON.toJavaObject((JSON) executeRequest(request), Contacts.class);
         }
 
-        public List<User> list(Collection<Long> userIds, String type) {
+        public List<User> list(Collection<Long> userIds, int type) {
             if (userIds == null || userIds.isEmpty()) return new ArrayList<User>();
 
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()

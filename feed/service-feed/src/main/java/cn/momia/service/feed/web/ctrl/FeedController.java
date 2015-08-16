@@ -55,7 +55,7 @@ public class FeedController extends AbstractController {
 
         Set<Long> userIds = new HashSet<Long>();
         for (Feed feed : feeds) userIds.add(feed.getUserId());
-        List<User> users = userServiceApi.USER.list(userIds, "mini");
+        List<User> users = userServiceApi.USER.list(userIds, User.Type.MINI);
         Map<Long, User> usersMap = new HashMap<Long, User>();
         for (User user : users) usersMap.put(user.getId(), user);
 
@@ -131,7 +131,7 @@ public class FeedController extends AbstractController {
 
         List<Long> userIds = new ArrayList<Long>();
         for (FeedComment comment : comments) userIds.add(comment.getUserId());
-        List<User> users = userServiceApi.USER.list(userIds, "mini");
+        List<User> users = userServiceApi.USER.list(userIds, User.Type.MINI);
         Map<Long, User> usersMap = new HashMap<Long, User>();
         for (User user : users) usersMap.put(user.getId(), user);
 
@@ -176,7 +176,7 @@ public class FeedController extends AbstractController {
         if (totalCount <= 0) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
 
         List<Long> userIds = feedServiceFacade.queryStaredUserIds(id, start, count);
-        List<User> users = userServiceApi.USER.list(userIds, "mini");
+        List<User> users = userServiceApi.USER.list(userIds, User.Type.MINI);
 
         PagedListDto staredUsersDto = new PagedListDto(totalCount, start, count);
         for (User user : users) staredUsersDto.add(user);

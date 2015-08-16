@@ -7,6 +7,12 @@ import java.util.Date;
 import java.util.List;
 
 public class User {
+    public static class Type {
+        public static final int MINI = 1;
+        public static final int BASE = 2;
+        public static final int FULL = 3;
+    }
+
     private long id;
     private String nickName;
     private String avatar;

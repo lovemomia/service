@@ -178,7 +178,7 @@ public class OrderController extends AbstractController {
 
         List<Long> customerIds = new ArrayList<Long>();
         for (Order order : orders) customerIds.add(order.getCustomerId());
-        List<User> customers = userServiceApi.USER.list(customerIds, "mini");
+        List<User> customers = userServiceApi.USER.list(customerIds, User.Type.MINI);
         Map<Long, User> customersMap = new HashMap<Long, User>();
         for (User customer : customers) {
             customersMap.put(customer.getId(), customer);
@@ -243,7 +243,7 @@ public class OrderController extends AbstractController {
         }
 
         Map<Long, User> customersMap = new HashMap<Long, User>();
-        for (User customer : userServiceApi.USER.list(customerIds, "mini")) {
+        for (User customer : userServiceApi.USER.list(customerIds, User.Type.MINI)) {
             customersMap.put(customer.getId(), customer);
         }
 

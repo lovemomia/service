@@ -247,21 +247,24 @@ public class UserController extends UserRelatedController {
 
     // TODO mini
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public ResponseMessage listUsers(@RequestParam String uids, @RequestParam(defaultValue = "mini") String type) {
+    public ResponseMessage listUsers(@RequestParam String uids, @RequestParam(defaultValue = "" + User.Type.BASE) int type) {
         List<Long> ids = new ArrayList<Long>();
         for (String id : Splitter.on(",").trimResults().omitEmptyStrings().split(uids)) ids.add(Long.valueOf(id));
 
         List<User> users = userServiceFacade.getUsers(ids);
         ListDto usersDto = new ListDto();
-        if ("mini".equalsIgnoreCase(type)) {
-            for (User user : users) usersDto.add(new MiniUserDto(user));
-        } else if ("base".equalsIgnoreCase(type)) {
-            for (User user : users) usersDto.add(new BaseUserDto(user));
-        } else {
-            // TODO 性能
-            for (User user : users) usersDto.add(new FullUserDto(user,
-                    userServiceFacade.getChildren(user.getId(), user.getChildren()),
-                    userServiceFacade.getLeaderInfo(user.getId())));
+
+        switch (type) {
+            case User.Type.MINI:
+                for (User user : users) usersDto.add(new MiniUserDto(user));
+                break;
+            case User.Type.FULL:
+                // TODO 性能
+                for (User user : users) usersDto.add(new FullUserDto(user,
+                        userServiceFacade.getChildren(user.getId(), user.getChildren()),
+                        userServiceFacade.getLeaderInfo(user.getId())));
+                break;
+            default: for (User user : users) usersDto.add(new BaseUserDto(user));
         }
 
         return ResponseMessage.SUCCESS(usersDto);
