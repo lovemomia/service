@@ -85,7 +85,7 @@ public class OrderController extends AbstractController {
                 order.getProductId() <= 0 ||
                 order.getSkuId() <= 0 ||
                 order.getPrices().isEmpty() ||
-                sku.getSkuId() == 0 ||
+                !sku.exists() ||
                 sku.getProductId() != order.getProductId() ||
                 sku.isClosed())  throw new MomiaFailedException("活动已结束或下线，不能再下单");
 
@@ -162,7 +162,7 @@ public class OrderController extends AbstractController {
                                   @RequestParam(value = "pid") long productId) {
         Order order = dealServiceFacade.getOrder(id);
         Product product = productServiceApi.PRODUCT.get(productId, false);
-        if (!order.exists() || product.getId() == 0 ||
+        if (!order.exists() || !product.exists() ||
                 order.getCustomerId() != userId ||
                 order.getProductId() != product.getId()) return ResponseMessage.FAILED("无效的订单");
 

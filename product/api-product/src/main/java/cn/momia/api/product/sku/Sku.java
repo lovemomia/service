@@ -141,4 +141,8 @@ public class Sku {
 
         return false;
     }
+
+    public boolean exists() {
+        return skuId > 0;
+    }
 }

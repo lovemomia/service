@@ -234,4 +234,8 @@ public class Product {
 
         return "";
     }
+
+    public boolean exists() {
+        return id > 0;
+    }
 }

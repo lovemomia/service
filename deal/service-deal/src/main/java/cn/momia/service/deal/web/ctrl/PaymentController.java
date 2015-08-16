@@ -65,7 +65,7 @@ public class PaymentController extends AbstractController {
 
         Product product = productServiceApi.PRODUCT.get(productId, false);
         Sku sku = productServiceApi.SKU.get(productId, skuId);
-        if (product.getId() == 0 || sku.getSkuId() == 0 || sku.isClosed()) return ResponseMessage.FAILED("活动已结束或下线，不能再付款");
+        if (!product.exists() || !sku.exists() || sku.isClosed()) return ResponseMessage.FAILED("活动已结束或下线，不能再付款");
 
         String userCouponIdStr = request.getParameter("coupon");
         long userCouponId = StringUtils.isBlank(userCouponIdStr) ? 0 : Long.valueOf(userCouponIdStr);
@@ -138,7 +138,7 @@ public class PaymentController extends AbstractController {
 
         Product product = productServiceApi.PRODUCT.get(productId, false);
         Sku sku = productServiceApi.SKU.get(productId, skuId);
-        if (product.getId() == 0 || sku.getSkuId() == 0 || sku.isClosed()) return ResponseMessage.FAILED("活动已结束或下线，不能再付款");
+        if (!product.exists() || !sku.exists() || sku.isClosed()) return ResponseMessage.FAILED("活动已结束或下线，不能再付款");
 
         BigDecimal totalFee = order.getTotalFee();
         if (userCouponId != null && userCouponId > 0) {
