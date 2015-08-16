@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Logger>
+        <Level>INFO</Level>
+    </Logger>
+
+    <Server>
+        <Biz>service</Biz>
+    </Server>
+
+    <Limit>
+        <MaxPage>50</MaxPage>
+        <MaxPageSize>50</MaxPageSize>
+    </Limit>
+
+    <Database>
+        <Tongqu>
+            <JdbcUrl><![CDATA[jdbc:mysql://120.55.102.12:3306/tongqu?characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull]]></JdbcUrl>
+            <Username>tongqu</Username>
+            <Password>Tongqu!@#456</Password>
+        </Tongqu>
+    </Database>
+
+    <Sms>
+        <CorePoolSize>5</CorePoolSize>
+        <MaxPoolSize>20</MaxPoolSize>
+        <QueueSize>1000</QueueSize>
+        <Luosimao>
+            <Service>http://sms-api.luosimao.com/v1/send.json</Service>
+        </Luosimao>
+    </Sms>
+</Configuration>

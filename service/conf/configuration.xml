@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Logger>
+        <Level>INFO</Level>
+    </Logger>
+
+    <Server>
+        <Biz>service</Biz>
+    </Server>
+
+    <Service>
+        <Base>http://localhost:7070</Base>
+    </Service>
+
+    <Sms>
+        <CorePoolSize>5</CorePoolSize>
+        <MaxPoolSize>20</MaxPoolSize>
+        <QueueSize>1000</QueueSize>
+        <Luosimao>
+            <Service>http://sms-api.luosimao.com/v1/send.json</Service>
+        </Luosimao>
+    </Sms>
+
+    <Limit>
+        <MaxPage>50</MaxPage>
+        <MaxPageSize>50</MaxPageSize>
+    </Limit>
+
+    <Database>
+        <Tongqu>
+            <JdbcUrl><![CDATA[jdbc:mysql://120.55.102.12:3306/tongqu?characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull]]></JdbcUrl>
+            <Username>tongqu</Username>
+            <Password>Tongqu!@#456</Password>
+        </Tongqu>
+    </Database>
+
+    <Wap>
+        <Domain>m.momia.cn</Domain>
+        <ProductUrl>http://m.momia.cn/actsDetail.html</ProductUrl>
+    </Wap>
+
+    <Payment>
+        <Ali>
+            <AppService>mobile.securitypay.pay</AppService>
+            <WapService>alipay.wap.create.direct.pay.by.user</WapService>
+            <Partner>2088911944697039</Partner>
+            <NotifyUrl>https://i.momia.cn/callback/alipay</NotifyUrl>
+            <VerifyUrl><![CDATA[https://mapi.alipay.com/gateway.do?service=notify_verify&]]></VerifyUrl>
+        </Ali>
+        <Wechat>
+            <AccessTokenService>https://api.weixin.qq.com/sns/oauth2/access_token</AccessTokenService>
+            <PrepayService>https://api.mch.weixin.qq.com/pay/unifiedorder</PrepayService>
+            <AppAppId>wxcf7b15b51d3b4e53</AppAppId>
+            <AppMchId>1252007801</AppMchId>
+            <JsApiAppId>wxc4ca5800d28b5650</JsApiAppId>
+            <JsApiMchId>1251671101</JsApiMchId>
+            <NotifyUrl>https://i.momia.cn/callback/wechatpay</NotifyUrl>
+        </Wechat>
+    </Payment>
+
+    <Product>
+        <Month>
+            <PageSize>10</PageSize>
+        </Month>
+        <Playmate>
+            <PageSize>10</PageSize>
+        </Playmate>
+    </Product>
+</Configuration>

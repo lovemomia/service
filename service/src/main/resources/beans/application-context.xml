@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="conf" class="org.apache.commons.configuration.XMLConfiguration" init-method="load">
+        <property name="fileName" value="conf/configuration.xml" />
+    </bean>
+
+    <bean class="cn.momia.service.base.config.XmlPropertyPlaceholderConfigurer">
+        <property name="conf" ref="conf" />
+    </bean>
+
+    <bean class="cn.momia.service.base.config.LoggerConfigurer" init-method="init">
+        <property name="conf" ref="conf" />
+    </bean>
+
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="com.mysql.jdbc.Driver" />
+        <property name="jdbcUrl" value="${Database.Tongqu.JdbcUrl}" />
+        <property name="user" value="${Database.Tongqu.Username}" />
+        <property name="password" value="${Database.Tongqu.Password}" />
+        <property name="maxPoolSize" value="30" />
+        <property name="maxIdleTime" value="7200" />
+        <property name="testConnectionOnCheckin" value="true" />
+        <property name="idleConnectionTestPeriod" value="5" />
+        <property name="preferredTestQuery" value="SELECT 1" />
+        <property name="checkoutTimeout" value="1800000" />
+    </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <bean id="secretKey" class="cn.momia.service.base.config.SecretKey" init-method="init">
+        <property name="biz" value="${Server.Biz}" />
+        <property name="jdbcTemplate" ref="jdbcTemplate" />
+    </bean>
+
+    <bean class="cn.momia.service.base.config.Configuration">
+        <property name="xmlConf" ref="conf" />
+        <property name="secretKey" ref="secretKey" />
+    </bean>
+
+    <!-- Service -->
+    <bean id="dbAccessService" class="cn.momia.service.base.impl.DbAccessService" abstract="true">
+        <property name="jdbcTemplate" ref="jdbcTemplate" />
+    </bean>
+
+    <bean id="smsSender" class="cn.momia.service.common.sms.impl.LuosimaoSmsSender" parent="dbAccessService" />
+    <bean id="smsVerifier" class="cn.momia.service.common.sms.SmsVerifier" parent="dbAccessService" />
+    <bean id="cityService" class="cn.momia.service.common.city.impl.CityServiceImpl" parent="dbAccessService" init-method="init" />
+    <bean id="regionService" class="cn.momia.service.common.region.impl.RegionServiceImpl" parent="dbAccessService" init-method="init" />
+    <bean id="feedbackService" class="cn.momia.service.common.feedback.impl.FeedbackServiceImpl" parent="dbAccessService" />
+    <bean id="recommendService" class="cn.momia.service.common.recommend.impl.RecommendServiceImpl" parent="dbAccessService" />
+    <bean id="commonServiceFacade" class="cn.momia.service.common.facade.impl.CommonServiceFacadeImpl">
+        <property name="smsSender" ref="smsSender" />
+        <property name="smsVerifier" ref="smsVerifier" />
+        <property name="cityService" ref="cityService" />
+        <property name="regionService" ref="regionService" />
+        <property name="feedbackService" ref="feedbackService" />
+        <property name="recommendService" ref="recommendService" />
+    </bean>
+
+    <bean id="baseFeedService" class="cn.momia.service.feed.base.impl.BaseFeedServiceImpl" parent="dbAccessService" />
+    <bean id="feedTopicService" class="cn.momia.service.feed.topic.impl.FeedTopicServiceImpl" parent="dbAccessService" />
+    <bean id="feedCommentService" class="cn.momia.service.feed.comment.impl.FeedCommentServiceImpl" parent="dbAccessService" />
+    <bean id="feedStarService" class="cn.momia.service.feed.star.impl.FeedStarServiceImpl" parent="dbAccessService" />
+    <bean id="feedServiceFacade" class="cn.momia.service.feed.facade.impl.FeedServiceFacadeImpl" parent="dbAccessService">
+        <property name="baseFeedService" ref="baseFeedService" />
+        <property name="feedTopicService" ref="feedTopicService" />
+        <property name="feedCommentService" ref="feedCommentService" />
+        <property name="feedStarService" ref="feedStarService" />
+    </bean>
+
+    <bean id="bannerService" class="cn.momia.service.product.banner.impl.BannerServiceImpl" parent="dbAccessService" />
+    <bean id="baseProductService" class="cn.momia.service.product.base.impl.BaseProductServiceImpl" parent="dbAccessService" init-method="init" />
+    <bean id="placeService" class="cn.momia.service.product.place.impl.PlaceServiceImpl" parent="dbAccessService" />
+    <bean id="skuService" class="cn.momia.service.product.sku.impl.SkuServiceImpl" parent="dbAccessService" />
+    <bean id="topicService" class="cn.momia.service.product.topic.impl.TopicServiceImpl" parent="dbAccessService" />
+    <bean id="favoriteService" class="cn.momia.service.product.favorite.impl.FavoriteServiceImpl" parent="dbAccessService" />
+    <bean id="productServiceFacade" class="cn.momia.service.product.facade.impl.ProductServiceFacadeImpl" parent="dbAccessService">
+        <property name="bannerService" ref="bannerService" />
+        <property name="baseProductService" ref="baseProductService" />
+        <property name="placeService" ref="placeService" />
+        <property name="skuService" ref="skuService" />
+        <property name="topicService" ref="topicService" />
+        <property name="favoriteService" ref="favoriteService" />
+    </bean>
+
+    <bean id="couponService" class="cn.momia.service.promo.coupon.impl.CouponServiceImpl" parent="dbAccessService" />
+    <bean id="promoServiceFacade" class="cn.momia.service.promo.facade.impl.PromoServiceFacadeImpl">
+        <property name="couponService" ref="couponService" />
+    </bean>
+
+    <bean id="userService" class="cn.momia.service.user.base.impl.UserServiceImpl" parent="dbAccessService" />
+    <bean id="participantService" class="cn.momia.service.user.participant.impl.ParticipantServiceImpl" parent="dbAccessService" />
+    <bean id="leaderService" class="cn.momia.service.user.leader.impl.LeaderServiceImpl" parent="dbAccessService" />
+    <bean id="userServiceFacade" class="cn.momia.service.user.facade.impl.UserServiceFacadeImpl">
+        <property name="userService" ref="userService" />
+        <property name="participantService" ref="participantService" />
+        <property name="leaderService" ref="leaderService" />
+    </bean>
+
+    <bean id="orderService" class="cn.momia.service.deal.order.impl.OrderServiceImpl" parent="dbAccessService" />
+    <bean id="paymentService" class="cn.momia.service.deal.payment.impl.PaymentServiceImpl" parent="dbAccessService" />
+    <bean id="dealServiceFacade" class="cn.momia.service.deal.facade.impl.DealServiceFacadeImpl">
+        <property name="orderService" ref="orderService" />
+        <property name="paymentService" ref="paymentService" />
+    </bean>
+
+    <bean id="abstractPaymentGateway" class="cn.momia.service.deal.gateway.AbstractPaymentGateway" abstract="true">
+        <property name="dealServiceFacade" ref="dealServiceFacade" />
+    </bean>
+
+    <bean id="alipay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
+        <property name="staticField" value="cn.momia.service.deal.payment.Payment.Type.ALIPAY" />
+    </bean>
+    <bean id="alipayGateway" class="cn.momia.service.deal.gateway.alipay.AlipayGateway" parent="abstractPaymentGateway" />
+
+    <bean id="wechatpay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
+        <property name="staticField" value="cn.momia.service.deal.payment.Payment.Type.WECHATPAY" />
+    </bean>
+    <bean id="wechatpayGateway" class="cn.momia.service.deal.gateway.wechatpay.WechatpayGateway" parent="abstractPaymentGateway" />
+
+    <bean class="cn.momia.service.deal.gateway.factory.PaymentGatewayFactory">
+        <property name="prototypes">
+            <map value-type="cn.momia.service.deal.gateway.PaymentGateway">
+                <entry key-ref="alipay">
+                    <ref bean="alipayGateway" />
+                </entry>
+                <entry key-ref="wechatpay">
+                    <ref bean="wechatpayGateway" />
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean class="cn.momia.service.deal.gateway.factory.PrepayParamFactory" />
+
+    <bean id="srviceApi" class="cn.momia.api.base.ServiceApi" abstract="true">
+        <property name="service" value="${Service.Base}" />
+    </bean>
+
+    <bean id="commonServiceApi" class="cn.momia.service.common.api.CommonServiceApi" parent="srviceApi" init-method="init" />
+    <bean id="productServiceApi" class="cn.momia.service.product.api.ProductServiceApi" parent="srviceApi" init-method="init" />
+    <bean id="userServiceApi" class="cn.momia.service.user.api.UserServiceApi" parent="srviceApi" init-method="init" />
+</beans>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="conf" class="org.apache.commons.configuration.XMLConfiguration" init-method="load">
+        <property name="fileName" value="conf/configuration.xml" />
+    </bean>
+
+    <bean class="cn.momia.service.base.config.XmlPropertyPlaceholderConfigurer">
+        <property name="conf" ref="conf" />
+    </bean>
+
+    <bean class="cn.momia.service.base.config.LoggerConfigurer" init-method="init">
+        <property name="conf" ref="conf" />
+    </bean>
+
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="com.mysql.jdbc.Driver" />
+        <property name="jdbcUrl" value="${Database.Tongqu.JdbcUrl}" />
+        <property name="user" value="${Database.Tongqu.Username}" />
+        <property name="password" value="${Database.Tongqu.Password}" />
+        <property name="maxPoolSize" value="30" />
+        <property name="maxIdleTime" value="7200" />
+        <property name="testConnectionOnCheckin" value="true" />
+        <property name="idleConnectionTestPeriod" value="5" />
+        <property name="preferredTestQuery" value="SELECT 1" />
+        <property name="checkoutTimeout" value="1800000" />
+    </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <bean id="secretKey" class="cn.momia.service.base.config.SecretKey" init-method="init">
+        <property name="biz" value="${Server.Biz}" />
+        <property name="jdbcTemplate" ref="jdbcTemplate" />
+    </bean>
+
+    <bean class="cn.momia.service.base.config.Configuration">
+        <property name="xmlConf" ref="conf" />
+        <property name="secretKey" ref="secretKey" />
+    </bean>
+
+    <!-- Service -->
+    <bean id="dbAccessService" class="cn.momia.service.base.impl.DbAccessService" abstract="true">
+        <property name="jdbcTemplate" ref="jdbcTemplate" />
+    </bean>
+
+    <bean id="smsSender" class="cn.momia.service.common.sms.impl.LuosimaoSmsSender" parent="dbAccessService" />
+    <bean id="smsVerifier" class="cn.momia.service.common.sms.SmsVerifier" parent="dbAccessService" />
+    <bean id="cityService" class="cn.momia.service.common.city.impl.CityServiceImpl" parent="dbAccessService" init-method="init" />
+    <bean id="regionService" class="cn.momia.service.common.region.impl.RegionServiceImpl" parent="dbAccessService" init-method="init" />
+    <bean id="feedbackService" class="cn.momia.service.common.feedback.impl.FeedbackServiceImpl" parent="dbAccessService" />
+    <bean id="recommendService" class="cn.momia.service.common.recommend.impl.RecommendServiceImpl" parent="dbAccessService" />
+    <bean id="commonServiceFacade" class="cn.momia.service.common.facade.impl.CommonServiceFacadeImpl">
+        <property name="smsSender" ref="smsSender" />
+        <property name="smsVerifier" ref="smsVerifier" />
+        <property name="cityService" ref="cityService" />
+        <property name="regionService" ref="regionService" />
+        <property name="feedbackService" ref="feedbackService" />
+        <property name="recommendService" ref="recommendService" />
+    </bean>
+</beans>
