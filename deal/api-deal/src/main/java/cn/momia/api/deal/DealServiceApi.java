@@ -31,9 +31,9 @@ public class DealServiceApi extends ServiceApi {
     }
 
     public static class OrderServiceApi extends DealServiceApi {
-        public void add(JSONObject orderJson) {
+        public Order add(JSONObject orderJson) {
             MomiaHttpRequest request = MomiaHttpRequest.POST(url("order"), orderJson.toString());
-            executeRequest(request);
+            return JSON.toJavaObject((JSON) executeRequest(request), Order.class);
         }
 
         public PagedOrders listOrders(long userId, int status, int start, int count) {

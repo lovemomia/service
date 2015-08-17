@@ -13,37 +13,6 @@
     <url>http://www.momia.cn</url>
 
     <dependencies>
-        <!-- Http Client -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.codehaus.castor</groupId>
-            <artifactId>castor-xml</artifactId>
-            <version>1.3.3</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!-- Db -->
-        <dependency>
-            <groupId>com.mchange</groupId>
-            <artifactId>c3p0</artifactId>
-            <version>0.9.5</version>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.35</version>
-        </dependency>
-
         <!-- Momia Api -->
         <dependency>
             <groupId>cn.momia</groupId>
@@ -64,7 +33,7 @@
         <!-- Momia Service -->
         <dependency>
             <groupId>cn.momia</groupId>
-            <artifactId>duola-common</artifactId>
+            <artifactId>duola-service-base</artifactId>
             <version>1.0.0</version>
         </dependency>
         <dependency>

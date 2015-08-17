@@ -8,8 +8,9 @@ import java.util.Date;
 public class Order {
     private long id;
     private long productId;
+    private long skuId;
     private int count;
-    private BigDecimal getTotalFee;
+    private BigDecimal totalFee;
     private String participants;
     private String contacts;
     private String mobile;
@@ -40,6 +41,14 @@ public class Order {
         this.productId = productId;
     }
 
+    public long getSkuId() {
+        return skuId;
+    }
+
+    public void setSkuId(long skuId) {
+        this.skuId = skuId;
+    }
+
     public int getCount() {
         return count;
     }
@@ -48,12 +57,12 @@ public class Order {
         this.count = count;
     }
 
-    public BigDecimal getGetTotalFee() {
-        return getTotalFee;
+    public BigDecimal getTotalFee() {
+        return totalFee;
     }
 
-    public void setGetTotalFee(BigDecimal getTotalFee) {
-        this.getTotalFee = getTotalFee;
+    public void setTotalFee(BigDecimal totalFee) {
+        this.totalFee = totalFee;
     }
 
     public String getParticipants() {
