@@ -1,6 +1,7 @@
 package cn.momia.service.user.web.ctrl.dto;
 
 import cn.momia.service.user.base.User;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 
@@ -18,6 +19,8 @@ public class ContactsDto implements Serializable {
 
     public ContactsDto(User user) {
         this.name = user.getName();
+        if (StringUtils.isBlank(this.name)) this.name = user.getNickName();
+
         this.mobile = user.getMobile();
     }
 }
