@@ -1,5 +1,6 @@
 package cn.momia.service.user.web.ctrl;
 
+import cn.momia.service.base.util.MobileUtil;
 import cn.momia.service.user.web.ctrl.dto.BaseUserDto;
 import cn.momia.service.user.web.ctrl.dto.ContactsDto;
 import cn.momia.service.user.web.ctrl.dto.FullUserDto;
@@ -245,7 +246,15 @@ public class UserController extends UserRelatedController {
         return ResponseMessage.SUCCESS(new ContactsDto(user));
     }
 
-    // TODO mini
+    @RequestMapping(value = "/contacts", method = RequestMethod.POST)
+    public ResponseMessage processContacts(@RequestParam(value = "uid") long userId, @RequestParam String mobile, @RequestParam String name) {
+        if (userId <= 0 || MobileUtil.isInvalidMobile(mobile) || StringUtils.isBlank(name)) return ResponseMessage.BAD_REQUEST;
+
+        userServiceFacade.processContacts(userId, mobile, name);
+
+        return ResponseMessage.SUCCESS;
+    }
+
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public ResponseMessage listUsers(@RequestParam String uids, @RequestParam(defaultValue = "" + User.Type.BASE) int type) {
         List<Long> ids = new ArrayList<Long>();

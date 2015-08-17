@@ -23,6 +23,7 @@ import cn.momia.service.base.web.ctrl.dto.ListDto;
 import cn.momia.service.base.web.ctrl.dto.PagedListDto;
 import cn.momia.service.base.web.response.ResponseMessage;
 import cn.momia.service.promo.facade.PromoServiceFacade;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,7 @@ public class OrderController extends AbstractController {
 
         long orderId = 0;
         try {
+            processContacts(order.getCustomerId(), order.getMobile(), order.getContacts());
             dealServiceFacade.checkLimit(order.getCustomerId(), sku.getSkuId(), order.getCount(), sku.getLimit());
 
             orderId = dealServiceFacade.placeOrder(order);
@@ -102,6 +104,15 @@ public class OrderController extends AbstractController {
 
     private boolean lockSku(Order order) {
         return productServiceApi.SKU.lockStock(order.getProductId(), order.getSkuId(), order.getCount(), order.getJoinedCount());
+    }
+
+    private void processContacts(long userId, String mobile, String name) {
+        try {
+            if (MobileUtil.isInvalidMobile(mobile) || StringUtils.isBlank(name)) return;
+            userServiceApi.USER.processContacts(userId, mobile, name);
+        } catch (Exception e) {
+            LOGGER.error("error occurred during process contacts {}/{}", mobile, name);
+        }
     }
 
     private boolean unlockSku(Order order) {

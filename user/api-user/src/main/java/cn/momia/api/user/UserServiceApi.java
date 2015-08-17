@@ -242,6 +242,15 @@ public class UserServiceApi extends ServiceApi {
 
             return users;
         }
+
+        public void processContacts(long userId, String mobile, String name) {
+            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                    .add("uids", userId)
+                    .add("mobile", mobile)
+                    .add("name", name);
+            MomiaHttpRequest request = MomiaHttpRequest.POST(url("user/contacts"), builder.build());
+            executeRequest(request);
+        }
     }
 
     public static class ParticipantServiceApi extends UserServiceApi {
