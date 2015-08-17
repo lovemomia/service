@@ -30,6 +30,7 @@ public class LeaderController extends UserRelatedController {
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage add(@RequestBody Leader leader) {
         if (MobileUtil.isInvalidMobile(leader.getMobile())) return ResponseMessage.FAILED("手机号码不正确");
+        if (userServiceFacade.getLeaderInfo(leader.getUserId()).exists()) return ResponseMessage.FAILED("您已经注册成为了领队，不能重复注册");
         if (!userServiceFacade.addLeaderInfo(leader)) return ResponseMessage.FAILED("注册领队失败，参数不完整或不正确");
         return ResponseMessage.SUCCESS;
     }
@@ -48,6 +49,7 @@ public class LeaderController extends UserRelatedController {
     @RequestMapping(method = RequestMethod.PUT, consumes = "application/json")
     public ResponseMessage update(@RequestBody Leader leader) {
         if (MobileUtil.isInvalidMobile(leader.getMobile())) return ResponseMessage.FAILED("手机号码不正确");
+        if (!userServiceFacade.getLeaderInfo(leader.getUserId()).exists()) return ResponseMessage.FAILED("您还没有注册成为领队");
         if (!userServiceFacade.updateLeaderInfo(leader)) return ResponseMessage.FAILED("更新领队信息失败，参数不完整或不正确");
         return ResponseMessage.SUCCESS;
     }
