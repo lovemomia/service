@@ -1,10 +1,12 @@
 package cn.momia.service.deal.web.ctrl.dto;
 
+import cn.momia.api.product.sku.Sku;
 import cn.momia.service.deal.order.Order;
 import cn.momia.api.product.Product;
 import cn.momia.service.base.web.ctrl.dto.Dto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class OrderDetailDto extends OrderDto implements Dto {
     private Product product;
@@ -36,6 +38,16 @@ public class OrderDetailDto extends OrderDto implements Dto {
 
     public String getTime() {
         return product.getSkuTime(getSkuId());
+    }
+
+    public boolean isClosed() {
+        List<Sku> skus = product.getSkus();
+        if (skus == null || skus.isEmpty()) return true;
+        for (Sku sku : skus) {
+            if (sku.getSkuId() == getSkuId()) return sku.isClosed();
+        }
+
+        return true;
     }
 
     public OrderDetailDto(Order order, Product product) {
