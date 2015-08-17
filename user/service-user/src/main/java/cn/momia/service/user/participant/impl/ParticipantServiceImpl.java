@@ -156,4 +156,16 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
 
         return update(sql, new Object[] { id, userId });
     }
+
+    @Override
+    public boolean check(long userId, final Collection<Long> ids) {
+        String sql = "SELECT COUNT(1) FROM t_user_participant WHERE userId=? AND status=1 AND id IN (" + StringUtils.join(ids, ",") + ")";
+
+        return jdbcTemplate.query(sql, new Object[] { userId }, new ResultSetExtractor<Boolean>() {
+            @Override
+            public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getInt(1) == ids.size() : false;
+            }
+        });
+    }
 }

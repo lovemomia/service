@@ -255,6 +255,15 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
     }
 
     @Override
+    public boolean checkParticipants(long userId, Collection<Long> participantIds) {
+        if (userId <= 0) return false;
+        if (participantIds == null || participantIds.isEmpty()) return true;
+        Set<Long> participantIdsSet = new HashSet<Long>();
+        participantIdsSet.addAll(participantIds);
+        return participantService.check(userId, participantIdsSet);
+    }
+
+    @Override
     public Leader getLeaderInfo(long userId) {
         if (userId <= 0) return Leader.NOT_EXIST_LEADER;
         return leaderService.getByUser(userId);

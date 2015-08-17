@@ -48,6 +48,7 @@ public interface UserServiceFacade {
     List<Participant> getParticipantsByUser(long userId);
     boolean updateParticipant(Participant participant);
     boolean deleteParticipant(long userId, long participantId);
+    boolean checkParticipants(long userId, Collection<Long> participantIds);
 
     Leader getLeaderInfo(long userId);
     List<Leader> getLeaderInfos(Collection<Long> userIds);

@@ -295,6 +295,14 @@ public class UserServiceApi extends ServiceApi {
 
             return participants;
         }
+
+        public void checkParticipants(long userId, Collection<Long> participantIds) {
+            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                    .add("uid", userId)
+                    .add("paids", StringUtils.join(participantIds, ","));
+            MomiaHttpRequest request = MomiaHttpRequest.GET(url("participant/check"), builder.build());
+            executeRequest(request);
+        }
     }
 
     public static class LeaderServiceApi extends UserServiceApi {

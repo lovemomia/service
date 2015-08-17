@@ -90,6 +90,7 @@ public class OrderController extends AbstractController {
                 sku.isClosed())  throw new MomiaFailedException("活动已结束或下线，不能再下单");
 
         if (sku.isNeedRealName() && (order.getParticipants() == null || order.getParticipants().isEmpty())) throw new MomiaFailedException("无效的订单，缺少出行人");
+        if (order.getParticipants() != null && !order.getParticipants().isEmpty()) userServiceApi.PARTICIPANT.checkParticipants(order.getCustomerId(), order.getParticipants());
 
         for (OrderPrice price : order.getPrices()) {
             if (!sku.findPrice(price.getAdult(), price.getChild(), price.getPrice())) throw new MomiaFailedException("无效的订单，套餐不正确");

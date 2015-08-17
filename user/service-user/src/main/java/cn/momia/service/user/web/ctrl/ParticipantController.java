@@ -68,4 +68,13 @@ public class ParticipantController extends UserRelatedController {
 
         return ResponseMessage.SUCCESS(ParticipantDto.toDtos(participants));
     }
+
+    @RequestMapping(value = "/check", method = RequestMethod.GET)
+    public ResponseMessage check(@RequestParam(value = "uid") long userId, @RequestParam(value = "paids") String paids) {
+        List<Long> ids = new ArrayList<Long>();
+        for (String id : Splitter.on(",").trimResults().omitEmptyStrings().split(paids)) ids.add(Long.valueOf(id));
+
+        if (!userServiceFacade.checkParticipants(userId, ids)) return ResponseMessage.FAILED("出行人信息不正确");
+        return ResponseMessage.SUCCESS;
+    }
 }

@@ -23,7 +23,6 @@ public abstract class AbstractController {
     public ResponseMessage exception(Exception exception) throws Exception {
         if (exception instanceof MomiaException) LOGGER.error("exception!!", exception);
 
-        // TODO 清理
         if (exception instanceof MomiaFailedException) {
             return ResponseMessage.FAILED(exception.getMessage());
         } else if (exception instanceof MomiaExpiredException) {

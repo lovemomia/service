@@ -18,4 +18,6 @@ public interface ParticipantService extends Service {
     boolean updateSex(long userId, long id, String sex);
     boolean updateBirthday(long userId, long id, Date birthday);
     boolean delete(long userId, long id);
+
+    boolean check(long userId, Collection<Long> ids);
 }
