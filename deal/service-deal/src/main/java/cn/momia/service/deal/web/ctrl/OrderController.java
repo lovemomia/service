@@ -94,7 +94,7 @@ public class OrderController extends AbstractController {
         if (sku.isNeedRealName() &&
                 (order.getParticipants() == null ||
                         order.getParticipants().isEmpty() ||
-                        order.getParticipants().size() != order.getCount())) throw new MomiaFailedException("无效的订单，出行人信息不完整");
+                        order.getParticipants().size() != order.getJoinedCount())) throw new MomiaFailedException("无效的订单，出行人信息不完整");
         if (order.getParticipants() != null && !order.getParticipants().isEmpty()) userServiceApi.PARTICIPANT.checkParticipants(order.getCustomerId(), order.getParticipants());
 
         for (OrderPrice price : order.getPrices()) {
@@ -111,7 +111,7 @@ public class OrderController extends AbstractController {
             if (MobileUtil.isInvalidMobile(mobile) || StringUtils.isBlank(name)) return;
             userServiceApi.USER.processContacts(userId, mobile, name);
         } catch (Exception e) {
-            LOGGER.error("error occurred during process contacts {}/{}", mobile, name);
+            LOGGER.error("error occurred during process contacts {}/{}", mobile, name, e);
         }
     }
 

@@ -37,11 +37,12 @@ public class AuthController extends UserRelatedController {
         try {
             Participant participant = new Participant();
             participant.setUserId(user.getId());
+            participant.setName(user.getNickName());
             participant.setSex("女");
             participant.setBirthday(new Date(0));
             userServiceFacade.addParticipant(participant);
         } catch (Exception e) {
-            LOGGER.error("fail to add participant for user: {}", user.getId());
+            LOGGER.error("fail to add participant for user: {}", user.getId(), e);
         }
 
         return ResponseMessage.SUCCESS(buildUserResponse(user));

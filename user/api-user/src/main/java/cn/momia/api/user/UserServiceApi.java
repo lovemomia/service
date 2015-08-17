@@ -220,7 +220,7 @@ public class UserServiceApi extends ServiceApi {
 
         public Contacts getContacts(String utoken) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-            MomiaHttpRequest request = MomiaHttpRequest.GET("contacts", true, url("user/contacts"), builder.build());
+            MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/contacts"), builder.build());
 
             return JSON.toJavaObject((JSON) executeRequest(request), Contacts.class);
         }
@@ -245,7 +245,7 @@ public class UserServiceApi extends ServiceApi {
 
         public void processContacts(long userId, String mobile, String name) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                    .add("uids", userId)
+                    .add("uid", userId)
                     .add("mobile", mobile)
                     .add("name", name);
             MomiaHttpRequest request = MomiaHttpRequest.POST(url("user/contacts"), builder.build());

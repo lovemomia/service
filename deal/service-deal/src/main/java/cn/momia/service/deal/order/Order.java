@@ -163,7 +163,7 @@ public class Order implements Serializable {
     public int getAdultCount() {
         int count = 0;
         for (OrderPrice price : prices) {
-            count += price.getAdult();
+            count += price.getAdult() * price.getCount();
         }
 
         return count;
@@ -172,7 +172,7 @@ public class Order implements Serializable {
     public int getChildCount() {
         int count = 0;
         for (OrderPrice price : prices) {
-            count += price.getChild();
+            count += price.getChild() * price.getCount();
         }
 
         return count;
