@@ -80,7 +80,9 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
             order.setProductId(rs.getLong("productId"));
             order.setSkuId(rs.getLong("skuId"));
             order.setPrices(parseOrderPrices(order.getId(), rs.getString("prices")));
-            order.setContacts(rs.getString("contacts"));
+            String contacts = rs.getString("contacts");
+            if (contacts == null) contacts = "";
+            order.setContacts(contacts);
             order.setMobile(rs.getString("mobile"));
             order.setStatus(rs.getInt("status"));
             order.setAddTime(rs.getTimestamp("addTime"));
