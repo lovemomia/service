@@ -33,8 +33,6 @@ public class PaymentController extends AbstractController {
     @Autowired private DealServiceFacade dealServiceFacade;
     @Autowired private PromoServiceFacade promoServiceFacade;
 
-    @Autowired private ProductServiceApi productServiceApi;
-
     private static Map<String, String> extractParams(Map<String, String[]> httpParams) {
         Map<String, String> params = new HashMap<String, String>();
         for (Map.Entry<String, String[]> entry : httpParams.entrySet()) {
@@ -63,8 +61,8 @@ public class PaymentController extends AbstractController {
                 order.getProductId() != productId ||
                 order.getSkuId() != skuId) return ResponseMessage.FAILED("订单数据有问题，无效的订单");
 
-        Product product = productServiceApi.PRODUCT.get(productId, Product.Type.MINI);
-        Sku sku = productServiceApi.SKU.get(productId, skuId);
+        Product product = ProductServiceApi.PRODUCT.get(productId, Product.Type.MINI);
+        Sku sku = ProductServiceApi.SKU.get(productId, skuId);
         if (!product.exists() || !sku.exists() || sku.isClosed()) return ResponseMessage.FAILED("活动已结束或下线，不能再付款");
 
         String userCouponIdStr = request.getParameter("coupon");
@@ -136,8 +134,8 @@ public class PaymentController extends AbstractController {
 
         if (order.isPayed()) return ResponseMessage.SUCCESS;
 
-        Product product = productServiceApi.PRODUCT.get(productId, Product.Type.MINI);
-        Sku sku = productServiceApi.SKU.get(productId, skuId);
+        Product product = ProductServiceApi.PRODUCT.get(productId, Product.Type.MINI);
+        Sku sku = ProductServiceApi.SKU.get(productId, skuId);
         if (!product.exists() || !sku.exists() || sku.isClosed()) return ResponseMessage.FAILED("活动已结束或下线，不能再付款");
 
         BigDecimal totalFee = order.getTotalFee();

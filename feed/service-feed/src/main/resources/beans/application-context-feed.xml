@@ -59,7 +59,7 @@
         <property name="feedStarService" ref="feedStarService" />
     </bean>
 
-    <bean id="userServiceApi" class="cn.momia.api.user.UserServiceApi" init-method="init">
+    <bean class="cn.momia.api.user.UserServiceApi" init-method="init">
         <property name="service" value="${Service.User}" />
     </bean>
 </beans>
