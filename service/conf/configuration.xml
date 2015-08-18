@@ -50,8 +50,8 @@
         <Wechat>
             <AccessTokenService>https://api.weixin.qq.com/sns/oauth2/access_token</AccessTokenService>
             <PrepayService>https://api.mch.weixin.qq.com/pay/unifiedorder</PrepayService>
-            <AppAppId>wxcf7b15b51d3b4e53</AppAppId>
-            <AppMchId>1252007801</AppMchId>
+            <AppAppId>wx50b2ac03c88ad6e7</AppAppId>
+            <AppMchId>1264856501</AppMchId>
             <JsApiAppId>wxc4ca5800d28b5650</JsApiAppId>
             <JsApiMchId>1251671101</JsApiMchId>
             <NotifyUrl>https://i.momia.cn/callback/wechatpay</NotifyUrl>
