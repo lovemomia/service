@@ -70,6 +70,13 @@ public class CommonServiceFacadeImpl implements CommonServiceFacade {
     }
 
     @Override
+    public boolean notifyUser(String mobile, String msg) {
+        if (MobileUtil.isInvalidMobile(mobile) || StringUtils.isBlank(msg)) return false;
+
+        return smsSender.notify(mobile, msg);
+    }
+
+    @Override
     public String getCityName(int cityId) {
         return cityService.get(cityId).getName();
     }

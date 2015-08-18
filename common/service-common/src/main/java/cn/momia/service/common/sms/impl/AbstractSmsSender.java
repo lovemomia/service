@@ -135,4 +135,19 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
 
         return jdbcTemplate.update(sql, new Object[] { mobile }) == 1;
     }
+
+    public boolean notify(final String mobile, final String msg) {
+        if (executorService == null) initExecutorService();
+
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                doNotify(mobile, msg);
+            }
+        });
+
+        return true;
+    }
+
+    protected abstract boolean doNotify(String mobile, String msg);
 }

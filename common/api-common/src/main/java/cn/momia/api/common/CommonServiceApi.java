@@ -109,5 +109,13 @@ public class CommonServiceApi extends ServiceApi {
             MomiaHttpRequest request = MomiaHttpRequest.POST(url("sms/verify"), builder.build());
             executeRequest(request);
         }
+
+        public void notify(String mobile, String msg) {
+            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                    .add("mobile", mobile)
+                    .add("msg", msg);
+            MomiaHttpRequest request = MomiaHttpRequest.POST(url("sms/notify"), builder.build());
+            executeRequest(request);
+        }
     }
 }
