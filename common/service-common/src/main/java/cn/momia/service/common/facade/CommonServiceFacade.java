@@ -8,6 +8,7 @@ import java.util.List;
 public interface CommonServiceFacade {
     boolean sendCode(String mobile, String type);
     boolean verifyCode(String mobile, String code);
+    boolean notifyUser(String mobile, String msg);
 
     String getCityName(int cityId);
     List<City> getAllCities();

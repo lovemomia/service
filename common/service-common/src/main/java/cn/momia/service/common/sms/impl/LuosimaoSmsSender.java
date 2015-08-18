@@ -45,4 +45,34 @@ public class LuosimaoSmsSender extends AbstractSmsSender {
 
         return false;
     }
+
+    @Override
+    protected boolean doNotify(String mobile, String msg) {
+        try {
+            Client client = Client.create();
+            client.addFilter(new HTTPBasicAuthFilter("api", Configuration.getSecretKey("luosimao")));
+            WebResource webResource = client.resource(Configuration.getString("Sms.Luosimao.Service"));
+            MultivaluedMapImpl formData = new MultivaluedMapImpl();
+            formData.add("mobile", mobile);
+            formData.add("message", msg);
+            ClientResponse response =  webResource.type(MediaType.APPLICATION_FORM_URLENCODED).post(ClientResponse.class, formData);
+            int status = response.getStatus();
+            if (status != 200) {
+                LOGGER.error("fail to notify user");
+                return false;
+            }
+
+            String textEntity = response.getEntity(String.class);
+            JSONObject responseJson = JSON.parseObject(textEntity);
+            int error = responseJson.getInteger("error");
+
+            if (error == 0) return true;
+
+            LOGGER.error("fail to notify user, error code is: {}", error);
+        } catch (Exception e) {
+            LOGGER.error("fail to notify user", e);
+        }
+
+        return false;
+    }
 }

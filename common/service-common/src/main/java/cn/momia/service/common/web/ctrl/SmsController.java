@@ -25,4 +25,10 @@ public class SmsController extends AbstractController {
         if (!commonServiceFacade.verifyCode(mobile, code)) return ResponseMessage.FAILED("验证码不正确");
         return ResponseMessage.SUCCESS;
     }
+
+    @RequestMapping(value = "/send", method = RequestMethod.POST)
+    public ResponseMessage notify(@RequestParam String mobile, @RequestParam String msg) {
+        if (!commonServiceFacade.notifyUser(mobile, msg)) return ResponseMessage.FAILED("发送通知失败");
+        return ResponseMessage.SUCCESS;
+    }
 }

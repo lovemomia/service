@@ -1,5 +1,7 @@
 package cn.momia.service.deal.web.ctrl;
 
+import cn.momia.api.common.CommonServiceApi;
+import cn.momia.api.product.Product;
 import cn.momia.service.base.web.ctrl.AbstractController;
 import cn.momia.service.deal.facade.DealServiceFacade;
 import cn.momia.service.deal.gateway.CallbackResult;
@@ -27,6 +29,8 @@ public class CallbackController extends AbstractController {
 
     @Autowired private DealServiceFacade dealServiceFacade;
     @Autowired private PromoServiceFacade promoServiceFacade;
+
+    @Autowired private CommonServiceApi commonServiceApi;
     @Autowired private ProductServiceApi productServiceApi;
 
     private static Map<String, String> extractParams(Map<String, String[]> httpParams) {
@@ -53,6 +57,7 @@ public class CallbackController extends AbstractController {
             if (order.exists()) {
                 updateUserCoupon(order);
                 updateSales(order);
+                notifyUser(order);
             }
 
             return ResponseMessage.SUCCESS("OK");
@@ -78,6 +83,23 @@ public class CallbackController extends AbstractController {
             productServiceApi.PRODUCT.sold(order.getProductId(), order.getCount());
         } catch (Exception e) {
             LOGGER.error("fail to update sales of order: {}", order.getId(), e);
+        }
+    }
+
+    private void notifyUser(Order order) {
+        try {
+            Product product = productServiceApi.PRODUCT.get(order.getProductId(), Product.Type.BASE_WITH_SKU);
+            StringBuilder msg = new StringBuilder();
+            msg.append("您的订单：\"")
+                    .append(product.getTitle())
+                    .append("\"支付成功，时间：")
+                    .append(product.getSkuTime(order.getSkuId()))
+                    .append("，地点：")
+                    .append(product.getAddress())
+                    .append("，请准时参加【哆啦亲子】");
+            commonServiceApi.SMS.notify(order.getMobile(), msg.toString());
+        } catch (Exception e) {
+            LOGGER.error("fail to notify user for order: {}", order.getId(), e);
         }
     }
 
