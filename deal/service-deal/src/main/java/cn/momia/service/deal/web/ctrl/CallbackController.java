@@ -54,7 +54,9 @@ public class CallbackController extends AbstractController {
         if (result.isSuccessful()) {
             long orderId = result.getOrderId();
             Order order = dealServiceFacade.getOrder(orderId);
-            if (order.exists()) {
+            if (order.exists() &&
+                    (payType == Payment.Type.WECHATPAY ||
+                            (payType == Payment.Type.ALIPAY && "TRADE_SUCCESS".equalsIgnoreCase(request.getParameter("trade_status"))))) {
                 updateUserCoupon(order);
                 updateSales(order);
                 notifyUser(order);

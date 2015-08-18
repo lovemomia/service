@@ -26,7 +26,7 @@ public class SmsController extends AbstractController {
         return ResponseMessage.SUCCESS;
     }
 
-    @RequestMapping(value = "/send", method = RequestMethod.POST)
+    @RequestMapping(value = "/notify", method = RequestMethod.POST)
     public ResponseMessage notify(@RequestParam String mobile, @RequestParam String msg) {
         if (!commonServiceFacade.notifyUser(mobile, msg)) return ResponseMessage.FAILED("发送通知失败");
         return ResponseMessage.SUCCESS;
