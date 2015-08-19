@@ -143,7 +143,7 @@
         <property name="service" value="${Service.Base}" />
     </bean>
 
-    <bean id="commonServiceApi" class="cn.momia.api.common.CommonServiceApi" parent="srviceApi" init-method="init" />
-    <bean id="productServiceApi" class="cn.momia.api.product.ProductServiceApi" parent="srviceApi" init-method="init" />
-    <bean id="userServiceApi" class="cn.momia.api.user.UserServiceApi" parent="srviceApi" init-method="init" />
+    <bean class="cn.momia.api.common.CommonServiceApi" parent="srviceApi" init-method="init" />
+    <bean class="cn.momia.api.product.ProductServiceApi" parent="srviceApi" init-method="init" />
+    <bean class="cn.momia.api.user.UserServiceApi" parent="srviceApi" init-method="init" />
 </beans>

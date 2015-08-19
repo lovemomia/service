@@ -36,9 +36,15 @@ public class DealServiceApi extends ServiceApi {
             return JSON.toJavaObject((JSON) executeRequest(request), Order.class);
         }
 
-        public PagedOrders listOrders(long userId, int status, int start, int count) {
+        public void delete(String utoken, long id) {
+            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+            MomiaHttpRequest request = MomiaHttpRequest.DELETE(url("order", id), builder.build());
+            executeRequest(request);
+        }
+
+        public PagedOrders listOrders(String utoken, int status, int start, int count) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                    .add("uid", userId)
+                    .add("utoken", utoken)
                     .add("status", status)
                     .add("start", start)
                     .add("count", count);
@@ -47,9 +53,9 @@ public class DealServiceApi extends ServiceApi {
             return JSON.toJavaObject((JSON) executeRequest(request), PagedOrders.class);
         }
 
-        public Order get(long userId, long orderId, long productId) {
+        public Order get(String utoken, long orderId, long productId) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                    .add("uid", userId)
+                    .add("utoken", utoken)
                     .add("pid", productId);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("order", orderId), builder.build());
 
@@ -81,18 +87,12 @@ public class DealServiceApi extends ServiceApi {
 
             return playmates;
         }
-
-        public void delete(long userId, long id) {
-            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
-            MomiaHttpRequest request = MomiaHttpRequest.DELETE(url("order", id), builder.build());
-            executeRequest(request);
-        }
     }
 
     public static class PaymentServiceApi extends DealServiceApi {
-        public Object prepayAlipay(long userId, long orderId, long productId, long skuId, String type, Long coupon) {
+        public Object prepayAlipay(String utoken, long orderId, long productId, long skuId, String type, Long coupon) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                    .add("uid", userId)
+                    .add("utoken", utoken)
                     .add("oid", orderId)
                     .add("pid", productId)
                     .add("sid", skuId)
@@ -103,9 +103,9 @@ public class DealServiceApi extends ServiceApi {
             return executeRequest(request);
         }
 
-        public Object prepayWechatpay(long userId, long orderId, long productId, long skuId, String tradeType, Long coupon, String code) {
+        public Object prepayWechatpay(String utoken, long orderId, long productId, long skuId, String tradeType, Long coupon, String code) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                    .add("uid", userId)
+                    .add("utoken", utoken)
                     .add("oid", orderId)
                     .add("pid", productId)
                     .add("sid", skuId)
@@ -117,9 +117,9 @@ public class DealServiceApi extends ServiceApi {
             return executeRequest(request);
         }
 
-        public void prepayFree(long userId, long orderId, long productId, long skuId, Long coupon) {
+        public void prepayFree(String utoken, long orderId, long productId, long skuId, Long coupon) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                    .add("uid", userId)
+                    .add("utoken", utoken)
                     .add("oid", orderId)
                     .add("pid", productId)
                     .add("sid", skuId);
@@ -128,9 +128,9 @@ public class DealServiceApi extends ServiceApi {
             executeRequest(request);
         }
 
-        public void check(long userId, long orderId, long productId, long skuId) {
+        public void check(String utoken, long orderId, long productId, long skuId) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                    .add("uid", userId)
+                    .add("utoken", utoken)
                     .add("oid", orderId)
                     .add("pid", productId)
                     .add("sid", skuId);
@@ -152,9 +152,9 @@ public class DealServiceApi extends ServiceApi {
     }
 
     public static class CouponServiceApi extends DealServiceApi {
-        public PagedCoupons listCoupons(long userId, long orderId, int status, int start, int count) {
+        public PagedCoupons listCoupons(String utoken, long orderId, int status, int start, int count) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                    .add("uid", userId)
+                    .add("utoken", utoken)
                     .add("oid", orderId)
                     .add("status", status)
                     .add("start", start)
@@ -164,9 +164,9 @@ public class DealServiceApi extends ServiceApi {
             return JSON.toJavaObject((JSON) executeRequest(request), PagedCoupons.class);
         }
 
-        public BigDecimal calcTotalFee(long userId, long orderId, long coupon) {
+        public BigDecimal calcTotalFee(String utoken, long orderId, long coupon) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                    .add("uid", userId)
+                    .add("utoken", utoken)
                     .add("oid", orderId)
                     .add("coupon", coupon);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("coupon"), builder.build());

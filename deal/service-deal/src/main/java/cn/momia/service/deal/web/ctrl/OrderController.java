@@ -49,12 +49,9 @@ public class OrderController extends AbstractController {
     @Autowired private DealServiceFacade dealServiceFacade;
     @Autowired private PromoServiceFacade promoServiceFacade;
 
-    @Autowired private ProductServiceApi productServiceApi;
-    @Autowired private UserServiceApi userServiceApi;
-
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage add(@RequestBody Order order) {
-        Sku sku = productServiceApi.SKU.get(order.getProductId(), order.getSkuId());
+        Sku sku = ProductServiceApi.SKU.get(order.getProductId(), order.getSkuId());
         checkOrder(order, sku);
 
         if (!lockSku(order)) return ResponseMessage.FAILED("库存不足");
@@ -95,7 +92,7 @@ public class OrderController extends AbstractController {
                 (order.getParticipants() == null ||
                         order.getParticipants().isEmpty() ||
                         order.getParticipants().size() != order.getJoinedCount())) throw new MomiaFailedException("无效的订单，出行人信息不完整");
-        if (order.getParticipants() != null && !order.getParticipants().isEmpty()) userServiceApi.PARTICIPANT.checkParticipants(order.getCustomerId(), order.getParticipants());
+        if (order.getParticipants() != null && !order.getParticipants().isEmpty()) UserServiceApi.PARTICIPANT.checkParticipants(order.getCustomerId(), order.getParticipants());
 
         for (OrderPrice price : order.getPrices()) {
             if (!sku.findPrice(price.getAdult(), price.getChild(), price.getPrice())) throw new MomiaFailedException("无效的订单，套餐不正确");
@@ -103,28 +100,29 @@ public class OrderController extends AbstractController {
     }
 
     private boolean lockSku(Order order) {
-        return productServiceApi.SKU.lockStock(order.getProductId(), order.getSkuId(), order.getCount(), order.getJoinedCount());
+        return ProductServiceApi.SKU.lockStock(order.getProductId(), order.getSkuId(), order.getCount(), order.getJoinedCount());
     }
 
     private void processContacts(long userId, String mobile, String name) {
         try {
             if (MobileUtil.isInvalidMobile(mobile) || StringUtils.isBlank(name)) return;
-            userServiceApi.USER.processContacts(userId, mobile, name);
+            UserServiceApi.USER.processContacts(userId, mobile, name);
         } catch (Exception e) {
             LOGGER.error("error occurred during process contacts {}/{}", mobile, name, e);
         }
     }
 
     private boolean unlockSku(Order order) {
-        return productServiceApi.SKU.unlockStock(order.getProductId(), order.getSkuId(), order.getCount(), order.getJoinedCount());
+        return ProductServiceApi.SKU.unlockStock(order.getProductId(), order.getSkuId(), order.getCount(), order.getJoinedCount());
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseMessage delete(@RequestParam(value = "uid") long userId, @PathVariable long id) {
+    public ResponseMessage delete(@RequestParam String utoken, @PathVariable long id) {
+        User user = UserServiceApi.USER.get(utoken);
         Order order = dealServiceFacade.getOrder(id);
-        if (!order.exists() || order.getCustomerId() != userId) return ResponseMessage.FAILED("无效的订单");
+        if (!order.exists() || order.getCustomerId() != user.getId()) return ResponseMessage.FAILED("无效的订单");
 
-        if (!dealServiceFacade.deleteOrder(userId, id)) return ResponseMessage.FAILED("删除订单失败");
+        if (!dealServiceFacade.deleteOrder(user.getId(), id)) return ResponseMessage.FAILED("删除订单失败");
 
         // TODO 需要告警
         if (!unlockSku(order)) LOGGER.error("fail to unlock sku, skuId: {}, count: {}", new Object[] { order.getSkuId(), order.getCount() });
@@ -136,18 +134,19 @@ public class OrderController extends AbstractController {
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public ResponseMessage list(@RequestParam(value = "uid") long userId,
+    public ResponseMessage list(@RequestParam String utoken,
                                 @RequestParam int status,
                                 @RequestParam int start,
                                 @RequestParam int count) {
         if (isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
 
-        long totalCount = dealServiceFacade.queryOrderCountByUser(userId, status);
-        List<Order> orders = dealServiceFacade.queryOrderByUser(userId, status, start, count);
+        User user = UserServiceApi.USER.get(utoken);
+        long totalCount = dealServiceFacade.queryOrderCountByUser(user.getId(), status);
+        List<Order> orders = dealServiceFacade.queryOrderByUser(user.getId(), status, start, count);
 
         List<Long> productIds = new ArrayList<Long>();
         for (Order order : orders) productIds.add(order.getProductId());
-        List<Product> products = productServiceApi.PRODUCT.list(productIds);
+        List<Product> products = ProductServiceApi.PRODUCT.list(productIds);
 
         return ResponseMessage.SUCCESS(buildUserOrders(totalCount, orders, products, start, count));
     }
@@ -172,13 +171,14 @@ public class OrderController extends AbstractController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseMessage detail(@RequestParam(value = "uid") long userId,
+    public ResponseMessage detail(@RequestParam String utoken,
                                   @PathVariable(value = "id") long id,
                                   @RequestParam(value = "pid") long productId) {
+        User user = UserServiceApi.USER.get(utoken);
         Order order = dealServiceFacade.getOrder(id);
-        Product product = productServiceApi.PRODUCT.get(productId, Product.Type.BASE_WITH_SKU);
+        Product product = ProductServiceApi.PRODUCT.get(productId, Product.Type.BASE_WITH_SKU);
         if (!order.exists() || !product.exists() ||
-                order.getCustomerId() != userId ||
+                order.getCustomerId() != user.getId() ||
                 order.getProductId() != product.getId()) return ResponseMessage.FAILED("无效的订单");
 
         return ResponseMessage.SUCCESS(new OrderDetailDto(order, product));
@@ -193,7 +193,7 @@ public class OrderController extends AbstractController {
 
         List<Long> customerIds = new ArrayList<Long>();
         for (Order order : orders) customerIds.add(order.getCustomerId());
-        List<User> customers = userServiceApi.USER.list(customerIds, User.Type.MINI);
+        List<User> customers = UserServiceApi.USER.list(customerIds, User.Type.MINI);
         Map<Long, User> customersMap = new HashMap<Long, User>();
         for (User customer : customers) {
             customersMap.put(customer.getId(), customer);
@@ -258,12 +258,12 @@ public class OrderController extends AbstractController {
         }
 
         Map<Long, User> customersMap = new HashMap<Long, User>();
-        for (User customer : userServiceApi.USER.list(customerIds, User.Type.MINI)) {
+        for (User customer : UserServiceApi.USER.list(customerIds, User.Type.MINI)) {
             customersMap.put(customer.getId(), customer);
         }
 
         Map<Long, Participant> participantsMap = new HashMap<Long, Participant>();
-        for (Participant participant : userServiceApi.PARTICIPANT.list(participantIds)) {
+        for (Participant participant : UserServiceApi.PARTICIPANT.list(participantIds)) {
             participantsMap.put(participant.getId(), participant);
         }
 
@@ -271,7 +271,7 @@ public class OrderController extends AbstractController {
     }
 
     private List<Sku> querySkus(long id, int start, int count) {
-        List<Sku> skus = productServiceApi.SKU.listAll(id);
+        List<Sku> skus = ProductServiceApi.SKU.listAll(id);
 
         List<Sku> result = new ArrayList<Sku>();
         for (int i = start; i < Math.min(skus.size(), start + count); i++) {

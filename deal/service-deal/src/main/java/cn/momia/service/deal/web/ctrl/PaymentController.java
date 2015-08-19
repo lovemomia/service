@@ -1,6 +1,8 @@
 package cn.momia.service.deal.web.ctrl;
 
 import cn.momia.api.base.exception.MomiaFailedException;
+import cn.momia.api.user.User;
+import cn.momia.api.user.UserServiceApi;
 import cn.momia.service.base.web.ctrl.AbstractController;
 import cn.momia.service.deal.facade.DealServiceFacade;
 import cn.momia.service.deal.facade.OrderInfoFields;
@@ -33,8 +35,6 @@ public class PaymentController extends AbstractController {
     @Autowired private DealServiceFacade dealServiceFacade;
     @Autowired private PromoServiceFacade promoServiceFacade;
 
-    @Autowired private ProductServiceApi productServiceApi;
-
     private static Map<String, String> extractParams(Map<String, String[]> httpParams) {
         Map<String, String> params = new HashMap<String, String>();
         for (Map.Entry<String, String[]> entry : httpParams.entrySet()) {
@@ -52,24 +52,24 @@ public class PaymentController extends AbstractController {
     }
 
     private ResponseMessage prepay(HttpServletRequest request, int payType) {
-        long userId = Long.valueOf(request.getParameter("uid"));
+        User user = UserServiceApi.USER.get(request.getParameter("utoken"));
         long orderId = Long.valueOf(request.getParameter("oid"));
         long productId = Long.valueOf(request.getParameter("pid"));
         long skuId = Long.valueOf(request.getParameter("sid"));
 
         Order order = dealServiceFacade.getOrder(orderId);
         if (!order.exists() ||
-                order.getCustomerId() != userId ||
+                order.getCustomerId() != user.getId() ||
                 order.getProductId() != productId ||
                 order.getSkuId() != skuId) return ResponseMessage.FAILED("订单数据有问题，无效的订单");
 
-        Product product = productServiceApi.PRODUCT.get(productId, Product.Type.MINI);
-        Sku sku = productServiceApi.SKU.get(productId, skuId);
+        Product product = ProductServiceApi.PRODUCT.get(productId, Product.Type.MINI);
+        Sku sku = ProductServiceApi.SKU.get(productId, skuId);
         if (!product.exists() || !sku.exists() || sku.isClosed()) return ResponseMessage.FAILED("活动已结束或下线，不能再付款");
 
         String userCouponIdStr = request.getParameter("coupon");
         long userCouponId = StringUtils.isBlank(userCouponIdStr) ? 0 : Long.valueOf(userCouponIdStr);
-        Coupon coupon = useCoupon(userId, order, userCouponId);
+        Coupon coupon = useCoupon(user.getId(), order, userCouponId);
 
         Map<String, String> orderInfo = extraOrderInfo(request, order, product, coupon, payType);
         PrepayResult prepayResult = dealServiceFacade.prepay(orderInfo, payType);
@@ -123,30 +123,31 @@ public class PaymentController extends AbstractController {
     }
 
     @RequestMapping(value = "/prepay/free", method = RequestMethod.POST)
-    public ResponseMessage prepayFree(@RequestParam(value = "uid") long userId,
+    public ResponseMessage prepayFree(@RequestParam String utoken,
                                       @RequestParam(value = "oid") long orderId,
                                       @RequestParam(value = "pid") long productId,
                                       @RequestParam(value = "sid") long skuId,
                                       @RequestParam(value = "coupon", required = false) Long userCouponId) {
+        User user = UserServiceApi.USER.get(utoken);
         Order order = dealServiceFacade.getOrder(orderId);
         if (!order.exists() ||
-                order.getCustomerId() != userId ||
+                order.getCustomerId() != user.getId() ||
                 order.getProductId() != productId ||
                 order.getSkuId() != skuId) return ResponseMessage.FAILED("订单数据有问题，无效的订单");
 
         if (order.isPayed()) return ResponseMessage.SUCCESS;
 
-        Product product = productServiceApi.PRODUCT.get(productId, Product.Type.MINI);
-        Sku sku = productServiceApi.SKU.get(productId, skuId);
+        Product product = ProductServiceApi.PRODUCT.get(productId, Product.Type.MINI);
+        Sku sku = ProductServiceApi.SKU.get(productId, skuId);
         if (!product.exists() || !sku.exists() || sku.isClosed()) return ResponseMessage.FAILED("活动已结束或下线，不能再付款");
 
         BigDecimal totalFee = order.getTotalFee();
         if (userCouponId != null && userCouponId > 0) {
-            Coupon coupon = useCoupon(userId, order, userCouponId);
+            Coupon coupon = useCoupon(user.getId(), order, userCouponId);
             totalFee = promoServiceFacade.calcTotalFee(totalFee, coupon);
 
             if (totalFee.compareTo(new BigDecimal(0)) != 0 ||
-                    (coupon.exists() && !promoServiceFacade.useUserCoupon(userId, orderId, userCouponId))) return ResponseMessage.FAILED("支付失败");
+                    (coupon.exists() && !promoServiceFacade.useUserCoupon(user.getId(), orderId, userCouponId))) return ResponseMessage.FAILED("支付失败");
         }
 
         if (totalFee.compareTo(new BigDecimal(0)) != 0 ||
@@ -157,11 +158,12 @@ public class PaymentController extends AbstractController {
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.GET)
-    public ResponseMessage checkPayment(@RequestParam(value = "uid") long userId,
+    public ResponseMessage checkPayment(@RequestParam String utoken,
                                         @RequestParam(value = "oid") long orderId,
                                         @RequestParam(value = "pid") long productId,
                                         @RequestParam(value = "sid") long skuId) {
-        if (!dealServiceFacade.check(userId, orderId, productId, skuId)) return ResponseMessage.FAILED("支付失败");
+        User user = UserServiceApi.USER.get(utoken);
+        if (!dealServiceFacade.check(user.getId(), orderId, productId, skuId)) return ResponseMessage.FAILED("支付失败");
         return ResponseMessage.SUCCESS;
     }
 }

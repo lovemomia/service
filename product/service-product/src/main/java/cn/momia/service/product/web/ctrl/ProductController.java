@@ -50,7 +50,6 @@ public class ProductController extends AbstractController {
     private static final Pattern SORT_PATTERN = Pattern.compile("(ASC|DESC)\\(([a-zA-Z0-9]+)\\)");
 
     @Autowired private ProductServiceFacade productServiceFacade;
-    @Autowired private UserServiceApi userServiceApi;
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public ResponseMessage list(@RequestParam(value = "pids") String pids) {
@@ -258,7 +257,7 @@ public class ProductController extends AbstractController {
         List<Long> leaderUserIds = new ArrayList<Long>();
         for (Sku sku : skus) leaderUserIds.add(sku.getLeaderUserId());
 
-        List<Leader> leaders = userServiceApi.LEADER.list(leaderUserIds);
+        List<Leader> leaders = UserServiceApi.LEADER.list(leaderUserIds);
         Map<Long, Leader> leadersMap = new HashMap<Long, Leader>();
         for (Leader leader : leaders) leadersMap.put(leader.getUserId(), leader);
 

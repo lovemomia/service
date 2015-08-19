@@ -30,9 +30,6 @@ public class CallbackController extends AbstractController {
     @Autowired private DealServiceFacade dealServiceFacade;
     @Autowired private PromoServiceFacade promoServiceFacade;
 
-    @Autowired private CommonServiceApi commonServiceApi;
-    @Autowired private ProductServiceApi productServiceApi;
-
     private static Map<String, String> extractParams(Map<String, String[]> httpParams) {
         Map<String, String> params = new HashMap<String, String>();
         for (Map.Entry<String, String[]> entry : httpParams.entrySet()) {
@@ -82,7 +79,7 @@ public class CallbackController extends AbstractController {
 
     private void updateSales(Order order) {
         try {
-            productServiceApi.PRODUCT.sold(order.getProductId(), order.getCount());
+            ProductServiceApi.PRODUCT.sold(order.getProductId(), order.getCount());
         } catch (Exception e) {
             LOGGER.error("fail to update sales of order: {}", order.getId(), e);
         }
@@ -90,7 +87,7 @@ public class CallbackController extends AbstractController {
 
     private void notifyUser(Order order) {
         try {
-            Product product = productServiceApi.PRODUCT.get(order.getProductId(), Product.Type.BASE_WITH_SKU);
+            Product product = ProductServiceApi.PRODUCT.get(order.getProductId(), Product.Type.BASE_WITH_SKU);
             StringBuilder msg = new StringBuilder();
             msg.append("您的订单：\"")
                     .append(product.getTitle())
@@ -99,7 +96,7 @@ public class CallbackController extends AbstractController {
                     .append("，地点：")
                     .append(product.getAddress())
                     .append("，请准时参加【哆啦亲子】");
-            commonServiceApi.SMS.notify(order.getMobile(), msg.toString());
+            CommonServiceApi.SMS.notify(order.getMobile(), msg.toString());
         } catch (Exception e) {
             LOGGER.error("fail to notify user for order: {}", order.getId(), e);
         }

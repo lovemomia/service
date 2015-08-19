@@ -33,7 +33,6 @@ public class FeedController extends AbstractController {
     private static final Logger LOGGER = LoggerFactory.getLogger(FeedController.class);
 
     @Autowired private FeedServiceFacade feedServiceFacade;
-    @Autowired private UserServiceApi userServiceApi;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseMessage list(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
@@ -55,7 +54,7 @@ public class FeedController extends AbstractController {
 
         Set<Long> userIds = new HashSet<Long>();
         for (Feed feed : feeds) userIds.add(feed.getUserId());
-        List<User> users = userServiceApi.USER.list(userIds, User.Type.MINI);
+        List<User> users = UserServiceApi.USER.list(userIds, User.Type.MINI);
         Map<Long, User> usersMap = new HashMap<Long, User>();
         for (User user : users) usersMap.put(user.getId(), user);
 
@@ -103,7 +102,7 @@ public class FeedController extends AbstractController {
         Feed feed = feedServiceFacade.getFeed(id);
         if (!feed.exists()) return ResponseMessage.FAILED("无效的Feed");
 
-        User feedUser = userServiceApi.USER.get(feed.getUserId());
+        User feedUser = UserServiceApi.USER.get(feed.getUserId());
         if (feedUser.getId() <= 0) return ResponseMessage.FAILED("无效的Feed");
 
         boolean stared = feedServiceFacade.isStared(userId, id);
@@ -131,7 +130,7 @@ public class FeedController extends AbstractController {
 
         List<Long> userIds = new ArrayList<Long>();
         for (FeedComment comment : comments) userIds.add(comment.getUserId());
-        List<User> users = userServiceApi.USER.list(userIds, User.Type.MINI);
+        List<User> users = UserServiceApi.USER.list(userIds, User.Type.MINI);
         Map<Long, User> usersMap = new HashMap<Long, User>();
         for (User user : users) usersMap.put(user.getId(), user);
 
@@ -176,7 +175,7 @@ public class FeedController extends AbstractController {
         if (totalCount <= 0) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
 
         List<Long> userIds = feedServiceFacade.queryStaredUserIds(id, start, count);
-        List<User> users = userServiceApi.USER.list(userIds, User.Type.MINI);
+        List<User> users = UserServiceApi.USER.list(userIds, User.Type.MINI);
 
         PagedListDto staredUsersDto = new PagedListDto(totalCount, start, count);
         for (User user : users) staredUsersDto.add(user);

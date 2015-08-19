@@ -26,4 +26,12 @@ public class FullUserDto extends BaseUserDto {
         }
         this.leader = leader;
     }
+
+    public FullUserDto(User user, List<Participant> children, Leader leader, boolean showToken) {
+        super(user, showToken);
+        for (Participant child : children) {
+            this.children.add(new ParticipantDto(child));
+        }
+        this.leader = leader;
+    }
 }

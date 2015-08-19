@@ -57,7 +57,7 @@
         <property name="leaderService" ref="leaderService" />
     </bean>
 
-    <bean id="commonServiceApi" class="cn.momia.api.common.CommonServiceApi" init-method="init">
+    <bean class="cn.momia.api.common.CommonServiceApi" init-method="init">
         <property name="service" value="${Service.Common}" />
     </bean>
 </beans>

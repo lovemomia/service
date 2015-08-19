@@ -89,10 +89,13 @@
 
     <bean class="cn.momia.service.deal.gateway.factory.PrepayParamFactory" />
 
-    <bean id="productServiceApi" class="cn.momia.api.product.ProductServiceApi" init-method="init">
+    <bean class="cn.momia.api.common.CommonServiceApi" init-method="init">
+        <property name="service" value="${Service.Common}" />
+    </bean>
+    <bean class="cn.momia.api.product.ProductServiceApi" init-method="init">
         <property name="service" value="${Service.Product}" />
     </bean>
-    <bean id="userServiceApi" class="cn.momia.api.user.UserServiceApi" init-method="init">
+    <bean class="cn.momia.api.user.UserServiceApi" init-method="init">
         <property name="service" value="${Service.User}" />
     </bean>
 </beans>

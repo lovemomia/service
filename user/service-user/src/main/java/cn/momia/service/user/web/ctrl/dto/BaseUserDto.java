@@ -7,8 +7,10 @@ import com.alibaba.fastjson.annotation.JSONField;
 import java.util.Date;
 
 public class BaseUserDto extends MiniUserDto {
+    protected boolean showToken = true;
+
     public String getToken() {
-        return user.getToken();
+        return showToken ? user.getToken() : null;
     }
 
     public String getMobile() {
@@ -52,4 +54,10 @@ public class BaseUserDto extends MiniUserDto {
     public BaseUserDto(User user) {
         super(user);
     }
+
+    public BaseUserDto(User user, boolean showToken) {
+        super(user);
+        this.showToken = showToken;
+    }
+
 }
