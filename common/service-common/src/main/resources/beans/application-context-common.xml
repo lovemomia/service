@@ -48,7 +48,7 @@
         <property name="jdbcTemplate" ref="jdbcTemplate" />
     </bean>
 
-    <bean id="smsSender" class="cn.momia.service.common.sms.impl.LuosimaoSmsSender" parent="dbAccessService" />
+    <bean id="smsSender" class="cn.momia.service.common.sms.impl.LuosimaoSmsSender" />
     <bean id="smsService" class="cn.momia.service.common.sms.impl.SmsServiceImpl" parent="dbAccessService">
         <property name="sender" ref="smsSender" />
     </bean>
