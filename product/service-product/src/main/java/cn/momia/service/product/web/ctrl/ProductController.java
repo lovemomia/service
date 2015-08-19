@@ -231,7 +231,7 @@ public class ProductController extends AbstractController {
     @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
     public ResponseMessage listSkus(@PathVariable long id) {
         List<Sku> skus = productServiceFacade.getSkus(id);
-        skus = Sku.filter(skus);
+        skus = Sku.sort(Sku.filterFinished(skus));
         return ResponseMessage.SUCCESS(buildSkusDto(skus));
     }
 
@@ -253,7 +253,7 @@ public class ProductController extends AbstractController {
 
     @RequestMapping(value = "/{id}/sku/leader", method = RequestMethod.GET)
     public ResponseMessage listSkusWithLeaders(@PathVariable long id) {
-        List<Sku> skus = Sku.filter(productServiceFacade.getSkus(id));
+        List<Sku> skus = Sku.filterClosed(productServiceFacade.getSkus(id));
 
         List<Long> leaderUserIds = new ArrayList<Long>();
         for (Sku sku : skus) leaderUserIds.add(sku.getLeaderUserId());

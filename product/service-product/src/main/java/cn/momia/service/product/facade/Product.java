@@ -99,7 +99,7 @@ public class Product implements Serializable {
         Date now = new Date();
         if (getOfflineTime().before(now) || isSoldOut() || getStatus() != 1) return false;
 
-        return !Sku.filter(skus).isEmpty();
+        return !Sku.filterClosed(skus).isEmpty();
     }
 
     public void setBaseProduct(BaseProduct baseProduct) {

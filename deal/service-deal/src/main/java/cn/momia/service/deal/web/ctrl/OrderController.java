@@ -89,7 +89,7 @@ public class OrderController extends AbstractController {
                 order.getPrices().isEmpty() ||
                 !sku.exists() ||
                 sku.getProductId() != order.getProductId() ||
-                sku.isClosed())  throw new MomiaFailedException("活动已结束或下线，不能再下单");
+                sku.isClosed())  throw new MomiaFailedException("活动已报满或结束，不能再下单");
 
         if (sku.isNeedRealName() &&
                 (order.getParticipants() == null ||

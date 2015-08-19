@@ -32,6 +32,31 @@ public class Sku implements Serializable {
         INVALID_SKU.setId(0);
     }
 
+    public static List<Sku> sort(List<Sku> skus) {
+        Collections.sort(skus, new Comparator<Sku>() {
+            @Override
+            public int compare(Sku s1, Sku s2) {
+                if (s1.isFull() && s2.isFull()) return 0;
+                if (s1.isFull()) return 1;
+                if (s2.isFull()) return -1;
+
+                Date time1 = s1.startTime();
+                Date time2 = s2.startTime();
+
+                if (time1 == null) return 1;
+                if (time2 == null) return -1;
+
+                long timeStamp1 = time1.getTime();
+                long timeStamp2 = time2.getTime();
+
+                if (timeStamp1 <= timeStamp2) return 1;
+                return -1;
+            }
+        });
+
+        return skus;
+    }
+
     public static List<Sku> sortByStartTime(List<Sku> skus) {
         Collections.sort(skus, new Comparator<Sku>() {
             @Override
@@ -61,7 +86,19 @@ public class Sku implements Serializable {
         return times.get(0);
     }
 
-    public static List<Sku> filter(List<Sku> skus) {
+    public static List<Sku> filterFinished(List<Sku> skus) {
+        List<Sku> filteredSkus = new ArrayList<Sku>();
+
+        Date now = new Date();
+        for (Sku sku : skus) {
+            if (sku.isFinished(now)) continue;
+            filteredSkus.add(sku);
+        }
+
+        return filteredSkus;
+    }
+
+    public static List<Sku> filterClosed(List<Sku> skus) {
         List<Sku> filteredSkus = new ArrayList<Sku>();
 
         Date now = new Date();
@@ -352,10 +389,18 @@ public class Sku implements Serializable {
         return new ArrayList<Date>();
     }
 
+    public boolean isFinished(Date now) {
+        if (offlineTime.before(now) || (startTime.before(now) && !anyTime)) return true;
+
+        return false;
+    }
+
+    public boolean isFull() {
+        return type != 1 && unlockedStock <= 0;
+    }
+
     public boolean isClosed(Date now) {
-        if (offlineTime.before(now) ||
-                (startTime.before(now) && !anyTime) ||
-                (type != 1 && unlockedStock <= 0)) return true;
+        if (isFinished(now) || isFull()) return true;
 
         return false;
     }

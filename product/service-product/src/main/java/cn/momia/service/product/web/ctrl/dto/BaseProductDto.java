@@ -106,7 +106,7 @@ public class BaseProductDto extends MiniProductDto implements Dto {
     private ListDto buildSkusDto(List<Sku> skus) {
         ListDto skusDto = new ListDto();
 
-        skus = Sku.filter(skus);
+        skus = Sku.filterFinished(skus);
         for (Sku sku : skus) {
             skusDto.add(new FullSkuDto(sku));
         }
