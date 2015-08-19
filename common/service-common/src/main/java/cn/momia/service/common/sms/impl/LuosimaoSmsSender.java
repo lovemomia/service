@@ -40,9 +40,9 @@ public class LuosimaoSmsSender implements SmsSender {
 
             if (error == 0) return true;
 
-            LOGGER.error("fail to notify user, {}/{}, error code is: {}", mobile, msg, error);
+            LOGGER.error("fail to send msg to user, {}/{}, error code is: {}", mobile, msg, error);
         } catch (Exception e) {
-            LOGGER.error("fail to notify user, {}/{}", mobile, msg, e);
+            LOGGER.error("fail to send msg to user, {}/{}", mobile, msg, e);
         }
 
         return false;
