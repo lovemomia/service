@@ -9,8 +9,7 @@ import cn.momia.service.common.feedback.FeedbackService;
 import cn.momia.service.common.recommend.RecommendService;
 import cn.momia.service.common.region.Region;
 import cn.momia.service.common.region.RegionService;
-import cn.momia.service.common.sms.SmsSender;
-import cn.momia.service.common.sms.SmsVerifier;
+import cn.momia.service.common.sms.SmsService;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,19 +19,14 @@ import java.util.Set;
 public class CommonServiceFacadeImpl implements CommonServiceFacade {
     private static final Set<String> TYPES = Sets.newHashSet(new String[] { "register", "login" });
 
-    private SmsSender smsSender;
-    private SmsVerifier smsVerifier;
+    private SmsService smsService;
     private CityService cityService;
     private RegionService regionService;
     private FeedbackService feedbackService;
     private RecommendService recommendService;
 
-    public void setSmsSender(SmsSender smsSender) {
-        this.smsSender = smsSender;
-    }
-
-    public void setSmsVerifier(SmsVerifier smsVerifier) {
-        this.smsVerifier = smsVerifier;
+    public void setSmsService(SmsService smsService) {
+        this.smsService = smsService;
     }
 
     public void setCityService(CityService cityService) {
@@ -55,7 +49,7 @@ public class CommonServiceFacadeImpl implements CommonServiceFacade {
     public boolean sendCode(String mobile, String type) {
         if (MobileUtil.isInvalidMobile(mobile) || isInvalidType(type)) return false;
 
-        return smsSender.send(mobile, type);
+        return smsService.sendCode(mobile, type);
     }
 
     private boolean isInvalidType(String type) {
@@ -66,14 +60,14 @@ public class CommonServiceFacadeImpl implements CommonServiceFacade {
     public boolean verifyCode(String mobile, String code) {
         if (MobileUtil.isInvalidMobile(mobile) || StringUtils.isBlank(code)) return false;
 
-        return smsVerifier.verify(mobile, code);
+        return smsService.verifyCode(mobile, code);
     }
 
     @Override
     public boolean notifyUser(String mobile, String msg) {
         if (MobileUtil.isInvalidMobile(mobile) || StringUtils.isBlank(msg)) return false;
 
-        return smsSender.notify(mobile, msg);
+        return smsService.notifyUser(mobile, msg);
     }
 
     @Override

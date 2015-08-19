@@ -1,9 +1,10 @@
 package cn.momia.service.common.sms.impl;
 
-import cn.momia.service.base.config.Configuration;
 import cn.momia.api.base.exception.MomiaFailedException;
+import cn.momia.service.base.config.Configuration;
 import cn.momia.service.base.impl.DbAccessService;
 import cn.momia.service.common.sms.SmsSender;
+import cn.momia.service.common.sms.SmsService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -16,11 +17,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public abstract class AbstractSmsSender extends DbAccessService implements SmsSender {
+public class SmsServiceImpl extends DbAccessService implements SmsService {
     private ExecutorService executorService;
+    private SmsSender sender;
+
+    public void setSender(SmsSender sender) {
+        this.sender = sender;
+    }
 
     @Override
-    public boolean send(String mobile, String type) {
+    public boolean sendCode(String mobile, String type) {
         if(StringUtils.equals(type, "login") && !userExists(mobile)) throw new MomiaFailedException("用户不存在，请先注册");
 
         String code = getGeneratedCode(mobile);
@@ -32,7 +38,7 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
         Date lastSendTime = getLastSendTime(mobile);
         if (lastSendTime != null && new Date().getTime() - lastSendTime.getTime() < 60 * 1000) return true;
 
-        sendAsync(mobile, code);
+        sendAsync(mobile, buildCodeMsg(code));
 
         return true;
     }
@@ -52,18 +58,17 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
     {
         String sql = "SELECT code, status, generateTime FROM t_verify WHERE mobile=?";
 
-        return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<String>()
-        {
+        return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<String>() {
             @Override
-            public String extractData(ResultSet rs) throws SQLException, DataAccessException
-            {
+            public String extractData(ResultSet rs) throws SQLException, DataAccessException {
                 if (!rs.next()) return null;
 
                 String code = rs.getString("code");
                 int status = rs.getInt("status");
                 Date generateTime = rs.getTimestamp("generateTime");
 
-                if (status == 0 || generateTime == null || new Date().getTime() - generateTime.getTime() > 30 * 60 * 1000) return "";
+                if (status == 0 || generateTime == null || new Date().getTime() - generateTime.getTime() > 30 * 60 * 1000)
+                    return "";
                 return code;
             }
         });
@@ -105,13 +110,17 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
         });
     }
 
-    private void sendAsync(final String mobile, final String code) {
+    private String buildCodeMsg(String code) {
+        return "验证码：" + code + "，30分钟内有效【哆啦亲子】";
+    }
+
+    private void sendAsync(final String mobile, final String codeMsg) {
         if (executorService == null) initExecutorService();
 
         executorService.execute(new Runnable() {
             @Override
             public void run() {
-                if (doSend(mobile, code)) {
+                if (sender.send(mobile, codeMsg)) {
                     updateSendTime(mobile);
                 }
             }
@@ -127,8 +136,6 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
         executorService = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 5, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(queueSize));
     }
 
-    protected abstract boolean doSend(String mobile, String code);
-
     private boolean updateSendTime(String mobile)
     {
         String sql = "UPDATE t_verify SET sendTime=NOW() WHERE mobile=?";
@@ -136,18 +143,43 @@ public abstract class AbstractSmsSender extends DbAccessService implements SmsSe
         return jdbcTemplate.update(sql, new Object[] { mobile }) == 1;
     }
 
-    public boolean notify(final String mobile, final String msg) {
+    @Override
+    public boolean verifyCode(String mobile, String code) {
+        String sql = "SELECT generateTime FROM t_verify WHERE mobile=? AND code=? AND status=1";
+        boolean successful = jdbcTemplate.query(sql, new Object[] { mobile, code }, new ResultSetExtractor<Boolean>()
+        {
+            @Override
+            public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException
+            {
+                if (rs.next()) {
+                    Date generateTime = rs.getTimestamp("generateTime");
+                    return new Date().getTime() - generateTime.getTime() < 30 * 60 * 1000;
+                }
+
+                return false;
+            }
+        });
+        if (successful) disable(mobile, code);
+
+        return successful;
+    }
+
+    private void disable(String mobile, String code) {
+        String sql = "UPDATE t_verify SET status=0 WHERE mobile=? AND code=?";
+        jdbcTemplate.update(sql, new Object[] { mobile, code });
+    }
+
+    @Override
+    public boolean notifyUser(final String mobile, final String msg) {
         if (executorService == null) initExecutorService();
 
         executorService.execute(new Runnable() {
             @Override
             public void run() {
-                doNotify(mobile, msg);
+                sender.send(mobile, msg);
             }
         });
 
         return true;
     }
-
-    protected abstract boolean doNotify(String mobile, String msg);
 }
