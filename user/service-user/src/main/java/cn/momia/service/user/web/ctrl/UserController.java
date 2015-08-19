@@ -41,7 +41,7 @@ public class UserController extends UserRelatedController {
     public ResponseMessage getUser(@PathVariable long id) {
         User user = userServiceFacade.getUser(id);
 
-        return ResponseMessage.SUCCESS(buildUserResponse(user));
+        return ResponseMessage.SUCCESS(buildUserResponse(user, false));
     }
 
     @RequestMapping(value = "/nickname", method = RequestMethod.PUT)
@@ -271,9 +271,9 @@ public class UserController extends UserRelatedController {
                 // TODO 性能
                 for (User user : users) usersDto.add(new FullUserDto(user,
                         userServiceFacade.getChildren(user.getId(), user.getChildren()),
-                        userServiceFacade.getLeaderInfo(user.getId())));
+                        userServiceFacade.getLeaderInfo(user.getId()), false));
                 break;
-            default: for (User user : users) usersDto.add(new BaseUserDto(user));
+            default: for (User user : users) usersDto.add(new BaseUserDto(user, false));
         }
 
         return ResponseMessage.SUCCESS(usersDto);

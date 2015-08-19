@@ -225,6 +225,15 @@ public class UserServiceApi extends ServiceApi {
             return JSON.toJavaObject((JSON) executeRequest(request), Contacts.class);
         }
 
+        public void processContacts(long userId, String mobile, String name) {
+            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                    .add("uid", userId)
+                    .add("mobile", mobile)
+                    .add("name", name);
+            MomiaHttpRequest request = MomiaHttpRequest.POST(url("user/contacts"), builder.build());
+            executeRequest(request);
+        }
+
         public List<User> list(Collection<Long> userIds, int type) {
             if (userIds == null || userIds.isEmpty()) return new ArrayList<User>();
 
@@ -241,15 +250,6 @@ public class UserServiceApi extends ServiceApi {
             }
 
             return users;
-        }
-
-        public void processContacts(long userId, String mobile, String name) {
-            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                    .add("uid", userId)
-                    .add("mobile", mobile)
-                    .add("name", name);
-            MomiaHttpRequest request = MomiaHttpRequest.POST(url("user/contacts"), builder.build());
-            executeRequest(request);
         }
     }
 

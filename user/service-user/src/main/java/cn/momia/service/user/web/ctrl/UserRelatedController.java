@@ -15,9 +15,13 @@ public abstract class UserRelatedController extends AbstractController {
     @Autowired protected UserServiceFacade userServiceFacade;
 
     protected FullUserDto buildUserResponse(User user) {
+        return buildUserResponse(user, true);
+    }
+
+    protected FullUserDto buildUserResponse(User user, boolean showToken) {
         return new FullUserDto(user,
                 userServiceFacade.getChildren(user.getId(), user.getChildren()),
-                userServiceFacade.getLeaderInfo(user.getId()));
+                userServiceFacade.getLeaderInfo(user.getId()), showToken);
     }
 
     protected ListDto buildParticipantsResponse(List<Participant> participants) {
