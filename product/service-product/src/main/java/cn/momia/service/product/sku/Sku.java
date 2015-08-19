@@ -49,8 +49,8 @@ public class Sku implements Serializable {
                 long timeStamp1 = time1.getTime();
                 long timeStamp2 = time2.getTime();
 
-                if (timeStamp1 <= timeStamp2) return 1;
-                return -1;
+                if (timeStamp1 <= timeStamp2) return -1;
+                return 1;
             }
         });
 
@@ -70,8 +70,8 @@ public class Sku implements Serializable {
                 long timeStamp1 = time1.getTime();
                 long timeStamp2 = time2.getTime();
 
-                if (timeStamp1 <= timeStamp2) return 1;
-                return -1;
+                if (timeStamp1 <= timeStamp2) return -1;
+                return 1;
             }
         });
 
