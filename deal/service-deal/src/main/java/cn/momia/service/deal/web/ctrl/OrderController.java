@@ -117,11 +117,12 @@ public class OrderController extends AbstractController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseMessage delete(@RequestParam(value = "uid") long userId, @PathVariable long id) {
+    public ResponseMessage delete(@RequestParam String utoken, @PathVariable long id) {
+        User user = UserServiceApi.USER.get(utoken);
         Order order = dealServiceFacade.getOrder(id);
-        if (!order.exists() || order.getCustomerId() != userId) return ResponseMessage.FAILED("无效的订单");
+        if (!order.exists() || order.getCustomerId() != user.getId()) return ResponseMessage.FAILED("无效的订单");
 
-        if (!dealServiceFacade.deleteOrder(userId, id)) return ResponseMessage.FAILED("删除订单失败");
+        if (!dealServiceFacade.deleteOrder(user.getId(), id)) return ResponseMessage.FAILED("删除订单失败");
 
         // TODO 需要告警
         if (!unlockSku(order)) LOGGER.error("fail to unlock sku, skuId: {}, count: {}", new Object[] { order.getSkuId(), order.getCount() });
@@ -133,14 +134,15 @@ public class OrderController extends AbstractController {
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public ResponseMessage list(@RequestParam(value = "uid") long userId,
+    public ResponseMessage list(@RequestParam String utoken,
                                 @RequestParam int status,
                                 @RequestParam int start,
                                 @RequestParam int count) {
         if (isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
 
-        long totalCount = dealServiceFacade.queryOrderCountByUser(userId, status);
-        List<Order> orders = dealServiceFacade.queryOrderByUser(userId, status, start, count);
+        User user = UserServiceApi.USER.get(utoken);
+        long totalCount = dealServiceFacade.queryOrderCountByUser(user.getId(), status);
+        List<Order> orders = dealServiceFacade.queryOrderByUser(user.getId(), status, start, count);
 
         List<Long> productIds = new ArrayList<Long>();
         for (Order order : orders) productIds.add(order.getProductId());
@@ -169,13 +171,14 @@ public class OrderController extends AbstractController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseMessage detail(@RequestParam(value = "uid") long userId,
+    public ResponseMessage detail(@RequestParam String utoken,
                                   @PathVariable(value = "id") long id,
                                   @RequestParam(value = "pid") long productId) {
+        User user = UserServiceApi.USER.get(utoken);
         Order order = dealServiceFacade.getOrder(id);
         Product product = ProductServiceApi.PRODUCT.get(productId, Product.Type.BASE_WITH_SKU);
         if (!order.exists() || !product.exists() ||
-                order.getCustomerId() != userId ||
+                order.getCustomerId() != user.getId() ||
                 order.getProductId() != product.getId()) return ResponseMessage.FAILED("无效的订单");
 
         return ResponseMessage.SUCCESS(new OrderDetailDto(order, product));

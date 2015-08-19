@@ -1,5 +1,7 @@
 package cn.momia.service.deal.web.ctrl;
 
+import cn.momia.api.user.User;
+import cn.momia.api.user.UserServiceApi;
 import cn.momia.service.base.web.ctrl.AbstractController;
 import cn.momia.service.deal.facade.DealServiceFacade;
 import cn.momia.service.deal.order.Order;
@@ -28,13 +30,15 @@ public class CouponController extends AbstractController {
     @Autowired private PromoServiceFacade promoServiceFacade;
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage coupon(@RequestParam(value = "uid") long userId,
+    public ResponseMessage coupon(@RequestParam String utoken,
                                   @RequestParam(value = "oid") long orderId,
                                   @RequestParam(value = "coupon") long userCouponId) {
-        Order order = dealServiceFacade.getOrder(orderId);
-        if (!order.exists() || order.isPayed() || order.getCustomerId() != userId) return ResponseMessage.FAILED("无效的订单");
+        User user = UserServiceApi.USER.get(utoken);
 
-        Coupon coupon = promoServiceFacade.getCoupon(userId, order.getId(), userCouponId);
+        Order order = dealServiceFacade.getOrder(orderId);
+        if (!order.exists() || order.isPayed() || order.getCustomerId() != user.getId()) return ResponseMessage.FAILED("无效的订单");
+
+        Coupon coupon = promoServiceFacade.getCoupon(user.getId(), order.getId(), userCouponId);
         if (!coupon.exists()) return ResponseMessage.FAILED("无效的优惠券，或使用条件不满足");
 
         BigDecimal totalFee = order.getTotalFee();
@@ -45,15 +49,17 @@ public class CouponController extends AbstractController {
 
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public ResponseMessage listCoupons(@RequestParam(value = "uid") long userId,
+    public ResponseMessage listCoupons(@RequestParam String utoken,
                                        @RequestParam(value = "oid") long orderId,
                                        @RequestParam int status,
                                        @RequestParam int start,
                                        @RequestParam int count) {
         if (isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
 
-        int totalCount = promoServiceFacade.queryUserCouponCount(userId, orderId, status);
-        List<UserCoupon> userCoupons = promoServiceFacade.queryUserCoupon(userId, orderId, status, start, count);
+        User user = UserServiceApi.USER.get(utoken);
+
+        int totalCount = promoServiceFacade.queryUserCouponCount(user.getId(), orderId, status);
+        List<UserCoupon> userCoupons = promoServiceFacade.queryUserCoupon(user.getId(), orderId, status, start, count);
 
         List<Integer> couponIds = new ArrayList<Integer>();
         for (UserCoupon userCoupon : userCoupons) couponIds.add(userCoupon.getCouponId());
