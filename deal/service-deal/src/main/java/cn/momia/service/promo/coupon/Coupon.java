@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class Coupon {
-    public static class Usage {
+    public static class Src {
         public static final int NORMAL = 0;
         public static final int REGISTER = 1;
     }

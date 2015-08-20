@@ -3,11 +3,6 @@ package cn.momia.service.promo.coupon;
 import java.util.Date;
 
 public class UserCoupon {
-    public static class Type {
-        public static final int NORMAL = 0;
-        public static final int REGISTER = 1;
-    }
-
     public static class Status {
         public static final int NOT_USED = 1;
         public static final int USED = 2;
@@ -25,7 +20,6 @@ public class UserCoupon {
     private long id;
     private long userId;
     private int couponId;
-    private int type;
     private Date startTime;
     private Date endTime;
     private long orderId;
@@ -53,14 +47,6 @@ public class UserCoupon {
 
     public void setCouponId(int couponId) {
         this.couponId = couponId;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
     }
 
     public Date getStartTime() {

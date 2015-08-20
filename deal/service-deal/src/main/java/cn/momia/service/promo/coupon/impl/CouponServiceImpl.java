@@ -22,34 +22,34 @@ import java.util.List;
 public class CouponServiceImpl extends DbAccessService implements CouponService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CouponServiceImpl.class);
     private static final String[] COUPON_FIELDS = { "id", "`type`", "`count`", "title", "`desc`", "discount", "consumption", "accumulation", "startTime", "endTime" };
-    private static final String[] USER_COUPON_FIELDS = { "id", "userId", "couponId", "`type`", "startTime", "orderId", "endTime", "status" };
+    private static final String[] USER_COUPON_FIELDS = { "id", "userId", "couponId", "startTime", "orderId", "endTime", "status" };
 
     @Override
-    public void distributeCoupon(long userId, int type) {
+    public void distributeCoupon(long userId, int src) {
         try {
-            if (getUserCouponCount(userId, type) > 0) return;
+            if (getUserCouponCount(userId, src) > 0) return;
 
-            List<Coupon> coupons = getCoupons(type);
+            List<Coupon> coupons = getCoupons(src);
             if (coupons.isEmpty()) return;
 
             List<Object[]> params = new ArrayList<Object[]>();
             for (Coupon coupon : coupons) {
                 for (int i = 0; i < coupon.getCount(); i++) {
-                    params.add(new Object[] { userId, coupon.getId(), type, coupon.getStartTime(), coupon.getEndTime() });
+                    params.add(new Object[] { userId, coupon.getId(), src, coupon.getStartTime(), coupon.getEndTime() });
                 }
             }
 
-            String sql = "INSERT INTO t_user_coupon(userId, couponId, `type`, startTime, endTime, addTime) VALUES (?, ?, ?, ?, ?, NOW())";
+            String sql = "INSERT INTO t_user_coupon(userId, couponId, src, startTime, endTime, addTime) VALUES (?, ?, ?, ?, ?, NOW())";
             jdbcTemplate.batchUpdate(sql, params);
         } catch (Exception e) {
-            LOGGER.error("fail to distribute coupon to user: {}/{}", userId, type, e);
+            LOGGER.error("fail to distribute coupon to user: {}/{}", userId, src, e);
         }
     }
 
-    private int getUserCouponCount(long userId, int type) {
-        String sql = "SELECT COUNT(1) FROM t_user_coupon WHERE userId=? AND type=?";
+    private int getUserCouponCount(long userId, int src) {
+        String sql = "SELECT COUNT(1) FROM t_user_coupon WHERE userId=? AND src=?";
 
-        return jdbcTemplate.query(sql, new Object[] { userId, type }, new ResultSetExtractor<Integer>() {
+        return jdbcTemplate.query(sql, new Object[] { userId, src }, new ResultSetExtractor<Integer>() {
             @Override
             public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
                 return rs.next() ? rs.getInt(1) : 0;
@@ -57,10 +57,10 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
         });
     }
 
-    private List<Coupon> getCoupons(int type) {
+    private List<Coupon> getCoupons(int src) {
         final List<Coupon> coupons = new ArrayList<Coupon>();
-        String sql = "SELECT " + joinCouponFields() + " FROM t_coupon WHERE status=1 AND `usage`=? AND endTime>NOW() ORDER BY addTime DESC";
-        jdbcTemplate.query(sql, new Object[] { type }, new RowCallbackHandler() {
+        String sql = "SELECT " + joinCouponFields() + " FROM t_coupon WHERE status=1 AND src=? AND endTime>NOW() ORDER BY addTime DESC";
+        jdbcTemplate.query(sql, new Object[] { src }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 Coupon coupon = buildCoupon(rs);
@@ -250,7 +250,6 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
             userCoupon.setId(rs.getLong("id"));
             userCoupon.setUserId(rs.getLong("userId"));
             userCoupon.setCouponId(rs.getInt("couponId"));
-            userCoupon.setType(rs.getInt("type"));
             userCoupon.setStartTime(rs.getTimestamp("startTime"));
             userCoupon.setEndTime(rs.getTimestamp("endTime"));
             userCoupon.setOrderId(rs.getLong("orderId"));
