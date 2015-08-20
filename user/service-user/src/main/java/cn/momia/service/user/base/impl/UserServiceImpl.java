@@ -49,17 +49,18 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
-    public long add(final String nickName, final String mobile, final String password, final String token) {
+    public long add(final String nickName, final String mobile, final String password, final String token, final String inviteCode) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO t_user(nickName, mobile, password, token, addTime) VALUES (?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO t_user(nickName, mobile, password, token, inviteCode, addTime) VALUES (?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, nickName);
                 ps.setString(2, mobile);
                 ps.setString(3, encryptPassword(mobile, password, Configuration.getPasswordSecretKey()));
                 ps.setString(4, token);
+                ps.setString(5, inviteCode);
 
                 return ps;
             }

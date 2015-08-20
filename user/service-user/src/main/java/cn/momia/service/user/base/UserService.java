@@ -10,7 +10,7 @@ import java.util.Set;
 public interface UserService extends Service {
     boolean exists(String field, String value);
 
-    long add(String nickName, String mobile, String password, String token);
+    long add(String nickName, String mobile, String password, String token, String inviteCode);
     boolean validatePassword(String mobile, String password);
 
     User get(long id);

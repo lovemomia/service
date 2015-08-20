@@ -58,12 +58,16 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
                 MobileUtil.isInvalidMobile(mobile) ||
                 StringUtils.isBlank(password)) return User.NOT_EXIST_USER;
 
-        long userId = userService.add(nickName, mobile, password, generateToken(mobile));
+        long userId = userService.add(nickName, mobile, password, generateToken(mobile), generateInviteCode(nickName, mobile));
         return userService.get(userId);
     }
 
     private String generateToken(String mobile) {
         return DigestUtils.md5Hex(StringUtils.join(new String[] { mobile, new Date().toString(), Configuration.getSecretKey() }, "|"));
+    }
+
+    private String generateInviteCode(String nickName, String mobile) {
+        return DigestUtils.md5Hex(StringUtils.join(new String[] { nickName, mobile, new Date().toString(), Configuration.getSecretKey() }, "|"));
     }
 
     @Override
