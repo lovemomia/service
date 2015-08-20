@@ -18,6 +18,7 @@ public class Coupon {
 
     private int id;
     private int type;
+    private int count;
     private String title;
     private String desc;
     private BigDecimal discount;
@@ -40,6 +41,14 @@ public class Coupon {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 
     public String getTitle() {

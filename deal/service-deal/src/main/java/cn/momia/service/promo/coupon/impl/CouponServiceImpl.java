@@ -21,7 +21,7 @@ import java.util.List;
 
 public class CouponServiceImpl extends DbAccessService implements CouponService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CouponServiceImpl.class);
-    private static final String[] COUPON_FIELDS = { "id", "`type`", "title", "`desc`", "discount", "consumption", "accumulation", "startTime", "endTime" };
+    private static final String[] COUPON_FIELDS = { "id", "`type`", "`count`", "title", "`desc`", "discount", "consumption", "accumulation", "startTime", "endTime" };
     private static final String[] USER_COUPON_FIELDS = { "id", "userId", "couponId", "`type`", "startTime", "orderId", "endTime", "status" };
 
     @Override
@@ -34,7 +34,9 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
 
             List<Object[]> params = new ArrayList<Object[]>();
             for (Coupon coupon : coupons) {
-                params.add(new Object[] { userId, coupon.getId(), type, coupon.getStartTime(), coupon.getEndTime() });
+                for (int i = 0; i < coupon.getCount(); i++) {
+                    params.add(new Object[] { userId, coupon.getId(), type, coupon.getStartTime(), coupon.getEndTime() });
+                }
             }
 
             String sql = "INSERT INTO t_user_coupon(userId, couponId, `type`, startTime, endTime, addTime) VALUES (?, ?, ?, ?, ?, NOW())";
@@ -78,6 +80,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
             Coupon coupon = new Coupon();
             coupon.setId(rs.getInt("id"));
             coupon.setType(rs.getInt("type"));
+            coupon.setCount(rs.getInt("count"));
             coupon.setTitle(rs.getString("title"));
             coupon.setDesc(rs.getString("desc"));
             coupon.setDiscount(rs.getBigDecimal("discount"));
