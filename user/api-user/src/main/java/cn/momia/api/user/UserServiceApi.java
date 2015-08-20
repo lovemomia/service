@@ -227,10 +227,9 @@ public class UserServiceApi extends ServiceApi {
 
         public void processContacts(long userId, String mobile, String name) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                    .add("uid", userId)
                     .add("mobile", mobile)
                     .add("name", name);
-            MomiaHttpRequest request = MomiaHttpRequest.POST(url("user/contacts"), builder.build());
+            MomiaHttpRequest request = MomiaHttpRequest.POST(url("user" + userId + "contacts"), builder.build());
             executeRequest(request);
         }
 
@@ -250,6 +249,22 @@ public class UserServiceApi extends ServiceApi {
             }
 
             return users;
+        }
+
+        public boolean isPayed(long userId) {
+            MomiaHttpRequest request = MomiaHttpRequest.GET(url("user", userId, "payed"));
+            return (Boolean) executeRequest(request);
+        }
+
+        public boolean setPayed(long userId) {
+            MomiaHttpRequest request = MomiaHttpRequest.POST(url("user", userId, "payed"));
+            return (Boolean) executeRequest(request);
+        }
+
+        public long getIdByInviteCode(String inviteCode) {
+            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("code", inviteCode);
+            MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/code"), builder.build());
+            return (Long) executeRequest(request);
         }
     }
 

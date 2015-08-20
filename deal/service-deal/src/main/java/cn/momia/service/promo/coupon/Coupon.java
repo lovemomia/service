@@ -7,6 +7,7 @@ public class Coupon {
     public static class Src {
         public static final int NORMAL = 0;
         public static final int REGISTER = 1;
+        public static final int SHARE = 2;
     }
 
     public static final Coupon NOT_EXIST_COUPON = new Coupon();

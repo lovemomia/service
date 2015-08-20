@@ -266,4 +266,35 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
         return update(sql, new Object[] { encryptPassword(mobile, password, Configuration.getPasswordSecretKey()), id });
     }
+
+    @Override
+    public boolean isPayed(long id) {
+        String sql = "SELECT payed FROM t_user WHERE id=? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Boolean>() {
+            @Override
+            public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getBoolean("payed") : true;
+            }
+        });
+    }
+
+    @Override
+    public boolean setPayed(long id) {
+        String sql = "UPDATE t_user SET payed=? WHERE id=? AND payed=?";
+
+        return update(sql, new Object[] { true, id, false });
+    }
+
+    @Override
+    public long getIdByCode(String inviteCode) {
+        String sql = "SELECT id FROM t_user WHERE inviteCode=? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[] { inviteCode }, new ResultSetExtractor<Long>() {
+            @Override
+            public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getLong("id") : 0;
+            }
+        });
+    }
 }

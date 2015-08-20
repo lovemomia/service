@@ -150,4 +150,8 @@ public class User {
     public void setLeader(Boolean leader) {
         this.leader = leader;
     }
+
+    public boolean exists() {
+        return id > 0;
+    }
 }

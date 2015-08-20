@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface PromoServiceFacade {
     void distributeRegisterCoupon(long userId);
+    void distributeShareCoupon(long customerId, long sharerId, BigDecimal totalFee);
 
     Coupon getCoupon(long userId, long orderId, long userCouponId);
     boolean canUse(BigDecimal totalFee, Coupon coupon);

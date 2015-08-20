@@ -2,6 +2,7 @@ package cn.momia.service.deal.web.ctrl;
 
 import cn.momia.api.common.CommonServiceApi;
 import cn.momia.api.product.Product;
+import cn.momia.api.user.UserServiceApi;
 import cn.momia.service.base.web.ctrl.AbstractController;
 import cn.momia.service.deal.facade.DealServiceFacade;
 import cn.momia.service.deal.gateway.CallbackResult;
@@ -11,6 +12,7 @@ import cn.momia.api.product.ProductServiceApi;
 import cn.momia.service.promo.coupon.UserCoupon;
 import cn.momia.service.base.web.response.ResponseMessage;
 import cn.momia.service.promo.facade.PromoServiceFacade;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,12 +53,13 @@ public class CallbackController extends AbstractController {
         if (result.isSuccessful()) {
             long orderId = result.getOrderId();
             Order order = dealServiceFacade.getOrder(orderId);
-            if (order.exists() &&
+            if (order.exists() && order.isPayed() &&
                     (payType == Payment.Type.WECHATPAY ||
                             (payType == Payment.Type.ALIPAY && "TRADE_SUCCESS".equalsIgnoreCase(request.getParameter("trade_status"))))) {
                 updateUserCoupon(order);
                 updateSales(order);
                 notifyUser(order);
+                if (!StringUtils.isBlank(order.getInviteCode())) distributeCoupon(order);
             }
 
             return ResponseMessage.SUCCESS("OK");
@@ -99,6 +102,21 @@ public class CallbackController extends AbstractController {
             CommonServiceApi.SMS.notify(order.getMobile(), msg.toString());
         } catch (Exception e) {
             LOGGER.error("fail to notify user for order: {}", order.getId(), e);
+        }
+    }
+
+    private void distributeCoupon(Order order) {
+        try {
+            if (UserServiceApi.USER.isPayed(order.getCustomerId())) return;
+
+            if (UserServiceApi.USER.setPayed(order.getCustomerId())) {
+                long userId = UserServiceApi.USER.getIdByInviteCode(order.getInviteCode());
+                if (userId <= 0) return;
+
+                promoServiceFacade.distributeShareCoupon(order.getCustomerId(), userId, order.getTotalFee());
+            }
+        } catch (Exception e) {
+            LOGGER.error("fail to distribute share coupon for order: {}", order.getId(), e);
         }
     }
 

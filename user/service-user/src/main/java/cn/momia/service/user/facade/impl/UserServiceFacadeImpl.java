@@ -178,6 +178,24 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
     }
 
     @Override
+    public boolean isPayed(long userId) {
+        if (userId <= 0) return true;
+        return userService.isPayed(userId);
+    }
+
+    @Override
+    public boolean setPayed(long userId) {
+        if (userId <= 0) return false;
+        return userService.setPayed(userId);
+    }
+
+    @Override
+    public long getIdByCode(String inviteCode) {
+        if (StringUtils.isBlank(inviteCode)) return 0;
+        return userService.getIdByCode(inviteCode);
+    }
+
+    @Override
     public long addChild(Participant child) {
         if (child.isInvalid()) return 0;
         return participantService.add(child);

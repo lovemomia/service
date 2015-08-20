@@ -25,24 +25,24 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     private static final String[] USER_COUPON_FIELDS = { "id", "userId", "couponId", "startTime", "orderId", "endTime", "status" };
 
     @Override
-    public void distributeCoupon(long userId, int src) {
+    public void distributeRegisterCoupon(long userId) {
         try {
-            if (getUserCouponCount(userId, src) > 0) return;
+            if (getUserCouponCount(userId, Coupon.Src.REGISTER) > 0) return;
 
-            List<Coupon> coupons = getCoupons(src);
+            List<Coupon> coupons = getCoupons(Coupon.Src.REGISTER);
             if (coupons.isEmpty()) return;
 
             List<Object[]> params = new ArrayList<Object[]>();
             for (Coupon coupon : coupons) {
                 for (int i = 0; i < coupon.getCount(); i++) {
-                    params.add(new Object[] { userId, coupon.getId(), src, coupon.getStartTime(), coupon.getEndTime() });
+                    params.add(new Object[] { userId, coupon.getId(), Coupon.Src.REGISTER, coupon.getStartTime(), coupon.getEndTime() });
                 }
             }
 
             String sql = "INSERT INTO t_user_coupon(userId, couponId, src, startTime, endTime, addTime) VALUES (?, ?, ?, ?, ?, NOW())";
             jdbcTemplate.batchUpdate(sql, params);
         } catch (Exception e) {
-            LOGGER.error("fail to distribute coupon to user: {}/{}", userId, src, e);
+            LOGGER.error("fail to distribute user coupon to user: {}", userId, e);
         }
     }
 
@@ -94,6 +94,40 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
             LOGGER.error("fail to build coupon: {}", rs.getInt("id"), e);
             return Coupon.INVALID_COUPON;
         }
+    }
+
+
+    @Override
+    public void distributeShareCoupon(long userId, int discount) {
+        try {
+            List<Coupon> coupons = getCoupons(Coupon.Src.SHARE, discount);
+            if (coupons.isEmpty()) return;
+
+            List<Object[]> params = new ArrayList<Object[]>();
+            Coupon coupon = coupons.get(0);
+            for (int i = 0; i < coupon.getCount(); i++) {
+                params.add(new Object[] { userId, coupon.getId(), Coupon.Src.SHARE, coupon.getStartTime(), coupon.getEndTime() });
+            }
+
+            String sql = "INSERT INTO t_user_coupon(userId, couponId, src, startTime, endTime, addTime) VALUES (?, ?, ?, ?, ?, NOW())";
+            jdbcTemplate.batchUpdate(sql, params);
+        } catch (Exception e) {
+            LOGGER.error("fail to distribute share coupon to user: {}/{}", userId, discount, e);
+        }
+    }
+
+    private List<Coupon> getCoupons(int src, int discount) {
+        final List<Coupon> coupons = new ArrayList<Coupon>();
+        String sql = "SELECT " + joinCouponFields() + " FROM t_coupon WHERE status=1 AND src=? AND discount=? AND endTime>NOW() ORDER BY addTime DESC";
+        jdbcTemplate.query(sql, new Object[] { src, discount }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                Coupon coupon = buildCoupon(rs);
+                if (coupon.exists()) coupons.add(coupon);
+            }
+        });
+
+        return coupons;
     }
 
     @Override
