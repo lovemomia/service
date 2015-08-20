@@ -34,7 +34,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private static final Splitter CHILDREN_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
-    private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "password", "avatar", "name", "sex", "birthday", "cityId", "regionId", "address", "children" };
+    private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "password", "avatar", "name", "sex", "birthday", "cityId", "regionId", "address", "children", "inviteCode" };
 
     @Override
     public boolean exists(String field, String value) {
@@ -131,6 +131,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
             user.setRegionId(rs.getInt("regionId"));
             user.setAddress(rs.getString("address"));
             user.setChildren(parseChildren(rs.getString("children")));
+            user.setInviteCode(rs.getString("inviteCode"));
 
             return user;
         } catch (Exception e) {
