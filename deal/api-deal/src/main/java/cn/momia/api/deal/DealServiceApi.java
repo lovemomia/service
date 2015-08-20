@@ -173,5 +173,11 @@ public class DealServiceApi extends ServiceApi {
 
             return new BigDecimal(String.valueOf(executeRequest(request)));
         }
+
+        public void distributeRegisterCoupon(String utoken) {
+            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+            MomiaHttpRequest request = MomiaHttpRequest.POST(url("coupon/register"), builder.build());
+            executeRequest(request);
+        }
     }
 }

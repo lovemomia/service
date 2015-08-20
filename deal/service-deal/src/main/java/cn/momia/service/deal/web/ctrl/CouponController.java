@@ -11,6 +11,7 @@ import cn.momia.service.promo.coupon.UserCoupon;
 import cn.momia.service.base.web.ctrl.dto.PagedListDto;
 import cn.momia.service.base.web.response.ResponseMessage;
 import cn.momia.service.promo.facade.PromoServiceFacade;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -93,5 +94,15 @@ public class CouponController extends AbstractController {
         }
 
         return userCouponsDto;
+    }
+
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public ResponseMessage registerCoupon(@RequestParam String utoken) {
+        if (StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
+
+        User user = UserServiceApi.USER.get(utoken);
+        promoServiceFacade.distributeRegisterCoupon(user.getId());
+
+        return ResponseMessage.SUCCESS;
     }
 }

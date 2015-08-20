@@ -22,9 +22,9 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
     }
 
     @Override
-    public void getUserRegisterCoupons(long userId) {
+    public void distributeRegisterCoupon(long userId) {
         if (userId <= 0) return;
-        couponService.getUserRegisterCoupons(userId);
+        couponService.distributeCoupon(userId, UserCoupon.Type.REGISTER);
     }
 
     @Override
