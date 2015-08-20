@@ -35,6 +35,7 @@ public class Order implements Serializable {
     private String contacts;
     private String mobile;
     private List<Long> participants;
+    private String inviteCode = "";
     private int status;
     private Date addTime;
 
@@ -100,6 +101,14 @@ public class Order implements Serializable {
 
     public void setParticipants(List<Long> participants) {
         this.participants = participants;
+    }
+
+    public String getInviteCode() {
+        return inviteCode;
+    }
+
+    public void setInviteCode(String inviteCode) {
+        this.inviteCode = inviteCode;
     }
 
     public int getStatus() {

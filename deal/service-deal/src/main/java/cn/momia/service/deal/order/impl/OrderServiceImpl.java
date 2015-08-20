@@ -27,7 +27,7 @@ import java.util.List;
 
 public class OrderServiceImpl extends DbAccessService implements OrderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
-    private static final String[] ORDER_FIELDS = { "id", "customerId", "productId", "skuId", "prices", "contacts", "mobile", "participants", "status", "addTime" };
+    private static final String[] ORDER_FIELDS = { "id", "customerId", "productId", "skuId", "prices", "contacts", "mobile", "participants", "inviteCode", "status", "addTime" };
 
     @Override
     public long add(final Order order) {
@@ -36,7 +36,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException
             {
-                String sql = "INSERT INTO t_order(customerId, productId, skuId, prices, contacts, mobile, participants, addTime) VALUES(?, ?, ?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO t_order(customerId, productId, skuId, prices, contacts, mobile, participants, inviteCode, addTime) VALUES(?, ?, ?, ?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setLong(1, order.getCustomerId());
                 ps.setLong(2, order.getProductId());
@@ -46,6 +46,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
                 ps.setString(6, order.getMobile());
                 List<Long> participants = order.getParticipants();
                 ps.setString(7, (participants == null ? "" : StringUtils.join(participants, ",")));
+                ps.setString(8, order.getInviteCode());
 
                 return ps;
             }
@@ -84,6 +85,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
             if (contacts == null) contacts = "";
             order.setContacts(contacts);
             order.setMobile(rs.getString("mobile"));
+            order.setInviteCode(rs.getString("inviteCode"));
             order.setStatus(rs.getInt("status"));
             order.setAddTime(rs.getTimestamp("addTime"));
 
