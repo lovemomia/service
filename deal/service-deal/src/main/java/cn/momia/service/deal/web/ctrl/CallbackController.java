@@ -59,7 +59,8 @@ public class CallbackController extends AbstractController {
                 updateUserCoupon(order);
                 updateSales(order);
                 notifyUser(order);
-                if (!StringUtils.isBlank(order.getInviteCode())) distributeCoupon(order);
+                distributeCoupon(order);
+
             }
 
             return ResponseMessage.SUCCESS("OK");
@@ -107,9 +108,9 @@ public class CallbackController extends AbstractController {
 
     private void distributeCoupon(Order order) {
         try {
-            if (UserServiceApi.USER.isPayed(order.getCustomerId())) return;
-
-            if (UserServiceApi.USER.setPayed(order.getCustomerId())) {
+            if (!UserServiceApi.USER.isPayed(order.getCustomerId()) &&
+                    UserServiceApi.USER.setPayed(order.getCustomerId())) {
+                if (StringUtils.isBlank(order.getInviteCode())) return;
                 long userId = UserServiceApi.USER.getIdByInviteCode(order.getInviteCode());
                 if (userId <= 0) return;
 
