@@ -229,7 +229,7 @@ public class UserServiceApi extends ServiceApi {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("mobile", mobile)
                     .add("name", name);
-            MomiaHttpRequest request = MomiaHttpRequest.POST(url("user" + userId + "contacts"), builder.build());
+            MomiaHttpRequest request = MomiaHttpRequest.POST(url("user", userId, "contacts"), builder.build());
             executeRequest(request);
         }
 
