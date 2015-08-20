@@ -292,6 +292,14 @@ public class UserController extends UserRelatedController {
     }
 
     @RequestMapping(value = "/code", method = RequestMethod.GET)
+    public ResponseMessage getInviteCode(@RequestParam String utoken) {
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        return ResponseMessage.SUCCESS(user.getInviteCode());
+    }
+
+    @RequestMapping(value = "/code/id", method = RequestMethod.GET)
     public ResponseMessage getIdByCode(@RequestParam(value = "code") String inviteCode) {
         return ResponseMessage.SUCCESS(userServiceFacade.getIdByCode(inviteCode));
     }

@@ -261,9 +261,15 @@ public class UserServiceApi extends ServiceApi {
             return (Boolean) executeRequest(request);
         }
 
+        public String getInviteCode(String utoken) {
+            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+            MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/code"), builder.build());
+            return (String) executeRequest(request);
+        }
+
         public long getIdByInviteCode(String inviteCode) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("code", inviteCode);
-            MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/code"), builder.build());
+            MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/code/id"), builder.build());
             return ((Number) executeRequest(request)).longValue();
         }
     }
