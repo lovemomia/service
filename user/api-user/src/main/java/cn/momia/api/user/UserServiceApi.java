@@ -264,7 +264,7 @@ public class UserServiceApi extends ServiceApi {
         public long getIdByInviteCode(String inviteCode) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("code", inviteCode);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/code"), builder.build());
-            return (Long) executeRequest(request);
+            return ((Number) executeRequest(request)).longValue();
         }
     }
 
