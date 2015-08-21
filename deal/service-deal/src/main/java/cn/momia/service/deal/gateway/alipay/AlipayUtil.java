@@ -27,7 +27,7 @@ public class AlipayUtil {
         kvs.add(AlipayPrepayResult.Field.PAYMENT_TYPE + "=" + quote + params.get(AlipayPrepayResult.Field.PAYMENT_TYPE) + quote);
         kvs.add(AlipayPrepayResult.Field.INPUT_CHARSET + "=" + quote + params.get(AlipayPrepayResult.Field.INPUT_CHARSET) + quote);
         kvs.add(AlipayPrepayResult.Field.IT_B_PAY + "=" + quote + params.get(AlipayPrepayResult.Field.IT_B_PAY) + quote);
-        kvs.add(AlipayPrepayResult.Field.SHOW_URL + "=" + quote + params.get(AlipayPrepayResult.Field.SHOW_URL) + quote);
+        if (params.containsKey(AlipayPrepayResult.Field.SHOW_URL)) kvs.add(AlipayPrepayResult.Field.SHOW_URL + "=" + quote + params.get(AlipayPrepayResult.Field.SHOW_URL) + quote);
         if (ClientType.isFromWap(clientType)) {
             kvs.add(AlipayPrepayResult.Field.RETURN_URL + "=" + quote + params.get(AlipayPrepayResult.Field.RETURN_URL) + quote);
             Collections.sort(kvs);
