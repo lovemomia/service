@@ -14,8 +14,6 @@ public class AlipayPrepayParam extends PrepayParam {
     private String productUrl;
     private String totalFee;
 
-    private String terminal;
-
     @Override
     public long getOrderId() {
         return Long.valueOf(outTradeNo);
@@ -37,10 +35,6 @@ public class AlipayPrepayParam extends PrepayParam {
         return totalFee;
     }
 
-    public String getTerminal() {
-        return terminal;
-    }
-
     public AlipayPrepayParam(Map<String, String> params) {
         String type = params.get("type");
         if ("app".equalsIgnoreCase(type)) setClientType(ClientType.APP);
@@ -51,7 +45,6 @@ public class AlipayPrepayParam extends PrepayParam {
         this.productTitle = params.get(OrderInfoFields.PRODUCT_TITLE);
         this.productUrl = buildProductUrl(params);
         this.totalFee = params.get(OrderInfoFields.TOTAL_FEE);
-        this.terminal = params.get(OrderInfoFields.TERMINAL);
     }
 
     private static String buildProductUrl(Map<String, String> params) {

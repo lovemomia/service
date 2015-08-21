@@ -113,7 +113,6 @@ public class PaymentController extends AbstractController {
             orderInfo.put(OrderInfoFields.TOTAL_FEE, String.valueOf(promoServiceFacade.calcTotalFee(order.getTotalFee(), coupon)));
 
         orderInfo.put(OrderInfoFields.USER_IP, RequestUtil.getRemoteIp(request));
-        orderInfo.put(OrderInfoFields.TERMINAL, request.getParameter("terminal"));
 
         return orderInfo;
     }

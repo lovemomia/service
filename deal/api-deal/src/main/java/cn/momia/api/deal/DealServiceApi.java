@@ -90,14 +90,13 @@ public class DealServiceApi extends ServiceApi {
     }
 
     public static class PaymentServiceApi extends DealServiceApi {
-        public Object prepayAlipay(String utoken, long orderId, long productId, long skuId, String type, String terminal, Long coupon) {
+        public Object prepayAlipay(String utoken, long orderId, long productId, long skuId, String type, Long coupon) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("utoken", utoken)
                     .add("oid", orderId)
                     .add("pid", productId)
                     .add("sid", skuId)
                     .add("type", type);
-            if (!StringUtils.isBlank(terminal)) builder.add("terminal", terminal);
             if (coupon != null && coupon > 0) builder.add("coupon", coupon);
             MomiaHttpRequest request = MomiaHttpRequest.POST(url("payment/prepay/alipay"), builder.build());
 

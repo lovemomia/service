@@ -7,5 +7,4 @@ public class OrderInfoFields {
     public static final String TOTAL_FEE = "totalFee";
     public static final String USER_IP = "userIp";
     public static final String UTOKEN = "utoken";
-    public static final String TERMINAL = "terminal";
 }

@@ -32,7 +32,7 @@ public class AlipayGateway extends AbstractPaymentGateway {
         result.add(AlipayPrepayResult.Field.TOTAL_FEE, alipayPrepayParam.getTotalFee());
         result.add(AlipayPrepayResult.Field.BODY, alipayPrepayParam.getProductTitle());
         result.add(AlipayPrepayResult.Field.IT_B_PAY, "30m");
-        if (!"android".equalsIgnoreCase(alipayPrepayParam.getTerminal())) result.add(AlipayPrepayResult.Field.SHOW_URL, Configuration.getString("Wap.Domain"));
+        result.add(AlipayPrepayResult.Field.SHOW_URL, Configuration.getString("Wap.Domain"));
         result.add(AlipayPrepayResult.Field.SIGN, AlipayUtil.sign(result.getAll(), param.getClientType()));
 
         result.setSuccessful(!StringUtils.isBlank(result.get(AlipayPrepayResult.Field.SIGN)));
