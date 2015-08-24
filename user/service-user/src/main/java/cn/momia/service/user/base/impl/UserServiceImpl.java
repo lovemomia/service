@@ -34,7 +34,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private static final Splitter CHILDREN_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
-    private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "password", "avatar", "name", "sex", "birthday", "cityId", "regionId", "address", "children" };
+    private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "password", "avatar", "name", "sex", "birthday", "cityId", "regionId", "address", "children", "inviteCode" };
 
     @Override
     public boolean exists(String field, String value) {
@@ -49,17 +49,18 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
-    public long add(final String nickName, final String mobile, final String password, final String token) {
+    public long add(final String nickName, final String mobile, final String password, final String token, final String inviteCode) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO t_user(nickName, mobile, password, token, addTime) VALUES (?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO t_user(nickName, mobile, password, token, inviteCode, addTime) VALUES (?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, nickName);
                 ps.setString(2, mobile);
                 ps.setString(3, encryptPassword(mobile, password, Configuration.getPasswordSecretKey()));
                 ps.setString(4, token);
+                ps.setString(5, inviteCode);
 
                 return ps;
             }
@@ -130,6 +131,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
             user.setRegionId(rs.getInt("regionId"));
             user.setAddress(rs.getString("address"));
             user.setChildren(parseChildren(rs.getString("children")));
+            user.setInviteCode(rs.getString("inviteCode"));
 
             return user;
         } catch (Exception e) {
@@ -264,5 +266,36 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         String sql = "UPDATE t_user SET password=? WHERE id=?";
 
         return update(sql, new Object[] { encryptPassword(mobile, password, Configuration.getPasswordSecretKey()), id });
+    }
+
+    @Override
+    public boolean isPayed(long id) {
+        String sql = "SELECT payed FROM t_user WHERE id=? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Boolean>() {
+            @Override
+            public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getBoolean("payed") : true;
+            }
+        });
+    }
+
+    @Override
+    public boolean setPayed(long id) {
+        String sql = "UPDATE t_user SET payed=? WHERE id=? AND payed=?";
+
+        return update(sql, new Object[] { true, id, false });
+    }
+
+    @Override
+    public long getIdByCode(String inviteCode) {
+        String sql = "SELECT id FROM t_user WHERE inviteCode=? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[] { inviteCode }, new ResultSetExtractor<Long>() {
+            @Override
+            public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getLong("id") : 0;
+            }
+        });
     }
 }

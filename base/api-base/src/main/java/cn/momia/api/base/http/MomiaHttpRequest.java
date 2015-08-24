@@ -47,6 +47,10 @@ public abstract class MomiaHttpRequest implements HttpUriRequest, HttpEntityEncl
         };
     }
 
+    public static MomiaHttpRequest POST(String uri) {
+        return POST("anonymous", true, uri, null);
+    }
+
     public static MomiaHttpRequest POST(String uri, Map<String, String> params) {
         return POST("anonymous", true, uri, params);
     }

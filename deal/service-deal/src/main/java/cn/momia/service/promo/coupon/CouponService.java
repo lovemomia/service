@@ -7,7 +7,8 @@ import java.util.Collection;
 import java.util.List;
 
 public interface CouponService extends Service {
-    void distributeCoupon(long userId, int src);
+    void distributeRegisterCoupon(long userId);
+    void distributeShareCoupon(long userId, int discount);
     Coupon getCoupon(int couponId);
     List<Coupon> getCoupons(Collection<Integer> couponIds);
     int queryCountByUser(long userId, long orderId, int status);

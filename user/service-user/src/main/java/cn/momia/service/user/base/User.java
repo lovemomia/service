@@ -38,6 +38,7 @@ public class User implements Serializable {
     private int regionId;
     private String address;
     private Set<Long> children;
+    private String inviteCode;
 
     public long getId() {
         return id;
@@ -141,6 +142,14 @@ public class User implements Serializable {
 
     public void setChildren(Set<Long> children) {
         this.children = children;
+    }
+
+    public String getInviteCode() {
+        return inviteCode;
+    }
+
+    public void setInviteCode(String inviteCode) {
+        this.inviteCode = inviteCode;
     }
 
     @Override

@@ -245,7 +245,7 @@ public class ProductController extends AbstractController {
 
     @RequestMapping(value = "/{id}/sku/all", method = RequestMethod.GET)
     public ResponseMessage listAllSkus(@PathVariable long id) {
-        List<Sku> skus = productServiceFacade.getSkus(id);
+        List<Sku> skus = productServiceFacade.getAllSkus(id);
         skus = Sku.sortByStartTime(skus);
         return ResponseMessage.SUCCESS(buildSkusDto(skus));
     }

@@ -32,6 +32,9 @@ public interface UserServiceFacade {
     User updateUserPassword(String mobile, String password);
 
     void processContacts(long userId, String mobile, String contacts);
+    boolean isPayed(long userId);
+    boolean setPayed(long userId);
+    long getIdByCode(String inviteCode);
 
     // 孩子
     long addChild(Participant child);

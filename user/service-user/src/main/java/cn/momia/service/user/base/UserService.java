@@ -10,7 +10,7 @@ import java.util.Set;
 public interface UserService extends Service {
     boolean exists(String field, String value);
 
-    long add(String nickName, String mobile, String password, String token);
+    long add(String nickName, String mobile, String password, String token, String inviteCode);
     boolean validatePassword(String mobile, String password);
 
     User get(long id);
@@ -28,4 +28,8 @@ public interface UserService extends Service {
     boolean updateAddress(long id, String address);
     boolean updateChildren(long id, Set<Long> children);
     boolean updatePassword(long id, String mobile, String password);
+
+    boolean isPayed(long id);
+    boolean setPayed(long id);
+    long getIdByCode(String inviteCode);
 }

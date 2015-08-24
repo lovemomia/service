@@ -27,6 +27,7 @@ public class User {
     private Integer cityId;
     private Integer regionId;
     private String address;
+    private String inviteCode;
 
     private List<Participant> children;
     private Boolean leader;
@@ -135,6 +136,14 @@ public class User {
         this.address = address;
     }
 
+    public String getInviteCode() {
+        return inviteCode;
+    }
+
+    public void setInviteCode(String inviteCode) {
+        this.inviteCode = inviteCode;
+    }
+
     public List<Participant> getChildren() {
         return children;
     }
@@ -149,5 +158,9 @@ public class User {
 
     public void setLeader(Boolean leader) {
         this.leader = leader;
+    }
+
+    public boolean exists() {
+        return id > 0;
     }
 }

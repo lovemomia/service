@@ -51,6 +51,10 @@ public class BaseUserDto extends MiniUserDto {
         return user.getAddress();
     }
 
+    public String getInviteCode() {
+        return user.getInviteCode();
+    }
+
     public BaseUserDto(User user) {
         super(user);
     }
@@ -59,5 +63,4 @@ public class BaseUserDto extends MiniUserDto {
         super(user);
         this.showToken = showToken;
     }
-
 }

@@ -246,8 +246,8 @@ public class UserController extends UserRelatedController {
         return ResponseMessage.SUCCESS(new ContactsDto(user));
     }
 
-    @RequestMapping(value = "/contacts", method = RequestMethod.POST)
-    public ResponseMessage processContacts(@RequestParam(value = "uid") long userId, @RequestParam String mobile, @RequestParam String name) {
+    @RequestMapping(value = "/{id}/contacts", method = RequestMethod.POST)
+    public ResponseMessage processContacts(@PathVariable(value = "id") long userId, @RequestParam String mobile, @RequestParam String name) {
         if (userId <= 0 || MobileUtil.isInvalidMobile(mobile) || StringUtils.isBlank(name)) return ResponseMessage.BAD_REQUEST;
 
         userServiceFacade.processContacts(userId, mobile, name);
@@ -277,5 +277,30 @@ public class UserController extends UserRelatedController {
         }
 
         return ResponseMessage.SUCCESS(usersDto);
+    }
+
+    @RequestMapping(value = "/{id}/payed", method = RequestMethod.GET)
+    public ResponseMessage isPayed(@PathVariable(value = "id") long userId) {
+        if (userId <= 0) return ResponseMessage.SUCCESS(true);
+        return ResponseMessage.SUCCESS(userServiceFacade.isPayed(userId));
+    }
+
+    @RequestMapping(value = "/{id}/payed", method = RequestMethod.POST)
+    public ResponseMessage setPayed(@PathVariable(value = "id") long userId) {
+        if (userId <= 0) return ResponseMessage.SUCCESS(false);
+        return ResponseMessage.SUCCESS(userServiceFacade.setPayed(userId));
+    }
+
+    @RequestMapping(value = "/code", method = RequestMethod.GET)
+    public ResponseMessage getInviteCode(@RequestParam String utoken) {
+        User user = userServiceFacade.getUserByToken(utoken);
+        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+
+        return ResponseMessage.SUCCESS(user.getInviteCode());
+    }
+
+    @RequestMapping(value = "/code/id", method = RequestMethod.GET)
+    public ResponseMessage getIdByCode(@RequestParam(value = "code") String inviteCode) {
+        return ResponseMessage.SUCCESS(userServiceFacade.getIdByCode(inviteCode));
     }
 }
