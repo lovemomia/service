@@ -53,7 +53,7 @@
 
     <Product>
         <Playmate>
-            <PageSize>10</PageSize>
+            <PageSize>20</PageSize>
         </Playmate>
     </Product>
 </Configuration>

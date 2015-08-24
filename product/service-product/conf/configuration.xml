@@ -27,7 +27,7 @@
 
     <Product>
         <Month>
-            <PageSize>10</PageSize>
+            <PageSize>20</PageSize>
         </Month>
     </Product>
 </Configuration>
