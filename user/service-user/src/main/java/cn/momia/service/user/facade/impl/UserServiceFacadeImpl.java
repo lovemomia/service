@@ -15,6 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -24,6 +26,7 @@ import java.util.Set;
 
 public class UserServiceFacadeImpl implements UserServiceFacade {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceFacadeImpl.class);
+    private DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private static final Set<String> SEX = new HashSet<String>();
     static {
@@ -67,7 +70,7 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
     }
 
     private String generateInviteCode(String nickName, String mobile) {
-        return DigestUtils.md5Hex(StringUtils.join(new String[] { nickName, mobile, new Date().toString(), Configuration.getSecretKey() }, "|"));
+        return DigestUtils.md5Hex(StringUtils.join(new String[] { nickName, mobile, DATE_FORMAT.format(new Date()), Configuration.getSecretKey() }, "|"));
     }
 
     @Override
@@ -316,5 +319,9 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
     public boolean deleteLeaderInfo(long userId) {
         if (userId <= 0) return false;
         return leaderService.deleteByUser(userId);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(new Date().toString());
     }
 }
