@@ -320,8 +320,4 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
         if (userId <= 0) return false;
         return leaderService.deleteByUser(userId);
     }
-
-    public static void main(String[] args) {
-        System.out.println(new Date().toString());
-    }
 }
