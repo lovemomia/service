@@ -66,15 +66,15 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
     }
 
     @Override
-    public int queryUserCouponCount(long userId, long orderId, int status) {
+    public int queryUserCouponCount(long userId, long orderId, BigDecimal totalFee, int status) {
         if (userId <= 0) return 0;
-        return couponService.queryCountByUser(userId, orderId, status);
+        return couponService.queryCountByUser(userId, orderId, totalFee, status);
     }
 
     @Override
-    public List<UserCoupon> queryUserCoupon(long userId, long orderId, int status, int start, int count) {
+    public List<UserCoupon> queryUserCoupon(long userId, long orderId, BigDecimal totalFee, int status, int start, int count) {
         if (userId <= 0) return new ArrayList<UserCoupon>();
-        return couponService.queryByUser(userId, orderId, status, start, count);
+        return couponService.queryByUser(userId, orderId, totalFee, status, start, count);
     }
 
     @Override
