@@ -30,13 +30,16 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
     @Override
     public void distributeShareCoupon(long customerId, long sharerId, BigDecimal totalFee) {
         if (customerId <= 0 || sharerId <=0) return;
+
         int discount = calcDiscount(totalFee.intValue());
+        if (discount <= 0) return;
+
         couponService.distributeShareCoupon(customerId, discount);
         couponService.distributeShareCoupon(sharerId, discount);
     }
 
     private int calcDiscount(int totalFee) {
-        if (totalFee < 50) return 1;
+        if (totalFee < 50) return 0;
         else if (totalFee >= 50 && totalFee < 100) return 5;
         else if (totalFee >= 100 && totalFee < 500) return 10;
         else return 50;
