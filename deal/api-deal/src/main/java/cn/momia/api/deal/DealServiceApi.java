@@ -36,6 +36,15 @@ public class DealServiceApi extends ServiceApi {
             return JSON.toJavaObject((JSON) executeRequest(request), Order.class);
         }
 
+        public JSON checkDup(String utoken, String order) {
+            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                    .add("utoken", utoken)
+                    .add("order", order);
+            MomiaHttpRequest request = MomiaHttpRequest.GET(url("order/check/dup"), builder.build());
+
+            return (JSON) executeRequest(request);
+        }
+
         public void delete(String utoken, long id) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
             MomiaHttpRequest request = MomiaHttpRequest.DELETE(url("order", id), builder.build());
