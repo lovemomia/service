@@ -275,24 +275,18 @@ public class UserController extends UserRelatedController {
                 for (User user : users) childrenIds.addAll(user.getChildren());
                 List<Participant> children = userServiceFacade.getParticipants(childrenIds);
                 Map<Long, Participant> childrenMap = new HashMap<Long, Participant>();
-                for (Participant child : children) {
-                    childrenMap.put(child.getId(), child);
-                }
+                for (Participant child : children) childrenMap.put(child.getId(), child);
 
                 Map<Long, Leader> userLeaderInfosMap = new HashMap<Long, Leader>();
                 List<Leader> leaderInfos = userServiceFacade.getLeaderInfos(ids);
-                for (Leader leaderInfo : leaderInfos) {
-                    userLeaderInfosMap.put(leaderInfo.getUserId(), leaderInfo);
-                }
+                for (Leader leaderInfo : leaderInfos) userLeaderInfosMap.put(leaderInfo.getUserId(), leaderInfo);
 
                 for (User user : users) {
                     List<Participant> userChildren = new ArrayList<Participant>();
                     Set<Long> userChildrenIds = user.getChildren();
-                    if (userChildrenIds != null) {
-                        for (long userChildId : userChildrenIds) {
-                            Participant child = childrenMap.get(userChildId);
-                            if (child != null) userChildren.add(child);
-                        }
+                    for (long userChildId : userChildrenIds) {
+                        Participant child = childrenMap.get(userChildId);
+                        if (child != null) userChildren.add(child);
                     }
 
                     Leader leaderInfo = userLeaderInfosMap.get(user.getId());
