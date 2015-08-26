@@ -1,6 +1,7 @@
 package cn.momia.service.user.web.ctrl;
 
 import cn.momia.service.base.util.MobileUtil;
+import cn.momia.service.user.leader.Leader;
 import cn.momia.service.user.web.ctrl.dto.BaseUserDto;
 import cn.momia.service.user.web.ctrl.dto.ContactsDto;
 import cn.momia.service.user.web.ctrl.dto.FullUserDto;
@@ -22,8 +23,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -268,10 +271,35 @@ public class UserController extends UserRelatedController {
                 for (User user : users) usersDto.add(new MiniUserDto(user));
                 break;
             case User.Type.FULL:
-                // TODO 性能
-                for (User user : users) usersDto.add(new FullUserDto(user,
-                        userServiceFacade.getChildren(user.getId(), user.getChildren()),
-                        userServiceFacade.getLeaderInfo(user.getId()), false));
+                Set<Long> childrenIds = new HashSet<Long>();
+                for (User user : users) childrenIds.addAll(user.getChildren());
+                List<Participant> children = userServiceFacade.getParticipants(childrenIds);
+                Map<Long, Participant> childrenMap = new HashMap<Long, Participant>();
+                for (Participant child : children) {
+                    childrenMap.put(child.getId(), child);
+                }
+
+                Map<Long, Leader> userLeaderInfosMap = new HashMap<Long, Leader>();
+                List<Leader> leaderInfos = userServiceFacade.getLeaderInfos(ids);
+                for (Leader leaderInfo : leaderInfos) {
+                    userLeaderInfosMap.put(leaderInfo.getUserId(), leaderInfo);
+                }
+
+                for (User user : users) {
+                    List<Participant> userChildren = new ArrayList<Participant>();
+                    Set<Long> userChildrenIds = user.getChildren();
+                    if (userChildrenIds != null) {
+                        for (long userChildId : userChildrenIds) {
+                            Participant child = childrenMap.get(userChildId);
+                            if (child != null) userChildren.add(child);
+                        }
+                    }
+
+                    Leader leaderInfo = userLeaderInfosMap.get(user.getId());
+                    if (leaderInfo == null) leaderInfo = Leader.NOT_EXIST_LEADER;
+
+                    usersDto.add(new FullUserDto(user, userChildren, leaderInfo, false));
+                }
                 break;
             default: for (User user : users) usersDto.add(new BaseUserDto(user, false));
         }
