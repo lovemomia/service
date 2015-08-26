@@ -42,7 +42,11 @@ public abstract class AbstractPaymentGateway implements PaymentGateway {
             // 因为当订单无效或payOrder返回false(代表之前已经完成过付款)时
             // 如果返回false，第三方支付系统会认为通知失败进而多次尝试通知，而实际是不需要的
             // 只有写入数据库时抛了异常才是需要重试的
-            if (!order.exists() || !dealServiceFacade.payOrder(orderId)) return true;
+            if (!order.exists() || !dealServiceFacade.payOrder(orderId)) {
+                // TODO 自动退款相关处理
+                LOGGER.error("duplicated payment for order: {}", order.getId());
+                return true;
+            }
 
             logPayment(param);
         } catch (Exception e) {
