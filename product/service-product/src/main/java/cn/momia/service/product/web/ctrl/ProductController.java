@@ -373,7 +373,7 @@ public class ProductController extends AbstractController {
     @RequestMapping(value = "/{id}/comment", method = RequestMethod.POST, consumes = "application/json")
     public ResponseMessage addComment(@RequestBody Comment comment) {
         long commentId = productServiceFacade.addComment(comment);
-        
+
         if (commentId <= 0) return ResponseMessage.FAILED("发表评论失败");
         return ResponseMessage.SUCCESS;
     }
