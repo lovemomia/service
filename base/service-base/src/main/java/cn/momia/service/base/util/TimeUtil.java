@@ -82,13 +82,20 @@ public class TimeUtil {
         return String.format("%d-%02d", currentYear, nextMonth);
     }
 
-    public static int getAge(Date birthday) {
+    public static float getAge(Date birthday) {
         Calendar calendar = Calendar.getInstance();
         int yearNow = calendar.get(Calendar.YEAR);
+        int monthNow = calendar.get(Calendar.MONTH);
         calendar.setTime(birthday);
         int yearBorn = calendar.get(Calendar.YEAR);
+        int monthBorn = calendar.get(Calendar.MONTH);
 
-        return yearNow - yearBorn;
+        int year = yearNow - yearBorn;
+        if (year >= 1) return year;
+
+        int month = monthNow - monthBorn;
+        if (month > 0 && month < 1) month = 1;
+        return month / 12.0F;
     }
 
     public static boolean isAdult(Date birthday) {
