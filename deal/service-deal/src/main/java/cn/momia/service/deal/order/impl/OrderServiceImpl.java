@@ -200,7 +200,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public List<Order> queryAllCustomerOrderByProduct(long productId) {
-        String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status<>0 AND status<=?";
+        String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status<>0 AND status<=? ORDER BY addTime DESC";
         final List<Order> orders = new ArrayList<Order>();
         jdbcTemplate.query(sql, new Object[] { productId, Order.Status.FINISHED }, new RowCallbackHandler() {
             @Override
@@ -215,7 +215,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public List<Order> queryDistinctCustomerOrderByProduct(long productId, int start, int count) {
-        String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status<>0 AND status<=? GROUP BY customerId LIMIT ?,?";
+        String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status<>0 AND status<=? GROUP BY customerId ORDER BY addTime DESC LIMIT ?,?";
         final List<Order> orders = new ArrayList<Order>();
         jdbcTemplate.query(sql, new Object[] { productId, Order.Status.FINISHED, start, count }, new RowCallbackHandler() {
             @Override
