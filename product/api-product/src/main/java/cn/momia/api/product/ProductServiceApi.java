@@ -161,8 +161,11 @@ public class ProductServiceApi extends ServiceApi {
             executeRequest(request);
         }
 
-        public PagedComments list(long productId) {
-            MomiaHttpRequest request = MomiaHttpRequest.GET(url("product", productId, "comment"));
+        public PagedComments list(long productId, int start, int count) {
+            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                    .add("start", start)
+                    .add("count", count);
+            MomiaHttpRequest request = MomiaHttpRequest.GET(url("product", productId, "comment"), builder.build());
 
             return JSON.toJavaObject((JSON) executeRequest(request), PagedComments.class);
         }
