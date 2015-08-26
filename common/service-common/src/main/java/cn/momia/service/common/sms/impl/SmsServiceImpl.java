@@ -111,7 +111,7 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
     }
 
     private String buildCodeMsg(String code) {
-        return "验证码：" + code + "，30分钟内有效【哆啦亲子】";
+        return "验证码：" + code + "，30分钟内有效【松果亲子】";
     }
 
     private void sendAsync(final String mobile, final String codeMsg) {

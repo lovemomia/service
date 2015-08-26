@@ -95,11 +95,11 @@ public class CallbackController extends AbstractController {
             StringBuilder msg = new StringBuilder();
             msg.append("您的订单：\"")
                     .append(product.getTitle())
-                    .append("\"支付成功，时间：")
+                    .append("\"付款成功，时间：")
                     .append(product.getSkuTime(order.getSkuId()))
                     .append("，地点：")
                     .append(product.getAddress())
-                    .append("，请准时参加【哆啦亲子】");
+                    .append("【松果亲子】");
             CommonServiceApi.SMS.notify(order.getMobile(), msg.toString());
         } catch (Exception e) {
             LOGGER.error("fail to notify user for order: {}", order.getId(), e);
