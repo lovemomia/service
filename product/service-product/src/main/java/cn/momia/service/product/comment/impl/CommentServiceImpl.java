@@ -61,14 +61,14 @@ public class CommentServiceImpl extends DbAccessService implements CommentServic
         if (imgs == null || imgs.isEmpty()) return;
 
         try {
-            String sql = "INSERT INTO t_product_comment_img(commentId, url, width, height, addTime) VALUSE(?, ?, ?, ?, NOW())";
+            String sql = "INSERT INTO t_product_comment_img(commentId, url, width, height, addTime) VALUES(?, ?, ?, ?, NOW())";
             List<Object[]> args = new ArrayList<Object[]>();
             for (CommentImage img : imgs) {
                 args.add(new Object[] { commentId, img.getUrl(), img.getWidth(), img.getHeight() });
             }
             jdbcTemplate.batchUpdate(sql, args);
         } catch (Exception e) {
-            LOGGER.error("fail to add imgs for comment: {}", commentId);
+            LOGGER.error("fail to add imgs for comment: {}", commentId, e);
         }
     }
 

@@ -29,6 +29,8 @@ public class CommentImage {
         this.height = height;
     }
 
+    public CommentImage() {}
+
     public CommentImage(String url, int width, int height) {
         this.url = url;
         this.width = width;
