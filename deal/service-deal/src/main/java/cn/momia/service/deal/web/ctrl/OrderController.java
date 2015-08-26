@@ -170,6 +170,21 @@ public class OrderController extends AbstractController {
         return userOrdersDto;
     }
 
+    @RequestMapping(value = "/{id}/check", method = RequestMethod.GET)
+    public ResponseMessage check(@RequestParam String utoken,
+                                  @PathVariable(value = "id") long id,
+                                  @RequestParam(value = "pid") long productId,
+                                  @RequestParam(value = "sid") long skuId) {
+        User user = UserServiceApi.USER.get(utoken);
+        Order order = dealServiceFacade.getOrder(id);
+        if (!order.isPayed() ||
+                order.getCustomerId() != user.getId() ||
+                order.getProductId() != productId ||
+                order.getSkuId() != skuId) return ResponseMessage.SUCCESS(false);
+
+        return ResponseMessage.SUCCESS(true);
+    }
+
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseMessage detail(@RequestParam String utoken,
                                   @PathVariable(value = "id") long id,

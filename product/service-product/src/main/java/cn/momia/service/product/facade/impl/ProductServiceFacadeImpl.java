@@ -252,6 +252,12 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
     @Override
     public long addComment(Comment comment) {
+        if (comment.getOrderId() <= 0 ||
+                comment.getProductId() <= 0 ||
+                comment.getSkuId() <= 0 ||
+                comment.getUserId() <= 0 ||
+                comment.getStar() < 0 ||
+                StringUtils.isBlank(comment.getContent())) throw new MomiaFailedException("无效的评论，参数不完整");
         return commentService.add(comment);
     }
 

@@ -87,6 +87,16 @@ public class DealServiceApi extends ServiceApi {
 
             return playmates;
         }
+
+        public boolean check(String utoken, long orderId, long productId, long skuId) {
+            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                    .add("utoken", utoken)
+                    .add("pid", productId)
+                    .add("sid", skuId);
+            MomiaHttpRequest request = MomiaHttpRequest.GET(url("order", orderId, "check"), builder.build());
+
+            return (Boolean) executeRequest(request);
+        }
     }
 
     public static class PaymentServiceApi extends DealServiceApi {
