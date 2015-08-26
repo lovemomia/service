@@ -35,11 +35,11 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
             List<Object[]> params = new ArrayList<Object[]>();
             for (Coupon coupon : coupons) {
                 for (int i = 0; i < coupon.getCount(); i++) {
-                    params.add(new Object[] { userId, coupon.getId(), Coupon.Src.REGISTER, coupon.getStartTime(), coupon.getEndTime() });
+                    params.add(new Object[] { userId, coupon.getId(), Coupon.Src.REGISTER, coupon.getConsumption(), coupon.getStartTime(), coupon.getEndTime() });
                 }
             }
 
-            String sql = "INSERT INTO t_user_coupon(userId, couponId, src, startTime, endTime, addTime) VALUES (?, ?, ?, ?, ?, NOW())";
+            String sql = "INSERT INTO t_user_coupon(userId, couponId, src, consumption, startTime, endTime, addTime) VALUES (?, ?, ?, ?, ?, ?, NOW())";
             jdbcTemplate.batchUpdate(sql, params);
         } catch (Exception e) {
             LOGGER.error("fail to distribute user coupon to user: {}", userId, e);
@@ -106,10 +106,10 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
             List<Object[]> params = new ArrayList<Object[]>();
             Coupon coupon = coupons.get(0);
             for (int i = 0; i < coupon.getCount(); i++) {
-                params.add(new Object[] { userId, coupon.getId(), Coupon.Src.SHARE, coupon.getStartTime(), coupon.getEndTime() });
+                params.add(new Object[] { userId, coupon.getId(), Coupon.Src.SHARE, coupon.getConsumption(), coupon.getStartTime(), coupon.getEndTime() });
             }
 
-            String sql = "INSERT INTO t_user_coupon(userId, couponId, src, startTime, endTime, addTime) VALUES (?, ?, ?, ?, ?, NOW())";
+            String sql = "INSERT INTO t_user_coupon(userId, couponId, src, consumption, startTime, endTime, addTime) VALUES (?, ?, ?, ?, ?, ?, NOW())";
             jdbcTemplate.batchUpdate(sql, params);
         } catch (Exception e) {
             LOGGER.error("fail to distribute share coupon to user: {}/{}", userId, discount, e);
