@@ -4,11 +4,13 @@ import cn.momia.service.base.config.Configuration;
 import cn.momia.api.base.exception.MomiaFailedException;
 import cn.momia.service.base.util.TimeUtil;
 import cn.momia.service.product.base.ProductSort;
+import cn.momia.service.product.comment.Comment;
 import cn.momia.service.product.facade.Product;
 import cn.momia.service.product.facade.ProductServiceFacade;
 import cn.momia.service.product.sku.Sku;
 import cn.momia.service.product.web.ctrl.dto.BaseProductDto;
 import cn.momia.service.product.web.ctrl.dto.BaseSkuDto;
+import cn.momia.service.product.web.ctrl.dto.CommentDto;
 import cn.momia.service.product.web.ctrl.dto.FullProductDto;
 import cn.momia.service.product.web.ctrl.dto.FullSkuDto;
 import cn.momia.service.product.web.ctrl.dto.MiniProductDto;
@@ -365,5 +367,18 @@ public class ProductController extends AbstractController {
     public ResponseMessage sold(@PathVariable long id, @RequestParam int count) {
         if (!productServiceFacade.sold(id, count)) return ResponseMessage.FAILED;
         return ResponseMessage.SUCCESS;
+    }
+
+    @RequestMapping(value = "/{id}/comment", method = RequestMethod.GET)
+    public ResponseMessage listComments(@PathVariable long id, @RequestParam int start, @RequestParam int count){
+        if (id <= 0 || isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
+
+        long totalCount = productServiceFacade.queryCommentCountOfProduct(id);
+        List<Comment> comments = productServiceFacade.queryCommentOfProduct(id, start, count);
+
+        PagedListDto commentsDto = new PagedListDto(totalCount, start, count);
+        for (Comment comment : comments) commentsDto.add(new CommentDto(comment));
+
+        return ResponseMessage.SUCCESS(commentsDto);
     }
 }

@@ -2,6 +2,7 @@ package cn.momia.service.product.facade;
 
 import cn.momia.service.product.banner.Banner;
 import cn.momia.service.product.base.ProductSort;
+import cn.momia.service.product.comment.Comment;
 import cn.momia.service.product.sku.Sku;
 import cn.momia.service.product.topic.Topic;
 import cn.momia.service.product.topic.TopicGroup;
@@ -26,6 +27,9 @@ public interface ProductServiceFacade {
     List<Product> queryByMonth(int cityId, int month);
     long queryCountNeedLeader(int cityId);
     List<Product> queryNeedLeader(int cityId, int start, int count);
+
+    long queryCommentCountOfProduct(long productId);
+    List<Comment> queryCommentOfProduct(long productId, int start, int count);
 
     long queryCountOfLedSkus(long userId);
     List<Sku> queryLedSkus(long userId, int start, int count);

@@ -115,6 +115,7 @@ public class CommentServiceImpl extends DbAccessService implements CommentServic
             comment.setUserId(rs.getLong("userId"));
             comment.setStar(rs.getInt("star"));
             comment.setContent(rs.getString("content"));
+            comment.setAddTime(rs.getTimestamp("addTime"));
 
             return comment;
         } catch (Exception e) {

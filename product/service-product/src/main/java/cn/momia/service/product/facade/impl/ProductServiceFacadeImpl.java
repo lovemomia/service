@@ -5,6 +5,8 @@ import cn.momia.service.base.util.TimeUtil;
 import cn.momia.service.base.impl.DbAccessService;
 import cn.momia.service.product.banner.Banner;
 import cn.momia.service.product.banner.BannerService;
+import cn.momia.service.product.comment.Comment;
+import cn.momia.service.product.comment.CommentService;
 import cn.momia.service.product.facade.Product;
 import cn.momia.service.product.facade.ProductImage;
 import cn.momia.service.product.facade.ProductServiceFacade;
@@ -42,6 +44,7 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
     private BannerService bannerService;
     private BaseProductService baseProductService;
+    private CommentService commentService;
     private PlaceService placeService;
     private SkuService skuService;
     private TopicService topicService;
@@ -54,6 +57,10 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
     public void setBaseProductService(BaseProductService baseProductService) {
         this.baseProductService = baseProductService;
+    }
+
+    public void setCommentService(CommentService commentService) {
+        this.commentService = commentService;
     }
 
     public void setPlaceService(PlaceService placeService) {
@@ -241,6 +248,18 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     @Override
     public List<Product> queryNeedLeader(int cityId, int start, int count) {
         return buildProducts(baseProductService.queryNeedLeader(cityId, start, count));
+    }
+
+    @Override
+    public long queryCommentCountOfProduct(long productId) {
+        if (productId <= 0) return 0;
+        return commentService.queryCountByProduct(productId);
+    }
+
+    @Override
+    public List<Comment> queryCommentOfProduct(long productId, int start, int count) {
+        if (productId <= 0 || start < 0 || count <= 0) return new ArrayList<Comment>();
+        return commentService.queryByProduct(productId, start, count);
     }
 
     @Override

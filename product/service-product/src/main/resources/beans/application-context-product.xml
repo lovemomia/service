@@ -50,6 +50,7 @@
 
     <bean id="bannerService" class="cn.momia.service.product.banner.impl.BannerServiceImpl" parent="dbAccessService" />
     <bean id="baseProductService" class="cn.momia.service.product.base.impl.BaseProductServiceImpl" parent="dbAccessService" init-method="init" />
+    <bean id="commentService" class="cn.momia.service.product.comment.impl.CommentServiceImpl" parent="dbAccessService" />
     <bean id="placeService" class="cn.momia.service.product.place.impl.PlaceServiceImpl" parent="dbAccessService" />
     <bean id="skuService" class="cn.momia.service.product.sku.impl.SkuServiceImpl" parent="dbAccessService" />
     <bean id="topicService" class="cn.momia.service.product.topic.impl.TopicServiceImpl" parent="dbAccessService" />
@@ -57,6 +58,7 @@
     <bean id="productServiceFacade" class="cn.momia.service.product.facade.impl.ProductServiceFacadeImpl" parent="dbAccessService">
         <property name="bannerService" ref="bannerService" />
         <property name="baseProductService" ref="baseProductService" />
+        <property name="commentService" ref="commentService" />
         <property name="placeService" ref="placeService" />
         <property name="skuService" ref="skuService" />
         <property name="topicService" ref="topicService" />
