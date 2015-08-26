@@ -26,6 +26,7 @@ import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -366,6 +367,14 @@ public class ProductController extends AbstractController {
     @RequestMapping(value = "/{id}/sold", method = RequestMethod.POST)
     public ResponseMessage sold(@PathVariable long id, @RequestParam int count) {
         if (!productServiceFacade.sold(id, count)) return ResponseMessage.FAILED;
+        return ResponseMessage.SUCCESS;
+    }
+
+    @RequestMapping(value = "/{id}/comment", method = RequestMethod.POST, consumes = "application/json")
+    public ResponseMessage addComment(@RequestBody Comment comment) {
+        long commentId = productServiceFacade.addComment(comment);
+        
+        if (commentId <= 0) return ResponseMessage.FAILED("发表评论失败");
         return ResponseMessage.SUCCESS;
     }
 

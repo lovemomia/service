@@ -28,6 +28,7 @@ public interface ProductServiceFacade {
     long queryCountNeedLeader(int cityId);
     List<Product> queryNeedLeader(int cityId, int start, int count);
 
+    long addComment(Comment comment);
     long queryCommentCountOfProduct(long productId);
     List<Comment> queryCommentOfProduct(long productId, int start, int count);
 

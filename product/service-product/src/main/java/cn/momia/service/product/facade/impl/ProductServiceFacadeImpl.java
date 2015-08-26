@@ -251,6 +251,11 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     }
 
     @Override
+    public long addComment(Comment comment) {
+        return commentService.add(comment);
+    }
+
+    @Override
     public long queryCommentCountOfProduct(long productId) {
         if (productId <= 0) return 0;
         return commentService.queryCountByProduct(productId);
