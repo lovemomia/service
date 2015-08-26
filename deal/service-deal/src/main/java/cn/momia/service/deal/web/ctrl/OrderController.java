@@ -222,7 +222,7 @@ public class OrderController extends AbstractController {
         if (orders.isEmpty()) return ResponseMessage.EMPTY_ARRAY;
 
         Map<Long, List<Order>> skuOrdersMap = new HashMap<Long, List<Order>>();
-        Map<Long, Set<Long>> skuCustomerIdsMap = new HashMap<Long, Set<Long>>();
+        Map<Long, List<Long>> skuCustomerIdsMap = new HashMap<Long, List<Long>>();
         Set<Long> customerIds = new HashSet<Long>();
         Set<Long> participantIds = new HashSet<Long>();
         Map<Long, Set<Long>> customerPrticipantsIdsMap = new HashMap<Long, Set<Long>>();
@@ -239,12 +239,12 @@ public class OrderController extends AbstractController {
             }
             skuOrders.add(order);
 
-            Set<Long> skuCustomerIds = skuCustomerIdsMap.get(skuId);
+            List<Long> skuCustomerIds = skuCustomerIdsMap.get(skuId);
             if (skuCustomerIds == null) {
-                skuCustomerIds = new HashSet<Long>();
+                skuCustomerIds = new ArrayList<Long>();
                 skuCustomerIdsMap.put(skuId, skuCustomerIds);
             }
-            skuCustomerIds.add(customerId);
+            if (!skuCustomerIds.contains(customerId)) skuCustomerIds.add(customerId);
 
             customerIds.add(customerId);
             participantIds.addAll(orderParticipantIds);
@@ -299,7 +299,7 @@ public class OrderController extends AbstractController {
 
     private List<SkuPlaymatesDto> buildPlaymates(List<Sku> skus,
                                                  Map<Long, List<Order>> skuOrdersMap,
-                                                 Map<Long, Set<Long>> skuCustomerIdsMap,
+                                                 Map<Long, List<Long>> skuCustomerIdsMap,
                                                  Map<Long, Set<Long>> customerPrticipantsIdsMap,
                                                  Map<Long, User> customersMap,
                                                  Map<Long, Participant> participantsMap) {
@@ -352,13 +352,13 @@ public class OrderController extends AbstractController {
     }
 
     private List<PlaymateDto> extractPlayMates(long skuId,
-                                               Map<Long, Set<Long>> skuCustomerIdsMap,
+                                               Map<Long, List<Long>> skuCustomerIdsMap,
                                                Map<Long, Set<Long>> customerPrticipantsIdsMap,
                                                Map<Long, User> customersMap,
                                                Map<Long, Participant> participantsMap) {
         int pageSize = Configuration.getInt("Product.Playmate.PageSize");
         List<PlaymateDto> playmatesDto = new ArrayList<PlaymateDto>();
-        Set<Long> customerIds = skuCustomerIdsMap.get(skuId);
+        List<Long> customerIds = skuCustomerIdsMap.get(skuId);
         if (customerIds != null) {
             for (long customerId : customerIds) {
                 PlaymateDto playmateDto = new PlaymateDto();
