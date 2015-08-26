@@ -6,9 +6,6 @@ import java.util.Date;
 import java.util.List;
 
 public class Comment {
-    private long id;
-    private long productId;
-    private long skuId;
     private long userId;
     private String nickName;
     private String avatar;
@@ -16,30 +13,6 @@ public class Comment {
     private String content;
     @JSONField(format = "yyyy-MM-dd HH:mm:ss") private Date addTime;
     private List<String> imgs;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public long getProductId() {
-        return productId;
-    }
-
-    public void setProductId(long productId) {
-        this.productId = productId;
-    }
-
-    public long getSkuId() {
-        return skuId;
-    }
-
-    public void setSkuId(long skuId) {
-        this.skuId = skuId;
-    }
 
     public long getUserId() {
         return userId;
