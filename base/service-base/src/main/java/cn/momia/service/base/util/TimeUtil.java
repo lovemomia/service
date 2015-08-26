@@ -98,6 +98,18 @@ public class TimeUtil {
         return month / 12.0F;
     }
 
+    public static String getAgeDesc(Date birthday) {
+        float age = getAge(birthday);
+
+        if (age <= 0) return "未出生";
+        else if (age > 0 && age < 1) {
+            int month = (int) (age * 12);
+            if (month == 0) month = 1;
+            return month + "个月";
+        }
+        else return ((int) age) + "岁";
+    }
+
     public static boolean isAdult(Date birthday) {
         return getAge(birthday) > 15;
     }

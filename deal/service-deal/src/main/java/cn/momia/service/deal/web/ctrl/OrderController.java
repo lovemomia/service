@@ -224,13 +224,10 @@ public class OrderController extends AbstractController {
         Map<Long, List<Order>> skuOrdersMap = new HashMap<Long, List<Order>>();
         Map<Long, List<Long>> skuCustomerIdsMap = new HashMap<Long, List<Long>>();
         Set<Long> customerIds = new HashSet<Long>();
-        Set<Long> participantIds = new HashSet<Long>();
-        Map<Long, Set<Long>> customerPrticipantsIdsMap = new HashMap<Long, Set<Long>>();
 
         for (Order order: orders) {
             long skuId = order.getSkuId();
             long customerId = order.getCustomerId();
-            List<Long> orderParticipantIds = order.getParticipants();
 
             List<Order> skuOrders = skuOrdersMap.get(skuId);
             if (skuOrders == null) {
@@ -245,29 +242,15 @@ public class OrderController extends AbstractController {
                 skuCustomerIdsMap.put(skuId, skuCustomerIds);
             }
             if (!skuCustomerIds.contains(customerId)) skuCustomerIds.add(customerId);
-
             customerIds.add(customerId);
-            participantIds.addAll(orderParticipantIds);
-
-            Set<Long> customerParticipantsIds = customerPrticipantsIdsMap.get(customerId);
-            if (customerParticipantsIds == null) {
-                customerParticipantsIds = new HashSet<Long>();
-                customerPrticipantsIdsMap.put(customerId, customerParticipantsIds);
-            }
-            customerParticipantsIds.addAll(orderParticipantIds);
         }
 
         Map<Long, User> customersMap = new HashMap<Long, User>();
-        for (User customer : UserServiceApi.USER.list(customerIds, User.Type.MINI)) {
+        for (User customer : UserServiceApi.USER.list(customerIds, User.Type.FULL)) {
             customersMap.put(customer.getId(), customer);
         }
 
-        Map<Long, Participant> participantsMap = new HashMap<Long, Participant>();
-        for (Participant participant : UserServiceApi.PARTICIPANT.list(participantIds)) {
-            participantsMap.put(participant.getId(), participant);
-        }
-
-        return ResponseMessage.SUCCESS(buildPlaymates(skus, skuOrdersMap, skuCustomerIdsMap, customerPrticipantsIdsMap, customersMap, participantsMap));
+        return ResponseMessage.SUCCESS(buildPlaymates(skus, skuOrdersMap, skuCustomerIdsMap, customersMap));
     }
 
     private List<Sku> querySkus(long id, int start, int count) {
@@ -300,16 +283,14 @@ public class OrderController extends AbstractController {
     private List<SkuPlaymatesDto> buildPlaymates(List<Sku> skus,
                                                  Map<Long, List<Order>> skuOrdersMap,
                                                  Map<Long, List<Long>> skuCustomerIdsMap,
-                                                 Map<Long, Set<Long>> customerPrticipantsIdsMap,
-                                                 Map<Long, User> customersMap,
-                                                 Map<Long, Participant> participantsMap) {
+                                                 Map<Long, User> customersMap) {
         List<SkuPlaymatesDto> skusPlaymatesDto = new ArrayList<SkuPlaymatesDto>();
         for (Sku sku : skus) {
             try {
                 SkuPlaymatesDto skuPlaymatesDto = new SkuPlaymatesDto();
                 skuPlaymatesDto.setTime(sku.getTime());
                 skuPlaymatesDto.setJoined(formatJoined(skuOrdersMap.get(sku.getSkuId())));
-                skuPlaymatesDto.setPlaymates(extractPlayMates(sku.getSkuId(), skuCustomerIdsMap, customerPrticipantsIdsMap, customersMap, participantsMap));
+                skuPlaymatesDto.setPlaymates(extractPlayMates(sku.getSkuId(), skuCustomerIdsMap, customersMap));
 
                 skusPlaymatesDto.add(skuPlaymatesDto);
             } catch (Exception e) {
@@ -351,11 +332,7 @@ public class OrderController extends AbstractController {
         return builder.toString();
     }
 
-    private List<PlaymateDto> extractPlayMates(long skuId,
-                                               Map<Long, List<Long>> skuCustomerIdsMap,
-                                               Map<Long, Set<Long>> customerPrticipantsIdsMap,
-                                               Map<Long, User> customersMap,
-                                               Map<Long, Participant> participantsMap) {
+    private List<PlaymateDto> extractPlayMates(long skuId, Map<Long, List<Long>> skuCustomerIdsMap, Map<Long, User> customersMap) {
         int pageSize = Configuration.getInt("Product.Playmate.PageSize");
         List<PlaymateDto> playmatesDto = new ArrayList<PlaymateDto>();
         List<Long> customerIds = skuCustomerIdsMap.get(skuId);
@@ -368,19 +345,17 @@ public class OrderController extends AbstractController {
                 playmateDto.setNickName(customer.getNickName());
                 playmateDto.setAvatar(customer.getAvatar());
 
-                List<String> children = new ArrayList<String>();
-                Set<Long> customerPrticipantsIds = customerPrticipantsIdsMap.get(customerId);
-                if (customerPrticipantsIds != null) {
-                    for (long participantId : customerPrticipantsIds) {
-                        Participant participant = participantsMap.get(participantId);
-                        if (participant != null && TimeUtil.isChild(participant.getBirthday())) {
-                            children.add(participant.getSex() + "孩" + TimeUtil.getAge(participant.getBirthday()) + "岁");
-                        }
+                List<String> childrenStrs = new ArrayList<String>();
+                List<Participant> children = customer.getChildren();
+                if (children != null) {
+                    for (Participant child : children) {
+                        childrenStrs.add(child.getSex() + "孩" + TimeUtil.getAgeDesc(child.getBirthday()));
                     }
                 }
-                playmateDto.setChildren(children);
+                playmateDto.setChildren(childrenStrs);
 
                 if (playmatesDto.size() < pageSize) playmatesDto.add(playmateDto);
+                else break;
             }
         }
 

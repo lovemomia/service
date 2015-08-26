@@ -120,10 +120,8 @@ public class Participant implements Serializable {
     public String getDesc() {
         if (TimeUtil.isAdult(this.birthday)) return "成人";
 
-        int age = TimeUtil.getAge(this.birthday);
-        String ageStr = age <= 0 ? "不到1" : String.valueOf(age);
-
-        if (!("男".equals(this.sex) || "女".equals(this.sex))) return "孩子" + ageStr + "岁";
-        return this.sex + "孩" + ageStr + "岁";
+        String ageStr = TimeUtil.getAgeDesc(birthday);
+        if (!("男".equals(this.sex) || "女".equals(this.sex))) return "孩子" + ageStr;
+        return this.sex + "孩" + ageStr;
     }
 }
