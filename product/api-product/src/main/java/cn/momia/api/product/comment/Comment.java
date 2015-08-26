@@ -10,6 +10,8 @@ public class Comment {
     private long productId;
     private long skuId;
     private long userId;
+    private String nickName;
+    private String avatar;
     private int star;
     private String content;
     @JSONField(format = "yyyy-MM-dd HH:mm:ss") private Date addTime;
@@ -45,6 +47,22 @@ public class Comment {
 
     public void setUserId(long userId) {
         this.userId = userId;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     public int getStar() {
