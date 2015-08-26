@@ -42,6 +42,28 @@ public class OrderPrice {
         this.child = child;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof OrderPrice)) return false;
+
+        OrderPrice price1 = (OrderPrice) o;
+
+        if (getCount() != price1.getCount()) return false;
+        if (getAdult() != price1.getAdult()) return false;
+        if (getChild() != price1.getChild()) return false;
+        return !(getPrice() != null ? !getPrice().equals(price1.getPrice()) : price1.getPrice() != null);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getPrice() != null ? getPrice().hashCode() : 0;
+        result = 31 * result + getCount();
+        result = 31 * result + getAdult();
+        result = 31 * result + getChild();
+        return result;
+    }
+
     public OrderPrice() {}
 
     public OrderPrice(JSONObject priceJson) {

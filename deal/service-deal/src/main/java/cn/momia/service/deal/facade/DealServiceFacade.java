@@ -14,6 +14,7 @@ public interface DealServiceFacade {
     void checkLimit(long userId, long skuId, int count, int limit) throws OrderLimitException;
 
     Order getOrder(long orderId);
+    Order getOrder(long userId, long productId, long skuId);
     boolean deleteOrder(long userId, long orderId);
     long queryOrderCountByUser(long userId, int status);
     List<Order> queryOrderByUser(long userId, int status, int start, int count);

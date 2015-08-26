@@ -11,6 +11,7 @@ import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderPrice;
 import cn.momia.service.deal.web.ctrl.dto.OrderDetailDto;
 import cn.momia.service.deal.web.ctrl.dto.OrderDto;
+import cn.momia.service.deal.web.ctrl.dto.OrderDupDto;
 import cn.momia.service.deal.web.ctrl.dto.PlaymateDto;
 import cn.momia.service.deal.web.ctrl.dto.SkuPlaymatesDto;
 import cn.momia.api.product.ProductServiceApi;
@@ -23,6 +24,7 @@ import cn.momia.service.base.web.ctrl.dto.ListDto;
 import cn.momia.service.base.web.ctrl.dto.PagedListDto;
 import cn.momia.service.base.web.response.ResponseMessage;
 import cn.momia.service.promo.facade.PromoServiceFacade;
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,6 +116,79 @@ public class OrderController extends AbstractController {
 
     private boolean unlockSku(Order order) {
         return ProductServiceApi.SKU.unlockStock(order.getProductId(), order.getSkuId(), order.getCount(), order.getJoinedCount());
+    }
+
+    @RequestMapping(value = "/check/dup", method = RequestMethod.GET)
+    public ResponseMessage checkDup(@RequestParam String utoken, @RequestParam String order) {
+        if (StringUtils.isBlank(utoken) || StringUtils.isBlank(order)) return ResponseMessage.SUCCESS(OrderDupDto.NOT_DUPLICATED);
+
+        try {
+            User user = UserServiceApi.USER.get(utoken);
+            Order orderObj = JSON.toJavaObject(JSON.parseObject(order), Order.class);
+            Order orderInDb = dealServiceFacade.getOrder(user.getId(), orderObj.getProductId(), orderObj.getSkuId());
+            if (!orderInDb.exists() || orderInDb.isPayed()) return ResponseMessage.SUCCESS(OrderDupDto.NOT_DUPLICATED);
+
+            OrderDupDto orderDupDto = new OrderDupDto();
+            orderDupDto.setDuplicated(true);
+            orderDupDto.setOrderId(orderInDb.getId());
+            if (isSame(orderObj, orderInDb)) orderDupDto.setSame(true);
+
+            return ResponseMessage.SUCCESS(orderDupDto);
+        } catch (Exception e) {
+            return ResponseMessage.SUCCESS(OrderDupDto.NOT_DUPLICATED);
+        }
+    }
+
+    private boolean isSame(Order order1, Order order2) {
+        if (!isSamePrices(order1.getPrices(), order2.getPrices())) return false;
+        if (!isSameContacts(order1.getContacts(), order2.getContacts())) return false;
+        if (!isSameMobile(order1.getMobile(), order2.getMobile())) return false;
+        if (!isSameParticipants(order1.getParticipants(), order2.getParticipants())) return false;
+        return true;
+    }
+
+    private boolean isSamePrices(List<OrderPrice> prices1, List<OrderPrice> prices2) {
+        if (prices1 == null && prices2 == null) return true;
+        if (prices1 != null && prices2 != null) {
+            for (OrderPrice price : prices1) {
+                if (!prices2.contains(price)) return false;
+            }
+
+            for (OrderPrice price : prices2) {
+                if (!prices1.contains(price)) return false;
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isSameContacts(String contacts1, String contacts2) {
+        if (contacts1 == null && contacts2 == null) return true;
+        if (contacts1 != null && contacts2 != null) return contacts1.equals(contacts2);
+        return false;
+    }
+
+    private boolean isSameMobile(String mobile1, String mobile2) {
+        if (mobile1 == null && mobile2 == null) return true;
+        if (mobile1 != null && mobile2 != null) return mobile1.equals(mobile2);
+        return false;
+    }
+
+    private boolean isSameParticipants(List<Long> participants1, List<Long> participants2) {
+        if (participants1 == null && participants2 == null) return true;
+        if (participants1 != null && participants2 != null) {
+            for (long id : participants1) {
+                if (!participants2.contains(id)) return false;
+            }
+
+            for (long id : participants2) {
+                if (!participants1.contains(id)) return false;
+            }
+
+            return true;
+        }
+        return false;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)

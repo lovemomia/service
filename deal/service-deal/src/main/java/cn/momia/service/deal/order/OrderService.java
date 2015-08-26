@@ -7,6 +7,7 @@ import java.util.List;
 public interface OrderService extends Service {
     long add(Order order);
     Order get(long id);
+    Order get(long userId, long productId, long skuId);
     long queryCountByUser(long userId, int status);
     List<Order> queryByUser(long userId, int status, int start, int count);
     List<Order> queryByUserAndSku(long userId, long skuId);
