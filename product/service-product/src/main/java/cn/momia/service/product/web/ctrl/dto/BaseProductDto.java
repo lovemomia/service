@@ -1,5 +1,6 @@
 package cn.momia.service.product.web.ctrl.dto;
 
+import cn.momia.api.common.MetaUtil;
 import cn.momia.service.product.facade.Product;
 import cn.momia.service.product.sku.Sku;
 import cn.momia.service.base.web.ctrl.dto.Dto;
@@ -65,6 +66,10 @@ public class BaseProductDto extends MiniProductDto implements Dto {
 
     public int getRegionId() {
         return product.getRegionId();
+    }
+
+    public String getRegion() {
+        return MetaUtil.getRegionName(product.getRegionId());
     }
 
     public String getAddress() {

@@ -9,6 +9,7 @@
     </Server>
 
     <Service>
+        <Common>http://localhost:7070</Common>
         <User>http://localhost:7070</User>
     </Service>
 

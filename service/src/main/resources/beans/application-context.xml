@@ -149,4 +149,6 @@
     <bean class="cn.momia.api.common.CommonServiceApi" parent="srviceApi" init-method="init" />
     <bean class="cn.momia.api.product.ProductServiceApi" parent="srviceApi" init-method="init" />
     <bean class="cn.momia.api.user.UserServiceApi" parent="srviceApi" init-method="init" />
+
+    <bean class="cn.momia.api.common.MetaUtil" init-method="init" />
 </beans>

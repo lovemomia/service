@@ -65,7 +65,14 @@
         <property name="favoriteService" ref="favoriteService" />
     </bean>
 
+
+    <bean class="cn.momia.api.common.CommonServiceApi" init-method="init">
+        <property name="service" value="${Service.Common}" />
+    </bean>
+
     <bean class="cn.momia.api.user.UserServiceApi" init-method="init">
         <property name="service" value="${Service.User}" />
     </bean>
+
+    <bean class="cn.momia.api.common.MetaUtil" init-method="init" />
 </beans>
