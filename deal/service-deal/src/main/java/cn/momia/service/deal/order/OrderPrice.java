@@ -47,12 +47,12 @@ public class OrderPrice {
         if (this == o) return true;
         if (!(o instanceof OrderPrice)) return false;
 
-        OrderPrice price1 = (OrderPrice) o;
+        OrderPrice other = (OrderPrice) o;
 
-        if (getCount() != price1.getCount()) return false;
-        if (getAdult() != price1.getAdult()) return false;
-        if (getChild() != price1.getChild()) return false;
-        return !(getPrice() != null ? !getPrice().equals(price1.getPrice()) : price1.getPrice() != null);
+        if (getCount() != other.getCount()) return false;
+        if (getAdult() != other.getAdult()) return false;
+        if (getChild() != other.getChild()) return false;
+        return getPrice() == null ? other.getPrice() == null : getPrice().equals(other.getPrice());
     }
 
     @Override
@@ -61,6 +61,7 @@ public class OrderPrice {
         result = 31 * result + getCount();
         result = 31 * result + getAdult();
         result = 31 * result + getChild();
+
         return result;
     }
 
