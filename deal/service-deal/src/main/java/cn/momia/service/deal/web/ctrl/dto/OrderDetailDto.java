@@ -23,10 +23,9 @@ public class OrderDetailDto extends OrderDto implements Dto {
         return product.getScheduler();
     }
 
-    // TODO
-//    public String getRegion() {
-//        return MetaUtil.getRegionName(product.getRegionId());
-//    }
+    public int getRegionId() {
+        return product.getRegionId();
+    }
 
     public String getAddress() {
         return product.getAddress();
