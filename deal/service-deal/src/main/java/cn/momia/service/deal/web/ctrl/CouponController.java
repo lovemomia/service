@@ -59,8 +59,14 @@ public class CouponController extends AbstractController {
 
         User user = UserServiceApi.USER.get(utoken);
 
-        int totalCount = promoServiceFacade.queryUserCouponCount(user.getId(), orderId, status);
-        List<UserCoupon> userCoupons = promoServiceFacade.queryUserCoupon(user.getId(), orderId, status, start, count);
+        BigDecimal totalFee = new BigDecimal(0);
+        if (orderId > 0) {
+            Order order = dealServiceFacade.getOrder(orderId);
+            if (order.exists()) totalFee = order.getTotalFee();
+        }
+
+        int totalCount = promoServiceFacade.queryUserCouponCount(user.getId(), orderId, totalFee, status);
+        List<UserCoupon> userCoupons = promoServiceFacade.queryUserCoupon(user.getId(), orderId, totalFee, status, start, count);
 
         List<Integer> couponIds = new ArrayList<Integer>();
         for (UserCoupon userCoupon : userCoupons) couponIds.add(userCoupon.getCouponId());

@@ -15,8 +15,8 @@ public interface PromoServiceFacade {
     boolean canUse(BigDecimal totalFee, Coupon coupon);
     BigDecimal calcTotalFee(BigDecimal totalFee, Coupon coupon);
 
-    int queryUserCouponCount(long userId, long orderId, int status);
-    List<UserCoupon> queryUserCoupon(long userId, long orderId, int status, int start, int count);
+    int queryUserCouponCount(long userId, long orderId, BigDecimal totalFee, int status);
+    List<UserCoupon> queryUserCoupon(long userId, long orderId, BigDecimal totalFee, int status, int start, int count);
     List<Coupon> getCoupons(Collection<Integer> couponIds);
 
     UserCoupon getNotUsedUserCouponByOrder(long orderId);

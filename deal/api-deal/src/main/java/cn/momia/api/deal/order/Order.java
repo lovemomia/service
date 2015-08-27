@@ -16,6 +16,7 @@ public class Order {
     private String mobile;
     @JSONField(format = "yyyy-MM-dd HH:mm:ss") private Date addTime;
     private int status;
+    private boolean payed;
 
     private String cover;
     private String title;
@@ -104,6 +105,14 @@ public class Order {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public boolean isPayed() {
+        return payed;
+    }
+
+    public void setPayed(boolean payed) {
+        this.payed = payed;
     }
 
     public String getCover() {

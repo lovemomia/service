@@ -11,8 +11,8 @@ public interface CouponService extends Service {
     void distributeShareCoupon(long userId, int discount);
     Coupon getCoupon(int couponId);
     List<Coupon> getCoupons(Collection<Integer> couponIds);
-    int queryCountByUser(long userId, long orderId, int status);
-    List<UserCoupon> queryByUser(long userId, long orderId, int status, int start, int count);
+    int queryCountByUser(long userId, long orderId, BigDecimal totalFee, int status);
+    List<UserCoupon> queryByUser(long userId, long orderId, BigDecimal totalFee, int status, int start, int count);
     boolean lockUserCoupon(long userId, long orderId, long userCouponId);
     boolean useUserCoupon(long userId, long orderId, long userCouponId);
     boolean releaseUserCoupon(long userId, long orderId);

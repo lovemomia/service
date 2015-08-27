@@ -68,6 +68,22 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         });
     }
 
+    @Override
+    public List<Order> list(long userId, long productId, long skuId) {
+        final List<Order> orders = new ArrayList<Order>();
+
+        String sql = "SELECT " + joinFields() + " FROM t_order WHERE customerId=? AND productId=? AND skuId=? AND status>0 ORDER BY addTime DESC";
+        jdbcTemplate.query(sql, new Object[] { userId, productId, skuId }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                Order order = buildOrder(rs);
+                if (order.exists()) orders.add(order);
+            }
+        });
+
+        return orders;
+    }
+
     private String joinFields() {
         return StringUtils.join(ORDER_FIELDS, ",");
     }
@@ -246,8 +262,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public boolean pay(long id) {
-        String sql = "UPDATE t_order SET status=? WHERE id=? AND (status=? OR status=?)";
-        int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PAYED, id, Order.Status.PRE_PAYED, Order.Status.PAYED });
+        String sql = "UPDATE t_order SET status=? WHERE id=? AND status=?";
+        int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PAYED, id, Order.Status.PRE_PAYED });
 
         return updateCount == 1;
     }

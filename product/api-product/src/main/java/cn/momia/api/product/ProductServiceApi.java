@@ -3,6 +3,7 @@ package cn.momia.api.product;
 import cn.momia.api.base.ServiceApi;
 import cn.momia.api.base.http.MomiaHttpParamBuilder;
 import cn.momia.api.base.http.MomiaHttpRequest;
+import cn.momia.api.product.comment.PagedComments;
 import cn.momia.api.product.sku.Sku;
 import cn.momia.api.product.topic.Topic;
 import cn.momia.api.product.topic.Banner;
@@ -18,12 +19,14 @@ import java.util.List;
 public class ProductServiceApi extends ServiceApi {
     public static TopicServiceApi TOPIC = new TopicServiceApi();
     public static BaseProductServiceApi PRODUCT = new BaseProductServiceApi();
+    public static CommentServiceApi COMMENT = new CommentServiceApi();
     public static SkuServiceApi SKU = new SkuServiceApi();
     public static FavoriteServiceApi FAVORITE = new FavoriteServiceApi();
 
     public void init() {
         TOPIC.setService(service);
         PRODUCT.setService(service);
+        COMMENT.setService(service);
         SKU.setService(service);
         FAVORITE.setService(service);
     }
@@ -149,6 +152,22 @@ public class ProductServiceApi extends ServiceApi {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("count", count);
             MomiaHttpRequest request = MomiaHttpRequest.POST(url("product", productId, "sold"), builder.build());
             executeRequest(request);
+        }
+    }
+
+    public static class CommentServiceApi extends ProductServiceApi {
+        public void add(JSONObject commentJson) {
+            MomiaHttpRequest request = MomiaHttpRequest.POST(url("product", commentJson.getLong("productId"), "comment"), commentJson.toJSONString());
+            executeRequest(request);
+        }
+
+        public PagedComments list(long productId, int start, int count) {
+            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                    .add("start", start)
+                    .add("count", count);
+            MomiaHttpRequest request = MomiaHttpRequest.GET(url("product", productId, "comment"), builder.build());
+
+            return JSON.toJavaObject((JSON) executeRequest(request), PagedComments.class);
         }
     }
 

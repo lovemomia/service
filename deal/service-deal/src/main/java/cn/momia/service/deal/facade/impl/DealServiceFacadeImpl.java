@@ -56,6 +56,12 @@ public class DealServiceFacadeImpl implements DealServiceFacade {
     }
 
     @Override
+    public List<Order> getOrders(long userId, long productId, long skuId) {
+        if (userId <= 0 || productId <= 0 || skuId <= 0) return new ArrayList<Order>();
+        return orderService.list(userId, productId, skuId);
+    }
+
+    @Override
     public boolean deleteOrder(long userId, long orderId) {
         if (userId <= 0 || orderId <= 0) return false;
         return orderService.delete(userId, orderId);

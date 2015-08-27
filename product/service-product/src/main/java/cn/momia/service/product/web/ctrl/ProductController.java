@@ -4,11 +4,13 @@ import cn.momia.service.base.config.Configuration;
 import cn.momia.api.base.exception.MomiaFailedException;
 import cn.momia.service.base.util.TimeUtil;
 import cn.momia.service.product.base.ProductSort;
+import cn.momia.service.product.comment.Comment;
 import cn.momia.service.product.facade.Product;
 import cn.momia.service.product.facade.ProductServiceFacade;
 import cn.momia.service.product.sku.Sku;
 import cn.momia.service.product.web.ctrl.dto.BaseProductDto;
 import cn.momia.service.product.web.ctrl.dto.BaseSkuDto;
+import cn.momia.service.product.web.ctrl.dto.CommentDto;
 import cn.momia.service.product.web.ctrl.dto.FullProductDto;
 import cn.momia.service.product.web.ctrl.dto.FullSkuDto;
 import cn.momia.service.product.web.ctrl.dto.MiniProductDto;
@@ -24,6 +26,7 @@ import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -365,5 +368,26 @@ public class ProductController extends AbstractController {
     public ResponseMessage sold(@PathVariable long id, @RequestParam int count) {
         if (!productServiceFacade.sold(id, count)) return ResponseMessage.FAILED;
         return ResponseMessage.SUCCESS;
+    }
+
+    @RequestMapping(value = "/{id}/comment", method = RequestMethod.POST, consumes = "application/json")
+    public ResponseMessage addComment(@RequestBody Comment comment) {
+        long commentId = productServiceFacade.addComment(comment);
+
+        if (commentId <= 0) return ResponseMessage.FAILED("发表评论失败");
+        return ResponseMessage.SUCCESS;
+    }
+
+    @RequestMapping(value = "/{id}/comment", method = RequestMethod.GET)
+    public ResponseMessage listComments(@PathVariable long id, @RequestParam int start, @RequestParam int count){
+        if (id <= 0 || isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
+
+        long totalCount = productServiceFacade.queryCommentCountOfProduct(id);
+        List<Comment> comments = productServiceFacade.queryCommentOfProduct(id, start, count);
+
+        PagedListDto commentsDto = new PagedListDto(totalCount, start, count);
+        for (Comment comment : comments) commentsDto.add(new CommentDto(comment));
+
+        return ResponseMessage.SUCCESS(commentsDto);
     }
 }

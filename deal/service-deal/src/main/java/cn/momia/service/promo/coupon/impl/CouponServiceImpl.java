@@ -35,11 +35,11 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
             List<Object[]> params = new ArrayList<Object[]>();
             for (Coupon coupon : coupons) {
                 for (int i = 0; i < coupon.getCount(); i++) {
-                    params.add(new Object[] { userId, coupon.getId(), Coupon.Src.REGISTER, coupon.getStartTime(), coupon.getEndTime() });
+                    params.add(new Object[] { userId, coupon.getId(), Coupon.Src.REGISTER, coupon.getConsumption(), coupon.getStartTime(), coupon.getEndTime() });
                 }
             }
 
-            String sql = "INSERT INTO t_user_coupon(userId, couponId, src, startTime, endTime, addTime) VALUES (?, ?, ?, ?, ?, NOW())";
+            String sql = "INSERT INTO t_user_coupon(userId, couponId, src, consumption, startTime, endTime, addTime) VALUES (?, ?, ?, ?, ?, ?, NOW())";
             jdbcTemplate.batchUpdate(sql, params);
         } catch (Exception e) {
             LOGGER.error("fail to distribute user coupon to user: {}", userId, e);
@@ -106,10 +106,10 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
             List<Object[]> params = new ArrayList<Object[]>();
             Coupon coupon = coupons.get(0);
             for (int i = 0; i < coupon.getCount(); i++) {
-                params.add(new Object[] { userId, coupon.getId(), Coupon.Src.SHARE, coupon.getStartTime(), coupon.getEndTime() });
+                params.add(new Object[] { userId, coupon.getId(), Coupon.Src.SHARE, coupon.getConsumption(), coupon.getStartTime(), coupon.getEndTime() });
             }
 
-            String sql = "INSERT INTO t_user_coupon(userId, couponId, src, startTime, endTime, addTime) VALUES (?, ?, ?, ?, ?, NOW())";
+            String sql = "INSERT INTO t_user_coupon(userId, couponId, src, consumption, startTime, endTime, addTime) VALUES (?, ?, ?, ?, ?, ?, NOW())";
             jdbcTemplate.batchUpdate(sql, params);
         } catch (Exception e) {
             LOGGER.error("fail to distribute share coupon to user: {}/{}", userId, discount, e);
@@ -161,7 +161,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     }
 
     @Override
-    public int queryCountByUser(long userId, long orderId, int status) {
+    public int queryCountByUser(long userId, long orderId, BigDecimal totalFee, int status) {
         if (status == UserCoupon.Status.EXPIRED) {
             String sql = "SELECT COUNT(1) FROM t_user_coupon WHERE userId=? AND status=? AND endTime<=NOW()";
 
@@ -172,9 +172,9 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
                 }
             });
         } else if (status == UserCoupon.Status.NOT_USED && orderId > 0) {
-            String sql = "SELECT COUNT(1) FROM t_user_coupon WHERE userId=? AND ((status=? AND endTime>NOW()) OR (orderId=? AND status=?))";
+            String sql = "SELECT COUNT(1) FROM t_user_coupon WHERE userId=? AND consumption<=? AND ((status=? AND endTime>NOW()) OR (orderId=? AND status=?))";
 
-            return jdbcTemplate.query(sql, new Object[] { userId, status, orderId, UserCoupon.Status.LOCKED }, new ResultSetExtractor<Integer>() {
+            return jdbcTemplate.query(sql, new Object[] { userId, totalFee, status, orderId, UserCoupon.Status.LOCKED }, new ResultSetExtractor<Integer>() {
                 @Override
                 public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
                     return rs.next() ? rs.getInt(1) : 0;
@@ -211,7 +211,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     }
 
     @Override
-    public List<UserCoupon> queryByUser(long userId, long orderId, int status, int start, int count) {
+    public List<UserCoupon> queryByUser(long userId, long orderId, BigDecimal totalFee, int status, int start, int count) {
         final List<UserCoupon> userCoupons = new ArrayList<UserCoupon>();
 
         if (status == UserCoupon.Status.EXPIRED) {
@@ -227,8 +227,8 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
                 }
             });
         } else if (status == UserCoupon.Status.NOT_USED && orderId > 0) {
-            String sql = "SELECT " + joinUserCouponFields() + " FROM t_user_coupon WHERE userId=? AND ((status=? AND endTime>NOW()) OR (orderId=? AND status=?)) ORDER BY addTime DESC LIMIT ?,?";
-            jdbcTemplate.query(sql, new Object[] { userId, status, orderId, UserCoupon.Status.LOCKED, start, count }, new RowCallbackHandler() {
+            String sql = "SELECT " + joinUserCouponFields() + " FROM t_user_coupon WHERE userId=? AND consumption<=? AND ((status=? AND endTime>NOW()) OR (orderId=? AND status=?)) ORDER BY addTime DESC LIMIT ?,?";
+            jdbcTemplate.query(sql, new Object[] { userId, totalFee, status, orderId, UserCoupon.Status.LOCKED, start, count }, new RowCallbackHandler() {
                 @Override
                 public void processRow(ResultSet rs) throws SQLException {
                     UserCoupon userCoupon = buildUserCoupon(rs);

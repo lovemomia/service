@@ -36,6 +36,11 @@ public class DealServiceApi extends ServiceApi {
             return JSON.toJavaObject((JSON) executeRequest(request), Order.class);
         }
 
+        public JSON checkDup(JSONObject orderJson) {
+            MomiaHttpRequest request = MomiaHttpRequest.POST(url("order/check/dup"), orderJson.toString());
+            return (JSON) executeRequest(request);
+        }
+
         public void delete(String utoken, long id) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
             MomiaHttpRequest request = MomiaHttpRequest.DELETE(url("order", id), builder.build());
@@ -86,6 +91,16 @@ public class DealServiceApi extends ServiceApi {
             }
 
             return playmates;
+        }
+
+        public boolean check(String utoken, long orderId, long productId, long skuId) {
+            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                    .add("utoken", utoken)
+                    .add("pid", productId)
+                    .add("sid", skuId);
+            MomiaHttpRequest request = MomiaHttpRequest.GET(url("order", orderId, "check"), builder.build());
+
+            return (Boolean) executeRequest(request);
         }
     }
 
