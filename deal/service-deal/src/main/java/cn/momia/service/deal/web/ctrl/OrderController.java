@@ -129,6 +129,7 @@ public class OrderController extends AbstractController {
                 OrderDupDto orderDupDto = new OrderDupDto();
                 orderDupDto.setDuplicated(true);
                 orderDupDto.setOrderId(o.getId());
+                orderDupDto.setProductId(o.getProductId());
                 if (isSame(order, o)) orderDupDto.setSame(true);
 
                 return ResponseMessage.SUCCESS(orderDupDto);

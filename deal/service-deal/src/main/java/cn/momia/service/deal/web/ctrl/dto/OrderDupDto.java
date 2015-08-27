@@ -8,6 +8,7 @@ public class OrderDupDto {
 
     private boolean duplicated;
     private Long orderId;
+    private Long productId;
     private Boolean same;
 
     public boolean isDuplicated() {
@@ -24,6 +25,14 @@ public class OrderDupDto {
 
     public void setOrderId(Long orderId) {
         this.orderId = orderId;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 
     public Boolean isSame() {
