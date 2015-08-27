@@ -13,10 +13,6 @@ public class MetaUtil {
     private static Map<Integer, City> citiesMap = new HashMap<Integer, City>();
     private static Map<Integer, Region> regionsMap = new HashMap<Integer, Region>();
 
-    public void init() {
-        reload();
-    }
-
     private synchronized static void reload() {
         if (!isOutOfDate()) return;
 
