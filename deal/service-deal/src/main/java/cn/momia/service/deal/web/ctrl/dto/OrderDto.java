@@ -68,6 +68,10 @@ public class OrderDto implements Dto {
         return order.getStatus();
     }
 
+    public boolean isPayed() {
+        return order.isPayed();
+    }
+
     public OrderDto(Order order) {
         this.order = order;
     }
