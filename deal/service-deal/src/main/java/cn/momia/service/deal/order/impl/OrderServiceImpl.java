@@ -69,16 +69,19 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
-    public Order get(long userId, long productId, long skuId) {
-        String sql = "SELECT " + joinFields() + " FROM t_order WHERE customerId=? AND productId=? AND skuId=? AND status>0";
+    public List<Order> list(long userId, long productId, long skuId) {
+        final List<Order> orders = new ArrayList<Order>();
 
-        return jdbcTemplate.query(sql, new Object[] { userId, productId, skuId }, new ResultSetExtractor<Order>() {
+        String sql = "SELECT " + joinFields() + " FROM t_order WHERE customerId=? AND productId=? AND skuId=? AND status>0 ORDER BY addTime DESC";
+        jdbcTemplate.query(sql, new Object[] { userId, productId, skuId }, new RowCallbackHandler() {
             @Override
-            public Order extractData(ResultSet rs) throws SQLException, DataAccessException {
-                if (rs.next()) return buildOrder(rs);
-                return Order.NOT_EXIST_ORDER;
+            public void processRow(ResultSet rs) throws SQLException {
+                Order order = buildOrder(rs);
+                if (order.exists()) orders.add(order);
             }
         });
+
+        return orders;
     }
 
     private String joinFields() {

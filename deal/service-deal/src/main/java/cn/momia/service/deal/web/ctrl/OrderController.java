@@ -24,7 +24,6 @@ import cn.momia.service.base.web.ctrl.dto.ListDto;
 import cn.momia.service.base.web.ctrl.dto.PagedListDto;
 import cn.momia.service.base.web.response.ResponseMessage;
 import cn.momia.service.promo.facade.PromoServiceFacade;
-import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,25 +117,27 @@ public class OrderController extends AbstractController {
         return ProductServiceApi.SKU.unlockStock(order.getProductId(), order.getSkuId(), order.getCount(), order.getJoinedCount());
     }
 
-    @RequestMapping(value = "/check/dup", method = RequestMethod.GET)
-    public ResponseMessage checkDup(@RequestParam String utoken, @RequestParam String order) {
-        if (StringUtils.isBlank(utoken) || StringUtils.isBlank(order)) return ResponseMessage.SUCCESS(OrderDupDto.NOT_DUPLICATED);
-
+    @RequestMapping(value = "/check/dup", method = RequestMethod.POST, consumes = "application/json")
+    public ResponseMessage checkDup(@RequestBody Order order) {
         try {
-            User user = UserServiceApi.USER.get(utoken);
-            Order orderObj = JSON.toJavaObject(JSON.parseObject(order), Order.class);
-            Order orderInDb = dealServiceFacade.getOrder(user.getId(), orderObj.getProductId(), orderObj.getSkuId());
-            if (!orderInDb.exists() || orderInDb.isPayed()) return ResponseMessage.SUCCESS(OrderDupDto.NOT_DUPLICATED);
+            List<Order> orders = dealServiceFacade.getOrders(order.getCustomerId(), order.getProductId(), order.getSkuId());
+            if (orders.isEmpty()) return ResponseMessage.SUCCESS(OrderDupDto.NOT_DUPLICATED);
 
-            OrderDupDto orderDupDto = new OrderDupDto();
-            orderDupDto.setDuplicated(true);
-            orderDupDto.setOrderId(orderInDb.getId());
-            if (isSame(orderObj, orderInDb)) orderDupDto.setSame(true);
+            for (Order o : orders) {
+                if (o.isPayed()) continue;
 
-            return ResponseMessage.SUCCESS(orderDupDto);
+                OrderDupDto orderDupDto = new OrderDupDto();
+                orderDupDto.setDuplicated(true);
+                orderDupDto.setOrderId(o.getId());
+                if (isSame(order, o)) orderDupDto.setSame(true);
+
+                return ResponseMessage.SUCCESS(orderDupDto);
+            }
         } catch (Exception e) {
             return ResponseMessage.SUCCESS(OrderDupDto.NOT_DUPLICATED);
         }
+
+        return ResponseMessage.SUCCESS(OrderDupDto.NOT_DUPLICATED);
     }
 
     private boolean isSame(Order order1, Order order2) {

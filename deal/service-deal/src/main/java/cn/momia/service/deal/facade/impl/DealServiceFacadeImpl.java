@@ -56,9 +56,9 @@ public class DealServiceFacadeImpl implements DealServiceFacade {
     }
 
     @Override
-    public Order getOrder(long userId, long productId, long skuId) {
-        if (userId <= 0 || productId <= 0 || skuId <= 0) return Order.NOT_EXIST_ORDER;
-        return orderService.get(userId, productId, skuId);
+    public List<Order> getOrders(long userId, long productId, long skuId) {
+        if (userId <= 0 || productId <= 0 || skuId <= 0) return new ArrayList<Order>();
+        return orderService.list(userId, productId, skuId);
     }
 
     @Override
