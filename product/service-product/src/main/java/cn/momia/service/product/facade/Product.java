@@ -177,7 +177,6 @@ public class Product implements Serializable {
     public boolean isInvalid() {
         return !(baseProduct != null && baseProduct.exists() &&
                 imgs != null && !imgs.isEmpty() &&
-                place != null && place.exists() &&
                 places != null && !places.isEmpty() &&
                 skus != null && !skus.isEmpty());
     }
