@@ -43,6 +43,8 @@ public class MetaUtil {
     public static String getRegionName(int regionId) {
         if (isOutOfDate()) reload();
 
+        if (regionId == Region.MULTI_REGION_ID) return "多商区";
+
         Region region = regionsMap.get(regionId);
         return region == null ? "" : region.getName();
     }

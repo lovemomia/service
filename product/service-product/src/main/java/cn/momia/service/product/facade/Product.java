@@ -1,5 +1,6 @@
 package cn.momia.service.product.facade;
 
+import cn.momia.api.common.region.Region;
 import cn.momia.service.base.util.TimeUtil;
 import cn.momia.service.product.base.BaseProduct;
 import cn.momia.service.product.place.Place;
@@ -116,7 +117,7 @@ public class Product implements Serializable {
     }
 
     public int getRegionId() {
-        if (places.size() > 1) return 0;
+        if (places.size() > 1) return Region.MULTI_REGION_ID;
         return places.get(0).getRegionId();
     }
 
