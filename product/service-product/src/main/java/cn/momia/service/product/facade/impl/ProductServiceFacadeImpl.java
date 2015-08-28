@@ -148,7 +148,7 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
         if (baseProducts.isEmpty()) return products;
 
         List<Long> productIds = new ArrayList<Long>();
-        List<Long> placeIds = new ArrayList<Long>();
+        List<Integer> placeIds = new ArrayList<Integer>();
         for (BaseProduct baseProduct : baseProducts) {
             if (!baseProduct.exists()) continue;
             productIds.add(baseProduct.getId());
@@ -156,7 +156,7 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
         }
 
         Map<Long, List<ProductImage>> imgsOfProducts = getProductsImgs(productIds);
-        Map<Long, Place> placeOfProducts = placeService.get(placeIds);
+        Map<Integer, Place> placeOfProducts = placeService.get(placeIds);
         Map<Long, List<Sku>> skusOfProducts = skuService.queryByProducts(productIds);
 
         for (BaseProduct baseProduct : baseProducts) {

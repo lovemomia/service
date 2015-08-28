@@ -22,7 +22,8 @@ public class BaseProduct {
     private String cover;
     private String thumb;
     private String crowd;
-    private long placeId;
+    private int placeId;
+    private List<Integer> places;
     private JSONArray content;
     private int joined;
     private int sales;
@@ -95,11 +96,11 @@ public class BaseProduct {
         this.crowd = crowd;
     }
 
-    public long getPlaceId() {
+    public int getPlaceId() {
         return placeId;
     }
 
-    public void setPlaceId(long placeId) {
+    public void setPlaceId(int placeId) {
         this.placeId = placeId;
     }
 

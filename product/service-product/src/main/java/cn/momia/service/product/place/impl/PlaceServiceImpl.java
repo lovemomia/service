@@ -21,7 +21,7 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     private static final String[] PLACE_FIELDS = { "id", "cityId", "regionId", "name", "address", "`desc`", "lng", "lat" };
 
     @Override
-    public Place get(long id) {
+    public Place get(int id) {
         String sql = "SELECT " + joinFields() + " FROM t_place WHERE id=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[]{id}, new ResultSetExtractor<Place>() {
@@ -40,7 +40,7 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     private Place buildPlace(ResultSet rs) throws SQLException {
         try {
             Place place = new Place();
-            place.setId(rs.getLong("id"));
+            place.setId(rs.getInt("id"));
             place.setCityId(rs.getInt("cityId"));
             place.setRegionId(rs.getInt("regionId"));
             place.setName(rs.getString("name"));
@@ -58,8 +58,8 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     }
 
     @Override
-    public Map<Long, Place> get(Collection<Long> ids) {
-        final Map<Long, Place> places = new HashMap<Long, Place>();
+    public Map<Integer, Place> get(Collection<Integer> ids) {
+        final Map<Integer, Place> places = new HashMap<Integer, Place>();
         if (ids == null || ids.isEmpty()) return places;
 
         String sql = "SELECT " + joinFields() + " FROM t_place WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";

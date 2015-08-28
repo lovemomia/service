@@ -6,6 +6,6 @@ import java.util.Collection;
 import java.util.Map;
 
 public interface PlaceService extends Service {
-    Place get(long id);
-    Map<Long, Place> get(Collection<Long> ids);
+    Place get(int id);
+    Map<Integer, Place> get(Collection<Integer> ids);
 }
