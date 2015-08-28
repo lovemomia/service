@@ -102,7 +102,7 @@ public class CallbackController extends AbstractController {
                     .append("\"付款成功");
 
             if (sku.getType() == 1) {
-                msg.append("，如果您被选中参加，我们的客服会在活动开始前提前与您联系");
+                msg.append("，参加规则详见活动说明");
             } else {
                 msg.append("，时间：")
                         .append(sku.getTime())
