@@ -50,6 +50,14 @@ public class BaseSkuDto implements Dto {
         return sku.getFormatedTime();
     }
 
+    public int getPlaceId() {
+        return sku.getPlaceId();
+    }
+
+    public String getAddress() {
+        return sku.getAddress();
+    }
+
     public boolean isHasLeader() {
         return sku.hasLeader() || !sku.isNeedLeader();
     }
@@ -58,6 +66,10 @@ public class BaseSkuDto implements Dto {
         if (!sku.isNeedLeader()) return "本场不需要领队";
         if (leader == null || StringUtils.isBlank(leader.getName())) return "";
         return leader.getName() + "已成为领队";
+    }
+
+    public boolean isFull() {
+        return sku.isFull();
     }
 
     public boolean isClosed() {

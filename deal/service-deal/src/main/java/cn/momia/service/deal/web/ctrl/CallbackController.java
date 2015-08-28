@@ -107,7 +107,7 @@ public class CallbackController extends AbstractController {
                 msg.append("，时间：")
                         .append(sku.getTime())
                         .append("，地点：")
-                        .append(product.getAddress());
+                        .append(sku.getAddress());
             }
 
             msg.append("【松果亲子】");

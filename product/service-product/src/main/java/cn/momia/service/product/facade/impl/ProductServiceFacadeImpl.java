@@ -107,10 +107,22 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
             if (places.isEmpty()) return Product.NOT_EXIST_PRODUCT;
 
             product.setPlaces(places);
-            product.setSkus(skuService.queryByProduct(baseProduct.getId()));
+            product.setSkus(buildFullSkus(skuService.queryByProduct(baseProduct.getId())));
         }
 
         return product;
+    }
+
+    private List<Sku> buildFullSkus(List<Sku> skus) {
+        List<Integer> placeIds = new ArrayList<Integer>();
+        for (Sku sku : skus) placeIds.add(sku.getPlaceId());
+        List<Place> places = placeService.get(placeIds);
+        Map<Integer, Place> placesMap = new HashMap<Integer, Place>();
+        for (Place place : places) placesMap.put(place.getId(), place);
+
+        for (Sku sku : skus) sku.setPlace(placesMap.get(sku.getPlaceId()));
+
+        return skus;
     }
 
     private List<ProductImage> getProductImgs(long productId) {
@@ -158,7 +170,16 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
         Map<Long, List<ProductImage>> imgsOfProducts = getProductsImgs(productIds);
         Map<Integer, Place> placesOfProducts = new HashMap<Integer, Place>();
         for (Place place : placeService.get(placeIds)) placesOfProducts.put(place.getId(), place);
-        Map<Long, List<Sku>> skusOfProducts = skuService.queryByProducts(productIds);
+        List<Sku> skus = buildFullSkus(skuService.queryByProducts(productIds));
+        Map<Long, List<Sku>> skusOfProducts = new HashMap<Long, List<Sku>>();
+        for (Sku sku : skus) {
+            List<Sku> skusOfProduct = skusOfProducts.get(sku.getProductId());
+            if (skusOfProduct == null) {
+                skusOfProduct = new ArrayList<Sku>();
+                skusOfProducts.put(sku.getProductId(), skusOfProduct);
+            }
+            skusOfProduct.add(sku);
+        }
 
         for (BaseProduct baseProduct : baseProducts) {
             if (!baseProduct.exists()) continue;
@@ -288,25 +309,35 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     @Override
     public List<Sku> queryLedSkus(long userId, int start, int count) {
         if (userId <= 0 || start < 0 || count <= 0) return new ArrayList<Sku>();
-        return skuService.queryLedSkus(userId, start, count);
+        return buildFullSkus(skuService.queryLedSkus(userId, start, count));
     }
 
     @Override
     public List<Sku> getSkus(long productId) {
         if (productId <= 0) return new ArrayList<Sku>();
-        return skuService.queryByProduct(productId);
+        return buildFullSkus(skuService.queryByProduct(productId));
     }
 
     @Override
     public List<Sku> getAllSkus(long productId) {
         if (productId <= 0) return new ArrayList<Sku>();
-        return skuService.queryAllByProduct(productId);
+        return buildFullSkus(skuService.queryAllByProduct(productId));
     }
 
     @Override
     public Sku getSku(long skuId) {
         if (skuId <= 0) return Sku.NOT_EXIST_SKU;
-        return skuService.get(skuId);
+        return buildFullSku(skuService.get(skuId));
+    }
+
+    private Sku buildFullSku(Sku sku) {
+        int placeId = sku.getPlaceId();
+        if (placeId > 0) {
+            Place place = placeService.get(placeId);
+            if (place.exists()) sku.setPlace(place);
+        }
+
+        return sku;
     }
 
     @Override
@@ -318,7 +349,7 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
             if (!sku.hasLeader()) skusWithoutLeader.add(sku);
         }
 
-        return skusWithoutLeader;
+        return buildFullSkus(skusWithoutLeader);
     }
 
     @Override

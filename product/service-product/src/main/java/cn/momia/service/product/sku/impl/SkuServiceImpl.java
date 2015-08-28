@@ -19,9 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class SkuServiceImpl extends DbAccessService implements SkuService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SkuServiceImpl.class);
@@ -128,26 +126,20 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
     }
 
     @Override
-    public Map<Long, List<Sku>> queryByProducts(Collection<Long> productIds) {
-        final Map<Long, List<Sku>> skusOfProducts = new HashMap<Long, List<Sku>>();
-        if (productIds == null || productIds.isEmpty()) return skusOfProducts;
+    public List<Sku> queryByProducts(Collection<Long> productIds) {
+        final List<Sku> skus = new ArrayList<Sku>();
+        if (productIds == null || productIds.isEmpty()) return skus;
 
         String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId IN (" + StringUtils.join(productIds, ",") + ") AND status=1 ORDER BY startTime ASC";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 Sku sku = buildSku(rs);
-                if (!sku.exists()) return;
-                List<Sku> skus = skusOfProducts.get(sku.getProductId());
-                if (skus == null) {
-                    skus = new ArrayList<Sku>();
-                    skusOfProducts.put(sku.getProductId(), skus);
-                }
-                skus.add(sku);
+                if (sku.exists()) skus.add(sku);
             }
         });
 
-        return skusOfProducts;
+        return skus;
     }
 
     @Override
