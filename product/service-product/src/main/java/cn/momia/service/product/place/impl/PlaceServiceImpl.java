@@ -12,16 +12,16 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PlaceServiceImpl.class);
     private static final String[] PLACE_FIELDS = { "id", "cityId", "regionId", "name", "address", "`desc`", "lng", "lat" };
 
     @Override
-    public Place get(long id) {
+    public Place get(int id) {
         String sql = "SELECT " + joinFields() + " FROM t_place WHERE id=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[]{id}, new ResultSetExtractor<Place>() {
@@ -40,7 +40,7 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     private Place buildPlace(ResultSet rs) throws SQLException {
         try {
             Place place = new Place();
-            place.setId(rs.getLong("id"));
+            place.setId(rs.getInt("id"));
             place.setCityId(rs.getInt("cityId"));
             place.setRegionId(rs.getInt("regionId"));
             place.setName(rs.getString("name"));
@@ -58,8 +58,8 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     }
 
     @Override
-    public Map<Long, Place> get(Collection<Long> ids) {
-        final Map<Long, Place> places = new HashMap<Long, Place>();
+    public List<Place> get(Collection<Integer> ids) {
+        final List<Place> places = new ArrayList<Place>();
         if (ids == null || ids.isEmpty()) return places;
 
         String sql = "SELECT " + joinFields() + " FROM t_place WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
@@ -67,7 +67,7 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 Place place = buildPlace(rs);
-                if (place.exists()) places.put(place.getId(), place);
+                if (place.exists()) places.add(place);
             }
         });
 

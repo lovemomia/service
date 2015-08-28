@@ -1,5 +1,6 @@
 package cn.momia.service.product.facade;
 
+import cn.momia.api.common.region.Region;
 import cn.momia.service.base.util.TimeUtil;
 import cn.momia.service.product.base.BaseProduct;
 import cn.momia.service.product.place.Place;
@@ -34,7 +35,7 @@ public class Product implements Serializable {
 
     private BaseProduct baseProduct;
     private List<ProductImage> imgs;
-    private Place place;
+    private List<Place> places;
     private List<Sku> skus;
 
     public long getId() {
@@ -115,23 +116,26 @@ public class Product implements Serializable {
     }
 
     public int getRegionId() {
-        return this.place.getRegionId();
+        if (places.size() > 1) return Region.MULTI_REGION_ID;
+        return places.get(0).getRegionId();
     }
 
     public String getAddress() {
-        return this.place.getAddress();
+        if (places.size() > 1) return "多个地点可供选择";
+        return places.get(0).getAddress();
     }
 
     public String getPoi() {
-        return this.place.getLng() + ":" + this.place.getLat();
+        Place nearestPlace = places.get(0); // TODO 选最近的
+        return nearestPlace.getLng() + ":" + nearestPlace.getLat();
     }
 
-    public Place getPlace() {
-        return place;
+    public List<Place> getPlaces() {
+        return places;
     }
 
-    public void setPlace(Place place) {
-        this.place = place;
+    public void setPlaces(List<Place> places) {
+        this.places = places;
     }
 
     public List<Sku> getSkus() {
@@ -164,7 +168,7 @@ public class Product implements Serializable {
     public boolean isInvalid() {
         return !(baseProduct != null && baseProduct.exists() &&
                 imgs != null && !imgs.isEmpty() &&
-                place != null && place.exists() &&
+                places != null && !places.isEmpty() &&
                 skus != null && !skus.isEmpty());
     }
 
@@ -262,14 +266,6 @@ public class Product implements Serializable {
         }
 
         return stock;
-    }
-
-    public String getSkuTime(long skuId) {
-        for (Sku sku : skus) {
-            if (sku.getId() == skuId) return sku.getFormatedTime();
-        }
-
-        return "";
     }
 
     public boolean isFinished() {

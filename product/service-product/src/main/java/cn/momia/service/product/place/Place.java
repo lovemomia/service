@@ -11,7 +11,7 @@ public class Place implements Serializable {
         INVALID_PLACE.setId(0);
     }
 
-    private long id;
+    private int id;
     private int cityId;
     private int regionId;
     private String name;
@@ -20,11 +20,11 @@ public class Place implements Serializable {
     private double lng;
     private double lat;
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

@@ -1,6 +1,7 @@
 package cn.momia.service.product.sku;
 
 import cn.momia.service.base.util.TimeUtil;
+import cn.momia.service.product.place.Place;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
@@ -129,6 +130,8 @@ public class Sku implements Serializable {
     private boolean onWeekend;
     private boolean needLeader;
     private long leaderUserId;
+
+    private Place place;
 
     public long getId() {
         return id;
@@ -282,6 +285,10 @@ public class Sku implements Serializable {
         this.leaderUserId = leaderUserId;
     }
 
+    public void setPlace(Place place) {
+        this.place = place;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -349,6 +356,28 @@ public class Sku implements Serializable {
         }
 
         return builder.toString();
+    }
+
+    public int getPlaceId() {
+        if (place != null) return place.getId();
+
+        for (SkuProperty property : properties) {
+            if ("place".equalsIgnoreCase(property.getName())) return Integer.valueOf(property.getValue());
+        }
+
+        return 0;
+    }
+
+    public String getPlaceName() {
+        return place == null ? "" : place.getName();
+    }
+
+    public int getRegionId() {
+        return place == null ? 0 : place.getRegionId();
+    }
+
+    public String getAddress() {
+        return place == null ? "" : place.getAddress();
     }
 
     public BigDecimal getMinPrice() {

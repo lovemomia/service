@@ -18,8 +18,13 @@ public class Sku {
     private BigDecimal minPrice;
     private BigDecimal minOriginalPrice;
     private String time;
+    private int placeId;
+    private String placeName;
+    private int regionId;
+    private String address;
     private boolean hasLeader;
     private String leaderInfo;
+    private boolean full;
     private boolean closed;
 
     private Boolean needRealName;
@@ -97,6 +102,38 @@ public class Sku {
         this.time = time;
     }
 
+    public int getPlaceId() {
+        return placeId;
+    }
+
+    public void setPlaceId(int placeId) {
+        this.placeId = placeId;
+    }
+
+    public String getPlaceName() {
+        return placeName;
+    }
+
+    public void setPlaceName(String placeName) {
+        this.placeName = placeName;
+    }
+
+    public int getRegionId() {
+        return regionId;
+    }
+
+    public void setRegionId(int regionId) {
+        this.regionId = regionId;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     public boolean isHasLeader() {
         return hasLeader;
     }
@@ -111,6 +148,14 @@ public class Sku {
 
     public void setLeaderInfo(String leaderInfo) {
         this.leaderInfo = leaderInfo;
+    }
+
+    public boolean isFull() {
+        return full;
+    }
+
+    public void setFull(boolean full) {
+        this.full = full;
     }
 
     public boolean isClosed() {

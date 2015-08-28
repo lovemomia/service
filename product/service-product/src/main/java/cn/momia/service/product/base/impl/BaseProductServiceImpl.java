@@ -18,14 +18,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class BaseProductServiceImpl extends DbAccessService implements BaseProductService {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseProductServiceImpl.class);
     private static final Splitter TAGS_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
+    private static final Splitter PLACES_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
     private static final int MAX_TAG_COUNT = 3;
-    private static final String[] PRODUCT_FIELDS = { "id", "cityId", "tags", "title", "abstracts", "cover", "thumb", "crowd", "placeId", "content", "joined", "sales", "soldOut", "onlineTime", "offlineTime", "status" };
+    private static final String[] PRODUCT_FIELDS = { "id", "cityId", "tags", "title", "abstracts", "cover", "thumb", "crowd", "places", "content", "joined", "sales", "soldOut", "onlineTime", "offlineTime", "status" };
 
     private Map<Integer, String> tagsCache;
 
@@ -68,7 +71,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
             baseProduct.setCover(rs.getString("cover"));
             baseProduct.setThumb(rs.getString("thumb"));
             baseProduct.setCrowd(rs.getString("crowd"));
-            baseProduct.setPlaceId(rs.getLong("placeId"));
+            baseProduct.setPlaces(parsePlaces(rs.getString("places")));
             baseProduct.setContent(JSON.parseArray(rs.getString("content")));
             baseProduct.setJoined(rs.getInt("joined"));
             baseProduct.setSales(rs.getInt("sales"));
@@ -95,6 +98,18 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
         }
 
         return tags;
+    }
+
+
+    private Set<Integer> parsePlaces(String placesStr) {
+        Set<Integer> places = new HashSet<Integer>();
+        if (!StringUtils.isBlank(placesStr)) {
+            for (String placeId : PLACES_SPLITTER.split(placesStr)) {
+                places.add(Integer.valueOf(placeId));
+            }
+        }
+
+        return places;
     }
 
     @Override

@@ -107,7 +107,7 @@ public class CallbackController extends AbstractController {
                 msg.append("，时间：")
                         .append(sku.getTime())
                         .append("，地点：")
-                        .append(product.getAddress());
+                        .append(sku.getAddress());
             }
 
             msg.append("【松果亲子】");
@@ -123,7 +123,7 @@ public class CallbackController extends AbstractController {
                     UserServiceApi.USER.setPayed(order.getCustomerId())) {
                 if (StringUtils.isBlank(order.getInviteCode())) return;
                 long userId = UserServiceApi.USER.getIdByInviteCode(order.getInviteCode());
-                if (userId <= 0) return;
+                if (userId <= 0 || userId == order.getCustomerId()) return;
 
                 promoServiceFacade.distributeShareCoupon(order.getCustomerId(), userId, order.getTotalFee());
             }

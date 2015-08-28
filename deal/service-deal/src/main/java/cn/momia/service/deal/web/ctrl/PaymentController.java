@@ -154,6 +154,8 @@ public class PaymentController extends AbstractController {
                 !dealServiceFacade.prepayOrder(orderId) ||
                 !dealServiceFacade.payOrder(orderId)) return ResponseMessage.FAILED("支付失败");
 
+        if (!UserServiceApi.USER.isPayed(order.getCustomerId())) UserServiceApi.USER.setPayed(order.getCustomerId());
+
         return ResponseMessage.SUCCESS;
     }
 

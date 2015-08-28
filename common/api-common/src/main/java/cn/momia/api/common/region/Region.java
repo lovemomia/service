@@ -1,6 +1,8 @@
 package cn.momia.api.common.region;
 
 public class Region {
+    public static final int MULTI_REGION_ID = -1;
+
     private int id;
     private int cityId;
     private String name;
