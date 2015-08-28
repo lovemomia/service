@@ -27,7 +27,7 @@ public class Participant implements Serializable {
     private String name;
     private String sex;
     private Date birthday;
-    private int idType;
+    private int idType = 1;
     private String idNo;
 
     public long getId() {
