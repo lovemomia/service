@@ -123,7 +123,7 @@ public class CallbackController extends AbstractController {
                     UserServiceApi.USER.setPayed(order.getCustomerId())) {
                 if (StringUtils.isBlank(order.getInviteCode())) return;
                 long userId = UserServiceApi.USER.getIdByInviteCode(order.getInviteCode());
-                if (userId <= 0) return;
+                if (userId <= 0 || userId == order.getCustomerId()) return;
 
                 promoServiceFacade.distributeShareCoupon(order.getCustomerId(), userId, order.getTotalFee());
             }
