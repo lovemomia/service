@@ -20,6 +20,7 @@ public class Sku {
     private String time;
     private int placeId;
     private String placeName;
+    private int regionId;
     private String address;
     private boolean hasLeader;
     private String leaderInfo;
@@ -115,6 +116,14 @@ public class Sku {
 
     public void setPlaceName(String placeName) {
         this.placeName = placeName;
+    }
+
+    public int getRegionId() {
+        return regionId;
+    }
+
+    public void setRegionId(int regionId) {
+        this.regionId = regionId;
     }
 
     public String getAddress() {

@@ -372,6 +372,10 @@ public class Sku implements Serializable {
         return place == null ? "" : place.getName();
     }
 
+    public int getRegionId() {
+        return place == null ? 0 : place.getRegionId();
+    }
+
     public String getAddress() {
         return place == null ? "" : place.getAddress();
     }

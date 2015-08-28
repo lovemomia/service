@@ -2,6 +2,7 @@ package cn.momia.api.product;
 
 import cn.momia.api.product.sku.Sku;
 import com.alibaba.fastjson.JSONArray;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -240,6 +241,18 @@ public class Product {
         }
 
         return Sku.NOT_EXIST_SKU;
+    }
+
+    public int getSkuRegionId(long skuId) {
+        Sku sku = getSku(skuId);
+        if (!sku.exists() || sku.getRegionId() == 0) return getRegionId();
+        return sku.getRegionId();
+    }
+
+    public String getSkuAddress(long skuId) {
+        Sku sku = getSku(skuId);
+        if (!sku.exists() || StringUtils.isBlank(sku.getAddress())) return getAddress();
+        return sku.getAddress();
     }
 
     public String getSkuTime(long skuId) {

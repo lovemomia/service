@@ -25,11 +25,11 @@ public class OrderDetailDto extends OrderDto implements Dto {
     }
 
     public String getRegion() {
-        return MetaUtil.getRegionName(product.getRegionId());
+        return MetaUtil.getRegionName(product.getSkuRegionId(getSkuId()));
     }
 
     public String getAddress() {
-        return product.getAddress();
+        return product.getSkuAddress(getSkuId());
     }
 
     public BigDecimal getPrice() {
