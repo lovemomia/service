@@ -234,6 +234,14 @@ public class Product {
         this.url = url;
     }
 
+    public Sku getSku(long skuId) {
+        for (Sku sku : skus) {
+            if (sku.getSkuId() == skuId) return sku;
+        }
+
+        return Sku.NOT_EXIST_SKU;
+    }
+
     public String getSkuTime(long skuId) {
         for (Sku sku : skus) {
             if (sku.getSkuId() == skuId) return sku.getTime();

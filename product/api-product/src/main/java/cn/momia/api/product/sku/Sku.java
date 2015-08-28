@@ -4,6 +4,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class Sku {
+    public static final Sku NOT_EXIST_SKU = new Sku();
+    static {
+        NOT_EXIST_SKU.setSkuId(0);
+    }
+
     private long productId;
     private long skuId;
     private String desc;

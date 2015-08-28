@@ -2,6 +2,7 @@ package cn.momia.service.deal.web.ctrl;
 
 import cn.momia.api.common.CommonServiceApi;
 import cn.momia.api.product.Product;
+import cn.momia.api.product.sku.Sku;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.service.base.web.ctrl.AbstractController;
 import cn.momia.service.deal.facade.DealServiceFacade;
@@ -92,14 +93,24 @@ public class CallbackController extends AbstractController {
     private void notifyUser(Order order) {
         try {
             Product product = ProductServiceApi.PRODUCT.get(order.getProductId(), Product.Type.BASE_WITH_SKU);
+            Sku sku = product.getSku(order.getSkuId());
+            if (!sku.exists()) return;
+
             StringBuilder msg = new StringBuilder();
             msg.append("您的订单：\"")
                     .append(product.getTitle())
-                    .append("\"付款成功，时间：")
-                    .append(product.getSkuTime(order.getSkuId()))
-                    .append("，地点：")
-                    .append(product.getAddress())
-                    .append("【松果亲子】");
+                    .append("\"付款成功");
+
+            if (sku.getType() == 1) {
+                msg.append("，如果您被选中参加，我们的客服会在活动开始前提前与您联系");
+            } else {
+                msg.append("，时间：")
+                        .append(sku.getTime())
+                        .append("，地点：")
+                        .append(product.getAddress());
+            }
+
+            msg.append("【松果亲子】");
             CommonServiceApi.SMS.notify(order.getMobile(), msg.toString());
         } catch (Exception e) {
             LOGGER.error("fail to notify user for order: {}", order.getId(), e);
