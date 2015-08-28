@@ -23,7 +23,6 @@ public class BaseProduct {
     private String cover;
     private String thumb;
     private String crowd;
-    private int placeId;
     private Set<Integer> places;
     private JSONArray content;
     private int joined;
@@ -95,16 +94,6 @@ public class BaseProduct {
 
     public void setCrowd(String crowd) {
         this.crowd = crowd;
-    }
-
-    @Deprecated
-    public int getPlaceId() {
-        return placeId;
-    }
-
-    @Deprecated
-    public void setPlaceId(int placeId) {
-        this.placeId = placeId;
     }
 
     public Set<Integer> getPlaces() {

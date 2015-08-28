@@ -28,7 +28,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     private static final Splitter TAGS_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
     private static final Splitter PLACES_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
     private static final int MAX_TAG_COUNT = 3;
-    private static final String[] PRODUCT_FIELDS = { "id", "cityId", "tags", "title", "abstracts", "cover", "thumb", "crowd", "placeId", "places", "content", "joined", "sales", "soldOut", "onlineTime", "offlineTime", "status" };
+    private static final String[] PRODUCT_FIELDS = { "id", "cityId", "tags", "title", "abstracts", "cover", "thumb", "crowd", "places", "content", "joined", "sales", "soldOut", "onlineTime", "offlineTime", "status" };
 
     private Map<Integer, String> tagsCache;
 
@@ -71,7 +71,6 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
             baseProduct.setCover(rs.getString("cover"));
             baseProduct.setThumb(rs.getString("thumb"));
             baseProduct.setCrowd(rs.getString("crowd"));
-            baseProduct.setPlaceId(rs.getInt("placeId"));
             baseProduct.setPlaces(parsePlaces(rs.getString("places")));
             baseProduct.setContent(JSON.parseArray(rs.getString("content")));
             baseProduct.setJoined(rs.getInt("joined"));

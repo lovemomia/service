@@ -35,7 +35,6 @@ public class Product implements Serializable {
 
     private BaseProduct baseProduct;
     private List<ProductImage> imgs;
-    private Place place;
     private List<Place> places;
     private List<Sku> skus;
 
@@ -129,14 +128,6 @@ public class Product implements Serializable {
     public String getPoi() {
         Place nearestPlace = places.get(0); // TODO 选最近的
         return nearestPlace.getLng() + ":" + nearestPlace.getLat();
-    }
-
-    public Place getPlace() {
-        return place;
-    }
-
-    public void setPlace(Place place) {
-        this.place = place;
     }
 
     public List<Place> getPlaces() {
@@ -275,14 +266,6 @@ public class Product implements Serializable {
         }
 
         return stock;
-    }
-
-    public String getSkuTime(long skuId) {
-        for (Sku sku : skus) {
-            if (sku.getId() == skuId) return sku.getFormatedTime();
-        }
-
-        return "";
     }
 
     public boolean isFinished() {
