@@ -12,9 +12,9 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PlaceServiceImpl.class);
@@ -58,8 +58,8 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     }
 
     @Override
-    public Map<Integer, Place> get(Collection<Integer> ids) {
-        final Map<Integer, Place> places = new HashMap<Integer, Place>();
+    public List<Place> get(Collection<Integer> ids) {
+        final List<Place> places = new ArrayList<Place>();
         if (ids == null || ids.isEmpty()) return places;
 
         String sql = "SELECT " + joinFields() + " FROM t_place WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
@@ -67,7 +67,7 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 Place place = buildPlace(rs);
-                if (place.exists()) places.put(place.getId(), place);
+                if (place.exists()) places.add(place);
             }
         });
 

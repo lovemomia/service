@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 public class BaseProduct {
     public static final BaseProduct NOT_EXIST_BASEPRODUCT = new BaseProduct();
@@ -23,7 +24,7 @@ public class BaseProduct {
     private String thumb;
     private String crowd;
     private int placeId;
-    private List<Integer> places;
+    private Set<Integer> places;
     private JSONArray content;
     private int joined;
     private int sales;
@@ -96,12 +97,22 @@ public class BaseProduct {
         this.crowd = crowd;
     }
 
+    @Deprecated
     public int getPlaceId() {
         return placeId;
     }
 
+    @Deprecated
     public void setPlaceId(int placeId) {
         this.placeId = placeId;
+    }
+
+    public Set<Integer> getPlaces() {
+        return places;
+    }
+
+    public void setPlaces(Set<Integer> places) {
+        this.places = places;
     }
 
     public JSONArray getContent() {

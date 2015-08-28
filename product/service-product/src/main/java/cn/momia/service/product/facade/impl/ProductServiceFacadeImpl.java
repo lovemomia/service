@@ -103,10 +103,10 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
         if (!mini) {
             product.setImgs(getProductImgs(baseProduct.getId()));
 
-            Place place = placeService.get(baseProduct.getPlaceId());
-            if (!place.exists()) return Product.NOT_EXIST_PRODUCT;
+            List<Place> places = placeService.get(baseProduct.getPlaces());
+            if (places.isEmpty()) return Product.NOT_EXIST_PRODUCT;
 
-            product.setPlace(place);
+            product.setPlaces(places);
             product.setSkus(skuService.queryByProduct(baseProduct.getId()));
         }
 
@@ -152,11 +152,12 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
         for (BaseProduct baseProduct : baseProducts) {
             if (!baseProduct.exists()) continue;
             productIds.add(baseProduct.getId());
-            placeIds.add(baseProduct.getPlaceId());
+            placeIds.addAll(baseProduct.getPlaces());
         }
 
         Map<Long, List<ProductImage>> imgsOfProducts = getProductsImgs(productIds);
-        Map<Integer, Place> placeOfProducts = placeService.get(placeIds);
+        Map<Integer, Place> placesOfProducts = new HashMap<Integer, Place>();
+        for (Place place : placeService.get(placeIds)) placesOfProducts.put(place.getId(), place);
         Map<Long, List<Sku>> skusOfProducts = skuService.queryByProducts(productIds);
 
         for (BaseProduct baseProduct : baseProducts) {
@@ -164,7 +165,12 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
             Product product = new Product();
             product.setBaseProduct(baseProduct);
             product.setImgs(imgsOfProducts.get(baseProduct.getId()));
-            product.setPlace(placeOfProducts.get(baseProduct.getPlaceId()));
+            List<Place> places = new ArrayList<Place>();
+            for (int placeId : baseProduct.getPlaces()) {
+                Place place = placesOfProducts.get(placeId);
+                if (place != null) places.add(place);
+            }
+            product.setPlaces(places);
             product.setSkus(skusOfProducts.get(baseProduct.getId()));
 
             if (!product.isInvalid()) products.add(product);
