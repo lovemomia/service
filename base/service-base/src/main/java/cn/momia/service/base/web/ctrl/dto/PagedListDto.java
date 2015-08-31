@@ -4,7 +4,7 @@ public class PagedListDto implements Dto {
     public static final PagedListDto EMPTY = new PagedListDto(0, 0, 0);
 
     private long totalCount;
-    private Integer nextIndex = -1;
+    private Integer nextIndex = 0;
     private ListDto list = new ListDto();
 
     public long getTotalCount() {
