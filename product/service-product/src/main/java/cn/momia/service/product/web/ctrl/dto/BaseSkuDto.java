@@ -76,6 +76,10 @@ public class BaseSkuDto implements Dto {
         return sku.isFull();
     }
 
+    public boolean isFinished() {
+        return sku.isFinished(new Date());
+    }
+
     public boolean isClosed() {
         return sku.isClosed(new Date());
     }

@@ -25,6 +25,7 @@ public class Sku {
     private boolean hasLeader;
     private String leaderInfo;
     private boolean full;
+    private boolean finished;
     private boolean closed;
 
     private Boolean needRealName;
@@ -156,6 +157,14 @@ public class Sku {
 
     public void setFull(boolean full) {
         this.full = full;
+    }
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public void setFinished(boolean finished) {
+        this.finished = finished;
     }
 
     public boolean isClosed() {
