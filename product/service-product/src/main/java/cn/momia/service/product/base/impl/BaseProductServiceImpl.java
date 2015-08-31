@@ -28,7 +28,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     private static final Splitter TAGS_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
     private static final Splitter PLACES_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
     private static final int MAX_TAG_COUNT = 3;
-    private static final String[] PRODUCT_FIELDS = { "id", "cityId", "tags", "title", "abstracts", "cover", "thumb", "crowd", "places", "content", "joined", "sales", "soldOut", "onlineTime", "offlineTime", "status" };
+    private static final String[] PRODUCT_FIELDS = { "id", "cityId", "tags", "title", "abstracts", "cover", "thumb", "crowd", "placeId", "places", "content", "joined", "sales", "soldOut", "onlineTime", "offlineTime", "status" };
 
     private Map<Integer, String> tagsCache;
 
@@ -71,7 +71,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
             baseProduct.setCover(rs.getString("cover"));
             baseProduct.setThumb(rs.getString("thumb"));
             baseProduct.setCrowd(rs.getString("crowd"));
-            baseProduct.setPlaces(parsePlaces(rs.getString("places")));
+            baseProduct.setPlaces(parsePlaces(rs.getInt("placeId"), rs.getString("places")));
             baseProduct.setContent(JSON.parseArray(rs.getString("content")));
             baseProduct.setJoined(rs.getInt("joined"));
             baseProduct.setSales(rs.getInt("sales"));
@@ -101,13 +101,15 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     }
 
 
-    private Set<Integer> parsePlaces(String placesStr) {
+    private Set<Integer> parsePlaces(int placeId, String placesStr) {
         Set<Integer> places = new HashSet<Integer>();
         if (!StringUtils.isBlank(placesStr)) {
-            for (String placeId : PLACES_SPLITTER.split(placesStr)) {
-                places.add(Integer.valueOf(placeId));
+            for (String id : PLACES_SPLITTER.split(placesStr)) {
+                places.add(Integer.valueOf(id));
             }
         }
+
+        if (places.isEmpty()) places.add(placeId);
 
         return places;
     }
