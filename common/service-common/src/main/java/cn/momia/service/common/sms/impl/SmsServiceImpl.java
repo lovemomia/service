@@ -27,8 +27,9 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
 
     @Override
     public boolean sendCode(String mobile, String type) {
-        if (StringUtils.equals(type, "register") && userExists(mobile)) throw new MomiaFailedException("该手机号已经注册过");
-        else if (StringUtils.equals(type, "login") && !userExists(mobile)) throw new MomiaFailedException("用户不存在，请先注册");
+//        if (StringUtils.equals(type, "register") && userExists(mobile)) throw new MomiaFailedException("该手机号已经注册过");
+//        else 
+        if (StringUtils.equals(type, "login") && !userExists(mobile)) throw new MomiaFailedException("用户不存在，请先注册");
 
         String code = getGeneratedCode(mobile);
         if (StringUtils.isBlank(code)) {
