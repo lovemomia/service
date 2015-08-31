@@ -25,6 +25,7 @@ public class Order {
     private String address;
     private BigDecimal price;
     private String time;
+    private Boolean finished;
     private Boolean closed;
 
     public long getId() {
@@ -169,6 +170,14 @@ public class Order {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public Boolean isFinished() {
+        return finished;
+    }
+
+    public void setFinished(Boolean finished) {
+        this.finished = finished;
     }
 
     public Boolean isClosed() {

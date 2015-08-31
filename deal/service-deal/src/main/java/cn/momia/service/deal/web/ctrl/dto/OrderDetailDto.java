@@ -40,6 +40,16 @@ public class OrderDetailDto extends OrderDto implements Dto {
         return product.getSkuTime(getSkuId());
     }
 
+    public boolean isFinished() {
+        List<Sku> skus = product.getSkus();
+        if (skus == null || skus.isEmpty()) return true;
+        for (Sku sku : skus) {
+            if (sku.getSkuId() == getSkuId()) return sku.isFinished();
+        }
+
+        return true;
+    }
+
     public boolean isClosed() {
         List<Sku> skus = product.getSkus();
         if (skus == null || skus.isEmpty()) return true;
