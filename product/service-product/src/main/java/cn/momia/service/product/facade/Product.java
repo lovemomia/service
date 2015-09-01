@@ -175,9 +175,10 @@ public class Product implements Serializable {
     public String getScheduler() {
         if(skus == null || skus.isEmpty()) return "";
 
+        Date now = new Date();
         List<Date> times = new ArrayList<Date>();
-        for (Sku sku : Sku.filterFinished(skus)) {
-            times.addAll(sku.getStartEndTimes());
+        for (Sku sku : skus) {
+            if (!sku.isFinished(now)) times.addAll(sku.getStartEndTimes());
         }
         Collections.sort(times);
 
