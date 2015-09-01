@@ -116,17 +116,23 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
 
     @Override
     public List<BaseProduct> get(Collection<Long> ids) {
-        final List<BaseProduct> baseProducts = new ArrayList<BaseProduct>();
+        List<BaseProduct> baseProducts = new ArrayList<BaseProduct>();
         if (ids == null || ids.isEmpty()) return baseProducts;
 
+        final Map<Long, BaseProduct> baseProductsMap = new HashMap<Long, BaseProduct>();
         String sql = "SELECT " + joinFields() + " FROM t_product WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status<>0 ORDER BY addTime DESC";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 BaseProduct baseProduct = buildBaseProduct(rs);
-                if (baseProduct.exists()) baseProducts.add(baseProduct);
+                if (baseProduct.exists()) baseProductsMap.put(baseProduct.getId(), baseProduct);
             }
         });
+
+        for (long id : ids) {
+            BaseProduct baseProduct = baseProductsMap.get(id);
+            if (baseProduct != null) baseProducts.add(baseProduct);
+        }
 
         return baseProducts;
     }
