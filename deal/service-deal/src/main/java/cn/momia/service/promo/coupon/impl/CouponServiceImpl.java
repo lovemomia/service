@@ -59,7 +59,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
 
     private List<Coupon> getCoupons(int src) {
         final List<Coupon> coupons = new ArrayList<Coupon>();
-        String sql = "SELECT " + joinCouponFields() + " FROM t_coupon WHERE status=1 AND src=? AND endTime>NOW() ORDER BY addTime DESC";
+        String sql = "SELECT " + joinCouponFields() + " FROM t_coupon WHERE status=1 AND src=? AND onlineTime<=NOW() AND offlineTime>NOW() ORDER BY addTime DESC";
         jdbcTemplate.query(sql, new Object[] { src }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -118,7 +118,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
 
     private List<Coupon> getCoupons(int src, int discount) {
         final List<Coupon> coupons = new ArrayList<Coupon>();
-        String sql = "SELECT " + joinCouponFields() + " FROM t_coupon WHERE status=1 AND src=? AND discount=? AND endTime>NOW() ORDER BY addTime DESC";
+        String sql = "SELECT " + joinCouponFields() + " FROM t_coupon WHERE status=1 AND src=? AND discount=? AND onlineTime<=NOW() AND offlineTime>NOW() ORDER BY addTime DESC";
         jdbcTemplate.query(sql, new Object[] { src, discount }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
