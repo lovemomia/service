@@ -106,8 +106,10 @@ public class CallbackController extends AbstractController {
             } else {
                 msg.append("，时间：")
                         .append(sku.getTime())
-                        .append("，地点：")
-                        .append(sku.getAddress());
+                        .append("，地点：");
+                String address = sku.getAddress();
+                if (StringUtils.isBlank(address)) address = product.getAddress();
+                msg.append(address);
             }
 
             msg.append("【松果亲子】");
