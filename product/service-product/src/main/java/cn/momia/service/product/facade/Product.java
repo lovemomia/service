@@ -176,7 +176,7 @@ public class Product implements Serializable {
         if(skus == null || skus.isEmpty()) return "";
 
         List<Date> times = new ArrayList<Date>();
-        for (Sku sku : skus) {
+        for (Sku sku : Sku.filterFinished(skus)) {
             times.addAll(sku.getStartEndTimes());
         }
         Collections.sort(times);
