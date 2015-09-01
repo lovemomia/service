@@ -47,7 +47,10 @@ public class AuthController extends UserRelatedController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseMessage login(@RequestParam String mobile, @RequestParam String password) {
-        User user = userServiceFacade.login(mobile, password);
+        User user = userServiceFacade.getUserByMobile(mobile);
+        if (!user.exists()) return ResponseMessage.FAILED("用户不存在，请先注册");
+
+        user = userServiceFacade.login(mobile, password);
         if (!user.exists()) return ResponseMessage.FAILED("登录失败，密码不正确");
 
         return ResponseMessage.SUCCESS(buildUserResponse(user));
