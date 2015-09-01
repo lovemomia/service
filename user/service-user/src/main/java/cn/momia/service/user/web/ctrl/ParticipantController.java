@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/participant")
@@ -48,6 +49,10 @@ public class ParticipantController extends UserRelatedController {
 
         boolean successful = userServiceFacade.deleteParticipant(user.getId(), id);
         if (!successful) return ResponseMessage.FAILED("删除出行人失败");
+
+        Set<Long> children = user.getChildren();
+        if (children.contains(id)) children.remove(id);
+        userServiceFacade.updateUserChildren(user.getId(), children);
 
         return ResponseMessage.SUCCESS;
     }
