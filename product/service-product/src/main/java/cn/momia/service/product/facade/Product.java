@@ -177,9 +177,13 @@ public class Product implements Serializable {
 
         Date now = new Date();
         List<Date> times = new ArrayList<Date>();
+        List<Date> allTimes = new ArrayList<Date>();
         for (Sku sku : skus) {
-            if (!sku.isFinished(now)) times.addAll(sku.getStartEndTimes());
+            List<Date> startEndTimes = sku.getStartEndTimes();
+            if (!sku.isFinished(now)) times.addAll(startEndTimes);
+            allTimes.addAll(startEndTimes);
         }
+        if (times.isEmpty()) times = allTimes;
         Collections.sort(times);
 
         return format(times);
