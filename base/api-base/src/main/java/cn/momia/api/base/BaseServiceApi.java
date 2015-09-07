@@ -13,7 +13,7 @@ import com.alibaba.fastjson.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommonServiceApi extends AbstractServiceApi {
+public class BaseServiceApi extends AbstractServiceApi {
     public static CityServiceApi CITY = new CityServiceApi();
     public static RegionServiceApi REGION = new RegionServiceApi();
     public static FeedbackServiceApi FEEDBACK = new FeedbackServiceApi();
@@ -28,7 +28,7 @@ public class CommonServiceApi extends AbstractServiceApi {
         SMS.setService(service);
     }
 
-    public static class CityServiceApi extends CommonServiceApi {
+    public static class CityServiceApi extends BaseServiceApi {
         public List<City> getAll() {
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("city"));
             JSONArray citiesJson = (JSONArray) executeRequest(request);
@@ -43,7 +43,7 @@ public class CommonServiceApi extends AbstractServiceApi {
         }
     }
 
-    public static class RegionServiceApi extends CommonServiceApi {
+    public static class RegionServiceApi extends BaseServiceApi {
         public List<Region> getAll() {
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("region"));
             JSONArray regionsJson = (JSONArray) executeRequest(request);
@@ -71,7 +71,7 @@ public class CommonServiceApi extends AbstractServiceApi {
         }
     }
 
-    public static class FeedbackServiceApi extends CommonServiceApi {
+    public static class FeedbackServiceApi extends BaseServiceApi {
         public void addFeedback(String content, String email) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("content", content)
@@ -81,7 +81,7 @@ public class CommonServiceApi extends AbstractServiceApi {
         }
     }
 
-    public static class RecommendServiceApi extends CommonServiceApi {
+    public static class RecommendServiceApi extends BaseServiceApi {
         public void addRecommend(String content, String time, String address, String contacts) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("content", content)
@@ -93,7 +93,7 @@ public class CommonServiceApi extends AbstractServiceApi {
         }
     }
 
-    public static class SmsServiceApi extends CommonServiceApi {
+    public static class SmsServiceApi extends BaseServiceApi {
         public void send(String mobile, String type) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("mobile", mobile)
