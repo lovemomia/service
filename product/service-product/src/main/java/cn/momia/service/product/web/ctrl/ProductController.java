@@ -20,8 +20,6 @@ import cn.momia.service.product.web.ctrl.dto.FullSkuDto;
 import cn.momia.service.product.web.ctrl.dto.MiniProductDto;
 import cn.momia.service.product.web.ctrl.dto.ProductDto;
 import cn.momia.service.product.web.ctrl.dto.ProductsOfDayDto;
-import cn.momia.api.user.UserServiceApi;
-import cn.momia.api.user.leader.Leader;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -257,17 +255,8 @@ public class ProductController extends BaseController {
     public MomiaHttpResponse listSkusWithLeaders(@PathVariable long id) {
         List<Sku> skus = Sku.filterClosed(productServiceFacade.getSkus(id));
 
-        List<Long> leaderUserIds = new ArrayList<Long>();
-        for (Sku sku : skus) leaderUserIds.add(sku.getLeaderUserId());
-
-        List<Leader> leaders = UserServiceApi.LEADER.list(leaderUserIds);
-        Map<Long, Leader> leadersMap = new HashMap<Long, Leader>();
-        for (Leader leader : leaders) leadersMap.put(leader.getUserId(), leader);
-
         ListDto skusDto = new ListDto();
-        for (Sku sku : skus) {
-            skusDto.add(new BaseSkuDto(sku, leadersMap.get(sku.getLeaderUserId())));
-        }
+        for (Sku sku : skus) skusDto.add(new BaseSkuDto(sku));
 
         return MomiaHttpResponse.SUCCESS(skusDto);
     }

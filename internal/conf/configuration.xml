@@ -5,7 +5,7 @@
     </Logger>
 
     <Service>
-        <Base>http://localhost:7070</Base>
+        <Base>http://localhost:6060</Base>
         <User>http://localhost:7070</User>
     </Service>
 

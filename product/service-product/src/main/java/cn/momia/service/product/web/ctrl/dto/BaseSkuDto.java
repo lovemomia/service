@@ -2,15 +2,12 @@ package cn.momia.service.product.web.ctrl.dto;
 
 import cn.momia.common.webapp.ctrl.dto.Dto;
 import cn.momia.service.product.sku.Sku;
-import cn.momia.api.user.leader.Leader;
-import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
 public class BaseSkuDto implements Dto {
     protected Sku sku;
-    protected Leader leader;
 
     public long getProductId() {
         return sku.getProductId();
@@ -66,10 +63,8 @@ public class BaseSkuDto implements Dto {
         return sku.hasLeader() || !sku.isNeedLeader();
     }
 
-    public String getLeaderInfo() {
-        if (!sku.isNeedLeader()) return "本场不需要领队";
-        if (leader == null || StringUtils.isBlank(leader.getName())) return "";
-        return leader.getName() + "已成为领队";
+    public long getLeaderId() {
+        return sku.getLeaderUserId();
     }
 
     public boolean isFull() {
@@ -86,10 +81,5 @@ public class BaseSkuDto implements Dto {
 
     public BaseSkuDto(Sku sku) {
         this.sku = sku;
-    }
-
-    public BaseSkuDto(Sku sku, Leader leader) {
-        this(sku);
-        this.leader = leader;
     }
 }

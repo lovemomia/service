@@ -23,7 +23,7 @@ public class Sku {
     private int regionId;
     private String address;
     private boolean hasLeader;
-    private String leaderInfo;
+    private long leaderId;
     private boolean full;
     private boolean finished;
     private boolean closed;
@@ -143,12 +143,12 @@ public class Sku {
         this.hasLeader = hasLeader;
     }
 
-    public String getLeaderInfo() {
-        return leaderInfo;
+    public long getLeaderId() {
+        return leaderId;
     }
 
-    public void setLeaderInfo(String leaderInfo) {
-        this.leaderInfo = leaderInfo;
+    public void setLeaderId(long leaderId) {
+        this.leaderId = leaderId;
     }
 
     public boolean isFull() {

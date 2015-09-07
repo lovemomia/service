@@ -5,7 +5,7 @@
     </Logger>
 
     <Service>
-        <User>http://localhost:7070</User>
+        <Base>http://localhost:7070</Base>
     </Service>
 
     <Limit>
