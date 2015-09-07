@@ -42,15 +42,15 @@
         <property name="jdbcTemplate" ref="jdbcTemplate" />
     </bean>
 
-    <bean id="smsSender" class="cn.momia.service.common.sms.impl.LuosimaoSmsSender" />
-    <bean id="smsService" class="cn.momia.service.common.sms.impl.SmsServiceImpl" parent="dbAccessService">
+    <bean id="smsSender" class="cn.momia.service.base.sms.impl.LuosimaoSmsSender" />
+    <bean id="smsService" class="cn.momia.service.base.sms.impl.SmsServiceImpl" parent="dbAccessService">
         <property name="sender" ref="smsSender" />
     </bean>
-    <bean id="cityService" class="cn.momia.service.common.city.impl.CityServiceImpl" parent="dbAccessService" init-method="init" />
-    <bean id="regionService" class="cn.momia.service.common.region.impl.RegionServiceImpl" parent="dbAccessService" init-method="init" />
-    <bean id="feedbackService" class="cn.momia.service.common.feedback.impl.FeedbackServiceImpl" parent="dbAccessService" />
-    <bean id="recommendService" class="cn.momia.service.common.recommend.impl.RecommendServiceImpl" parent="dbAccessService" />
-    <bean id="commonServiceFacade" class="cn.momia.service.common.facade.impl.CommonServiceFacadeImpl">
+    <bean id="cityService" class="cn.momia.service.base.city.impl.CityServiceImpl" parent="dbAccessService" init-method="init" />
+    <bean id="regionService" class="cn.momia.service.base.region.impl.RegionServiceImpl" parent="dbAccessService" init-method="init" />
+    <bean id="feedbackService" class="cn.momia.service.base.feedback.impl.FeedbackServiceImpl" parent="dbAccessService" />
+    <bean id="recommendService" class="cn.momia.service.base.recommend.impl.RecommendServiceImpl" parent="dbAccessService" />
+    <bean id="commonServiceFacade" class="cn.momia.service.base.facade.impl.CommonServiceFacadeImpl">
         <property name="smsService" ref="smsService" />
         <property name="cityService" ref="cityService" />
         <property name="regionService" ref="regionService" />

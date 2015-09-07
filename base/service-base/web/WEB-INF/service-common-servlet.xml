@@ -9,7 +9,7 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <context:component-scan base-package="cn.momia.common.webapp.ctrl" />
-    <context:component-scan base-package="cn.momia.service.common.web.ctrl" />
+    <context:component-scan base-package="cn.momia.service.base.web.ctrl" />
 
     <mvc:annotation-driven>
         <mvc:message-converters register-defaults="true">
