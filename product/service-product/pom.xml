@@ -28,7 +28,7 @@
         <!-- Momia -->
         <dependency>
             <groupId>cn.momia</groupId>
-            <artifactId>duola-service-base</artifactId>
+            <artifactId>duola-common-webapp</artifactId>
             <version>1.0.0</version>
         </dependency>
 
