@@ -1,5 +1,6 @@
 package cn.momia.service.product.web.ctrl.dto;
 
+import cn.momia.common.webapp.ctrl.dto.Dto;
 import cn.momia.service.product.comment.Comment;
 import cn.momia.service.product.comment.CommentImage;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -8,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class CommentDto {
+public class CommentDto implements Dto {
     private Comment comment;
 
     public long getId() {

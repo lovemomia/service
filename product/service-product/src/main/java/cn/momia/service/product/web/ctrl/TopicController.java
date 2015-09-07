@@ -1,12 +1,12 @@
 package cn.momia.service.product.web.ctrl;
 
+import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.product.facade.Product;
 import cn.momia.service.product.facade.ProductServiceFacade;
 import cn.momia.service.product.topic.Topic;
 import cn.momia.service.product.topic.TopicGroup;
 import cn.momia.service.product.web.ctrl.dto.BaseProductDto;
-import cn.momia.service.base.web.ctrl.AbstractController;
-import cn.momia.service.base.web.response.ResponseMessage;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,18 +22,18 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/topic")
-public class TopicController extends AbstractController {
+public class TopicController extends BaseController {
     @Autowired private ProductServiceFacade productServiceFacade;
 
     @RequestMapping(value = "/banner", method = RequestMethod.GET)
-    public ResponseMessage listBanners(@RequestParam(value = "city") int cityId, @RequestParam int count) {
-        return ResponseMessage.SUCCESS(productServiceFacade.getBanners(cityId, count));
+    public MomiaHttpResponse listBanners(@RequestParam(value = "city") int cityId, @RequestParam int count) {
+        return MomiaHttpResponse.SUCCESS(productServiceFacade.getBanners(cityId, count));
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseMessage topic(@PathVariable long id) {
+    public MomiaHttpResponse topic(@PathVariable long id) {
         Topic topic = productServiceFacade.getTopic(id);
-        if (!topic.exists()) return ResponseMessage.BAD_REQUEST;
+        if (!topic.exists()) return MomiaHttpResponse.BAD_REQUEST;
 
         JSONObject topicJson = new JSONObject();
         topicJson.put("id", topic.getId());
@@ -60,6 +60,6 @@ public class TopicController extends AbstractController {
 
         topicJson.put("groups", groupedProductsJson);
 
-        return ResponseMessage.SUCCESS(topicJson);
+        return MomiaHttpResponse.SUCCESS(topicJson);
     }
 }

@@ -1,8 +1,12 @@
 package cn.momia.service.product.web.ctrl;
 
-import cn.momia.service.base.config.Configuration;
+import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.util.TimeUtil;
+import cn.momia.common.webapp.config.Configuration;
+import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.api.base.exception.MomiaFailedException;
-import cn.momia.service.base.util.TimeUtil;
+import cn.momia.common.webapp.ctrl.dto.ListDto;
+import cn.momia.common.webapp.ctrl.dto.PagedListDto;
 import cn.momia.service.product.base.ProductSort;
 import cn.momia.service.product.comment.Comment;
 import cn.momia.service.product.facade.Product;
@@ -18,10 +22,6 @@ import cn.momia.service.product.web.ctrl.dto.ProductDto;
 import cn.momia.service.product.web.ctrl.dto.ProductsOfDayDto;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.leader.Leader;
-import cn.momia.service.base.web.ctrl.AbstractController;
-import cn.momia.service.base.web.ctrl.dto.ListDto;
-import cn.momia.service.base.web.ctrl.dto.PagedListDto;
-import cn.momia.service.base.web.response.ResponseMessage;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,31 +49,31 @@ import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/product")
-public class ProductController extends AbstractController {
+public class ProductController extends BaseController {
     private static final Pattern SORT_PATTERN = Pattern.compile("(ASC|DESC)\\(([a-zA-Z0-9]+)\\)");
 
     @Autowired private ProductServiceFacade productServiceFacade;
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public ResponseMessage list(@RequestParam(value = "pids") String pids) {
+    public MomiaHttpResponse list(@RequestParam(value = "pids") String pids) {
         Set<Long> ids = new HashSet<Long>();
         for (String id : Splitter.on(",").trimResults().omitEmptyStrings().split(pids)) ids.add(Long.valueOf(id));
 
         List<Product> products = productServiceFacade.get(ids);
-        return ResponseMessage.SUCCESS(BaseProductDto.toDtos(products, true));
+        return MomiaHttpResponse.SUCCESS(BaseProductDto.toDtos(products, true));
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage list(@RequestParam(value = "city") int cityId,
-                                @RequestParam int start,
-                                @RequestParam int count,
-                                @RequestParam(required = false) String sort) {
-        if (cityId < 0 || isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
+    public MomiaHttpResponse list(@RequestParam(value = "city") int cityId,
+                                  @RequestParam int start,
+                                  @RequestParam int count,
+                                  @RequestParam(required = false) String sort) {
+        if (cityId < 0 || isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);
 
         long totalCount = productServiceFacade.queryCount(cityId);
         List<Product> products = productServiceFacade.query(cityId, start, count, parseSort(sort));
 
-        return ResponseMessage.SUCCESS(buildProductsDto(totalCount, products, start, count));
+        return MomiaHttpResponse.SUCCESS(buildProductsDto(totalCount, products, start, count));
     }
 
     private ProductSort parseSort(String sort) {
@@ -101,15 +101,15 @@ public class ProductController extends AbstractController {
     }
 
     @RequestMapping(value = "/weekend", method = RequestMethod.GET)
-    public ResponseMessage listByWeekend(@RequestParam(value = "city") int cityId,
-                                         @RequestParam int start,
-                                         @RequestParam int count) {
-        if (cityId <0 || isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
+    public MomiaHttpResponse listByWeekend(@RequestParam(value = "city") int cityId,
+                                           @RequestParam int start,
+                                           @RequestParam int count) {
+        if (cityId <0 || isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);
 
         long totalCount = productServiceFacade.queryCountByWeekend(cityId);
         List<Product> products = productServiceFacade.queryByWeekend(cityId, start, count);
 
-        return ResponseMessage.SUCCESS(buildWeekendProductsDto(totalCount, products, start, count));
+        return MomiaHttpResponse.SUCCESS(buildWeekendProductsDto(totalCount, products, start, count));
     }
 
     private PagedListDto buildWeekendProductsDto(long totalCount, List<Product> products, int start, int count) {
@@ -126,10 +126,10 @@ public class ProductController extends AbstractController {
     }
 
     @RequestMapping(value = "/month", method = RequestMethod.GET)
-    public ResponseMessage listByMonth(@RequestParam(value = "city") int cityId, @RequestParam int month) {
+    public MomiaHttpResponse listByMonth(@RequestParam(value = "city") int cityId, @RequestParam int month) {
         List<Product> products = productServiceFacade.queryByMonth(cityId, month);
 
-        return ResponseMessage.SUCCESS(buildGroupedProductsDto(month, products));
+        return MomiaHttpResponse.SUCCESS(buildGroupedProductsDto(month, products));
     }
 
     private ListDto buildGroupedProductsDto(int month, List<Product> products) {
@@ -140,10 +140,10 @@ public class ProductController extends AbstractController {
             DateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
 
             Date now = new Date();
-            Date currentMonth = monthFormat.parse(TimeUtil.formatMonth(month));
+            Date currentMonth = monthFormat.parse(TimeUtil.formatYearMonth(month));
 
             Date start = now.before(currentMonth) ? currentMonth : now;
-            Date end = monthFormat.parse(TimeUtil.formatNextMonth(month));
+            Date end = monthFormat.parse(TimeUtil.formatNextYearMonth(month));
 
             int pageSize = Configuration.getInt("Product.Month.PageSize");
             Map<String, ProductsOfDayDto> productsOfDayDtoMap = new HashMap<String, ProductsOfDayDto>();
@@ -184,21 +184,21 @@ public class ProductController extends AbstractController {
     }
 
     @RequestMapping(value = "/leader", method = RequestMethod.GET)
-    public ResponseMessage listNeedLeader(@RequestParam(value = "city") int cityId,
-                                          @RequestParam int start,
-                                          @RequestParam int count) {
-        if (cityId < 0 || isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
+    public MomiaHttpResponse listNeedLeader(@RequestParam(value = "city") int cityId,
+                                            @RequestParam int start,
+                                            @RequestParam int count) {
+        if (cityId < 0 || isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);
 
         long totalCount = productServiceFacade.queryCountNeedLeader(cityId);
         List<Product> products = productServiceFacade.queryNeedLeader(cityId, start, count);
 
-        return ResponseMessage.SUCCESS(buildProductsDto(totalCount, products, start, count));
+        return MomiaHttpResponse.SUCCESS(buildProductsDto(totalCount, products, start, count));
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseMessage get(@PathVariable long id, @RequestParam(defaultValue = "" + Product.Type.BASE) int type) {
+    public MomiaHttpResponse get(@PathVariable long id, @RequestParam(defaultValue = "" + Product.Type.BASE) int type) {
         Product product = productServiceFacade.get(id);
-        if (!product.exists()) return ResponseMessage.FAILED("活动不存在");
+        if (!product.exists()) return MomiaHttpResponse.FAILED("活动不存在");
 
         ProductDto productDto = null;
         switch (type) {
@@ -213,28 +213,28 @@ public class ProductController extends AbstractController {
                 break;
             default: productDto = new BaseProductDto((product));
         }
-        return ResponseMessage.SUCCESS(productDto);
+        return MomiaHttpResponse.SUCCESS(productDto);
     }
 
     @RequestMapping(value = "/{id}/detail", method = RequestMethod.GET)
-    public ResponseMessage getDetail(@PathVariable long id) {
+    public MomiaHttpResponse getDetail(@PathVariable long id) {
         String productDetail = productServiceFacade.getDetail(id);
-        if (StringUtils.isBlank(productDetail)) return ResponseMessage.FAILED("活动详情不存在");
-        return ResponseMessage.SUCCESS(productDetail);
+        if (StringUtils.isBlank(productDetail)) return MomiaHttpResponse.FAILED("活动详情不存在");
+        return MomiaHttpResponse.SUCCESS(productDetail);
     }
 
     @RequestMapping(value = "/{id}/sku/{sid}", method = RequestMethod.GET)
-    public ResponseMessage getSku(@PathVariable long id, @PathVariable(value = "sid") long skuId) {
+    public MomiaHttpResponse getSku(@PathVariable long id, @PathVariable(value = "sid") long skuId) {
         Sku sku = productServiceFacade.getSku(skuId);
-        if (sku.getProductId() != id) return ResponseMessage.FAILED("无效的SKU");
-        return ResponseMessage.SUCCESS(new FullSkuDto(sku));
+        if (sku.getProductId() != id) return MomiaHttpResponse.FAILED("无效的SKU");
+        return MomiaHttpResponse.SUCCESS(new FullSkuDto(sku));
     }
 
     @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
-    public ResponseMessage listSkus(@PathVariable long id) {
+    public MomiaHttpResponse listSkus(@PathVariable long id) {
         List<Sku> skus = productServiceFacade.getSkus(id);
         skus = Sku.sort(Sku.filterFinished(skus));
-        return ResponseMessage.SUCCESS(buildSkusDto(skus));
+        return MomiaHttpResponse.SUCCESS(buildSkusDto(skus));
     }
 
     private ListDto buildSkusDto(List<Sku> skus) {
@@ -247,14 +247,14 @@ public class ProductController extends AbstractController {
     }
 
     @RequestMapping(value = "/{id}/sku/all", method = RequestMethod.GET)
-    public ResponseMessage listAllSkus(@PathVariable long id) {
+    public MomiaHttpResponse listAllSkus(@PathVariable long id) {
         List<Sku> skus = productServiceFacade.getAllSkus(id);
         skus = Sku.sortByStartTime(skus);
-        return ResponseMessage.SUCCESS(buildSkusDto(skus));
+        return MomiaHttpResponse.SUCCESS(buildSkusDto(skus));
     }
 
     @RequestMapping(value = "/{id}/sku/leader", method = RequestMethod.GET)
-    public ResponseMessage listSkusWithLeaders(@PathVariable long id) {
+    public MomiaHttpResponse listSkusWithLeaders(@PathVariable long id) {
         List<Sku> skus = Sku.filterClosed(productServiceFacade.getSkus(id));
 
         List<Long> leaderUserIds = new ArrayList<Long>();
@@ -269,17 +269,17 @@ public class ProductController extends AbstractController {
             skusDto.add(new BaseSkuDto(sku, leadersMap.get(sku.getLeaderUserId())));
         }
 
-        return ResponseMessage.SUCCESS(skusDto);
+        return MomiaHttpResponse.SUCCESS(skusDto);
     }
 
     @RequestMapping(value = "/favorite", method = RequestMethod.GET)
-    public ResponseMessage listFavorites(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
+    public MomiaHttpResponse listFavorites(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);
 
         long totalCount = productServiceFacade.queryFavoritesCount(userId);
         List<Product> products = productServiceFacade.queryFavorites(userId, start, count);
 
-        return ResponseMessage.SUCCESS(buildFavoritesDto(totalCount, products, start, count));
+        return MomiaHttpResponse.SUCCESS(buildFavoritesDto(totalCount, products, start, count));
     }
 
     private PagedListDto buildFavoritesDto(long totalCount, List<Product> products, int start, int count) {
@@ -294,34 +294,34 @@ public class ProductController extends AbstractController {
     }
 
     @RequestMapping(value = "/{id}/favor", method = RequestMethod.POST)
-    public ResponseMessage favor(@RequestParam(value = "uid") long userId, @PathVariable long id){
+    public MomiaHttpResponse favor(@RequestParam(value = "uid") long userId, @PathVariable long id){
         Product product = productServiceFacade.get(id, true);
-        if (!product.exists()) return ResponseMessage.FAILED("添加收藏失败");
+        if (!product.exists()) return MomiaHttpResponse.FAILED("添加收藏失败");
 
-        if (!productServiceFacade.favor(userId, id)) return ResponseMessage.FAILED("添加收藏失败");
-        return ResponseMessage.SUCCESS;
+        if (!productServiceFacade.favor(userId, id)) return MomiaHttpResponse.FAILED("添加收藏失败");
+        return MomiaHttpResponse.SUCCESS;
     }
 
     @RequestMapping(value = "/{id}/unfavor", method = RequestMethod.POST)
-    public ResponseMessage unfavor(@RequestParam(value = "uid") long userId, @PathVariable long id){
-        if (!productServiceFacade.unFavor(userId, id)) return ResponseMessage.FAILED("取消收藏失败");
-        return ResponseMessage.SUCCESS;
+    public MomiaHttpResponse unfavor(@RequestParam(value = "uid") long userId, @PathVariable long id){
+        if (!productServiceFacade.unFavor(userId, id)) return MomiaHttpResponse.FAILED("取消收藏失败");
+        return MomiaHttpResponse.SUCCESS;
     }
 
     @RequestMapping(value = "/{id}/favored", method = RequestMethod.GET)
-    public ResponseMessage favored(@RequestParam(value = "uid") long userId, @PathVariable long id){
-        return ResponseMessage.SUCCESS(productServiceFacade.isFavoried(userId, id));
+    public MomiaHttpResponse favored(@RequestParam(value = "uid") long userId, @PathVariable long id){
+        return MomiaHttpResponse.SUCCESS(productServiceFacade.isFavoried(userId, id));
     }
 
     @RequestMapping(value = "/{id}/sku/{sid}/leader/apply", method = RequestMethod.POST)
-    public ResponseMessage applyLeader(@RequestParam(value = "uid") long userId, @PathVariable long id, @PathVariable(value = "sid") long skuId){
-        if (!productServiceFacade.addSkuLeader(userId, id, skuId)) return ResponseMessage.FAILED("无法申请，或已经有人在您前面申请");
-        return ResponseMessage.SUCCESS;
+    public MomiaHttpResponse applyLeader(@RequestParam(value = "uid") long userId, @PathVariable long id, @PathVariable(value = "sid") long skuId){
+        if (!productServiceFacade.addSkuLeader(userId, id, skuId)) return MomiaHttpResponse.FAILED("无法申请，或已经有人在您前面申请");
+        return MomiaHttpResponse.SUCCESS;
     }
 
     @RequestMapping(value = "/led/list", method = RequestMethod.GET)
-    public ResponseMessage getLedProducts(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
+    public MomiaHttpResponse getLedProducts(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);
 
         long totalCount = productServiceFacade.queryCountOfLedSkus(userId);
         List<Sku> ledSkus = productServiceFacade.queryLedSkus(userId, start, count);
@@ -345,42 +345,42 @@ public class ProductController extends AbstractController {
             productsDto.add(baseProductDto);
         }
 
-        return ResponseMessage.SUCCESS(productsDto);
+        return MomiaHttpResponse.SUCCESS(productsDto);
     }
 
     @RequestMapping(value = "/{id}/sku/{sid}/lock", method = RequestMethod.POST)
-    public ResponseMessage lock(@PathVariable long id,
-                                @PathVariable(value = "sid") long skuId,
-                                @RequestParam int count,
-                                @RequestParam(value = "joined") int joinedCount) {
-        return ResponseMessage.SUCCESS(productServiceFacade.lockStock(id, skuId, count, joinedCount));
-    }
-
-    @RequestMapping(value = "/{id}/sku/{sid}/unlock", method = RequestMethod.POST)
-    public ResponseMessage unlock(@PathVariable long id,
+    public MomiaHttpResponse lock(@PathVariable long id,
                                   @PathVariable(value = "sid") long skuId,
                                   @RequestParam int count,
                                   @RequestParam(value = "joined") int joinedCount) {
-        return ResponseMessage.SUCCESS(productServiceFacade.unlockStock(id, skuId, count, joinedCount));
+        return MomiaHttpResponse.SUCCESS(productServiceFacade.lockStock(id, skuId, count, joinedCount));
+    }
+
+    @RequestMapping(value = "/{id}/sku/{sid}/unlock", method = RequestMethod.POST)
+    public MomiaHttpResponse unlock(@PathVariable long id,
+                                    @PathVariable(value = "sid") long skuId,
+                                    @RequestParam int count,
+                                    @RequestParam(value = "joined") int joinedCount) {
+        return MomiaHttpResponse.SUCCESS(productServiceFacade.unlockStock(id, skuId, count, joinedCount));
     }
 
     @RequestMapping(value = "/{id}/sold", method = RequestMethod.POST)
-    public ResponseMessage sold(@PathVariable long id, @RequestParam int count) {
-        if (!productServiceFacade.sold(id, count)) return ResponseMessage.FAILED;
-        return ResponseMessage.SUCCESS;
+    public MomiaHttpResponse sold(@PathVariable long id, @RequestParam int count) {
+        if (!productServiceFacade.sold(id, count)) return MomiaHttpResponse.FAILED;
+        return MomiaHttpResponse.SUCCESS;
     }
 
     @RequestMapping(value = "/{id}/comment", method = RequestMethod.POST, consumes = "application/json")
-    public ResponseMessage addComment(@RequestBody Comment comment) {
+    public MomiaHttpResponse addComment(@RequestBody Comment comment) {
         long commentId = productServiceFacade.addComment(comment);
 
-        if (commentId <= 0) return ResponseMessage.FAILED("发表评论失败");
-        return ResponseMessage.SUCCESS;
+        if (commentId <= 0) return MomiaHttpResponse.FAILED("发表评论失败");
+        return MomiaHttpResponse.SUCCESS;
     }
 
     @RequestMapping(value = "/{id}/comment", method = RequestMethod.GET)
-    public ResponseMessage listComments(@PathVariable long id, @RequestParam int start, @RequestParam int count){
-        if (id <= 0 || isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
+    public MomiaHttpResponse listComments(@PathVariable long id, @RequestParam int start, @RequestParam int count){
+        if (id <= 0 || isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);
 
         long totalCount = productServiceFacade.queryCommentCountOfProduct(id);
         List<Comment> comments = productServiceFacade.queryCommentOfProduct(id, start, count);
@@ -388,6 +388,6 @@ public class ProductController extends AbstractController {
         PagedListDto commentsDto = new PagedListDto(totalCount, start, count);
         for (Comment comment : comments) commentsDto.add(new CommentDto(comment));
 
-        return ResponseMessage.SUCCESS(commentsDto);
+        return MomiaHttpResponse.SUCCESS(commentsDto);
     }
 }

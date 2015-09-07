@@ -1,6 +1,6 @@
 package cn.momia.service.product.comment.impl;
 
-import cn.momia.service.base.impl.DbAccessService;
+import cn.momia.common.service.DbAccessService;
 import cn.momia.service.product.comment.Comment;
 import cn.momia.service.product.comment.CommentImage;
 import cn.momia.service.product.comment.CommentService;

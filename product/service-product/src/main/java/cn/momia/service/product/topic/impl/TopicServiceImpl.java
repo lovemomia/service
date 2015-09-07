@@ -1,6 +1,6 @@
 package cn.momia.service.product.topic.impl;
 
-import cn.momia.service.base.impl.DbAccessService;
+import cn.momia.common.service.DbAccessService;
 import cn.momia.service.product.topic.Topic;
 import cn.momia.service.product.topic.TopicGroup;
 import cn.momia.service.product.topic.TopicService;

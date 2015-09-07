@@ -1,6 +1,6 @@
 package cn.momia.service.product.sku;
 
-import cn.momia.service.base.util.TimeUtil;
+import cn.momia.common.util.TimeUtil;
 import cn.momia.service.product.place.Place;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -342,7 +342,7 @@ public class Sku implements Serializable {
             for (String timeStr : timeStrs) {
                 Date time = TimeUtil.castToDate(timeStr);
                 if (time != null) {
-                    builder.append(TimeUtil.formatDateWithWeekDay(time));
+                    builder.append(TimeUtil.formatMonthDateWithWeekDay(time));
                     if (timeStr.contains(":"))
                         builder.append(TimeUtil.getAmPm(time))
                                 .append(TIME_FORMATTER.format(time));
@@ -350,9 +350,9 @@ public class Sku implements Serializable {
                 }
             }
         } else {
-            builder.append(TimeUtil.formatDateWithWeekDay(start))
+            builder.append(TimeUtil.formatMonthDateWithWeekDay(start))
                     .append("~")
-                    .append(TimeUtil.formatDateWithWeekDay(end));
+                    .append(TimeUtil.formatMonthDateWithWeekDay(end));
         }
 
         return builder.toString();

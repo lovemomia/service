@@ -1,8 +1,8 @@
 package cn.momia.service.product.facade.impl;
 
 import cn.momia.api.base.exception.MomiaFailedException;
-import cn.momia.service.base.util.TimeUtil;
-import cn.momia.service.base.impl.DbAccessService;
+import cn.momia.common.service.DbAccessService;
+import cn.momia.common.util.TimeUtil;
 import cn.momia.service.product.banner.Banner;
 import cn.momia.service.product.banner.BannerService;
 import cn.momia.service.product.comment.Comment;
@@ -257,13 +257,13 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     @Override
     public long queryCountByMonth(int cityId, int month) {
         if (cityId < 0 || month <= 0 || month > 12) return 0;
-        return baseProductService.queryCountByMonth(cityId, TimeUtil.formatMonth(month), TimeUtil.formatNextMonth(month));
+        return baseProductService.queryCountByMonth(cityId, TimeUtil.formatYearMonth(month), TimeUtil.formatNextYearMonth(month));
     }
 
     @Override
     public List<Product> queryByMonth(int cityId, int month) {
         if (cityId < 0 || month <= 0 || month > 12) return new ArrayList<Product>();
-        return buildProducts(baseProductService.queryByMonth(cityId, TimeUtil.formatMonth(month), TimeUtil.formatNextMonth(month)));
+        return buildProducts(baseProductService.queryByMonth(cityId, TimeUtil.formatYearMonth(month), TimeUtil.formatNextYearMonth(month)));
     }
 
     @Override

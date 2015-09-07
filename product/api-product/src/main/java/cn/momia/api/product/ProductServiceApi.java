@@ -1,12 +1,12 @@
 package cn.momia.api.product;
 
-import cn.momia.api.base.ServiceApi;
-import cn.momia.api.base.http.MomiaHttpParamBuilder;
-import cn.momia.api.base.http.MomiaHttpRequest;
 import cn.momia.api.product.comment.PagedComments;
 import cn.momia.api.product.sku.Sku;
 import cn.momia.api.product.topic.Topic;
 import cn.momia.api.product.topic.Banner;
+import cn.momia.common.api.AbstractServiceApi;
+import cn.momia.common.api.http.MomiaHttpParamBuilder;
+import cn.momia.common.api.http.MomiaHttpRequest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class ProductServiceApi extends ServiceApi {
+public class ProductServiceApi extends AbstractServiceApi {
     public static TopicServiceApi TOPIC = new TopicServiceApi();
     public static BaseProductServiceApi PRODUCT = new BaseProductServiceApi();
     public static CommentServiceApi COMMENT = new CommentServiceApi();
