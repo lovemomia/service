@@ -6,6 +6,7 @@
 
     <Service>
         <Base>http://localhost:7070</Base>
+        <User>http://localhost:7070</User>
     </Service>
 
     <Limit>
@@ -20,6 +21,12 @@
             <Password>Tongqu!@#456</Password>
         </Tongqu>
     </Database>
+
+    <Product>
+        <Month>
+            <PageSize>20</PageSize>
+        </Month>
+    </Product>
 
     <SecretKey>
         <Password></Password>
