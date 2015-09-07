@@ -1,6 +1,6 @@
 package cn.momia.service.user.leader.impl;
 
-import cn.momia.service.base.impl.DbAccessService;
+import cn.momia.common.service.DbAccessService;
 import cn.momia.service.user.leader.Leader;
 import cn.momia.service.user.leader.LeaderService;
 import org.apache.commons.lang3.StringUtils;

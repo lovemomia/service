@@ -1,11 +1,11 @@
 package cn.momia.api.user;
 
-import cn.momia.api.base.ServiceApi;
-import cn.momia.api.base.http.MomiaHttpParamBuilder;
-import cn.momia.api.base.http.MomiaHttpRequest;
 import cn.momia.api.user.leader.Leader;
 import cn.momia.api.user.leader.LeaderStatus;
 import cn.momia.api.user.participant.Participant;
+import cn.momia.common.api.AbstractServiceApi;
+import cn.momia.common.api.http.MomiaHttpParamBuilder;
+import cn.momia.common.api.http.MomiaHttpRequest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-public class UserServiceApi extends ServiceApi {
+public class UserServiceApi extends AbstractServiceApi {
     public static BaseUserServiceApi USER = new BaseUserServiceApi();
     public static ParticipantServiceApi PARTICIPANT = new ParticipantServiceApi();
     public static LeaderServiceApi LEADER = new LeaderServiceApi();

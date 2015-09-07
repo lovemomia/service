@@ -1,6 +1,6 @@
 package cn.momia.service.deal.gateway.wechatpay;
 
-import cn.momia.api.base.exception.MomiaFailedException;
+import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.service.deal.gateway.CallbackParam;
 import cn.momia.service.deal.gateway.MapWrapper;
 import cn.momia.service.deal.gateway.ClientType;

@@ -1,6 +1,6 @@
 package cn.momia.service.user.participant;
 
-import cn.momia.service.base.util.TimeUtil;
+import cn.momia.common.util.TimeUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;

@@ -1,6 +1,6 @@
 package cn.momia.service.user.leader;
 
-import cn.momia.service.base.util.MobileUtil;
+import cn.momia.common.util.MobileUtil;
 import org.apache.commons.lang3.StringUtils;
 
 public class Leader {
@@ -140,7 +140,7 @@ public class Leader {
     public boolean isInvalid() {
         return userId <= 0 ||
                 StringUtils.isBlank(name) ||
-                MobileUtil.isInvalidMobile(mobile) ||
+                MobileUtil.isInvalid(mobile) ||
 //                cityId <= 0 ||
 //                regionId <= 0 ||
 //                StringUtils.isBlank(address) ||

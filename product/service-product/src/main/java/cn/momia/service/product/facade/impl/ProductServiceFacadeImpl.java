@@ -1,6 +1,6 @@
 package cn.momia.service.product.facade.impl;
 
-import cn.momia.api.base.exception.MomiaFailedException;
+import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.service.DbAccessService;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.service.product.banner.Banner;

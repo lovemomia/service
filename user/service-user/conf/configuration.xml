@@ -24,4 +24,9 @@
             <Password>Tongqu!@#456</Password>
         </Tongqu>
     </Database>
+
+    <SecretKey>
+        <Password></Password>
+        <UToken></UToken>
+    </SecretKey>
 </Configuration>

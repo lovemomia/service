@@ -1,8 +1,8 @@
 package cn.momia.service.deal.web.ctrl;
 
-import cn.momia.api.base.exception.MomiaFailedException;
 import cn.momia.api.user.User;
 import cn.momia.api.user.UserServiceApi;
+import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.deal.facade.DealServiceFacade;

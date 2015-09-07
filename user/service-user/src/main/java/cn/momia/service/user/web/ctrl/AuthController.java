@@ -1,7 +1,7 @@
 package cn.momia.service.user.web.ctrl;
 
 import cn.momia.api.common.CommonServiceApi;
-import cn.momia.service.base.web.response.ResponseMessage;
+import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;
 import org.slf4j.Logger;
@@ -19,17 +19,17 @@ public class AuthController extends UserRelatedController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthController.class);
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ResponseMessage register(@RequestParam(value = "nickname") String nickName,
-                                    @RequestParam String mobile,
-                                    @RequestParam String password,
-                                    @RequestParam String code){
-        if (userServiceFacade.exists("mobile", mobile)) return ResponseMessage.FAILED("该手机号已经注册过");
-        if (userServiceFacade.exists("nickName", nickName)) return ResponseMessage.FAILED("该昵称已存在");
+    public MomiaHttpResponse register(@RequestParam(value = "nickname") String nickName,
+                                      @RequestParam String mobile,
+                                      @RequestParam String password,
+                                      @RequestParam String code){
+        if (userServiceFacade.exists("mobile", mobile)) return MomiaHttpResponse.FAILED("该手机号已经注册过");
+        if (userServiceFacade.exists("nickName", nickName)) return MomiaHttpResponse.FAILED("该昵称已存在");
 
         CommonServiceApi.SMS.verify(mobile, code);
 
         User user = userServiceFacade.register(nickName, mobile, password);
-        if (!user.exists()) return ResponseMessage.FAILED("注册失败");
+        if (!user.exists()) return MomiaHttpResponse.FAILED("注册失败");
 
         try {
             Participant participant = new Participant();
@@ -42,37 +42,37 @@ public class AuthController extends UserRelatedController {
             LOGGER.error("fail to add participant for user: {}", user.getId(), e);
         }
 
-        return ResponseMessage.SUCCESS(buildUserResponse(user));
+        return MomiaHttpResponse.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseMessage login(@RequestParam String mobile, @RequestParam String password) {
+    public MomiaHttpResponse login(@RequestParam String mobile, @RequestParam String password) {
         User user = userServiceFacade.getUserByMobile(mobile);
-        if (!user.exists()) return ResponseMessage.FAILED("用户不存在，请先注册");
+        if (!user.exists()) return MomiaHttpResponse.FAILED("用户不存在，请先注册");
 
         user = userServiceFacade.login(mobile, password);
-        if (!user.exists()) return ResponseMessage.FAILED("登录失败，密码不正确");
+        if (!user.exists()) return MomiaHttpResponse.FAILED("登录失败，密码不正确");
 
-        return ResponseMessage.SUCCESS(buildUserResponse(user));
+        return MomiaHttpResponse.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/login/code", method = RequestMethod.POST)
-    public ResponseMessage loginByCode(@RequestParam String mobile, @RequestParam String code) {
+    public MomiaHttpResponse loginByCode(@RequestParam String mobile, @RequestParam String code) {
         CommonServiceApi.SMS.verify(mobile, code);
 
         User user = userServiceFacade.getUserByMobile(mobile);
-        if (!user.exists()) return ResponseMessage.FAILED("登录失败");
+        if (!user.exists()) return MomiaHttpResponse.FAILED("登录失败");
 
-        return ResponseMessage.SUCCESS(buildUserResponse(user));
+        return MomiaHttpResponse.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/password", method = RequestMethod.PUT)
-    public ResponseMessage updatePassword(@RequestParam String mobile, @RequestParam String password, @RequestParam String code) {
+    public MomiaHttpResponse updatePassword(@RequestParam String mobile, @RequestParam String password, @RequestParam String code) {
         CommonServiceApi.SMS.verify(mobile, code);
 
         User user = userServiceFacade.updateUserPassword(mobile, password);
-        if (!user.exists()) return ResponseMessage.FAILED("更改密码失败");
+        if (!user.exists()) return MomiaHttpResponse.FAILED("更改密码失败");
 
-        return ResponseMessage.SUCCESS(buildUserResponse(user));
+        return MomiaHttpResponse.SUCCESS(buildUserResponse(user));
     }
 }

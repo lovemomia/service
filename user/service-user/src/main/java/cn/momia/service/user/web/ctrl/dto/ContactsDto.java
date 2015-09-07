@@ -1,11 +1,10 @@
 package cn.momia.service.user.web.ctrl.dto;
 
+import cn.momia.common.webapp.ctrl.dto.Dto;
 import cn.momia.service.user.base.User;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.Serializable;
-
-public class ContactsDto implements Serializable {
+public class ContactsDto implements Dto {
     private String name;
     private String mobile;
 

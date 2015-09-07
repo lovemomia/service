@@ -1,8 +1,8 @@
 package cn.momia.service.user.facade.impl;
 
-import cn.momia.service.base.util.MobileUtil;
-import cn.momia.service.base.config.Configuration;
-import cn.momia.api.base.exception.MomiaFailedException;
+import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.common.util.MobileUtil;
+import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.user.facade.UserServiceFacade;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
@@ -58,7 +58,7 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
     @Override
     public User register(String nickName, String mobile, String password) {
         if (StringUtils.isBlank(nickName) ||
-                MobileUtil.isInvalidMobile(mobile) ||
+                MobileUtil.isInvalid(mobile) ||
                 StringUtils.isBlank(password)) return User.NOT_EXIST_USER;
 
         long userId = userService.add(nickName, mobile, password, generateToken(mobile), generateInviteCode(nickName, mobile));
@@ -66,16 +66,16 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
     }
 
     private String generateToken(String mobile) {
-        return DigestUtils.md5Hex(StringUtils.join(new String[] { mobile, new Date().toString(), Configuration.getSecretKey() }, "|"));
+        return DigestUtils.md5Hex(StringUtils.join(new String[] { mobile, new Date().toString(), Configuration.getString("SecretKey.UToken") }, "|"));
     }
 
     private String generateInviteCode(String nickName, String mobile) {
-        return DigestUtils.md5Hex(StringUtils.join(new String[] { nickName, mobile, DATE_FORMAT.format(new Date()), Configuration.getSecretKey() }, "|"));
+        return DigestUtils.md5Hex(StringUtils.join(new String[] { nickName, mobile, DATE_FORMAT.format(new Date()), Configuration.getString("SecretKey.UToken") }, "|"));
     }
 
     @Override
     public User login(String mobile, String password) {
-        if (MobileUtil.isInvalidMobile(mobile) || StringUtils.isBlank(password)) return User.NOT_EXIST_USER;
+        if (MobileUtil.isInvalid(mobile) || StringUtils.isBlank(password)) return User.NOT_EXIST_USER;
         if (!userService.validatePassword(mobile, password)) return User.NOT_EXIST_USER;
 
         return userService.getByMobile(mobile);
@@ -95,7 +95,7 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
 
     @Override
     public User getUserByMobile(String mobile) {
-        if (MobileUtil.isInvalidMobile(mobile)) return User.NOT_EXIST_USER;
+        if (MobileUtil.isInvalid(mobile)) return User.NOT_EXIST_USER;
         return userService.getByMobile(mobile);
     }
 
@@ -159,7 +159,7 @@ public class UserServiceFacadeImpl implements UserServiceFacade {
 
     @Override
     public User updateUserPassword(String mobile, String password) {
-        if (MobileUtil.isInvalidMobile(mobile) || StringUtils.isBlank(password)) return User.NOT_EXIST_USER;
+        if (MobileUtil.isInvalid(mobile) || StringUtils.isBlank(password)) return User.NOT_EXIST_USER;
 
         User user = userService.getByMobile(mobile);
         if (user.exists() && !userService.updatePassword(user.getId(), mobile, password)) throw new MomiaFailedException("更改密码失败");

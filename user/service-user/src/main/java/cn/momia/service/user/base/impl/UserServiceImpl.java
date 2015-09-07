@@ -1,8 +1,8 @@
 package cn.momia.service.user.base.impl;
 
-import cn.momia.service.base.config.Configuration;
-import cn.momia.api.base.exception.MomiaFailedException;
-import cn.momia.service.base.impl.DbAccessService;
+import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.common.service.DbAccessService;
+import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
 import com.google.common.base.Splitter;
@@ -58,7 +58,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, nickName);
                 ps.setString(2, mobile);
-                ps.setString(3, encryptPassword(mobile, password, Configuration.getPasswordSecretKey()));
+                ps.setString(3, encryptPassword(mobile, password, Configuration.getString("SecretKey.Password")));
                 ps.setString(4, token);
                 ps.setString(5, inviteCode);
 
@@ -87,7 +87,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     public boolean validatePassword(String mobile, String password) {
         String sql = "SELECT mobile, password FROM t_user WHERE mobile=? AND password=?";
 
-        return jdbcTemplate.query(sql, new Object[] { mobile, encryptPassword(mobile, password, Configuration.getPasswordSecretKey()) }, new ResultSetExtractor<Boolean>() {
+        return jdbcTemplate.query(sql, new Object[] { mobile, encryptPassword(mobile, password, Configuration.getString("SecretKey.Password")) }, new ResultSetExtractor<Boolean>() {
             @Override
             public Boolean extractData(ResultSet resultSet) throws SQLException, DataAccessException {
                 if (resultSet.next()) return true;
@@ -265,7 +265,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     public boolean updatePassword(long id, String mobile, String password) {
         String sql = "UPDATE t_user SET password=? WHERE id=?";
 
-        return update(sql, new Object[] { encryptPassword(mobile, password, Configuration.getPasswordSecretKey()), id });
+        return update(sql, new Object[] { encryptPassword(mobile, password, Configuration.getString("SecretKey.Password")), id });
     }
 
     @Override

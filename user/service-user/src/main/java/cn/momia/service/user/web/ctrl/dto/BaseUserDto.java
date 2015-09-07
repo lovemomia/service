@@ -1,6 +1,6 @@
 package cn.momia.service.user.web.ctrl.dto;
 
-import cn.momia.service.base.util.MobileUtil;
+import cn.momia.common.util.MobileUtil;
 import cn.momia.service.user.base.User;
 import com.alibaba.fastjson.annotation.JSONField;
 
