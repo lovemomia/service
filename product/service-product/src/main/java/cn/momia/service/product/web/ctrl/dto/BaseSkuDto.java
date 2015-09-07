@@ -59,11 +59,15 @@ public class BaseSkuDto implements Dto {
         return sku.getAddress();
     }
 
+    public boolean isNeedLeader() {
+        return sku.isNeedLeader();
+    }
+
     public boolean isHasLeader() {
         return sku.hasLeader() || !sku.isNeedLeader();
     }
 
-    public long getLeaderId() {
+    public long getLeaderUserId() {
         return sku.getLeaderUserId();
     }
 

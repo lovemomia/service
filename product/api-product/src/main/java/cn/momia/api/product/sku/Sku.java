@@ -22,8 +22,10 @@ public class Sku {
     private String placeName;
     private int regionId;
     private String address;
+    private boolean needLeader;
     private boolean hasLeader;
-    private long leaderId;
+    private long leaderUserId;
+    private String leaderInfo;
     private boolean full;
     private boolean finished;
     private boolean closed;
@@ -135,6 +137,14 @@ public class Sku {
         this.address = address;
     }
 
+    public boolean isNeedLeader() {
+        return needLeader;
+    }
+
+    public void setNeedLeader(boolean needLeader) {
+        this.needLeader = needLeader;
+    }
+
     public boolean isHasLeader() {
         return hasLeader;
     }
@@ -143,12 +153,20 @@ public class Sku {
         this.hasLeader = hasLeader;
     }
 
-    public long getLeaderId() {
-        return leaderId;
+    public long getLeaderUserId() {
+        return leaderUserId;
     }
 
-    public void setLeaderId(long leaderId) {
-        this.leaderId = leaderId;
+    public void setLeaderUserId(long leaderUserId) {
+        this.leaderUserId = leaderUserId;
+    }
+
+    public String getLeaderInfo() {
+        return leaderInfo;
+    }
+
+    public void setLeaderInfo(String leaderInfo) {
+        this.leaderInfo = leaderInfo;
     }
 
     public boolean isFull() {
