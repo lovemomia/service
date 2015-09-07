@@ -1,8 +1,8 @@
 package cn.momia.service.common.web.ctrl;
 
+import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.common.facade.CommonServiceFacade;
-import cn.momia.service.base.web.ctrl.AbstractController;
-import cn.momia.service.base.web.response.ResponseMessage;
 import cn.momia.service.common.city.City;
 import cn.momia.service.common.region.Region;
 import com.alibaba.fastjson.JSONArray;
@@ -19,16 +19,16 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/region")
-public class RegionController extends AbstractController {
+public class RegionController extends BaseController {
     @Autowired private CommonServiceFacade commonServiceFacade;
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage list() {
-        return ResponseMessage.SUCCESS(commonServiceFacade.getAllRegions());
+    public MomiaHttpResponse list() {
+        return MomiaHttpResponse.SUCCESS(commonServiceFacade.getAllRegions());
     }
 
     @RequestMapping(value = "/district/tree", method = RequestMethod.GET)
-    public ResponseMessage getDistrictTree() {
+    public MomiaHttpResponse getDistrictTree() {
         List<City> cities = commonServiceFacade.getAllCities();
         List<Region> regions = commonServiceFacade.getAllRegions();
         Map<Integer, List<Region>> districtsOfCities = new HashMap<Integer, List<Region>>();
@@ -53,6 +53,6 @@ public class RegionController extends AbstractController {
             treeJson.add(cityDistrictsJson);
         }
 
-        return ResponseMessage.SUCCESS(treeJson);
+        return MomiaHttpResponse.SUCCESS(treeJson);
     }
 }

@@ -1,6 +1,6 @@
 package cn.momia.service.common.recommend.impl;
 
-import cn.momia.service.base.impl.DbAccessService;
+import cn.momia.common.service.DbAccessService;
 import cn.momia.service.common.recommend.RecommendService;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;

@@ -44,7 +44,7 @@
     </bean>
 
     <!-- Service -->
-    <bean id="dbAccessService" class="cn.momia.service.base.impl.DbAccessService" abstract="true">
+    <bean id="dbAccessService" class="cn.momia.common.service.DbAccessService" abstract="true">
         <property name="jdbcTemplate" ref="jdbcTemplate" />
     </bean>
 

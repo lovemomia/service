@@ -1,6 +1,6 @@
 package cn.momia.service.common.sms.impl;
 
-import cn.momia.service.base.config.Configuration;
+import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.common.sms.SmsSender;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -22,7 +22,7 @@ public class LuosimaoSmsSender implements SmsSender {
         try {
             // TODO 使用HttpClient
             Client client = Client.create();
-            client.addFilter(new HTTPBasicAuthFilter("api", Configuration.getSecretKey("luosimao")));
+            client.addFilter(new HTTPBasicAuthFilter("api", Configuration.getString("Sms.Luosimao.Key")));
             WebResource webResource = client.resource(Configuration.getString("Sms.Luosimao.Service"));
             MultivaluedMapImpl formData = new MultivaluedMapImpl();
             formData.add("mobile", mobile);

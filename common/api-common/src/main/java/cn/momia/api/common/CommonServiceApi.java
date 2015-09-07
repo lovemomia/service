@@ -1,11 +1,11 @@
 package cn.momia.api.common;
 
-import cn.momia.api.base.ServiceApi;
-import cn.momia.api.base.http.MomiaHttpParamBuilder;
-import cn.momia.api.base.http.MomiaHttpRequest;
 import cn.momia.api.common.city.City;
 import cn.momia.api.common.region.CityDistrict;
 import cn.momia.api.common.region.Region;
+import cn.momia.common.api.AbstractServiceApi;
+import cn.momia.common.api.http.MomiaHttpParamBuilder;
+import cn.momia.common.api.http.MomiaHttpRequest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -13,7 +13,7 @@ import com.alibaba.fastjson.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommonServiceApi extends ServiceApi {
+public class CommonServiceApi extends AbstractServiceApi {
     public static CityServiceApi CITY = new CityServiceApi();
     public static RegionServiceApi REGION = new RegionServiceApi();
     public static FeedbackServiceApi FEEDBACK = new FeedbackServiceApi();

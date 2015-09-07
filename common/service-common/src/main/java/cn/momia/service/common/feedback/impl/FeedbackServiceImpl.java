@@ -1,7 +1,7 @@
 package cn.momia.service.common.feedback.impl;
 
+import cn.momia.common.service.DbAccessService;
 import cn.momia.service.common.feedback.FeedbackService;
-import cn.momia.service.base.impl.DbAccessService;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;

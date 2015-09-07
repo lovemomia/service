@@ -26,6 +26,7 @@
         <MaxPoolSize>20</MaxPoolSize>
         <QueueSize>1000</QueueSize>
         <Luosimao>
+            <Key></Key>
             <Service>http://sms-api.luosimao.com/v1/send.json</Service>
         </Luosimao>
     </Sms>

@@ -1,7 +1,7 @@
 package cn.momia.service.common.facade.impl;
 
-import cn.momia.service.base.util.MobileUtil;
-import cn.momia.api.base.exception.MomiaFailedException;
+import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.common.util.MobileUtil;
 import cn.momia.service.common.facade.CommonServiceFacade;
 import cn.momia.service.common.city.City;
 import cn.momia.service.common.city.CityService;
@@ -47,7 +47,7 @@ public class CommonServiceFacadeImpl implements CommonServiceFacade {
 
     @Override
     public boolean sendCode(String mobile, String type) {
-        if (MobileUtil.isInvalidMobile(mobile) || isInvalidType(type)) return false;
+        if (MobileUtil.isInvalid(mobile) || isInvalidType(type)) return false;
 
         return smsService.sendCode(mobile, type);
     }
@@ -58,14 +58,14 @@ public class CommonServiceFacadeImpl implements CommonServiceFacade {
 
     @Override
     public boolean verifyCode(String mobile, String code) {
-        if (MobileUtil.isInvalidMobile(mobile) || StringUtils.isBlank(code)) return false;
+        if (MobileUtil.isInvalid(mobile) || StringUtils.isBlank(code)) return false;
 
         return smsService.verifyCode(mobile, code);
     }
 
     @Override
     public boolean notifyUser(String mobile, String msg) {
-        if (MobileUtil.isInvalidMobile(mobile) || StringUtils.isBlank(msg)) return false;
+        if (MobileUtil.isInvalid(mobile) || StringUtils.isBlank(msg)) return false;
 
         return smsService.notifyUser(mobile, msg);
     }
