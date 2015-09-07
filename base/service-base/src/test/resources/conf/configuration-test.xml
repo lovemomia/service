@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Configuration>
-    <Boolean>true</Boolean>
-    <Integer>10</Integer>
-    <Long>12345678901234</Long>
-    <Float>0.5</Float>
-    <Double>0.0000000005</Double>
-    <String>configuration</String>
-</Configuration>

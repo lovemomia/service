@@ -13,7 +13,6 @@
     <url>http://www.momia.cn</url>
 
     <modules>
-        <module>base</module>
         <module>common</module>
         <module>deal</module>
         <module>feed</module>
