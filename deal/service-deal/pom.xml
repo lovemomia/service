@@ -13,7 +13,7 @@
     <url>http://www.momia.cn</url>
 
     <dependencies>
-        <!-- Momia -->
+        <!-- Momia API -->
         <dependency>
             <groupId>cn.momia</groupId>
             <artifactId>duola-api-common</artifactId>
@@ -30,6 +30,7 @@
             <version>1.0.0</version>
         </dependency>
 
+        <!-- Momia Webapp -->
         <dependency>
             <groupId>cn.momia</groupId>
             <artifactId>duola-common-webapp</artifactId>

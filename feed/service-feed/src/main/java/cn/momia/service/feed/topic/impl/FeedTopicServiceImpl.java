@@ -1,6 +1,6 @@
 package cn.momia.service.feed.topic.impl;
 
-import cn.momia.service.base.impl.DbAccessService;
+import cn.momia.common.service.DbAccessService;
 import cn.momia.service.feed.topic.FeedTopic;
 import cn.momia.service.feed.topic.FeedTopicService;
 import org.apache.commons.lang3.StringUtils;

@@ -19,7 +19,7 @@
             <version>1.19</version>
         </dependency>
 
-        <!-- Momia -->
+        <!-- Momia Webapp -->
         <dependency>
             <groupId>cn.momia</groupId>
             <artifactId>duola-common-webapp</artifactId>

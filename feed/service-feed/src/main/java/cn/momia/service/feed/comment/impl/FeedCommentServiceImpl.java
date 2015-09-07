@@ -1,6 +1,6 @@
 package cn.momia.service.feed.comment.impl;
 
-import cn.momia.service.base.impl.DbAccessService;
+import cn.momia.common.service.DbAccessService;
 import cn.momia.service.feed.comment.FeedComment;
 import cn.momia.service.feed.comment.FeedCommentService;
 import org.apache.commons.lang3.StringUtils;
