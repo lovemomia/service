@@ -1,10 +1,8 @@
 package cn.momia.service.deal.order;
 
-import cn.momia.service.base.Service;
-
 import java.util.List;
 
-public interface OrderService extends Service {
+public interface OrderService {
     long add(Order order);
     Order get(long id);
     List<Order> list(long userId, long productId, long skuId);

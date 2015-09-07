@@ -1,12 +1,10 @@
 package cn.momia.service.user.participant;
 
-import cn.momia.service.base.Service;
-
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-public interface ParticipantService extends Service {
+public interface ParticipantService {
     long add(Participant participant);
 
     Participant get(long id);

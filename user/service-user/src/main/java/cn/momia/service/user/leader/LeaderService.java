@@ -1,11 +1,9 @@
 package cn.momia.service.user.leader;
 
-import cn.momia.service.base.Service;
-
 import java.util.Collection;
 import java.util.List;
 
-public interface LeaderService extends Service {
+public interface LeaderService {
     String getDesc();
 
     Leader getByUser(long userId);

@@ -1,7 +1,5 @@
 package cn.momia.service.feed.topic;
 
-import cn.momia.service.base.Service;
-
-public interface FeedTopicService extends Service {
+public interface FeedTopicService {
     FeedTopic get(long id);
 }

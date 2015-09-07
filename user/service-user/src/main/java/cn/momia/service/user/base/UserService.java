@@ -1,13 +1,11 @@
 package cn.momia.service.user.base;
 
-import cn.momia.service.base.Service;
-
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-public interface UserService extends Service {
+public interface UserService {
     boolean exists(String field, String value);
 
     long add(String nickName, String mobile, String password, String token, String inviteCode);

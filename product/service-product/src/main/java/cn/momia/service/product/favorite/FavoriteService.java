@@ -1,10 +1,8 @@
 package cn.momia.service.product.favorite;
 
-import cn.momia.service.base.Service;
-
 import java.util.List;
 
-public interface FavoriteService extends Service {
+public interface FavoriteService {
     boolean isFavoried(long userId, long productId);
     boolean favor(long userId, long productId);
     boolean unFavor(long userId, long productId);

@@ -1,12 +1,10 @@
 package cn.momia.service.promo.coupon;
 
-import cn.momia.service.base.Service;
-
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
-public interface CouponService extends Service {
+public interface CouponService {
     void distributeRegisterCoupon(long userId);
     void distributeShareCoupon(long userId, int discount);
     Coupon getCoupon(int couponId);
