@@ -9,7 +9,7 @@
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
-    <name>Momia Common</name>
+    <name>Momia Base</name>
     <url>http://www.momia.cn</url>
 
     <modules>

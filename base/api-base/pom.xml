@@ -9,7 +9,7 @@
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>Momia API Common</name>
+    <name>Momia API Base</name>
     <url>http://www.momia.cn</url>
 
     <dependencies>
