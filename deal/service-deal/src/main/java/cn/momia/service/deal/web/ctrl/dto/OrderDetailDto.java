@@ -2,9 +2,9 @@ package cn.momia.service.deal.web.ctrl.dto;
 
 import cn.momia.api.common.MetaUtil;
 import cn.momia.api.product.sku.Sku;
+import cn.momia.common.webapp.ctrl.dto.Dto;
 import cn.momia.service.deal.order.Order;
 import cn.momia.api.product.Product;
-import cn.momia.service.base.web.ctrl.dto.Dto;
 
 import java.math.BigDecimal;
 import java.util.List;

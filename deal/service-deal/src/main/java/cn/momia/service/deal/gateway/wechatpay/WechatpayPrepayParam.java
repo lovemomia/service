@@ -1,7 +1,7 @@
 package cn.momia.service.deal.gateway.wechatpay;
 
-import cn.momia.service.base.config.Configuration;
 import cn.momia.api.base.exception.MomiaFailedException;
+import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.deal.facade.OrderInfoFields;
 import cn.momia.service.deal.gateway.PrepayParam;
 import cn.momia.service.deal.gateway.ClientType;
@@ -81,7 +81,7 @@ public class WechatpayPrepayParam extends PrepayParam {
                     .append("?")
                     .append("appid=").append(Configuration.getString("Payment.Wechat.JsApiAppId"))
                     .append("&")
-                    .append("secret=").append(Configuration.getSecretKey("wechatpayJsApiKey"))
+                    .append("secret=").append(Configuration.getString("Payment.Wechat.JsApiSecret"))
                     .append("&")
                     .append("code=").append(code)
                     .append("&")

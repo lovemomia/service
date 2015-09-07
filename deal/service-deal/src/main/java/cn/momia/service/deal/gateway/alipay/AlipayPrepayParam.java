@@ -1,7 +1,7 @@
 package cn.momia.service.deal.gateway.alipay;
 
-import cn.momia.service.base.config.Configuration;
 import cn.momia.api.base.exception.MomiaFailedException;
+import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.deal.facade.OrderInfoFields;
 import cn.momia.service.deal.gateway.PrepayParam;
 import cn.momia.service.deal.gateway.ClientType;

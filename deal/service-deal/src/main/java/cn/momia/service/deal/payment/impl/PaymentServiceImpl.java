@@ -1,6 +1,6 @@
 package cn.momia.service.deal.payment.impl;
 
-import cn.momia.service.base.impl.DbAccessService;
+import cn.momia.common.service.DbAccessService;
 import cn.momia.service.deal.payment.Payment;
 import cn.momia.service.deal.payment.PaymentService;
 import org.apache.commons.lang3.StringUtils;

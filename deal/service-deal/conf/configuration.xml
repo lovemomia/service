@@ -4,10 +4,6 @@
         <Level>INFO</Level>
     </Logger>
 
-    <Server>
-        <Biz>service</Biz>
-    </Server>
-
     <Service>
         <Common>http://localhost:5050</Common>
         <Product>http://localhost:6060</Product>
@@ -34,6 +30,8 @@
 
     <Payment>
         <Ali>
+            <PublicKey></PublicKey>
+            <PrivateKey></PrivateKey>
             <AppService>mobile.securitypay.pay</AppService>
             <WapService>alipay.wap.create.direct.pay.by.user</WapService>
             <Partner>2088911944697039</Partner>
@@ -45,8 +43,11 @@
             <PrepayService>https://api.mch.weixin.qq.com/pay/unifiedorder</PrepayService>
             <AppAppId>wx50b2ac03c88ad6e7</AppAppId>
             <AppMchId>1264856501</AppMchId>
+            <AppKey></AppKey>
             <JsApiAppId>wxc4ca5800d28b5650</JsApiAppId>
             <JsApiMchId>1251671101</JsApiMchId>
+            <JsApiKey></JsApiKey>
+            <JsApiSecret></JsApiSecret>
             <NotifyUrl>https://i.momia.cn/callback/wechatpay</NotifyUrl>
         </Wechat>
     </Payment>

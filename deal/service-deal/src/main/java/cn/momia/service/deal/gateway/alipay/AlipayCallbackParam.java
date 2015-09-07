@@ -1,8 +1,8 @@
 package cn.momia.service.deal.gateway.alipay;
 
-import cn.momia.service.base.config.Configuration;
 import cn.momia.api.base.exception.MomiaFailedException;
-import cn.momia.service.base.util.TimeUtil;
+import cn.momia.common.util.TimeUtil;
+import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.deal.gateway.CallbackParam;
 import cn.momia.service.deal.gateway.MapWrapper;
 import org.apache.http.HttpResponse;

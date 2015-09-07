@@ -2,14 +2,14 @@ package cn.momia.service.deal.web.ctrl;
 
 import cn.momia.api.user.User;
 import cn.momia.api.user.UserServiceApi;
-import cn.momia.service.base.web.ctrl.AbstractController;
+import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.webapp.ctrl.BaseController;
+import cn.momia.common.webapp.ctrl.dto.PagedListDto;
 import cn.momia.service.deal.facade.DealServiceFacade;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.web.ctrl.dto.UserCouponDto;
 import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.UserCoupon;
-import cn.momia.service.base.web.ctrl.dto.PagedListDto;
-import cn.momia.service.base.web.response.ResponseMessage;
 import cn.momia.service.promo.facade.PromoServiceFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,36 +26,36 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/coupon")
-public class CouponController extends AbstractController {
+public class CouponController extends BaseController {
     @Autowired private DealServiceFacade dealServiceFacade;
     @Autowired private PromoServiceFacade promoServiceFacade;
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage coupon(@RequestParam String utoken,
-                                  @RequestParam(value = "oid") long orderId,
-                                  @RequestParam(value = "coupon") long userCouponId) {
+    public MomiaHttpResponse coupon(@RequestParam String utoken,
+                                    @RequestParam(value = "oid") long orderId,
+                                    @RequestParam(value = "coupon") long userCouponId) {
         User user = UserServiceApi.USER.get(utoken);
 
         Order order = dealServiceFacade.getOrder(orderId);
-        if (!order.exists() || order.isPayed() || order.getCustomerId() != user.getId()) return ResponseMessage.FAILED("无效的订单");
+        if (!order.exists() || order.isPayed() || order.getCustomerId() != user.getId()) return MomiaHttpResponse.FAILED("无效的订单");
 
         Coupon coupon = promoServiceFacade.getCoupon(user.getId(), order.getId(), userCouponId);
-        if (!coupon.exists()) return ResponseMessage.FAILED("无效的优惠券，或使用条件不满足");
+        if (!coupon.exists()) return MomiaHttpResponse.FAILED("无效的优惠券，或使用条件不满足");
 
         BigDecimal totalFee = order.getTotalFee();
-        if (!promoServiceFacade.canUse(totalFee, coupon)) return ResponseMessage.FAILED("使用条件不满足，无法使用");
+        if (!promoServiceFacade.canUse(totalFee, coupon)) return MomiaHttpResponse.FAILED("使用条件不满足，无法使用");
 
-        return ResponseMessage.SUCCESS(promoServiceFacade.calcTotalFee(totalFee, coupon));
+        return MomiaHttpResponse.SUCCESS(promoServiceFacade.calcTotalFee(totalFee, coupon));
     }
 
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public ResponseMessage listCoupons(@RequestParam String utoken,
-                                       @RequestParam(value = "oid") long orderId,
-                                       @RequestParam int status,
-                                       @RequestParam int start,
-                                       @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
+    public MomiaHttpResponse listCoupons(@RequestParam String utoken,
+                                         @RequestParam(value = "oid") long orderId,
+                                         @RequestParam int status,
+                                         @RequestParam int start,
+                                         @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);
 
         User user = UserServiceApi.USER.get(utoken);
 
@@ -72,7 +72,7 @@ public class CouponController extends AbstractController {
         for (UserCoupon userCoupon : userCoupons) couponIds.add(userCoupon.getCouponId());
         List<Coupon> coupons = promoServiceFacade.getCoupons(couponIds);
 
-        return ResponseMessage.SUCCESS(buildUserCoupons(totalCount, userCoupons, coupons, start, count));
+        return MomiaHttpResponse.SUCCESS(buildUserCoupons(totalCount, userCoupons, coupons, start, count));
     }
 
     private PagedListDto buildUserCoupons(int totalCount, List<UserCoupon> userCoupons, List<Coupon> coupons, int start, int count) {
@@ -103,12 +103,12 @@ public class CouponController extends AbstractController {
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ResponseMessage registerCoupon(@RequestParam String utoken) {
-        if (StringUtils.isBlank(utoken)) return ResponseMessage.BAD_REQUEST;
+    public MomiaHttpResponse registerCoupon(@RequestParam String utoken) {
+        if (StringUtils.isBlank(utoken)) return MomiaHttpResponse.BAD_REQUEST;
 
         User user = UserServiceApi.USER.get(utoken);
         promoServiceFacade.distributeRegisterCoupon(user.getId());
 
-        return ResponseMessage.SUCCESS;
+        return MomiaHttpResponse.SUCCESS;
     }
 }

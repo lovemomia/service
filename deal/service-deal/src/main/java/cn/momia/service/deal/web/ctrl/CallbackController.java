@@ -4,14 +4,14 @@ import cn.momia.api.common.CommonServiceApi;
 import cn.momia.api.product.Product;
 import cn.momia.api.product.sku.Sku;
 import cn.momia.api.user.UserServiceApi;
-import cn.momia.service.base.web.ctrl.AbstractController;
+import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.deal.facade.DealServiceFacade;
 import cn.momia.service.deal.gateway.CallbackResult;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
 import cn.momia.api.product.ProductServiceApi;
 import cn.momia.service.promo.coupon.UserCoupon;
-import cn.momia.service.base.web.response.ResponseMessage;
 import cn.momia.service.promo.facade.PromoServiceFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/callback")
-public class CallbackController extends AbstractController {
+public class CallbackController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(CallbackController.class);
 
     @Autowired private DealServiceFacade dealServiceFacade;
@@ -45,11 +45,11 @@ public class CallbackController extends AbstractController {
     }
 
     @RequestMapping(value = "/alipay", method = RequestMethod.POST)
-    public ResponseMessage alipayCallback(HttpServletRequest request) {
+    public MomiaHttpResponse alipayCallback(HttpServletRequest request) {
         return callback(request, Payment.Type.ALIPAY);
     }
 
-    private ResponseMessage callback(HttpServletRequest request, int payType) {
+    private MomiaHttpResponse callback(HttpServletRequest request, int payType) {
         CallbackResult result = dealServiceFacade.callback(extractParams(request.getParameterMap()), payType);
         if (result.isSuccessful()) {
             long orderId = result.getOrderId();
@@ -64,12 +64,12 @@ public class CallbackController extends AbstractController {
 
             }
 
-            return ResponseMessage.SUCCESS("OK");
+            return MomiaHttpResponse.SUCCESS("OK");
         }
 
         LOGGER.error("fail to finish payment for order: {}", result.getOrderId());
 
-        return ResponseMessage.SUCCESS("FAIL");
+        return MomiaHttpResponse.SUCCESS("FAIL");
     }
 
     private void updateUserCoupon(Order order) {
@@ -135,7 +135,7 @@ public class CallbackController extends AbstractController {
     }
 
     @RequestMapping(value = "/wechatpay", method = RequestMethod.POST)
-    public ResponseMessage wechatpayCallback(HttpServletRequest request) {
+    public MomiaHttpResponse wechatpayCallback(HttpServletRequest request) {
         return callback(request, Payment.Type.WECHATPAY);
     }
 }

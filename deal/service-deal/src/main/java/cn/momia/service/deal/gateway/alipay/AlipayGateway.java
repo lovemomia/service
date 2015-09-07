@@ -1,6 +1,6 @@
 package cn.momia.service.deal.gateway.alipay;
 
-import cn.momia.service.base.config.Configuration;
+import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.deal.gateway.AbstractPaymentGateway;
 import cn.momia.service.deal.gateway.PrepayResult;
 import cn.momia.service.deal.gateway.ClientType;
