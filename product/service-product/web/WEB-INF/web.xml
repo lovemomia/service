@@ -18,7 +18,7 @@
 
     <filter>
         <filter-name>loggingFilter</filter-name>
-        <filter-class>cn.momia.service.base.web.filter.LoggingFilter</filter-class>
+        <filter-class>cn.momia.common.webapp.filter.LoggingFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>loggingFilter</filter-name>
@@ -55,6 +55,10 @@
     <error-page>
         <error-code>400</error-code>
         <location>/error/400</location>
+    </error-page>
+    <error-page>
+        <error-code>403</error-code>
+        <location>/error/403</location>
     </error-page>
     <error-page>
         <error-code>404</error-code>
