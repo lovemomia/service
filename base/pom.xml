@@ -5,19 +5,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cn.momia</groupId>
-    <artifactId>service</artifactId>
+    <artifactId>base</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
-    <name>Momia Service</name>
+    <name>Momia Common</name>
     <url>http://www.momia.cn</url>
 
     <modules>
-        <module>base</module>
-        <module>deal</module>
-        <module>feed</module>
-        <module>product</module>
-        <module>user</module>
-        <module>service</module>
+        <module>api-base</module>
+        <module>service-base</module>
     </modules>
 </project>
