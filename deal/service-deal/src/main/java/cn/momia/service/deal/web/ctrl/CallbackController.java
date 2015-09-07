@@ -1,6 +1,6 @@
 package cn.momia.service.deal.web.ctrl;
 
-import cn.momia.api.common.CommonServiceApi;
+import cn.momia.api.base.BaseServiceApi;
 import cn.momia.api.product.Product;
 import cn.momia.api.product.sku.Sku;
 import cn.momia.api.user.UserServiceApi;
@@ -113,7 +113,7 @@ public class CallbackController extends BaseController {
             }
 
             msg.append("【松果亲子】");
-            CommonServiceApi.SMS.notify(order.getMobile(), msg.toString());
+            BaseServiceApi.SMS.notify(order.getMobile(), msg.toString());
         } catch (Exception e) {
             LOGGER.error("fail to notify user for order: {}", order.getId(), e);
         }

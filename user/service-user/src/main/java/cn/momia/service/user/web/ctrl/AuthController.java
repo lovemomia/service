@@ -1,6 +1,6 @@
 package cn.momia.service.user.web.ctrl;
 
-import cn.momia.api.common.CommonServiceApi;
+import cn.momia.api.base.BaseServiceApi;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;
@@ -26,7 +26,7 @@ public class AuthController extends UserRelatedController {
         if (userServiceFacade.exists("mobile", mobile)) return MomiaHttpResponse.FAILED("该手机号已经注册过");
         if (userServiceFacade.exists("nickName", nickName)) return MomiaHttpResponse.FAILED("该昵称已存在");
 
-        CommonServiceApi.SMS.verify(mobile, code);
+        BaseServiceApi.SMS.verify(mobile, code);
 
         User user = userServiceFacade.register(nickName, mobile, password);
         if (!user.exists()) return MomiaHttpResponse.FAILED("注册失败");
@@ -58,7 +58,7 @@ public class AuthController extends UserRelatedController {
 
     @RequestMapping(value = "/login/code", method = RequestMethod.POST)
     public MomiaHttpResponse loginByCode(@RequestParam String mobile, @RequestParam String code) {
-        CommonServiceApi.SMS.verify(mobile, code);
+        BaseServiceApi.SMS.verify(mobile, code);
 
         User user = userServiceFacade.getUserByMobile(mobile);
         if (!user.exists()) return MomiaHttpResponse.FAILED("登录失败");
@@ -68,7 +68,7 @@ public class AuthController extends UserRelatedController {
 
     @RequestMapping(value = "/password", method = RequestMethod.PUT)
     public MomiaHttpResponse updatePassword(@RequestParam String mobile, @RequestParam String password, @RequestParam String code) {
-        CommonServiceApi.SMS.verify(mobile, code);
+        BaseServiceApi.SMS.verify(mobile, code);
 
         User user = userServiceFacade.updateUserPassword(mobile, password);
         if (!user.exists()) return MomiaHttpResponse.FAILED("更改密码失败");
