@@ -4,4 +4,7 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <bean class="cn.momia.api.product.ProductServiceApi" init-method="init">
+        <property name="service" value="${Service.Product}" />
+    </bean>
 </beans>

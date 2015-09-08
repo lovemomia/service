@@ -4,44 +4,6 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="xmlConf" class="org.apache.commons.configuration.XMLConfiguration" init-method="load">
-        <property name="fileName" value="conf/configuration.xml" />
-    </bean>
-
-    <bean class="cn.momia.common.webapp.config.Configuration">
-        <property name="xmlConf" ref="xmlConf" />
-    </bean>
-
-    <bean class="cn.momia.common.webapp.config.XmlPropertyPlaceholderConfigurer">
-        <property name="xmlConf" ref="xmlConf" />
-    </bean>
-
-    <bean class="cn.momia.common.webapp.config.LoggerConfigurer" init-method="init">
-        <property name="xmlConf" ref="xmlConf" />
-    </bean>
-
-    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
-        <property name="driverClass" value="com.mysql.jdbc.Driver" />
-        <property name="jdbcUrl" value="${Database.Tongqu.JdbcUrl}" />
-        <property name="user" value="${Database.Tongqu.Username}" />
-        <property name="password" value="${Database.Tongqu.Password}" />
-        <property name="maxPoolSize" value="30" />
-        <property name="maxIdleTime" value="7200" />
-        <property name="testConnectionOnCheckin" value="true" />
-        <property name="idleConnectionTestPeriod" value="5" />
-        <property name="preferredTestQuery" value="SELECT 1" />
-        <property name="checkoutTimeout" value="1800000" />
-    </bean>
-
-    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-        <property name="dataSource" ref="dataSource" />
-    </bean>
-
-    <!-- Service -->
-    <bean id="dbAccessService" class="cn.momia.common.service.DbAccessService" abstract="true">
-        <property name="jdbcTemplate" ref="jdbcTemplate" />
-    </bean>
-
     <bean id="bannerService" class="cn.momia.service.product.banner.impl.BannerServiceImpl" parent="dbAccessService" />
     <bean id="baseProductService" class="cn.momia.service.product.base.impl.BaseProductServiceImpl" parent="dbAccessService" init-method="init" />
     <bean id="commentService" class="cn.momia.service.product.comment.impl.CommentServiceImpl" parent="dbAccessService" />
@@ -57,9 +19,5 @@
         <property name="skuService" ref="skuService" />
         <property name="topicService" ref="topicService" />
         <property name="favoriteService" ref="favoriteService" />
-    </bean>
-
-    <bean class="cn.momia.api.base.BaseServiceApi" init-method="init">
-        <property name="service" value="${Service.Base}" />
     </bean>
 </beans>
