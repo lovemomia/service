@@ -6,7 +6,7 @@
 
     <Service>
         <Base>http://localhost:7070</Base>
-        <Product>http://localhost:6060</Product>
+        <Product>http://localhost:7070</Product>
         <User>http://localhost:7070</User>
     </Service>
 
