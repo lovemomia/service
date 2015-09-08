@@ -11,25 +11,26 @@
     <context:component-scan base-package="cn.momia.common.webapp.ctrl" />
     <context:component-scan base-package="cn.momia.service.feed.web.ctrl" />
     <context:component-scan base-package="cn.momia.service.product.web.ctrl" />
-    <context:component-scan base-package="cn.momia.service.user.web.ctrl" />
 
     <mvc:annotation-driven>
         <mvc:message-converters register-defaults="true">
-            <bean id="fastJsonHttpMessageConverter" class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
-                <property name="supportedMediaTypes">
-                    <list>
-                        <value>application/json;charset=UTF-8</value>
-                        <value>text/html;charset=UTF-8</value>
-                    </list>
-                </property>
-                <property name="features">
-                    <array value-type="com.alibaba.fastjson.serializer.SerializerFeature">
-                        <value>DisableCircularReferenceDetect</value>
-                    </array>
-                </property>
-            </bean>
+            <ref bean="fastJsonHttpMessageConverter" />
         </mvc:message-converters>
     </mvc:annotation-driven>
+
+    <bean id="fastJsonHttpMessageConverter" class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+        <property name="supportedMediaTypes">
+            <list>
+                <value>application/json;charset=UTF-8</value>
+                <value>text/html;charset=UTF-8</value>
+            </list>
+        </property>
+        <property name="features">
+            <array value-type="com.alibaba.fastjson.serializer.SerializerFeature">
+                <value>DisableCircularReferenceDetect</value>
+            </array>
+        </property>
+    </bean>
 
     <bean id="DisableCircularReferenceDetect" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
         <property name="staticField" value="com.alibaba.fastjson.serializer.SerializerFeature.DisableCircularReferenceDetect" />
