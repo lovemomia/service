@@ -13,10 +13,11 @@ import java.util.List;
 import java.util.Map;
 
 public class RegionServiceImpl extends DbAccessService implements RegionService {
-    private List<Region> regionsCache;
-    private Map<Integer, Integer> regionsMap;
+    private List<Region> regionsCache = new ArrayList<Region>();
+    private Map<Integer, Integer> regionsMap = new HashMap<Integer, Integer>();
 
-    public void init() {
+    @Override
+    protected void doReload() {
         regionsCache = new ArrayList<Region>();
         regionsMap = new HashMap<Integer, Integer>();
 
@@ -43,7 +44,7 @@ public class RegionServiceImpl extends DbAccessService implements RegionService 
     }
 
     @Override
-    public List<Region> getAll() {
+    public List<Region> listAll() {
         return regionsCache;
     }
 }

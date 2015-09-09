@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface CityService {
     City get(int id);
-    List<City> getAll();
+    List<City> listAll();
 }

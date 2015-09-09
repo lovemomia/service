@@ -3,8 +3,9 @@ package cn.momia.service.base.web.ctrl;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.base.city.City;
-import cn.momia.service.base.facade.CommonServiceFacade;
+import cn.momia.service.base.city.CityService;
 import cn.momia.service.base.region.Region;
+import cn.momia.service.base.region.RegionService;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +21,18 @@ import java.util.Map;
 @RestController
 @RequestMapping("/region")
 public class RegionController extends BaseController {
-    @Autowired private CommonServiceFacade commonServiceFacade;
+    @Autowired private CityService cityService;
+    @Autowired private RegionService regionService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public MomiaHttpResponse list() {
-        return MomiaHttpResponse.SUCCESS(commonServiceFacade.getAllRegions());
+    public MomiaHttpResponse listAll() {
+        return MomiaHttpResponse.SUCCESS(regionService.listAll());
     }
 
     @RequestMapping(value = "/district/tree", method = RequestMethod.GET)
     public MomiaHttpResponse getDistrictTree() {
-        List<City> cities = commonServiceFacade.getAllCities();
-        List<Region> regions = commonServiceFacade.getAllRegions();
+        List<City> cities = cityService.listAll();
+        List<Region> regions = regionService.listAll();
         Map<Integer, List<Region>> districtsOfCities = new HashMap<Integer, List<Region>>();
         for (Region region : regions) {
             if (region.getParentId() > 0) continue;

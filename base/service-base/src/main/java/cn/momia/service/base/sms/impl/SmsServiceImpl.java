@@ -56,8 +56,7 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
         }) > 0;
     }
 
-    private String getGeneratedCode(String mobile)
-    {
+    private String getGeneratedCode(String mobile) {
         String sql = "SELECT code, status, generateTime FROM t_verify WHERE mobile=?";
 
         return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<String>() {
@@ -69,43 +68,34 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
                 int status = rs.getInt("status");
                 Date generateTime = rs.getTimestamp("generateTime");
 
-                if (status == 0 || generateTime == null || new Date().getTime() - generateTime.getTime() > 30 * 60 * 1000)
-                    return "";
+                if (status == 0 || generateTime == null || new Date().getTime() - generateTime.getTime() > 30 * 60 * 1000) return "";
                 return code;
             }
         });
     }
 
-    private String generateCode(String mobile)
-    {
+    private String generateCode(String mobile) {
         int number = (int) (Math.random() * 1000000);
 
         return String.format("%06d", number);
     }
 
-    private void updateCode(String mobile, String code, boolean outOfDate)
-    {
-        if (outOfDate)
-        {
+    private void updateCode(String mobile, String code, boolean outOfDate) {
+        if (outOfDate) {
             String sql = "UPDATE t_verify SET mobile=?, code=?, generateTime=NOW(), sendTime=NULL, status=1 WHERE mobile=?";
             jdbcTemplate.update(sql, new Object[] { mobile, code, mobile });
-        }
-        else
-        {
+        } else {
             String sql = "INSERT INTO t_verify(mobile, code, generateTime) VALUES (?, ?, NOW())";
             jdbcTemplate.update(sql, new Object[] { mobile, code });
         }
     }
 
-    private Date getLastSendTime(String mobile)
-    {
+    private Date getLastSendTime(String mobile) {
         String sql = "SELECT sendTime FROM t_verify WHERE mobile=?";
 
-        return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<Date>()
-        {
+        return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<Date>() {
             @Override
-            public Date extractData(ResultSet rs) throws SQLException, DataAccessException
-            {
+            public Date extractData(ResultSet rs) throws SQLException, DataAccessException {
                 if (rs.next()) return rs.getTimestamp("sendTime");
                 return null;
             }

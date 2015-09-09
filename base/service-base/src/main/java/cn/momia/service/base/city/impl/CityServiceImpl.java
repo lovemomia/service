@@ -13,10 +13,11 @@ import java.util.List;
 import java.util.Map;
 
 public class CityServiceImpl extends DbAccessService implements CityService {
-    private List<City> citiesCache;
-    private Map<Integer, Integer> citysMap;
+    private List<City> citiesCache = new ArrayList<City>();
+    private Map<Integer, Integer> citysMap = new HashMap<Integer, Integer>();
 
-    public void init() {
+    @Override
+    protected void doReload() {
         citiesCache = new ArrayList<City>();
         citysMap = new HashMap<Integer, Integer>();
 
@@ -42,7 +43,7 @@ public class CityServiceImpl extends DbAccessService implements CityService {
     }
 
     @Override
-    public List<City> getAll() {
+    public List<City> listAll() {
         return citiesCache;
     }
 }

@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface RegionService {
     Region get(int id);
-    List<Region> getAll();
+    List<Region> listAll();
 }
