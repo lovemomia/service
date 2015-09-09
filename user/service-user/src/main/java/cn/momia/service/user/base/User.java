@@ -23,7 +23,6 @@ public class User implements Serializable {
     private String token;
     private String nickName;
     private String mobile;
-    private boolean hasPassword;
     private String avatar;
     private String name;
     private String sex;
@@ -65,14 +64,6 @@ public class User implements Serializable {
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
-    }
-
-    public boolean isHasPassword() {
-        return hasPassword;
-    }
-
-    public void setHasPassword(boolean hasPassword) {
-        this.hasPassword = hasPassword;
     }
 
     public String getAvatar() {

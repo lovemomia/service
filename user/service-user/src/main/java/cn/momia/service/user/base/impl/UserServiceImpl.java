@@ -135,7 +135,6 @@ public class UserServiceImpl extends DbAccessService implements UserService {
             user.setToken(rs.getString("token"));
             user.setNickName(rs.getString("nickName"));
             user.setMobile(rs.getString("mobile"));
-            user.setHasPassword(!StringUtils.isBlank(rs.getString("password")));
             user.setAvatar(rs.getString("avatar"));
             user.setName(rs.getString("name"));
             user.setSex(rs.getString("sex"));

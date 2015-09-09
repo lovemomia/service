@@ -19,7 +19,6 @@ public class User {
 
     private String token;
     private String mobile;
-    private Boolean hasPassword;
     private String name;
     private String sex;
     @JSONField(format = "yyyy-MM-dd") private Date birthday;
@@ -70,14 +69,6 @@ public class User {
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
-    }
-
-    public Boolean getHasPassword() {
-        return hasPassword;
-    }
-
-    public void setHasPassword(Boolean hasPassword) {
-        this.hasPassword = hasPassword;
     }
 
     public String getName() {

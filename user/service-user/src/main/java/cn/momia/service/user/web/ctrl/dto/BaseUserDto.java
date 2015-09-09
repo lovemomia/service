@@ -17,10 +17,6 @@ public class BaseUserDto extends MiniUserDto {
         return MobileUtil.encrypt(user.getMobile());
     }
 
-    public boolean isHasPassword() {
-        return user.isHasPassword();
-    }
-
     public String getName() {
         return user.getName();
     }
