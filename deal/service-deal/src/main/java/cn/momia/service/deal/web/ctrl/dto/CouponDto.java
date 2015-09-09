@@ -6,7 +6,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class UserCouponDto implements Dto {
+public class CouponDto implements Dto {
     private long id;
     private int couponId;
     private int type;

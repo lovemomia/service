@@ -7,7 +7,7 @@ import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.webapp.ctrl.dto.PagedListDto;
 import cn.momia.service.deal.facade.DealServiceFacade;
 import cn.momia.service.deal.order.Order;
-import cn.momia.service.deal.web.ctrl.dto.UserCouponDto;
+import cn.momia.service.deal.web.ctrl.dto.CouponDto;
 import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.UserCoupon;
 import cn.momia.service.promo.facade.PromoServiceFacade;
@@ -72,11 +72,11 @@ public class CouponController extends BaseController {
         for (UserCoupon userCoupon : userCoupons) couponIds.add(userCoupon.getCouponId());
         List<Coupon> coupons = promoServiceFacade.listCoupons(couponIds);
 
-        return MomiaHttpResponse.SUCCESS(buildUserCoupons(totalCount, userCoupons, coupons, start, count));
+        return MomiaHttpResponse.SUCCESS(buildCouponsDto(totalCount, userCoupons, coupons, start, count));
     }
 
-    private PagedListDto buildUserCoupons(int totalCount, List<UserCoupon> userCoupons, List<Coupon> coupons, int start, int count) {
-        PagedListDto userCouponsDto = new PagedListDto(totalCount, start, count);
+    private PagedListDto buildCouponsDto(int totalCount, List<UserCoupon> userCoupons, List<Coupon> coupons, int start, int count) {
+        PagedListDto couponsDto = new PagedListDto(totalCount, start, count);
         Map<Integer, Coupon> couponsMap = new HashMap<Integer, Coupon>();
         for (Coupon coupon : coupons) couponsMap.put(coupon.getId(), coupon);
 
@@ -84,22 +84,22 @@ public class CouponController extends BaseController {
             Coupon coupon = couponsMap.get(userCoupon.getCouponId());
             if (coupon == null) continue;
 
-            UserCouponDto userCouponDto = new UserCouponDto();
-            userCouponDto.setId(userCoupon.getId());
-            userCouponDto.setCouponId(userCoupon.getCouponId());
-            userCouponDto.setType(coupon.getType());
-            userCouponDto.setTitle(coupon.getTitle());
-            userCouponDto.setDesc(coupon.getDesc());
-            userCouponDto.setDiscount(coupon.getDiscount());
-            userCouponDto.setConsumption(coupon.getConsumption());
-            userCouponDto.setStartTime(userCoupon.getStartTime());
-            userCouponDto.setEndTime(userCoupon.getEndTime());
-            userCouponDto.setStatus(userCoupon.getStatus());
+            CouponDto couponDto = new CouponDto();
+            couponDto.setId(userCoupon.getId());
+            couponDto.setCouponId(userCoupon.getCouponId());
+            couponDto.setType(coupon.getType());
+            couponDto.setTitle(coupon.getTitle());
+            couponDto.setDesc(coupon.getDesc());
+            couponDto.setDiscount(coupon.getDiscount());
+            couponDto.setConsumption(coupon.getConsumption());
+            couponDto.setStartTime(userCoupon.getStartTime());
+            couponDto.setEndTime(userCoupon.getEndTime());
+            couponDto.setStatus(userCoupon.getStatus());
 
-            userCouponsDto.add(userCouponDto);
+            couponsDto.add(couponDto);
         }
 
-        return userCouponsDto;
+        return couponsDto;
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
