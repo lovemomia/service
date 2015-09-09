@@ -22,10 +22,10 @@ public class MetaUtil {
 
             regionsMap = new HashMap<Integer, Region>();
             for (Region region : BaseServiceApi.REGION.getAll()) regionsMap.put(region.getId(), region);
-
-            lastReloadTime = new Date();
         } catch (Exception e) {
             // do nothing
+        } finally {
+            lastReloadTime = new Date();
         }
     }
 
