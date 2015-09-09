@@ -59,15 +59,15 @@ public class BaseServiceApi extends AbstractServiceApi {
 
         public List<CityDistricts> getCityDistrictTree() {
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("region/district/tree"));
-            JSONArray cityDistrictsJson = (JSONArray) executeRequest(request);
+            JSONArray citiesDistrictsJson = (JSONArray) executeRequest(request);
 
-            List<CityDistricts> cityDistricts = new ArrayList<CityDistricts>();
-            for (int i = 0; i < cityDistrictsJson.size(); i++) {
-                JSONObject cityDistrictJson = cityDistrictsJson.getJSONObject(i);
-                cityDistricts.add(JSON.toJavaObject(cityDistrictJson, CityDistricts.class));
+            List<CityDistricts> citiesDistricts = new ArrayList<CityDistricts>();
+            for (int i = 0; i < citiesDistrictsJson.size(); i++) {
+                JSONObject cityDistrictsJson = citiesDistrictsJson.getJSONObject(i);
+                citiesDistricts.add(JSON.toJavaObject(cityDistrictsJson, CityDistricts.class));
             }
 
-            return cityDistricts;
+            return citiesDistricts;
         }
     }
 
