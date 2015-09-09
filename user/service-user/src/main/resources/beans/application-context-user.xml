@@ -7,9 +7,4 @@
     <bean id="userService" class="cn.momia.service.user.base.impl.UserServiceImpl" parent="dbAccessService" />
     <bean id="participantService" class="cn.momia.service.user.participant.impl.ParticipantServiceImpl" parent="dbAccessService" />
     <bean id="leaderService" class="cn.momia.service.user.leader.impl.LeaderServiceImpl" parent="dbAccessService" />
-    <bean id="userServiceFacade" class="cn.momia.service.user.facade.impl.UserServiceFacadeImpl">
-        <property name="userService" ref="userService" />
-        <property name="participantService" ref="participantService" />
-        <property name="leaderService" ref="leaderService" />
-    </bean>
 </beans>

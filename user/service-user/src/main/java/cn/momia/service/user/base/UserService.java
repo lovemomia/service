@@ -8,11 +8,11 @@ import java.util.Set;
 public interface UserService {
     boolean exists(String field, String value);
 
-    long add(String nickName, String mobile, String password, String token, String inviteCode);
+    long add(String nickName, String mobile, String password);
     boolean validatePassword(String mobile, String password);
 
     User get(long id);
-    List<User> get(Collection<Long> ids);
+    List<User> list(Collection<Long> ids);
     User getByToken(String token);
     User getByMobile(String mobile);
 
@@ -27,7 +27,6 @@ public interface UserService {
     boolean updateChildren(long id, Set<Long> children);
     boolean updatePassword(long id, String mobile, String password);
 
-    boolean isPayed(long id);
     boolean setPayed(long id);
     long getIdByCode(String inviteCode);
 }

@@ -13,16 +13,10 @@ public class User implements Serializable {
 
     public static final User NOT_EXIST_USER = new User();
     public static final User INVALID_USER = new User();
-    public static final User DUPLICATE_USER = new User() {
-        public boolean duplicated() {
-            return true;
-        }
-    };
 
     static {
         NOT_EXIST_USER.setId(0);
         INVALID_USER.setId(0);
-        DUPLICATE_USER.setId(0);
     }
 
     private long id;
@@ -38,6 +32,7 @@ public class User implements Serializable {
     private int regionId;
     private String address;
     private Set<Long> children;
+    private boolean payed;
     private String inviteCode;
 
     public long getId() {
@@ -144,6 +139,14 @@ public class User implements Serializable {
         this.children = children;
     }
 
+    public boolean isPayed() {
+        return payed;
+    }
+
+    public void setPayed(boolean payed) {
+        this.payed = payed;
+    }
+
     public String getInviteCode() {
         return inviteCode;
     }
@@ -169,9 +172,5 @@ public class User implements Serializable {
 
     public boolean exists() {
         return !this.equals(NOT_EXIST_USER);
-    }
-
-    public boolean duplicated() {
-        return false;
     }
 }

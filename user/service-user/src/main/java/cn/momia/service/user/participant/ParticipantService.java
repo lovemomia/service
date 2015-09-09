@@ -8,8 +8,8 @@ public interface ParticipantService {
     long add(Participant participant);
 
     Participant get(long id);
-    List<Participant> get(Collection<Long> ids);
-    List<Participant> getByUser(long userId);
+    List<Participant> list(Collection<Long> ids);
+    List<Participant> listByUser(long userId);
 
     boolean update(Participant participant);
     boolean updateName(long userId, long id, String name);
