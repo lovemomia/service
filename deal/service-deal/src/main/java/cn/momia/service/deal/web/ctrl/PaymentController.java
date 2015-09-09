@@ -10,7 +10,6 @@ import cn.momia.service.deal.facade.OrderInfoFields;
 import cn.momia.service.deal.gateway.PrepayResult;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
-import cn.momia.service.deal.web.util.RequestUtil;
 import cn.momia.api.product.ProductServiceApi;
 import cn.momia.api.product.Product;
 import cn.momia.api.product.sku.Sku;
@@ -112,9 +111,23 @@ public class PaymentController extends BaseController {
         else
             orderInfo.put(OrderInfoFields.TOTAL_FEE, String.valueOf(promoServiceFacade.calcTotalFee(order.getTotalFee(), coupon)));
 
-        orderInfo.put(OrderInfoFields.USER_IP, RequestUtil.getRemoteIp(request));
+        orderInfo.put(OrderInfoFields.USER_IP, getRemoteIp(request));
 
         return orderInfo;
+    }
+
+    private String getRemoteIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Real-IP");
+        if (isInvalidIp(ip)) ip = request.getHeader("X-Forwarded-For");
+        if (isInvalidIp(ip)) ip = request.getHeader("Proxy-Client-IP");
+        if (isInvalidIp(ip)) ip = request.getHeader("WL-Proxy-Client-IP");
+        if (isInvalidIp(ip)) ip = request.getRemoteAddr();
+
+        return ip;
+    }
+
+    private boolean isInvalidIp(String ip) {
+        return StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip);
     }
 
     @RequestMapping(value = "/prepay/wechatpay", method = RequestMethod.POST)
