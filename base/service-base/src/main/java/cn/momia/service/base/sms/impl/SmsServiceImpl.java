@@ -112,8 +112,7 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
         executorService = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 5, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(queueSize));
     }
 
-    private boolean updateSendTime(String mobile)
-    {
+    private boolean updateSendTime(String mobile) {
         String sql = "UPDATE t_verify SET sendTime=NOW() WHERE mobile=?";
 
         return jdbcTemplate.update(sql, new Object[] { mobile }) == 1;
@@ -122,11 +121,9 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
     @Override
     public boolean verifyCode(String mobile, String code) {
         String sql = "SELECT generateTime FROM t_verify WHERE mobile=? AND code=? AND status=1";
-        boolean successful = jdbcTemplate.query(sql, new Object[] { mobile, code }, new ResultSetExtractor<Boolean>()
-        {
+        boolean successful = jdbcTemplate.query(sql, new Object[] { mobile, code }, new ResultSetExtractor<Boolean>() {
             @Override
-            public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException
-            {
+            public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
                 if (rs.next()) {
                     Date generateTime = rs.getTimestamp("generateTime");
                     return new Date().getTime() - generateTime.getTime() < 30 * 60 * 1000;
