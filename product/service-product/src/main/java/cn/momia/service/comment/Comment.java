@@ -1,4 +1,6 @@
-package cn.momia.service.product.comment;
+package cn.momia.service.comment;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -110,5 +112,14 @@ public class Comment {
 
     public boolean exists() {
         return !this.equals(NOT_EXIST_COMMENT);
+    }
+
+    public boolean isInvalid() {
+        return (orderId <= 0 ||
+                productId <= 0 ||
+                skuId <= 0 ||
+                userId <= 0 ||
+                star < 0 ||
+                StringUtils.isBlank(content));
     }
 }

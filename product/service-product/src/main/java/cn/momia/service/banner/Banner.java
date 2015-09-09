@@ -1,4 +1,4 @@
-package cn.momia.service.product.banner;
+package cn.momia.service.banner;
 
 import java.io.Serializable;
 

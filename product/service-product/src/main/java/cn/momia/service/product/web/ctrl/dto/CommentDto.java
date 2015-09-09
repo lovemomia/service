@@ -1,8 +1,8 @@
 package cn.momia.service.product.web.ctrl.dto;
 
 import cn.momia.common.webapp.ctrl.dto.Dto;
-import cn.momia.service.product.comment.Comment;
-import cn.momia.service.product.comment.CommentImage;
+import cn.momia.service.comment.Comment;
+import cn.momia.service.comment.CommentImage;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package cn.momia.service.product.favorite;
+package cn.momia.service.favorite;
 
 import java.util.List;
 

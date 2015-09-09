@@ -1,9 +1,9 @@
-package cn.momia.service.product.comment.impl;
+package cn.momia.service.comment.impl;
 
 import cn.momia.common.service.DbAccessService;
-import cn.momia.service.product.comment.Comment;
-import cn.momia.service.product.comment.CommentImage;
-import cn.momia.service.product.comment.CommentService;
+import cn.momia.service.comment.Comment;
+import cn.momia.service.comment.CommentImage;
+import cn.momia.service.comment.CommentService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

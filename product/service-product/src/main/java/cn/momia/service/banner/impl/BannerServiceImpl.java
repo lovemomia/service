@@ -1,8 +1,8 @@
-package cn.momia.service.product.banner.impl;
+package cn.momia.service.banner.impl;
 
 import cn.momia.common.service.DbAccessService;
-import cn.momia.service.product.banner.Banner;
-import cn.momia.service.product.banner.BannerService;
+import cn.momia.service.banner.Banner;
+import cn.momia.service.banner.BannerService;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;
@@ -12,7 +12,7 @@ import java.util.List;
 
 public class BannerServiceImpl extends DbAccessService implements BannerService {
     @Override
-    public List<Banner> getBanners(int cityId, int count) {
+    public List<Banner> list(int cityId, int count) {
         final List<Banner> banners = new ArrayList<Banner>();
         String sql = "SELECT cover, action FROM t_banner WHERE status=1 AND (cityId=? OR cityId=0) ORDER BY addTime DESC LIMIT ?";
         jdbcTemplate.query(sql, new Object[]{cityId, count}, new RowCallbackHandler() {

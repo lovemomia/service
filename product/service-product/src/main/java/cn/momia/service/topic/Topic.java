@@ -1,4 +1,4 @@
-package cn.momia.service.product.topic;
+package cn.momia.service.topic;
 
 public class Topic {
     public static final Topic NOT_EXIST_TOPIC = new Topic();

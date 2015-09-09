@@ -20,6 +20,11 @@ public class Sku implements Serializable {
     private static final Splitter TIME_SPLITTER = Splitter.on("~").trimResults().omitEmptyStrings();
     private static final DateFormat TIME_FORMATTER = new SimpleDateFormat("h:mm");
 
+    public static class Status {
+        public static final int ALL = 1;
+        public static final int AVALIABLE = 2;
+    }
+
     public static class Type {
         public static final int NORMAL = 0;
         public static final int NO_CEILING = 1;
@@ -58,6 +63,14 @@ public class Sku implements Serializable {
         return skus;
     }
 
+    private Date startTime() {
+        List<Date> times = getStartEndTimes();
+        if (times.isEmpty()) return null;
+
+        Collections.sort(times);
+        return times.get(0);
+    }
+
     public static List<Sku> sortByStartTime(List<Sku> skus) {
         Collections.sort(skus, new Comparator<Sku>() {
             @Override
@@ -77,14 +90,6 @@ public class Sku implements Serializable {
         });
 
         return skus;
-    }
-
-    private Date startTime() {
-        List<Date> times = getStartEndTimes();
-        if (times.isEmpty()) return null;
-
-        Collections.sort(times);
-        return times.get(0);
     }
 
     public static List<Sku> filterFinished(List<Sku> skus) {
@@ -418,28 +423,18 @@ public class Sku implements Serializable {
         return new ArrayList<Date>();
     }
 
+    public boolean isFull() {
+        return type != 1 && unlockedStock <= 0;
+    }
+
     public boolean isFinished(Date now) {
         if (offlineTime.before(now) || (startTime.before(now) && !anyTime)) return true;
 
         return false;
     }
 
-    public boolean isFull() {
-        return type != 1 && unlockedStock <= 0;
-    }
-
     public boolean isClosed(Date now) {
-        if (isFinished(now) || isFull()) return true;
-
-        return false;
-    }
-
-    public boolean findPrice(int adult, int child, BigDecimal price) {
-        for (SkuPrice skuPrice : this.prices) {
-            if (skuPrice.getAdult() == adult &&
-                    skuPrice.getChild() == child &&
-                    skuPrice.getPrice().compareTo(price) == 0) return true;
-        }
+        if (isFull() || isFinished(now)) return true;
 
         return false;
     }

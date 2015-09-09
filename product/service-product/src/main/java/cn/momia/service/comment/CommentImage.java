@@ -1,4 +1,4 @@
-package cn.momia.service.product.comment;
+package cn.momia.service.comment;
 
 public class CommentImage {
     private String url;

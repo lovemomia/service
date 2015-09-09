@@ -178,21 +178,9 @@ public class ProductServiceApi extends AbstractServiceApi {
             return JSON.toJavaObject((JSON) executeRequest(request), Sku.class);
         }
 
-        public List<Sku> list(long productId) {
-            MomiaHttpRequest request = MomiaHttpRequest.GET(url("product", productId, "sku"));
-            JSONArray skusJson = (JSONArray) executeRequest(request);
-
-            List<Sku> skus = new ArrayList<Sku>();
-            for (int i = 0; i < skusJson.size(); i++) {
-                JSONObject skuJson = skusJson.getJSONObject(i);
-                skus.add(JSON.toJavaObject(skuJson, Sku.class));
-            }
-
-            return skus;
-        }
-
-        public List<Sku> listAll(long productId) {
-            MomiaHttpRequest request = MomiaHttpRequest.GET(url("product", productId, "sku/all"));
+        public List<Sku> list(long productId, int status) {
+            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("status", status);
+            MomiaHttpRequest request = MomiaHttpRequest.GET(url("product", productId, "sku"), builder.build());
             JSONArray skusJson = (JSONArray) executeRequest(request);
 
             List<Sku> skus = new ArrayList<Sku>();

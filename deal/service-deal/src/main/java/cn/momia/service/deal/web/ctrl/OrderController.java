@@ -346,8 +346,7 @@ public class OrderController extends BaseController {
     }
 
     private List<Sku> querySkus(long id, int start, int count) {
-        List<Sku> skus = ProductServiceApi.SKU.listAll(id);
-
+        List<Sku> skus = ProductServiceApi.SKU.list(id, Sku.Status.ALL);
         List<Sku> result = new ArrayList<Sku>();
         for (int i = start; i < Math.min(skus.size(), start + count); i++) {
             result.add(skus.get(i));
