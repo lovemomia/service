@@ -70,7 +70,7 @@ public class CouponController extends BaseController {
 
         List<Integer> couponIds = new ArrayList<Integer>();
         for (UserCoupon userCoupon : userCoupons) couponIds.add(userCoupon.getCouponId());
-        List<Coupon> coupons = promoServiceFacade.getCoupons(couponIds);
+        List<Coupon> coupons = promoServiceFacade.listCoupons(couponIds);
 
         return MomiaHttpResponse.SUCCESS(buildUserCoupons(totalCount, userCoupons, coupons, start, count));
     }
