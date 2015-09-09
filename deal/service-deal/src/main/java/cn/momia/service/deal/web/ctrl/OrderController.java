@@ -441,7 +441,7 @@ public class OrderController extends BaseController {
                 List<Participant> children = customer.getChildren();
                 if (children != null) {
                     for (Participant child : children) {
-                        childrenStrs.add(child.getSex() + "孩" + TimeUtil.getAgeDesc(child.getBirthday()));
+                        childrenStrs.add(child.getSex() + "孩" + TimeUtil.formatAge(child.getBirthday()));
                     }
                 }
                 playmateDto.setChildren(childrenStrs);
