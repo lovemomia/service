@@ -1,6 +1,5 @@
 package cn.momia.service.base.sms.impl;
 
-import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.service.DbAccessService;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.base.sms.SmsSender;
@@ -26,11 +25,7 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
     }
 
     @Override
-    public boolean sendCode(String mobile, String type) {
-//        if (StringUtils.equals(type, "register") && userExists(mobile)) throw new MomiaFailedException("该手机号已经注册过");
-//        else 
-        if (StringUtils.equals(type, "login") && !userExists(mobile)) throw new MomiaFailedException("用户不存在，请先注册");
-
+    public boolean sendCode(String mobile) {
         String code = getGeneratedCode(mobile);
         if (StringUtils.isBlank(code)) {
             boolean outOfDate = (code != null); // null 表示没有生成过，空表示生成过，但已过期
@@ -43,17 +38,6 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
         sendAsync(mobile, buildCodeMsg(code));
 
         return true;
-    }
-
-    private boolean userExists(String mobile) {
-        String sql = "SELECT id FROM t_user WHERE mobile=?";
-
-        return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<Integer>() {
-            @Override
-            public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
-                return rs.next() ? rs.getInt(1) : 0;
-            }
-        }) > 0;
     }
 
     private String getGeneratedCode(String mobile) {
@@ -151,6 +135,7 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
                 return false;
             }
         });
+
         if (successful) disable(mobile, code);
 
         return successful;
