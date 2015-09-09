@@ -2,7 +2,7 @@ package cn.momia.api.base;
 
 import cn.momia.api.base.region.Region;
 import cn.momia.api.base.city.City;
-import cn.momia.api.base.region.CityDistrict;
+import cn.momia.api.base.region.CityDistricts;
 import cn.momia.common.api.AbstractServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;
@@ -57,14 +57,14 @@ public class BaseServiceApi extends AbstractServiceApi {
             return regions;
         }
 
-        public List<CityDistrict> getCityDistrictTree() {
+        public List<CityDistricts> getCityDistrictTree() {
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("region/district/tree"));
             JSONArray cityDistrictsJson = (JSONArray) executeRequest(request);
 
-            List<CityDistrict> cityDistricts = new ArrayList<CityDistrict>();
+            List<CityDistricts> cityDistricts = new ArrayList<CityDistricts>();
             for (int i = 0; i < cityDistrictsJson.size(); i++) {
                 JSONObject cityDistrictJson = cityDistrictsJson.getJSONObject(i);
-                cityDistricts.add(JSON.toJavaObject(cityDistrictJson, CityDistrict.class));
+                cityDistricts.add(JSON.toJavaObject(cityDistrictJson, CityDistricts.class));
             }
 
             return cityDistricts;

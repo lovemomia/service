@@ -4,7 +4,7 @@ import cn.momia.api.base.city.City;
 
 import java.util.List;
 
-public class CityDistrict {
+public class CityDistricts {
     private City city;
     private List<Region> districts;
 
