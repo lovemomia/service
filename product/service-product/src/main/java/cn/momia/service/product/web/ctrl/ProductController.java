@@ -273,7 +273,7 @@ public class ProductController extends BaseController {
 
     @RequestMapping(value = "/{id}/sku/leader", method = RequestMethod.GET)
     public MomiaHttpResponse listSkusWithLeaders(@PathVariable long id) {
-        List<Sku> skus = Sku.filterClosed(productServiceFacade.listSkus(id));
+        List<Sku> skus = Sku.sortByStartTime(Sku.filterClosed(productServiceFacade.listSkus(id)));
 
         ListDto skusDto = new ListDto();
         for (Sku sku : skus) skusDto.add(new BaseSkuDto(sku));
@@ -304,7 +304,7 @@ public class ProductController extends BaseController {
         }
 
         PagedListDto productsDto = new PagedListDto(totalCount, start, count);
-        for (Sku sku : ledSkus) {
+        for (Sku sku : Sku.sortByStartTime(ledSkus)) {
             Product product = productsMap.get(sku.getProductId());
             if (product == null) continue;
 
