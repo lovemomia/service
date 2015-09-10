@@ -1,13 +1,10 @@
 package cn.momia.service.deal.facade;
 
 import cn.momia.service.deal.exception.OrderLimitException;
-import cn.momia.service.deal.gateway.CallbackResult;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
-import cn.momia.service.deal.gateway.PrepayResult;
 
 import java.util.List;
-import java.util.Map;
 
 public interface DealServiceFacade {
     long placeOrder(Order order);
@@ -24,9 +21,6 @@ public interface DealServiceFacade {
 
     boolean prepayOrder(long orderId);
     boolean payOrder(long orderId);
-
-    PrepayResult prepay(Map<String, String> params, int payType);
-    CallbackResult callback(Map<String, String> params, int payType);
 
     boolean check(long userId, long orderId, long productId, long skuId);
     boolean logPayment(Payment payment);

@@ -1,11 +1,8 @@
 package cn.momia.service.deal.gateway;
 
-public class PrepayResult extends MapWrapper {
-    public static final PrepayResult FAILED = new PrepayResult();
-    static {
-        FAILED.setSuccessful(false);
-    }
+import cn.momia.common.collection.MapWrapper;
 
+public abstract class PrepayResult extends MapWrapper {
     private boolean successful;
 
     public boolean isSuccessful() {

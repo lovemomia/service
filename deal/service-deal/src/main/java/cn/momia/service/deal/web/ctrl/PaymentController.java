@@ -4,10 +4,14 @@ import cn.momia.api.user.User;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.deal.facade.DealServiceFacade;
-import cn.momia.service.deal.facade.OrderInfoFields;
+import cn.momia.service.deal.gateway.ClientType;
+import cn.momia.service.deal.gateway.PaymentGateway;
+import cn.momia.service.deal.gateway.PrepayParam;
 import cn.momia.service.deal.gateway.PrepayResult;
+import cn.momia.service.deal.gateway.factory.PaymentGatewayFactory;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
 import cn.momia.api.product.ProductServiceApi;
@@ -25,25 +29,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/payment")
 public class PaymentController extends BaseController {
     @Autowired private DealServiceFacade dealServiceFacade;
     @Autowired private PromoServiceFacade promoServiceFacade;
-
-    private static Map<String, String> extractParams(Map<String, String[]> httpParams) {
-        Map<String, String> params = new HashMap<String, String>();
-        for (Map.Entry<String, String[]> entry : httpParams.entrySet()) {
-            String[] values = entry.getValue();
-            if (values.length <= 0) continue;
-            params.put(entry.getKey(), entry.getValue()[0]);
-        }
-
-        return params;
-    }
 
     @RequestMapping(value = "/prepay/alipay", method = RequestMethod.POST)
     public MomiaHttpResponse prepayAlipay(HttpServletRequest request) {
@@ -66,12 +57,15 @@ public class PaymentController extends BaseController {
         Sku sku = ProductServiceApi.SKU.get(productId, skuId);
         if (!product.exists() || !sku.exists() || sku.isFinished()) return MomiaHttpResponse.FAILED("活动已结束或下线，不能再付款");
 
+        if (!dealServiceFacade.prepayOrder(orderId)) return MomiaHttpResponse.FAILED;
+
         String userCouponIdStr = request.getParameter("coupon");
         long userCouponId = StringUtils.isBlank(userCouponIdStr) ? 0 : Long.valueOf(userCouponIdStr);
         Coupon coupon = useCoupon(user.getId(), order, userCouponId);
 
-        Map<String, String> orderInfo = extraOrderInfo(request, order, product, coupon, payType);
-        PrepayResult prepayResult = dealServiceFacade.prepay(orderInfo, payType);
+        PrepayParam prepayParam = extractPrepayParam(request, order, product, coupon, payType);
+        PaymentGateway gateway = PaymentGatewayFactory.create(payType);
+        PrepayResult prepayResult = gateway.prepay(prepayParam);
 
         if (!prepayResult.isSuccessful()) return MomiaHttpResponse.FAILED;
         return MomiaHttpResponse.SUCCESS(prepayResult);
@@ -100,20 +94,45 @@ public class PaymentController extends BaseController {
         promoServiceFacade.releaseUserCoupon(previousUserCoupon.getUserId(), previousUserCoupon.getOrderId());
     }
 
-    private Map<String, String> extraOrderInfo(HttpServletRequest request, Order order, Product product, Coupon coupon, int payType) {
-        Map<String, String> orderInfo = extractParams(request.getParameterMap());
-        orderInfo.put(OrderInfoFields.ORDER_ID, String.valueOf(order.getId()));
-        orderInfo.put(OrderInfoFields.PRODUCT_ID, String.valueOf(product.getId()));
-        orderInfo.put(OrderInfoFields.PRODUCT_TITLE, product.getTitle());
+    private PrepayParam extractPrepayParam(HttpServletRequest request, Order order, Product product, Coupon coupon, int payType) {
+        PrepayParam prepayParam = new PrepayParam();
 
-        if (payType == Payment.Type.WECHATPAY)
-            orderInfo.put(OrderInfoFields.TOTAL_FEE, String.valueOf((int) (promoServiceFacade.calcTotalFee(order.getTotalFee(), coupon).floatValue() * 100)));
-        else
-            orderInfo.put(OrderInfoFields.TOTAL_FEE, String.valueOf(promoServiceFacade.calcTotalFee(order.getTotalFee(), coupon)));
+        prepayParam.setClientType(extractClientType(request, payType));
+        prepayParam.setOrderId(order.getId());
+        prepayParam.setProductId(product.getId());
+        prepayParam.setProductTitle(product.getTitle());
+        prepayParam.setProductUrl(Configuration.getString("Wap.ProductUrl") + "?id=" + product.getId());
 
-        orderInfo.put(OrderInfoFields.USER_IP, getRemoteIp(request));
+        switch (payType) {
+            case Payment.Type.ALIPAY:
+                prepayParam.setTotalFee(promoServiceFacade.calcTotalFee(order.getTotalFee(), coupon));
+                break;
+            case Payment.Type.WECHATPAY:
+                prepayParam.setTotalFee(new BigDecimal(promoServiceFacade.calcTotalFee(order.getTotalFee(), coupon).floatValue() * 100));
+                break;
+            default: throw new MomiaFailedException("无效的支付类型: " + payType);
+        }
 
-        return orderInfo;
+        prepayParam.addAll(extractParams(request));
+        prepayParam.add("userIp", getRemoteIp(request));
+
+        return prepayParam;
+    }
+
+    private int extractClientType(HttpServletRequest request, int payType) {
+        switch (payType) {
+            case Payment.Type.ALIPAY:
+                String type = request.getParameter("type");
+                if ("app".equalsIgnoreCase(type)) return ClientType.APP;
+                else if ("wap".equalsIgnoreCase(type)) return ClientType.WAP;
+                else throw new MomiaFailedException("not supported type: " + type);
+            case Payment.Type.WECHATPAY:
+                String tradeType = request.getParameter("trade_type");
+                if ("APP".equals(tradeType)) return ClientType.APP;
+                else if ("JSAPI".equals(tradeType)) return ClientType.WAP;
+                else throw new MomiaFailedException("not supported trade type: " + tradeType);
+            default: return 0;
+        }
     }
 
     private String getRemoteIp(HttpServletRequest request) {

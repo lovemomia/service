@@ -1,6 +1,7 @@
 package cn.momia.service.deal.gateway.alipay;
 
 import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.common.sign.RSA;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.deal.gateway.ClientType;
 import org.apache.commons.lang3.StringUtils;

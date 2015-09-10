@@ -35,6 +35,7 @@ public class RegionServiceImpl extends DbAccessService implements RegionService 
             }
         });
     }
+
     @Override
     public Region get(int id) {
         Integer index = regionsMap.get(id);

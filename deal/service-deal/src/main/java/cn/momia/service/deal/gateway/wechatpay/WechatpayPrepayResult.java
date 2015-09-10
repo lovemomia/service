@@ -1,8 +1,13 @@
 package cn.momia.service.deal.gateway.wechatpay;
 
+import cn.momia.service.deal.gateway.ClientType;
 import cn.momia.service.deal.gateway.PrepayResult;
 
 public class WechatpayPrepayResult extends PrepayResult {
+    public static WechatpayPrepayResult create(int clientType) {
+        return ClientType.isFromApp(clientType) ? new WechatpayPrepayResult.App() : new WechatpayPrepayResult.JsApi();
+    }
+
     public static class App extends WechatpayPrepayResult {
         public static class Field {
             public static final String APPID = "appid";

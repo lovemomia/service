@@ -4,7 +4,7 @@ import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.deal.gateway.CallbackParam;
-import cn.momia.service.deal.gateway.MapWrapper;
+import cn.momia.common.collection.MapWrapper;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;

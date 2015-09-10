@@ -2,22 +2,13 @@ package cn.momia.service.deal.facade.impl;
 
 import cn.momia.service.deal.facade.DealServiceFacade;
 import cn.momia.service.deal.exception.OrderLimitException;
-import cn.momia.service.deal.gateway.CallbackResult;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.deal.payment.Payment;
 import cn.momia.service.deal.payment.PaymentService;
-import cn.momia.service.deal.gateway.CallbackParam;
-import cn.momia.service.deal.gateway.PaymentGateway;
-import cn.momia.service.deal.gateway.PrepayParam;
-import cn.momia.service.deal.gateway.PrepayResult;
-import cn.momia.service.deal.gateway.factory.CallbackParamFactory;
-import cn.momia.service.deal.gateway.factory.PaymentGatewayFactory;
-import cn.momia.service.deal.gateway.factory.PrepayParamFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class DealServiceFacadeImpl implements DealServiceFacade {
     private OrderService orderService;
@@ -97,22 +88,6 @@ public class DealServiceFacadeImpl implements DealServiceFacade {
     @Override
     public boolean payOrder(long orderId) {
         return orderService.pay(orderId);
-    }
-
-    @Override
-    public PrepayResult prepay(Map<String, String> params, int payType) {
-        PrepayParam prepayParam = PrepayParamFactory.create(params, payType);
-        PaymentGateway gateway = PaymentGatewayFactory.create(payType);
-
-        return gateway.prepay(prepayParam);
-    }
-
-    @Override
-    public CallbackResult callback(Map<String, String> params, int payType) {
-        CallbackParam callbackParam = CallbackParamFactory.create(params, payType);
-        PaymentGateway gateway = PaymentGatewayFactory.create(payType);
-
-        return gateway.callback(callbackParam);
     }
 
     @Override

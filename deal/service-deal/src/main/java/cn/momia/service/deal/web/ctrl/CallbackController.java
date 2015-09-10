@@ -7,7 +7,11 @@ import cn.momia.api.user.UserServiceApi;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.deal.facade.DealServiceFacade;
+import cn.momia.service.deal.gateway.CallbackParam;
 import cn.momia.service.deal.gateway.CallbackResult;
+import cn.momia.service.deal.gateway.PaymentGateway;
+import cn.momia.service.deal.gateway.factory.CallbackParamFactory;
+import cn.momia.service.deal.gateway.factory.PaymentGatewayFactory;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.payment.Payment;
 import cn.momia.api.product.ProductServiceApi;
@@ -22,8 +26,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/callback")
@@ -33,43 +35,58 @@ public class CallbackController extends BaseController {
     @Autowired private DealServiceFacade dealServiceFacade;
     @Autowired private PromoServiceFacade promoServiceFacade;
 
-    private static Map<String, String> extractParams(Map<String, String[]> httpParams) {
-        Map<String, String> params = new HashMap<String, String>();
-        for (Map.Entry<String, String[]> entry : httpParams.entrySet()) {
-            String[] values = entry.getValue();
-            if (values.length <= 0) continue;
-            params.put(entry.getKey(), entry.getValue()[0]);
-        }
-
-        return params;
-    }
-
     @RequestMapping(value = "/alipay", method = RequestMethod.POST)
     public MomiaHttpResponse alipayCallback(HttpServletRequest request) {
         return callback(request, Payment.Type.ALIPAY);
     }
 
     private MomiaHttpResponse callback(HttpServletRequest request, int payType) {
-        CallbackResult result = dealServiceFacade.callback(extractParams(request.getParameterMap()), payType);
-        if (result.isSuccessful()) {
-            long orderId = result.getOrderId();
-            Order order = dealServiceFacade.getOrder(orderId);
-            if (order.exists() && order.isPayed() &&
-                    (payType == Payment.Type.WECHATPAY ||
-                            (payType == Payment.Type.ALIPAY && "TRADE_SUCCESS".equalsIgnoreCase(request.getParameter("trade_status"))))) {
-                updateUserCoupon(order);
-                updateSales(order);
-                notifyUser(order);
-                distributeCoupon(order);
+        CallbackParam callbackParam = CallbackParamFactory.create(extractParams(request), payType);
+        PaymentGateway gateway = PaymentGatewayFactory.create(payType);
+        CallbackResult result = gateway.callback(callbackParam);
 
-            }
+        if (!result.isSuccessful()) return MomiaHttpResponse.SUCCESS("OK");
 
+        long orderId = result.getOrderId();
+        Order order = dealServiceFacade.getOrder(orderId);
+        if (!order.exists()) {
+            // TODO 自动退款
             return MomiaHttpResponse.SUCCESS("OK");
         }
 
-        LOGGER.error("fail to finish payment for order: {}", result.getOrderId());
+        if (order.isPayed()) {
+            // TODO 判断是否重复付款，是则退款
+            return MomiaHttpResponse.SUCCESS("OK");
+        }
 
-        return MomiaHttpResponse.SUCCESS("FAIL");
+        if (!finishPayment(order, result)) return MomiaHttpResponse.SUCCESS("FAIL");
+
+        return MomiaHttpResponse.SUCCESS("OK");
+    }
+
+    private boolean finishPayment(Order order, CallbackResult result) {
+        // TODO 这里需要事务
+        if (!dealServiceFacade.payOrder(order.getId()) ||
+                !dealServiceFacade.logPayment(createPayment(result))) return false;
+
+        updateUserCoupon(order);
+        updateSales(order);
+        notifyUser(order);
+        distributeCoupon(order);
+
+        return true;
+    }
+
+    private Payment createPayment(CallbackResult result) {
+        Payment payment = new Payment();
+        payment.setOrderId(result.getOrderId());
+        payment.setPayer(result.getPayer());
+        payment.setFinishTime(result.getFinishTime());
+        payment.setPayType(result.getPayType());
+        payment.setTradeNo(result.getTradeNo());
+        payment.setFee(result.getTotalFee());
+
+        return payment;
     }
 
     private void updateUserCoupon(Order order) {
