@@ -55,6 +55,10 @@ public class BaseSkuDto implements Dto {
         return sku.getPlaceName();
     }
 
+    public int getRegionId() {
+        return sku.getRegionId();
+    }
+
     public String getAddress() {
         return sku.getAddress();
     }
