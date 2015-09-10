@@ -29,6 +29,10 @@ public class AlipayCallbackParam extends MapWrapper implements CallbackParam {
         public static final String TRADE_STATUS = "trade_status";
     }
 
+    public AlipayCallbackParam(Map<String, String> params) {
+        addAll(params);
+    }
+
     @Override
     public boolean isPayedSuccessfully() {
         try {
@@ -83,9 +87,5 @@ public class AlipayCallbackParam extends MapWrapper implements CallbackParam {
     @Override
     public BigDecimal getTotalFee() {
         return new BigDecimal(get(Field.TOTAL_FEE));
-    }
-
-    public AlipayCallbackParam(Map<String, String> params) {
-        addAll(params);
     }
 }

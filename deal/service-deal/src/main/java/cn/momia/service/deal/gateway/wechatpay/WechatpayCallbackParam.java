@@ -29,6 +29,10 @@ public class WechatpayCallbackParam extends MapWrapper implements CallbackParam 
     private static final DateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT_STR);
     private static final String SUCCESS = "SUCCESS";
 
+    public WechatpayCallbackParam(Map<String, String> params) {
+        addAll(params);
+    }
+
     @Override
     public boolean isPayedSuccessfully() {
         try {
@@ -85,9 +89,5 @@ public class WechatpayCallbackParam extends MapWrapper implements CallbackParam 
     @Override
     public BigDecimal getTotalFee() {
         return new BigDecimal(get(Field.TOTAL_FEE)).divide(new BigDecimal(100));
-    }
-
-    public WechatpayCallbackParam(Map<String, String> params) {
-        addAll(params);
     }
 }

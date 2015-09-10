@@ -40,12 +40,6 @@ public class WechatpayPrepayParam extends PrepayParam {
     private static final String DATE_FORMAT_STR = "yyyyMMddHHmmss";
     private static final DateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT_STR);
 
-    @Override
-    public long getOrderId() {
-        String outTradeNo = get(Field.OUT_TRADE_NO);
-        return Long.valueOf(outTradeNo.substring(0, outTradeNo.length() - DATE_FORMAT_STR.length()));
-    }
-
     public WechatpayPrepayParam(Map<String, String> params) {
         String tradeType = params.get("trade_type");
         if ("APP".equals(tradeType)) {
@@ -101,5 +95,11 @@ public class WechatpayPrepayParam extends PrepayParam {
         } catch (Exception e) {
             throw new MomiaFailedException("fail to get openid");
         }
+    }
+
+    @Override
+    public long getOrderId() {
+        String outTradeNo = get(Field.OUT_TRADE_NO);
+        return Long.valueOf(outTradeNo.substring(0, outTradeNo.length() - DATE_FORMAT_STR.length()));
     }
 }

@@ -14,11 +14,6 @@ public class AlipayPrepayParam extends PrepayParam {
     private String productUrl;
     private String totalFee;
 
-    @Override
-    public long getOrderId() {
-        return Long.valueOf(outTradeNo);
-    }
-
     public String getOutTradeNo() {
         return outTradeNo;
     }
@@ -51,5 +46,10 @@ public class AlipayPrepayParam extends PrepayParam {
         String url = Configuration.getString("Wap.ProductUrl") + "?id=" + params.get(OrderInfoFields.PRODUCT_ID);
 
         return url;
+    }
+
+    @Override
+    public long getOrderId() {
+        return Long.valueOf(outTradeNo);
     }
 }
