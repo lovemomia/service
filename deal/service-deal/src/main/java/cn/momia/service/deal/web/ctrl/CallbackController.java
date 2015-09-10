@@ -70,7 +70,10 @@ public class CallbackController extends BaseController {
         updateUserCoupon(order);
         updateSales(order);
         notifyUser(order);
-        distributeCoupon(order);
+
+        if (!UserServiceApi.USER.isPayed(order.getCustomerId())) {
+            if (UserServiceApi.USER.setPayed(order.getCustomerId())) distributeCoupon(order);
+        }
 
         return true;
     }
@@ -136,14 +139,11 @@ public class CallbackController extends BaseController {
 
     private void distributeCoupon(Order order) {
         try {
-            if (!UserServiceApi.USER.isPayed(order.getCustomerId()) &&
-                    UserServiceApi.USER.setPayed(order.getCustomerId())) {
-                if (StringUtils.isBlank(order.getInviteCode())) return;
-                long userId = UserServiceApi.USER.getIdByInviteCode(order.getInviteCode());
-                if (userId <= 0 || userId == order.getCustomerId()) return;
+            if (StringUtils.isBlank(order.getInviteCode())) return;
+            long userId = UserServiceApi.USER.getIdByInviteCode(order.getInviteCode());
+            if (userId <= 0 || userId == order.getCustomerId()) return;
 
-                promoServiceFacade.distributeShareCoupon(order.getCustomerId(), userId, order.getTotalFee());
-            }
+            promoServiceFacade.distributeShareCoupon(order.getCustomerId(), userId, order.getTotalFee());
         } catch (Exception e) {
             LOGGER.error("fail to distribute share coupon for order: {}", order.getId(), e);
         }

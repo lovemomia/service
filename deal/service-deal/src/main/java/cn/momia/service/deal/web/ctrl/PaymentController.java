@@ -186,6 +186,7 @@ public class PaymentController extends BaseController {
                 !orderService.prepay(orderId) ||
                 !orderService.pay(orderId)) return MomiaHttpResponse.FAILED("支付失败");
 
+        ProductServiceApi.PRODUCT.sold(order.getProductId(), order.getCount());
         if (!UserServiceApi.USER.isPayed(order.getCustomerId())) UserServiceApi.USER.setPayed(order.getCustomerId());
 
         return MomiaHttpResponse.SUCCESS;
