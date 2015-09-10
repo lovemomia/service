@@ -309,7 +309,7 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
         if (id <= 0) return true;
 
         int unlockedStock = 0;
-        List<Sku> skus = listSkus(id);
+        List<Sku> skus = Sku.filterClosed(listSkus(id));
         for (Sku sku : skus) {
             if (sku.getType() == Sku.Type.NO_CEILING) return false;
             unlockedStock += sku.getUnlockedStock();
