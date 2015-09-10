@@ -89,7 +89,7 @@ public class ParticipantController extends UserRelatedController {
             ids.add(Long.valueOf(id));
         }
 
-        if (!ids.isEmpty() && participantService.check(userId, ids)) return MomiaHttpResponse.FAILED("出行人信息不正确");
+        if (!ids.isEmpty() && !participantService.check(userId, ids)) return MomiaHttpResponse.FAILED("出行人信息不正确");
         return MomiaHttpResponse.SUCCESS;
     }
 }
