@@ -127,7 +127,7 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
     }
 
     @Override
-    public List<Long> getFollowedIds(long userId) {
+    public List<Long> queryFollowedIds(long userId) {
         if (userId <= 0) return new ArrayList<Long>();
         return baseFeedService.getFollowedIds(userId);
     }

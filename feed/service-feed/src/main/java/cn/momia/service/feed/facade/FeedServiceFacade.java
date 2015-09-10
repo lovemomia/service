@@ -10,7 +10,7 @@ public interface FeedServiceFacade {
     void pushFeed(long feedId, Collection<Long> followedIds);
     Feed getFeed(long feedId);
     boolean deleteFeed(long userId, long feedId);
-    List<Long> getFollowedIds(long userId);
+    List<Long> queryFollowedIds(long userId);
     long queryFollowedCountByUser(long userId);
     List<Feed> queryFollowedByUser(long userId, int start, int count);
 

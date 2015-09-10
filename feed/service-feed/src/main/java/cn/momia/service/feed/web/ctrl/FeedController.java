@@ -87,7 +87,7 @@ public class FeedController extends BaseController {
         if (feedId <= 0) return MomiaHttpResponse.FAILED("发表Feed失败");
         try {
             // TODO 异步推送
-            List<Long> followedIds = feedServiceFacade.getFollowedIds(feed.getUserId());
+            List<Long> followedIds = feedServiceFacade.queryFollowedIds(feed.getUserId());
             followedIds.add(feed.getUserId());
             feedServiceFacade.pushFeed(feedId, followedIds);
         } catch (Exception e) {
