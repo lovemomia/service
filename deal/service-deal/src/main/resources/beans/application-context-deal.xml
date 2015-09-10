@@ -18,19 +18,15 @@
         <property name="paymentService" ref="paymentService" />
     </bean>
 
-    <bean id="abstractPaymentGateway" class="cn.momia.service.deal.gateway.AbstractPaymentGateway" abstract="true">
-        <property name="dealServiceFacade" ref="dealServiceFacade" />
-    </bean>
-
     <bean id="alipay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
         <property name="staticField" value="cn.momia.service.deal.payment.Payment.Type.ALIPAY" />
     </bean>
-    <bean id="alipayGateway" class="cn.momia.service.deal.gateway.alipay.AlipayGateway" parent="abstractPaymentGateway" />
+    <bean id="alipayGateway" class="cn.momia.service.deal.gateway.alipay.AlipayGateway" />
 
     <bean id="wechatpay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
         <property name="staticField" value="cn.momia.service.deal.payment.Payment.Type.WECHATPAY" />
     </bean>
-    <bean id="wechatpayGateway" class="cn.momia.service.deal.gateway.wechatpay.WechatpayGateway" parent="abstractPaymentGateway" />
+    <bean id="wechatpayGateway" class="cn.momia.service.deal.gateway.wechatpay.WechatpayGateway" />
 
     <bean class="cn.momia.service.deal.gateway.factory.PaymentGatewayFactory">
         <property name="prototypes">
