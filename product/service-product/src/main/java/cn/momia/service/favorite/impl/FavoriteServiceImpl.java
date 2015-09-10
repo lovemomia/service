@@ -77,7 +77,7 @@ public class FavoriteServiceImpl extends DbAccessService implements FavoriteServ
         if (userId <= 0) return new ArrayList<Long>();
 
         final List<Long> productIds = new ArrayList<Long>();
-        String sql = "SELECT productId FROM t_favorite WHERE userId=? AND status=1 ORDER BY addTime DESC LIMIT ?,?";
+        String sql = "SELECT productId FROM t_favorite WHERE userId=? AND status=1 ORDER BY updateTime DESC LIMIT ?,?";
         jdbcTemplate.query(sql, new Object[] { userId, start, count }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
