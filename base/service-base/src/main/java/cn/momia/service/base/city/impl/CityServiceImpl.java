@@ -18,8 +18,8 @@ public class CityServiceImpl extends DbAccessService implements CityService {
 
     @Override
     protected void doReload() {
-        citiesCache = new ArrayList<City>();
-        citysMap = new HashMap<Integer, Integer>();
+        final List<City> newCitiesCache = new ArrayList<City>();
+        final Map<Integer, Integer> newCitysMap = new HashMap<Integer, Integer>();
 
         String sql = "SELECT id, name FROM t_city WHERE status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
@@ -28,14 +28,19 @@ public class CityServiceImpl extends DbAccessService implements CityService {
                 City city = new City();
                 city.setId(rs.getInt("id"));
                 city.setName(rs.getString("name"));
-                citiesCache.add(city);
-                citysMap.put(city.getId(), citiesCache.size() - 1);
+                newCitiesCache.add(city);
+                newCitysMap.put(city.getId(), newCitiesCache.size() - 1);
             }
         });
+
+        citiesCache = newCitiesCache;
+        citysMap = newCitysMap;
     }
 
     @Override
     public City get(int id) {
+        if (isOutOfDate()) reload();
+
         Integer index = citysMap.get(id);
         if (index == null) return City.NOT_EXIST_CITY;
 
@@ -44,6 +49,8 @@ public class CityServiceImpl extends DbAccessService implements CityService {
 
     @Override
     public List<City> listAll() {
+        if (isOutOfDate()) reload();
+
         return citiesCache;
     }
 }

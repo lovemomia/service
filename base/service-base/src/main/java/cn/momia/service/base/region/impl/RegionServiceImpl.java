@@ -18,8 +18,8 @@ public class RegionServiceImpl extends DbAccessService implements RegionService 
 
     @Override
     protected void doReload() {
-        regionsCache = new ArrayList<Region>();
-        regionsMap = new HashMap<Integer, Integer>();
+        final List<Region> newRegionsCache = new ArrayList<Region>();
+        final Map<Integer, Integer> newRegionsMap = new HashMap<Integer, Integer>();
 
         String sql = "SELECT id, cityId, name, parentId FROM t_region WHERE status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
@@ -30,14 +30,19 @@ public class RegionServiceImpl extends DbAccessService implements RegionService 
                 region.setCityId(rs.getInt("cityId"));
                 region.setName(rs.getString("name"));
                 region.setParentId(rs.getInt("parentId"));
-                regionsCache.add(region);
-                regionsMap.put(region.getId(), regionsCache.size() - 1);
+                newRegionsCache.add(region);
+                newRegionsMap.put(region.getId(), newRegionsCache.size() - 1);
             }
         });
+
+        regionsCache = newRegionsCache;
+        regionsMap = newRegionsMap;
     }
 
     @Override
     public Region get(int id) {
+        if (isOutOfDate()) reload();
+
         Integer index = regionsMap.get(id);
         if (index == null) return Region.NOT_EXIST_REGION;
 
@@ -46,6 +51,8 @@ public class RegionServiceImpl extends DbAccessService implements RegionService 
 
     @Override
     public List<Region> listAll() {
+        if (isOutOfDate()) reload();
+
         return regionsCache;
     }
 }
