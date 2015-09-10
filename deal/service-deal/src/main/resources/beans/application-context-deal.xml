@@ -12,19 +12,14 @@
     </bean>
 
     <bean id="orderService" class="cn.momia.service.deal.order.impl.OrderServiceImpl" parent="dbAccessService" />
-    <bean id="paymentService" class="cn.momia.service.deal.payment.impl.PaymentServiceImpl" parent="dbAccessService" />
-    <bean id="dealServiceFacade" class="cn.momia.service.deal.facade.impl.DealServiceFacadeImpl">
-        <property name="orderService" ref="orderService" />
-        <property name="paymentService" ref="paymentService" />
-    </bean>
 
     <bean id="alipay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
-        <property name="staticField" value="cn.momia.service.deal.payment.Payment.Type.ALIPAY" />
+        <property name="staticField" value="cn.momia.service.deal.order.Payment.Type.ALIPAY" />
     </bean>
     <bean id="alipayGateway" class="cn.momia.service.deal.gateway.alipay.AlipayGateway" />
 
     <bean id="wechatpay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
-        <property name="staticField" value="cn.momia.service.deal.payment.Payment.Type.WECHATPAY" />
+        <property name="staticField" value="cn.momia.service.deal.order.Payment.Type.WECHATPAY" />
     </bean>
     <bean id="wechatpayGateway" class="cn.momia.service.deal.gateway.wechatpay.WechatpayGateway" />
 

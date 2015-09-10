@@ -6,7 +6,7 @@ import cn.momia.service.deal.gateway.CallbackResult;
 import cn.momia.service.deal.gateway.PaymentGateway;
 import cn.momia.service.deal.gateway.PrepayResult;
 import cn.momia.service.deal.gateway.ClientType;
-import cn.momia.service.deal.payment.Payment;
+import cn.momia.service.deal.order.Payment;
 import cn.momia.service.deal.gateway.PrepayParam;
 import org.apache.commons.lang3.StringUtils;
 

@@ -8,10 +8,10 @@ import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.webapp.ctrl.dto.ListDto;
 import cn.momia.common.webapp.ctrl.dto.PagedListDto;
-import cn.momia.service.deal.exception.OrderLimitException;
-import cn.momia.service.deal.facade.DealServiceFacade;
+import cn.momia.service.deal.order.OrderLimitException;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderPrice;
+import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.deal.web.ctrl.dto.OrderDetailDto;
 import cn.momia.service.deal.web.ctrl.dto.OrderDto;
 import cn.momia.service.deal.web.ctrl.dto.OrderDupDto;
@@ -47,7 +47,7 @@ import java.util.Set;
 public class OrderController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
 
-    @Autowired private DealServiceFacade dealServiceFacade;
+    @Autowired private OrderService orderService;
     @Autowired private PromoServiceFacade promoServiceFacade;
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
@@ -60,9 +60,9 @@ public class OrderController extends BaseController {
         long orderId = 0;
         try {
             processContacts(order.getCustomerId(), order.getMobile(), order.getContacts());
-            dealServiceFacade.checkLimit(order.getCustomerId(), sku.getSkuId(), order.getCount(), sku.getLimit());
+            orderService.checkLimit(order.getCustomerId(), sku.getSkuId(), order.getCount(), sku.getLimit());
 
-            orderId = dealServiceFacade.placeOrder(order);
+            orderId = orderService.add(order);
             if (orderId > 0) {
                 order.setId(orderId);
                 return MomiaHttpResponse.SUCCESS(new OrderDto(order));
@@ -120,7 +120,7 @@ public class OrderController extends BaseController {
     @RequestMapping(value = "/check/dup", method = RequestMethod.POST, consumes = "application/json")
     public MomiaHttpResponse checkDup(@RequestBody Order order) {
         try {
-            List<Order> orders = dealServiceFacade.getOrders(order.getCustomerId(), order.getProductId(), order.getSkuId());
+            List<Order> orders = orderService.list(order.getCustomerId(), order.getProductId(), order.getSkuId());
             if (orders.isEmpty()) return MomiaHttpResponse.SUCCESS(OrderDupDto.NOT_DUPLICATED);
 
             for (Order o : orders) {
@@ -196,10 +196,10 @@ public class OrderController extends BaseController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public MomiaHttpResponse delete(@RequestParam String utoken, @PathVariable long id) {
         User user = UserServiceApi.USER.get(utoken);
-        Order order = dealServiceFacade.getOrder(id);
+        Order order = orderService.get(id);
         if (!order.exists() || order.getCustomerId() != user.getId()) return MomiaHttpResponse.FAILED("无效的订单");
 
-        if (!dealServiceFacade.deleteOrder(user.getId(), id)) return MomiaHttpResponse.FAILED("删除订单失败");
+        if (!orderService.delete(user.getId(), id)) return MomiaHttpResponse.FAILED("删除订单失败");
 
         // TODO 需要告警
         if (!unlockSku(order)) LOGGER.error("fail to unlock sku, skuId: {}, count: {}", new Object[] { order.getSkuId(), order.getCount() });
@@ -218,8 +218,8 @@ public class OrderController extends BaseController {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);
 
         User user = UserServiceApi.USER.get(utoken);
-        long totalCount = dealServiceFacade.queryOrderCountByUser(user.getId(), status);
-        List<Order> orders = dealServiceFacade.queryOrderByUser(user.getId(), status, start, count);
+        long totalCount = orderService.queryCountByUser(user.getId(), status);
+        List<Order> orders = orderService.queryByUser(user.getId(), status, start, count);
 
         List<Long> productIds = new ArrayList<Long>();
         for (Order order : orders) productIds.add(order.getProductId());
@@ -253,7 +253,7 @@ public class OrderController extends BaseController {
                                    @RequestParam(value = "pid") long productId,
                                    @RequestParam(value = "sid") long skuId) {
         User user = UserServiceApi.USER.get(utoken);
-        Order order = dealServiceFacade.getOrder(id);
+        Order order = orderService.get(id);
         if (!order.isPayed() ||
                 order.getCustomerId() != user.getId() ||
                 order.getProductId() != productId ||
@@ -267,7 +267,7 @@ public class OrderController extends BaseController {
                                     @PathVariable(value = "id") long id,
                                     @RequestParam(value = "pid") long productId) {
         User user = UserServiceApi.USER.get(utoken);
-        Order order = dealServiceFacade.getOrder(id);
+        Order order = orderService.get(id);
         Product product = ProductServiceApi.PRODUCT.get(productId, Product.Type.BASE_WITH_SKU);
         if (!order.exists() || !product.exists() ||
                 order.getCustomerId() != user.getId() ||
@@ -280,7 +280,7 @@ public class OrderController extends BaseController {
     public MomiaHttpResponse getProductCustomersInfo(@RequestParam(value = "pid") long productId, @RequestParam int count) {
         if (productId <= 0 || count <= 0) return MomiaHttpResponse.BAD_REQUEST;
 
-        List<Order> orders = dealServiceFacade.queryDistinctCustomerOrderByProduct(productId, 0, count);
+        List<Order> orders = orderService.queryDistinctCustomerOrderByProduct(productId, 0, count);
         if (orders.isEmpty()) return MomiaHttpResponse.SUCCESS(ListDto.EMPTY);
 
         List<Long> customerIds = new ArrayList<Long>();
@@ -363,7 +363,7 @@ public class OrderController extends BaseController {
 
         // TODO 性能优化
         List<Order> result = new ArrayList<Order>();
-        List<Order> orders = dealServiceFacade.queryAllCustomerOrderByProduct(id);
+        List<Order> orders = orderService.queryAllCustomerOrderByProduct(id);
         for (Order order : orders) {
             if (skuIds.contains(order.getSkuId())) result.add(order);
         }

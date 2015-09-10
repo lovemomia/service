@@ -6,14 +6,14 @@ import cn.momia.api.product.sku.Sku;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.service.deal.facade.DealServiceFacade;
 import cn.momia.service.deal.gateway.CallbackParam;
 import cn.momia.service.deal.gateway.CallbackResult;
 import cn.momia.service.deal.gateway.PaymentGateway;
 import cn.momia.service.deal.gateway.factory.CallbackParamFactory;
 import cn.momia.service.deal.gateway.factory.PaymentGatewayFactory;
 import cn.momia.service.deal.order.Order;
-import cn.momia.service.deal.payment.Payment;
+import cn.momia.service.deal.order.OrderService;
+import cn.momia.service.deal.order.Payment;
 import cn.momia.api.product.ProductServiceApi;
 import cn.momia.service.promo.coupon.UserCoupon;
 import cn.momia.service.promo.facade.PromoServiceFacade;
@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 public class CallbackController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(CallbackController.class);
 
-    @Autowired private DealServiceFacade dealServiceFacade;
+    @Autowired private OrderService orderService;
     @Autowired private PromoServiceFacade promoServiceFacade;
 
     @RequestMapping(value = "/alipay", method = RequestMethod.POST)
@@ -48,7 +48,7 @@ public class CallbackController extends BaseController {
         if (!result.isSuccessful()) return MomiaHttpResponse.SUCCESS("OK");
 
         long orderId = result.getOrderId();
-        Order order = dealServiceFacade.getOrder(orderId);
+        Order order = orderService.get(orderId);
         if (!order.exists()) {
             // TODO 自动退款
             return MomiaHttpResponse.SUCCESS("OK");
@@ -65,9 +65,7 @@ public class CallbackController extends BaseController {
     }
 
     private boolean finishPayment(Order order, CallbackResult result) {
-        // TODO 这里需要事务
-        if (!dealServiceFacade.payOrder(order.getId()) ||
-                !dealServiceFacade.logPayment(createPayment(result))) return false;
+        if (!orderService.pay(createPayment(result))) return false;
 
         updateUserCoupon(order);
         updateSales(order);

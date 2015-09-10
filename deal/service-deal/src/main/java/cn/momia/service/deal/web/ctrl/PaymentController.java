@@ -6,14 +6,14 @@ import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.service.deal.facade.DealServiceFacade;
 import cn.momia.service.deal.gateway.ClientType;
 import cn.momia.service.deal.gateway.PaymentGateway;
 import cn.momia.service.deal.gateway.PrepayParam;
 import cn.momia.service.deal.gateway.PrepayResult;
 import cn.momia.service.deal.gateway.factory.PaymentGatewayFactory;
 import cn.momia.service.deal.order.Order;
-import cn.momia.service.deal.payment.Payment;
+import cn.momia.service.deal.order.OrderService;
+import cn.momia.service.deal.order.Payment;
 import cn.momia.api.product.ProductServiceApi;
 import cn.momia.api.product.Product;
 import cn.momia.api.product.sku.Sku;
@@ -33,7 +33,7 @@ import java.math.BigDecimal;
 @RestController
 @RequestMapping("/payment")
 public class PaymentController extends BaseController {
-    @Autowired private DealServiceFacade dealServiceFacade;
+    @Autowired private OrderService orderService;
     @Autowired private PromoServiceFacade promoServiceFacade;
 
     @RequestMapping(value = "/prepay/alipay", method = RequestMethod.POST)
@@ -47,7 +47,7 @@ public class PaymentController extends BaseController {
         long productId = Long.valueOf(request.getParameter("pid"));
         long skuId = Long.valueOf(request.getParameter("sid"));
 
-        Order order = dealServiceFacade.getOrder(orderId);
+        Order order = orderService.get(orderId);
         if (!order.exists() ||
                 order.getCustomerId() != user.getId() ||
                 order.getProductId() != productId ||
@@ -57,7 +57,7 @@ public class PaymentController extends BaseController {
         Sku sku = ProductServiceApi.SKU.get(productId, skuId);
         if (!product.exists() || !sku.exists() || sku.isFinished()) return MomiaHttpResponse.FAILED("活动已结束或下线，不能再付款");
 
-        if (!dealServiceFacade.prepayOrder(orderId)) return MomiaHttpResponse.FAILED;
+        if (!orderService.prepay(orderId)) return MomiaHttpResponse.FAILED;
 
         String userCouponIdStr = request.getParameter("coupon");
         long userCouponId = StringUtils.isBlank(userCouponIdStr) ? 0 : Long.valueOf(userCouponIdStr);
@@ -161,7 +161,7 @@ public class PaymentController extends BaseController {
                                         @RequestParam(value = "sid") long skuId,
                                         @RequestParam(value = "coupon", required = false) Long userCouponId) {
         User user = UserServiceApi.USER.get(utoken);
-        Order order = dealServiceFacade.getOrder(orderId);
+        Order order = orderService.get(orderId);
         if (!order.exists() ||
                 order.getCustomerId() != user.getId() ||
                 order.getProductId() != productId ||
@@ -183,8 +183,8 @@ public class PaymentController extends BaseController {
         }
 
         if (totalFee.compareTo(new BigDecimal(0)) != 0 ||
-                !dealServiceFacade.prepayOrder(orderId) ||
-                !dealServiceFacade.payOrder(orderId)) return MomiaHttpResponse.FAILED("支付失败");
+                !orderService.prepay(orderId) ||
+                !orderService.pay(orderId)) return MomiaHttpResponse.FAILED("支付失败");
 
         if (!UserServiceApi.USER.isPayed(order.getCustomerId())) UserServiceApi.USER.setPayed(order.getCustomerId());
 
@@ -197,7 +197,7 @@ public class PaymentController extends BaseController {
                                           @RequestParam(value = "pid") long productId,
                                           @RequestParam(value = "sid") long skuId) {
         User user = UserServiceApi.USER.get(utoken);
-        if (!dealServiceFacade.check(user.getId(), orderId, productId, skuId)) return MomiaHttpResponse.FAILED("支付失败");
+        if (!orderService.check(user.getId(), orderId, productId, skuId)) return MomiaHttpResponse.FAILED("支付失败");
         return MomiaHttpResponse.SUCCESS;
     }
 }

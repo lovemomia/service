@@ -5,8 +5,8 @@ import cn.momia.api.user.UserServiceApi;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.webapp.ctrl.dto.PagedListDto;
-import cn.momia.service.deal.facade.DealServiceFacade;
 import cn.momia.service.deal.order.Order;
+import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.deal.web.ctrl.dto.CouponDto;
 import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.UserCoupon;
@@ -27,7 +27,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/coupon")
 public class CouponController extends BaseController {
-    @Autowired private DealServiceFacade dealServiceFacade;
+    @Autowired private OrderService orderService;
     @Autowired private PromoServiceFacade promoServiceFacade;
 
     @RequestMapping(method = RequestMethod.GET)
@@ -36,7 +36,7 @@ public class CouponController extends BaseController {
                                     @RequestParam(value = "coupon") long userCouponId) {
         User user = UserServiceApi.USER.get(utoken);
 
-        Order order = dealServiceFacade.getOrder(orderId);
+        Order order = orderService.get(orderId);
         if (!order.exists() || order.isPayed() || order.getCustomerId() != user.getId()) return MomiaHttpResponse.FAILED("无效的订单");
 
         Coupon coupon = promoServiceFacade.getCoupon(user.getId(), order.getId(), userCouponId);
@@ -61,7 +61,7 @@ public class CouponController extends BaseController {
 
         BigDecimal totalFee = new BigDecimal(0);
         if (orderId > 0) {
-            Order order = dealServiceFacade.getOrder(orderId);
+            Order order = orderService.get(orderId);
             if (order.exists()) totalFee = order.getTotalFee();
         }
 
