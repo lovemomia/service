@@ -81,7 +81,7 @@ public class Product implements Serializable {
     }
 
     public boolean isSoldOut() {
-        return baseProduct.isSoldOut();
+        return !isOpened();
     }
 
     public Date getOnlineTime() {

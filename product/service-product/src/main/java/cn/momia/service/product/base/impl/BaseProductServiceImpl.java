@@ -25,10 +25,11 @@ import java.util.Set;
 
 public class BaseProductServiceImpl extends DbAccessService implements BaseProductService {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseProductServiceImpl.class);
+
     private static final Splitter TAGS_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
     private static final Splitter PLACES_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
     private static final int MAX_TAG_COUNT = 3;
-    private static final String[] PRODUCT_FIELDS = { "id", "cityId", "tags", "title", "abstracts", "cover", "thumb", "crowd", "placeId", "places", "content", "joined", "sales", "soldOut", "onlineTime", "offlineTime", "status" };
+    private static final String[] PRODUCT_FIELDS = { "id", "cityId", "tags", "title", "abstracts", "cover", "thumb", "crowd", "placeId", "places", "content", "joined", "sales", "onlineTime", "offlineTime", "status" };
 
     private Map<Integer, String> tagsCache;
 
@@ -75,7 +76,6 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
             baseProduct.setContent(JSON.parseArray(rs.getString("content")));
             baseProduct.setJoined(rs.getInt("joined"));
             baseProduct.setSales(rs.getInt("sales"));
-            baseProduct.setSoldOut(rs.getBoolean("soldOut"));
             baseProduct.setOnlineTime(rs.getTimestamp("onlineTime"));
             baseProduct.setOfflineTime(rs.getTimestamp("offlineTime"));
             baseProduct.setStatus(rs.getInt("status"));
