@@ -293,18 +293,19 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
         if (productId <= 0 || skuId <= 0 || count <= 0) return false;
 
         boolean successful = skuService.lock(skuId, count);
-        try {
-            if (successful) {
+        if (successful) {
+            try {
                 if (isSoldOut(productId)) baseProductService.soldOut(productId);
                 baseProductService.join(productId, joined);
+            } catch (Exception e) {
+                LOGGER.error("fail to update sold out/joined status of product: {}", productId, e);
             }
-        } catch (Exception e) {
-            LOGGER.error("fail to update sold out/joined status of product: {}", productId, e);
         }
 
         return successful;
     }
 
+    // TODO 高并发下 soldOut状态的更新不稳定，容易出问题
     private boolean isSoldOut(long id) {
         if (id <= 0) return true;
 
@@ -322,18 +323,13 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     public boolean unlockStock(long productId, long skuId, int count, int joined) {
         if (productId <= 0 || skuId <= 0 || count <= 0) return true;
 
-        try {
-            baseProductService.unSoldOut(productId);
-        } catch (Exception e) {
-            LOGGER.error("fail to set sold out status of product: {}", productId, e);
-        }
-
         boolean successful = skuService.unlock(skuId, count);
         if (successful) {
             try {
+                if (!isSoldOut(productId)) baseProductService.unSoldOut(productId);
                 baseProductService.decreaseJoined(productId, joined);
             } catch (Exception e) {
-                LOGGER.error("fail to decrease joined of product: {}", productId, e);
+                LOGGER.error("fail to update sold out/joined status of product: {}", productId, e);
             }
         }
 
