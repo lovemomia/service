@@ -98,7 +98,7 @@ public class Product implements Serializable {
 
     public boolean isOpened() {
         Date now = new Date();
-        if (getOfflineTime().before(now) || isSoldOut() || getStatus() != 1) return false;
+        if (getOfflineTime().before(now) || getStatus() != 1) return false;
 
         return !Sku.filterClosed(skus).isEmpty();
     }
