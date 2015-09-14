@@ -130,7 +130,7 @@ public class CallbackController extends BaseController {
                 msg.append(address);
             }
 
-            msg.append("【松果亲子】");
+            msg.append("，请添加客服微信dorakids01【松果亲子】");
             BaseServiceApi.SMS.notify(order.getMobile(), msg.toString());
         } catch (Exception e) {
             LOGGER.error("fail to notify user for order: {}", order.getId(), e);
