@@ -1,12 +1,13 @@
 package cn.momia.service.user.web.ctrl.dto;
 
-import cn.momia.service.base.util.MobileUtil;
+import cn.momia.common.util.MobileUtil;
+import cn.momia.common.webapp.ctrl.dto.Dto;
+import cn.momia.common.webapp.ctrl.dto.ListDto;
 import cn.momia.service.user.leader.Leader;
-import cn.momia.service.base.web.ctrl.dto.ListDto;
 
 import java.util.List;
 
-public class LeaderDto {
+public class LeaderDto implements Dto {
     public static ListDto toDtos(List<Leader> leaders) {
         ListDto leadersDto = new ListDto();
         for (Leader leader : leaders) {

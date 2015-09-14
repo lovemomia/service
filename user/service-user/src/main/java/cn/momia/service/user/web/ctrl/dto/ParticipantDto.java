@@ -1,15 +1,15 @@
 package cn.momia.service.user.web.ctrl.dto;
 
-import cn.momia.service.base.util.TimeUtil;
+import cn.momia.common.util.TimeUtil;
+import cn.momia.common.webapp.ctrl.dto.Dto;
 import cn.momia.service.user.participant.Participant;
 import com.alibaba.fastjson.annotation.JSONField;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ParticipantDto implements Serializable {
+public class ParticipantDto implements Dto {
     public static List<ParticipantDto> toDtos(List<Participant> participants) {
         List<ParticipantDto> dtos = new ArrayList<ParticipantDto>();
         for (Participant participant : participants) {

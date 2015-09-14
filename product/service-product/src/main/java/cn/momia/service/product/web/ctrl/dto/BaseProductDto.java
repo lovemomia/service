@@ -1,10 +1,10 @@
 package cn.momia.service.product.web.ctrl.dto;
 
-import cn.momia.api.common.MetaUtil;
+import cn.momia.api.base.MetaUtil;
+import cn.momia.common.webapp.ctrl.dto.Dto;
+import cn.momia.common.webapp.ctrl.dto.ListDto;
 import cn.momia.service.product.facade.Product;
 import cn.momia.service.product.sku.Sku;
-import cn.momia.service.base.web.ctrl.dto.Dto;
-import cn.momia.service.base.web.ctrl.dto.ListDto;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

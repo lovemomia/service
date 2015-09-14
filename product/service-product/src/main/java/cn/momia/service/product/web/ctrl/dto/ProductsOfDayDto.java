@@ -1,7 +1,7 @@
 package cn.momia.service.product.web.ctrl.dto;
 
-import cn.momia.service.base.web.ctrl.dto.Dto;
-import cn.momia.service.base.web.ctrl.dto.ListDto;
+import cn.momia.common.webapp.ctrl.dto.Dto;
+import cn.momia.common.webapp.ctrl.dto.ListDto;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;

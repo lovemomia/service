@@ -1,17 +1,21 @@
 package cn.momia.service.deal.web.ctrl;
 
-import cn.momia.api.common.CommonServiceApi;
+import cn.momia.api.base.BaseServiceApi;
 import cn.momia.api.product.Product;
 import cn.momia.api.product.sku.Sku;
 import cn.momia.api.user.UserServiceApi;
-import cn.momia.service.base.web.ctrl.AbstractController;
-import cn.momia.service.deal.facade.DealServiceFacade;
+import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.webapp.ctrl.BaseController;
+import cn.momia.service.deal.gateway.CallbackParam;
 import cn.momia.service.deal.gateway.CallbackResult;
+import cn.momia.service.deal.gateway.PaymentGateway;
+import cn.momia.service.deal.gateway.factory.CallbackParamFactory;
+import cn.momia.service.deal.gateway.factory.PaymentGatewayFactory;
 import cn.momia.service.deal.order.Order;
-import cn.momia.service.deal.payment.Payment;
+import cn.momia.service.deal.order.OrderService;
+import cn.momia.service.deal.order.Payment;
 import cn.momia.api.product.ProductServiceApi;
 import cn.momia.service.promo.coupon.UserCoupon;
-import cn.momia.service.base.web.response.ResponseMessage;
 import cn.momia.service.promo.facade.PromoServiceFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -22,54 +26,68 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/callback")
-public class CallbackController extends AbstractController {
+public class CallbackController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(CallbackController.class);
 
-    @Autowired private DealServiceFacade dealServiceFacade;
+    @Autowired private OrderService orderService;
     @Autowired private PromoServiceFacade promoServiceFacade;
 
-    private static Map<String, String> extractParams(Map<String, String[]> httpParams) {
-        Map<String, String> params = new HashMap<String, String>();
-        for (Map.Entry<String, String[]> entry : httpParams.entrySet()) {
-            String[] values = entry.getValue();
-            if (values.length <= 0) continue;
-            params.put(entry.getKey(), entry.getValue()[0]);
-        }
-
-        return params;
-    }
-
     @RequestMapping(value = "/alipay", method = RequestMethod.POST)
-    public ResponseMessage alipayCallback(HttpServletRequest request) {
+    public MomiaHttpResponse alipayCallback(HttpServletRequest request) {
         return callback(request, Payment.Type.ALIPAY);
     }
 
-    private ResponseMessage callback(HttpServletRequest request, int payType) {
-        CallbackResult result = dealServiceFacade.callback(extractParams(request.getParameterMap()), payType);
-        if (result.isSuccessful()) {
-            long orderId = result.getOrderId();
-            Order order = dealServiceFacade.getOrder(orderId);
-            if (order.exists() && order.isPayed() &&
-                    (payType == Payment.Type.WECHATPAY ||
-                            (payType == Payment.Type.ALIPAY && "TRADE_SUCCESS".equalsIgnoreCase(request.getParameter("trade_status"))))) {
-                updateUserCoupon(order);
-                updateSales(order);
-                notifyUser(order);
-                distributeCoupon(order);
+    private MomiaHttpResponse callback(HttpServletRequest request, int payType) {
+        CallbackParam callbackParam = CallbackParamFactory.create(extractParams(request), payType);
+        PaymentGateway gateway = PaymentGatewayFactory.create(payType);
+        CallbackResult result = gateway.callback(callbackParam);
 
-            }
+        if (!result.isSuccessful()) return MomiaHttpResponse.SUCCESS("OK");
 
-            return ResponseMessage.SUCCESS("OK");
+        long orderId = result.getOrderId();
+        Order order = orderService.get(orderId);
+        if (!order.exists()) {
+            // TODO 自动退款
+            return MomiaHttpResponse.SUCCESS("OK");
         }
 
-        LOGGER.error("fail to finish payment for order: {}", result.getOrderId());
+        if (order.isPayed()) {
+            // TODO 判断是否重复付款，是则退款
+            return MomiaHttpResponse.SUCCESS("OK");
+        }
 
-        return ResponseMessage.SUCCESS("FAIL");
+        if (!finishPayment(order, result)) return MomiaHttpResponse.SUCCESS("FAIL");
+
+        return MomiaHttpResponse.SUCCESS("OK");
+    }
+
+    private boolean finishPayment(Order order, CallbackResult result) {
+        if (!orderService.pay(createPayment(result))) return false;
+
+        updateUserCoupon(order);
+        updateSales(order);
+        notifyUser(order);
+
+        if (!UserServiceApi.USER.isPayed(order.getCustomerId())) {
+            if (UserServiceApi.USER.setPayed(order.getCustomerId())) distributeCoupon(order);
+        }
+
+        return true;
+    }
+
+    private Payment createPayment(CallbackResult result) {
+        Payment payment = new Payment();
+        payment.setOrderId(result.getOrderId());
+        payment.setPayer(result.getPayer());
+        payment.setFinishTime(result.getFinishTime());
+        payment.setPayType(result.getPayType());
+        payment.setTradeNo(result.getTradeNo());
+        payment.setFee(result.getTotalFee());
+
+        return payment;
     }
 
     private void updateUserCoupon(Order order) {
@@ -113,7 +131,7 @@ public class CallbackController extends AbstractController {
             }
 
             msg.append("【松果亲子】");
-            CommonServiceApi.SMS.notify(order.getMobile(), msg.toString());
+            BaseServiceApi.SMS.notify(order.getMobile(), msg.toString());
         } catch (Exception e) {
             LOGGER.error("fail to notify user for order: {}", order.getId(), e);
         }
@@ -121,21 +139,18 @@ public class CallbackController extends AbstractController {
 
     private void distributeCoupon(Order order) {
         try {
-            if (!UserServiceApi.USER.isPayed(order.getCustomerId()) &&
-                    UserServiceApi.USER.setPayed(order.getCustomerId())) {
-                if (StringUtils.isBlank(order.getInviteCode())) return;
-                long userId = UserServiceApi.USER.getIdByInviteCode(order.getInviteCode());
-                if (userId <= 0 || userId == order.getCustomerId()) return;
+            if (StringUtils.isBlank(order.getInviteCode())) return;
+            long userId = UserServiceApi.USER.getIdByInviteCode(order.getInviteCode());
+            if (userId <= 0 || userId == order.getCustomerId()) return;
 
-                promoServiceFacade.distributeShareCoupon(order.getCustomerId(), userId, order.getTotalFee());
-            }
+            promoServiceFacade.distributeShareCoupon(order.getCustomerId(), userId, order.getTotalFee());
         } catch (Exception e) {
             LOGGER.error("fail to distribute share coupon for order: {}", order.getId(), e);
         }
     }
 
     @RequestMapping(value = "/wechatpay", method = RequestMethod.POST)
-    public ResponseMessage wechatpayCallback(HttpServletRequest request) {
+    public MomiaHttpResponse wechatpayCallback(HttpServletRequest request) {
         return callback(request, Payment.Type.WECHATPAY);
     }
 }

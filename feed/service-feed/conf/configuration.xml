@@ -4,10 +4,6 @@
         <Level>INFO</Level>
     </Logger>
 
-    <Server>
-        <Biz>service</Biz>
-    </Server>
-
     <Service>
         <User>http://localhost:7070</User>
     </Service>

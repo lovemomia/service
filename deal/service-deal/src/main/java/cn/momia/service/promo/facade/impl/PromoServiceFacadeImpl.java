@@ -1,5 +1,6 @@
 package cn.momia.service.promo.facade.impl;
 
+import cn.momia.service.promo.coupon.UserCouponService;
 import cn.momia.service.promo.facade.PromoServiceFacade;
 import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.CouponService;
@@ -16,15 +17,37 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
     private static final Logger LOGGER = LoggerFactory.getLogger(PromoServiceFacadeImpl.class);
 
     private CouponService couponService;
+    private UserCouponService userCouponService;
 
     public void setCouponService(CouponService couponService) {
         this.couponService = couponService;
     }
 
+    public void setUserCouponService(UserCouponService userCouponService) {
+        this.userCouponService = userCouponService;
+    }
+
     @Override
     public void distributeRegisterCoupon(long userId) {
         if (userId <= 0) return;
-        couponService.distributeRegisterCoupon(userId);
+
+        try {
+            if (userCouponService.queryCountByUserAndSrc(userId, Coupon.Src.REGISTER) > 0) return;
+
+            List<Coupon> coupons = couponService.queryBySrc(Coupon.Src.REGISTER);
+            if (coupons.isEmpty()) return;
+
+            List<Object[]> params = new ArrayList<Object[]>();
+            for (Coupon coupon : coupons) {
+                for (int i = 0; i < coupon.getCount(); i++) {
+                    params.add(new Object[] { userId, coupon.getId(), Coupon.Src.REGISTER, coupon.getConsumption(), coupon.getStartTime(), coupon.getEndTime() });
+                }
+            }
+
+            userCouponService.add(params);
+        } catch (Exception e) {
+            LOGGER.error("fail to distribute user coupon to user: {}", userId, e);
+        }
     }
 
     @Override
@@ -34,8 +57,8 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
         int discount = calcDiscount(totalFee.intValue());
         if (discount <= 0) return;
 
-        couponService.distributeShareCoupon(customerId, discount);
-        couponService.distributeShareCoupon(sharerId, discount);
+        distributeShareCoupon(customerId, discount);
+        distributeShareCoupon(sharerId, discount);
     }
 
     private int calcDiscount(int totalFee) {
@@ -45,14 +68,36 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
         else return 50;
     }
 
+    private void distributeShareCoupon(long userId, int discount) {
+        try {
+            List<Coupon> coupons = couponService.queryBySrcAndDiscount(Coupon.Src.SHARE, discount);
+            if (coupons.isEmpty()) return;
+
+            List<Object[]> params = new ArrayList<Object[]>();
+            Coupon coupon = coupons.get(0);
+            for (int i = 0; i < coupon.getCount(); i++) {
+                params.add(new Object[] { userId, coupon.getId(), Coupon.Src.SHARE, coupon.getConsumption(), coupon.getStartTime(), coupon.getEndTime() });
+            }
+
+            userCouponService.add(params);
+        } catch (Exception e) {
+            LOGGER.error("fail to distribute share coupon to user: {}/{}", userId, discount, e);
+        }
+    }
+
     @Override
     public Coupon getCoupon(long userId, long orderId, long userCouponId) {
         if (userId <= 0 || orderId <= 0 || userCouponId <= 0) return Coupon.NOT_EXIST_COUPON;
 
-        UserCoupon userCoupon = couponService.getUserCoupon(userId, orderId, userCouponId);
+        UserCoupon userCoupon = userCouponService.query(userId, orderId, userCouponId);
         if (!userCoupon.exists()) return Coupon.NOT_EXIST_COUPON;
 
-        return couponService.getCoupon(userCoupon.getCouponId());
+        return couponService.get(userCoupon.getCouponId());
+    }
+
+    @Override
+    public List<Coupon> listCoupons(Collection<Integer> couponIds) {
+        return couponService.list(couponIds);
     }
 
     @Override
@@ -68,35 +113,30 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
     @Override
     public int queryUserCouponCount(long userId, long orderId, BigDecimal totalFee, int status) {
         if (userId <= 0) return 0;
-        return couponService.queryCountByUser(userId, orderId, totalFee, status);
+        return userCouponService.queryCountByUser(userId, orderId, totalFee, status);
     }
 
     @Override
     public List<UserCoupon> queryUserCoupon(long userId, long orderId, BigDecimal totalFee, int status, int start, int count) {
         if (userId <= 0) return new ArrayList<UserCoupon>();
-        return couponService.queryByUser(userId, orderId, totalFee, status, start, count);
-    }
-
-    @Override
-    public List<Coupon> getCoupons(Collection<Integer> couponIds) {
-        return couponService.getCoupons(couponIds);
+        return userCouponService.queryByUser(userId, orderId, totalFee, status, start, count);
     }
 
     @Override
     public UserCoupon getNotUsedUserCouponByOrder(long orderId) {
-        return couponService.getNotUsedUserCouponByOrder(orderId);
+        return userCouponService.queryNotUsedByOrder(orderId);
     }
 
     @Override
     public boolean lockUserCoupon(long userId, long orderId, long userCouponId) {
         if (userId <= 0 || orderId <= 0 || userCouponId <= 0) return true;
-        return couponService.lockUserCoupon(userId, orderId, userCouponId);
+        return userCouponService.lock(userId, orderId, userCouponId);
     }
 
     @Override
     public boolean useUserCoupon(long userId, long orderId, long userCouponId) {
         if (userId <= 0 || orderId <= 0 || userCouponId <= 0) return true;
-        return couponService.useUserCoupon(userId, orderId, userCouponId);
+        return userCouponService.use(userId, orderId, userCouponId);
     }
 
     @Override
@@ -104,10 +144,10 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
         if (userId <= 0 || orderId <= 0) return true;
 
         try {
-            UserCoupon userCoupon = couponService.getNotUsedUserCouponByOrder(orderId);
+            UserCoupon userCoupon = userCouponService.queryNotUsedByOrder(orderId);
             if (!userCoupon.exists() || userCoupon.getUserId() != userId) return true;
 
-            if (!couponService.releaseUserCoupon(userId, orderId)) {
+            if (!userCouponService.release(userId, orderId)) {
                 LOGGER.error("fail to release user coupon of order: {}", orderId);
                 return false;
             }

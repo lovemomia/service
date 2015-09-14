@@ -1,10 +1,10 @@
 package cn.momia.service.deal.gateway.factory;
 
-import cn.momia.api.base.exception.MomiaFailedException;
+import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.service.deal.gateway.CallbackParam;
 import cn.momia.service.deal.gateway.alipay.AlipayCallbackParam;
 import cn.momia.service.deal.gateway.wechatpay.WechatpayCallbackParam;
-import cn.momia.service.deal.payment.Payment;
+import cn.momia.service.deal.order.Payment;
 
 import java.util.Map;
 

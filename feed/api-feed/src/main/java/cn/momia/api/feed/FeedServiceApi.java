@@ -1,14 +1,14 @@
 package cn.momia.api.feed;
 
-import cn.momia.api.base.ServiceApi;
-import cn.momia.api.base.http.MomiaHttpParamBuilder;
-import cn.momia.api.base.http.MomiaHttpRequest;
 import cn.momia.api.feed.comment.PagedFeedComments;
 import cn.momia.api.feed.star.PagedFeedStars;
+import cn.momia.common.api.AbstractServiceApi;
+import cn.momia.common.api.http.MomiaHttpParamBuilder;
+import cn.momia.common.api.http.MomiaHttpRequest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
-public class FeedServiceApi extends ServiceApi {
+public class FeedServiceApi extends AbstractServiceApi {
     public static FeedServiceApi FEED = new FeedServiceApi();
 
     public void init() {

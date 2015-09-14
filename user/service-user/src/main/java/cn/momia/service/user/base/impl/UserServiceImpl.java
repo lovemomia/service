@@ -1,12 +1,14 @@
 package cn.momia.service.user.base.impl;
 
-import cn.momia.service.base.config.Configuration;
-import cn.momia.api.base.exception.MomiaFailedException;
-import cn.momia.service.base.impl.DbAccessService;
+import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.common.service.DbAccessService;
+import cn.momia.common.util.MobileUtil;
+import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
 import com.google.common.base.Splitter;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +25,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -33,8 +37,9 @@ import java.util.Set;
 public class UserServiceImpl extends DbAccessService implements UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final Splitter CHILDREN_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
-    private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "password", "avatar", "name", "sex", "birthday", "cityId", "regionId", "address", "children", "inviteCode" };
+    private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "password", "avatar", "name", "sex", "birthday", "cityId", "regionId", "address", "children", "payed", "inviteCode" };
 
     @Override
     public boolean exists(String field, String value) {
@@ -49,7 +54,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
-    public long add(final String nickName, final String mobile, final String password, final String token, final String inviteCode) {
+    public long add(final String nickName, final String mobile, final String password) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
@@ -58,9 +63,9 @@ public class UserServiceImpl extends DbAccessService implements UserService {
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, nickName);
                 ps.setString(2, mobile);
-                ps.setString(3, encryptPassword(mobile, password, Configuration.getPasswordSecretKey()));
-                ps.setString(4, token);
-                ps.setString(5, inviteCode);
+                ps.setString(3, encryptPassword(mobile, password, Configuration.getString("SecretKey.Password")));
+                ps.setString(4, generateToken(mobile));
+                ps.setString(5, generateInviteCode(nickName, mobile));
 
                 return ps;
             }
@@ -83,11 +88,19 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         }
     }
 
+    private String generateToken(String mobile) {
+        return DigestUtils.md5Hex(StringUtils.join(new String[] { mobile, new Date().toString(), Configuration.getString("SecretKey.UToken") }, "|"));
+    }
+
+    private String generateInviteCode(String nickName, String mobile) {
+        return DigestUtils.md5Hex(StringUtils.join(new String[] { nickName, mobile, DATE_FORMAT.format(new Date()), Configuration.getString("SecretKey.UToken") }, "|"));
+    }
+
     @Override
     public boolean validatePassword(String mobile, String password) {
         String sql = "SELECT mobile, password FROM t_user WHERE mobile=? AND password=?";
 
-        return jdbcTemplate.query(sql, new Object[] { mobile, encryptPassword(mobile, password, Configuration.getPasswordSecretKey()) }, new ResultSetExtractor<Boolean>() {
+        return jdbcTemplate.query(sql, new Object[] { mobile, encryptPassword(mobile, password, Configuration.getString("SecretKey.Password")) }, new ResultSetExtractor<Boolean>() {
             @Override
             public Boolean extractData(ResultSet resultSet) throws SQLException, DataAccessException {
                 if (resultSet.next()) return true;
@@ -122,7 +135,6 @@ public class UserServiceImpl extends DbAccessService implements UserService {
             user.setToken(rs.getString("token"));
             user.setNickName(rs.getString("nickName"));
             user.setMobile(rs.getString("mobile"));
-            user.setHasPassword(!StringUtils.isBlank(rs.getString("password")));
             user.setAvatar(rs.getString("avatar"));
             user.setName(rs.getString("name"));
             user.setSex(rs.getString("sex"));
@@ -131,6 +143,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
             user.setRegionId(rs.getInt("regionId"));
             user.setAddress(rs.getString("address"));
             user.setChildren(parseChildren(rs.getString("children")));
+            user.setPayed(rs.getBoolean("payed"));
             user.setInviteCode(rs.getString("inviteCode"));
 
             return user;
@@ -152,7 +165,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
-    public List<User> get(Collection<Long> ids) {
+    public List<User> list(Collection<Long> ids) {
         final List<User> users = new ArrayList<User>();
         if (ids == null || ids.size() <= 0) return users;
 
@@ -170,6 +183,8 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public User getByToken(String token) {
+        if (StringUtils.isBlank(token)) return User.NOT_EXIST_USER;
+
         String sql = "SELECT " + joinFields() + " FROM t_user WHERE token=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { token }, new ResultSetExtractor<User>() {
@@ -183,6 +198,8 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public User getByMobile(String mobile) {
+        if (MobileUtil.isInvalid(mobile)) return User.NOT_EXIST_USER;
+
         String sql = "SELECT " + joinFields() + " FROM t_user WHERE mobile=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<User>() {
@@ -265,19 +282,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     public boolean updatePassword(long id, String mobile, String password) {
         String sql = "UPDATE t_user SET password=? WHERE id=?";
 
-        return update(sql, new Object[] { encryptPassword(mobile, password, Configuration.getPasswordSecretKey()), id });
-    }
-
-    @Override
-    public boolean isPayed(long id) {
-        String sql = "SELECT payed FROM t_user WHERE id=? AND status=1";
-
-        return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Boolean>() {
-            @Override
-            public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
-                return rs.next() ? rs.getBoolean("payed") : true;
-            }
-        });
+        return update(sql, new Object[] { encryptPassword(mobile, password, Configuration.getString("SecretKey.Password")), id });
     }
 
     @Override

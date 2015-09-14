@@ -13,10 +13,10 @@
     <url>http://www.momia.cn</url>
 
     <dependencies>
-        <!-- Momia Api -->
+        <!-- Momia API -->
         <dependency>
             <groupId>cn.momia</groupId>
-            <artifactId>duola-api-common</artifactId>
+            <artifactId>duola-api-base</artifactId>
             <version>1.0.0</version>
         </dependency>
         <dependency>
@@ -34,11 +34,6 @@
         <dependency>
             <groupId>cn.momia</groupId>
             <artifactId>duola-service-base</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.momia</groupId>
-            <artifactId>duola-service-common</artifactId>
             <version>1.0.0</version>
         </dependency>
         <dependency>
@@ -62,10 +57,11 @@
             <version>1.0.0</version>
         </dependency>
 
+        <!-- Momia Webapp -->
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>1.19</version>
+            <groupId>cn.momia</groupId>
+            <artifactId>duola-common-webapp</artifactId>
+            <version>1.0.0</version>
         </dependency>
 
         <!-- Test -->

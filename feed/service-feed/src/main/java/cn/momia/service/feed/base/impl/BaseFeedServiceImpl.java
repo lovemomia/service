@@ -1,9 +1,8 @@
 package cn.momia.service.feed.base.impl;
 
-import cn.momia.service.base.impl.DbAccessService;
+import cn.momia.common.service.DbAccessService;
 import cn.momia.service.feed.base.BaseFeed;
 import cn.momia.service.feed.base.BaseFeedService;
-import cn.momia.service.feed.facade.Feed;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

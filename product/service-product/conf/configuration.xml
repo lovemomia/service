@@ -4,13 +4,8 @@
         <Level>INFO</Level>
     </Logger>
 
-    <Server>
-        <Biz>service</Biz>
-    </Server>
-
     <Service>
-        <Common>http://localhost:7070</Common>
-        <User>http://localhost:7070</User>
+        <Base>http://localhost:7070</Base>
     </Service>
 
     <Limit>

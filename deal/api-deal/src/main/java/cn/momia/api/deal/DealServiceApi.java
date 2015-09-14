@@ -1,12 +1,12 @@
 package cn.momia.api.deal;
 
-import cn.momia.api.base.ServiceApi;
-import cn.momia.api.base.http.MomiaHttpParamBuilder;
-import cn.momia.api.base.http.MomiaHttpRequest;
 import cn.momia.api.deal.coupon.PagedCoupons;
 import cn.momia.api.deal.order.Order;
 import cn.momia.api.deal.order.PagedOrders;
 import cn.momia.api.deal.order.SkuPlaymates;
+import cn.momia.common.api.AbstractServiceApi;
+import cn.momia.common.api.http.MomiaHttpParamBuilder;
+import cn.momia.common.api.http.MomiaHttpRequest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class DealServiceApi extends ServiceApi {
+public class DealServiceApi extends AbstractServiceApi {
     public static OrderServiceApi ORDER = new OrderServiceApi();
     public static PaymentServiceApi PAYMENT = new PaymentServiceApi();
     public static CallbackServiceApi CALLBACK = new CallbackServiceApi();

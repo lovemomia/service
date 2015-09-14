@@ -1,10 +1,9 @@
 package cn.momia.service.user.web.ctrl.dto;
 
+import cn.momia.common.webapp.ctrl.dto.Dto;
 import cn.momia.service.user.base.User;
 
-import java.io.Serializable;
-
-public class MiniUserDto implements Serializable {
+public class MiniUserDto implements Dto {
     protected User user;
 
     public long getId() {

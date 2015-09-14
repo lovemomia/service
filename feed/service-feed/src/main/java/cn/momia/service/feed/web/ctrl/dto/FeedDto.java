@@ -1,5 +1,6 @@
 package cn.momia.service.feed.web.ctrl.dto;
 
+import cn.momia.common.webapp.ctrl.dto.Dto;
 import cn.momia.service.feed.facade.Feed;
 import cn.momia.service.feed.facade.FeedImage;
 import cn.momia.api.user.User;
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class FeedDto {
+public class FeedDto implements Dto {
     private Feed feed;
     private User user;
     private boolean stared;

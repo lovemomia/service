@@ -1,14 +1,17 @@
 package cn.momia.service.deal.web.ctrl;
 
-import cn.momia.service.base.config.Configuration;
-import cn.momia.service.base.util.MobileUtil;
-import cn.momia.api.base.exception.MomiaFailedException;
-import cn.momia.service.base.util.TimeUtil;
-import cn.momia.service.base.web.ctrl.AbstractController;
-import cn.momia.service.deal.exception.OrderLimitException;
-import cn.momia.service.deal.facade.DealServiceFacade;
+import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.util.MobileUtil;
+import cn.momia.common.util.TimeUtil;
+import cn.momia.common.webapp.config.Configuration;
+import cn.momia.common.webapp.ctrl.BaseController;
+import cn.momia.common.webapp.ctrl.dto.ListDto;
+import cn.momia.common.webapp.ctrl.dto.PagedListDto;
+import cn.momia.service.deal.order.OrderLimitException;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderPrice;
+import cn.momia.service.deal.order.OrderService;
 import cn.momia.service.deal.web.ctrl.dto.OrderDetailDto;
 import cn.momia.service.deal.web.ctrl.dto.OrderDto;
 import cn.momia.service.deal.web.ctrl.dto.OrderDupDto;
@@ -20,9 +23,6 @@ import cn.momia.api.product.sku.Sku;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.participant.Participant;
 import cn.momia.api.user.User;
-import cn.momia.service.base.web.ctrl.dto.ListDto;
-import cn.momia.service.base.web.ctrl.dto.PagedListDto;
-import cn.momia.service.base.web.response.ResponseMessage;
 import cn.momia.service.promo.facade.PromoServiceFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -44,31 +44,31 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/order")
-public class OrderController extends AbstractController {
+public class OrderController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
 
-    @Autowired private DealServiceFacade dealServiceFacade;
+    @Autowired private OrderService orderService;
     @Autowired private PromoServiceFacade promoServiceFacade;
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
-    public ResponseMessage add(@RequestBody Order order) {
+    public MomiaHttpResponse add(@RequestBody Order order) {
         Sku sku = ProductServiceApi.SKU.get(order.getProductId(), order.getSkuId());
         checkOrder(order, sku);
 
-        if (!lockSku(order)) return ResponseMessage.FAILED("库存不足");
+        if (!lockSku(order)) return MomiaHttpResponse.FAILED("库存不足");
 
         long orderId = 0;
         try {
             processContacts(order.getCustomerId(), order.getMobile(), order.getContacts());
-            dealServiceFacade.checkLimit(order.getCustomerId(), sku.getSkuId(), order.getCount(), sku.getLimit());
+            orderService.checkLimit(order.getCustomerId(), sku.getSkuId(), order.getCount(), sku.getLimit());
 
-            orderId = dealServiceFacade.placeOrder(order);
+            orderId = orderService.add(order);
             if (orderId > 0) {
                 order.setId(orderId);
-                return ResponseMessage.SUCCESS(new OrderDto(order));
+                return MomiaHttpResponse.SUCCESS(new OrderDto(order));
             }
         } catch (OrderLimitException e) {
-            return ResponseMessage.FAILED("本单有限购，您已超出购买限额");
+            return MomiaHttpResponse.FAILED("本单有限购，您已超出购买限额");
         } catch (Exception e) {
             LOGGER.error("fail to place order, customerId: {}, productId: {}, skuId: {}", new Object[] { order.getCustomerId(), order.getProductId(), order.getSkuId(), e });
         } finally {
@@ -76,11 +76,11 @@ public class OrderController extends AbstractController {
             if (orderId <= 0 && !unlockSku(order)) LOGGER.error("fail to unlock sku, skuId: {}, count: {}", new Object[] { order.getSkuId(), order.getCount() });
         }
 
-        return ResponseMessage.FAILED("下单失败");
+        return MomiaHttpResponse.FAILED("下单失败");
     }
 
     private void checkOrder(Order order, Sku sku) {
-        if (MobileUtil.isInvalidMobile(order.getMobile())) throw new MomiaFailedException("无效的联系电话");
+        if (MobileUtil.isInvalid(order.getMobile())) throw new MomiaFailedException("无效的联系电话");
         if (order.getCustomerId() <= 0 ||
                 order.getProductId() <= 0 ||
                 order.getSkuId() <= 0 ||
@@ -106,7 +106,7 @@ public class OrderController extends AbstractController {
 
     private void processContacts(long userId, String mobile, String name) {
         try {
-            if (MobileUtil.isInvalidMobile(mobile) || StringUtils.isBlank(name)) return;
+            if (MobileUtil.isInvalid(mobile) || StringUtils.isBlank(name)) return;
             UserServiceApi.USER.processContacts(userId, mobile, name);
         } catch (Exception e) {
             LOGGER.error("error occurred during process contacts {}/{}", mobile, name, e);
@@ -118,10 +118,10 @@ public class OrderController extends AbstractController {
     }
 
     @RequestMapping(value = "/check/dup", method = RequestMethod.POST, consumes = "application/json")
-    public ResponseMessage checkDup(@RequestBody Order order) {
+    public MomiaHttpResponse checkDup(@RequestBody Order order) {
         try {
-            List<Order> orders = dealServiceFacade.getOrders(order.getCustomerId(), order.getProductId(), order.getSkuId());
-            if (orders.isEmpty()) return ResponseMessage.SUCCESS(OrderDupDto.NOT_DUPLICATED);
+            List<Order> orders = orderService.list(order.getCustomerId(), order.getProductId(), order.getSkuId());
+            if (orders.isEmpty()) return MomiaHttpResponse.SUCCESS(OrderDupDto.NOT_DUPLICATED);
 
             for (Order o : orders) {
                 if (o.isPayed()) continue;
@@ -132,13 +132,13 @@ public class OrderController extends AbstractController {
                 orderDupDto.setProductId(o.getProductId());
                 if (isSame(order, o)) orderDupDto.setSame(true);
 
-                return ResponseMessage.SUCCESS(orderDupDto);
+                return MomiaHttpResponse.SUCCESS(orderDupDto);
             }
         } catch (Exception e) {
-            return ResponseMessage.SUCCESS(OrderDupDto.NOT_DUPLICATED);
+            return MomiaHttpResponse.SUCCESS(OrderDupDto.NOT_DUPLICATED);
         }
 
-        return ResponseMessage.SUCCESS(OrderDupDto.NOT_DUPLICATED);
+        return MomiaHttpResponse.SUCCESS(OrderDupDto.NOT_DUPLICATED);
     }
 
     private boolean isSame(Order order1, Order order2) {
@@ -194,12 +194,12 @@ public class OrderController extends AbstractController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseMessage delete(@RequestParam String utoken, @PathVariable long id) {
+    public MomiaHttpResponse delete(@RequestParam String utoken, @PathVariable long id) {
         User user = UserServiceApi.USER.get(utoken);
-        Order order = dealServiceFacade.getOrder(id);
-        if (!order.exists() || order.getCustomerId() != user.getId()) return ResponseMessage.FAILED("无效的订单");
+        Order order = orderService.get(id);
+        if (!order.exists() || order.getCustomerId() != user.getId()) return MomiaHttpResponse.FAILED("无效的订单");
 
-        if (!dealServiceFacade.deleteOrder(user.getId(), id)) return ResponseMessage.FAILED("删除订单失败");
+        if (!orderService.delete(user.getId(), id)) return MomiaHttpResponse.FAILED("删除订单失败");
 
         // TODO 需要告警
         if (!unlockSku(order)) LOGGER.error("fail to unlock sku, skuId: {}, count: {}", new Object[] { order.getSkuId(), order.getCount() });
@@ -207,25 +207,25 @@ public class OrderController extends AbstractController {
         int status = order.getStatus();
         if (status == Order.Status.PRE_PAYED) promoServiceFacade.releaseUserCoupon(order.getCustomerId(), order.getId());
 
-        return ResponseMessage.SUCCESS;
+        return MomiaHttpResponse.SUCCESS;
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public ResponseMessage list(@RequestParam String utoken,
-                                @RequestParam int status,
-                                @RequestParam int start,
-                                @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return ResponseMessage.SUCCESS(PagedListDto.EMPTY);
+    public MomiaHttpResponse list(@RequestParam String utoken,
+                                  @RequestParam int status,
+                                  @RequestParam int start,
+                                  @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);
 
         User user = UserServiceApi.USER.get(utoken);
-        long totalCount = dealServiceFacade.queryOrderCountByUser(user.getId(), status);
-        List<Order> orders = dealServiceFacade.queryOrderByUser(user.getId(), status, start, count);
+        long totalCount = orderService.queryCountByUser(user.getId(), status);
+        List<Order> orders = orderService.queryByUser(user.getId(), status, start, count);
 
         List<Long> productIds = new ArrayList<Long>();
         for (Order order : orders) productIds.add(order.getProductId());
         List<Product> products = ProductServiceApi.PRODUCT.list(productIds);
 
-        return ResponseMessage.SUCCESS(buildUserOrders(totalCount, orders, products, start, count));
+        return MomiaHttpResponse.SUCCESS(buildUserOrders(totalCount, orders, products, start, count));
     }
 
     private PagedListDto buildUserOrders(long totalCount, List<Order> orders, List<Product> products, int start, int count) {
@@ -248,40 +248,40 @@ public class OrderController extends AbstractController {
     }
 
     @RequestMapping(value = "/{id}/check", method = RequestMethod.GET)
-    public ResponseMessage check(@RequestParam String utoken,
-                                  @PathVariable(value = "id") long id,
-                                  @RequestParam(value = "pid") long productId,
-                                  @RequestParam(value = "sid") long skuId) {
+    public MomiaHttpResponse check(@RequestParam String utoken,
+                                   @PathVariable(value = "id") long id,
+                                   @RequestParam(value = "pid") long productId,
+                                   @RequestParam(value = "sid") long skuId) {
         User user = UserServiceApi.USER.get(utoken);
-        Order order = dealServiceFacade.getOrder(id);
+        Order order = orderService.get(id);
         if (!order.isPayed() ||
                 order.getCustomerId() != user.getId() ||
                 order.getProductId() != productId ||
-                order.getSkuId() != skuId) return ResponseMessage.SUCCESS(false);
+                order.getSkuId() != skuId) return MomiaHttpResponse.SUCCESS(false);
 
-        return ResponseMessage.SUCCESS(true);
+        return MomiaHttpResponse.SUCCESS(true);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseMessage detail(@RequestParam String utoken,
-                                  @PathVariable(value = "id") long id,
-                                  @RequestParam(value = "pid") long productId) {
+    public MomiaHttpResponse detail(@RequestParam String utoken,
+                                    @PathVariable(value = "id") long id,
+                                    @RequestParam(value = "pid") long productId) {
         User user = UserServiceApi.USER.get(utoken);
-        Order order = dealServiceFacade.getOrder(id);
+        Order order = orderService.get(id);
         Product product = ProductServiceApi.PRODUCT.get(productId, Product.Type.BASE_WITH_SKU);
         if (!order.exists() || !product.exists() ||
                 order.getCustomerId() != user.getId() ||
-                order.getProductId() != product.getId()) return ResponseMessage.FAILED("无效的订单");
+                order.getProductId() != product.getId()) return MomiaHttpResponse.FAILED("无效的订单");
 
-        return ResponseMessage.SUCCESS(new OrderDetailDto(order, product));
+        return MomiaHttpResponse.SUCCESS(new OrderDetailDto(order, product));
     }
 
     @RequestMapping(value = "/customer", method = RequestMethod.GET)
-    public ResponseMessage getProductCustomersInfo(@RequestParam(value = "pid") long productId, @RequestParam int count) {
-        if (productId <= 0 || count <= 0) return ResponseMessage.BAD_REQUEST;
+    public MomiaHttpResponse getProductCustomersInfo(@RequestParam(value = "pid") long productId, @RequestParam int count) {
+        if (productId <= 0 || count <= 0) return MomiaHttpResponse.BAD_REQUEST;
 
-        List<Order> orders = dealServiceFacade.queryDistinctCustomerOrderByProduct(productId, 0, count);
-        if (orders.isEmpty()) return ResponseMessage.SUCCESS(ListDto.EMPTY);
+        List<Order> orders = orderService.queryDistinctCustomerOrderByProduct(productId, 0, count);
+        if (orders.isEmpty()) return MomiaHttpResponse.SUCCESS(ListDto.EMPTY);
 
         List<Long> customerIds = new ArrayList<Long>();
         for (Order order : orders) customerIds.add(order.getCustomerId());
@@ -300,18 +300,18 @@ public class OrderController extends AbstractController {
             avatars.add(customer.getAvatar());
         }
 
-        return ResponseMessage.SUCCESS(avatars);
+        return MomiaHttpResponse.SUCCESS(avatars);
     }
 
     @RequestMapping(value = "/playmate", method = RequestMethod.GET)
-    public ResponseMessage listPlaymates(@RequestParam(value = "pid") long productId, @RequestParam int start, @RequestParam int count) {
-        if (productId <= 0 || isInvalidLimit(start, count)) return ResponseMessage.BAD_REQUEST;
+    public MomiaHttpResponse listPlaymates(@RequestParam(value = "pid") long productId, @RequestParam int start, @RequestParam int count) {
+        if (productId <= 0 || isInvalidLimit(start, count)) return MomiaHttpResponse.BAD_REQUEST;
 
         List<Sku> skus = querySkus(productId, start, count);
-        if (skus.isEmpty()) return ResponseMessage.EMPTY_ARRAY;
+        if (skus.isEmpty()) return MomiaHttpResponse.EMPTY_ARRAY;
 
         List<Order> orders = queryOrders(productId, skus);
-        if (orders.isEmpty()) return ResponseMessage.EMPTY_ARRAY;
+        if (orders.isEmpty()) return MomiaHttpResponse.EMPTY_ARRAY;
 
         Map<Long, List<Order>> skuOrdersMap = new HashMap<Long, List<Order>>();
         Map<Long, List<Long>> skuCustomerIdsMap = new HashMap<Long, List<Long>>();
@@ -342,12 +342,11 @@ public class OrderController extends AbstractController {
             customersMap.put(customer.getId(), customer);
         }
 
-        return ResponseMessage.SUCCESS(buildPlaymates(skus, skuOrdersMap, skuCustomerIdsMap, customersMap));
+        return MomiaHttpResponse.SUCCESS(buildPlaymates(skus, skuOrdersMap, skuCustomerIdsMap, customersMap));
     }
 
     private List<Sku> querySkus(long id, int start, int count) {
-        List<Sku> skus = ProductServiceApi.SKU.listAll(id);
-
+        List<Sku> skus = ProductServiceApi.SKU.list(id, Sku.Status.ALL);
         List<Sku> result = new ArrayList<Sku>();
         for (int i = start; i < Math.min(skus.size(), start + count); i++) {
             result.add(skus.get(i));
@@ -364,7 +363,7 @@ public class OrderController extends AbstractController {
 
         // TODO 性能优化
         List<Order> result = new ArrayList<Order>();
-        List<Order> orders = dealServiceFacade.queryAllCustomerOrderByProduct(id);
+        List<Order> orders = orderService.queryAllCustomerOrderByProduct(id);
         for (Order order : orders) {
             if (skuIds.contains(order.getSkuId())) result.add(order);
         }
@@ -441,7 +440,7 @@ public class OrderController extends AbstractController {
                 List<Participant> children = customer.getChildren();
                 if (children != null) {
                     for (Participant child : children) {
-                        childrenStrs.add(child.getSex() + "孩" + TimeUtil.getAgeDesc(child.getBirthday()));
+                        childrenStrs.add(child.getSex() + "孩" + TimeUtil.formatAge(child.getBirthday()));
                     }
                 }
                 playmateDto.setChildren(childrenStrs);

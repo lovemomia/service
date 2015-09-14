@@ -1,10 +1,8 @@
 package cn.momia.service.feed.base;
 
-import cn.momia.service.base.Service;
-
 import java.util.List;
 
-public interface BaseFeedService extends Service {
+public interface BaseFeedService {
     long add(BaseFeed baseFeed);
     BaseFeed get(long id);
     boolean delete(long userId, long id);

@@ -1,14 +1,14 @@
 package cn.momia.service.user.web.ctrl;
 
-import cn.momia.service.base.util.MobileUtil;
+import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.util.MobileUtil;
+import cn.momia.common.webapp.ctrl.dto.ListDto;
 import cn.momia.service.user.leader.Leader;
 import cn.momia.service.user.web.ctrl.dto.BaseUserDto;
 import cn.momia.service.user.web.ctrl.dto.ContactsDto;
 import cn.momia.service.user.web.ctrl.dto.FullUserDto;
 import cn.momia.service.user.web.ctrl.dto.MiniUserDto;
 import cn.momia.service.user.web.ctrl.dto.ParticipantDto;
-import cn.momia.service.base.web.ctrl.dto.ListDto;
-import cn.momia.service.base.web.response.ResponseMessage;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;
 import com.google.common.base.Splitter;
@@ -33,237 +33,267 @@ import java.util.Set;
 @RequestMapping("/user")
 public class UserController extends UserRelatedController {
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseMessage getUser(@RequestParam String utoken) {
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+    public MomiaHttpResponse getUser(@RequestParam String utoken) {
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
-        return ResponseMessage.SUCCESS(buildUserResponse(user));
+        return MomiaHttpResponse.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseMessage getUser(@PathVariable long id) {
-        User user = userServiceFacade.getUser(id);
+    public MomiaHttpResponse getUser(@PathVariable long id) {
+        User user = userService.get(id);
 
-        return ResponseMessage.SUCCESS(buildUserResponse(user, false));
+        return MomiaHttpResponse.SUCCESS(buildUserResponse(user, false));
     }
 
     @RequestMapping(value = "/nickname", method = RequestMethod.PUT)
-    public ResponseMessage updateNickName(@RequestParam String utoken, @RequestParam(value = "nickname") String nickName) {
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+    public MomiaHttpResponse updateNickName(@RequestParam String utoken, @RequestParam(value = "nickname") String nickName) {
+        if (StringUtils.isBlank(nickName)) return MomiaHttpResponse.FAILED("昵称不能为空");
+        if (userService.exists("nickName", nickName)) return MomiaHttpResponse.FAILED("昵称已存在，不能使用");
+
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
         String originalNickName = user.getNickName();
         if (StringUtils.isBlank(originalNickName) || !originalNickName.equals(nickName)) {
-            boolean successful = userServiceFacade.updateUserNickName(user.getId(), nickName);
-            if (!successful) return ResponseMessage.FAILED("更新失败，昵称已存在");
+            boolean successful = userService.updateNickName(user.getId(), nickName);
+            if (!successful) return MomiaHttpResponse.FAILED("更新昵称失败");
         }
 
         user.setNickName(nickName);
-        return ResponseMessage.SUCCESS(buildUserResponse(user));
+        return MomiaHttpResponse.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/avatar", method = RequestMethod.PUT)
-    public ResponseMessage updateAvatar(@RequestParam String utoken, @RequestParam String avatar) {
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+    public MomiaHttpResponse updateAvatar(@RequestParam String utoken, @RequestParam String avatar) {
+        if (StringUtils.isBlank(avatar)) return MomiaHttpResponse.FAILED("头像不能为空");
 
-        boolean successful = userServiceFacade.updateUserAvatar(user.getId(), avatar);
-        if (!successful) return ResponseMessage.FAILED("更新用户头像失败");
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
+
+        boolean successful = userService.updateAvatar(user.getId(), avatar);
+        if (!successful) return MomiaHttpResponse.FAILED("更新用户头像失败");
 
         user.setAvatar(avatar);
-        return ResponseMessage.SUCCESS(buildUserResponse(user));
+        return MomiaHttpResponse.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/name", method = RequestMethod.PUT)
-    public ResponseMessage updateName(@RequestParam String utoken, @RequestParam String name) {
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+    public MomiaHttpResponse updateName(@RequestParam String utoken, @RequestParam String name) {
+        if (StringUtils.isBlank(name)) return MomiaHttpResponse.FAILED("姓名不能为空");
 
-        boolean successful = userServiceFacade.updateUserName(user.getId(), name);
-        if (!successful) return ResponseMessage.FAILED("更新用户名字失败");
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
+
+        boolean successful = userService.updateName(user.getId(), name);
+        if (!successful) return MomiaHttpResponse.FAILED("更新用户名字失败");
 
         user.setName(name);
-        return ResponseMessage.SUCCESS(buildUserResponse(user));
+        return MomiaHttpResponse.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/sex", method = RequestMethod.PUT)
-    public ResponseMessage updateSex(@RequestParam String utoken, @RequestParam String sex) {
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+    public MomiaHttpResponse updateSex(@RequestParam String utoken, @RequestParam String sex) {
+        if (StringUtils.isBlank(sex) || !SEX.contains(sex)) return MomiaHttpResponse.FAILED("无效的性别");
 
-        boolean successful = userServiceFacade.updateUserSex(user.getId(), sex);
-        if (!successful) return ResponseMessage.FAILED("更新用户性别失败");
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
+
+        boolean successful = userService.updateSex(user.getId(), sex);
+        if (!successful) return MomiaHttpResponse.FAILED("更新用户性别失败");
 
         user.setSex(sex);
-        return ResponseMessage.SUCCESS(buildUserResponse(user));
+        return MomiaHttpResponse.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/birthday", method = RequestMethod.PUT)
-    public ResponseMessage updateBirthday(@RequestParam String utoken, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date birthday) {
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+    public MomiaHttpResponse updateBirthday(@RequestParam String utoken, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date birthday) {
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
-        boolean successful = userServiceFacade.updateUserBirthday(user.getId(), birthday);
-        if (!successful) return ResponseMessage.FAILED("更新用户生日失败");
+        boolean successful = userService.updateBirthday(user.getId(), birthday);
+        if (!successful) return MomiaHttpResponse.FAILED("更新用户生日失败");
 
         user.setBirthday(birthday);
-        return ResponseMessage.SUCCESS(buildUserResponse(user));
+        return MomiaHttpResponse.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/city", method = RequestMethod.PUT)
-    public ResponseMessage updateCity(@RequestParam String utoken, @RequestParam(value = "city") int cityId) {
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+    public MomiaHttpResponse updateCity(@RequestParam String utoken, @RequestParam(value = "city") int cityId) {
+        if (cityId <= 0) return MomiaHttpResponse.FAILED("无效的城市");
 
-        boolean successful = userServiceFacade.updateUserCityId(user.getId(), cityId);
-        if (!successful) return ResponseMessage.FAILED("更新用户城市失败");
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
+
+        boolean successful = userService.updateCityId(user.getId(), cityId);
+        if (!successful) return MomiaHttpResponse.FAILED("更新用户城市失败");
 
         user.setCityId(cityId);
-        return ResponseMessage.SUCCESS(buildUserResponse(user));
+        return MomiaHttpResponse.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/region", method = RequestMethod.PUT)
-    public ResponseMessage updateRegion(@RequestParam String utoken, @RequestParam(value = "region") int regionId) {
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+    public MomiaHttpResponse updateRegion(@RequestParam String utoken, @RequestParam(value = "region") int regionId) {
+        if (regionId <= 0) return MomiaHttpResponse.FAILED("无效的地区");
 
-        boolean successful = userServiceFacade.updateUserRegionId(user.getId(), regionId);
-        if (!successful) return ResponseMessage.FAILED("更新用户所在区域失败");
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
+
+        boolean successful = userService.updateRegionId(user.getId(), regionId);
+        if (!successful) return MomiaHttpResponse.FAILED("更新用户所在区域失败");
 
         user.setRegionId(regionId);
-        return ResponseMessage.SUCCESS(buildUserResponse(user));
+        return MomiaHttpResponse.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/address", method = RequestMethod.PUT)
-    public ResponseMessage updateAddress(@RequestParam String utoken, @RequestParam String address) {
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+    public MomiaHttpResponse updateAddress(@RequestParam String utoken, @RequestParam String address) {
+        if (StringUtils.isBlank(address)) return MomiaHttpResponse.FAILED("住址不能为空");
 
-        boolean successful = userServiceFacade.updateUserAddress(user.getId(), address);
-        if (!successful) return ResponseMessage.FAILED("更新用户地址失败");
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
+
+        boolean successful = userService.updateAddress(user.getId(), address);
+        if (!successful) return MomiaHttpResponse.FAILED("更新用户地址失败");
 
         user.setAddress(address);
-        return ResponseMessage.SUCCESS(buildUserResponse(user));
+        return MomiaHttpResponse.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/child", method = RequestMethod.POST, consumes = "application/json")
-    public ResponseMessage addChild(@RequestBody Participant[] children) {
-        for(Participant child : children) if (child.isInvalid()) return ResponseMessage.FAILED("添加孩子信息失败");
+    public MomiaHttpResponse addChild(@RequestBody Participant[] children) {
+        for(Participant child : children) if (child.isInvalid()) return MomiaHttpResponse.FAILED("添加孩子信息失败");
 
         long userId = 0;
         Set<Long> childIds = new HashSet<Long>();
         for(Participant child : children) {
             userId = child.getUserId();
-            long childId = userServiceFacade.addChild(child);
-            if (childId <= 0) return ResponseMessage.FAILED("添加孩子信息失败");
+            long childId = participantService.add(child);
+            if (childId <= 0) return MomiaHttpResponse.FAILED("添加孩子信息失败");
             childIds.add(childId);
         }
 
-        User user = userServiceFacade.getUser(userId);
-        if (!user.exists()) return ResponseMessage.FAILED("用户不存在");
+        User user = userService.get(userId);
+        if (!user.exists()) return MomiaHttpResponse.FAILED("用户不存在");
 
         user.getChildren().addAll(childIds);
-        if (!userServiceFacade.updateUserChildren(userId, user.getChildren())) return ResponseMessage.FAILED("添加孩子信息失败");
+        if (!userService.updateChildren(userId, user.getChildren())) return MomiaHttpResponse.FAILED("添加孩子信息失败");
 
-        return ResponseMessage.SUCCESS(buildUserResponse(user));
+        return MomiaHttpResponse.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/child/{cid}", method = RequestMethod.GET)
-    public ResponseMessage getChild(@RequestParam String utoken, @PathVariable(value = "cid") long childId) {
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+    public MomiaHttpResponse getChild(@RequestParam String utoken, @PathVariable(value = "cid") long childId) {
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
         Set<Long> children = user.getChildren();
-        if (!children.contains(childId)) return ResponseMessage.FAILED("孩子信息不存在");
+        if (!children.contains(childId)) return MomiaHttpResponse.FAILED("孩子信息不存在");
 
-        Participant child = userServiceFacade.getChild(user.getId(), childId);
-        if (!child.exists()) return ResponseMessage.FAILED("孩子不存在");
+        Participant child = participantService.get(childId);
+        if (!child.exists() || child.getUserId() != user.getId()) return MomiaHttpResponse.FAILED("孩子不存在");
 
-        return ResponseMessage.SUCCESS(new ParticipantDto(child));
+        return MomiaHttpResponse.SUCCESS(new ParticipantDto(child));
     }
 
     @RequestMapping(value = "/child/{cid}/name",method = RequestMethod.PUT)
-    public ResponseMessage updateChildName(@RequestParam String utoken,
-                                           @PathVariable(value = "cid") long childId,
-                                           @RequestParam String name) {
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+    public MomiaHttpResponse updateChildName(@RequestParam String utoken,
+                                             @PathVariable(value = "cid") long childId,
+                                             @RequestParam String name) {
+        if (StringUtils.isBlank(name)) return MomiaHttpResponse.FAILED("孩子姓名不能为空");
+
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
         if (!user.getChildren().contains(childId) ||
-                !userServiceFacade.updateChildName(user.getId(), childId, name)) return ResponseMessage.FAILED("更新孩子姓名失败");
+                !participantService.updateName(user.getId(), childId, name)) return MomiaHttpResponse.FAILED("更新孩子姓名失败");
 
-        return ResponseMessage.SUCCESS(buildUserResponse(userServiceFacade.getUserByToken(utoken)));
+        return MomiaHttpResponse.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/child/{cid}/sex",method = RequestMethod.PUT)
-    public ResponseMessage updateChildSex(@RequestParam String utoken,
-                                          @PathVariable(value = "cid") long childId,
-                                          @RequestParam String sex) {
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+    public MomiaHttpResponse updateChildSex(@RequestParam String utoken,
+                                            @PathVariable(value = "cid") long childId,
+                                            @RequestParam String sex) {
+        if (StringUtils.isBlank(sex) || !SEX.contains(sex)) return MomiaHttpResponse.FAILED("无效的孩子性别");
+
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
         if (!user.getChildren().contains(childId) ||
-                !userServiceFacade.updateChildSex(user.getId(), childId, sex)) return ResponseMessage.FAILED("更新孩子性别失败");
+                !participantService.updateSex(user.getId(), childId, sex)) return MomiaHttpResponse.FAILED("更新孩子性别失败");
 
-        return ResponseMessage.SUCCESS(buildUserResponse(userServiceFacade.getUserByToken(utoken)));
+        return MomiaHttpResponse.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/child/{cid}/birthday",method = RequestMethod.PUT)
-    public ResponseMessage updateChildBirthday(@RequestParam String utoken,
-                                               @PathVariable(value = "cid") long childId,
-                                               @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd")Date birthday) {
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+    public MomiaHttpResponse updateChildBirthday(@RequestParam String utoken,
+                                                 @PathVariable(value = "cid") long childId,
+                                                 @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd")Date birthday) {
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
         if (!user.getChildren().contains(childId) ||
-                !userServiceFacade.updateChildBirthday(user.getId(), childId, birthday)) return ResponseMessage.FAILED("更新孩子生日失败");
+                !participantService.updateBirthday(user.getId(), childId, birthday)) return MomiaHttpResponse.FAILED("更新孩子生日失败");
 
-        return ResponseMessage.SUCCESS(buildUserResponse(userServiceFacade.getUserByToken(utoken)));
+        return MomiaHttpResponse.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/child/{cid}", method = RequestMethod.DELETE)
-    public ResponseMessage deleteChild(@RequestParam String utoken, @PathVariable(value = "cid") long childId) {
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+    public MomiaHttpResponse deleteChild(@RequestParam String utoken, @PathVariable(value = "cid") long childId) {
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
-        user.getChildren().remove(childId);
-        if (!userServiceFacade.updateUserChildren(user.getId(), user.getChildren())) return ResponseMessage.FAILED("删除孩子信息失败");
+        if (user.getChildren().contains(childId)) {
+            user.getChildren().remove(childId);
+            if (!userService.updateChildren(user.getId(), user.getChildren())) return MomiaHttpResponse.FAILED("删除孩子信息失败");
+        }
 
-        return ResponseMessage.SUCCESS(buildUserResponse(user));
+        return MomiaHttpResponse.SUCCESS(buildUserResponse(user));
     }
 
     @RequestMapping(value = "/child", method = RequestMethod.GET)
-    public ResponseMessage listChildren(@RequestParam String utoken) {
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+    public MomiaHttpResponse listChildren(@RequestParam String utoken) {
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
         Set<Long> childIds = user.getChildren();
-        return ResponseMessage.SUCCESS(buildParticipantsResponse(userServiceFacade.getChildren(user.getId(), childIds)));
+        return MomiaHttpResponse.SUCCESS(buildParticipantsResponse(participantService.list(childIds)));
     }
 
     @RequestMapping(value = "/contacts", method = RequestMethod.GET)
-    public ResponseMessage getContacts(@RequestParam String utoken) {
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+    public MomiaHttpResponse getContacts(@RequestParam String utoken) {
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
-        return ResponseMessage.SUCCESS(new ContactsDto(user));
+        return MomiaHttpResponse.SUCCESS(new ContactsDto(user));
     }
 
     @RequestMapping(value = "/{id}/contacts", method = RequestMethod.POST)
-    public ResponseMessage processContacts(@PathVariable(value = "id") long userId, @RequestParam String mobile, @RequestParam String name) {
-        if (userId <= 0 || MobileUtil.isInvalidMobile(mobile) || StringUtils.isBlank(name)) return ResponseMessage.BAD_REQUEST;
+    public MomiaHttpResponse processContacts(@PathVariable(value = "id") long userId, @RequestParam String mobile, @RequestParam String name) {
+        if (userId <= 0 || MobileUtil.isInvalid(mobile) || StringUtils.isBlank(name)) return MomiaHttpResponse.SUCCESS;
 
-        userServiceFacade.processContacts(userId, mobile, name);
+        try {
+            User user = userService.getByMobile(mobile);
+            if (user.exists()) {
+                if (user.getId() == userId &&
+                        StringUtils.isBlank(user.getName()) &&
+                        !name.equals(user.getNickName())) userService.updateName(user.getId(), name);
+            }
+        } catch (Exception e) {
+            // do nothing
+        }
 
-        return ResponseMessage.SUCCESS;
+        return MomiaHttpResponse.SUCCESS;
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public ResponseMessage listUsers(@RequestParam String uids, @RequestParam(defaultValue = "" + User.Type.BASE) int type) {
+    public MomiaHttpResponse listUsers(@RequestParam String uids, @RequestParam(defaultValue = "" + User.Type.BASE) int type) {
         List<Long> ids = new ArrayList<Long>();
         for (String id : Splitter.on(",").trimResults().omitEmptyStrings().split(uids)) ids.add(Long.valueOf(id));
 
-        List<User> users = userServiceFacade.getUsers(ids);
+        List<User> users = userService.list(ids);
         ListDto usersDto = new ListDto();
 
         switch (type) {
@@ -273,12 +303,12 @@ public class UserController extends UserRelatedController {
             case User.Type.FULL:
                 Set<Long> childrenIds = new HashSet<Long>();
                 for (User user : users) childrenIds.addAll(user.getChildren());
-                List<Participant> children = userServiceFacade.getParticipants(childrenIds);
+                List<Participant> children = participantService.list(childrenIds);
                 Map<Long, Participant> childrenMap = new HashMap<Long, Participant>();
                 for (Participant child : children) childrenMap.put(child.getId(), child);
 
                 Map<Long, Leader> userLeaderInfosMap = new HashMap<Long, Leader>();
-                List<Leader> leaderInfos = userServiceFacade.getLeaderInfos(ids);
+                List<Leader> leaderInfos = leaderService.listByUsers(ids);
                 for (Leader leaderInfo : leaderInfos) userLeaderInfosMap.put(leaderInfo.getUserId(), leaderInfo);
 
                 for (User user : users) {
@@ -298,31 +328,32 @@ public class UserController extends UserRelatedController {
             default: for (User user : users) usersDto.add(new BaseUserDto(user, false));
         }
 
-        return ResponseMessage.SUCCESS(usersDto);
+        return MomiaHttpResponse.SUCCESS(usersDto);
     }
 
     @RequestMapping(value = "/{id}/payed", method = RequestMethod.GET)
-    public ResponseMessage isPayed(@PathVariable(value = "id") long userId) {
-        if (userId <= 0) return ResponseMessage.SUCCESS(true);
-        return ResponseMessage.SUCCESS(userServiceFacade.isPayed(userId));
+    public MomiaHttpResponse isPayed(@PathVariable(value = "id") long userId) {
+        User user = userService.get(userId);
+        if (!user.exists()) return MomiaHttpResponse.SUCCESS(true);
+        return MomiaHttpResponse.SUCCESS(user.isPayed());
     }
 
     @RequestMapping(value = "/{id}/payed", method = RequestMethod.POST)
-    public ResponseMessage setPayed(@PathVariable(value = "id") long userId) {
-        if (userId <= 0) return ResponseMessage.SUCCESS(false);
-        return ResponseMessage.SUCCESS(userServiceFacade.setPayed(userId));
+    public MomiaHttpResponse setPayed(@PathVariable(value = "id") long userId) {
+        if (userId <= 0) return MomiaHttpResponse.SUCCESS(false);
+        return MomiaHttpResponse.SUCCESS(userService.setPayed(userId));
     }
 
     @RequestMapping(value = "/code", method = RequestMethod.GET)
-    public ResponseMessage getInviteCode(@RequestParam String utoken) {
-        User user = userServiceFacade.getUserByToken(utoken);
-        if (!user.exists()) return ResponseMessage.TOKEN_EXPIRED;
+    public MomiaHttpResponse getInviteCode(@RequestParam String utoken) {
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
-        return ResponseMessage.SUCCESS(user.getInviteCode());
+        return MomiaHttpResponse.SUCCESS(user.getInviteCode());
     }
 
     @RequestMapping(value = "/code/id", method = RequestMethod.GET)
-    public ResponseMessage getIdByCode(@RequestParam(value = "code") String inviteCode) {
-        return ResponseMessage.SUCCESS(userServiceFacade.getIdByCode(inviteCode));
+    public MomiaHttpResponse getIdByCode(@RequestParam(value = "code") String inviteCode) {
+        return MomiaHttpResponse.SUCCESS(userService.getIdByCode(inviteCode));
     }
 }

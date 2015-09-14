@@ -27,7 +27,6 @@ public class BaseProduct {
     private JSONArray content;
     private int joined;
     private int sales;
-    private boolean soldOut;
     private Date onlineTime;
     private Date offlineTime;
     private int status;
@@ -126,14 +125,6 @@ public class BaseProduct {
 
     public void setSales(int sales) {
         this.sales = sales;
-    }
-
-    public boolean isSoldOut() {
-        return soldOut;
-    }
-
-    public void setSoldOut(boolean soldOut) {
-        this.soldOut = soldOut;
     }
 
     public Date getOnlineTime() {

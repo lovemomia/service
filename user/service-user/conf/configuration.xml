@@ -4,12 +4,8 @@
         <Level>INFO</Level>
     </Logger>
 
-    <Server>
-        <Biz>service</Biz>
-    </Server>
-
     <Service>
-        <Common>http://localhost:7070</Common>
+        <Base>http://localhost:7070</Base>
     </Service>
 
     <Limit>
@@ -24,4 +20,9 @@
             <Password>Tongqu!@#456</Password>
         </Tongqu>
     </Database>
+
+    <SecretKey>
+        <Password></Password>
+        <UToken></UToken>
+    </SecretKey>
 </Configuration>

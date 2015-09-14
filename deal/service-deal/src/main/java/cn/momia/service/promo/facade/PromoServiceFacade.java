@@ -12,12 +12,12 @@ public interface PromoServiceFacade {
     void distributeShareCoupon(long customerId, long sharerId, BigDecimal totalFee);
 
     Coupon getCoupon(long userId, long orderId, long userCouponId);
+    List<Coupon> listCoupons(Collection<Integer> couponIds);
     boolean canUse(BigDecimal totalFee, Coupon coupon);
     BigDecimal calcTotalFee(BigDecimal totalFee, Coupon coupon);
 
     int queryUserCouponCount(long userId, long orderId, BigDecimal totalFee, int status);
     List<UserCoupon> queryUserCoupon(long userId, long orderId, BigDecimal totalFee, int status, int start, int count);
-    List<Coupon> getCoupons(Collection<Integer> couponIds);
 
     UserCoupon getNotUsedUserCouponByOrder(long orderId);
     boolean lockUserCoupon(long userId, long orderId, long userCouponId);

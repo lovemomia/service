@@ -1,6 +1,6 @@
 package cn.momia.service.deal.gateway.wechatpay;
 
-import cn.momia.service.base.config.Configuration;
+import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.deal.gateway.ClientType;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +35,7 @@ public class WechatpayUtil {
             kvs.add(key + "=" + value);
         }
         Collections.sort(kvs);
-        kvs.add("key=" + (ClientType.isFromApp(clientType) ? Configuration.getSecretKey("wechatpayApp") : Configuration.getSecretKey("wechatpayJsApi")));
+        kvs.add("key=" + (ClientType.isFromApp(clientType) ? Configuration.getString("Payment.Wechat.AppKey") : Configuration.getString("Payment.Wechat.JsApiKey")));
 
         String s = StringUtils.join(kvs, "&");
         return DigestUtils.md5Hex(s).toUpperCase();

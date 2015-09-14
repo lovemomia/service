@@ -1,8 +1,8 @@
 package cn.momia.service.deal.gateway.wechatpay;
 
-import cn.momia.api.base.exception.MomiaFailedException;
+import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.service.deal.gateway.CallbackParam;
-import cn.momia.service.deal.gateway.MapWrapper;
+import cn.momia.common.collection.MapWrapper;
 import cn.momia.service.deal.gateway.ClientType;
 
 import java.math.BigDecimal;
@@ -28,6 +28,10 @@ public class WechatpayCallbackParam extends MapWrapper implements CallbackParam 
     private static final String DATE_FORMAT_STR = "yyyyMMddHHmmss";
     private static final DateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT_STR);
     private static final String SUCCESS = "SUCCESS";
+
+    public WechatpayCallbackParam(Map<String, String> params) {
+        addAll(params);
+    }
 
     @Override
     public boolean isPayedSuccessfully() {
@@ -85,9 +89,5 @@ public class WechatpayCallbackParam extends MapWrapper implements CallbackParam 
     @Override
     public BigDecimal getTotalFee() {
         return new BigDecimal(get(Field.TOTAL_FEE)).divide(new BigDecimal(100));
-    }
-
-    public WechatpayCallbackParam(Map<String, String> params) {
-        addAll(params);
     }
 }

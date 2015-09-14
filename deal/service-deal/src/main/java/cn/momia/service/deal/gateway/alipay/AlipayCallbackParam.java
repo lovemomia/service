@@ -1,10 +1,10 @@
 package cn.momia.service.deal.gateway.alipay;
 
-import cn.momia.service.base.config.Configuration;
-import cn.momia.api.base.exception.MomiaFailedException;
-import cn.momia.service.base.util.TimeUtil;
+import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.common.util.TimeUtil;
+import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.deal.gateway.CallbackParam;
-import cn.momia.service.deal.gateway.MapWrapper;
+import cn.momia.common.collection.MapWrapper;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
@@ -27,6 +27,10 @@ public class AlipayCallbackParam extends MapWrapper implements CallbackParam {
         public static final String GMT_PAYMENT = "gmt_payment"; //交易付款时间
         public static final String BUYER_ID = "buyer_id"; //买家支付宝帐号
         public static final String TRADE_STATUS = "trade_status";
+    }
+
+    public AlipayCallbackParam(Map<String, String> params) {
+        addAll(params);
     }
 
     @Override
@@ -83,9 +87,5 @@ public class AlipayCallbackParam extends MapWrapper implements CallbackParam {
     @Override
     public BigDecimal getTotalFee() {
         return new BigDecimal(get(Field.TOTAL_FEE));
-    }
-
-    public AlipayCallbackParam(Map<String, String> params) {
-        addAll(params);
     }
 }

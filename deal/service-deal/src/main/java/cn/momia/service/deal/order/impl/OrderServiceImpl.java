@@ -1,9 +1,11 @@
 package cn.momia.service.deal.order.impl;
 
-import cn.momia.service.base.impl.DbAccessService;
+import cn.momia.common.service.DbAccessService;
+import cn.momia.service.deal.order.OrderLimitException;
 import cn.momia.service.deal.order.Order;
 import cn.momia.service.deal.order.OrderPrice;
 import cn.momia.service.deal.order.OrderService;
+import cn.momia.service.deal.order.Payment;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -16,6 +18,8 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -57,6 +61,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public Order get(long id) {
+        if (id <= 0) return Order.NOT_EXIST_ORDER;
+
         String sql = "SELECT " + joinFields() + " FROM t_order WHERE id=? AND status>0";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Order>() {
@@ -70,8 +76,9 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public List<Order> list(long userId, long productId, long skuId) {
-        final List<Order> orders = new ArrayList<Order>();
+        if (userId <= 0 || productId <= 0 || skuId <= 0) return new ArrayList<Order>();
 
+        final List<Order> orders = new ArrayList<Order>();
         String sql = "SELECT " + joinFields() + " FROM t_order WHERE customerId=? AND productId=? AND skuId=? AND status>0 ORDER BY addTime DESC";
         jdbcTemplate.query(sql, new Object[] { userId, productId, skuId }, new RowCallbackHandler() {
             @Override
@@ -136,6 +143,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public long queryCountByUser(long userId, int status) {
+        if (userId <= 0 || status <= 0) return 0;
+
         if (status == 1) {
             String sql = "SELECT COUNT(1) FROM t_order WHERE customerId=? AND status<>0";
             return jdbcTemplate.query(sql, new Object[] { userId }, new ResultSetExtractor<Long>() {
@@ -165,8 +174,9 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public List<Order> queryByUser(long userId, int status, int start, int count) {
-        final List<Order> orders = new ArrayList<Order>();
+        if (userId <= 0 || status <= 0) return new ArrayList<Order>();
 
+        final List<Order> orders = new ArrayList<Order>();
         if (status == 1) {
             String sql = "SELECT " + joinFields() + " FROM t_order WHERE customerId=? AND status<>0 ORDER BY addTime DESC LIMIT ?,?";
             jdbcTemplate.query(sql, new Object[] { userId, start, count }, new RowCallbackHandler() {
@@ -245,7 +255,22 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
+    public void checkLimit(long userId, long skuId, int count, int limit) throws OrderLimitException {
+        if (limit <= 0) return;
+
+        List<Order> orders = queryByUserAndSku(userId, skuId);
+        for (Order order : orders) {
+            if (!order.exists()) continue;
+            count += order.getCount();
+        }
+
+        if (count > limit) throw new OrderLimitException();
+    }
+
+    @Override
     public boolean delete(long userId, long id) {
+        if (userId <= 0 || id <= 0) return false;
+
         String sql = "UPDATE t_order SET status=0 WHERE id=? AND customerId=? AND (status=? OR status=?)";
         int updateCount = jdbcTemplate.update(sql, new Object[] { id, userId, Order.Status.NOT_PAYED, Order.Status.PRE_PAYED });
 
@@ -262,14 +287,53 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public boolean pay(long id) {
+        try {
+            payOrder(id);
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean pay(final Payment payment) {
+        try {
+            transactionTemplate.execute(new TransactionCallback() {
+                @Override
+                public Object doInTransaction(TransactionStatus status) {
+                    payOrder(payment.getOrderId());
+                    logPayment(payment);
+
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            LOGGER.error("fail to pay order: {}", payment.getOrderId(), e);
+            return false;
+        }
+
+        return true;
+    }
+
+    private void payOrder(long id) {
         String sql = "UPDATE t_order SET status=? WHERE id=? AND status=?";
         int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PAYED, id, Order.Status.PRE_PAYED });
 
-        return updateCount == 1;
+        if (updateCount != 1) throw new RuntimeException("fail to pay order: {}" + id);
+    }
+
+    private void logPayment(final Payment payment) {
+        String sql = "INSERT INTO t_payment(orderId, payer, finishTime, payType, tradeNo, fee, addTime) VALUES(?, ?, ?, ?, ?, ?, NOW())";
+        int updateCount = jdbcTemplate.update(sql, new Object[] { payment.getOrderId(), payment.getPayer(), payment.getFinishTime(), payment.getPayType(), payment.getTradeNo(), payment.getFee() });
+
+        if (updateCount != 1) throw new RuntimeException("fail to log payment for order: " + payment.getOrderId());
     }
 
     @Override
     public boolean check(long userId, long id, long productId, long skuId) {
+        if (userId <= 0 || id <= 0 || productId <= 0 || skuId <= 0) return false;
+
         String sql = "SELECT status FROM t_order WHERE id=? AND customerId=? AND productId=? AND skuId=?";
         int status = jdbcTemplate.query(sql, new Object[] { id, userId, productId, skuId }, new ResultSetExtractor<Integer>() {
             @Override

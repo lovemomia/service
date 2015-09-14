@@ -1,6 +1,6 @@
 package cn.momia.service.deal.gateway.factory;
 
-import cn.momia.api.base.exception.MomiaFailedException;
+import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.service.deal.gateway.PaymentGateway;
 
 import java.util.Map;

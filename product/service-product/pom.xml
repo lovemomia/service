@@ -16,19 +16,14 @@
         <!-- Momia Api -->
         <dependency>
             <groupId>cn.momia</groupId>
-            <artifactId>duola-api-common</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.momia</groupId>
-            <artifactId>duola-api-user</artifactId>
+            <artifactId>duola-api-base</artifactId>
             <version>1.0.0</version>
         </dependency>
 
         <!-- Momia -->
         <dependency>
             <groupId>cn.momia</groupId>
-            <artifactId>duola-service-base</artifactId>
+            <artifactId>duola-common-webapp</artifactId>
             <version>1.0.0</version>
         </dependency>
 

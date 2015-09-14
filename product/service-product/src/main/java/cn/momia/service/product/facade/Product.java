@@ -1,7 +1,7 @@
 package cn.momia.service.product.facade;
 
-import cn.momia.api.common.region.Region;
-import cn.momia.service.base.util.TimeUtil;
+import cn.momia.api.base.region.Region;
+import cn.momia.common.util.TimeUtil;
 import cn.momia.service.product.base.BaseProduct;
 import cn.momia.service.product.place.Place;
 import cn.momia.service.product.sku.Sku;
@@ -81,7 +81,7 @@ public class Product implements Serializable {
     }
 
     public boolean isSoldOut() {
-        return baseProduct.isSoldOut();
+        return !isOpened();
     }
 
     public Date getOnlineTime() {
@@ -98,7 +98,7 @@ public class Product implements Serializable {
 
     public boolean isOpened() {
         Date now = new Date();
-        if (getOfflineTime().before(now) || isSoldOut() || getStatus() != 1) return false;
+        if (getOfflineTime().before(now) || getStatus() != 1) return false;
 
         return !Sku.filterClosed(skus).isEmpty();
     }

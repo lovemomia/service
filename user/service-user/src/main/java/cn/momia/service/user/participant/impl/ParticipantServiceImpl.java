@@ -1,6 +1,6 @@
 package cn.momia.service.user.participant.impl;
 
-import cn.momia.service.base.impl.DbAccessService;
+import cn.momia.common.service.DbAccessService;
 import cn.momia.service.user.participant.Participant;
 import cn.momia.service.user.participant.ParticipantService;
 import org.apache.commons.lang3.StringUtils;
@@ -27,6 +27,7 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
     private static final Logger LOGGER = LoggerFactory.getLogger(ParticipantServiceImpl.class);
 
     private static final String[] PARTICIPANT_FIELDS = { "id", "userId", "name", "sex", "birthday", "idType", "idNo" };
+
     @Override
     public long add(final Participant participant) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -51,6 +52,8 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
 
     @Override
     public Participant get(long id) {
+        if (id <= 0) return Participant.NOT_EXIST_PARTICIPANT;
+
         String sql = "SELECT " + joinFields() + " FROM t_user_participant WHERE id=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Participant>() {
@@ -85,10 +88,10 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
     }
 
     @Override
-    public List<Participant> get(Collection<Long> ids) {
-        final List<Participant> participants = new ArrayList<Participant>();
-        if (ids == null || ids.size() <= 0) return participants;
+    public List<Participant> list(Collection<Long> ids) {
+        if (ids.isEmpty()) return new ArrayList<Participant>();
 
+        final List<Participant> participants = new ArrayList<Participant>();
         String sql = "SELECT " + joinFields() + " FROM t_user_participant WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
@@ -102,9 +105,10 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
     }
 
     @Override
-    public List<Participant> getByUser(long userId) {
-        final List<Participant> participants = new ArrayList<Participant>();
+    public List<Participant> listByUser(long userId) {
+        if (userId <= 0) return new ArrayList<Participant>();
 
+        final List<Participant> participants = new ArrayList<Participant>();
         String sql = "SELECT " + joinFields() + " FROM t_user_participant WHERE userId=? AND status=1";
         jdbcTemplate.query(sql, new Object[] { userId }, new RowCallbackHandler() {
 

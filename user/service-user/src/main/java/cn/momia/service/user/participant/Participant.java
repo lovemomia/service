@@ -1,6 +1,6 @@
 package cn.momia.service.user.participant;
 
-import cn.momia.service.base.util.TimeUtil;
+import cn.momia.common.util.TimeUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -120,7 +120,7 @@ public class Participant implements Serializable {
     public String getDesc() {
         if (TimeUtil.isAdult(this.birthday)) return "成人";
 
-        String ageStr = TimeUtil.getAgeDesc(birthday);
+        String ageStr = TimeUtil.formatAge(birthday);
         if (!("男".equals(this.sex) || "女".equals(this.sex))) return "孩子" + ageStr;
         return this.sex + "孩" + ageStr;
     }

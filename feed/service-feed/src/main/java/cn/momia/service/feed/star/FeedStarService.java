@@ -1,11 +1,9 @@
 package cn.momia.service.feed.star;
 
-import cn.momia.service.base.Service;
-
 import java.util.Collection;
 import java.util.List;
 
-public interface FeedStarService extends Service {
+public interface FeedStarService {
     boolean isStared(long userId, long feedId);
     List<Long> queryStaredFeeds(long userId, Collection<Long> feedIds);
 

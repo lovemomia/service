@@ -1,6 +1,6 @@
 package cn.momia.service.product.sku;
 
-import cn.momia.service.base.util.TimeUtil;
+import cn.momia.common.util.TimeUtil;
 import cn.momia.service.product.place.Place;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -19,6 +19,11 @@ import java.util.List;
 public class Sku implements Serializable {
     private static final Splitter TIME_SPLITTER = Splitter.on("~").trimResults().omitEmptyStrings();
     private static final DateFormat TIME_FORMATTER = new SimpleDateFormat("h:mm");
+
+    public static class Status {
+        public static final int ALL = 1;
+        public static final int AVALIABLE = 2;
+    }
 
     public static class Type {
         public static final int NORMAL = 0;
@@ -58,6 +63,14 @@ public class Sku implements Serializable {
         return skus;
     }
 
+    private Date startTime() {
+        List<Date> times = getStartEndTimes();
+        if (times.isEmpty()) return null;
+
+        Collections.sort(times);
+        return times.get(0);
+    }
+
     public static List<Sku> sortByStartTime(List<Sku> skus) {
         Collections.sort(skus, new Comparator<Sku>() {
             @Override
@@ -77,14 +90,6 @@ public class Sku implements Serializable {
         });
 
         return skus;
-    }
-
-    private Date startTime() {
-        List<Date> times = getStartEndTimes();
-        if (times.isEmpty()) return null;
-
-        Collections.sort(times);
-        return times.get(0);
     }
 
     public static List<Sku> filterFinished(List<Sku> skus) {
@@ -342,7 +347,7 @@ public class Sku implements Serializable {
             for (String timeStr : timeStrs) {
                 Date time = TimeUtil.castToDate(timeStr);
                 if (time != null) {
-                    builder.append(TimeUtil.formatDateWithWeekDay(time));
+                    builder.append(TimeUtil.formatMonthDateWithWeekDay(time));
                     if (timeStr.contains(":"))
                         builder.append(TimeUtil.getAmPm(time))
                                 .append(TIME_FORMATTER.format(time));
@@ -350,9 +355,9 @@ public class Sku implements Serializable {
                 }
             }
         } else {
-            builder.append(TimeUtil.formatDateWithWeekDay(start))
+            builder.append(TimeUtil.formatMonthDateWithWeekDay(start))
                     .append("~")
-                    .append(TimeUtil.formatDateWithWeekDay(end));
+                    .append(TimeUtil.formatMonthDateWithWeekDay(end));
         }
 
         return builder.toString();
@@ -418,28 +423,18 @@ public class Sku implements Serializable {
         return new ArrayList<Date>();
     }
 
+    public boolean isFull() {
+        return type != 1 && unlockedStock <= 0;
+    }
+
     public boolean isFinished(Date now) {
         if (offlineTime.before(now) || (startTime.before(now) && !anyTime)) return true;
 
         return false;
     }
 
-    public boolean isFull() {
-        return type != 1 && unlockedStock <= 0;
-    }
-
     public boolean isClosed(Date now) {
-        if (isFinished(now) || isFull()) return true;
-
-        return false;
-    }
-
-    public boolean findPrice(int adult, int child, BigDecimal price) {
-        for (SkuPrice skuPrice : this.prices) {
-            if (skuPrice.getAdult() == adult &&
-                    skuPrice.getChild() == child &&
-                    skuPrice.getPrice().compareTo(price) == 0) return true;
-        }
+        if (isFull() || isFinished(now)) return true;
 
         return false;
     }

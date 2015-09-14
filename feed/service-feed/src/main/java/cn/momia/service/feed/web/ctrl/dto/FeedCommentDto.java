@@ -1,12 +1,13 @@
 package cn.momia.service.feed.web.ctrl.dto;
 
+import cn.momia.common.webapp.ctrl.dto.Dto;
 import cn.momia.service.feed.comment.FeedComment;
 import cn.momia.api.user.User;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
 
-public class FeedCommentDto {
+public class FeedCommentDto implements Dto {
     private FeedComment comment;
     private User user;
 

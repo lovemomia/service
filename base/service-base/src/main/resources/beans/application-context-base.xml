@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="smsSender" class="cn.momia.service.base.sms.impl.LuosimaoSmsSender" />
+    <bean id="smsService" class="cn.momia.service.base.sms.impl.SmsServiceImpl" parent="dbAccessService">
+        <property name="sender" ref="smsSender" />
+    </bean>
+    <bean id="cityService" class="cn.momia.service.base.city.impl.CityServiceImpl" parent="dbAccessService" />
+    <bean id="regionService" class="cn.momia.service.base.region.impl.RegionServiceImpl" parent="dbAccessService" />
+    <bean id="feedbackService" class="cn.momia.service.base.feedback.impl.FeedbackServiceImpl" parent="dbAccessService" />
+    <bean id="recommendService" class="cn.momia.service.base.recommend.impl.RecommendServiceImpl" parent="dbAccessService" />
+</beans>

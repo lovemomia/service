@@ -1,6 +1,6 @@
 package cn.momia.service.feed.facade.impl;
 
-import cn.momia.service.base.impl.DbAccessService;
+import cn.momia.common.service.DbAccessService;
 import cn.momia.service.feed.facade.Feed;
 import cn.momia.service.feed.facade.FeedImage;
 import cn.momia.service.feed.facade.FeedServiceFacade;
@@ -127,7 +127,7 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
     }
 
     @Override
-    public List<Long> getFollowedIds(long userId) {
+    public List<Long> queryFollowedIds(long userId) {
         if (userId <= 0) return new ArrayList<Long>();
         return baseFeedService.getFollowedIds(userId);
     }

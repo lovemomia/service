@@ -4,6 +4,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class Sku {
+    public static class Status {
+        public static final int ALL = 1;
+        public static final int AVALIABLE = 2;
+    }
+
     public static final Sku NOT_EXIST_SKU = new Sku();
     static {
         NOT_EXIST_SKU.setSkuId(0);
@@ -22,7 +27,9 @@ public class Sku {
     private String placeName;
     private int regionId;
     private String address;
+    private boolean needLeader;
     private boolean hasLeader;
+    private long leaderUserId;
     private String leaderInfo;
     private boolean full;
     private boolean finished;
@@ -135,12 +142,28 @@ public class Sku {
         this.address = address;
     }
 
+    public boolean isNeedLeader() {
+        return needLeader;
+    }
+
+    public void setNeedLeader(boolean needLeader) {
+        this.needLeader = needLeader;
+    }
+
     public boolean isHasLeader() {
         return hasLeader;
     }
 
     public void setHasLeader(boolean hasLeader) {
         this.hasLeader = hasLeader;
+    }
+
+    public long getLeaderUserId() {
+        return leaderUserId;
+    }
+
+    public void setLeaderUserId(long leaderUserId) {
+        this.leaderUserId = leaderUserId;
     }
 
     public String getLeaderInfo() {
