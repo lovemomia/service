@@ -1,5 +1,6 @@
 package cn.momia.service.deal.order.impl;
 
+import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.service.DbAccessService;
 import cn.momia.service.deal.order.OrderLimitException;
 import cn.momia.service.deal.order.Order;
@@ -31,7 +32,9 @@ import java.util.List;
 
 public class OrderServiceImpl extends DbAccessService implements OrderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
-    private static final String[] ORDER_FIELDS = { "id", "customerId", "productId", "skuId", "prices", "contacts", "mobile", "participants", "inviteCode", "status", "addTime" };
+
+    private static final int MAX_RETRY_TIME = 10;
+    private static final String[] ORDER_FIELDS = { "id", "customerId", "productId", "skuId", "prices", "contacts", "mobile", "participants", "inviteCode", "ticketNumber", "status", "addTime" };
 
     @Override
     public long add(final Order order) {
@@ -40,7 +43,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException
             {
-                String sql = "INSERT INTO t_order(customerId, productId, skuId, prices, contacts, mobile, participants, inviteCode, addTime) VALUES(?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO t_order(customerId, productId, skuId, prices, contacts, mobile, participants, inviteCode, ticketNumber, addTime) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setLong(1, order.getCustomerId());
                 ps.setLong(2, order.getProductId());
@@ -51,12 +54,43 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
                 List<Long> participants = order.getParticipants();
                 ps.setString(7, (participants == null ? "" : StringUtils.join(participants, ",")));
                 ps.setString(8, order.getInviteCode());
+                ps.setString(9, generateTickNumber());
 
                 return ps;
             }
         }, keyHolder);
 
         return keyHolder.getKey().longValue();
+    }
+
+    private String generateTickNumber() {
+        // TODO
+        for (int i = 0; i < MAX_RETRY_TIME; i++) {
+            long number = (long) (Math.random() * 10000000000L);
+            if (!isDupTicketNumber(number)) return String.format("%010d", number);
+        }
+
+        throw new MomiaFailedException("fail to generate ticket number");
+    }
+
+    private boolean isDupTicketNumber(long number) {
+        String sql = "SELECT COUNT(1) FROM t_ticket WHERE ticket=?";
+
+        boolean isDup = jdbcTemplate.query(sql, new Object[] { number }, new ResultSetExtractor<Boolean>() {
+            @Override
+            public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getInt(1) > 0 : false;
+            }
+        });
+
+        if (isDup) return true;
+
+        sql = "INSERT INTO t_ticket(ticket) VALUES (?)";
+        int count = jdbcTemplate.update(sql, new Object[] { number });
+
+        if (count <= 0) return true;
+
+        return false;
     }
 
     @Override
@@ -109,6 +143,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
             order.setContacts(contacts);
             order.setMobile(rs.getString("mobile"));
             order.setInviteCode(rs.getString("inviteCode"));
+            order.setTicketNumber(rs.getString("ticketNumber"));
             order.setStatus(rs.getInt("status"));
             order.setAddTime(rs.getTimestamp("addTime"));
 

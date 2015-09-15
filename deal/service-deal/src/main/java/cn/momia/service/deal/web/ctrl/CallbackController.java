@@ -128,6 +128,8 @@ public class CallbackController extends BaseController {
                 String address = sku.getAddress();
                 if (StringUtils.isBlank(address)) address = product.getAddress();
                 msg.append(address);
+                msg.append("，券号：")
+                        .append(order.getTicketNumber());
             }
 
             msg.append("，请添加客服微信dorakids01【松果亲子】");
