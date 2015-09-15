@@ -108,7 +108,7 @@ public class PaymentController extends BaseController {
                 prepayParam.setTotalFee(promoServiceFacade.calcTotalFee(order.getTotalFee(), coupon));
                 break;
             case Payment.Type.WECHATPAY:
-                prepayParam.setTotalFee(promoServiceFacade.calcTotalFee(order.getTotalFee(), coupon).multiply(new BigDecimal(100)));
+                prepayParam.setTotalFee(new BigDecimal(promoServiceFacade.calcTotalFee(order.getTotalFee(), coupon).multiply(new BigDecimal(100)).intValue()));
                 break;
             default: throw new MomiaFailedException("无效的支付类型: " + payType);
         }
