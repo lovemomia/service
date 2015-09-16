@@ -54,7 +54,7 @@ public class FeedController extends BaseController {
 
         Set<Long> userIds = new HashSet<Long>();
         for (Feed feed : feeds) userIds.add(feed.getUserId());
-        List<User> users = UserServiceApi.USER.list(userIds, User.Type.MINI);
+        List<User> users = UserServiceApi.USER.list(userIds, User.Type.FULL);
         Map<Long, User> usersMap = new HashMap<Long, User>();
         for (User user : users) usersMap.put(user.getId(), user);
 

@@ -2,6 +2,7 @@ package cn.momia.api.feed;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -10,17 +11,17 @@ public class Feed {
     private int type;
     private long topicId;
     private long tpoicProductId;
-    private String topic;
-    private List<String> imgs;
+    private String topic = "";
+    private List<String> imgs = new ArrayList<String>();
     private String content;
     @JSONField(format = "yyyy-MM-dd") private Date addTime;
-    private String poi;
+    private String poi = "";
     private int commentCount;
     private int starCount;
     private long userId;
-    private String avatar;
+    private String avatar = "";
     private String nickName;
-    private List<String> children;
+    private List<String> children = new ArrayList<String>();
     private boolean stared;
 
     public long getId() {

@@ -1,5 +1,7 @@
 package cn.momia.service.feed.web.ctrl.dto;
 
+import cn.momia.api.user.participant.Participant;
+import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.dto.Dto;
 import cn.momia.service.feed.facade.Feed;
 import cn.momia.service.feed.facade.FeedImage;
@@ -73,6 +75,26 @@ public class FeedDto implements Dto {
 
     public String getNickName() {
         return user.getNickName();
+    }
+
+    public List<String> getChildren() {
+        List<String> children = new ArrayList<String>();
+
+        if (user.getChildren() != null) {
+            int count = 0;
+            for (Participant child : user.getChildren()) {
+                if (TimeUtil.isAdult(child.getBirthday())) continue;
+
+                String ageStr = TimeUtil.formatAge(child.getBirthday());
+                if (!("男".equals(child.getSex()) || "女".equals(child.getSex()))) children.add("孩子" + ageStr);
+                else children.add(child.getSex() + "孩" + ageStr);
+
+                count++;
+                if (count >= 2) break;
+            }
+        }
+
+        return children;
     }
 
     public boolean isStared() {
