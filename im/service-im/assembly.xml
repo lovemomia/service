@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+    <id>release</id>
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+    <dependencySets>
+        <dependencySet>
+            <useProjectArtifact>true</useProjectArtifact>
+            <outputDirectory>lib</outputDirectory>
+        </dependencySet>
+    </dependencySets>
+    <fileSets>
+        <fileSet>
+            <directory>bin</directory>
+            <directoryMode>0777</directoryMode>
+            <outputDirectory>bin</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>conf</directory>
+            <outputDirectory>conf</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>web</directory>
+            <outputDirectory>web</outputDirectory>
+        </fileSet>
+    </fileSets>
+</assembly>

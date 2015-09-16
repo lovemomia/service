@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Logger>
+        <Level>INFO</Level>
+    </Logger>
+
+    <Image>
+        <Domain>http://s.momia.cn</Domain>
+    </Image>
+
+    <Service>
+        <User>http://localhost:7070</User>
+    </Service>
+
+    <Limit>
+        <MaxPage>50</MaxPage>
+        <MaxPageSize>50</MaxPageSize>
+    </Limit>
+
+    <Database>
+        <Tongqu>
+            <JdbcUrl><![CDATA[jdbc:mysql://120.55.102.12:3306/tongqu?characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull]]></JdbcUrl>
+            <Username>tongqu</Username>
+            <Password>Tongqu!@#456</Password>
+        </Tongqu>
+    </Database>
+
+    <Im>
+        <RongCloud>
+            <Service>https://api.cn.ronghub.com/user/getToken.json</Service>
+            <AppKey>lmxuhwagxybkd</AppKey>
+            <AppSecret>ZFpOktg33dzF</AppSecret>
+        </RongCloud>
+    </Im>
+</Configuration>

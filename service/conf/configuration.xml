@@ -4,6 +4,10 @@
         <Level>INFO</Level>
     </Logger>
 
+    <Image>
+        <Domain>http://s.momia.cn</Domain>
+    </Image>
+
     <Service>
         <Base>http://localhost:7070</Base>
         <Product>http://localhost:7070</Product>

@@ -9,11 +9,6 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <context:component-scan base-package="cn.momia.common.webapp.ctrl" />
-    <context:component-scan base-package="cn.momia.service.base.web.ctrl" />
-    <context:component-scan base-package="cn.momia.service.deal.web.ctrl" />
-    <context:component-scan base-package="cn.momia.service.feed.web.ctrl" />
-    <context:component-scan base-package="cn.momia.service.product.web.ctrl" />
-    <context:component-scan base-package="cn.momia.service.user.web.ctrl" />
     <context:component-scan base-package="cn.momia.service.im.web.ctrl" />
 
     <mvc:annotation-driven>
