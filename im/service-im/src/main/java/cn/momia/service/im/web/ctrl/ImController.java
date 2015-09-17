@@ -9,12 +9,17 @@ import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.image.api.ImageFile;
 import cn.momia.service.im.Group;
 import cn.momia.service.im.ImService;
+import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/im")
@@ -47,7 +52,31 @@ public class ImController {
             if (groupId <= 0) return MomiaHttpResponse.FAILED("创建群组失败");
 
             if (!imService.initGroup(user.getId(), groupId, groupName)) return MomiaHttpResponse.FAILED("初始化群组失败");
+
+            Set<Long> userIds = new HashSet<Long>();
+            userIds.add(user.getId());
+            imService.logGroupUsers(groupId, userIds);
         }
+
+        return MomiaHttpResponse.SUCCESS;
+    }
+
+    @RequestMapping(value = "/group/{gid}/invite", method = RequestMethod.POST)
+    public MomiaHttpResponse invite(@RequestParam String utoken,
+                                    @PathVariable(value = "gid") long groupId,
+                                    @RequestParam String uids) {
+        // TODO check 管理员权限
+        User user = UserServiceApi.USER.get(utoken);
+
+        Set<Long> userIds = new HashSet<Long>();
+        for (String idStr : Splitter.on(",").trimResults().omitEmptyStrings().split(uids)) {
+            long id = Long.valueOf(idStr);
+            if (id > 0) userIds.add(id);
+        }
+
+        if (!imService.joinGroup(groupId, userIds)) return MomiaHttpResponse.FAILED;
+
+        imService.logGroupUsers(groupId, userIds);
 
         return MomiaHttpResponse.SUCCESS;
     }

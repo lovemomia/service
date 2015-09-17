@@ -33,8 +33,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class RongCloudImService extends DbAccessService implements ImService {
@@ -177,12 +179,53 @@ public class RongCloudImService extends DbAccessService implements ImService {
 
             return true;
         } catch (Exception e) {
-            throw new MomiaFailedException("fail to register im", e);
+            throw new MomiaFailedException("fail to init group", e);
         }
     }
 
     @Override
-    public boolean joinGroup(long groupId, List<Long> userIds) {
-        return false;
+    public boolean joinGroup(long groupId, Collection<Long> userIds) {
+        try {
+            HttpPost httpPost = createHttpPost(Configuration.getString("Im.RongCloud.Service.JoinGroup"));
+
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            for (long userId : userIds) {
+                params.add(new BasicNameValuePair("userId", String.valueOf(userId)));
+            }
+            params.add(new BasicNameValuePair("groupId", String.valueOf(groupId)));
+            HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
+            httpPost.setEntity(entity);
+
+            HttpClient httpClient = HttpClientBuilder.create().build();
+            HttpResponse response = httpClient.execute(httpPost);
+            if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                throw new MomiaFailedException("fail to join group");
+            }
+
+            String responseEntity = EntityUtils.toString(response.getEntity());
+            JSONObject responseJson = JSON.parseObject(responseEntity);
+
+            int code = responseJson.getInteger("code");
+            if (code != 200) throw new MomiaFailedException("fail to join group");
+
+            return true;
+        } catch (Exception e) {
+            throw new MomiaFailedException("fail to join group", e);
+        }
+    }
+
+    @Override
+    public void logGroupUsers(long groupId, Set<Long> userIds) {
+        try {
+            String sql = "INSERT INTO t_im_group_user(groupId, userId, addTime) VALUES (?, ?, NOW())";
+            List<Object[]> params = new ArrayList<Object[]>();
+            for (long userId : userIds) {
+                params.add(new Object[] { groupId, userId });
+            }
+
+            jdbcTemplate.batchUpdate(sql, params);
+        } catch (Exception e) {
+            LOGGER.error("fail to log group users for group: {}", groupId);
+        }
     }
 }

@@ -32,6 +32,7 @@
             <Service>
                 <GetToken>https://api.cn.ronghub.com/user/getToken.json</GetToken>
                 <CreateGroup>https://api.cn.ronghub.com/group/create.json</CreateGroup>
+                <JoinGroup>https://api.cn.ronghub.com/group/join.json</JoinGroup>
             </Service>
             <AppKey>lmxuhwagxybkd</AppKey>
             <AppSecret>ZFpOktg33dzF</AppSecret>
