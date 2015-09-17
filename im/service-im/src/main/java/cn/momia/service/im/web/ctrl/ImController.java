@@ -61,6 +61,22 @@ public class ImController {
         return MomiaHttpResponse.SUCCESS;
     }
 
+    @RequestMapping(value = "/group", method = RequestMethod.DELETE)
+    public MomiaHttpResponse deleteGroup(@RequestParam String utoken,
+                                         @RequestParam(value = "pid") long productId,
+                                         @RequestParam(value = "sid") long skuId) {
+        // TODO check 管理员权限
+        User user = UserServiceApi.USER.get(utoken);
+
+        Group group = imService.queryGroup(productId, skuId);
+        if (group.exists()) {
+            if (!imService.deleteGroup(user.getId(), group.getId())) return MomiaHttpResponse.FAILED("解散群组失败");
+            imService.deleteGroupInfo(group.getId());
+        }
+
+        return MomiaHttpResponse.SUCCESS;
+    }
+
     @RequestMapping(value = "/group/{gid}/invite", method = RequestMethod.POST)
     public MomiaHttpResponse invite(@RequestParam String utoken,
                                     @PathVariable(value = "gid") long groupId,

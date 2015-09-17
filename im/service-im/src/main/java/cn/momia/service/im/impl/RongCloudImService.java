@@ -215,6 +215,35 @@ public class RongCloudImService extends DbAccessService implements ImService {
     }
 
     @Override
+    public boolean deleteGroup(long userId, long groupId) {
+        try {
+            HttpPost httpPost = createHttpPost(Configuration.getString("Im.RongCloud.Service.DeleteGroup"));
+
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("userId", String.valueOf(userId)));
+            params.add(new BasicNameValuePair("groupId", String.valueOf(groupId)));
+            HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
+            httpPost.setEntity(entity);
+
+            HttpClient httpClient = HttpClientBuilder.create().build();
+            HttpResponse response = httpClient.execute(httpPost);
+            if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                throw new MomiaFailedException("fail to delete group");
+            }
+
+            String responseEntity = EntityUtils.toString(response.getEntity());
+            JSONObject responseJson = JSON.parseObject(responseEntity);
+
+            int code = responseJson.getInteger("code");
+            if (code != 200) throw new MomiaFailedException("fail to delete group");
+
+            return true;
+        } catch (Exception e) {
+            throw new MomiaFailedException("fail to delete group", e);
+        }
+    }
+
+    @Override
     public void logGroupUsers(long groupId, Set<Long> userIds) {
         try {
             String sql = "INSERT INTO t_im_group_user(groupId, userId, addTime) VALUES (?, ?, NOW())";
@@ -226,6 +255,19 @@ public class RongCloudImService extends DbAccessService implements ImService {
             jdbcTemplate.batchUpdate(sql, params);
         } catch (Exception e) {
             LOGGER.error("fail to log group users for group: {}", groupId);
+        }
+    }
+
+    @Override
+    public void deleteGroupInfo(long groupId) {
+        try {
+            String sql = "UPDATE t_im_group SET status=0 WHERE id=?";
+            jdbcTemplate.update(sql, new Object[] { groupId });
+
+            sql = "UPDATE t_im_group_user SET status=0 WHERE groupId=?";
+            jdbcTemplate.update(sql, new Object[] { groupId });
+        } catch (Exception e) {
+            LOGGER.error("fail to delete group infod for group: {}", groupId);
         }
     }
 }

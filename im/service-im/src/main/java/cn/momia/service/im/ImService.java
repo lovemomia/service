@@ -11,6 +11,8 @@ public interface ImService {
     long createGroup(String groupName, long productId, long skuId);
     boolean initGroup(long userId, long groupId, String groupName);
     boolean joinGroup(long groupId, Collection<Long> userIds);
+    boolean deleteGroup(long userId, long groupId);
 
     void logGroupUsers(long groupId, Set<Long> userIds);
+    void deleteGroupInfo(long groupId);
 }
