@@ -102,6 +102,15 @@ public class DealServiceApi extends AbstractServiceApi {
 
             return (Boolean) executeRequest(request);
         }
+
+        public List<Long> queryUserIds(long productId, long skuId) {
+            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                    .add("pid", productId)
+                    .add("sid", skuId);
+            MomiaHttpRequest request = MomiaHttpRequest.GET(url("order/user"), builder.build());
+
+            return JSON.toJavaObject((JSON) executeRequest(request), List.class);
+        }
     }
 
     public static class PaymentServiceApi extends DealServiceApi {

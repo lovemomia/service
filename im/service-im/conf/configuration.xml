@@ -9,6 +9,8 @@
     </Image>
 
     <Service>
+        <Deal>http://localhost:7070</Deal>
+        <Product>http://localhost:7070</Product>
         <User>http://localhost:7070</User>
     </Service>
 
@@ -27,7 +29,10 @@
 
     <Im>
         <RongCloud>
-            <Service>https://api.cn.ronghub.com/user/getToken.json</Service>
+            <Service>
+                <GetToken>https://api.cn.ronghub.com/user/getToken.json</GetToken>
+                <CreateGroup>https://api.cn.ronghub.com/group/create.json</CreateGroup>
+            </Service>
             <AppKey>lmxuhwagxybkd</AppKey>
             <AppSecret>ZFpOktg33dzF</AppSecret>
         </RongCloud>

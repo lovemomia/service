@@ -10,6 +10,7 @@
 
     <Service>
         <Base>http://localhost:7070</Base>
+        <Deal>http://localhost:7070</Deal>
         <Product>http://localhost:7070</Product>
         <User>http://localhost:7070</User>
     </Service>
@@ -79,4 +80,15 @@
             <PageSize>20</PageSize>
         </Playmate>
     </Product>
+
+    <Im>
+        <RongCloud>
+            <Service>
+                <GetToken>https://api.cn.ronghub.com/user/getToken.json</GetToken>
+                <CreateGroup>https://api.cn.ronghub.com/group/create.json</CreateGroup>
+            </Service>
+            <AppKey>lmxuhwagxybkd</AppKey>
+            <AppSecret>ZFpOktg33dzF</AppSecret>
+        </RongCloud>
+    </Im>
 </Configuration>

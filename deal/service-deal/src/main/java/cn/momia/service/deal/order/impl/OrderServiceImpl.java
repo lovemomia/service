@@ -380,4 +380,21 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
         return status >= Order.Status.PAYED;
     }
+
+    @Override
+    public List<Long> queryUserIds(long productId, long skuId) {
+        if (productId <= 0 || skuId <= 0) return new ArrayList<Long>();
+
+        final List<Long> userIds = new ArrayList<Long>();
+        String sql = "SELECT customerId FROM t_order WHERE productId=? AND skuId=? AND status=?";
+        jdbcTemplate.query(sql, new Object[] { productId, skuId, Order.Status.PAYED }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                long userId = rs.getLong(1);
+                if (userId > 0) userIds.add(userId);
+            }
+        });
+
+        return userIds;
+    }
 }

@@ -21,4 +21,6 @@ public interface OrderService {
     boolean pay(long id);
     boolean pay(Payment payment);
     boolean check(long userId, long id, long productId, long skuId);
+
+    List<Long> queryUserIds(long productId, long skuId);
 }

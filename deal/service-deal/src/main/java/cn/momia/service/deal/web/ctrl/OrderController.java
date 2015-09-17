@@ -452,4 +452,9 @@ public class OrderController extends BaseController {
 
         return playmatesDto;
     }
+
+    @RequestMapping(value = "/user", method = RequestMethod.GET)
+    public MomiaHttpResponse queryUsersByProduct(@RequestParam(value = "pid") long productId, @RequestParam(value = "sid") long skuId) {
+        return MomiaHttpResponse.SUCCESS(orderService.queryUserIds(productId, skuId));
+    }
 }
