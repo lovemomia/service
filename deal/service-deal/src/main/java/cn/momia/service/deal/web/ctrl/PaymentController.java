@@ -185,12 +185,11 @@ public class PaymentController extends BaseController {
         if (userCouponId != null && userCouponId > 0) {
             Coupon coupon = preUseCoupon(user.getId(), order, userCouponId);
             totalFee = promoServiceFacade.calcTotalFee(totalFee, coupon);
-
-            if (totalFee.compareTo(new BigDecimal(0)) != 0) return MomiaHttpResponse.FAILED("支付失败");
         }
 
-        if (totalFee.compareTo(new BigDecimal(0)) != 0 || !orderService.prepay(orderId)) return MomiaHttpResponse.FAILED("支付失败");
-        if (!finishPayment(order, createPayment(order))) return MomiaHttpResponse.FAILED("支付失败");
+        if (totalFee.compareTo(new BigDecimal(0)) != 0 ||
+                !orderService.prepay(orderId) ||
+                !finishPayment(order, createPayment(order))) return MomiaHttpResponse.FAILED("支付失败");
 
         return MomiaHttpResponse.SUCCESS;
     }
