@@ -4,6 +4,7 @@ import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.webapp.ctrl.dto.ListDto;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
+import cn.momia.service.user.leader.Leader;
 import cn.momia.service.user.leader.LeaderService;
 import cn.momia.service.user.participant.Participant;
 import cn.momia.service.user.participant.ParticipantService;
@@ -11,6 +12,7 @@ import cn.momia.service.user.web.ctrl.dto.FullUserDto;
 import cn.momia.service.user.web.ctrl.dto.ParticipantDto;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +33,7 @@ public abstract class UserRelatedController extends BaseController {
     }
 
     protected FullUserDto buildUserResponse(User user, boolean showToken) {
+        if (!user.exists()) return new FullUserDto(user, new ArrayList<Participant>(), Leader.NOT_EXIST_LEADER);
         return new FullUserDto(user, participantService.list(user.getChildren()), leaderService.getByUser(user.getId()), showToken);
     }
 
