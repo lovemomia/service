@@ -46,6 +46,13 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
     }
 
     @Override
+    public boolean follow(long userId, long followedId) {
+        if (userId <= 0 || followedId <= 0) return false;
+        if (baseFeedService.isFollowed(userId, followedId)) return true;
+        return baseFeedService.follow(userId, followedId);
+    }
+
+    @Override
     public long addFeed(Feed feed) {
         if (feed.isInvalid()) return 0;
         long feedId = baseFeedService.add(feed.getBaseFeed());

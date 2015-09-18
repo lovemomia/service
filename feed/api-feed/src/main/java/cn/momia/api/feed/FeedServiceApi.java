@@ -15,6 +15,15 @@ public class FeedServiceApi extends AbstractServiceApi {
         FEED.setService(service);
     }
 
+    public void follow(String utoken, long followedId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("fuid", followedId);
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("feed/follow"), builder.build());
+
+        executeRequest(request);
+    }
+
     public PagedFeeds list(long userId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)

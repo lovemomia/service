@@ -34,6 +34,14 @@ public class FeedController extends BaseController {
 
     @Autowired private FeedServiceFacade feedServiceFacade;
 
+    @RequestMapping(value = "/follow", method = RequestMethod.POST)
+    public MomiaHttpResponse follow(@RequestParam String utoken, @RequestParam(value = "fuid") long followedId) {
+        User user = UserServiceApi.USER.get(utoken);
+        if (!feedServiceFacade.follow(user.getId(), followedId)) return MomiaHttpResponse.FAILED("关注失败");
+
+        return MomiaHttpResponse.SUCCESS;
+    }
+
     @RequestMapping(method = RequestMethod.GET)
     public MomiaHttpResponse list(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);

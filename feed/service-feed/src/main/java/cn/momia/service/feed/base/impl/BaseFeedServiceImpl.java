@@ -100,6 +100,23 @@ public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedServ
     }
 
     @Override
+    public boolean isFollowed(long userId, long followedId) {
+        String sql = "SELECT COUNT(1) FROM t_user_follow WHERE userId=? AND followedId=? AND status=1";
+        return jdbcTemplate.query(sql, new Object[] { userId, followedId }, new ResultSetExtractor<Boolean>() {
+            @Override
+            public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getInt(1) > 0 : false;
+            }
+        });
+    }
+
+    @Override
+    public boolean follow(long userId, long followedId) {
+        String sql = "INSERT INTO t_user_follow(userId, followedId, addTime) VALUES (?, ?, NOW())";
+        return jdbcTemplate.update(sql, new Object[] { userId, followedId }) == 1;
+    }
+
+    @Override
     public List<Long> getFollowedIds(long id) {
         final List<Long> followedIds = new ArrayList<Long>();
         String sql = "SELECT followedId FROM t_user_follow WHERE userId=? AND status=1";

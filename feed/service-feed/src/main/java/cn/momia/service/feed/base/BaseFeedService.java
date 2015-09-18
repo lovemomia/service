@@ -7,6 +7,8 @@ public interface BaseFeedService {
     BaseFeed get(long id);
     boolean delete(long userId, long id);
 
+    boolean isFollowed(long userId, long followedId);
+    boolean follow(long userId, long followId);
     List<Long> getFollowedIds(long id);
     long queryFollowedCountByUser(long userId);
     List<BaseFeed> queryFollowedByUser(long userId, int start, int count);
