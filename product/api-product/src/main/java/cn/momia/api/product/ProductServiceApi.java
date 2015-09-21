@@ -1,13 +1,13 @@
 package cn.momia.api.product;
 
-import cn.momia.api.product.entity.PagedComments;
-import cn.momia.api.product.entity.PagedProducts;
+import cn.momia.api.product.entity.Comment;
 import cn.momia.api.product.entity.Product;
 import cn.momia.api.product.entity.ProductGroup;
 import cn.momia.api.product.entity.Sku;
 import cn.momia.api.product.entity.Topic;
 import cn.momia.api.product.entity.Banner;
 import cn.momia.common.api.AbstractServiceApi;
+import cn.momia.common.api.entity.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;
 import cn.momia.common.api.http.util.CastUtil;
@@ -58,24 +58,24 @@ public class ProductServiceApi extends AbstractServiceApi {
             return CastUtil.toList((JSONArray) executeRequest(request), Product.class);
         }
 
-        public PagedProducts list(int cityId, int start, int count) {
+        public PagedList<Product> list(int cityId, int start, int count) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("city", cityId)
                     .add("start", start)
                     .add("count", count);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("product"), builder.build());
 
-            return JSON.toJavaObject((JSON) executeRequest(request), PagedProducts.class);
+            return CastUtil.toPagedList((JSONObject) executeRequest(request), Product.class);
         }
 
-        public PagedProducts listByWeekend(int cityId, int start, int count) {
+        public PagedList<Product> listByWeekend(int cityId, int start, int count) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("city", cityId)
                     .add("start", start)
                     .add("count", count);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("product/weekend"), builder.build());
 
-            return JSON.toJavaObject((JSON) executeRequest(request), PagedProducts.class);
+            return CastUtil.toPagedList((JSONObject) executeRequest(request), Product.class);
         }
 
         public List<ProductGroup> listByMonth(int cityId, int month) {
@@ -87,14 +87,14 @@ public class ProductServiceApi extends AbstractServiceApi {
             return CastUtil.toList((JSONArray) executeRequest(request), ProductGroup.class);
         }
 
-        public PagedProducts listNeedLeader(int cityId, int start, int count) {
+        public PagedList<Product> listNeedLeader(int cityId, int start, int count) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("city", cityId)
                     .add("start", start)
                     .add("count", count);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("product/leader"), builder.build());
 
-            return JSON.toJavaObject((JSON) executeRequest(request), PagedProducts.class);
+            return CastUtil.toPagedList((JSONObject) executeRequest(request), Product.class);
         }
 
         public Product get(long productId, int type) {
@@ -142,13 +142,13 @@ public class ProductServiceApi extends AbstractServiceApi {
             executeRequest(request);
         }
 
-        public PagedComments list(long productId, int start, int count) {
+        public PagedList<Comment> list(long productId, int start, int count) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("start", start)
                     .add("count", count);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("product", productId, "comment"), builder.build());
 
-            return JSON.toJavaObject((JSON) executeRequest(request), PagedComments.class);
+            return CastUtil.toPagedList((JSONObject) executeRequest(request), Comment.class);
         }
     }
 
@@ -176,14 +176,14 @@ public class ProductServiceApi extends AbstractServiceApi {
             executeRequest(request);
         }
 
-        public PagedProducts getLedProducts(long userId, int start, int count) {
+        public PagedList<Product> getLedProducts(long userId, int start, int count) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("uid", userId)
                     .add("start", start)
                     .add("count", count);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("product/led/list"), builder.build());
 
-            return JSON.toJavaObject((JSON) executeRequest(request), PagedProducts.class);
+            return CastUtil.toPagedList((JSONObject) executeRequest(request), Product.class);
         }
 
         public boolean lockStock(long productId, long skuId, int count, int joinedCount) {
@@ -206,14 +206,14 @@ public class ProductServiceApi extends AbstractServiceApi {
     }
 
     public static class FavoriteServiceApi extends ProductServiceApi {
-        public PagedProducts listFavorites(long userId, int start, int count) {
+        public PagedList<Product> listFavorites(long userId, int start, int count) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("uid", userId)
                     .add("start", start)
                     .add("count", count);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("product/favorite"), builder.build());
 
-            return JSON.toJavaObject((JSON) executeRequest(request), PagedProducts.class);
+            return CastUtil.toPagedList((JSONObject) executeRequest(request), Product.class);
         }
     }
 }

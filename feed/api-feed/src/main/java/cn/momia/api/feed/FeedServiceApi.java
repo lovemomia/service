@@ -1,12 +1,13 @@
 package cn.momia.api.feed;
 
-import cn.momia.api.feed.entity.PagedFeedComments;
+import cn.momia.api.feed.entity.FeedComment;
 import cn.momia.api.feed.entity.Feed;
-import cn.momia.api.feed.entity.PagedFeeds;
-import cn.momia.api.feed.entity.PagedFeedStars;
+import cn.momia.api.feed.entity.FeedStar;
 import cn.momia.common.api.AbstractServiceApi;
+import cn.momia.common.api.entity.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;
+import cn.momia.common.api.http.util.CastUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
@@ -25,17 +26,17 @@ public class FeedServiceApi extends AbstractServiceApi {
         executeRequest(request);
     }
 
-    public PagedFeeds list(long userId, int start, int count) {
+    public PagedList<Feed> list(long userId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
                 .add("start", start)
                 .add("count", count);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("feed"), builder.build());
 
-        return JSON.toJavaObject((JSON) executeRequest(request), PagedFeeds.class);
+        return CastUtil.toPagedList((JSONObject) executeRequest(request), Feed.class);
     }
 
-    public PagedFeeds listByTopic(long userId, long topicId, int start, int count) {
+    public PagedList<Feed> listByTopic(long userId, long topicId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
                 .add("tid", topicId)
@@ -43,7 +44,7 @@ public class FeedServiceApi extends AbstractServiceApi {
                 .add("count", count);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("feed/topic"), builder.build());
 
-        return JSON.toJavaObject((JSON) executeRequest(request), PagedFeeds.class);
+        return CastUtil.toPagedList((JSONObject) executeRequest(request), Feed.class);
     }
 
     public void add(JSONObject feedJson) {
@@ -64,13 +65,13 @@ public class FeedServiceApi extends AbstractServiceApi {
         executeRequest(request);
     }
 
-    public PagedFeedComments listComments(long feedId, int start, int count) {
+    public PagedList<FeedComment> listComments(long feedId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
                 .add("count", count);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("feed", feedId, "comment/list"), builder.build());
 
-        return JSON.toJavaObject((JSON) executeRequest(request), PagedFeedComments.class);
+        return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedComment.class);
     }
 
     public void addComment(long userId, long feedId, String content) {
@@ -99,12 +100,12 @@ public class FeedServiceApi extends AbstractServiceApi {
         executeRequest(request);
     }
 
-    public PagedFeedStars listStars(long feedId, int start, int count) {
+    public PagedList<FeedStar> listStars(long feedId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
                 .add("count", count);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("feed", feedId, "star/list"), builder.build());
 
-        return JSON.toJavaObject((JSON) executeRequest(request), PagedFeedStars.class);
+        return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedStar.class);
     }
 }

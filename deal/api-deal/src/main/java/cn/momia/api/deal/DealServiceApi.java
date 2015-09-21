@@ -1,10 +1,10 @@
 package cn.momia.api.deal;
 
-import cn.momia.api.deal.entity.PagedCoupons;
+import cn.momia.api.deal.entity.Coupon;
 import cn.momia.api.deal.entity.Order;
-import cn.momia.api.deal.entity.PagedOrders;
 import cn.momia.api.deal.entity.SkuPlaymates;
 import cn.momia.common.api.AbstractServiceApi;
+import cn.momia.common.api.entity.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;
 import cn.momia.common.api.http.util.CastUtil;
@@ -47,7 +47,7 @@ public class DealServiceApi extends AbstractServiceApi {
             executeRequest(request);
         }
 
-        public PagedOrders listOrders(String utoken, int status, int start, int count) {
+        public PagedList<Order> listOrders(String utoken, int status, int start, int count) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("utoken", utoken)
                     .add("status", status)
@@ -55,7 +55,7 @@ public class DealServiceApi extends AbstractServiceApi {
                     .add("count", count);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("order/list"), builder.build());
 
-            return JSON.toJavaObject((JSON) executeRequest(request), PagedOrders.class);
+            return CastUtil.toPagedList((JSONObject) executeRequest(request), Order.class);
         }
 
         public Order get(String utoken, long orderId, long productId) {
@@ -169,7 +169,7 @@ public class DealServiceApi extends AbstractServiceApi {
     }
 
     public static class CouponServiceApi extends DealServiceApi {
-        public PagedCoupons listCoupons(String utoken, long orderId, int status, int start, int count) {
+        public PagedList<Coupon> listCoupons(String utoken, long orderId, int status, int start, int count) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("utoken", utoken)
                     .add("oid", orderId)
@@ -178,7 +178,7 @@ public class DealServiceApi extends AbstractServiceApi {
                     .add("count", count);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("coupon/list"), builder.build());
 
-            return JSON.toJavaObject((JSON) executeRequest(request), PagedCoupons.class);
+            return CastUtil.toPagedList((JSONObject) executeRequest(request), Coupon.class);
         }
 
         public BigDecimal calcTotalFee(String utoken, long orderId, long coupon) {
