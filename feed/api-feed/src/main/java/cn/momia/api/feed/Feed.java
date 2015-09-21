@@ -10,7 +10,7 @@ public class Feed {
     private long id;
     private int type;
     private long topicId;
-    private long tpoicProductId;
+    private long topicProductId;
     private String topic = "";
     private List<String> imgs = new ArrayList<String>();
     private String content;
@@ -48,12 +48,12 @@ public class Feed {
         this.topicId = topicId;
     }
 
-    public long getTpoicProductId() {
-        return tpoicProductId;
+    public long getTopicProductId() {
+        return topicProductId;
     }
 
-    public void setTpoicProductId(long tpoicProductId) {
-        this.tpoicProductId = tpoicProductId;
+    public void setTopicProductId(long topicProductId) {
+        this.topicProductId = topicProductId;
     }
 
     public String getTopic() {
