@@ -48,7 +48,7 @@ public class Feed {
         return baseFeed.getTopicId();
     }
 
-    public long getTpoicProductId() {
+    public long getTopicProductId() {
         return baseFeed.getProductId();
     }
 

@@ -29,8 +29,8 @@ public class FeedDto implements Dto {
         return feed.getTopicId();
     }
 
-    public long getTpoicProductId() {
-        return feed.getTpoicProductId();
+    public long getTopicProductId() {
+        return feed.getTopicProductId();
     }
 
     public String getTopic() {
