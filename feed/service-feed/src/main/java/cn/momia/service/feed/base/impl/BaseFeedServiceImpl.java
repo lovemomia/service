@@ -178,7 +178,7 @@ public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedServ
 
     @Override
     public long queryPublicFeedsCount() {
-        String sql = "SELECT COUNT(1) FROM t_feed_follow WHERE type=? AND status=1";
+        String sql = "SELECT COUNT(1) FROM t_feed WHERE type=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { BaseFeed.Type.PUBLIC }, new ResultSetExtractor<Long>() {
             @Override
