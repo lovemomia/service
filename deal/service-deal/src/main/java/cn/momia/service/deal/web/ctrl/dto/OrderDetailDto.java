@@ -3,7 +3,7 @@ package cn.momia.service.deal.web.ctrl.dto;
 import cn.momia.api.base.MetaUtil;
 import cn.momia.api.product.sku.Sku;
 import cn.momia.common.webapp.ctrl.dto.Dto;
-import cn.momia.service.deal.order.Order;
+import cn.momia.service.order.product.Order;
 import cn.momia.api.product.Product;
 
 import java.math.BigDecimal;

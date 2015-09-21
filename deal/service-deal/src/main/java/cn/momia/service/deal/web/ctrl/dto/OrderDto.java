@@ -2,8 +2,8 @@ package cn.momia.service.deal.web.ctrl.dto;
 
 import cn.momia.common.util.MobileUtil;
 import cn.momia.common.webapp.ctrl.dto.Dto;
-import cn.momia.service.deal.order.Order;
-import cn.momia.service.deal.order.OrderPrice;
+import cn.momia.service.order.product.Order;
+import cn.momia.service.order.product.OrderPrice;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.math.BigDecimal;

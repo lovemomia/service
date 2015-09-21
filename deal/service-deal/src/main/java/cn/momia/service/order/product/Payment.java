@@ -1,4 +1,4 @@
-package cn.momia.service.deal.order;
+package cn.momia.service.order.product;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

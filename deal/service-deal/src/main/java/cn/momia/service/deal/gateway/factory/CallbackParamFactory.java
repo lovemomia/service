@@ -4,7 +4,7 @@ import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.service.deal.gateway.CallbackParam;
 import cn.momia.service.deal.gateway.alipay.AlipayCallbackParam;
 import cn.momia.service.deal.gateway.wechatpay.WechatpayCallbackParam;
-import cn.momia.service.deal.order.Payment;
+import cn.momia.service.order.product.Payment;
 
 import java.util.Map;
 

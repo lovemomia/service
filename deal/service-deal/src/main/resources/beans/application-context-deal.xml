@@ -11,15 +11,15 @@
         <property name="userCouponService" ref="userCouponService" />
     </bean>
 
-    <bean id="orderService" class="cn.momia.service.deal.order.impl.OrderServiceImpl" parent="dbAccessService" />
+    <bean id="orderService" class="cn.momia.service.order.product.impl.OrderServiceImpl" parent="dbAccessService" />
 
     <bean id="alipay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
-        <property name="staticField" value="cn.momia.service.deal.order.Payment.Type.ALIPAY" />
+        <property name="staticField" value="cn.momia.service.order.product.Payment.Type.ALIPAY" />
     </bean>
     <bean id="alipayGateway" class="cn.momia.service.deal.gateway.alipay.AlipayGateway" />
 
     <bean id="wechatpay" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
-        <property name="staticField" value="cn.momia.service.deal.order.Payment.Type.WECHATPAY" />
+        <property name="staticField" value="cn.momia.service.order.product.Payment.Type.WECHATPAY" />
     </bean>
     <bean id="wechatpayGateway" class="cn.momia.service.deal.gateway.wechatpay.WechatpayGateway" />
 

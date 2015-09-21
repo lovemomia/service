@@ -9,7 +9,7 @@ import cn.momia.service.deal.gateway.PaymentGateway;
 import cn.momia.service.deal.gateway.PrepayParam;
 import cn.momia.service.deal.gateway.PrepayResult;
 import cn.momia.service.deal.gateway.ClientType;
-import cn.momia.service.deal.order.Payment;
+import cn.momia.service.order.product.Payment;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpResponse;

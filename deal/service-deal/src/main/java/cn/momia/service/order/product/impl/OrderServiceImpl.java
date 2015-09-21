@@ -1,12 +1,12 @@
-package cn.momia.service.deal.order.impl;
+package cn.momia.service.order.product.impl;
 
 import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.service.DbAccessService;
-import cn.momia.service.deal.order.OrderLimitException;
-import cn.momia.service.deal.order.Order;
-import cn.momia.service.deal.order.OrderPrice;
-import cn.momia.service.deal.order.OrderService;
-import cn.momia.service.deal.order.Payment;
+import cn.momia.service.order.product.Order;
+import cn.momia.service.order.product.OrderLimitException;
+import cn.momia.service.order.product.OrderPrice;
+import cn.momia.service.order.product.OrderService;
+import cn.momia.service.order.product.Payment;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
