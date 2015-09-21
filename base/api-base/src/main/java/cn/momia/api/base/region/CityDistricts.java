@@ -23,12 +23,4 @@ public class CityDistricts {
     public void setDistricts(List<Region> districts) {
         this.districts = districts;
     }
-
-    @Override
-    public String toString() {
-        return "CityDistrict{" +
-                "city=" + city +
-                ", districts=" + districts +
-                '}';
-    }
 }
