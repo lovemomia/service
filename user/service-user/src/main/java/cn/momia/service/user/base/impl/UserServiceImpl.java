@@ -167,7 +167,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     @Override
     public List<User> list(Collection<Long> ids) {
         final List<User> users = new ArrayList<User>();
-        if (ids == null || ids.size() <= 0) return users;
+        if (ids == null || ids.isEmpty()) return users;
 
         String sql = "SELECT " + joinFields() + " FROM t_user WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {

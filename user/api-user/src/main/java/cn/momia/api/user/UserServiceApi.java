@@ -6,14 +6,13 @@ import cn.momia.api.user.participant.Participant;
 import cn.momia.common.api.AbstractServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;
+import cn.momia.common.api.http.util.CastUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -81,7 +80,6 @@ public class UserServiceApi extends AbstractServiceApi {
 
         public User get(long userId) {
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("user", userId));
-
             return JSON.toJavaObject((JSON) executeRequest(request), User.class);
         }
 
@@ -159,7 +157,6 @@ public class UserServiceApi extends AbstractServiceApi {
 
         public User addChildren(List<Participant> children) {
             MomiaHttpRequest request = MomiaHttpRequest.POST(url("user/child"), JSON.toJSONString(children));
-
             return JSON.toJavaObject((JSON) executeRequest(request), User.class);
         }
 
@@ -207,15 +204,8 @@ public class UserServiceApi extends AbstractServiceApi {
         public List<Participant> listChildren(String utoken) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/child"), builder.build());
-            JSONArray childrenJson = (JSONArray) executeRequest(request);
 
-            List<Participant> children = new ArrayList<Participant>();
-            for (int i = 0; i < childrenJson.size(); i++) {
-                JSONObject childJson = childrenJson.getJSONObject(i);
-                children.add(JSON.toJavaObject(childJson, Participant.class));
-            }
-
-            return children;
+            return CastUtil.toList((JSONArray) executeRequest(request), Participant.class);
         }
 
         public Contacts getContacts(String utoken) {
@@ -234,21 +224,12 @@ public class UserServiceApi extends AbstractServiceApi {
         }
 
         public List<User> list(Collection<Long> userIds, int type) {
-            if (userIds == null || userIds.isEmpty()) return new ArrayList<User>();
-
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("uids", StringUtils.join(userIds, ","))
                     .add("type", type);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/list"), builder.build());
-            JSONArray usersJson = (JSONArray) executeRequest(request);
 
-            List<User> users = new ArrayList<User>();
-            for (int i = 0; i < usersJson.size(); i++) {
-                JSONObject userJson = usersJson.getJSONObject(i);
-                users.add(JSON.toJavaObject(userJson, User.class));
-            }
-
-            return users;
+            return CastUtil.toList((JSONArray) executeRequest(request), User.class);
         }
 
         public boolean isPayed(long userId) {
@@ -264,12 +245,14 @@ public class UserServiceApi extends AbstractServiceApi {
         public String getInviteCode(String utoken) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/code"), builder.build());
+
             return (String) executeRequest(request);
         }
 
         public long getIdByInviteCode(String inviteCode) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("code", inviteCode);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/code/id"), builder.build());
+
             return ((Number) executeRequest(request)).longValue();
         }
     }
@@ -301,29 +284,15 @@ public class UserServiceApi extends AbstractServiceApi {
         public List<Participant> list(String utoken) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("participant"), builder.build());
-            JSONArray participantsJson = (JSONArray) executeRequest(request);
 
-            List<Participant> participants = new ArrayList<Participant>();
-            for (int i = 0; i < participantsJson.size(); i++) {
-                JSONObject participantJson = participantsJson.getJSONObject(i);
-                participants.add(JSON.toJavaObject(participantJson, Participant.class));
-            }
-
-            return participants;
+            return CastUtil.toList((JSONArray) executeRequest(request), Participant.class);
         }
 
         public List<Participant> list(Set<Long> participantIds) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("paids", StringUtils.join(participantIds, ","));
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("participant/list"), builder.build());
-            JSONArray participantsJson = (JSONArray) executeRequest(request);
 
-            List<Participant> participants = new ArrayList<Participant>();
-            for (int i = 0; i < participantsJson.size(); i++) {
-                JSONObject participantJson = participantsJson.getJSONObject(i);
-                participants.add(JSON.toJavaObject(participantJson, Participant.class));
-            }
-
-            return participants;
+            return CastUtil.toList((JSONArray) executeRequest(request), Participant.class);
         }
 
         public void checkParticipants(long userId, Collection<Long> participantIds) {
@@ -351,19 +320,10 @@ public class UserServiceApi extends AbstractServiceApi {
         }
 
         public List<Leader> list(Collection<Long> userIds) {
-            if (userIds.isEmpty()) return new ArrayList<Leader>();
-
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uids", StringUtils.join(userIds, ","));
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("leader/list"), builder.build());
-            JSONArray leadersJson = (JSONArray) executeRequest(request);
 
-            List<Leader> leaders = new ArrayList<Leader>();
-            for (int i = 0; i < leadersJson.size(); i++) {
-                JSONObject leaderJson = leadersJson.getJSONObject(i);
-                leaders.add(JSON.toJavaObject(leaderJson, Leader.class));
-            }
-
-            return leaders;
+            return CastUtil.toList((JSONArray) executeRequest(request), Leader.class);
         }
 
         public void add(Leader leader) {

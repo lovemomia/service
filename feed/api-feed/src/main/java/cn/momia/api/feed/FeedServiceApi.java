@@ -20,7 +20,6 @@ public class FeedServiceApi extends AbstractServiceApi {
                 .add("uid", userId)
                 .add("fuid", followedId);
         MomiaHttpRequest request = MomiaHttpRequest.POST(url("feed/follow"), builder.build());
-
         executeRequest(request);
     }
 

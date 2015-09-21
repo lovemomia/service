@@ -7,12 +7,12 @@ import cn.momia.api.product.topic.Banner;
 import cn.momia.common.api.AbstractServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;
+import cn.momia.common.api.http.util.CastUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -37,20 +37,12 @@ public class ProductServiceApi extends AbstractServiceApi {
                     .add("city", cityId)
                     .add("count", count);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("topic/banner"), builder.build());
-            JSONArray bannersJson = (JSONArray) executeRequest(request);
 
-            List<Banner> banners = new ArrayList<Banner>();
-            for (int i = 0; i < bannersJson.size(); i++) {
-                JSONObject bannerJson = bannersJson.getJSONObject(i);
-                banners.add(JSON.toJavaObject(bannerJson, Banner.class));
-            }
-
-            return banners;
+            return CastUtil.toList((JSONArray) executeRequest(request), Banner.class);
         }
 
         public Topic get(long topicId) {
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("topic", topicId));
-
             return JSON.toJavaObject((JSON) executeRequest(request), Topic.class);
         }
     }
@@ -59,15 +51,8 @@ public class ProductServiceApi extends AbstractServiceApi {
         public List<Product> list(Collection<Long> productIds) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("pids", StringUtils.join(productIds, ","));
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("product/list"), builder.build());
-            JSONArray productsJson = (JSONArray) executeRequest(request);
 
-            List<Product> products = new ArrayList<Product>();
-            for (int i = 0; i < productsJson.size(); i++) {
-                JSONObject productJson = productsJson.getJSONObject(i);
-                products.add(JSON.toJavaObject(productJson, Product.class));
-            }
-
-            return products;
+            return CastUtil.toList((JSONArray) executeRequest(request), Product.class);
         }
 
         public PagedProducts list(int cityId, int start, int count) {
@@ -95,15 +80,8 @@ public class ProductServiceApi extends AbstractServiceApi {
                     .add("city", cityId)
                     .add("month", month);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("product/month"), builder.build());
-            JSONArray productGroupsJson = (JSONArray) executeRequest(request);
 
-            List<ProductGroup> productGroups = new ArrayList<ProductGroup>();
-            for (int i = 0; i < productGroupsJson.size(); i++) {
-                JSONObject productGroupJson = productGroupsJson.getJSONObject(i);
-                productGroups.add(JSON.toJavaObject(productGroupJson, ProductGroup.class));
-            }
-
-            return productGroups;
+            return CastUtil.toList((JSONArray) executeRequest(request), ProductGroup.class);
         }
 
         public PagedProducts listNeedLeader(int cityId, int start, int count) {
@@ -174,41 +152,24 @@ public class ProductServiceApi extends AbstractServiceApi {
     public static class SkuServiceApi extends ProductServiceApi {
         public Sku get(long productId, long skuId) {
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("product", productId, "sku", skuId));
-
             return JSON.toJavaObject((JSON) executeRequest(request), Sku.class);
         }
 
         public List<Sku> list(long productId, int status) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("status", status);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("product", productId, "sku"), builder.build());
-            JSONArray skusJson = (JSONArray) executeRequest(request);
 
-            List<Sku> skus = new ArrayList<Sku>();
-            for (int i = 0; i < skusJson.size(); i++) {
-                JSONObject skuJson = skusJson.getJSONObject(i);
-                skus.add(JSON.toJavaObject(skuJson, Sku.class));
-            }
-
-            return skus;
+            return CastUtil.toList((JSONArray) executeRequest(request), Sku.class);
         }
 
         public List<Sku> listWithLeader(long productId) {
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("product", productId, "sku/leader"));
-            JSONArray skusJson = (JSONArray) executeRequest(request);
-
-            List<Sku> skus = new ArrayList<Sku>();
-            for (int i = 0; i < skusJson.size(); i++) {
-                JSONObject skuJson = skusJson.getJSONObject(i);
-                skus.add(JSON.toJavaObject(skuJson, Sku.class));
-            }
-
-            return skus;
+            return CastUtil.toList((JSONArray) executeRequest(request), Sku.class);
         }
 
         public void applyLeader(long userId, long productId, long skuId) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
             MomiaHttpRequest request = MomiaHttpRequest.POST(url("product", productId, "sku", skuId, "leader/apply"), builder.build());
-
             executeRequest(request);
         }
 
