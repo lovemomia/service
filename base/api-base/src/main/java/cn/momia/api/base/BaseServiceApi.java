@@ -6,6 +6,7 @@ import cn.momia.api.base.region.CityDistricts;
 import cn.momia.common.api.AbstractServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;
+import cn.momia.common.api.http.util.CastUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -31,43 +32,19 @@ public class BaseServiceApi extends AbstractServiceApi {
     public static class CityServiceApi extends BaseServiceApi {
         public List<City> getAll() {
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("city"));
-            JSONArray citiesJson = (JSONArray) executeRequest(request);
-
-            List<City> cities = new ArrayList<City>();
-            for (int i = 0; i < citiesJson.size(); i++) {
-                JSONObject cityJson = citiesJson.getJSONObject(i);
-                cities.add(JSON.toJavaObject(cityJson, City.class));
-            }
-
-            return cities;
+            return CastUtil.toList((JSONArray) executeRequest(request), City.class);
         }
     }
 
     public static class RegionServiceApi extends BaseServiceApi {
         public List<Region> getAll() {
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("region"));
-            JSONArray regionsJson = (JSONArray) executeRequest(request);
-
-            List<Region> regions = new ArrayList<Region>();
-            for (int i = 0; i < regionsJson.size(); i++) {
-                JSONObject regionJson = regionsJson.getJSONObject(i);
-                regions.add(JSON.toJavaObject(regionJson, Region.class));
-            }
-
-            return regions;
+            return CastUtil.toList((JSONArray) executeRequest(request), Region.class);
         }
 
         public List<CityDistricts> getCityDistrictTree() {
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("region/district/tree"));
-            JSONArray citiesDistrictsJson = (JSONArray) executeRequest(request);
-
-            List<CityDistricts> citiesDistricts = new ArrayList<CityDistricts>();
-            for (int i = 0; i < citiesDistrictsJson.size(); i++) {
-                JSONObject cityDistrictsJson = citiesDistrictsJson.getJSONObject(i);
-                citiesDistricts.add(JSON.toJavaObject(cityDistrictsJson, CityDistricts.class));
-            }
-
-            return citiesDistricts;
+            return CastUtil.toList((JSONArray) executeRequest(request), CityDistricts.class);
         }
     }
 
