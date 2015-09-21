@@ -6,6 +6,7 @@ import java.util.Date;
 public interface CallbackParam {
     boolean isPayedSuccessfully();
     long getOrderId();
+    int getPayType();
     String getPayer();
     Date getFinishTime();
     String getTradeNo();

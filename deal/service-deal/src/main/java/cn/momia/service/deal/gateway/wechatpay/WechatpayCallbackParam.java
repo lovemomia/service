@@ -4,6 +4,7 @@ import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.service.deal.gateway.CallbackParam;
 import cn.momia.common.collection.MapWrapper;
 import cn.momia.service.deal.gateway.ClientType;
+import cn.momia.service.order.product.Payment;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -62,6 +63,14 @@ public class WechatpayCallbackParam extends MapWrapper implements CallbackParam 
     public long getOrderId() {
         String outTradeNo = get(Field.OUT_TRADE_NO);
         return Long.valueOf(outTradeNo.substring(0, outTradeNo.length() - DATE_FORMAT_STR.length()));
+    }
+
+    @Override
+    public int getPayType() {
+        String tradeType = get(Field.TRADE_TYPE);
+        if ("APP".equalsIgnoreCase(tradeType)) return Payment.Type.WECHATPAY_APP;
+        else if ("JSAPI".equalsIgnoreCase(tradeType)) return Payment.Type.WECHATPAY_JSAPI;
+        else return Payment.Type.WECHATPAY;
     }
 
     @Override

@@ -3,13 +3,10 @@ package cn.momia.service.deal.gateway.wechatpay;
 import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.util.XmlUtil;
 import cn.momia.common.webapp.config.Configuration;
-import cn.momia.service.deal.gateway.CallbackParam;
-import cn.momia.service.deal.gateway.CallbackResult;
 import cn.momia.service.deal.gateway.PaymentGateway;
 import cn.momia.service.deal.gateway.PrepayParam;
 import cn.momia.service.deal.gateway.PrepayResult;
 import cn.momia.service.deal.gateway.ClientType;
-import cn.momia.service.order.product.Payment;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpResponse;
@@ -30,7 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WechatpayGateway implements PaymentGateway {
+public class WechatpayGateway extends PaymentGateway {
     private static class PrepayRequestField {
         public static final String APPID = "appid"; //微信公众号id
         public static final String MCH_ID = "mch_id"; //商户id
@@ -186,22 +183,5 @@ public class WechatpayGateway implements PaymentGateway {
         } else {
             LOGGER.error("fail to prepay: {}/{}/{}", params.get(PREPAY_REQUEST_RETURN_CODE), params.get(PREPAY_REQUEST_RESULT_CODE), params.get(PREPAY_REQUEST_RETURN_MSG));
         }
-    }
-
-    @Override
-    public CallbackResult callback(CallbackParam param) {
-        CallbackResult result = new CallbackResult();
-        result.setOrderId(param.getOrderId());
-        result.setPayType(Payment.Type.WECHATPAY);
-
-        if (param.isPayedSuccessfully()) {
-            result.setSuccessful(true);
-            result.setPayer(param.getPayer());
-            result.setFinishTime(param.getFinishTime());
-            result.setTradeNo(param.getTradeNo());
-            result.setTotalFee(param.getTotalFee());
-        }
-
-        return result;
     }
 }

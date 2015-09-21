@@ -5,6 +5,7 @@ import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.deal.gateway.CallbackParam;
 import cn.momia.common.collection.MapWrapper;
+import cn.momia.service.order.product.Payment;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
@@ -66,6 +67,11 @@ public class AlipayCallbackParam extends MapWrapper implements CallbackParam {
     @Override
     public long getOrderId() {
         return Long.valueOf(get(Field.OUT_TRADE_NO));
+    }
+
+    @Override
+    public int getPayType() {
+        return Payment.Type.ALIPAY;
     }
 
     @Override

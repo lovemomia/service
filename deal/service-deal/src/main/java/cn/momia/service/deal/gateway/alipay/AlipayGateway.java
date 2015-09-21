@@ -1,16 +1,13 @@
 package cn.momia.service.deal.gateway.alipay;
 
 import cn.momia.common.webapp.config.Configuration;
-import cn.momia.service.deal.gateway.CallbackParam;
-import cn.momia.service.deal.gateway.CallbackResult;
 import cn.momia.service.deal.gateway.PaymentGateway;
 import cn.momia.service.deal.gateway.PrepayResult;
 import cn.momia.service.deal.gateway.ClientType;
-import cn.momia.service.order.product.Payment;
 import cn.momia.service.deal.gateway.PrepayParam;
 import org.apache.commons.lang3.StringUtils;
 
-public class AlipayGateway implements PaymentGateway {
+public class AlipayGateway extends PaymentGateway {
     @Override
     public PrepayResult prepay(PrepayParam param) {
         PrepayResult result = new AlipayPrepayResult();
@@ -37,23 +34,6 @@ public class AlipayGateway implements PaymentGateway {
         result.add(AlipayPrepayResult.Field.SIGN, AlipayUtil.sign(result.getAll(), param.getClientType()));
 
         result.setSuccessful(!StringUtils.isBlank(result.get(AlipayPrepayResult.Field.SIGN)));
-
-        return result;
-    }
-
-    @Override
-    public CallbackResult callback(CallbackParam param) {
-        CallbackResult result = new CallbackResult();
-        result.setOrderId(param.getOrderId());
-        result.setPayType(Payment.Type.ALIPAY);
-
-        if (param.isPayedSuccessfully()) {
-            result.setSuccessful(true);
-            result.setPayer(param.getPayer());
-            result.setFinishTime(param.getFinishTime());
-            result.setTradeNo(param.getTradeNo());
-            result.setTotalFee(param.getTotalFee());
-        }
 
         return result;
     }

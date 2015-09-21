@@ -106,7 +106,6 @@ public class ProductServiceApi extends AbstractServiceApi {
 
         public String getDetail(long productId) {
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("product", productId, "detail"));
-
             return (String) executeRequest(request);
         }
 
