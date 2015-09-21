@@ -1,7 +1,7 @@
 package cn.momia.api.base;
 
-import cn.momia.api.base.region.Region;
-import cn.momia.api.base.city.City;
+import cn.momia.api.base.entity.Region;
+import cn.momia.api.base.entity.City;
 
 import java.util.Date;
 import java.util.HashMap;

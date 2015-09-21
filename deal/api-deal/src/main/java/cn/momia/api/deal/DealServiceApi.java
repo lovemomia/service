@@ -1,9 +1,9 @@
 package cn.momia.api.deal;
 
-import cn.momia.api.deal.coupon.PagedCoupons;
-import cn.momia.api.deal.order.Order;
-import cn.momia.api.deal.order.PagedOrders;
-import cn.momia.api.deal.order.SkuPlaymates;
+import cn.momia.api.deal.entity.PagedCoupons;
+import cn.momia.api.deal.entity.Order;
+import cn.momia.api.deal.entity.PagedOrders;
+import cn.momia.api.deal.entity.SkuPlaymates;
 import cn.momia.common.api.AbstractServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;

@@ -1,8 +1,8 @@
 package cn.momia.api.base;
 
-import cn.momia.api.base.region.Region;
-import cn.momia.api.base.city.City;
-import cn.momia.api.base.region.CityDistricts;
+import cn.momia.api.base.entity.Region;
+import cn.momia.api.base.entity.City;
+import cn.momia.api.base.entity.CityDistricts;
 import cn.momia.common.api.AbstractServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;

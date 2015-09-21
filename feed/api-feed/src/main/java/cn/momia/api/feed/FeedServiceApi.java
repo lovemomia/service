@@ -1,7 +1,9 @@
 package cn.momia.api.feed;
 
-import cn.momia.api.feed.comment.PagedFeedComments;
-import cn.momia.api.feed.star.PagedFeedStars;
+import cn.momia.api.feed.entity.PagedFeedComments;
+import cn.momia.api.feed.entity.Feed;
+import cn.momia.api.feed.entity.PagedFeeds;
+import cn.momia.api.feed.entity.PagedFeedStars;
 import cn.momia.common.api.AbstractServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;

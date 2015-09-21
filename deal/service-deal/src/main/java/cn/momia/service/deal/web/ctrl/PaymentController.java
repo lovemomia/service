@@ -1,7 +1,7 @@
 package cn.momia.service.deal.web.ctrl;
 
 import cn.momia.api.base.BaseServiceApi;
-import cn.momia.api.user.User;
+import cn.momia.api.user.entity.User;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.api.http.MomiaHttpResponse;
@@ -19,8 +19,8 @@ import cn.momia.service.order.product.Order;
 import cn.momia.service.order.product.OrderService;
 import cn.momia.service.order.product.Payment;
 import cn.momia.api.product.ProductServiceApi;
-import cn.momia.api.product.Product;
-import cn.momia.api.product.sku.Sku;
+import cn.momia.api.product.entity.Product;
+import cn.momia.api.product.entity.Sku;
 import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.UserCoupon;
 import cn.momia.service.promo.facade.PromoServiceFacade;

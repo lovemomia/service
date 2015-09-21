@@ -1,6 +1,6 @@
 package cn.momia.service.deal.web.ctrl;
 
-import cn.momia.api.user.User;
+import cn.momia.api.user.entity.User;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;

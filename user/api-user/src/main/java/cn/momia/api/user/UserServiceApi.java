@@ -1,8 +1,10 @@
 package cn.momia.api.user;
 
-import cn.momia.api.user.leader.Leader;
-import cn.momia.api.user.leader.LeaderStatus;
-import cn.momia.api.user.participant.Participant;
+import cn.momia.api.user.entity.Contacts;
+import cn.momia.api.user.entity.User;
+import cn.momia.api.user.entity.Leader;
+import cn.momia.api.user.entity.LeaderStatus;
+import cn.momia.api.user.entity.Participant;
 import cn.momia.common.api.AbstractServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;

@@ -1,6 +1,6 @@
 package cn.momia.service.product.facade;
 
-import cn.momia.api.base.region.Region;
+import cn.momia.api.base.entity.Region;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.service.product.base.BaseProduct;
 import cn.momia.service.product.place.Place;

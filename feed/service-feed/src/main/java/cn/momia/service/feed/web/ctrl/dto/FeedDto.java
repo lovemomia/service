@@ -1,11 +1,11 @@
 package cn.momia.service.feed.web.ctrl.dto;
 
-import cn.momia.api.user.participant.Participant;
+import cn.momia.api.user.entity.Participant;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.dto.Dto;
 import cn.momia.service.feed.facade.Feed;
 import cn.momia.service.feed.facade.FeedImage;
-import cn.momia.api.user.User;
+import cn.momia.api.user.entity.User;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.ArrayList;

@@ -1,9 +1,12 @@
 package cn.momia.api.product;
 
-import cn.momia.api.product.comment.PagedComments;
-import cn.momia.api.product.sku.Sku;
-import cn.momia.api.product.topic.Topic;
-import cn.momia.api.product.topic.Banner;
+import cn.momia.api.product.entity.PagedComments;
+import cn.momia.api.product.entity.PagedProducts;
+import cn.momia.api.product.entity.Product;
+import cn.momia.api.product.entity.ProductGroup;
+import cn.momia.api.product.entity.Sku;
+import cn.momia.api.product.entity.Topic;
+import cn.momia.api.product.entity.Banner;
 import cn.momia.common.api.AbstractServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;

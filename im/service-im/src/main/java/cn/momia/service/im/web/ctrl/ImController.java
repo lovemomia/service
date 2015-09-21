@@ -1,9 +1,9 @@
 package cn.momia.service.im.web.ctrl;
 
-import cn.momia.api.product.Product;
+import cn.momia.api.product.entity.Product;
 import cn.momia.api.product.ProductServiceApi;
-import cn.momia.api.product.sku.Sku;
-import cn.momia.api.user.User;
+import cn.momia.api.product.entity.Sku;
+import cn.momia.api.user.entity.User;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.image.api.ImageFile;

@@ -2,7 +2,7 @@ package cn.momia.service.feed.web.ctrl.dto;
 
 import cn.momia.common.webapp.ctrl.dto.Dto;
 import cn.momia.service.feed.comment.FeedComment;
-import cn.momia.api.user.User;
+import cn.momia.api.user.entity.User;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
