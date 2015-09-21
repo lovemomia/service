@@ -14,6 +14,8 @@ public interface FeedServiceFacade {
     List<Long> queryFollowedIds(long userId);
     long queryFollowedCountByUser(long userId);
     List<Feed> queryFollowedByUser(long userId, int start, int count);
+    long queryPublicFeedsCount();
+    List<Feed> queryPublicFeeds(int start, int count);
 
     long queryCommentsCount(long feedId);
     List<FeedComment> queryComments(long feedId, int start, int count);

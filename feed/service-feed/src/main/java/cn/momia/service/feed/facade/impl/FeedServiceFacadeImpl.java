@@ -158,6 +158,23 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
     }
 
     @Override
+    public long queryPublicFeedsCount() {
+        return baseFeedService.queryPublicFeedsCount();
+    }
+
+    @Override
+    public List<Feed> queryPublicFeeds(int start, int count) {
+        if (start < 0 || count <= 0) return new ArrayList<Feed>();
+        List<BaseFeed> baseFeeds = baseFeedService.queryPublicFeeds(start, count);
+        List<Feed> feeds = new ArrayList<Feed>();
+        for (BaseFeed baseFeed : baseFeeds) {
+            feeds.add(buildFeed(baseFeed));
+        }
+
+        return feeds;
+    }
+
+    @Override
     public long queryCommentsCount(long feedId) {
         if (feedId <= 0) return 0;
         return feedCommentService.queryCount(feedId);

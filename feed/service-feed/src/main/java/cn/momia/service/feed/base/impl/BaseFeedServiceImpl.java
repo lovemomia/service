@@ -177,6 +177,33 @@ public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedServ
     }
 
     @Override
+    public long queryPublicFeedsCount() {
+        String sql = "SELECT COUNT(1) FROM t_feed_follow WHERE type=? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[] { BaseFeed.Type.PUBLIC }, new ResultSetExtractor<Long>() {
+            @Override
+            public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getLong(1) : 0;
+            }
+        });
+    }
+
+    @Override
+    public List<BaseFeed> queryPublicFeeds(int start, int count) {
+        final List<BaseFeed> baseFeeds = new ArrayList<BaseFeed>();
+        String sql = "SELECT " + joinFields() + " FROM t_feed WHERE type=? AND status=1 ORDER BY addTime DESC LIMIT ?,?";
+        jdbcTemplate.query(sql, new Object[] { BaseFeed.Type.PUBLIC, start, count }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                BaseFeed baseFeed = buildBaseFeed(rs);
+                if (baseFeed.exists()) baseFeeds.add(baseFeed);
+            }
+        });
+
+        return baseFeeds;
+    }
+
+    @Override
     public long queryCountByTopic(long topicId) {
         String sql = "SELECT COUNT(1) FROM t_feed WHERE topicId=? AND status=1";
 

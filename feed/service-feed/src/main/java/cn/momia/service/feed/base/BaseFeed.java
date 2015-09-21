@@ -3,6 +3,10 @@ package cn.momia.service.feed.base;
 import java.util.Date;
 
 public class BaseFeed {
+    public static class Type {
+        public static final int PUBLIC = 1;
+    }
+
     public static final BaseFeed NOT_EXIST_BASE_FEED = new BaseFeed();
     public static final BaseFeed INVALID_BASE_FEED = new BaseFeed();
     static {

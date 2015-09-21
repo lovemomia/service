@@ -45,8 +45,15 @@ public class FeedController extends BaseController {
     public MomiaHttpResponse list(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);
 
-        long totalCount = feedServiceFacade.queryFollowedCountByUser(userId);
-        List<Feed> feeds = feedServiceFacade.queryFollowedByUser(userId, start, count);
+        long totalCount;
+        List<Feed> feeds;
+        if (userId > 0) {
+            totalCount = feedServiceFacade.queryFollowedCountByUser(userId);
+            feeds = feedServiceFacade.queryFollowedByUser(userId, start, count);
+        } else {
+            totalCount = feedServiceFacade.queryPublicFeedsCount();
+            feeds = feedServiceFacade.queryPublicFeeds(start, count);
+        }
 
         return MomiaHttpResponse.SUCCESS(buildFeedsDto(userId, feeds, totalCount, start, count));
     }
