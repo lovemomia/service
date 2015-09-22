@@ -2,11 +2,11 @@ package cn.momia.api.product.dto;
 
 import java.util.List;
 
-public class Topic {
+public class TopicDto {
     private long id;
     private String cover;
     private String title;
-    private List<TopicGroup> groups;
+    private List<TopicGroupDto> groups;
 
     public long getId() {
         return id;
@@ -32,11 +32,11 @@ public class Topic {
         this.title = title;
     }
 
-    public List<TopicGroup> getGroups() {
+    public List<TopicGroupDto> getGroups() {
         return groups;
     }
 
-    public void setGroups(List<TopicGroup> groups) {
+    public void setGroups(List<TopicGroupDto> groups) {
         this.groups = groups;
     }
 }

@@ -4,8 +4,8 @@ import cn.momia.api.product.dto.CommentDto;
 import cn.momia.api.product.dto.ProductDto;
 import cn.momia.api.product.dto.ProductGroupDto;
 import cn.momia.api.product.dto.SkuDto;
-import cn.momia.api.product.dto.Topic;
-import cn.momia.api.product.dto.Banner;
+import cn.momia.api.product.dto.TopicDto;
+import cn.momia.api.product.dto.BannerDto;
 import cn.momia.common.api.AbstractServiceApi;
 import cn.momia.common.api.entity.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
@@ -35,18 +35,18 @@ public class ProductServiceApi extends AbstractServiceApi {
     }
 
     public static class TopicServiceApi extends ProductServiceApi {
-        public List<Banner> listBanners(int cityId, int count) {
+        public List<BannerDto> listBanners(int cityId, int count) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("city", cityId)
                     .add("count", count);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("topic/banner"), builder.build());
 
-            return CastUtil.toList((JSONArray) executeRequest(request), Banner.class);
+            return CastUtil.toList((JSONArray) executeRequest(request), BannerDto.class);
         }
 
-        public Topic get(long topicId) {
+        public TopicDto get(long topicId) {
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("topic", topicId));
-            return JSON.toJavaObject((JSON) executeRequest(request), Topic.class);
+            return JSON.toJavaObject((JSON) executeRequest(request), TopicDto.class);
         }
     }
 

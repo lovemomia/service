@@ -1,6 +1,6 @@
 package cn.momia.api.product.dto;
 
-public class Banner {
+public class BannerDto {
     private String cover;
     private String action;
 

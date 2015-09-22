@@ -2,7 +2,7 @@ package cn.momia.api.product.dto;
 
 import java.util.List;
 
-public class TopicGroup {
+public class TopicGroupDto {
     private String title;
     private List<ProductDto> products;
 
