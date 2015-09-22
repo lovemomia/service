@@ -1,8 +1,8 @@
-package cn.momia.api.deal.entity;
+package cn.momia.api.deal.dto;
 
 import java.util.List;
 
-public class Playmate {
+public class PlaymateDto {
     private long id;
     private String nickName;
     private String avatar;

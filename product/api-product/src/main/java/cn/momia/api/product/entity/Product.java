@@ -262,6 +262,18 @@ public class Product {
         return "";
     }
 
+    public boolean isSkuFinished(long skuId) {
+        Sku sku = getSku(skuId);
+        if (!sku.exists()) return true;
+        return sku.isFinished();
+    }
+
+    public boolean isSkuClosed(long skuId) {
+        Sku sku = getSku(skuId);
+        if (!sku.exists()) return true;
+        return sku.isClosed();
+    }
+
     public boolean exists() {
         return id > 0;
     }

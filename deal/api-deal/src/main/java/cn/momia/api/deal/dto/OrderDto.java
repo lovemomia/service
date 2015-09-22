@@ -1,11 +1,11 @@
-package cn.momia.api.deal.entity;
+package cn.momia.api.deal.dto;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class Order {
+public class OrderDto {
     private long id;
     private long productId;
     private long skuId;

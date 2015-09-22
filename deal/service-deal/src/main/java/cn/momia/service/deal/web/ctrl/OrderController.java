@@ -1,5 +1,10 @@
 package cn.momia.service.deal.web.ctrl;
 
+import cn.momia.api.base.MetaUtil;
+import cn.momia.api.deal.dto.OrderDto;
+import cn.momia.api.deal.dto.OrderDupDto;
+import cn.momia.api.deal.dto.PlaymateDto;
+import cn.momia.api.deal.dto.SkuPlaymatesDto;
 import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.MobileUtil;
@@ -12,11 +17,6 @@ import cn.momia.service.order.product.OrderLimitException;
 import cn.momia.service.order.product.Order;
 import cn.momia.service.order.product.OrderPrice;
 import cn.momia.service.order.product.OrderService;
-import cn.momia.service.deal.web.ctrl.dto.OrderDetailDto;
-import cn.momia.service.deal.web.ctrl.dto.OrderDto;
-import cn.momia.service.deal.web.ctrl.dto.OrderDupDto;
-import cn.momia.service.deal.web.ctrl.dto.PlaymateDto;
-import cn.momia.service.deal.web.ctrl.dto.SkuPlaymatesDto;
 import cn.momia.api.product.ProductServiceApi;
 import cn.momia.api.product.entity.Product;
 import cn.momia.api.product.entity.Sku;
@@ -65,7 +65,7 @@ public class OrderController extends BaseController {
             orderId = orderService.add(order);
             if (orderId > 0) {
                 order.setId(orderId);
-                return MomiaHttpResponse.SUCCESS(new OrderDto(order));
+                return MomiaHttpResponse.SUCCESS(buildOrderDto(order));
             }
         } catch (OrderLimitException e) {
             return MomiaHttpResponse.FAILED("本单有限购，您已超出购买限额");
@@ -111,6 +111,37 @@ public class OrderController extends BaseController {
         } catch (Exception e) {
             LOGGER.error("error occurred during process contacts {}/{}", mobile, name, e);
         }
+    }
+
+    private OrderDto buildOrderDto(Order order) {
+        OrderDto orderDto = new OrderDto();
+        orderDto.setId(order.getId());
+        orderDto.setProductId(order.getProductId());
+        orderDto.setSkuId(order.getSkuId());
+        orderDto.setCount(order.getCount());
+        orderDto.setTotalFee(order.getTotalFee());
+        orderDto.setParticipants(buildParticipants(order.getPrices()));
+        orderDto.setContacts(order.getContacts());
+        orderDto.setMobile(MobileUtil.encrypt(order.getMobile()));
+        orderDto.setAddTime(order.getAddTime());
+        orderDto.setStatus(order.getStatus());
+        orderDto.setPayed(order.isPayed());
+
+        return orderDto;
+    }
+
+    private String buildParticipants(List<OrderPrice> prices) {
+        int adult = 0;
+        int child = 0;
+        for (OrderPrice price : prices) {
+            adult += price.getAdult() * price.getCount();
+            child += price.getChild() * price.getCount();
+        }
+
+        if (adult > 0 && child > 0) return adult + "成人, " + child + "儿童";
+        else if (adult <= 0 && child > 0) return child + "儿童";
+        else if (adult > 0 && child <= 0) return adult + "成人";
+        return "";
     }
 
     private boolean unlockSku(Order order) {
@@ -238,13 +269,28 @@ public class OrderController extends BaseController {
                 Product product = productMap.get(order.getProductId());
                 if (product == null) continue;
 
-                userOrdersDto.add(new OrderDetailDto(order, product));
+                userOrdersDto.add(buildOrderDetailDto(order, product));
             } catch (Exception e) {
                 LOGGER.error("fail to build order dto for order: {}", order.getId(), e);
             }
         }
 
         return userOrdersDto;
+    }
+
+    private OrderDto buildOrderDetailDto(Order order, Product product) {
+        OrderDto orderDto = buildOrderDto(order);
+        orderDto.setCover(product.getCover());
+        orderDto.setTitle(product.getTitle());
+        orderDto.setScheduler(product.getScheduler());
+        orderDto.setRegion(MetaUtil.getRegionName(product.getSkuRegionId(order.getSkuId())));
+        orderDto.setAddress(product.getSkuAddress(order.getSkuId()));
+        orderDto.setPrice(product.getPrice());
+        orderDto.setTime(product.getSkuTime(order.getSkuId()));
+        orderDto.setFinished(product.isSkuFinished(order.getSkuId()));
+        orderDto.setClosed(product.isSkuClosed(order.getSkuId()));
+
+        return orderDto;
     }
 
     @RequestMapping(value = "/{id}/check", method = RequestMethod.GET)
@@ -273,7 +319,7 @@ public class OrderController extends BaseController {
                 order.getCustomerId() != user.getId() ||
                 order.getProductId() != product.getId()) return MomiaHttpResponse.FAILED("无效的订单");
 
-        return MomiaHttpResponse.SUCCESS(new OrderDetailDto(order, product));
+        return MomiaHttpResponse.SUCCESS(buildOrderDetailDto(order, product));
     }
 
     @RequestMapping(value = "/customer", method = RequestMethod.GET)
@@ -437,9 +483,10 @@ public class OrderController extends BaseController {
                 playmateDto.setAvatar(customer.getAvatar());
 
                 List<String> childrenStrs = new ArrayList<String>();
-                List<ParticipantDto> children = customer.getChildren();
+                ListDto children = customer.getChildren();
                 if (children != null) {
-                    for (ParticipantDto child : children) {
+                    for (Object childObj : children) {
+                        ParticipantDto child = (ParticipantDto) childObj;
                         childrenStrs.add(child.getSex() + "孩" + TimeUtil.formatAge(child.getBirthday()));
                     }
                 }

@@ -1,5 +1,6 @@
 package cn.momia.service.deal.web.ctrl;
 
+import cn.momia.api.deal.dto.CouponDto;
 import cn.momia.api.user.dto.UserDto;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.common.api.http.MomiaHttpResponse;
@@ -7,7 +8,6 @@ import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.api.dto.PagedListDto;
 import cn.momia.service.order.product.Order;
 import cn.momia.service.order.product.OrderService;
-import cn.momia.service.deal.web.ctrl.dto.CouponDto;
 import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.UserCoupon;
 import cn.momia.service.promo.facade.PromoServiceFacade;

@@ -1,4 +1,4 @@
-package cn.momia.service.deal.web.ctrl.dto;
+package cn.momia.api.deal.dto;
 
 public class OrderDupDto {
     public static final OrderDupDto NOT_DUPLICATED = new OrderDupDto();
