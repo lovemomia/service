@@ -2,7 +2,7 @@ package cn.momia.service.deal.web.ctrl.dto;
 
 import cn.momia.api.base.MetaUtil;
 import cn.momia.api.product.entity.Sku;
-import cn.momia.common.webapp.ctrl.dto.Dto;
+import cn.momia.common.api.dto.Dto;
 import cn.momia.service.order.product.Order;
 import cn.momia.api.product.entity.Product;
 

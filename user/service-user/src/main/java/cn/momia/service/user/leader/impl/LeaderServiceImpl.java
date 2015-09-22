@@ -127,7 +127,6 @@ public class LeaderServiceImpl extends DbAccessService implements LeaderService 
     @Override
     public boolean deleteByUser(long userId) {
         String sql = "UPDATE t_user_leader SET status=0 WHERE userId=?";
-
         return jdbcTemplate.update(sql, new Object[] { userId }) > 0;
     }
 }

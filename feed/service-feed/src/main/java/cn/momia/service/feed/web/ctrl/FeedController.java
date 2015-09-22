@@ -2,14 +2,14 @@ package cn.momia.service.feed.web.ctrl;
 
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.common.webapp.ctrl.dto.PagedListDto;
+import cn.momia.common.api.dto.PagedListDto;
 import cn.momia.service.feed.comment.FeedComment;
 import cn.momia.service.feed.facade.Feed;
 import cn.momia.service.feed.facade.FeedServiceFacade;
 import cn.momia.service.feed.web.ctrl.dto.FeedCommentDto;
 import cn.momia.service.feed.web.ctrl.dto.FeedDto;
 import cn.momia.api.user.UserServiceApi;
-import cn.momia.api.user.entity.User;
+import cn.momia.api.user.dto.UserDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,13 +68,13 @@ public class FeedController extends BaseController {
 
         Set<Long> userIds = new HashSet<Long>();
         for (Feed feed : feeds) userIds.add(feed.getUserId());
-        List<User> users = UserServiceApi.USER.list(userIds, User.Type.FULL);
-        Map<Long, User> usersMap = new HashMap<Long, User>();
-        for (User user : users) usersMap.put(user.getId(), user);
+        List<UserDto> users = UserServiceApi.USER.list(userIds, UserDto.Type.FULL);
+        Map<Long, UserDto> usersMap = new HashMap<Long, UserDto>();
+        for (UserDto user : users) usersMap.put(user.getId(), user);
 
         PagedListDto feedsDto = new PagedListDto(totalCount, start, count);
         for (Feed feed : feeds) {
-            User user = usersMap.get(feed.getUserId());
+            UserDto user = usersMap.get(feed.getUserId());
             if (user == null) continue;
 
             feedsDto.add(new FeedDto(feed, user, staredFeedIds.contains(feed.getId())));
@@ -116,7 +116,7 @@ public class FeedController extends BaseController {
         Feed feed = feedServiceFacade.getFeed(id);
         if (!feed.exists()) return MomiaHttpResponse.FAILED("无效的Feed");
 
-        User feedUser = UserServiceApi.USER.get(feed.getUserId());
+        UserDto feedUser = UserServiceApi.USER.get(feed.getUserId());
         if (feedUser.getId() <= 0) return MomiaHttpResponse.FAILED("无效的Feed");
 
         boolean stared = feedServiceFacade.isStared(userId, id);
@@ -144,13 +144,13 @@ public class FeedController extends BaseController {
 
         List<Long> userIds = new ArrayList<Long>();
         for (FeedComment comment : comments) userIds.add(comment.getUserId());
-        List<User> users = UserServiceApi.USER.list(userIds, User.Type.MINI);
-        Map<Long, User> usersMap = new HashMap<Long, User>();
-        for (User user : users) usersMap.put(user.getId(), user);
+        List<UserDto> users = UserServiceApi.USER.list(userIds, UserDto.Type.MINI);
+        Map<Long, UserDto> usersMap = new HashMap<Long, UserDto>();
+        for (UserDto user : users) usersMap.put(user.getId(), user);
 
         PagedListDto feedCommentsDto = new PagedListDto(totalCount, start, count);
         for (FeedComment comment : comments) {
-            User user = usersMap.get(comment.getUserId());
+            UserDto user = usersMap.get(comment.getUserId());
             if (user == null) continue;
 
             feedCommentsDto.add(new FeedCommentDto(comment, user));
@@ -189,10 +189,10 @@ public class FeedController extends BaseController {
         if (totalCount <= 0) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);
 
         List<Long> userIds = feedServiceFacade.queryStaredUserIds(id, start, count);
-        List<User> users = UserServiceApi.USER.list(userIds, User.Type.MINI);
+        List<UserDto> users = UserServiceApi.USER.list(userIds, UserDto.Type.MINI);
 
         PagedListDto staredUsersDto = new PagedListDto(totalCount, start, count);
-        for (User user : users) staredUsersDto.add(user);
+        for (UserDto user : users) staredUsersDto.add(user);
 
         return MomiaHttpResponse.SUCCESS(staredUsersDto);
     }

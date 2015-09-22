@@ -2,7 +2,7 @@ package cn.momia.service.product.web.ctrl;
 
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.common.webapp.ctrl.dto.PagedListDto;
+import cn.momia.common.api.dto.PagedListDto;
 import cn.momia.service.comment.Comment;
 import cn.momia.service.comment.CommentService;
 import cn.momia.service.product.web.ctrl.dto.CommentDto;

@@ -1,6 +1,6 @@
 package cn.momia.service.product.web.ctrl.dto;
 
-import cn.momia.common.webapp.ctrl.dto.Dto;
+import cn.momia.common.api.dto.Dto;
 import cn.momia.service.product.facade.Product;
 import cn.momia.service.product.facade.ProductImage;
 import com.alibaba.fastjson.JSONArray;

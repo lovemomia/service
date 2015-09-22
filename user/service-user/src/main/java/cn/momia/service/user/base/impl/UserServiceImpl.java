@@ -214,7 +214,6 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     @Override
     public boolean updateNickName(long id, String nickName) {
         String sql = "UPDATE t_user SET nickName=? WHERE id=?";
-
         return update(sql, new Object[] { nickName, id });
     }
 
@@ -225,70 +224,60 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     @Override
     public boolean updateAvatar(long id, String avatar) {
         String sql = "UPDATE t_user SET avatar=? WHERE id=?";
-
         return update(sql, new Object[] { avatar, id });
     }
 
     @Override
     public boolean updateName(long id, String name) {
         String sql = "UPDATE t_user SET name=? WHERE id=?";
-
         return update(sql, new Object[] { name, id });
     }
 
     @Override
     public boolean updateSex(long id, String sex) {
         String sql = "UPDATE t_user SET sex=? WHERE id=?";
-
         return update(sql, new Object[] { sex, id });
     }
 
     @Override
     public boolean updateBirthday(long id, Date birthday) {
         String sql = "UPDATE t_user SET `birthday`=? WHERE id=?";
-
         return update(sql, new Object[] { birthday, id });
     }
 
     @Override
     public boolean updateCityId(long id, int cityId) {
         String sql = "UPDATE t_user SET `cityId`=? WHERE id=?";
-
         return update(sql, new Object[] { cityId, id });
     }
 
     @Override
     public boolean updateRegionId(long id, int regionId) {
         String sql = "UPDATE t_user SET `regionId`=? WHERE id=?";
-
         return update(sql, new Object[] { regionId, id });
     }
 
     @Override
     public boolean updateAddress(long id, String address) {
         String sql = "UPDATE t_user SET address=? WHERE id=?";
-
         return update(sql, new Object[] { address, id });
     }
 
     @Override
     public boolean updateChildren(long id, Set<Long> children) {
         String sql = "UPDATE t_user SET children=? WHERE id=?";
-
         return update(sql, new Object[] { StringUtils.join(children, ","), id });
     }
 
     @Override
     public boolean updatePassword(long id, String mobile, String password) {
         String sql = "UPDATE t_user SET password=? WHERE id=?";
-
         return update(sql, new Object[] { encryptPassword(mobile, password, Configuration.getString("SecretKey.Password")), id });
     }
 
     @Override
     public boolean setPayed(long id) {
         String sql = "UPDATE t_user SET payed=? WHERE id=? AND payed=?";
-
         return update(sql, new Object[] { true, id, false });
     }
 

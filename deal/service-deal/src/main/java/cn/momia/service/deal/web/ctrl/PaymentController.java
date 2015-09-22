@@ -1,7 +1,7 @@
 package cn.momia.service.deal.web.ctrl;
 
 import cn.momia.api.base.BaseServiceApi;
-import cn.momia.api.user.entity.User;
+import cn.momia.api.user.dto.UserDto;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.api.http.MomiaHttpResponse;
@@ -50,7 +50,7 @@ public class PaymentController extends BaseController {
     }
 
     private MomiaHttpResponse prepay(HttpServletRequest request, int payType) {
-        User user = UserServiceApi.USER.get(request.getParameter("utoken"));
+        UserDto user = UserServiceApi.USER.get(request.getParameter("utoken"));
         long orderId = Long.valueOf(request.getParameter("oid"));
         long productId = Long.valueOf(request.getParameter("pid"));
         long skuId = Long.valueOf(request.getParameter("sid"));
@@ -168,7 +168,7 @@ public class PaymentController extends BaseController {
                                         @RequestParam(value = "pid") long productId,
                                         @RequestParam(value = "sid") long skuId,
                                         @RequestParam(value = "coupon", required = false) Long userCouponId) {
-        User user = UserServiceApi.USER.get(utoken);
+        UserDto user = UserServiceApi.USER.get(utoken);
         Order order = orderService.get(orderId);
         if (!order.exists() ||
                 order.getCustomerId() != user.getId() ||
@@ -286,7 +286,7 @@ public class PaymentController extends BaseController {
                                           @RequestParam(value = "oid") long orderId,
                                           @RequestParam(value = "pid") long productId,
                                           @RequestParam(value = "sid") long skuId) {
-        User user = UserServiceApi.USER.get(utoken);
+        UserDto user = UserServiceApi.USER.get(utoken);
         if (!orderService.check(user.getId(), orderId, productId, skuId)) return MomiaHttpResponse.FAILED("支付失败");
         return MomiaHttpResponse.SUCCESS;
     }

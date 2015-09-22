@@ -1,11 +1,12 @@
 package cn.momia.service.feed.web.ctrl.dto;
 
-import cn.momia.api.user.entity.Participant;
+import cn.momia.api.user.dto.ParticipantDto;
+import cn.momia.common.util.SexUtil;
 import cn.momia.common.util.TimeUtil;
-import cn.momia.common.webapp.ctrl.dto.Dto;
+import cn.momia.common.api.dto.Dto;
 import cn.momia.service.feed.facade.Feed;
 import cn.momia.service.feed.facade.FeedImage;
-import cn.momia.api.user.entity.User;
+import cn.momia.api.user.dto.UserDto;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import java.util.List;
 
 public class FeedDto implements Dto {
     private Feed feed;
-    private User user;
+    private UserDto user;
     private boolean stared;
 
     public long getId() {
@@ -82,11 +83,11 @@ public class FeedDto implements Dto {
 
         if (user.getChildren() != null) {
             int count = 0;
-            for (Participant child : user.getChildren()) {
+            for (ParticipantDto child : user.getChildren()) {
                 if (TimeUtil.isAdult(child.getBirthday())) continue;
 
                 String ageStr = TimeUtil.formatAge(child.getBirthday());
-                if (!("男".equals(child.getSex()) || "女".equals(child.getSex()))) children.add("孩子" + ageStr);
+                if (SexUtil.isInvalid(child.getSex())) children.add("孩子" + ageStr);
                 else children.add(child.getSex() + "孩" + ageStr);
 
                 count++;
@@ -101,12 +102,12 @@ public class FeedDto implements Dto {
         return stared;
     }
 
-    public FeedDto(Feed feed, User user) {
+    public FeedDto(Feed feed, UserDto user) {
         this.feed = feed;
         this.user = user;
     }
 
-    public FeedDto(Feed feed, User user, boolean stared) {
+    public FeedDto(Feed feed, UserDto user, boolean stared) {
         this(feed, user);
         this.stared = stared;
     }

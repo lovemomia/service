@@ -6,8 +6,8 @@ import cn.momia.common.util.MobileUtil;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.common.webapp.ctrl.dto.ListDto;
-import cn.momia.common.webapp.ctrl.dto.PagedListDto;
+import cn.momia.common.api.dto.ListDto;
+import cn.momia.common.api.dto.PagedListDto;
 import cn.momia.service.order.product.OrderLimitException;
 import cn.momia.service.order.product.Order;
 import cn.momia.service.order.product.OrderPrice;
@@ -21,8 +21,8 @@ import cn.momia.api.product.ProductServiceApi;
 import cn.momia.api.product.entity.Product;
 import cn.momia.api.product.entity.Sku;
 import cn.momia.api.user.UserServiceApi;
-import cn.momia.api.user.entity.Participant;
-import cn.momia.api.user.entity.User;
+import cn.momia.api.user.dto.ParticipantDto;
+import cn.momia.api.user.dto.UserDto;
 import cn.momia.service.promo.facade.PromoServiceFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -107,7 +107,7 @@ public class OrderController extends BaseController {
     private void processContacts(long userId, String mobile, String name) {
         try {
             if (MobileUtil.isInvalid(mobile) || StringUtils.isBlank(name)) return;
-            UserServiceApi.USER.processContacts(userId, mobile, name);
+            UserServiceApi.USER.setContacts(userId, mobile, name);
         } catch (Exception e) {
             LOGGER.error("error occurred during process contacts {}/{}", mobile, name, e);
         }
@@ -195,7 +195,7 @@ public class OrderController extends BaseController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public MomiaHttpResponse delete(@RequestParam String utoken, @PathVariable long id) {
-        User user = UserServiceApi.USER.get(utoken);
+        UserDto user = UserServiceApi.USER.get(utoken);
         Order order = orderService.get(id);
         if (!order.exists() || order.getCustomerId() != user.getId()) return MomiaHttpResponse.FAILED("无效的订单");
 
@@ -217,7 +217,7 @@ public class OrderController extends BaseController {
                                   @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);
 
-        User user = UserServiceApi.USER.get(utoken);
+        UserDto user = UserServiceApi.USER.get(utoken);
         long totalCount = orderService.queryCountByUser(user.getId(), status);
         List<Order> orders = orderService.queryByUser(user.getId(), status, start, count);
 
@@ -252,7 +252,7 @@ public class OrderController extends BaseController {
                                    @PathVariable(value = "id") long id,
                                    @RequestParam(value = "pid") long productId,
                                    @RequestParam(value = "sid") long skuId) {
-        User user = UserServiceApi.USER.get(utoken);
+        UserDto user = UserServiceApi.USER.get(utoken);
         Order order = orderService.get(id);
         if (!order.isPayed() ||
                 order.getCustomerId() != user.getId() ||
@@ -266,7 +266,7 @@ public class OrderController extends BaseController {
     public MomiaHttpResponse detail(@RequestParam String utoken,
                                     @PathVariable(value = "id") long id,
                                     @RequestParam(value = "pid") long productId) {
-        User user = UserServiceApi.USER.get(utoken);
+        UserDto user = UserServiceApi.USER.get(utoken);
         Order order = orderService.get(id);
         Product product = ProductServiceApi.PRODUCT.get(productId, Product.Type.BASE_WITH_SKU);
         if (!order.exists() || !product.exists() ||
@@ -285,16 +285,16 @@ public class OrderController extends BaseController {
 
         List<Long> customerIds = new ArrayList<Long>();
         for (Order order : orders) customerIds.add(order.getCustomerId());
-        List<User> customers = UserServiceApi.USER.list(customerIds, User.Type.MINI);
-        Map<Long, User> customersMap = new HashMap<Long, User>();
-        for (User customer : customers) {
+        List<UserDto> customers = UserServiceApi.USER.list(customerIds, UserDto.Type.MINI);
+        Map<Long, UserDto> customersMap = new HashMap<Long, UserDto>();
+        for (UserDto customer : customers) {
             customersMap.put(customer.getId(), customer);
         }
 
         ListDto avatars = new ListDto();
         for (Order order : orders) {
             long customerId = order.getCustomerId();
-            User customer = customersMap.get(customerId);
+            UserDto customer = customersMap.get(customerId);
             if (customer == null) continue;
 
             avatars.add(customer.getAvatar());
@@ -337,8 +337,8 @@ public class OrderController extends BaseController {
             customerIds.add(customerId);
         }
 
-        Map<Long, User> customersMap = new HashMap<Long, User>();
-        for (User customer : UserServiceApi.USER.list(customerIds, User.Type.FULL)) {
+        Map<Long, UserDto> customersMap = new HashMap<Long, UserDto>();
+        for (UserDto customer : UserServiceApi.USER.list(customerIds, UserDto.Type.FULL)) {
             customersMap.put(customer.getId(), customer);
         }
 
@@ -374,7 +374,7 @@ public class OrderController extends BaseController {
     private List<SkuPlaymatesDto> buildPlaymates(List<Sku> skus,
                                                  Map<Long, List<Order>> skuOrdersMap,
                                                  Map<Long, List<Long>> skuCustomerIdsMap,
-                                                 Map<Long, User> customersMap) {
+                                                 Map<Long, UserDto> customersMap) {
         List<SkuPlaymatesDto> skusPlaymatesDto = new ArrayList<SkuPlaymatesDto>();
         for (Sku sku : skus) {
             try {
@@ -423,23 +423,23 @@ public class OrderController extends BaseController {
         return builder.toString();
     }
 
-    private List<PlaymateDto> extractPlayMates(long skuId, Map<Long, List<Long>> skuCustomerIdsMap, Map<Long, User> customersMap) {
+    private List<PlaymateDto> extractPlayMates(long skuId, Map<Long, List<Long>> skuCustomerIdsMap, Map<Long, UserDto> customersMap) {
         int pageSize = Configuration.getInt("Product.Playmate.PageSize");
         List<PlaymateDto> playmatesDto = new ArrayList<PlaymateDto>();
         List<Long> customerIds = skuCustomerIdsMap.get(skuId);
         if (customerIds != null) {
             for (long customerId : customerIds) {
                 PlaymateDto playmateDto = new PlaymateDto();
-                User customer = customersMap.get(customerId);
+                UserDto customer = customersMap.get(customerId);
                 if (customer == null) continue;
                 playmateDto.setId(customer.getId());
                 playmateDto.setNickName(customer.getNickName());
                 playmateDto.setAvatar(customer.getAvatar());
 
                 List<String> childrenStrs = new ArrayList<String>();
-                List<Participant> children = customer.getChildren();
+                List<ParticipantDto> children = customer.getChildren();
                 if (children != null) {
-                    for (Participant child : children) {
+                    for (ParticipantDto child : children) {
                         childrenStrs.add(child.getSex() + "孩" + TimeUtil.formatAge(child.getBirthday()));
                     }
                 }

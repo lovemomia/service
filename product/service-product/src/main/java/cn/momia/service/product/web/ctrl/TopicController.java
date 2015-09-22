@@ -2,7 +2,7 @@ package cn.momia.service.product.web.ctrl;
 
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.common.webapp.ctrl.dto.ListDto;
+import cn.momia.common.api.dto.ListDto;
 import cn.momia.service.banner.BannerService;
 import cn.momia.service.product.facade.Product;
 import cn.momia.service.product.facade.ProductServiceFacade;

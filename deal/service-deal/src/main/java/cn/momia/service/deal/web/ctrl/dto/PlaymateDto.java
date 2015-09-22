@@ -1,6 +1,6 @@
 package cn.momia.service.deal.web.ctrl.dto;
 
-import cn.momia.common.webapp.ctrl.dto.Dto;
+import cn.momia.common.api.dto.Dto;
 
 import java.util.List;
 

@@ -1,20 +1,12 @@
 package cn.momia.service.user.participant;
 
-import cn.momia.common.util.TimeUtil;
+import cn.momia.common.util.SexUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 public class Participant implements Serializable {
-    private static final Set<String> SEX = new HashSet<String>();
-    static {
-        SEX.add("男");
-        SEX.add("女");
-    }
-
     public static final Participant NOT_EXIST_PARTICIPANT = new Participant();
     public static final Participant INVALID_PARTICIPANT = new Participant();
     static {
@@ -106,22 +98,6 @@ public class Participant implements Serializable {
     }
 
     public boolean isInvalid() {
-        return userId <= 0 || StringUtils.isBlank(name) || !SEX.contains(sex) || birthday == null;
-    }
-
-    public boolean isAdult() {
-        return TimeUtil.isAdult(this.birthday);
-    }
-
-    public boolean isChild() {
-        return TimeUtil.isChild(this.birthday);
-    }
-
-    public String getDesc() {
-        if (TimeUtil.isAdult(this.birthday)) return "成人";
-
-        String ageStr = TimeUtil.formatAge(birthday);
-        if (!("男".equals(this.sex) || "女".equals(this.sex))) return "孩子" + ageStr;
-        return this.sex + "孩" + ageStr;
+        return userId <= 0 || StringUtils.isBlank(name) || SexUtil.isInvalid(sex) || birthday == null;
     }
 }

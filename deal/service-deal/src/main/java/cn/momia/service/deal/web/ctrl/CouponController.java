@@ -1,10 +1,10 @@
 package cn.momia.service.deal.web.ctrl;
 
-import cn.momia.api.user.entity.User;
+import cn.momia.api.user.dto.UserDto;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.common.webapp.ctrl.dto.PagedListDto;
+import cn.momia.common.api.dto.PagedListDto;
 import cn.momia.service.order.product.Order;
 import cn.momia.service.order.product.OrderService;
 import cn.momia.service.deal.web.ctrl.dto.CouponDto;
@@ -34,7 +34,7 @@ public class CouponController extends BaseController {
     public MomiaHttpResponse coupon(@RequestParam String utoken,
                                     @RequestParam(value = "oid") long orderId,
                                     @RequestParam(value = "coupon") long userCouponId) {
-        User user = UserServiceApi.USER.get(utoken);
+        UserDto user = UserServiceApi.USER.get(utoken);
 
         Order order = orderService.get(orderId);
         if (!order.exists() || order.isPayed() || order.getCustomerId() != user.getId()) return MomiaHttpResponse.FAILED("无效的订单");
@@ -57,7 +57,7 @@ public class CouponController extends BaseController {
                                          @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);
 
-        User user = UserServiceApi.USER.get(utoken);
+        UserDto user = UserServiceApi.USER.get(utoken);
 
         BigDecimal totalFee = new BigDecimal(0);
         if (orderId > 0) {
@@ -106,7 +106,7 @@ public class CouponController extends BaseController {
     public MomiaHttpResponse registerCoupon(@RequestParam String utoken) {
         if (StringUtils.isBlank(utoken)) return MomiaHttpResponse.BAD_REQUEST;
 
-        User user = UserServiceApi.USER.get(utoken);
+        UserDto user = UserServiceApi.USER.get(utoken);
         promoServiceFacade.distributeRegisterCoupon(user.getId());
 
         return MomiaHttpResponse.SUCCESS;

@@ -2,8 +2,6 @@ package cn.momia.service.user.web.ctrl;
 
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.MobileUtil;
-import cn.momia.service.user.web.ctrl.dto.LeaderDto;
-import cn.momia.service.user.web.ctrl.dto.LeaderStatusDto;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.leader.Leader;
 import com.google.common.base.Splitter;
@@ -24,7 +22,7 @@ public class LeaderController extends UserRelatedController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
-        return MomiaHttpResponse.SUCCESS(new LeaderStatusDto(leaderService.getByUser(user.getId())));
+        return MomiaHttpResponse.SUCCESS(buildLeaderStatusDto(leaderService.getByUser(user.getId())));
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
@@ -49,7 +47,7 @@ public class LeaderController extends UserRelatedController {
         Leader leader = leaderService.getByUser(user.getId());
         if (!leader.exists()) return MomiaHttpResponse.FAILED("您还没注册为领队");
 
-        return MomiaHttpResponse.SUCCESS(new LeaderDto(leader));
+        return MomiaHttpResponse.SUCCESS(buildLeaderDto(leader));
     }
 
     @RequestMapping(method = RequestMethod.PUT, consumes = "application/json")
@@ -80,6 +78,6 @@ public class LeaderController extends UserRelatedController {
             userIds.add(Long.valueOf(userId));
         }
 
-        return MomiaHttpResponse.SUCCESS(LeaderDto.toDtos(leaderService.listByUsers(userIds)));
+        return MomiaHttpResponse.SUCCESS(buildLeaderDtos(leaderService.listByUsers(userIds)));
     }
 }

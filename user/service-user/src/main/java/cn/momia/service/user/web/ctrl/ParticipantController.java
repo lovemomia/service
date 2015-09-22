@@ -1,7 +1,6 @@
 package cn.momia.service.user.web.ctrl;
 
 import cn.momia.common.api.http.MomiaHttpResponse;
-import cn.momia.service.user.web.ctrl.dto.ParticipantDto;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;
 import com.google.common.base.Splitter;
@@ -35,7 +34,7 @@ public class ParticipantController extends UserRelatedController {
         Participant participant = participantService.get(id);
         if (!participant.exists() || participant.getUserId() != user.getId()) return MomiaHttpResponse.FAILED("出行人不存在");
 
-        return MomiaHttpResponse.SUCCESS(new ParticipantDto(participant, true));
+        return MomiaHttpResponse.SUCCESS(buildParticipantDto(participant, true));
     }
 
     @RequestMapping(method = RequestMethod.PUT, consumes = "application/json")
@@ -66,7 +65,7 @@ public class ParticipantController extends UserRelatedController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
-        return MomiaHttpResponse.SUCCESS(buildParticipantsResponse(participantService.listByUser(user.getId())));
+        return MomiaHttpResponse.SUCCESS(buildParticipantDtos(participantService.listByUser(user.getId())));
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
@@ -77,7 +76,7 @@ public class ParticipantController extends UserRelatedController {
         }
 
         List<Participant> participants = participantService.list(ids);
-        return MomiaHttpResponse.SUCCESS(ParticipantDto.toDtos(participants));
+        return MomiaHttpResponse.SUCCESS(buildParticipantDtos(participants));
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.GET)

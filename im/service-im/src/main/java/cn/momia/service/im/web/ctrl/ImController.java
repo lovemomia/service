@@ -3,7 +3,7 @@ package cn.momia.service.im.web.ctrl;
 import cn.momia.api.product.entity.Product;
 import cn.momia.api.product.ProductServiceApi;
 import cn.momia.api.product.entity.Sku;
-import cn.momia.api.user.entity.User;
+import cn.momia.api.user.dto.UserDto;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.image.api.ImageFile;
@@ -28,7 +28,7 @@ public class ImController {
 
     @RequestMapping(value = "/token", method = RequestMethod.POST)
     public MomiaHttpResponse token(@RequestParam String utoken) {
-        User user = UserServiceApi.USER.get(utoken);
+        UserDto user = UserServiceApi.USER.get(utoken);
         String token = imService.getToken(user.getId());
         if (StringUtils.isBlank(token)) token = imService.register(user.getId(), user.getNickName(), ImageFile.smallUrl(user.getAvatar()));
 
@@ -40,7 +40,7 @@ public class ImController {
                                          @RequestParam(value = "pid") long productId,
                                          @RequestParam(value = "sid") long skuId) {
         // TODO check 管理员权限
-        User user = UserServiceApi.USER.get(utoken);
+        UserDto user = UserServiceApi.USER.get(utoken);
 
         Group group = imService.queryGroup(productId, skuId);
         if (!group.exists()) {
@@ -66,7 +66,7 @@ public class ImController {
                                          @RequestParam(value = "pid") long productId,
                                          @RequestParam(value = "sid") long skuId) {
         // TODO check 管理员权限
-        User user = UserServiceApi.USER.get(utoken);
+        UserDto user = UserServiceApi.USER.get(utoken);
 
         Group group = imService.queryGroup(productId, skuId);
         if (group.exists()) {
@@ -82,7 +82,7 @@ public class ImController {
                                     @PathVariable(value = "gid") long groupId,
                                     @RequestParam String uids) {
         // TODO check 管理员权限
-        User user = UserServiceApi.USER.get(utoken);
+        UserDto user = UserServiceApi.USER.get(utoken);
 
         Set<Long> userIds = new HashSet<Long>();
         for (String idStr : Splitter.on(",").trimResults().omitEmptyStrings().split(uids)) {

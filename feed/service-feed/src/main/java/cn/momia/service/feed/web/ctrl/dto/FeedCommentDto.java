@@ -1,15 +1,15 @@
 package cn.momia.service.feed.web.ctrl.dto;
 
-import cn.momia.common.webapp.ctrl.dto.Dto;
+import cn.momia.common.api.dto.Dto;
 import cn.momia.service.feed.comment.FeedComment;
-import cn.momia.api.user.entity.User;
+import cn.momia.api.user.dto.UserDto;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
 
 public class FeedCommentDto implements Dto {
     private FeedComment comment;
-    private User user;
+    private UserDto user;
 
     public long getId() {
         return comment.getId();
@@ -32,7 +32,7 @@ public class FeedCommentDto implements Dto {
         return user.getNickName();
     }
 
-    public FeedCommentDto(FeedComment comment, User user) {
+    public FeedCommentDto(FeedComment comment, UserDto user) {
         this.comment = comment;
         this.user = user;
     }
