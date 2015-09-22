@@ -4,6 +4,10 @@
         <Level>INFO</Level>
     </Logger>
 
+    <Service>
+        <Base>http://localhost:8080</Base>
+    </Service>
+
     <Limit>
         <MaxPage>50</MaxPage>
         <MaxPageSize>50</MaxPageSize>
