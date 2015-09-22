@@ -6,7 +6,7 @@ import cn.momia.api.base.dto.CityDistrictsDto;
 import cn.momia.common.api.AbstractServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;
-import cn.momia.common.api.http.util.CastUtil;
+import cn.momia.common.api.util.CastUtil;
 import com.alibaba.fastjson.JSONArray;
 
 import java.util.List;
