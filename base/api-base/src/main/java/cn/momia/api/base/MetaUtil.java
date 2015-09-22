@@ -1,7 +1,7 @@
 package cn.momia.api.base;
 
-import cn.momia.api.base.entity.Region;
-import cn.momia.api.base.entity.City;
+import cn.momia.api.base.dto.RegionDto;
+import cn.momia.api.base.dto.CityDto;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -10,18 +10,18 @@ import java.util.Map;
 public class MetaUtil {
     private static Date lastReloadTime = null;
 
-    private static Map<Integer, City> citiesMap = new HashMap<Integer, City>();
-    private static Map<Integer, Region> regionsMap = new HashMap<Integer, Region>();
+    private static Map<Integer, CityDto> citiesMap = new HashMap<Integer, CityDto>();
+    private static Map<Integer, RegionDto> regionsMap = new HashMap<Integer, RegionDto>();
 
     private synchronized static void reload() {
         if (!isOutOfDate()) return;
 
         try {
-            citiesMap = new HashMap<Integer, City>();
-            for (City city : BaseServiceApi.CITY.getAll()) citiesMap.put(city.getId(), city);
+            citiesMap = new HashMap<Integer, CityDto>();
+            for (CityDto city : BaseServiceApi.CITY.getAll()) citiesMap.put(city.getId(), city);
 
-            regionsMap = new HashMap<Integer, Region>();
-            for (Region region : BaseServiceApi.REGION.getAll()) regionsMap.put(region.getId(), region);
+            regionsMap = new HashMap<Integer, RegionDto>();
+            for (RegionDto region : BaseServiceApi.REGION.getAll()) regionsMap.put(region.getId(), region);
         } catch (Exception e) {
             // do nothing
         } finally {
@@ -36,16 +36,16 @@ public class MetaUtil {
     public static String getCityName(int cityId) {
         if (isOutOfDate()) reload();
 
-        City city = citiesMap.get(cityId);
+        CityDto city = citiesMap.get(cityId);
         return city == null ? "" : city.getName();
     }
 
     public static String getRegionName(int regionId) {
         if (isOutOfDate()) reload();
 
-        if (regionId == Region.MULTI_REGION_ID) return "多商区";
+        if (regionId == RegionDto.MULTI_REGION_ID) return "多商区";
 
-        Region region = regionsMap.get(regionId);
+        RegionDto region = regionsMap.get(regionId);
         return region == null ? "" : region.getName();
     }
 }

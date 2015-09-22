@@ -1,6 +1,6 @@
-package cn.momia.api.base.entity;
+package cn.momia.api.base.dto;
 
-public class Region {
+public class RegionDto {
     public static final int MULTI_REGION_ID = -1;
 
     private int id;

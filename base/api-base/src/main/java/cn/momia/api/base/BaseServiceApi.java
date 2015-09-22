@@ -1,8 +1,8 @@
 package cn.momia.api.base;
 
-import cn.momia.api.base.entity.Region;
-import cn.momia.api.base.entity.City;
-import cn.momia.api.base.entity.CityDistricts;
+import cn.momia.api.base.dto.RegionDto;
+import cn.momia.api.base.dto.CityDto;
+import cn.momia.api.base.dto.CityDistrictsDto;
 import cn.momia.common.api.AbstractServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;
@@ -27,21 +27,21 @@ public class BaseServiceApi extends AbstractServiceApi {
     }
 
     public static class CityServiceApi extends BaseServiceApi {
-        public List<City> getAll() {
+        public List<CityDto> getAll() {
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("city"));
-            return CastUtil.toList((JSONArray) executeRequest(request), City.class);
+            return CastUtil.toList((JSONArray) executeRequest(request), CityDto.class);
         }
     }
 
     public static class RegionServiceApi extends BaseServiceApi {
-        public List<Region> getAll() {
+        public List<RegionDto> getAll() {
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("region"));
-            return CastUtil.toList((JSONArray) executeRequest(request), Region.class);
+            return CastUtil.toList((JSONArray) executeRequest(request), RegionDto.class);
         }
 
-        public List<CityDistricts> getCityDistrictTree() {
+        public List<CityDistrictsDto> getCityDistrictTree() {
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("region/district/tree"));
-            return CastUtil.toList((JSONArray) executeRequest(request), CityDistricts.class);
+            return CastUtil.toList((JSONArray) executeRequest(request), CityDistrictsDto.class);
         }
     }
 

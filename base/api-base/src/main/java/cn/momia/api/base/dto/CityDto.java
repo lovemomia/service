@@ -1,6 +1,6 @@
-package cn.momia.api.base.entity;
+package cn.momia.api.base.dto;
 
-public class City {
+public class CityDto {
     private int id;
     private String name;
 
