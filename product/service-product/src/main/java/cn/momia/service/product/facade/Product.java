@@ -54,7 +54,9 @@ public class Product implements Serializable {
         return baseProduct.getTitle();
     }
 
-    public String getAbstracts(){ return baseProduct.getAbstracts(); }
+    public String getAbstracts() {
+        return baseProduct.getAbstracts();
+    }
 
     public String getCover() {
         return baseProduct.getCover();

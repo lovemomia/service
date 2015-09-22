@@ -2,12 +2,12 @@ package cn.momia.service.product.web.ctrl;
 
 import cn.momia.api.product.dto.ProductDto;
 import cn.momia.api.product.dto.ProductGroupDto;
+import cn.momia.api.product.dto.SkuDto;
 import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.config.Configuration;
-import cn.momia.common.api.dto.ListDto;
-import cn.momia.common.api.dto.PagedListDto;
+import cn.momia.common.api.dto.PagedList;
 import cn.momia.service.product.base.ProductSort;
 import cn.momia.service.product.facade.Product;
 import cn.momia.service.product.sku.Sku;
@@ -53,12 +53,12 @@ public class ProductController extends ProductRelatedController {
                                    @RequestParam int start,
                                    @RequestParam int count,
                                    @RequestParam(required = false) String sort) {
-        if (cityId < 0 || isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);
+        if (cityId < 0 || isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
         long totalCount = productServiceFacade.queryCount(cityId);
         List<Product> products = productServiceFacade.query(cityId, start, count, parseSort(sort));
 
-        return MomiaHttpResponse.SUCCESS(buildProductsDto(totalCount, products, start, count));
+        return MomiaHttpResponse.SUCCESS(buildPagedProductDtos(totalCount, products, start, count));
     }
 
     private ProductSort parseSort(String sort) {
@@ -74,52 +74,52 @@ public class ProductController extends ProductRelatedController {
         return productSort;
     }
 
-    private PagedListDto buildProductsDto(long totalCount, List<Product> products, int start, int count) {
-        PagedListDto productsDto = new PagedListDto(totalCount, start, count);
-        ListDto baseProductsDto = new ListDto();
+    private PagedList buildPagedProductDtos(long totalCount, List<Product> products, int start, int count) {
+        PagedList pagedProductDtos = new PagedList(totalCount, start, count);
+        List<ProductDto> productDtos = new ArrayList<ProductDto>();
         for (Product product : products) {
-            baseProductsDto.add(buildProductDto(product, Product.Type.BASE, false));
+            productDtos.add(buildProductDto(product, Product.Type.BASE, false));
         }
-        productsDto.addAll(baseProductsDto);
+        pagedProductDtos.setList(productDtos);
 
-        return productsDto;
+        return pagedProductDtos;
     }
 
     @RequestMapping(value = "/weekend", method = RequestMethod.GET)
     public MomiaHttpResponse queryByWeekend(@RequestParam(value = "city") int cityId,
                                             @RequestParam int start,
                                             @RequestParam int count) {
-        if (cityId <0 || isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);
+        if (cityId <0 || isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
         long totalCount = productServiceFacade.queryCountByWeekend(cityId);
         List<Product> products = productServiceFacade.queryByWeekend(cityId, start, count);
 
-        return MomiaHttpResponse.SUCCESS(buildWeekendProductsDto(totalCount, products, start, count));
+        return MomiaHttpResponse.SUCCESS(buildWeekendProductDtos(totalCount, products, start, count));
     }
 
-    private PagedListDto buildWeekendProductsDto(long totalCount, List<Product> products, int start, int count) {
-        PagedListDto productsDto = new PagedListDto(totalCount, start, count);
-        ListDto baseProductsDto = new ListDto();
+    private PagedList buildWeekendProductDtos(long totalCount, List<Product> products, int start, int count) {
+        PagedList pagedProductDtos = new PagedList(totalCount, start, count);
+        List<ProductDto> productDtos = new ArrayList<ProductDto>();
         for (Product product : products) {
             ProductDto productDto = buildProductDto(product, Product.Type.BASE, false);
             productDto.setScheduler(product.getWeekendScheduler());
-            baseProductsDto.add(productDto);
+            productDtos.add(productDto);
         }
-        productsDto.addAll(baseProductsDto);
+        pagedProductDtos.setList(productDtos);
 
-        return productsDto;
+        return pagedProductDtos;
     }
 
     @RequestMapping(value = "/month", method = RequestMethod.GET)
     public MomiaHttpResponse queryByMonth(@RequestParam(value = "city") int cityId, @RequestParam int month) {
         List<Product> products = productServiceFacade.queryByMonth(cityId, month);
 
-        return MomiaHttpResponse.SUCCESS(buildGroupedProductsDto(month, products));
+        return MomiaHttpResponse.SUCCESS(buildProductGroupDtos(month, products));
     }
 
-    private ListDto buildGroupedProductsDto(int month, List<Product> products) {
+    private List<ProductGroupDto> buildProductGroupDtos(int month, List<Product> products) {
         try {
-            ListDto productsDto = new ListDto();
+            List<ProductGroupDto> productGroupDtos = new ArrayList<ProductGroupDto>();
 
             DateFormat monthFormat = new SimpleDateFormat("yyyy-MM");
             DateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -143,7 +143,7 @@ public class ProductController extends ProductRelatedController {
                             productsOfDayDtoMap.put(day, productsOfDayDto);
 
                             productsOfDayDto.setDate(startTime);
-                            productsDto.add(productsOfDayDto);
+                            productGroupDtos.add(productsOfDayDto);
                         }
                         ProductDto productDto = buildProductDto(product, Product.Type.BASE, false);
                         productDto.setScheduler(sku.getFormatedTime());
@@ -152,7 +152,7 @@ public class ProductController extends ProductRelatedController {
                 }
             }
 
-            Collections.sort(productsDto, new Comparator<Object>() {
+            Collections.sort(productGroupDtos, new Comparator<Object>() {
                 @Override
                 public int compare(Object o1, Object o2) {
                     ProductGroupDto productsOfDayDto1 = (ProductGroupDto) o1;
@@ -162,7 +162,7 @@ public class ProductController extends ProductRelatedController {
                 }
             });
 
-            return productsDto;
+            return productGroupDtos;
         } catch (ParseException e) {
             throw new MomiaFailedException("获取数据失败");
         }
@@ -172,12 +172,12 @@ public class ProductController extends ProductRelatedController {
     public MomiaHttpResponse queryNeedLeader(@RequestParam(value = "city") int cityId,
                                              @RequestParam int start,
                                              @RequestParam int count) {
-        if (cityId < 0 || isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);
+        if (cityId < 0 || isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
         long totalCount = productServiceFacade.queryCountNeedLeader(cityId);
         List<Product> products = productServiceFacade.queryNeedLeader(cityId, start, count);
 
-        return MomiaHttpResponse.SUCCESS(buildProductsDto(totalCount, products, start, count));
+        return MomiaHttpResponse.SUCCESS(buildPagedProductDtos(totalCount, products, start, count));
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -220,7 +220,7 @@ public class ProductController extends ProductRelatedController {
                 skus = Sku.sort(Sku.filterFinished(skus));
         }
 
-        return MomiaHttpResponse.SUCCESS(buildFullSkusDto(skus));
+        return MomiaHttpResponse.SUCCESS(buildFullSkuDtos(skus));
     }
 
     @RequestMapping(value = "/{id}/sku/{sid}", method = RequestMethod.GET)
@@ -250,10 +250,10 @@ public class ProductController extends ProductRelatedController {
     public MomiaHttpResponse listSkusWithLeaders(@PathVariable long id) {
         List<Sku> skus = Sku.sortByStartTime(Sku.filterClosed(productServiceFacade.listSkus(id)));
 
-        ListDto skusDto = new ListDto();
-        for (Sku sku : skus) skusDto.add(buildBaseSkuDto(sku));
+        List<SkuDto> skuDtos = new ArrayList<SkuDto>();
+        for (Sku sku : skus) skuDtos.add(buildBaseSkuDto(sku));
 
-        return MomiaHttpResponse.SUCCESS(skusDto);
+        return MomiaHttpResponse.SUCCESS(skuDtos);
     }
 
     @RequestMapping(value = "/{id}/sku/{sid}/leader/apply", method = RequestMethod.POST)
@@ -264,7 +264,7 @@ public class ProductController extends ProductRelatedController {
 
     @RequestMapping(value = "/led/list", method = RequestMethod.GET)
     public MomiaHttpResponse getLedProducts(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
         long totalCount = productServiceFacade.queryCountOfLedSkus(userId);
         List<Sku> ledSkus = productServiceFacade.queryLedSkus(userId, start, count);
@@ -278,16 +278,18 @@ public class ProductController extends ProductRelatedController {
             productsMap.put(product.getId(), product);
         }
 
-        PagedListDto productsDto = new PagedListDto(totalCount, start, count);
+        PagedList pagedProductDtos = new PagedList(totalCount, start, count);
+        List<ProductDto> productDtos = new ArrayList<ProductDto>();
         for (Sku sku : Sku.sortByStartTime(ledSkus)) {
             Product product = productsMap.get(sku.getProductId());
             if (product == null) continue;
 
             ProductDto productDto = buildProductDto(product, Product.Type.BASE, false);
             productDto.setScheduler(sku.getFormatedTime());
-            productsDto.add(productDto);
+            productDtos.add(productDto);
         }
+        pagedProductDtos.setList(productDtos);
 
-        return MomiaHttpResponse.SUCCESS(productsDto);
+        return MomiaHttpResponse.SUCCESS(pagedProductDtos);
     }
 }

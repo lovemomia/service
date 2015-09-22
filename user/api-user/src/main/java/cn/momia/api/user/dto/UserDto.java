@@ -1,9 +1,9 @@
 package cn.momia.api.user.dto;
 
-import cn.momia.common.api.dto.ListDto;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
+import java.util.List;
 
 public class UserDto {
     public static class Type {
@@ -27,7 +27,7 @@ public class UserDto {
     private String address;
     private String inviteCode;
 
-    private ListDto children;
+    private List<ParticipantDto> children;
     private Boolean leader;
 
     public long getId() {
@@ -134,11 +134,11 @@ public class UserDto {
         this.inviteCode = inviteCode;
     }
 
-    public ListDto getChildren() {
+    public List<ParticipantDto> getChildren() {
         return children;
     }
 
-    public void setChildren(ListDto children) {
+    public void setChildren(List<ParticipantDto> children) {
         this.children = children;
     }
 

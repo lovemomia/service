@@ -4,7 +4,6 @@ import cn.momia.api.base.MetaUtil;
 import cn.momia.api.product.dto.ProductDto;
 import cn.momia.api.product.dto.SkuDto;
 import cn.momia.api.product.dto.SkuPriceDto;
-import cn.momia.common.api.dto.ListDto;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.product.facade.Product;
 import cn.momia.service.product.facade.ProductImage;
@@ -96,13 +95,13 @@ public abstract class ProductRelatedController extends BaseController {
         return imgs;
     }
 
-    protected ListDto buildFullSkusDto(List<Sku> skus) {
-        ListDto skusDto = new ListDto();
+    protected List<SkuDto> buildFullSkuDtos(List<Sku> skus) {
+        List<SkuDto> skuDtos = new ArrayList<SkuDto>();
         for (Sku sku : skus) {
-            skusDto.add(buildFullSkuDto(sku));
+            skuDtos.add(buildFullSkuDto(sku));
         }
 
-        return skusDto;
+        return skuDtos;
     }
 
     protected SkuDto buildFullSkuDto(Sku sku) {

@@ -11,8 +11,7 @@ import cn.momia.common.util.MobileUtil;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.common.api.dto.ListDto;
-import cn.momia.common.api.dto.PagedListDto;
+import cn.momia.common.api.dto.PagedList;
 import cn.momia.service.order.product.OrderLimitException;
 import cn.momia.service.order.product.Order;
 import cn.momia.service.order.product.OrderPrice;
@@ -246,7 +245,7 @@ public class OrderController extends BaseController {
                                   @RequestParam int status,
                                   @RequestParam int start,
                                   @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
         UserDto user = UserServiceApi.USER.get(utoken);
         long totalCount = orderService.queryCountByUser(user.getId(), status);
@@ -256,26 +255,28 @@ public class OrderController extends BaseController {
         for (Order order : orders) productIds.add(order.getProductId());
         List<ProductDto> products = ProductServiceApi.PRODUCT.list(productIds);
 
-        return MomiaHttpResponse.SUCCESS(buildUserOrders(totalCount, orders, products, start, count));
+        return MomiaHttpResponse.SUCCESS(buildPagedUserOrderDtos(totalCount, orders, products, start, count));
     }
 
-    private PagedListDto buildUserOrders(long totalCount, List<Order> orders, List<ProductDto> products, int start, int count) {
+    private PagedList buildPagedUserOrderDtos(long totalCount, List<Order> orders, List<ProductDto> products, int start, int count) {
         Map<Long, ProductDto> productMap = new HashMap<Long, ProductDto>();
         for (ProductDto product : products) productMap.put(product.getId(), product);
 
-        PagedListDto userOrdersDto = new PagedListDto(totalCount, start, count);
+        PagedList pagedUserOrderDtos = new PagedList(totalCount, start, count);
+        List<OrderDto> userOrderDtos = new ArrayList<OrderDto>();
         for (Order order : orders) {
             try {
                 ProductDto product = productMap.get(order.getProductId());
                 if (product == null) continue;
 
-                userOrdersDto.add(buildOrderDetailDto(order, product));
+                userOrderDtos.add(buildOrderDetailDto(order, product));
             } catch (Exception e) {
                 LOGGER.error("fail to build order dto for order: {}", order.getId(), e);
             }
         }
+        pagedUserOrderDtos.setList(userOrderDtos);
 
-        return userOrdersDto;
+        return pagedUserOrderDtos;
     }
 
     private OrderDto buildOrderDetailDto(Order order, ProductDto product) {
@@ -327,7 +328,7 @@ public class OrderController extends BaseController {
         if (productId <= 0 || count <= 0) return MomiaHttpResponse.BAD_REQUEST;
 
         List<Order> orders = orderService.queryDistinctCustomerOrderByProduct(productId, 0, count);
-        if (orders.isEmpty()) return MomiaHttpResponse.SUCCESS(ListDto.EMPTY);
+        if (orders.isEmpty()) return MomiaHttpResponse.SUCCESS(new ArrayList<String>());
 
         List<Long> customerIds = new ArrayList<Long>();
         for (Order order : orders) customerIds.add(order.getCustomerId());
@@ -337,7 +338,7 @@ public class OrderController extends BaseController {
             customersMap.put(customer.getId(), customer);
         }
 
-        ListDto avatars = new ListDto();
+        List<String> avatars = new ArrayList<String>();
         for (Order order : orders) {
             long customerId = order.getCustomerId();
             UserDto customer = customersMap.get(customerId);
@@ -471,7 +472,7 @@ public class OrderController extends BaseController {
 
     private List<PlaymateDto> extractPlayMates(long skuId, Map<Long, List<Long>> skuCustomerIdsMap, Map<Long, UserDto> customersMap) {
         int pageSize = Configuration.getInt("Product.Playmate.PageSize");
-        List<PlaymateDto> playmatesDto = new ArrayList<PlaymateDto>();
+        List<PlaymateDto> playmateDtos = new ArrayList<PlaymateDto>();
         List<Long> customerIds = skuCustomerIdsMap.get(skuId);
         if (customerIds != null) {
             for (long customerId : customerIds) {
@@ -483,21 +484,20 @@ public class OrderController extends BaseController {
                 playmateDto.setAvatar(customer.getAvatar());
 
                 List<String> childrenStrs = new ArrayList<String>();
-                ListDto children = customer.getChildren();
+                List<ParticipantDto> children = customer.getChildren();
                 if (children != null) {
-                    for (Object childObj : children) {
-                        ParticipantDto child = (ParticipantDto) childObj;
+                    for (ParticipantDto child : children) {
                         childrenStrs.add(child.getSex() + "孩" + TimeUtil.formatAge(child.getBirthday()));
                     }
                 }
                 playmateDto.setChildren(childrenStrs);
 
-                if (playmatesDto.size() < pageSize) playmatesDto.add(playmateDto);
+                if (playmateDtos.size() < pageSize) playmateDtos.add(playmateDto);
                 else break;
             }
         }
 
-        return playmatesDto;
+        return playmateDtos;
     }
 
     @RequestMapping(value = "/user", method = RequestMethod.GET)

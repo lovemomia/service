@@ -3,7 +3,7 @@ package cn.momia.service.product.web.ctrl;
 import cn.momia.api.product.dto.CommentDto;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.common.api.dto.PagedListDto;
+import cn.momia.common.api.dto.PagedList;
 import cn.momia.service.comment.Comment;
 import cn.momia.service.comment.CommentImage;
 import cn.momia.service.comment.CommentService;
@@ -33,15 +33,19 @@ public class CommentController extends BaseController {
 
     @RequestMapping(value = "/{id}/comment", method = RequestMethod.GET)
     public MomiaHttpResponse listComments(@PathVariable long id, @RequestParam int start, @RequestParam int count){
-        if (id <= 0 || isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);
+        if (id <= 0 || isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
         long totalCount = commentService.queryCountByProduct(id);
         List<Comment> comments = commentService.queryByProduct(id, start, count);
 
-        PagedListDto commentsDto = new PagedListDto(totalCount, start, count);
-        for (Comment comment : comments) commentsDto.add(buildCommentDto(comment));
+        PagedList pagedCommentDtos = new PagedList(totalCount, start, count);
+        List<CommentDto> commentDtos = new ArrayList<CommentDto>();
+        for (Comment comment : comments) {
+            commentDtos.add(buildCommentDto(comment));
+        }
+        pagedCommentDtos.setList(commentDtos);
 
-        return MomiaHttpResponse.SUCCESS(commentsDto);
+        return MomiaHttpResponse.SUCCESS(pagedCommentDtos);
     }
 
     private CommentDto buildCommentDto(Comment comment) {

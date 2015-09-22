@@ -1,8 +1,8 @@
 package cn.momia.service.product.web.ctrl;
 
+import cn.momia.api.product.dto.ProductDto;
 import cn.momia.common.api.http.MomiaHttpResponse;
-import cn.momia.common.api.dto.ListDto;
-import cn.momia.common.api.dto.PagedListDto;
+import cn.momia.common.api.dto.PagedList;
 import cn.momia.service.product.facade.Product;
 import cn.momia.service.favorite.FavoriteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -21,24 +22,24 @@ public class FavoriteController extends ProductRelatedController {
 
     @RequestMapping(value = "/favorite", method = RequestMethod.GET)
     public MomiaHttpResponse list(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
         long totalCount = favoriteService.queryCount(userId);
         List<Long> productIds = favoriteService.query(userId, start, count);
         List<Product> products = productServiceFacade.list(productIds);
 
-        return MomiaHttpResponse.SUCCESS(buildFavoritesDto(totalCount, products, start, count));
+        return MomiaHttpResponse.SUCCESS(buildPagedFavoriteDtos(totalCount, products, start, count));
     }
 
-    private PagedListDto buildFavoritesDto(long totalCount, List<Product> products, int start, int count) {
-        PagedListDto favoritesDto = new PagedListDto(totalCount, start, count);
-        ListDto baseProductsDto = new ListDto();
+    private PagedList buildPagedFavoriteDtos(long totalCount, List<Product> products, int start, int count) {
+        PagedList favoriteDtos = new PagedList(totalCount, start, count);
+        List<ProductDto> productDtos = new ArrayList<ProductDto>();
         for (Product product : products) {
-            baseProductsDto.add(buildProductDto(product, Product.Type.BASE, false));
+            productDtos.add(buildProductDto(product, Product.Type.BASE, false));
         }
-        favoritesDto.addAll(baseProductsDto);
+        favoriteDtos.setList(productDtos);
 
-        return favoritesDto;
+        return favoriteDtos;
     }
 
     @RequestMapping(value = "/{id}/favor", method = RequestMethod.POST)

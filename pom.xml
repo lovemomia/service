@@ -21,10 +21,5 @@
         <module>im</module>
 
         <module>service</module>
-
-        <module>external</module>
-        <module>internal</module>
-
-        <module>activity</module>
     </modules>
 </project>

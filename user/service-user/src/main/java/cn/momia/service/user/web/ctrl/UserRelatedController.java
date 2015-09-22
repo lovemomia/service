@@ -7,7 +7,6 @@ import cn.momia.api.user.dto.ParticipantDto;
 import cn.momia.api.user.dto.UserDto;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.common.api.dto.ListDto;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
 import cn.momia.service.user.leader.Leader;
@@ -17,6 +16,7 @@ import cn.momia.service.user.participant.ParticipantService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class UserRelatedController extends BaseController {
@@ -92,8 +92,8 @@ public abstract class UserRelatedController extends BaseController {
         return participantDto;
     }
 
-    protected ListDto buildParticipantDtos(List<Participant> participants) {
-        ListDto participantDtos = new ListDto();
+    protected List<ParticipantDto> buildParticipantDtos(List<Participant> participants) {
+        List<ParticipantDto> participantDtos = new ArrayList<ParticipantDto>();
         for (Participant participant : participants) {
             participantDtos.add(buildParticipantDto(participant));
         }
@@ -124,8 +124,8 @@ public abstract class UserRelatedController extends BaseController {
         return leaderDto;
     }
 
-    protected ListDto buildLeaderDtos(List<Leader> leaders) {
-        ListDto leaderDtos = new ListDto();
+    protected List<LeaderDto> buildLeaderDtos(List<Leader> leaders) {
+        List<LeaderDto> leaderDtos = new ArrayList<LeaderDto>();
         for (Leader leader : leaders) {
             leaderDtos.add(buildLeaderDto(leader));
         }

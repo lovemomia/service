@@ -4,7 +4,7 @@ import cn.momia.api.feed.dto.FeedCommentDto;
 import cn.momia.api.feed.dto.FeedDto;
 import cn.momia.api.feed.dto.FeedStarDto;
 import cn.momia.common.api.AbstractServiceApi;
-import cn.momia.common.api.entity.PagedList;
+import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;
 import cn.momia.common.api.http.util.CastUtil;

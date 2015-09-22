@@ -1,9 +1,9 @@
 package cn.momia.service.user.web.ctrl;
 
+import cn.momia.api.user.dto.UserDto;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.MobileUtil;
 import cn.momia.common.util.SexUtil;
-import cn.momia.common.api.dto.ListDto;
 import cn.momia.service.user.leader.Leader;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.participant.Participant;
@@ -290,11 +290,11 @@ public class UserController extends UserRelatedController {
         for (String id : Splitter.on(",").trimResults().omitEmptyStrings().split(uids)) ids.add(Long.valueOf(id));
 
         List<User> users = userService.list(ids);
-        ListDto usersDto = new ListDto();
+        List<UserDto> userDtos = new ArrayList<UserDto>();
 
         switch (type) {
             case User.Type.MINI:
-                for (User user : users) usersDto.add(buildUserDto(user, User.Type.MINI));
+                for (User user : users) userDtos.add(buildUserDto(user, User.Type.MINI));
                 break;
             case User.Type.FULL:
                 Set<Long> childrenIds = new HashSet<Long>();
@@ -318,13 +318,13 @@ public class UserController extends UserRelatedController {
                     Leader leaderInfo = userLeaderInfosMap.get(user.getId());
                     if (leaderInfo == null) leaderInfo = Leader.NOT_EXIST_LEADER;
 
-                    usersDto.add(buildUserDto(user, User.Type.FULL, false, userChildren, leaderInfo));
+                    userDtos.add(buildUserDto(user, User.Type.FULL, false, userChildren, leaderInfo));
                 }
                 break;
-            default: for (User user : users) usersDto.add(buildUserDto(user, User.Type.BASE, false));
+            default: for (User user : users) userDtos.add(buildUserDto(user, User.Type.BASE, false));
         }
 
-        return MomiaHttpResponse.SUCCESS(usersDto);
+        return MomiaHttpResponse.SUCCESS(userDtos);
     }
 
     @RequestMapping(value = "/{id}/payed", method = RequestMethod.GET)

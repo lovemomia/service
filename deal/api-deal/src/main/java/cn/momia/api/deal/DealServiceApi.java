@@ -4,7 +4,7 @@ import cn.momia.api.deal.dto.CouponDto;
 import cn.momia.api.deal.dto.OrderDto;
 import cn.momia.api.deal.dto.SkuPlaymatesDto;
 import cn.momia.common.api.AbstractServiceApi;
-import cn.momia.common.api.entity.PagedList;
+import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;
 import cn.momia.common.api.http.util.CastUtil;

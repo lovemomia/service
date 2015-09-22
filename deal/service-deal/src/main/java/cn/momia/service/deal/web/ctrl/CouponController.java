@@ -5,7 +5,7 @@ import cn.momia.api.user.dto.UserDto;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.common.api.dto.PagedListDto;
+import cn.momia.common.api.dto.PagedList;
 import cn.momia.service.order.product.Order;
 import cn.momia.service.order.product.OrderService;
 import cn.momia.service.promo.coupon.Coupon;
@@ -55,7 +55,7 @@ public class CouponController extends BaseController {
                                          @RequestParam int status,
                                          @RequestParam int start,
                                          @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedListDto.EMPTY);
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
         UserDto user = UserServiceApi.USER.get(utoken);
 
@@ -72,14 +72,15 @@ public class CouponController extends BaseController {
         for (UserCoupon userCoupon : userCoupons) couponIds.add(userCoupon.getCouponId());
         List<Coupon> coupons = promoServiceFacade.listCoupons(couponIds);
 
-        return MomiaHttpResponse.SUCCESS(buildCouponsDto(totalCount, userCoupons, coupons, start, count));
+        return MomiaHttpResponse.SUCCESS(buildPagedCouponDtos(totalCount, userCoupons, coupons, start, count));
     }
 
-    private PagedListDto buildCouponsDto(int totalCount, List<UserCoupon> userCoupons, List<Coupon> coupons, int start, int count) {
-        PagedListDto couponsDto = new PagedListDto(totalCount, start, count);
+    private PagedList buildPagedCouponDtos(int totalCount, List<UserCoupon> userCoupons, List<Coupon> coupons, int start, int count) {
+        PagedList pagedCouponDtos = new PagedList(totalCount, start, count);
         Map<Integer, Coupon> couponsMap = new HashMap<Integer, Coupon>();
         for (Coupon coupon : coupons) couponsMap.put(coupon.getId(), coupon);
 
+        List<CouponDto> couponDtos = new ArrayList<CouponDto>();
         for (UserCoupon userCoupon : userCoupons) {
             Coupon coupon = couponsMap.get(userCoupon.getCouponId());
             if (coupon == null) continue;
@@ -96,10 +97,11 @@ public class CouponController extends BaseController {
             couponDto.setEndTime(userCoupon.getEndTime());
             couponDto.setStatus(userCoupon.getStatus());
 
-            couponsDto.add(couponDto);
+            couponDtos.add(couponDto);
         }
+        pagedCouponDtos.setList(couponDtos);
 
-        return couponsDto;
+        return pagedCouponDtos;
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
