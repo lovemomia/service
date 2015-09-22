@@ -18,8 +18,8 @@ import cn.momia.service.order.product.Order;
 import cn.momia.service.order.product.OrderPrice;
 import cn.momia.service.order.product.OrderService;
 import cn.momia.api.product.ProductServiceApi;
-import cn.momia.api.product.entity.Product;
-import cn.momia.api.product.entity.Sku;
+import cn.momia.api.product.dto.ProductDto;
+import cn.momia.api.product.dto.SkuDto;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.ParticipantDto;
 import cn.momia.api.user.dto.UserDto;
@@ -52,7 +52,7 @@ public class OrderController extends BaseController {
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public MomiaHttpResponse add(@RequestBody Order order) {
-        Sku sku = ProductServiceApi.SKU.get(order.getProductId(), order.getSkuId());
+        SkuDto sku = ProductServiceApi.SKU.get(order.getProductId(), order.getSkuId());
         checkOrder(order, sku);
 
         if (!lockSku(order)) return MomiaHttpResponse.FAILED("库存不足");
@@ -79,7 +79,7 @@ public class OrderController extends BaseController {
         return MomiaHttpResponse.FAILED("下单失败");
     }
 
-    private void checkOrder(Order order, Sku sku) {
+    private void checkOrder(Order order, SkuDto sku) {
         if (MobileUtil.isInvalid(order.getMobile())) throw new MomiaFailedException("无效的联系电话");
         if (order.getCustomerId() <= 0 ||
                 order.getProductId() <= 0 ||
@@ -254,19 +254,19 @@ public class OrderController extends BaseController {
 
         List<Long> productIds = new ArrayList<Long>();
         for (Order order : orders) productIds.add(order.getProductId());
-        List<Product> products = ProductServiceApi.PRODUCT.list(productIds);
+        List<ProductDto> products = ProductServiceApi.PRODUCT.list(productIds);
 
         return MomiaHttpResponse.SUCCESS(buildUserOrders(totalCount, orders, products, start, count));
     }
 
-    private PagedListDto buildUserOrders(long totalCount, List<Order> orders, List<Product> products, int start, int count) {
-        Map<Long, Product> productMap = new HashMap<Long, Product>();
-        for (Product product : products) productMap.put(product.getId(), product);
+    private PagedListDto buildUserOrders(long totalCount, List<Order> orders, List<ProductDto> products, int start, int count) {
+        Map<Long, ProductDto> productMap = new HashMap<Long, ProductDto>();
+        for (ProductDto product : products) productMap.put(product.getId(), product);
 
         PagedListDto userOrdersDto = new PagedListDto(totalCount, start, count);
         for (Order order : orders) {
             try {
-                Product product = productMap.get(order.getProductId());
+                ProductDto product = productMap.get(order.getProductId());
                 if (product == null) continue;
 
                 userOrdersDto.add(buildOrderDetailDto(order, product));
@@ -278,7 +278,7 @@ public class OrderController extends BaseController {
         return userOrdersDto;
     }
 
-    private OrderDto buildOrderDetailDto(Order order, Product product) {
+    private OrderDto buildOrderDetailDto(Order order, ProductDto product) {
         OrderDto orderDto = buildOrderDto(order);
         orderDto.setCover(product.getCover());
         orderDto.setTitle(product.getTitle());
@@ -314,7 +314,7 @@ public class OrderController extends BaseController {
                                     @RequestParam(value = "pid") long productId) {
         UserDto user = UserServiceApi.USER.get(utoken);
         Order order = orderService.get(id);
-        Product product = ProductServiceApi.PRODUCT.get(productId, Product.Type.BASE_WITH_SKU);
+        ProductDto product = ProductServiceApi.PRODUCT.get(productId, ProductDto.Type.BASE_WITH_SKU);
         if (!order.exists() || !product.exists() ||
                 order.getCustomerId() != user.getId() ||
                 order.getProductId() != product.getId()) return MomiaHttpResponse.FAILED("无效的订单");
@@ -353,7 +353,7 @@ public class OrderController extends BaseController {
     public MomiaHttpResponse listPlaymates(@RequestParam(value = "pid") long productId, @RequestParam int start, @RequestParam int count) {
         if (productId <= 0 || isInvalidLimit(start, count)) return MomiaHttpResponse.BAD_REQUEST;
 
-        List<Sku> skus = querySkus(productId, start, count);
+        List<SkuDto> skus = querySkus(productId, start, count);
         if (skus.isEmpty()) return MomiaHttpResponse.EMPTY_ARRAY;
 
         List<Order> orders = queryOrders(productId, skus);
@@ -391,9 +391,9 @@ public class OrderController extends BaseController {
         return MomiaHttpResponse.SUCCESS(buildPlaymates(skus, skuOrdersMap, skuCustomerIdsMap, customersMap));
     }
 
-    private List<Sku> querySkus(long id, int start, int count) {
-        List<Sku> skus = ProductServiceApi.SKU.list(id, Sku.Status.ALL);
-        List<Sku> result = new ArrayList<Sku>();
+    private List<SkuDto> querySkus(long id, int start, int count) {
+        List<SkuDto> skus = ProductServiceApi.SKU.list(id, SkuDto.Status.ALL);
+        List<SkuDto> result = new ArrayList<SkuDto>();
         for (int i = start; i < Math.min(skus.size(), start + count); i++) {
             result.add(skus.get(i));
         }
@@ -401,9 +401,9 @@ public class OrderController extends BaseController {
         return result;
     }
 
-    private List<Order> queryOrders(long id, List<Sku> skus) {
+    private List<Order> queryOrders(long id, List<SkuDto> skus) {
         Set<Long> skuIds = new HashSet<Long>();
-        for (Sku sku : skus) {
+        for (SkuDto sku : skus) {
             skuIds.add(sku.getSkuId());
         }
 
@@ -417,12 +417,12 @@ public class OrderController extends BaseController {
         return result;
     }
 
-    private List<SkuPlaymatesDto> buildPlaymates(List<Sku> skus,
+    private List<SkuPlaymatesDto> buildPlaymates(List<SkuDto> skus,
                                                  Map<Long, List<Order>> skuOrdersMap,
                                                  Map<Long, List<Long>> skuCustomerIdsMap,
                                                  Map<Long, UserDto> customersMap) {
         List<SkuPlaymatesDto> skusPlaymatesDto = new ArrayList<SkuPlaymatesDto>();
-        for (Sku sku : skus) {
+        for (SkuDto sku : skus) {
             try {
                 SkuPlaymatesDto skuPlaymatesDto = new SkuPlaymatesDto();
                 skuPlaymatesDto.setTime(sku.getTime());

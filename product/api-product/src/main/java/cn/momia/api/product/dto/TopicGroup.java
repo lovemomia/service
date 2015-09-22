@@ -1,12 +1,10 @@
-package cn.momia.api.product.entity;
-
-import cn.momia.api.product.entity.Product;
+package cn.momia.api.product.dto;
 
 import java.util.List;
 
 public class TopicGroup {
     private String title;
-    private List<Product> products;
+    private List<ProductDto> products;
 
     public String getTitle() {
         return title;
@@ -16,11 +14,11 @@ public class TopicGroup {
         this.title = title;
     }
 
-    public List<Product> getProducts() {
+    public List<ProductDto> getProducts() {
         return products;
     }
 
-    public void setProducts(List<Product> products) {
+    public void setProducts(List<ProductDto> products) {
         this.products = products;
     }
 }

@@ -1,11 +1,12 @@
 package cn.momia.service.product.web.ctrl;
 
+import cn.momia.api.product.dto.CommentDto;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.api.dto.PagedListDto;
 import cn.momia.service.comment.Comment;
+import cn.momia.service.comment.CommentImage;
 import cn.momia.service.comment.CommentService;
-import cn.momia.service.product.web.ctrl.dto.CommentDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -37,8 +39,28 @@ public class CommentController extends BaseController {
         List<Comment> comments = commentService.queryByProduct(id, start, count);
 
         PagedListDto commentsDto = new PagedListDto(totalCount, start, count);
-        for (Comment comment : comments) commentsDto.add(new CommentDto(comment));
+        for (Comment comment : comments) commentsDto.add(buildCommentDto(comment));
 
         return MomiaHttpResponse.SUCCESS(commentsDto);
+    }
+
+    private CommentDto buildCommentDto(Comment comment) {
+        CommentDto commentDto = new CommentDto();
+        commentDto.setUserId(comment.getUserId());
+        commentDto.setStar(comment.getStar());
+        commentDto.setContent(comment.getContent());
+        commentDto.setAddTime(comment.getAddTime());
+        commentDto.setImgs(getImgs(comment));
+
+        return commentDto;
+    }
+
+    private List<String> getImgs(Comment comment) {
+        List<String> imgs = new ArrayList<String>();
+        for (CommentImage commentImage : comment.getImgs()) {
+            imgs.add(commentImage.getUrl());
+        }
+
+        return imgs;
     }
 }

@@ -1,11 +1,11 @@
-package cn.momia.api.product.entity;
+package cn.momia.api.product.dto;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
 import java.util.List;
 
-public class Comment {
+public class CommentDto {
     private long userId;
     private String nickName;
     private String avatar;

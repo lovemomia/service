@@ -19,8 +19,8 @@ import cn.momia.service.order.product.Order;
 import cn.momia.service.order.product.OrderService;
 import cn.momia.service.order.product.Payment;
 import cn.momia.api.product.ProductServiceApi;
-import cn.momia.api.product.entity.Product;
-import cn.momia.api.product.entity.Sku;
+import cn.momia.api.product.dto.ProductDto;
+import cn.momia.api.product.dto.SkuDto;
 import cn.momia.service.promo.coupon.Coupon;
 import cn.momia.service.promo.coupon.UserCoupon;
 import cn.momia.service.promo.facade.PromoServiceFacade;
@@ -61,8 +61,8 @@ public class PaymentController extends BaseController {
                 order.getProductId() != productId ||
                 order.getSkuId() != skuId) return MomiaHttpResponse.FAILED("订单数据有问题，无效的订单");
 
-        Product product = ProductServiceApi.PRODUCT.get(productId, Product.Type.MINI);
-        Sku sku = ProductServiceApi.SKU.get(productId, skuId);
+        ProductDto product = ProductServiceApi.PRODUCT.get(productId, ProductDto.Type.MINI);
+        SkuDto sku = ProductServiceApi.SKU.get(productId, skuId);
         if (!product.exists() || !sku.exists() || sku.isFinished()) return MomiaHttpResponse.FAILED("活动已结束或下线，不能再付款");
 
         if (!orderService.prepay(orderId)) return MomiaHttpResponse.FAILED;
@@ -102,7 +102,7 @@ public class PaymentController extends BaseController {
         promoServiceFacade.releaseUserCoupon(previousUserCoupon.getUserId(), previousUserCoupon.getOrderId());
     }
 
-    private PrepayParam extractPrepayParam(HttpServletRequest request, Order order, Product product, Coupon coupon, int payType) {
+    private PrepayParam extractPrepayParam(HttpServletRequest request, Order order, ProductDto product, Coupon coupon, int payType) {
         PrepayParam prepayParam = new PrepayParam();
 
         prepayParam.setClientType(extractClientType(request, payType));
@@ -177,8 +177,8 @@ public class PaymentController extends BaseController {
 
         if (order.isPayed()) return MomiaHttpResponse.SUCCESS;
 
-        Product product = ProductServiceApi.PRODUCT.get(productId, Product.Type.MINI);
-        Sku sku = ProductServiceApi.SKU.get(productId, skuId);
+        ProductDto product = ProductServiceApi.PRODUCT.get(productId, ProductDto.Type.MINI);
+        SkuDto sku = ProductServiceApi.SKU.get(productId, skuId);
         if (!product.exists() || !sku.exists() || sku.isFinished()) return MomiaHttpResponse.FAILED("活动已结束或下线，不能再付款");
 
         BigDecimal totalFee = order.getTotalFee();
@@ -240,8 +240,8 @@ public class PaymentController extends BaseController {
 
     private void notifyUser(Order order) {
         try {
-            Product product = ProductServiceApi.PRODUCT.get(order.getProductId(), Product.Type.BASE_WITH_SKU);
-            Sku sku = product.getSku(order.getSkuId());
+            ProductDto product = ProductServiceApi.PRODUCT.get(order.getProductId(), ProductDto.Type.BASE_WITH_SKU);
+            SkuDto sku = product.getSku(order.getSkuId());
             if (!sku.exists()) return;
 
             StringBuilder msg = new StringBuilder();

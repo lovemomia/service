@@ -1,8 +1,8 @@
 package cn.momia.service.im.web.ctrl;
 
-import cn.momia.api.product.entity.Product;
+import cn.momia.api.product.dto.ProductDto;
 import cn.momia.api.product.ProductServiceApi;
-import cn.momia.api.product.entity.Sku;
+import cn.momia.api.product.dto.SkuDto;
 import cn.momia.api.user.dto.UserDto;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.common.api.http.MomiaHttpResponse;
@@ -44,8 +44,8 @@ public class ImController {
 
         Group group = imService.queryGroup(productId, skuId);
         if (!group.exists()) {
-            Product product = ProductServiceApi.PRODUCT.get(productId, Product.Type.MINI);
-            Sku sku = ProductServiceApi.SKU.get(productId, skuId);
+            ProductDto product = ProductServiceApi.PRODUCT.get(productId, ProductDto.Type.MINI);
+            SkuDto sku = ProductServiceApi.SKU.get(productId, skuId);
 
             String groupName = sku.getTime() + "-" + product.getTitle();
             long groupId = imService.createGroup(groupName, productId, skuId);

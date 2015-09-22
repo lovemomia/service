@@ -1,4 +1,4 @@
-package cn.momia.api.product.entity;
+package cn.momia.api.product.dto;
 
 import java.util.List;
 

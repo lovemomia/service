@@ -1,26 +1,18 @@
 package cn.momia.service.product.web.ctrl;
 
+import cn.momia.api.product.dto.ProductDto;
+import cn.momia.api.product.dto.ProductGroupDto;
 import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.config.Configuration;
-import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.api.dto.ListDto;
 import cn.momia.common.api.dto.PagedListDto;
 import cn.momia.service.product.base.ProductSort;
 import cn.momia.service.product.facade.Product;
-import cn.momia.service.product.facade.ProductServiceFacade;
 import cn.momia.service.product.sku.Sku;
-import cn.momia.service.product.web.ctrl.dto.BaseProductDto;
-import cn.momia.service.product.web.ctrl.dto.BaseSkuDto;
-import cn.momia.service.product.web.ctrl.dto.FullProductDto;
-import cn.momia.service.product.web.ctrl.dto.FullSkuDto;
-import cn.momia.service.product.web.ctrl.dto.MiniProductDto;
-import cn.momia.service.product.web.ctrl.dto.ProductDto;
-import cn.momia.service.product.web.ctrl.dto.ProductsOfDayDto;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -44,10 +36,8 @@ import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/product")
-public class ProductController extends BaseController {
+public class ProductController extends ProductRelatedController {
     private static final Pattern SORT_PATTERN = Pattern.compile("(ASC|DESC)\\(([a-zA-Z0-9]+)\\)");
-
-    @Autowired private ProductServiceFacade productServiceFacade;
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public MomiaHttpResponse list(@RequestParam(value = "pids") String pids) {
@@ -55,7 +45,7 @@ public class ProductController extends BaseController {
         for (String id : Splitter.on(",").trimResults().omitEmptyStrings().split(pids)) ids.add(Long.valueOf(id));
 
         List<Product> products = productServiceFacade.list(ids);
-        return MomiaHttpResponse.SUCCESS(BaseProductDto.toDtos(products, true));
+        return MomiaHttpResponse.SUCCESS(buildProductDtos(products, Product.Type.BASE_WITH_SKU, true));
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -88,7 +78,7 @@ public class ProductController extends BaseController {
         PagedListDto productsDto = new PagedListDto(totalCount, start, count);
         ListDto baseProductsDto = new ListDto();
         for (Product product : products) {
-            baseProductsDto.add(new BaseProductDto(product));
+            baseProductsDto.add(buildProductDto(product, Product.Type.BASE, false));
         }
         productsDto.addAll(baseProductsDto);
 
@@ -111,9 +101,9 @@ public class ProductController extends BaseController {
         PagedListDto productsDto = new PagedListDto(totalCount, start, count);
         ListDto baseProductsDto = new ListDto();
         for (Product product : products) {
-            BaseProductDto baseProductDto = new BaseProductDto(product);
-            baseProductDto.setScheduler(product.getWeekendScheduler());
-            baseProductsDto.add(baseProductDto);
+            ProductDto productDto = buildProductDto(product, Product.Type.BASE, false);
+            productDto.setScheduler(product.getWeekendScheduler());
+            baseProductsDto.add(productDto);
         }
         productsDto.addAll(baseProductsDto);
 
@@ -141,23 +131,23 @@ public class ProductController extends BaseController {
             Date end = monthFormat.parse(TimeUtil.formatNextYearMonth(month));
 
             int pageSize = Configuration.getInt("Product.Month.PageSize");
-            Map<String, ProductsOfDayDto> productsOfDayDtoMap = new HashMap<String, ProductsOfDayDto>();
+            Map<String, ProductGroupDto> productsOfDayDtoMap = new HashMap<String, ProductGroupDto>();
             for (Product product : products) {
                 for (Sku sku : product.getSkus()) {
                     Date startTime = sku.getStartTime();
                     if (startTime.after(start) && startTime.before(end)) {
                         String day = dayFormat.format(startTime);
-                        ProductsOfDayDto productsOfDayDto = productsOfDayDtoMap.get(day);
+                        ProductGroupDto productsOfDayDto = productsOfDayDtoMap.get(day);
                         if (productsOfDayDto == null) {
-                            productsOfDayDto = new ProductsOfDayDto();
+                            productsOfDayDto = new ProductGroupDto();
                             productsOfDayDtoMap.put(day, productsOfDayDto);
 
                             productsOfDayDto.setDate(startTime);
                             productsDto.add(productsOfDayDto);
                         }
-                        BaseProductDto baseProductDto = new BaseProductDto(product);
-                        baseProductDto.setScheduler(sku.getFormatedTime());
-                        if (productsOfDayDto.getProducts().size() < pageSize) productsOfDayDto.addProduct(baseProductDto);
+                        ProductDto productDto = buildProductDto(product, Product.Type.BASE, false);
+                        productDto.setScheduler(sku.getFormatedTime());
+                        if (productsOfDayDto.getProducts().size() < pageSize) productsOfDayDto.addProduct(productDto);
                     }
                 }
             }
@@ -165,8 +155,8 @@ public class ProductController extends BaseController {
             Collections.sort(productsDto, new Comparator<Object>() {
                 @Override
                 public int compare(Object o1, Object o2) {
-                    ProductsOfDayDto productsOfDayDto1 = (ProductsOfDayDto) o1;
-                    ProductsOfDayDto productsOfDayDto2 = (ProductsOfDayDto) o2;
+                    ProductGroupDto productsOfDayDto1 = (ProductGroupDto) o1;
+                    ProductGroupDto productsOfDayDto2 = (ProductGroupDto) o2;
 
                     return productsOfDayDto1.getDate().compareTo(productsOfDayDto2.getDate());
                 }
@@ -197,16 +187,10 @@ public class ProductController extends BaseController {
 
         ProductDto productDto;
         switch (type) {
-            case Product.Type.MINI:
-                productDto = new MiniProductDto(product);
-                break;
             case Product.Type.BASE_WITH_SKU:
-                productDto = new BaseProductDto(product, true);
+                productDto = buildProductDto(product, type, true);
                 break;
-            case Product.Type.FULL:
-                productDto = new FullProductDto(product);
-                break;
-            default: productDto = new BaseProductDto((product));
+            default: productDto = buildProductDto(product, type, false);
         }
 
         return MomiaHttpResponse.SUCCESS(productDto);
@@ -236,23 +220,14 @@ public class ProductController extends BaseController {
                 skus = Sku.sort(Sku.filterFinished(skus));
         }
 
-        return MomiaHttpResponse.SUCCESS(buildSkusDto(skus));
-    }
-
-    private ListDto buildSkusDto(List<Sku> skus) {
-        ListDto skusDto = new ListDto();
-        for (Sku sku : skus) {
-            skusDto.add(new FullSkuDto(sku));
-        }
-
-        return skusDto;
+        return MomiaHttpResponse.SUCCESS(buildFullSkusDto(skus));
     }
 
     @RequestMapping(value = "/{id}/sku/{sid}", method = RequestMethod.GET)
     public MomiaHttpResponse getSku(@PathVariable long id, @PathVariable(value = "sid") long skuId) {
         Sku sku = productServiceFacade.getSku(skuId);
         if (sku.getProductId() != id) return MomiaHttpResponse.FAILED("无效的SKU");
-        return MomiaHttpResponse.SUCCESS(new FullSkuDto(sku));
+        return MomiaHttpResponse.SUCCESS(buildFullSkuDto(sku));
     }
 
     @RequestMapping(value = "/{id}/sku/{sid}/lock", method = RequestMethod.POST)
@@ -276,7 +251,7 @@ public class ProductController extends BaseController {
         List<Sku> skus = Sku.sortByStartTime(Sku.filterClosed(productServiceFacade.listSkus(id)));
 
         ListDto skusDto = new ListDto();
-        for (Sku sku : skus) skusDto.add(new BaseSkuDto(sku));
+        for (Sku sku : skus) skusDto.add(buildBaseSkuDto(sku));
 
         return MomiaHttpResponse.SUCCESS(skusDto);
     }
@@ -308,9 +283,9 @@ public class ProductController extends BaseController {
             Product product = productsMap.get(sku.getProductId());
             if (product == null) continue;
 
-            BaseProductDto baseProductDto = new BaseProductDto(product, false);
-            baseProductDto.setScheduler(sku.getFormatedTime());
-            productsDto.add(baseProductDto);
+            ProductDto productDto = buildProductDto(product, Product.Type.BASE, false);
+            productDto.setScheduler(sku.getFormatedTime());
+            productsDto.add(productDto);
         }
 
         return MomiaHttpResponse.SUCCESS(productsDto);

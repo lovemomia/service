@@ -1,15 +1,15 @@
-package cn.momia.api.product.entity;
+package cn.momia.api.product.dto;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-public class Sku {
+public class SkuDto {
     public static class Status {
         public static final int ALL = 1;
         public static final int AVALIABLE = 2;
     }
 
-    public static final Sku NOT_EXIST_SKU = new Sku();
+    public static final SkuDto NOT_EXIST_SKU = new SkuDto();
     static {
         NOT_EXIST_SKU.setSkuId(0);
     }
@@ -36,7 +36,7 @@ public class Sku {
     private boolean closed;
 
     private Boolean needRealName;
-    private List<SkuPrice> prices;
+    private List<SkuPriceDto> prices;
 
     public long getProductId() {
         return productId;
@@ -206,16 +206,16 @@ public class Sku {
         this.needRealName = needRealName;
     }
 
-    public List<SkuPrice> getPrices() {
+    public List<SkuPriceDto> getPrices() {
         return prices;
     }
 
-    public void setPrices(List<SkuPrice> prices) {
+    public void setPrices(List<SkuPriceDto> prices) {
         this.prices = prices;
     }
 
     public boolean findPrice(int adult, int child, BigDecimal price) {
-        for (SkuPrice skuPrice : this.prices) {
+        for (SkuPriceDto skuPrice : this.prices) {
             if (skuPrice.getAdult() == adult &&
                     skuPrice.getChild() == child &&
                     skuPrice.getPrice().compareTo(price) == 0) return true;

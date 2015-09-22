@@ -1,4 +1,4 @@
-package cn.momia.api.product.entity;
+package cn.momia.api.product.dto;
 
 import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.lang3.StringUtils;
@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class Product {
+public class ProductDto {
     public static class Type {
         public static final int MINI = 1;
         public static final int BASE = 2;
@@ -19,7 +19,6 @@ public class Product {
     private String title;
     private String abstracts;
 
-    private Boolean favored;
     private String cover;
     private Integer joined;
     private String scheduler;
@@ -34,7 +33,7 @@ public class Product {
     private Boolean opened;
     private String crowd;
     private Integer stock;
-    private List<Sku> skus;
+    private List<SkuDto> skus;
     private Integer status;
 
     private List<String> imgs;
@@ -72,14 +71,6 @@ public class Product {
 
     public void setAbstracts(String abstracts) {
         this.abstracts = abstracts;
-    }
-
-    public Boolean isFavored() {
-        return favored;
-    }
-
-    public void setFavored(Boolean favored) {
-        this.favored = favored;
     }
 
     public String getCover() {
@@ -194,11 +185,11 @@ public class Product {
         this.stock = stock;
     }
 
-    public List<Sku> getSkus() {
+    public List<SkuDto> getSkus() {
         return skus;
     }
 
-    public void setSkus(List<Sku> skus) {
+    public void setSkus(List<SkuDto> skus) {
         this.skus = skus;
     }
 
@@ -234,28 +225,28 @@ public class Product {
         this.url = url;
     }
 
-    public Sku getSku(long skuId) {
-        for (Sku sku : skus) {
+    public SkuDto getSku(long skuId) {
+        for (SkuDto sku : skus) {
             if (sku.getSkuId() == skuId) return sku;
         }
 
-        return Sku.NOT_EXIST_SKU;
+        return SkuDto.NOT_EXIST_SKU;
     }
 
     public int getSkuRegionId(long skuId) {
-        Sku sku = getSku(skuId);
+        SkuDto sku = getSku(skuId);
         if (!sku.exists() || sku.getRegionId() == 0) return getRegionId();
         return sku.getRegionId();
     }
 
     public String getSkuAddress(long skuId) {
-        Sku sku = getSku(skuId);
+        SkuDto sku = getSku(skuId);
         if (!sku.exists() || StringUtils.isBlank(sku.getAddress())) return getAddress();
         return sku.getAddress();
     }
 
     public String getSkuTime(long skuId) {
-        for (Sku sku : skus) {
+        for (SkuDto sku : skus) {
             if (sku.getSkuId() == skuId) return sku.getTime();
         }
 
@@ -263,13 +254,13 @@ public class Product {
     }
 
     public boolean isSkuFinished(long skuId) {
-        Sku sku = getSku(skuId);
+        SkuDto sku = getSku(skuId);
         if (!sku.exists()) return true;
         return sku.isFinished();
     }
 
     public boolean isSkuClosed(long skuId) {
-        Sku sku = getSku(skuId);
+        SkuDto sku = getSku(skuId);
         if (!sku.exists()) return true;
         return sku.isClosed();
     }

@@ -1,15 +1,12 @@
 package cn.momia.service.product.web.ctrl;
 
 import cn.momia.common.api.http.MomiaHttpResponse;
-import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.api.dto.ListDto;
 import cn.momia.service.banner.BannerService;
 import cn.momia.service.product.facade.Product;
-import cn.momia.service.product.facade.ProductServiceFacade;
 import cn.momia.service.topic.Topic;
 import cn.momia.service.topic.TopicGroup;
 import cn.momia.service.topic.TopicService;
-import cn.momia.service.product.web.ctrl.dto.BaseProductDto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +22,11 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/topic")
-public class TopicController extends BaseController {
+public class TopicController extends ProductRelatedController {
     private static final int MAX_BANNER_COUNT = 20;
 
     @Autowired private BannerService bannerService;
     @Autowired private TopicService topicService;
-    @Autowired private ProductServiceFacade productServiceFacade;
 
     @RequestMapping(value = "/banner", method = RequestMethod.GET)
     public MomiaHttpResponse listBanners(@RequestParam(value = "city") int cityId, @RequestParam int count) {
@@ -62,7 +58,7 @@ public class TopicController extends BaseController {
 
             JSONObject productsJson = new JSONObject();
             productsJson.put("title", topicGroup.getTitle());
-            productsJson.put("products", BaseProductDto.toDtos(products));
+            productsJson.put("products", buildProductDtos(products, Product.Type.BASE, false));
 
             groupedProductsJson.add(productsJson);
         }

@@ -1,8 +1,8 @@
-package cn.momia.api.product.entity;
+package cn.momia.api.product.dto;
 
 import java.math.BigDecimal;
 
-public class SkuPrice {
+public class SkuPriceDto {
     private int adult;
     private int child;
     private BigDecimal price;

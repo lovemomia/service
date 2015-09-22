@@ -1,13 +1,10 @@
 package cn.momia.service.product.web.ctrl;
 
 import cn.momia.common.api.http.MomiaHttpResponse;
-import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.api.dto.ListDto;
 import cn.momia.common.api.dto.PagedListDto;
 import cn.momia.service.product.facade.Product;
-import cn.momia.service.product.facade.ProductServiceFacade;
 import cn.momia.service.favorite.FavoriteService;
-import cn.momia.service.product.web.ctrl.dto.BaseProductDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,9 +16,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/product")
-public class FavoriteController extends BaseController {
+public class FavoriteController extends ProductRelatedController {
     @Autowired private FavoriteService favoriteService;
-    @Autowired private ProductServiceFacade productServiceFacade;
 
     @RequestMapping(value = "/favorite", method = RequestMethod.GET)
     public MomiaHttpResponse list(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
@@ -38,7 +34,7 @@ public class FavoriteController extends BaseController {
         PagedListDto favoritesDto = new PagedListDto(totalCount, start, count);
         ListDto baseProductsDto = new ListDto();
         for (Product product : products) {
-            baseProductsDto.add(new BaseProductDto(product));
+            baseProductsDto.add(buildProductDto(product, Product.Type.BASE, false));
         }
         favoritesDto.addAll(baseProductsDto);
 
