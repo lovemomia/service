@@ -1,13 +1,17 @@
 package cn.momia.service.feed.web.ctrl;
 
+import cn.momia.api.feed.dto.FeedCommentDto;
+import cn.momia.api.feed.dto.FeedDto;
+import cn.momia.api.user.dto.ParticipantDto;
 import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.util.SexUtil;
+import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.api.dto.PagedListDto;
 import cn.momia.service.feed.comment.FeedComment;
 import cn.momia.service.feed.facade.Feed;
+import cn.momia.service.feed.facade.FeedImage;
 import cn.momia.service.feed.facade.FeedServiceFacade;
-import cn.momia.service.feed.web.ctrl.dto.FeedCommentDto;
-import cn.momia.service.feed.web.ctrl.dto.FeedDto;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.UserDto;
 import org.slf4j.Logger;
@@ -77,9 +81,59 @@ public class FeedController extends BaseController {
             UserDto user = usersMap.get(feed.getUserId());
             if (user == null) continue;
 
-            feedsDto.add(new FeedDto(feed, user, staredFeedIds.contains(feed.getId())));
+            feedsDto.add(buildFeedDto(feed, user, staredFeedIds.contains(feed.getId())));
         }
         return feedsDto;
+    }
+
+    private FeedDto buildFeedDto(Feed feed, UserDto user, boolean stared) {
+        FeedDto feedDto = new FeedDto();
+        feedDto.setId(feed.getId());
+        feedDto.setType(feed.getType());
+        feedDto.setTopicId(feed.getTopicId());
+        feedDto.setTopicProductId(feed.getTopicProductId());
+        feedDto.setTopic(feed.getTopic());
+        feedDto.setImgs(getImgs(feed));
+        feedDto.setContent(feed.getContent());
+        feedDto.setAddTime(feed.getAddTime());
+        feedDto.setPoi(feed.getPoi());
+        feedDto.setCommentCount(feed.getCommentCount());
+        feedDto.setStarCount(feed.getStarCount());
+        feedDto.setUserId(user.getId());
+        feedDto.setAvatar(user.getAvatar());
+        feedDto.setNickName(user.getNickName());
+        feedDto.setChildren(getChildren(user));
+        feedDto.setStared(stared);
+
+        return feedDto;
+    }
+
+    private List<String> getImgs(Feed feed) {
+        List<String> imgs = new ArrayList<String>();
+        for (FeedImage feedImage : feed.getImgs()) imgs.add(feedImage.getUrl());
+
+        return imgs;
+    }
+
+    public List<String> getChildren(UserDto user) {
+        List<String> children = new ArrayList<String>();
+
+        if (user.getChildren() != null) {
+            int count = 0;
+            for (Object childObj : user.getChildren()) {
+                ParticipantDto child = (ParticipantDto) childObj;
+                if (TimeUtil.isAdult(child.getBirthday())) continue;
+
+                String ageStr = TimeUtil.formatAge(child.getBirthday());
+                if (SexUtil.isInvalid(child.getSex())) children.add("孩子" + ageStr);
+                else children.add(child.getSex() + "孩" + ageStr);
+
+                count++;
+                if (count >= 2) break;
+            }
+        }
+
+        return children;
     }
 
     @RequestMapping(value = "/topic", method = RequestMethod.GET)
@@ -121,7 +175,7 @@ public class FeedController extends BaseController {
 
         boolean stared = feedServiceFacade.isStared(userId, id);
 
-        return MomiaHttpResponse.SUCCESS(new FeedDto(feed, feedUser, stared));
+        return MomiaHttpResponse.SUCCESS(buildFeedDto(feed, feedUser, stared));
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -153,11 +207,23 @@ public class FeedController extends BaseController {
             UserDto user = usersMap.get(comment.getUserId());
             if (user == null) continue;
 
-            feedCommentsDto.add(new FeedCommentDto(comment, user));
+            feedCommentsDto.add(buildFeedCommentDto(comment, user));
         }
 
         return MomiaHttpResponse.SUCCESS(feedCommentsDto);
     }
+
+    private FeedCommentDto buildFeedCommentDto(FeedComment comment, UserDto user) {
+        FeedCommentDto feedCommentDto = new FeedCommentDto();
+        feedCommentDto.setId(comment.getId());
+        feedCommentDto.setContent(comment.getContent());
+        feedCommentDto.setAddTime(comment.getAddTime());
+        feedCommentDto.setNickName(user.getNickName());
+        feedCommentDto.setAvatar(user.getAvatar());
+
+        return feedCommentDto;
+    }
+
 
     @RequestMapping(value = "/{id}/comment", method = RequestMethod.POST)
     public MomiaHttpResponse addComment(@RequestParam(value = "uid") long userId, @PathVariable long id, @RequestParam String content) {

@@ -1,10 +1,10 @@
-package cn.momia.api.feed.entity;
+package cn.momia.api.feed.dto;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
 
-public class FeedComment {
+public class FeedCommentDto {
     private long id;
     private String content;
     @JSONField(format = "yyyy-MM-dd HH:mm:ss") private Date addTime;

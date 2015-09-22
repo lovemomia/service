@@ -5,6 +5,7 @@
     </Logger>
 
     <Service>
+        <Feed>http://localhost:7070</Feed>
         <User>http://localhost:7070</User>
     </Service>
 

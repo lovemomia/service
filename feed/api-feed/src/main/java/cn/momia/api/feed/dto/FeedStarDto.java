@@ -1,6 +1,6 @@
-package cn.momia.api.feed.entity;
+package cn.momia.api.feed.dto;
 
-public class FeedStar {
+public class FeedStarDto {
     private long id;
     private String nickName;
     private String avatar;

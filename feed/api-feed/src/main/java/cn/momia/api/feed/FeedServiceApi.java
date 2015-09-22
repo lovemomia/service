@@ -1,8 +1,8 @@
 package cn.momia.api.feed;
 
-import cn.momia.api.feed.entity.FeedComment;
-import cn.momia.api.feed.entity.Feed;
-import cn.momia.api.feed.entity.FeedStar;
+import cn.momia.api.feed.dto.FeedCommentDto;
+import cn.momia.api.feed.dto.FeedDto;
+import cn.momia.api.feed.dto.FeedStarDto;
 import cn.momia.common.api.AbstractServiceApi;
 import cn.momia.common.api.entity.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
@@ -26,17 +26,17 @@ public class FeedServiceApi extends AbstractServiceApi {
         executeRequest(request);
     }
 
-    public PagedList<Feed> list(long userId, int start, int count) {
+    public PagedList<FeedDto> list(long userId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
                 .add("start", start)
                 .add("count", count);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("feed"), builder.build());
 
-        return CastUtil.toPagedList((JSONObject) executeRequest(request), Feed.class);
+        return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedDto.class);
     }
 
-    public PagedList<Feed> listByTopic(long userId, long topicId, int start, int count) {
+    public PagedList<FeedDto> listByTopic(long userId, long topicId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
                 .add("tid", topicId)
@@ -44,7 +44,7 @@ public class FeedServiceApi extends AbstractServiceApi {
                 .add("count", count);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("feed/topic"), builder.build());
 
-        return CastUtil.toPagedList((JSONObject) executeRequest(request), Feed.class);
+        return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedDto.class);
     }
 
     public void add(JSONObject feedJson) {
@@ -52,11 +52,11 @@ public class FeedServiceApi extends AbstractServiceApi {
         executeRequest(request);
     }
 
-    public Feed get(long userId, long feedId) {
+    public FeedDto get(long userId, long feedId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("feed", feedId), builder.build());
 
-        return JSON.toJavaObject((JSON) executeRequest(request), Feed.class);
+        return JSON.toJavaObject((JSON) executeRequest(request), FeedDto.class);
     }
 
     public void delete(long userId, long feedId) {
@@ -65,13 +65,13 @@ public class FeedServiceApi extends AbstractServiceApi {
         executeRequest(request);
     }
 
-    public PagedList<FeedComment> listComments(long feedId, int start, int count) {
+    public PagedList<FeedCommentDto> listComments(long feedId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
                 .add("count", count);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("feed", feedId, "comment/list"), builder.build());
 
-        return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedComment.class);
+        return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedCommentDto.class);
     }
 
     public void addComment(long userId, long feedId, String content) {
@@ -100,12 +100,12 @@ public class FeedServiceApi extends AbstractServiceApi {
         executeRequest(request);
     }
 
-    public PagedList<FeedStar> listStars(long feedId, int start, int count) {
+    public PagedList<FeedStarDto> listStars(long feedId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
                 .add("count", count);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("feed", feedId, "star/list"), builder.build());
 
-        return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedStar.class);
+        return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedStarDto.class);
     }
 }

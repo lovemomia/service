@@ -6,6 +6,7 @@
 
     <Service>
         <Base>http://localhost:7070</Base>
+        <User>http://localhost:8080</User>
     </Service>
 
     <Limit>
