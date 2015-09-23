@@ -5,6 +5,7 @@ import cn.momia.api.user.dto.UserDto;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.deal.gateway.PayType;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.deal.gateway.CallbackParam;
@@ -45,7 +46,7 @@ public class PaymentController extends BaseController {
 
     @RequestMapping(value = "/payment/prepay/alipay", method = RequestMethod.POST)
     public MomiaHttpResponse prepayAlipay(HttpServletRequest request) {
-        return prepay(request, Payment.Type.ALIPAY);
+        return prepay(request, PayType.ALIPAY);
     }
 
     private MomiaHttpResponse prepay(HttpServletRequest request, int payType) {
@@ -111,10 +112,10 @@ public class PaymentController extends BaseController {
         prepayParam.setProductUrl(Configuration.getString("Wap.ProductUrl") + "?id=" + product.getId());
 
         switch (payType) {
-            case Payment.Type.ALIPAY:
+            case PayType.ALIPAY:
                 prepayParam.setTotalFee(promoServiceFacade.calcTotalFee(order.getTotalFee(), coupon));
                 break;
-            case Payment.Type.WECHATPAY:
+            case PayType.WECHATPAY:
                 prepayParam.setTotalFee(new BigDecimal(promoServiceFacade.calcTotalFee(order.getTotalFee(), coupon).multiply(new BigDecimal(100)).intValue()));
                 break;
             default: throw new MomiaFailedException("无效的支付类型: " + payType);
@@ -128,12 +129,12 @@ public class PaymentController extends BaseController {
 
     private int extractClientType(HttpServletRequest request, int payType) {
         switch (payType) {
-            case Payment.Type.ALIPAY:
+            case PayType.ALIPAY:
                 String type = request.getParameter("type");
                 if ("app".equalsIgnoreCase(type)) return ClientType.APP;
                 else if ("wap".equalsIgnoreCase(type)) return ClientType.WAP;
                 else throw new MomiaFailedException("not supported type: " + type);
-            case Payment.Type.WECHATPAY:
+            case PayType.WECHATPAY:
                 String tradeType = request.getParameter("trade_type");
                 if ("APP".equals(tradeType)) return ClientType.APP;
                 else if ("JSAPI".equals(tradeType)) return ClientType.WAP;
@@ -158,7 +159,7 @@ public class PaymentController extends BaseController {
 
     @RequestMapping(value = "/payment/prepay/wechatpay", method = RequestMethod.POST)
     public MomiaHttpResponse prepayWechatpay(HttpServletRequest request) {
-        return prepay(request, Payment.Type.WECHATPAY);
+        return prepay(request, PayType.WECHATPAY);
     }
 
     @RequestMapping(value = "/payment/prepay/free", method = RequestMethod.POST)
@@ -198,7 +199,7 @@ public class PaymentController extends BaseController {
         payment.setOrderId(order.getId());
         payment.setPayer(String.valueOf(order.getCustomerId()));
         payment.setFinishTime(new Date());
-        payment.setPayType(Payment.Type.FREEPAY);
+        payment.setPayType(PayType.FREEPAY);
         payment.setTradeNo("");
         payment.setFee(new BigDecimal(0));
 
@@ -292,7 +293,7 @@ public class PaymentController extends BaseController {
 
     @RequestMapping(value = "/callback/alipay", method = RequestMethod.POST)
     public MomiaHttpResponse alipayCallback(HttpServletRequest request) {
-        return callback(request, Payment.Type.ALIPAY);
+        return callback(request, PayType.ALIPAY);
     }
 
     private MomiaHttpResponse callback(HttpServletRequest request, int payType) {
@@ -331,6 +332,6 @@ public class PaymentController extends BaseController {
 
     @RequestMapping(value = "/callback/wechatpay", method = RequestMethod.POST)
     public MomiaHttpResponse wechatpayCallback(HttpServletRequest request) {
-        return callback(request, Payment.Type.WECHATPAY);
+        return callback(request, PayType.WECHATPAY);
     }
 }

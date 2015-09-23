@@ -5,14 +5,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class Payment implements Serializable {
-    public static class Type {
-        public static final int ALIPAY = 0;
-        public static final int WECHATPAY = 1;
-        public static final int FREEPAY = 3;
-
-        public static final int WECHATPAY_APP = 11;
-        public static final int WECHATPAY_JSAPI = 12;
-    }
 
     public static final Payment NOT_EXIST_PAYMENT = new Payment();
     static {
