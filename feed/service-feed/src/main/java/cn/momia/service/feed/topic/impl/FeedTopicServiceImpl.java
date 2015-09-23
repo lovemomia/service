@@ -71,7 +71,7 @@ public class FeedTopicServiceImpl extends DbAccessService implements FeedTopicSe
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 FeedTopic topic = buildFeedTopic(rs);
-                if (rs.next()) topics.add(topic);
+                if (topic.exists()) topics.add(topic);
             }
         });
 

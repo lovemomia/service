@@ -52,7 +52,7 @@ public class FeedServiceApi extends AbstractServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
                 .add("count", count);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("feed/topic"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("feed/topic/list"), builder.build());
 
         return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedTopicDto.class);
     }
