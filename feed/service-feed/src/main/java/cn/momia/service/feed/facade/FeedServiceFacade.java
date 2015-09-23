@@ -1,6 +1,7 @@
 package cn.momia.service.feed.facade;
 
 import cn.momia.service.feed.comment.FeedComment;
+import cn.momia.service.feed.topic.FeedTopic;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +27,9 @@ public interface FeedServiceFacade {
 
     long queryCountByTopic(long topicId);
     List<Feed> queryByTopic(long topicId, int start, int count);
+
+    long queryTopicCount();
+    List<FeedTopic> queryTopic(int start, int count);
 
     boolean addComment(long userId, long feedId, String content);
     boolean deleteComment(long userId, long feedId, long commentId);

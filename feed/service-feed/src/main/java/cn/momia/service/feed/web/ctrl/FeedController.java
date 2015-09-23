@@ -1,6 +1,7 @@
 package cn.momia.service.feed.web.ctrl;
 
 import cn.momia.api.feed.dto.FeedDto;
+import cn.momia.api.feed.dto.FeedTopicDto;
 import cn.momia.api.user.dto.ParticipantDto;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.SexUtil;
@@ -12,6 +13,7 @@ import cn.momia.service.feed.facade.FeedImage;
 import cn.momia.service.feed.facade.FeedServiceFacade;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.UserDto;
+import cn.momia.service.feed.topic.FeedTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,6 +149,32 @@ public class FeedController extends BaseController {
         List<Feed> feeds = feedServiceFacade.queryByTopic(topicId, start, count);
 
         return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(userId, feeds, totalCount, start, count));
+    }
+
+    @RequestMapping(value = "/topic/list", method = RequestMethod.GET)
+    public MomiaHttpResponse listTopic(@RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = feedServiceFacade.queryTopicCount();
+        List<FeedTopic> topics = feedServiceFacade.queryTopic(start, count);
+
+        PagedList pagedFeedTopicDtos = new PagedList(totalCount, start, count);
+        List<FeedTopicDto> feedTopicDtos = new ArrayList<FeedTopicDto>();
+        for (FeedTopic feedTopic : topics) {
+            feedTopicDtos.add(buildFeedTopicDto(feedTopic));
+        }
+        pagedFeedTopicDtos.setList(feedTopicDtos);
+
+        return MomiaHttpResponse.SUCCESS(pagedFeedTopicDtos);
+    }
+
+    private FeedTopicDto buildFeedTopicDto(FeedTopic feedTopic) {
+        FeedTopicDto feedTopicDto = new FeedTopicDto();
+        feedTopicDto.setId(feedTopic.getId());
+        feedTopicDto.setTitle(feedTopic.getTitle());
+        feedTopicDto.setProductId(feedTopic.getProductId());
+
+        return feedTopicDto;
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")

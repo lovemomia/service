@@ -52,16 +52,15 @@ public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedServ
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO t_feed(`type`, userId, productId, topicId, topic, content, lng, lat, addTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO t_feed(userId, productId, topicId, topic, content, lng, lat, addTime) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                ps.setInt(1, baseFeed.getType());
-                ps.setLong(2, baseFeed.getUserId());
-                ps.setLong(3, baseFeed.getProductId());
-                ps.setLong(4, baseFeed.getTopicId());
-                ps.setString(5, baseFeed.getTopic());
-                ps.setString(6, baseFeed.getContent());
-                ps.setDouble(7, baseFeed.getLng());
-                ps.setDouble(8, baseFeed.getLat());
+                ps.setLong(1, baseFeed.getUserId());
+                ps.setLong(2, baseFeed.getProductId());
+                ps.setLong(3, baseFeed.getTopicId());
+                ps.setString(4, baseFeed.getTopic());
+                ps.setString(5, baseFeed.getContent());
+                ps.setDouble(6, baseFeed.getLng());
+                ps.setDouble(7, baseFeed.getLat());
 
                 return ps;
             }

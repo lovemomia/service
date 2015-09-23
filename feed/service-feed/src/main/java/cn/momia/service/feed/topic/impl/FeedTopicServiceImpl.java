@@ -8,9 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FeedTopicServiceImpl extends DbAccessService implements FeedTopicService {
     private static final Logger LOGGER = LoggerFactory.getLogger(FeedTopicServiceImpl.class);
@@ -46,5 +49,32 @@ public class FeedTopicServiceImpl extends DbAccessService implements FeedTopicSe
             LOGGER.error("fail to build feed topic: {}", rs.getLong("id"), e);
             return FeedTopic.NOT_EXIST_FEED_TOPIC;
         }
+    }
+
+    @Override
+    public long queryCount() {
+        String sql = "SELECT COUNT(1) FROM t_feed_topic WHERE status=1";
+
+        return jdbcTemplate.query(sql, new ResultSetExtractor<Long>() {
+            @Override
+            public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getLong(1) : 0;
+            }
+        });
+    }
+
+    @Override
+    public List<FeedTopic> query(int start, int count) {
+        final List<FeedTopic> topics = new ArrayList<FeedTopic>();
+        String sql = "SELECT " + joinFields() + " FROM t_feed_topic WHERE status=1 LIMIT ?,?";
+        jdbcTemplate.query(sql, new Object[] { start, count }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                FeedTopic topic = buildFeedTopic(rs);
+                if (rs.next()) topics.add(topic);
+            }
+        });
+
+        return topics;
     }
 }

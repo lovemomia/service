@@ -9,6 +9,7 @@ import cn.momia.service.feed.base.BaseFeedService;
 import cn.momia.service.feed.comment.FeedComment;
 import cn.momia.service.feed.comment.FeedCommentService;
 import cn.momia.service.feed.star.FeedStarService;
+import cn.momia.service.feed.topic.FeedTopic;
 import cn.momia.service.feed.topic.FeedTopicService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -216,6 +217,17 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
         }
         
         return feeds;
+    }
+
+    @Override
+    public long queryTopicCount() {
+        return feedTopicService.queryCount();
+    }
+
+    @Override
+    public List<FeedTopic> queryTopic(int start, int count) {
+        if (start < 0 || count <= 0) return new ArrayList<FeedTopic>();
+        return feedTopicService.query(start, count);
     }
 
     @Override

@@ -3,6 +3,7 @@ package cn.momia.api.feed;
 import cn.momia.api.feed.dto.FeedCommentDto;
 import cn.momia.api.feed.dto.FeedDto;
 import cn.momia.api.feed.dto.FeedStarDto;
+import cn.momia.api.feed.dto.FeedTopicDto;
 import cn.momia.common.api.AbstractServiceApi;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
@@ -45,6 +46,15 @@ public class FeedServiceApi extends AbstractServiceApi {
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("feed/topic"), builder.build());
 
         return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedDto.class);
+    }
+
+    public PagedList<FeedTopicDto> listTopic(int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("start", start)
+                .add("count", count);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("feed/topic"), builder.build());
+
+        return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedTopicDto.class);
     }
 
     public void add(JSONObject feedJson) {
