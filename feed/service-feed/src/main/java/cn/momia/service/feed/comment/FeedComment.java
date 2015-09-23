@@ -4,7 +4,6 @@ import java.util.Date;
 
 public class FeedComment {
     public static final FeedComment NOT_EXIST_FEED_COMMENT = new FeedComment();
-    public static final FeedComment INVALID_FEED_COMMENT = new FeedComment();
 
     private long id;
     private long feedId;

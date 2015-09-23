@@ -149,7 +149,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
             return user;
         } catch (Exception e) {
             LOGGER.error("fail to build user: {}", rs.getLong("id"), e);
-            return User.INVALID_USER;
+            return User.NOT_EXIST_USER;
         }
     }
 

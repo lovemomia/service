@@ -75,7 +75,7 @@ public class FeedCommentServiceImpl extends DbAccessService implements FeedComme
             return feedComment;
         } catch (Exception e) {
             LOGGER.error("fail to build feed comment: {}", rs.getLong("id"), e);
-            return FeedComment.INVALID_FEED_COMMENT;
+            return FeedComment.NOT_EXIST_FEED_COMMENT;
         }
     }
 }

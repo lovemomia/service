@@ -8,7 +8,6 @@ public class BaseFeed {
     }
 
     public static final BaseFeed NOT_EXIST_BASE_FEED = new BaseFeed();
-    public static final BaseFeed INVALID_BASE_FEED = new BaseFeed();
 
     private long id;
     private int type;

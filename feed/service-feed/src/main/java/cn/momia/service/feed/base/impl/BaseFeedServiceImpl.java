@@ -106,7 +106,7 @@ public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedServ
             return baseFeed;
         } catch (Exception e) {
             LOGGER.error("fail to build base feed: {}", rs.getLong("id"), e);
-            return BaseFeed.INVALID_BASE_FEED;
+            return BaseFeed.NOT_EXIST_BASE_FEED;
         }
     }
 

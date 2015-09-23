@@ -88,7 +88,7 @@ public class LeaderServiceImpl extends DbAccessService implements LeaderService 
             return leader;
         } catch (Exception e) {
             LOGGER.error("fail to build leader info: {}", rs.getLong("id"), e);
-            return Leader.INVALID_LEADER;
+            return Leader.NOT_EXIST_LEADER;
         }
     }
 

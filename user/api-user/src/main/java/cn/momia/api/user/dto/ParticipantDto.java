@@ -78,4 +78,8 @@ public class ParticipantDto {
     public void setIdNo(String idNo) {
         this.idNo = idNo;
     }
+
+    public boolean exists() {
+        return id > 0;
+    }
 }

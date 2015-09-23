@@ -2,7 +2,6 @@ package cn.momia.service.feed.topic;
 
 public class FeedTopic {
     public static final FeedTopic NOT_EXIST_FEED_TOPIC = new FeedTopic();
-    public static final FeedTopic INVALID_FEED_TOPIC = new FeedTopic();
 
     private long id;
     private String title;

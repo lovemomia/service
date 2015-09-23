@@ -39,7 +39,6 @@ public class UserController extends UserRelatedController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public MomiaHttpResponse getUser(@PathVariable long id) {
         User user = userService.get(id);
-
         return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL, false));
     }
 
@@ -331,6 +330,7 @@ public class UserController extends UserRelatedController {
     public MomiaHttpResponse isPayed(@PathVariable(value = "id") long userId) {
         User user = userService.get(userId);
         if (!user.exists()) return MomiaHttpResponse.SUCCESS(true);
+
         return MomiaHttpResponse.SUCCESS(user.isPayed());
     }
 

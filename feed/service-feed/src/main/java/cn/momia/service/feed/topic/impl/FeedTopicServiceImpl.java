@@ -44,7 +44,7 @@ public class FeedTopicServiceImpl extends DbAccessService implements FeedTopicSe
             return feedTopic;
         } catch (Exception e) {
             LOGGER.error("fail to build feed topic: {}", rs.getLong("id"), e);
-            return FeedTopic.INVALID_FEED_TOPIC;
+            return FeedTopic.NOT_EXIST_FEED_TOPIC;
         }
     }
 }

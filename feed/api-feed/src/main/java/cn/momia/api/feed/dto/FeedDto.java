@@ -151,4 +151,8 @@ public class FeedDto {
     public void setStared(boolean stared) {
         this.stared = stared;
     }
+
+    public boolean exists() {
+        return id > 0;
+    }
 }

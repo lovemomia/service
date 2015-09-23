@@ -12,11 +12,6 @@ public class Leader {
     }
 
     public static final Leader NOT_EXIST_LEADER = new Leader();
-    public static final Leader INVALID_LEADER = new Leader();
-    static {
-        NOT_EXIST_LEADER.setId(0);
-        INVALID_LEADER.setId(0);
-    }
 
     private long id;
     private long userId;
@@ -118,23 +113,8 @@ public class Leader {
         this.status = status;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Leader)) return false;
-
-        Leader leader = (Leader) o;
-
-        return getId() == leader.getId();
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (getId() ^ (getId() >>> 32));
-    }
-
     public boolean exists() {
-        return !this.equals(NOT_EXIST_LEADER);
+        return id > 0;
     }
 
     public boolean isInvalid() {

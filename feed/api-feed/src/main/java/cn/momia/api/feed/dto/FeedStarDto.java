@@ -28,4 +28,8 @@ public class FeedStarDto {
     public void setAvatar(String avatar) {
         this.avatar = avatar;
     }
+
+    public boolean exists() {
+        return id > 0;
+    }
 }

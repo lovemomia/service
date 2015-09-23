@@ -8,11 +8,6 @@ import java.util.Date;
 
 public class Participant implements Serializable {
     public static final Participant NOT_EXIST_PARTICIPANT = new Participant();
-    public static final Participant INVALID_PARTICIPANT = new Participant();
-    static {
-        NOT_EXIST_PARTICIPANT.setId(0);
-        INVALID_PARTICIPANT.setId(0);
-    }
 
     private long id;
     private long userId;
@@ -78,23 +73,8 @@ public class Participant implements Serializable {
         this.idNo = idNo;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Participant)) return false;
-
-        Participant that = (Participant) o;
-
-        return getId() == that.getId();
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (getId() ^ (getId() >>> 32));
-    }
-
     public boolean exists() {
-        return !this.equals(NOT_EXIST_PARTICIPANT);
+        return id > 0;
     }
 
     public boolean isInvalid() {

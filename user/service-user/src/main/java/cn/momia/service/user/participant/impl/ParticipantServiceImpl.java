@@ -83,7 +83,7 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
             return participant;
         } catch (Exception e) {
             LOGGER.error("fail to build participant: {}", rs.getLong("id"), e);
-            return Participant.INVALID_PARTICIPANT;
+            return Participant.NOT_EXIST_PARTICIPANT;
         }
     }
 

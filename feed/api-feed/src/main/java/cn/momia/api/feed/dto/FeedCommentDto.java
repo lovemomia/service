@@ -50,4 +50,8 @@ public class FeedCommentDto {
     public void setNickName(String nickName) {
         this.nickName = nickName;
     }
+
+    public boolean exists() {
+        return id > 0;
+    }
 }

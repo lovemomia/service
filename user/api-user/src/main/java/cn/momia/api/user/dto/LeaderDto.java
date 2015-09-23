@@ -91,4 +91,8 @@ public class LeaderDto {
     public void setStatus(int status) {
         this.status = status;
     }
+
+    public boolean exists() {
+        return id > 0;
+    }
 }
