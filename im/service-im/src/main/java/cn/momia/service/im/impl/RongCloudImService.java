@@ -129,7 +129,7 @@ public class RongCloudImService extends DbAccessService implements ImService {
             return group;
         } catch (Exception e) {
             LOGGER.error("fail to build group: {}", rs.getLong("id"), e);
-            return Group.INVALID_GROUP;
+            return Group.NOT_EXIST_GROUP;
         }
     }
 

@@ -5,8 +5,10 @@
     </Logger>
 
     <Service>
-        <Base>http://localhost:7070</Base>
+        <Base>http://localhost:5050</Base>
+        <Deal>http://localhost:6060</Deal>
         <Product>http://localhost:8080</Product>
+        <User>http://localhost:7070</User>
     </Service>
 
     <Limit>
@@ -22,9 +24,41 @@
         </Tongqu>
     </Database>
 
+    <Wap>
+        <Domain>m.momia.cn</Domain>
+        <ProductUrl>http://m.momia.cn/actsDetail.html</ProductUrl>
+    </Wap>
+
+    <Payment>
+        <Ali>
+            <PublicKey></PublicKey>
+            <PrivateKey></PrivateKey>
+            <AppService>mobile.securitypay.pay</AppService>
+            <WapService>alipay.wap.create.direct.pay.by.user</WapService>
+            <Partner>2088911944697039</Partner>
+            <NotifyUrl>https://i.momia.cn/callback/alipay</NotifyUrl>
+            <VerifyUrl><![CDATA[https://mapi.alipay.com/gateway.do?service=notify_verify&]]></VerifyUrl>
+        </Ali>
+        <Wechat>
+            <AccessTokenService>https://api.weixin.qq.com/sns/oauth2/access_token</AccessTokenService>
+            <PrepayService>https://api.mch.weixin.qq.com/pay/unifiedorder</PrepayService>
+            <AppAppId>wx50b2ac03c88ad6e7</AppAppId>
+            <AppMchId>1264856501</AppMchId>
+            <AppKey></AppKey>
+            <JsApiAppId>wxc4ca5800d28b5650</JsApiAppId>
+            <JsApiMchId>1251671101</JsApiMchId>
+            <JsApiKey></JsApiKey>
+            <JsApiSecret></JsApiSecret>
+            <NotifyUrl>https://i.momia.cn/callback/wechatpay</NotifyUrl>
+        </Wechat>
+    </Payment>
+
     <Product>
         <Month>
             <PageSize>20</PageSize>
         </Month>
+        <Playmate>
+            <PageSize>20</PageSize>
+        </Playmate>
     </Product>
 </Configuration>

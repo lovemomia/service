@@ -24,11 +24,16 @@
             <artifactId>duola-api-product</artifactId>
             <version>1.0.0</version>
         </dependency>
-
-        <!-- Momia -->
         <dependency>
             <groupId>cn.momia</groupId>
-            <artifactId>duola-common-webapp</artifactId>
+            <artifactId>duola-api-user</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <!-- Momia Deal -->
+        <dependency>
+            <groupId>cn.momia</groupId>
+            <artifactId>duola-common-deal</artifactId>
             <version>1.0.0</version>
         </dependency>
 

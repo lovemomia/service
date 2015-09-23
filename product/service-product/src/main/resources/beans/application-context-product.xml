@@ -16,4 +16,13 @@
         <property name="placeService" ref="placeService" />
         <property name="skuService" ref="skuService" />
     </bean>
+
+    <bean id="couponService" class="cn.momia.service.coupon.impl.CouponServiceImpl" parent="dbAccessService" />
+    <bean id="userCouponService" class="cn.momia.service.coupon.impl.UserCouponServiceImpl" parent="dbAccessService" />
+    <bean id="promoServiceFacade" class="cn.momia.service.product.facade.impl.PromoServiceFacadeImpl">
+        <property name="couponService" ref="couponService" />
+        <property name="userCouponService" ref="userCouponService" />
+    </bean>
+
+    <bean id="orderService" class="cn.momia.service.order.impl.OrderServiceImpl" parent="dbAccessService" />
 </beans>
