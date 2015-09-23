@@ -7,4 +7,8 @@
     <bean class="cn.momia.api.product.ProductServiceApi" init-method="init">
         <property name="service" value="${Service.Product}" />
     </bean>
+
+    <bean class="cn.momia.api.product.DealServiceApi" init-method="init">
+        <property name="service" value="${Service.Deal}" />
+    </bean>
 </beans>
