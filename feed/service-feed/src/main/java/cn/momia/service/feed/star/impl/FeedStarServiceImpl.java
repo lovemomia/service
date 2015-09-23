@@ -45,11 +45,9 @@ public class FeedStarServiceImpl extends DbAccessService implements FeedStarServ
         long id = getId(userId, feedId);
         if (id > 0) {
             String sql = "UPDATE t_feed_star SET status=1 WHERE id=? AND userId=? AND feedId=? AND status=0";
-
             return jdbcTemplate.update(sql, new Object[] { id, userId, feedId }) == 1;
         } else {
             String sql = "INSERT INTO t_feed_star(userId, feedId, addTime) VALUES (?, ?, NOW())";
-
             return jdbcTemplate.update(sql, new Object[] { userId, feedId }) == 1;
         }
     }
@@ -68,7 +66,6 @@ public class FeedStarServiceImpl extends DbAccessService implements FeedStarServ
     @Override
     public boolean delete(long userId, long feedId) {
         String sql = "UPDATE t_feed_star SET status=0 WHERE userId=? AND feedId=? AND status=1";
-
         return jdbcTemplate.update(sql, new Object[] { userId, feedId }) == 1;
     }
 

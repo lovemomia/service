@@ -29,6 +29,24 @@ public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedServ
     private static final String[] BASE_FEED_FIELDS = { "id", "`type`", "userId", "productId", "topicId", "topic", "content", "lng", "lat", "commentCount", "starCount", "addTime" };
 
     @Override
+    public boolean isFollowed(long ownUserId, long otherUserId) {
+        String sql = "SELECT COUNT(1) FROM t_user_follow WHERE userId=? AND followedId=? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[] { ownUserId, otherUserId }, new ResultSetExtractor<Boolean>() {
+            @Override
+            public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getInt(1) > 0 : false;
+            }
+        });
+    }
+
+    @Override
+    public boolean follow(long ownUserId, long otherUserId) {
+        String sql = "INSERT INTO t_user_follow(userId, followedId, addTime) VALUES (?, ?, NOW())";
+        return jdbcTemplate.update(sql, new Object[] { ownUserId, otherUserId }) == 1;
+    }
+
+    @Override
     public long add(final BaseFeed baseFeed) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
@@ -95,32 +113,14 @@ public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedServ
     @Override
     public boolean delete(long userId, long id) {
         String sql = "UPDATE t_feed SET status=0 WHERE id=? AND userId=?";
-
         return jdbcTemplate.update(sql, new Object[] { id, userId }) == 1;
     }
 
     @Override
-    public boolean isFollowed(long userId, long followedId) {
-        String sql = "SELECT COUNT(1) FROM t_user_follow WHERE userId=? AND followedId=? AND status=1";
-        return jdbcTemplate.query(sql, new Object[] { userId, followedId }, new ResultSetExtractor<Boolean>() {
-            @Override
-            public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
-                return rs.next() ? rs.getInt(1) > 0 : false;
-            }
-        });
-    }
-
-    @Override
-    public boolean follow(long userId, long followedId) {
-        String sql = "INSERT INTO t_user_follow(userId, followedId, addTime) VALUES (?, ?, NOW())";
-        return jdbcTemplate.update(sql, new Object[] { userId, followedId }) == 1;
-    }
-
-    @Override
-    public List<Long> getFollowedIds(long id) {
+    public List<Long> getFollowedIds(long userId) {
         final List<Long> followedIds = new ArrayList<Long>();
         String sql = "SELECT followedId FROM t_user_follow WHERE userId=? AND status=1";
-        jdbcTemplate.query(sql, new Object[] { id }, new RowCallbackHandler() {
+        jdbcTemplate.query(sql, new Object[] { userId }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 followedIds.add(rs.getLong("followedId"));

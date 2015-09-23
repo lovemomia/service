@@ -46,10 +46,10 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
     }
 
     @Override
-    public boolean follow(long userId, long followedId) {
-        if (userId <= 0 || followedId <= 0) return false;
-        if (baseFeedService.isFollowed(userId, followedId)) return true;
-        return baseFeedService.follow(userId, followedId);
+    public boolean follow(long ownUserId, long otherUserId) {
+        if (ownUserId <= 0 || otherUserId <= 0) return false;
+        if (baseFeedService.isFollowed(ownUserId, otherUserId)) return true;
+        return baseFeedService.follow(ownUserId, otherUserId);
     }
 
     @Override
@@ -183,7 +183,6 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
     @Override
     public List<FeedComment> queryComments(long feedId, int start, int count) {
         if (feedId <= 0 || start < 0 || count <= 0) return new ArrayList<FeedComment>();
-
         return feedCommentService.query(feedId, start, count);
     }
 
@@ -196,7 +195,6 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
     @Override
     public List<Long> queryStaredUserIds(long feedId, int start, int count) {
         if (feedId <= 0 || start < 0 || count <= 0) return new ArrayList<Long>();
-
         return feedStarService.queryUserIds(feedId, start, count);
     }
 
@@ -245,6 +243,18 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
     }
 
     @Override
+    public boolean isStared(long userId, long feedId) {
+        if (userId <= 0 || feedId <= 0) return false;
+        return feedStarService.isStared(userId, feedId);
+    }
+
+    @Override
+    public List<Long> queryStaredFeeds(long userId, Collection<Long> feedIds) {
+        if (userId <= 0 || feedIds == null || feedIds.isEmpty()) return new ArrayList<Long>();
+        return feedStarService.queryStaredFeeds(userId, feedIds);
+    }
+
+    @Override
     public boolean star(long userId, long feedId) {
         if (userId <= 0 || feedId <= 0) return false;
         return feedStarService.add(userId, feedId);
@@ -266,17 +276,5 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
     public void decreaseStarCount(long feedId) {
         if (feedId <= 0) return;
         baseFeedService.decreaseStarCount(feedId);
-    }
-
-    @Override
-    public boolean isStared(long userId, long feedId) {
-        if (userId <= 0 || feedId <= 0) return false;
-        return feedStarService.isStared(userId, feedId);
-    }
-
-    @Override
-    public List<Long> queryStaredFeeds(long userId, Collection<Long> feedIds) {
-        if (userId <= 0 || feedIds == null || feedIds.isEmpty()) return new ArrayList<Long>();
-        return feedStarService.queryStaredFeeds(userId, feedIds);
     }
 }

@@ -9,10 +9,6 @@ public class BaseFeed {
 
     public static final BaseFeed NOT_EXIST_BASE_FEED = new BaseFeed();
     public static final BaseFeed INVALID_BASE_FEED = new BaseFeed();
-    static {
-        NOT_EXIST_BASE_FEED.setId(0);
-        INVALID_BASE_FEED.setId(0);
-    }
 
     private long id;
     private int type;
@@ -123,23 +119,8 @@ public class BaseFeed {
         this.addTime = addTime;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof BaseFeed)) return false;
-
-        BaseFeed baseFeed = (BaseFeed) o;
-
-        return getId() == baseFeed.getId();
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (getId() ^ (getId() >>> 32));
-    }
-
     public boolean exists() {
-        return !this.equals(NOT_EXIST_BASE_FEED);
+        return id > 0;
     }
 
     public boolean isInvalid() {

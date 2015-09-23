@@ -88,6 +88,15 @@ public class FeedServiceApi extends AbstractServiceApi {
         executeRequest(request);
     }
 
+    public PagedList<FeedStarDto> listStars(long feedId, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("start", start)
+                .add("count", count);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("feed", feedId, "star/list"), builder.build());
+
+        return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedStarDto.class);
+    }
+
     public void star(long userId, long feedId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
         MomiaHttpRequest request = MomiaHttpRequest.POST(url("feed", feedId, "star"), builder.build());
@@ -98,14 +107,5 @@ public class FeedServiceApi extends AbstractServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
         MomiaHttpRequest request = MomiaHttpRequest.POST(url("feed", feedId, "unstar"), builder.build());
         executeRequest(request);
-    }
-
-    public PagedList<FeedStarDto> listStars(long feedId, int start, int count) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("start", start)
-                .add("count", count);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("feed", feedId, "star/list"), builder.build());
-
-        return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedStarDto.class);
     }
 }

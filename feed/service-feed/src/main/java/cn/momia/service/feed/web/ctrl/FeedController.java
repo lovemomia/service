@@ -1,6 +1,5 @@
 package cn.momia.service.feed.web.ctrl;
 
-import cn.momia.api.feed.dto.FeedCommentDto;
 import cn.momia.api.feed.dto.FeedDto;
 import cn.momia.api.user.dto.ParticipantDto;
 import cn.momia.common.api.http.MomiaHttpResponse;
@@ -8,7 +7,6 @@ import cn.momia.common.util.SexUtil;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.api.dto.PagedList;
-import cn.momia.service.feed.comment.FeedComment;
 import cn.momia.service.feed.facade.Feed;
 import cn.momia.service.feed.facade.FeedImage;
 import cn.momia.service.feed.facade.FeedServiceFacade;
@@ -183,110 +181,6 @@ public class FeedController extends BaseController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public MomiaHttpResponse delete(@RequestParam(value = "uid") long userId, @PathVariable long id) {
         if (!feedServiceFacade.deleteFeed(userId, id)) return MomiaHttpResponse.FAILED("删除Feed失败");
-        return MomiaHttpResponse.SUCCESS;
-    }
-
-    @RequestMapping(value = "/{id}/comment/list", method = RequestMethod.GET)
-    public MomiaHttpResponse listComments(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
-
-        Feed feed = feedServiceFacade.getFeed(id);
-        if (!feed.exists()) return MomiaHttpResponse.FAILED("无效的Feed");
-
-        long totalCount = feedServiceFacade.queryCommentsCount(id);
-        if (totalCount <= 0) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
-
-        List<FeedComment> comments = feedServiceFacade.queryComments(id, start, count);
-
-        List<Long> userIds = new ArrayList<Long>();
-        for (FeedComment comment : comments) userIds.add(comment.getUserId());
-        List<UserDto> users = UserServiceApi.USER.list(userIds, UserDto.Type.MINI);
-        Map<Long, UserDto> usersMap = new HashMap<Long, UserDto>();
-        for (UserDto user : users) usersMap.put(user.getId(), user);
-
-        PagedList pagedFeedCommentDtos = new PagedList(totalCount, start, count);
-        List<FeedCommentDto> feedCommentDtos = new ArrayList<FeedCommentDto>();
-        for (FeedComment comment : comments) {
-            UserDto user = usersMap.get(comment.getUserId());
-            if (user == null) continue;
-
-            feedCommentDtos.add(buildFeedCommentDto(comment, user));
-        }
-        pagedFeedCommentDtos.setList(feedCommentDtos);
-
-        return MomiaHttpResponse.SUCCESS(pagedFeedCommentDtos);
-    }
-
-    private FeedCommentDto buildFeedCommentDto(FeedComment comment, UserDto user) {
-        FeedCommentDto feedCommentDto = new FeedCommentDto();
-        feedCommentDto.setId(comment.getId());
-        feedCommentDto.setContent(comment.getContent());
-        feedCommentDto.setAddTime(comment.getAddTime());
-        feedCommentDto.setNickName(user.getNickName());
-        feedCommentDto.setAvatar(user.getAvatar());
-
-        return feedCommentDto;
-    }
-
-
-    @RequestMapping(value = "/{id}/comment", method = RequestMethod.POST)
-    public MomiaHttpResponse addComment(@RequestParam(value = "uid") long userId, @PathVariable long id, @RequestParam String content) {
-        Feed feed = feedServiceFacade.getFeed(id);
-        if (!feed.exists()) return MomiaHttpResponse.FAILED("无效的Feed");
-
-        if (!feedServiceFacade.addComment(userId, id, content)) return MomiaHttpResponse.FAILED("发表评论失败");
-
-        feedServiceFacade.increaseCommentCount(id);
-        return MomiaHttpResponse.SUCCESS;
-    }
-
-    @RequestMapping(value = "/{id}/comment/{cmid}", method = RequestMethod.DELETE)
-    public MomiaHttpResponse deleteComment(@RequestParam(value = "uid") long userId, @PathVariable long id, @PathVariable(value = "cmid") long commentId) {
-        if (!feedServiceFacade.deleteComment(userId, id, commentId)) return MomiaHttpResponse.FAILED("删除评论失败");
-
-        feedServiceFacade.decreaseCommentCount(id);
-        return MomiaHttpResponse.SUCCESS;
-    }
-
-    @RequestMapping(value = "/{id}/star/list", method = RequestMethod.GET)
-    public MomiaHttpResponse listStaredUsers(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
-
-        Feed feed = feedServiceFacade.getFeed(id);
-        if (!feed.exists()) return MomiaHttpResponse.FAILED("无效的Feed");
-
-        long totalCount = feedServiceFacade.queryStaredUsersCount(id);
-        if (totalCount <= 0) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
-
-        List<Long> userIds = feedServiceFacade.queryStaredUserIds(id, start, count);
-        List<UserDto> users = UserServiceApi.USER.list(userIds, UserDto.Type.MINI);
-
-        PagedList pagedStaredUserDtos = new PagedList(totalCount, start, count);
-        List<UserDto> staredUserDtos = new ArrayList<UserDto>();
-        for (UserDto user : users) {
-            staredUserDtos.add(user);
-        }
-        pagedStaredUserDtos.setList(staredUserDtos);
-
-        return MomiaHttpResponse.SUCCESS(pagedStaredUserDtos);
-    }
-
-    @RequestMapping(value = "/{id}/star", method = RequestMethod.POST)
-    public MomiaHttpResponse star(@RequestParam(value = "uid") long userId, @PathVariable long id) {
-        Feed feed = feedServiceFacade.getFeed(id);
-        if (!feed.exists()) return MomiaHttpResponse.FAILED("无效的Feed");
-
-        if (!feedServiceFacade.star(userId, id)) return MomiaHttpResponse.FAILED("赞失败");
-
-        feedServiceFacade.increaseStarCount(id);
-        return MomiaHttpResponse.SUCCESS;
-    }
-
-    @RequestMapping(value = "/{id}/unstar", method = RequestMethod.POST)
-    public MomiaHttpResponse unstar(@RequestParam(value = "uid") long userId, @PathVariable long id) {
-        if (!feedServiceFacade.unstar(userId, id)) return MomiaHttpResponse.FAILED("取消赞失败");
-
-        feedServiceFacade.decreaseStarCount(id);
         return MomiaHttpResponse.SUCCESS;
     }
 }

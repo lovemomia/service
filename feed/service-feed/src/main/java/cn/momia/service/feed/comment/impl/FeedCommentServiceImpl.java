@@ -23,14 +23,12 @@ public class FeedCommentServiceImpl extends DbAccessService implements FeedComme
     @Override
     public boolean add(long userId, long feedId, String content) {
         String sql = "INSERT INTO t_feed_comment(userId, feedId, content, addTime) VALUES (?, ?, ?, NOW())";
-
         return jdbcTemplate.update(sql, new Object[] { userId, feedId, content }) == 1;
     }
 
     @Override
     public boolean delete(long userId, long feedId, long commentId) {
         String sql = "UPDATE t_feed_comment SET status=0 WHERE id=? AND userId=? AND feedId=? AND status=1";
-
         return jdbcTemplate.update(sql, new Object[] { commentId, userId, feedId }) == 1;
     }
 

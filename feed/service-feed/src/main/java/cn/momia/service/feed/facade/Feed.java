@@ -76,23 +76,8 @@ public class Feed {
         return baseFeed.getStarCount();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Feed)) return false;
-
-        Feed feed = (Feed) o;
-
-        return getId() == feed.getId();
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (getId() ^ (getId() >>> 32));
-    }
-
     public boolean exists() {
-        return !this.equals(NOT_EXIST_FEED);
+        return getId() > 0;
     }
 
     public boolean isInvalid() {

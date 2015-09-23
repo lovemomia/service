@@ -5,10 +5,6 @@ import java.util.Date;
 public class FeedComment {
     public static final FeedComment NOT_EXIST_FEED_COMMENT = new FeedComment();
     public static final FeedComment INVALID_FEED_COMMENT = new FeedComment();
-    static {
-        NOT_EXIST_FEED_COMMENT.setId(0);
-        INVALID_FEED_COMMENT.setId(0);
-    }
 
     private long id;
     private long feedId;
@@ -56,23 +52,7 @@ public class FeedComment {
         this.addTime = addTime;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof FeedComment)) return false;
-
-        FeedComment comment = (FeedComment) o;
-
-        return getId() == comment.getId();
-
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (getId() ^ (getId() >>> 32));
-    }
-
     public boolean exists() {
-        return !this.equals(NOT_EXIST_FEED_COMMENT);
+        return id > 0;
     }
 }

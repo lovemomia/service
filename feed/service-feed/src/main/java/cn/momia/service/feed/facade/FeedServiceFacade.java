@@ -6,11 +6,13 @@ import java.util.Collection;
 import java.util.List;
 
 public interface FeedServiceFacade {
-    boolean follow(long userId, long followedId);
+    boolean follow(long ownUserId, long otherUserId);
+
     long addFeed(Feed feed);
     void pushFeed(long feedId, Collection<Long> followedIds);
     Feed getFeed(long feedId);
     boolean deleteFeed(long userId, long feedId);
+
     List<Long> queryFollowedIds(long userId);
     long queryFollowedCountByUser(long userId);
     List<Feed> queryFollowedByUser(long userId, int start, int count);
@@ -31,12 +33,12 @@ public interface FeedServiceFacade {
     void increaseCommentCount(long feedId);
     void decreaseCommentCount(long feedId);
 
+    boolean isStared(long userId, long feedId);
+    List<Long> queryStaredFeeds(long userId, Collection<Long> feedIds);
+
     boolean star(long userId, long feedId);
     boolean unstar(long userId, long feedId);
 
     void increaseStarCount(long feedId);
     void decreaseStarCount(long feedId);
-
-    boolean isStared(long userId, long feedId);
-    List<Long> queryStaredFeeds(long userId, Collection<Long> feedIds);
 }
