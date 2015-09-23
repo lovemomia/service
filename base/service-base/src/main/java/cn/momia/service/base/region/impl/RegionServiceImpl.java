@@ -52,7 +52,6 @@ public class RegionServiceImpl extends DbAccessService implements RegionService 
     @Override
     public List<Region> listAll() {
         if (isOutOfDate()) reload();
-
         return regionsCache;
     }
 }

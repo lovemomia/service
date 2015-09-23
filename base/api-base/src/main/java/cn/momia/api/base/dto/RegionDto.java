@@ -39,4 +39,8 @@ public class RegionDto {
     public void setParentId(int parentId) {
         this.parentId = parentId;
     }
+
+    public boolean exists() {
+        return id > 0;
+    }
 }

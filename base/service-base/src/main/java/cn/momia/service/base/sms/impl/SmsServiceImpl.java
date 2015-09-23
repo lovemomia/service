@@ -1,5 +1,6 @@
 package cn.momia.service.base.sms.impl;
 
+import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.service.DbAccessService;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.base.sms.SmsSender;
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 public class SmsServiceImpl extends DbAccessService implements SmsService {
     private ExecutorService executorService;
+
     private SmsSender sender;
 
     public void setSender(SmsSender sender) {
@@ -26,52 +28,18 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
 
     @Override
     public boolean sendCode(String mobile) {
-        String code = getGeneratedCode(mobile);
-        if (StringUtils.isBlank(code)) {
-            boolean outOfDate = (code != null); // null 表示没有生成过，空表示生成过，但已过期
-            code = generateCode(mobile);
-            updateCode(mobile, code, outOfDate);
-        }
-        Date lastSendTime = getLastSendTime(mobile);
-        if (lastSendTime != null && new Date().getTime() - lastSendTime.getTime() < 60 * 1000) return true;
+        checkFrequency(mobile);
 
+        String code = getOrGenerateCode(mobile);
         sendAsync(mobile, buildCodeMsg(code));
 
         return true;
     }
 
-    private String getGeneratedCode(String mobile) {
-        String sql = "SELECT code, status, generateTime FROM t_verify WHERE mobile=?";
-
-        return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<String>() {
-            @Override
-            public String extractData(ResultSet rs) throws SQLException, DataAccessException {
-                if (!rs.next()) return null;
-
-                String code = rs.getString("code");
-                int status = rs.getInt("status");
-                Date generateTime = rs.getTimestamp("generateTime");
-
-                if (status == 0 || generateTime == null || new Date().getTime() - generateTime.getTime() > 30 * 60 * 1000) return "";
-                return code;
-            }
-        });
-    }
-
-    private String generateCode(String mobile) {
-        int number = (int) (Math.random() * 1000000);
-
-        return String.format("%06d", number);
-    }
-
-    private void updateCode(String mobile, String code, boolean outOfDate) {
-        if (outOfDate) {
-            String sql = "UPDATE t_verify SET mobile=?, code=?, generateTime=NOW(), sendTime=NULL, status=1 WHERE mobile=?";
-            jdbcTemplate.update(sql, new Object[] { mobile, code, mobile });
-        } else {
-            String sql = "INSERT INTO t_verify(mobile, code, generateTime) VALUES (?, ?, NOW())";
-            jdbcTemplate.update(sql, new Object[] { mobile, code });
-        }
+    private void checkFrequency(String mobile) {
+        Date lastSendTime = getLastSendTime(mobile);
+        if (lastSendTime != null && new Date().getTime() - lastSendTime.getTime() < 60 * 1000)
+            throw new MomiaFailedException("发送频率过快，请稍后再试");
     }
 
     private Date getLastSendTime(String mobile) {
@@ -80,8 +48,54 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
         return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<Date>() {
             @Override
             public Date extractData(ResultSet rs) throws SQLException, DataAccessException {
-                if (rs.next()) return rs.getTimestamp("sendTime");
-                return null;
+                return rs.next() ? rs.getTimestamp("sendTime") : null;
+            }
+        });
+    }
+
+    private String getOrGenerateCode(String mobile) {
+        String code = getGeneratedCode(mobile);
+        if (StringUtils.isBlank(code)) {
+            code = generateCode(mobile);
+            updateCode(mobile, code);
+        }
+
+        return code;
+    }
+
+    private String getGeneratedCode(String mobile) {
+        String sql = "SELECT code FROM t_verify WHERE mobile=? AND generateTime>? AND status=1";
+
+        return jdbcTemplate.query(sql, new Object[] { mobile, new Date(new Date().getTime() - 30 * 60 * 1000) }, new ResultSetExtractor<String>() {
+            @Override
+            public String extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getString(1) : null;
+            }
+        });
+    }
+
+    private String generateCode(String mobile) {
+        int number = (int) (Math.random() * 1000000);
+        return String.format("%06d", number);
+    }
+
+    private void updateCode(String mobile, String code) {
+        if (exists(mobile)) {
+            String sql = "UPDATE t_verify SET mobile=?, code=?, generateTime=NOW(), sendTime=NULL, status=1 WHERE mobile=?";
+            jdbcTemplate.update(sql, new Object[] { mobile, code, mobile });
+        } else {
+            String sql = "INSERT INTO t_verify(mobile, code, generateTime) VALUES (?, ?, NOW())";
+            jdbcTemplate.update(sql, new Object[] { mobile, code });
+        }
+    }
+
+    private boolean exists(String mobile) {
+        String sql = "SELECT COUNT(1) FROM t_verify WHERE mobile=?";
+
+        return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<Boolean>() {
+            @Override
+            public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getInt(1) > 0 : false;
             }
         });
     }
@@ -114,22 +128,16 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
 
     private boolean updateSendTime(String mobile) {
         String sql = "UPDATE t_verify SET sendTime=NOW() WHERE mobile=?";
-
         return jdbcTemplate.update(sql, new Object[] { mobile }) == 1;
     }
 
     @Override
     public boolean verifyCode(String mobile, String code) {
-        String sql = "SELECT generateTime FROM t_verify WHERE mobile=? AND code=? AND status=1";
-        boolean successful = jdbcTemplate.query(sql, new Object[] { mobile, code }, new ResultSetExtractor<Boolean>() {
+        String sql = "SELECT COUNT(1) FROM t_verify WHERE mobile=? AND code=? AND generateTime>? AND status=1";
+        boolean successful = jdbcTemplate.query(sql, new Object[] { mobile, code, new Date(new Date().getTime() - 30 * 60 * 1000) }, new ResultSetExtractor<Boolean>() {
             @Override
             public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
-                if (rs.next()) {
-                    Date generateTime = rs.getTimestamp("generateTime");
-                    return new Date().getTime() - generateTime.getTime() < 30 * 60 * 1000;
-                }
-
-                return false;
+                return rs.next() ? rs.getInt(1) > 0 : false;
             }
         });
 

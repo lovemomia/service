@@ -50,7 +50,6 @@ public class CityServiceImpl extends DbAccessService implements CityService {
     @Override
     public List<City> listAll() {
         if (isOutOfDate()) reload();
-
         return citiesCache;
     }
 }

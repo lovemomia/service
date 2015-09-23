@@ -36,7 +36,7 @@ public class SmsController extends BaseController {
     @RequestMapping(value = "/notify", method = RequestMethod.POST)
     public MomiaHttpResponse notify(@RequestParam String mobile, @RequestParam String msg) {
         if (MobileUtil.isInvalid(mobile)) return MomiaHttpResponse.FAILED("无效的手机号码");
-        if (StringUtils.isBlank(msg)) return MomiaHttpResponse.FAILED("发送内容不能为空");
+        if (StringUtils.isBlank(msg)) return MomiaHttpResponse.FAILED("通知内容不能为空");
 
         if (!smsService.notifyUser(mobile, msg)) return MomiaHttpResponse.FAILED("发送通知失败");
         return MomiaHttpResponse.SUCCESS;

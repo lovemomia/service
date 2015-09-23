@@ -31,7 +31,7 @@ public class RegionController extends BaseController {
     }
 
     @RequestMapping(value = "/district/tree", method = RequestMethod.GET)
-    public MomiaHttpResponse getDistrictTree() {
+    public MomiaHttpResponse listAllCityDistricts() {
         List<City> cities = cityService.listAll();
         List<Region> regions = regionService.listAll();
         Map<Integer, List<Region>> districtsOfCities = new HashMap<Integer, List<Region>>();
