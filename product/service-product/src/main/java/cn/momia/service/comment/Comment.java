@@ -7,11 +7,6 @@ import java.util.List;
 
 public class Comment {
     public static Comment NOT_EXIST_COMMENT = new Comment();
-    public static Comment INVALID_COMMENT = new Comment();
-    static {
-        NOT_EXIST_COMMENT.setId(0);
-        INVALID_COMMENT.setId(0);
-    }
 
     private long id;
     private long orderId;
@@ -95,23 +90,8 @@ public class Comment {
         this.imgs = imgs;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Comment)) return false;
-
-        Comment comment = (Comment) o;
-
-        return getId() == comment.getId();
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (getId() ^ (getId() >>> 32));
-    }
-
     public boolean exists() {
-        return !this.equals(NOT_EXIST_COMMENT);
+        return id > 0;
     }
 
     public boolean isInvalid() {

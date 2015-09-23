@@ -229,6 +229,7 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
     @Override
     public List<Product> query(int cityId, int start, int count, ProductSort productSort) {
+        if (cityId < 0 || start < 0 || count <= 0) return new ArrayList<Product>();
         return buildProducts(baseProductService.query(cityId, start, count, productSort));
     }
 
@@ -240,6 +241,7 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
     @Override
     public List<Product> queryByWeekend(int cityId, int start, int count) {
+        if (cityId < 0 || start < 0 || count <= 0) return new ArrayList<Product>();
         return buildProducts(baseProductService.queryByWeekend(cityId, start, count));
     }
 
@@ -257,6 +259,7 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
     @Override
     public List<Product> queryNeedLeader(int cityId, int start, int count) {
+        if (cityId < 0 || start < 0 || count <= 0) return new ArrayList<Product>();
         return buildProducts(baseProductService.queryNeedLeader(cityId, start, count));
     }
 
@@ -327,7 +330,7 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
         if (successful) {
             try {
                 if (!isSoldOut(productId)) baseProductService.unSoldOut(productId);
-                baseProductService.decreaseJoined(productId, joined);
+                baseProductService.unjoin(productId, joined);
             } catch (Exception e) {
                 LOGGER.error("fail to update sold out/joined status of product: {}", productId, e);
             }

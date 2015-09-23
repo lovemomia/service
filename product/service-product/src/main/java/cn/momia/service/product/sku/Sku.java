@@ -31,12 +31,6 @@ public class Sku implements Serializable {
     }
 
     public static final Sku NOT_EXIST_SKU = new Sku();
-    public static final Sku INVALID_SKU = new Sku();
-
-    static {
-        NOT_EXIST_SKU.setId(0);
-        INVALID_SKU.setId(0);
-    }
 
     public static List<Sku> sort(List<Sku> skus) {
         Collections.sort(skus, new Comparator<Sku>() {
@@ -294,23 +288,8 @@ public class Sku implements Serializable {
         this.place = place;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Sku)) return false;
-
-        Sku sku = (Sku) o;
-
-        return getId() == sku.getId();
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (getId() ^ (getId() >>> 32));
-    }
-
     public boolean exists() {
-        return !this.equals(NOT_EXIST_SKU);
+        return id > 0;
     }
 
     public boolean hasLeader() {

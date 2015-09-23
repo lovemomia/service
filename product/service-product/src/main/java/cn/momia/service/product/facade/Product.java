@@ -148,23 +148,8 @@ public class Product implements Serializable {
         this.skus = skus;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Product)) return false;
-
-        Product product = (Product) o;
-
-        return getId() == product.getId();
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (getId() ^ (getId() >>> 32));
-    }
-
     public boolean exists() {
-        return !this.equals(NOT_EXIST_PRODUCT);
+        return getId() > 0;
     }
 
     public boolean isInvalid() {

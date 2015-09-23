@@ -4,12 +4,6 @@ import java.io.Serializable;
 
 public class Place implements Serializable {
     public static final Place NOT_EXIST_PLACE = new Place();
-    public static final Place INVALID_PLACE = new Place();
-
-    static {
-        NOT_EXIST_PLACE.setId(0);
-        INVALID_PLACE.setId(0);
-    }
 
     private int id;
     private int cityId;
@@ -84,22 +78,7 @@ public class Place implements Serializable {
         this.lat = lat;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Place)) return false;
-
-        Place place = (Place) o;
-
-        return getId() == place.getId();
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (getId() ^ (getId() >>> 32));
-    }
-
     public boolean exists() {
-        return !this.equals(NOT_EXIST_PLACE);
+        return id > 0;
     }
 }

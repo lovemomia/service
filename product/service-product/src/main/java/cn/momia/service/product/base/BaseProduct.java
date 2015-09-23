@@ -8,12 +8,6 @@ import java.util.Set;
 
 public class BaseProduct {
     public static final BaseProduct NOT_EXIST_BASEPRODUCT = new BaseProduct();
-    public static final BaseProduct INVALID_BASEPRODUCT = new BaseProduct();
-
-    static {
-        NOT_EXIST_BASEPRODUCT.setId(0);
-        INVALID_BASEPRODUCT.setId(0);
-    }
 
     private long id;
     private int cityId;
@@ -151,22 +145,7 @@ public class BaseProduct {
         this.status = status;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof BaseProduct)) return false;
-
-        BaseProduct baseProduct = (BaseProduct) o;
-
-        return getId() == baseProduct.getId();
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (getId() ^ (getId() >>> 32));
-    }
-
     public boolean exists() {
-        return !this.equals(NOT_EXIST_BASEPRODUCT);
+        return id > 0;
     }
 }

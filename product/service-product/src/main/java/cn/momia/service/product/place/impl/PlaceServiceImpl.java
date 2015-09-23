@@ -18,6 +18,7 @@ import java.util.List;
 
 public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PlaceServiceImpl.class);
+
     private static final String[] PLACE_FIELDS = { "id", "cityId", "regionId", "name", "address", "`desc`", "lng", "lat" };
 
     @Override
@@ -53,7 +54,7 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
         }
         catch (Exception e) {
             LOGGER.error("fail to build place: {}", rs.getLong("id"), e);
-            return Place.INVALID_PLACE;
+            return Place.NOT_EXIST_PLACE;
         }
     }
 

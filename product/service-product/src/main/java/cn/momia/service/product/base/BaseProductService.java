@@ -18,7 +18,7 @@ public interface BaseProductService {
     List<BaseProduct> queryNeedLeader(int cityId, int start, int count);
 
     void join(long id, int count);
-    void decreaseJoined(long id, int count);
+    void unjoin(long id, int count);
     void soldOut(long id);
     void unSoldOut(long id);
     boolean sold(long id, int count);

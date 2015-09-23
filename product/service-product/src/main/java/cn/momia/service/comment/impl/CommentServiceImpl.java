@@ -28,6 +28,7 @@ import java.util.Set;
 
 public class CommentServiceImpl extends DbAccessService implements CommentService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommentServiceImpl.class);
+
     private static final String[] COMMENT_FIELDS = { "id", "orderId", "productId", "skuId", "userid", "star", "content", "addTime" };
 
     @Override
@@ -120,7 +121,7 @@ public class CommentServiceImpl extends DbAccessService implements CommentServic
             return comment;
         } catch (Exception e) {
             LOGGER.error("fail to build comment: {}", rs.getLong("id"), e);
-            return Comment.INVALID_COMMENT;
+            return Comment.NOT_EXIST_COMMENT;
         }
     }
 

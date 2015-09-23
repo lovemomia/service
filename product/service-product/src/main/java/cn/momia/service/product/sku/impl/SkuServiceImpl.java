@@ -69,7 +69,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
         }
         catch (Exception e) {
             LOGGER.error("fail to build sku: {}", rs.getLong("id"), e);
-            return Sku.INVALID_SKU;
+            return Sku.NOT_EXIST_SKU;
         }
     }
 
@@ -111,21 +111,6 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
     }
 
     @Override
-    public List<Sku> queryAllByProduct(long productId) {
-        final List<Sku> skus = new ArrayList<Sku>();
-        String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId=? AND status<>0 ORDER BY startTime ASC";
-        jdbcTemplate.query(sql, new Object[] { productId }, new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                Sku sku = buildSku(rs);
-                if (sku.exists()) skus.add(sku);
-            }
-        });
-
-        return skus;
-    }
-
-    @Override
     public List<Sku> queryByProducts(Collection<Long> productIds) {
         final List<Sku> skus = new ArrayList<Sku>();
         if (productIds == null || productIds.isEmpty()) return skus;
@@ -140,13 +125,6 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
         });
 
         return skus;
-    }
-
-    @Override
-    public boolean addLeader(long userId, long productId, long id) {
-        String sql = "UPDATE t_sku SET leaderUserId=? WHERE id=? AND productId=? AND status=1 AND (leaderUserId<=0 OR leaderUserId=?)";
-
-        return jdbcTemplate.update(sql, new Object[] { userId, id, productId, userId }) == 1;
     }
 
     @Override
@@ -179,6 +157,13 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
         int updateCount = jdbcTemplate.update(sql, new Object[]{ count, count, id, count, count });
 
         return updateCount == 1;
+    }
+
+    @Override
+    public boolean addLeader(long userId, long productId, long id) {
+        String sql = "UPDATE t_sku SET leaderUserId=? WHERE id=? AND productId=? AND status=1 AND (leaderUserId<=0 OR leaderUserId=?)";
+
+        return jdbcTemplate.update(sql, new Object[] { userId, id, productId, userId }) == 1;
     }
 
     @Override

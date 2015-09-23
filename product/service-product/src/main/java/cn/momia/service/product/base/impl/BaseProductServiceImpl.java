@@ -84,7 +84,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
         }
         catch (Exception e) {
             LOGGER.error("fail to build base product: {}", rs.getLong("id"), e);
-            return BaseProduct.INVALID_BASEPRODUCT;
+            return BaseProduct.NOT_EXIST_BASEPRODUCT;
         }
     }
 
@@ -99,7 +99,6 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
 
         return tags;
     }
-
 
     private Set<Integer> parsePlaces(int placeId, String placesStr) {
         Set<Integer> places = new HashSet<Integer>();
@@ -300,7 +299,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     }
 
     @Override
-    public void decreaseJoined(long id, int count) {
+    public void unjoin(long id, int count) {
         String sql = "UPDATE t_product SET joined=joined-? WHERE id=? AND joined>=? AND status<>0";
         jdbcTemplate.update(sql, new Object[] { count, id, count });
     }
@@ -320,7 +319,6 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     @Override
     public boolean sold(long id, int count) {
         String sql = "UPDATE t_product SET sales=sales+? WHERE id=? AND status<>0";
-
         return jdbcTemplate.update(sql, new Object[] { count, id }) == 1;
     }
 }
