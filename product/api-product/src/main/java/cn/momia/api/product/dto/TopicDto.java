@@ -39,4 +39,8 @@ public class TopicDto {
     public void setGroups(List<TopicGroupDto> groups) {
         this.groups = groups;
     }
+
+    public boolean exists() {
+        return id > 0;
+    }
 }

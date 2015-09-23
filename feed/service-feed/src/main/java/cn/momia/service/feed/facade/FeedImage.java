@@ -13,6 +13,10 @@ public class FeedImage {
         this.url = url;
     }
 
+    public void setPath(String path) {
+        this.url = path;
+    }
+
     public int getWidth() {
         return width;
     }
