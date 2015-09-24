@@ -10,7 +10,6 @@
 
     <context:component-scan base-package="cn.momia.common.webapp.ctrl" />
     <context:component-scan base-package="cn.momia.service.base.web.ctrl" />
-    <context:component-scan base-package="cn.momia.service.deal.web.ctrl" />
     <context:component-scan base-package="cn.momia.service.feed.web.ctrl" />
     <context:component-scan base-package="cn.momia.service.product.web.ctrl" />
     <context:component-scan base-package="cn.momia.service.user.web.ctrl" />
