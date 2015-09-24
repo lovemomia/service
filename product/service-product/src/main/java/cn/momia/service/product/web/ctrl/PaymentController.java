@@ -9,7 +9,7 @@ import cn.momia.common.deal.gateway.PayType;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.deal.gateway.CallbackParam;
-import cn.momia.common.deal.gateway.ClientType;
+import cn.momia.common.client.ClientType;
 import cn.momia.common.deal.gateway.PaymentGateway;
 import cn.momia.common.deal.gateway.PrepayParam;
 import cn.momia.common.deal.gateway.PrepayResult;
