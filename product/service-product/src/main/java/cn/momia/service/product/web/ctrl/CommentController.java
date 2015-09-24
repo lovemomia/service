@@ -1,6 +1,8 @@
 package cn.momia.service.product.web.ctrl;
 
 import cn.momia.api.product.dto.CommentDto;
+import cn.momia.api.user.UserServiceApi;
+import cn.momia.api.user.dto.UserDto;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.api.dto.PagedList;
@@ -16,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/product")
@@ -38,23 +42,37 @@ public class CommentController extends BaseController {
         long totalCount = commentService.queryCountByProduct(id);
         List<Comment> comments = commentService.queryByProduct(id, start, count);
 
+        List<Long> userIds = new ArrayList<Long>();
+        for (Comment comment : comments) userIds.add(comment.getUserId());
+        List<UserDto> users = UserServiceApi.USER.list(userIds, UserDto.Type.MINI);
+        Map<Long, UserDto> usersMap = new HashMap<Long, UserDto>();
+        for (UserDto user : users) usersMap.put(user.getId(), user);
+
         PagedList<CommentDto> pagedCommentDtos = new PagedList(totalCount, start, count);
         List<CommentDto> commentDtos = new ArrayList<CommentDto>();
         for (Comment comment : comments) {
-            commentDtos.add(buildCommentDto(comment));
+            commentDtos.add(buildCommentDto(comment, usersMap.get(comment.getUserId())));
         }
         pagedCommentDtos.setList(commentDtos);
 
         return MomiaHttpResponse.SUCCESS(pagedCommentDtos);
     }
 
-    private CommentDto buildCommentDto(Comment comment) {
+    private CommentDto buildCommentDto(Comment comment, UserDto user) {
         CommentDto commentDto = new CommentDto();
         commentDto.setUserId(comment.getUserId());
         commentDto.setStar(comment.getStar());
         commentDto.setContent(comment.getContent());
         commentDto.setAddTime(comment.getAddTime());
         commentDto.setImgs(getImgs(comment));
+
+        if (user == null || !user.exists()) {
+            commentDto.setNickName("");
+            commentDto.setAvatar("");
+        } else {
+            commentDto.setNickName(user.getNickName());
+            commentDto.setAvatar(user.getAvatar());
+        }
 
         return commentDto;
     }
