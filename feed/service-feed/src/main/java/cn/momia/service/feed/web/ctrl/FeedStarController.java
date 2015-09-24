@@ -35,7 +35,7 @@ public class FeedStarController extends BaseController {
         List<Long> userIds = feedServiceFacade.queryStaredUserIds(id, start, count);
         List<UserDto> users = UserServiceApi.USER.list(userIds, UserDto.Type.MINI);
 
-        PagedList pagedStaredUserDtos = new PagedList(totalCount, start, count);
+        PagedList<UserDto> pagedStaredUserDtos = new PagedList(totalCount, start, count);
         List<UserDto> staredUserDtos = new ArrayList<UserDto>();
         for (UserDto user : users) {
             staredUserDtos.add(user);

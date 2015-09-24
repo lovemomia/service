@@ -75,8 +75,8 @@ public class CouponController extends BaseController {
         return MomiaHttpResponse.SUCCESS(buildPagedCouponDtos(totalCount, userCoupons, coupons, start, count));
     }
 
-    private PagedList buildPagedCouponDtos(int totalCount, List<UserCoupon> userCoupons, List<Coupon> coupons, int start, int count) {
-        PagedList pagedCouponDtos = new PagedList(totalCount, start, count);
+    private PagedList<CouponDto> buildPagedCouponDtos(int totalCount, List<UserCoupon> userCoupons, List<Coupon> coupons, int start, int count) {
+        PagedList<CouponDto> pagedCouponDtos = new PagedList(totalCount, start, count);
         Map<Integer, Coupon> couponsMap = new HashMap<Integer, Coupon>();
         for (Coupon coupon : coupons) couponsMap.put(coupon.getId(), coupon);
 

@@ -38,7 +38,7 @@ public class CommentController extends BaseController {
         long totalCount = commentService.queryCountByProduct(id);
         List<Comment> comments = commentService.queryByProduct(id, start, count);
 
-        PagedList pagedCommentDtos = new PagedList(totalCount, start, count);
+        PagedList<CommentDto> pagedCommentDtos = new PagedList(totalCount, start, count);
         List<CommentDto> commentDtos = new ArrayList<CommentDto>();
         for (Comment comment : comments) {
             commentDtos.add(buildCommentDto(comment));

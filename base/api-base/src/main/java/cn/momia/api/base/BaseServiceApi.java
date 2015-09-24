@@ -27,19 +27,19 @@ public class BaseServiceApi extends AbstractServiceApi {
     }
 
     public static class CityServiceApi extends BaseServiceApi {
-        public List<CityDto> getAll() {
+        public List<CityDto> listAll() {
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("city"));
             return CastUtil.toList((JSONArray) executeRequest(request), CityDto.class);
         }
     }
 
     public static class RegionServiceApi extends BaseServiceApi {
-        public List<RegionDto> getAll() {
+        public List<RegionDto> listAll() {
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("region"));
             return CastUtil.toList((JSONArray) executeRequest(request), RegionDto.class);
         }
 
-        public List<CityDistrictsDto> getCityDistrictTree() {
+        public List<CityDistrictsDto> listAllCityDistricts() {
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("region/district/tree"));
             return CastUtil.toList((JSONArray) executeRequest(request), CityDistrictsDto.class);
         }

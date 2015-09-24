@@ -18,10 +18,10 @@ public class MetaUtil {
 
         try {
             citiesMap = new HashMap<Integer, CityDto>();
-            for (CityDto city : BaseServiceApi.CITY.getAll()) citiesMap.put(city.getId(), city);
+            for (CityDto city : BaseServiceApi.CITY.listAll()) citiesMap.put(city.getId(), city);
 
             regionsMap = new HashMap<Integer, RegionDto>();
-            for (RegionDto region : BaseServiceApi.REGION.getAll()) regionsMap.put(region.getId(), region);
+            for (RegionDto region : BaseServiceApi.REGION.listAll()) regionsMap.put(region.getId(), region);
         } catch (Exception e) {
             // do nothing
         } finally {

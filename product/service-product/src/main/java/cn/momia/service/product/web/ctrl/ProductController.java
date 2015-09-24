@@ -74,8 +74,8 @@ public class ProductController extends ProductRelatedController {
         return productSort;
     }
 
-    private PagedList buildPagedProductDtos(long totalCount, List<Product> products, int start, int count) {
-        PagedList pagedProductDtos = new PagedList(totalCount, start, count);
+    private PagedList<ProductDto> buildPagedProductDtos(long totalCount, List<Product> products, int start, int count) {
+        PagedList<ProductDto> pagedProductDtos = new PagedList(totalCount, start, count);
         List<ProductDto> productDtos = new ArrayList<ProductDto>();
         for (Product product : products) {
             productDtos.add(buildProductDto(product, Product.Type.BASE, false));
@@ -97,8 +97,8 @@ public class ProductController extends ProductRelatedController {
         return MomiaHttpResponse.SUCCESS(buildWeekendProductDtos(totalCount, products, start, count));
     }
 
-    private PagedList buildWeekendProductDtos(long totalCount, List<Product> products, int start, int count) {
-        PagedList pagedProductDtos = new PagedList(totalCount, start, count);
+    private PagedList<ProductDto> buildWeekendProductDtos(long totalCount, List<Product> products, int start, int count) {
+        PagedList<ProductDto> pagedProductDtos = new PagedList(totalCount, start, count);
         List<ProductDto> productDtos = new ArrayList<ProductDto>();
         for (Product product : products) {
             ProductDto productDto = buildProductDto(product, Product.Type.BASE, false);
@@ -278,7 +278,7 @@ public class ProductController extends ProductRelatedController {
             productsMap.put(product.getId(), product);
         }
 
-        PagedList pagedProductDtos = new PagedList(totalCount, start, count);
+        PagedList<ProductDto> pagedProductDtos = new PagedList(totalCount, start, count);
         List<ProductDto> productDtos = new ArrayList<ProductDto>();
         for (Sku sku : Sku.sortByStartTime(ledSkus)) {
             Product product = productsMap.get(sku.getProductId());

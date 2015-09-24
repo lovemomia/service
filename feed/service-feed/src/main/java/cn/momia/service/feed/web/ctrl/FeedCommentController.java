@@ -44,7 +44,7 @@ public class FeedCommentController extends BaseController {
         Map<Long, UserDto> usersMap = new HashMap<Long, UserDto>();
         for (UserDto user : users) usersMap.put(user.getId(), user);
 
-        PagedList pagedFeedCommentDtos = new PagedList(totalCount, start, count);
+        PagedList<FeedCommentDto> pagedFeedCommentDtos = new PagedList(totalCount, start, count);
         List<FeedCommentDto> feedCommentDtos = new ArrayList<FeedCommentDto>();
         for (FeedComment comment : comments) {
             UserDto user = usersMap.get(comment.getUserId());

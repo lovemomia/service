@@ -258,11 +258,11 @@ public class OrderController extends BaseController {
         return MomiaHttpResponse.SUCCESS(buildPagedUserOrderDtos(totalCount, orders, products, start, count));
     }
 
-    private PagedList buildPagedUserOrderDtos(long totalCount, List<Order> orders, List<ProductDto> products, int start, int count) {
+    private PagedList<OrderDto> buildPagedUserOrderDtos(long totalCount, List<Order> orders, List<ProductDto> products, int start, int count) {
         Map<Long, ProductDto> productMap = new HashMap<Long, ProductDto>();
         for (ProductDto product : products) productMap.put(product.getId(), product);
 
-        PagedList pagedUserOrderDtos = new PagedList(totalCount, start, count);
+        PagedList<OrderDto> pagedUserOrderDtos = new PagedList(totalCount, start, count);
         List<OrderDto> userOrderDtos = new ArrayList<OrderDto>();
         for (Order order : orders) {
             try {

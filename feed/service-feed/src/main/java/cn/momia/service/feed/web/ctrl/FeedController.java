@@ -64,7 +64,7 @@ public class FeedController extends BaseController {
         return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(userId, feeds, totalCount, start, count));
     }
 
-    private PagedList buildPagedFeedDtos(long userId, List<Feed> feeds, long totalCount, @RequestParam int start, @RequestParam int count) {
+    private PagedList<FeedDto> buildPagedFeedDtos(long userId, List<Feed> feeds, long totalCount, @RequestParam int start, @RequestParam int count) {
         Set<Long> staredFeedIds = new HashSet<Long>();
         if (userId > 0) {
             Set<Long> feedIds = new HashSet<Long>();
@@ -78,7 +78,7 @@ public class FeedController extends BaseController {
         Map<Long, UserDto> usersMap = new HashMap<Long, UserDto>();
         for (UserDto user : users) usersMap.put(user.getId(), user);
 
-        PagedList pagedFeedDtos = new PagedList(totalCount, start, count);
+        PagedList<FeedDto> pagedFeedDtos = new PagedList(totalCount, start, count);
         List<FeedDto> feedDtos = new ArrayList<FeedDto>();
         for (Feed feed : feeds) {
             UserDto user = usersMap.get(feed.getUserId());
@@ -167,7 +167,7 @@ public class FeedController extends BaseController {
         Map<Long, ProductDto> productsMap = new HashMap<Long, ProductDto>();
         for (ProductDto product : products) productsMap.put(product.getId(), product);
 
-        PagedList pagedFeedTopicDtos = new PagedList(totalCount, start, count);
+        PagedList<FeedTopicDto> pagedFeedTopicDtos = new PagedList(totalCount, start, count);
         List<FeedTopicDto> feedTopicDtos = new ArrayList<FeedTopicDto>();
         for (FeedTopic feedTopic : topics) {
             ProductDto product = productsMap.get(feedTopic.getProductId());

@@ -31,8 +31,8 @@ public class FavoriteController extends ProductRelatedController {
         return MomiaHttpResponse.SUCCESS(buildPagedFavoriteDtos(totalCount, products, start, count));
     }
 
-    private PagedList buildPagedFavoriteDtos(long totalCount, List<Product> products, int start, int count) {
-        PagedList favoriteDtos = new PagedList(totalCount, start, count);
+    private PagedList<ProductDto> buildPagedFavoriteDtos(long totalCount, List<Product> products, int start, int count) {
+        PagedList<ProductDto> favoriteDtos = new PagedList(totalCount, start, count);
         List<ProductDto> productDtos = new ArrayList<ProductDto>();
         for (Product product : products) {
             productDtos.add(buildProductDto(product, Product.Type.BASE, false));
