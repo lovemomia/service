@@ -152,7 +152,7 @@ public class OrderController extends BaseController {
             List<Order> orders = orderService.list(order.getCustomerId(), order.getProductId(), order.getSkuId());
             if (!orders.isEmpty()) {
                 for (Order o : orders) {
-                    if (!o.isPayed()) MomiaHttpResponse.SUCCESS(o.getId());
+                    if (!o.isPayed()) return MomiaHttpResponse.SUCCESS(o.getId());
                 }
             }
         } catch (Exception e) {

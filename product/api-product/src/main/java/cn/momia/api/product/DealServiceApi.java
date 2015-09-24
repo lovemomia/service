@@ -36,9 +36,9 @@ public class DealServiceApi extends AbstractServiceApi {
             return JSON.toJavaObject((JSON) executeRequest(request), OrderDto.class);
         }
 
-        public JSON checkDup(JSONObject orderJson) {
+        public long checkDup(JSONObject orderJson) {
             MomiaHttpRequest request = MomiaHttpRequest.POST(url("order/check/dup"), orderJson.toString());
-            return (JSON) executeRequest(request);
+            return ((Number) executeRequest(request)).longValue();
         }
 
         public void delete(String utoken, long id) {
