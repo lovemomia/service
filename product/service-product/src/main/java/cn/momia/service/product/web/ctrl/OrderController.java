@@ -2,7 +2,6 @@ package cn.momia.service.product.web.ctrl;
 
 import cn.momia.api.base.MetaUtil;
 import cn.momia.api.product.dto.OrderDto;
-import cn.momia.api.product.dto.OrderDupDto;
 import cn.momia.api.product.dto.PlaymateDto;
 import cn.momia.api.product.dto.SkuPlaymatesDto;
 import cn.momia.common.api.exception.MomiaFailedException;
@@ -151,76 +150,16 @@ public class OrderController extends BaseController {
     public MomiaHttpResponse checkDup(@RequestBody Order order) {
         try {
             List<Order> orders = orderService.list(order.getCustomerId(), order.getProductId(), order.getSkuId());
-            if (orders.isEmpty()) return MomiaHttpResponse.SUCCESS(OrderDupDto.NOT_DUPLICATED);
-
-            for (Order o : orders) {
-                if (o.isPayed()) continue;
-
-                OrderDupDto orderDupDto = new OrderDupDto();
-                orderDupDto.setDuplicated(true);
-                orderDupDto.setOrderId(o.getId());
-                orderDupDto.setProductId(o.getProductId());
-                if (isSame(order, o)) orderDupDto.setSame(true);
-
-                return MomiaHttpResponse.SUCCESS(orderDupDto);
+            if (!orders.isEmpty()) {
+                for (Order o : orders) {
+                    if (!o.isPayed()) MomiaHttpResponse.SUCCESS(o.getId());
+                }
             }
         } catch (Exception e) {
-            return MomiaHttpResponse.SUCCESS(OrderDupDto.NOT_DUPLICATED);
+            // do nothing
         }
 
-        return MomiaHttpResponse.SUCCESS(OrderDupDto.NOT_DUPLICATED);
-    }
-
-    private boolean isSame(Order order1, Order order2) {
-        if (!isSamePrices(order1.getPrices(), order2.getPrices())) return false;
-        if (!isSameContacts(order1.getContacts(), order2.getContacts())) return false;
-        if (!isSameMobile(order1.getMobile(), order2.getMobile())) return false;
-        if (!isSameParticipants(order1.getParticipants(), order2.getParticipants())) return false;
-        return true;
-    }
-
-    private boolean isSamePrices(List<OrderPrice> prices1, List<OrderPrice> prices2) {
-        if (prices1 == null && prices2 == null) return true;
-        if (prices1 != null && prices2 != null) {
-            for (OrderPrice price : prices1) {
-                if (!prices2.contains(price)) return false;
-            }
-
-            for (OrderPrice price : prices2) {
-                if (!prices1.contains(price)) return false;
-            }
-
-            return true;
-        }
-        return false;
-    }
-
-    private boolean isSameContacts(String contacts1, String contacts2) {
-        if (contacts1 == null && contacts2 == null) return true;
-        if (contacts1 != null && contacts2 != null) return contacts1.equals(contacts2);
-        return false;
-    }
-
-    private boolean isSameMobile(String mobile1, String mobile2) {
-        if (mobile1 == null && mobile2 == null) return true;
-        if (mobile1 != null && mobile2 != null) return mobile1.equals(mobile2);
-        return false;
-    }
-
-    private boolean isSameParticipants(List<Long> participants1, List<Long> participants2) {
-        if (participants1 == null && participants2 == null) return true;
-        if (participants1 != null && participants2 != null) {
-            for (long id : participants1) {
-                if (!participants2.contains(id)) return false;
-            }
-
-            for (long id : participants2) {
-                if (!participants1.contains(id)) return false;
-            }
-
-            return true;
-        }
-        return false;
+        return MomiaHttpResponse.SUCCESS(0);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
