@@ -422,7 +422,7 @@ public class OrderController extends BaseController {
                                                  Map<Long, List<Order>> skuOrdersMap,
                                                  Map<Long, List<Long>> skuCustomerIdsMap,
                                                  Map<Long, UserDto> customersMap) {
-        List<SkuPlaymatesDto> skusPlaymatesDto = new ArrayList<SkuPlaymatesDto>();
+        List<SkuPlaymatesDto> skuPlaymatesDtos = new ArrayList<SkuPlaymatesDto>();
         for (SkuDto sku : skus) {
             try {
                 SkuPlaymatesDto skuPlaymatesDto = new SkuPlaymatesDto();
@@ -430,13 +430,13 @@ public class OrderController extends BaseController {
                 skuPlaymatesDto.setJoined(formatJoined(skuOrdersMap.get(sku.getSkuId())));
                 skuPlaymatesDto.setPlaymates(extractPlayMates(sku.getSkuId(), skuCustomerIdsMap, customersMap));
 
-                skusPlaymatesDto.add(skuPlaymatesDto);
+                skuPlaymatesDtos.add(skuPlaymatesDto);
             } catch (Exception e) {
                 LOGGER.error("fail to build playmate for sku: {}", sku.getSkuId(), e);
             }
         }
 
-        return skusPlaymatesDto;
+        return skuPlaymatesDtos;
     }
 
     private String formatJoined(List<Order> orders) {
