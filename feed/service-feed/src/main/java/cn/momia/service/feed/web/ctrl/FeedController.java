@@ -2,6 +2,8 @@ package cn.momia.service.feed.web.ctrl;
 
 import cn.momia.api.feed.dto.FeedDto;
 import cn.momia.api.feed.dto.FeedTopicDto;
+import cn.momia.api.product.ProductServiceApi;
+import cn.momia.api.product.dto.ProductDto;
 import cn.momia.api.user.dto.ParticipantDto;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.SexUtil;
@@ -158,21 +160,31 @@ public class FeedController extends BaseController {
         long totalCount = feedServiceFacade.queryTopicCount();
         List<FeedTopic> topics = feedServiceFacade.queryTopic(start, count);
 
+        Set<Long> productIds = new HashSet<Long>();
+        for (FeedTopic feedTopic : topics) productIds.add(feedTopic.getProductId());
+
+        List<ProductDto> products = ProductServiceApi.PRODUCT.list(productIds, ProductDto.Type.BASE);
+        Map<Long, ProductDto> productsMap = new HashMap<Long, ProductDto>();
+        for (ProductDto product : products) productsMap.put(product.getId(), product);
+
         PagedList pagedFeedTopicDtos = new PagedList(totalCount, start, count);
         List<FeedTopicDto> feedTopicDtos = new ArrayList<FeedTopicDto>();
         for (FeedTopic feedTopic : topics) {
-            feedTopicDtos.add(buildFeedTopicDto(feedTopic));
+            ProductDto product = productsMap.get(feedTopic.getProductId());
+            if (product != null) feedTopicDtos.add(buildFeedTopicDto(feedTopic, product));
         }
         pagedFeedTopicDtos.setList(feedTopicDtos);
 
         return MomiaHttpResponse.SUCCESS(pagedFeedTopicDtos);
     }
 
-    private FeedTopicDto buildFeedTopicDto(FeedTopic feedTopic) {
+    private FeedTopicDto buildFeedTopicDto(FeedTopic feedTopic, ProductDto product) {
         FeedTopicDto feedTopicDto = new FeedTopicDto();
         feedTopicDto.setId(feedTopic.getId());
         feedTopicDto.setTitle(feedTopic.getTitle());
         feedTopicDto.setProductId(feedTopic.getProductId());
+        feedTopicDto.setScheduler(product.getScheduler());
+        feedTopicDto.setRegion(product.getRegion());
 
         return feedTopicDto;
     }

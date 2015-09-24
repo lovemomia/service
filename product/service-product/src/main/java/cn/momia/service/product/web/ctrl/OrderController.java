@@ -253,7 +253,7 @@ public class OrderController extends BaseController {
 
         List<Long> productIds = new ArrayList<Long>();
         for (Order order : orders) productIds.add(order.getProductId());
-        List<ProductDto> products = ProductServiceApi.PRODUCT.list(productIds);
+        List<ProductDto> products = ProductServiceApi.PRODUCT.list(productIds, ProductDto.Type.BASE_WITH_SKU);
 
         return MomiaHttpResponse.SUCCESS(buildPagedUserOrderDtos(totalCount, orders, products, start, count));
     }

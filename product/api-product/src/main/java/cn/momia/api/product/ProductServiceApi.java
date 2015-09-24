@@ -51,8 +51,10 @@ public class ProductServiceApi extends AbstractServiceApi {
     }
 
     public static class BaseProductServiceApi extends ProductServiceApi {
-        public List<ProductDto> list(Collection<Long> productIds) {
-            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("pids", StringUtils.join(productIds, ","));
+        public List<ProductDto> list(Collection<Long> productIds, int type) {
+            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                    .add("pids", StringUtils.join(productIds, ","))
+                    .add("type", type);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("product/list"), builder.build());
 
             return CastUtil.toList((JSONArray) executeRequest(request), ProductDto.class);

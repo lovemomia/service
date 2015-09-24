@@ -40,12 +40,12 @@ public class ProductController extends ProductRelatedController {
     private static final Pattern SORT_PATTERN = Pattern.compile("(ASC|DESC)\\(([a-zA-Z0-9]+)\\)");
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public MomiaHttpResponse list(@RequestParam(value = "pids") String pids) {
+    public MomiaHttpResponse list(@RequestParam(value = "pids") String pids, @RequestParam int type) {
         Set<Long> ids = new HashSet<Long>();
         for (String id : Splitter.on(",").trimResults().omitEmptyStrings().split(pids)) ids.add(Long.valueOf(id));
 
         List<Product> products = productServiceFacade.list(ids);
-        return MomiaHttpResponse.SUCCESS(buildProductDtos(products, Product.Type.BASE_WITH_SKU, true));
+        return MomiaHttpResponse.SUCCESS(buildProductDtos(products, type, true));
     }
 
     @RequestMapping(method = RequestMethod.GET)
