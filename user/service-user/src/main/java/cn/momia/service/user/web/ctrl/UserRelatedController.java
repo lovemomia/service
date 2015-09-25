@@ -29,8 +29,6 @@ public abstract class UserRelatedController extends BaseController {
     }
 
     protected UserDto buildUserDto(User user, int type, boolean showToken) {
-        if (!user.exists()) return UserDto.NOT_EXIST_USER;
-
         List<Participant> children = (type == User.Type.FULL ? participantService.list(user.getChildren()) : null);
         Leader leader = (type == User.Type.FULL ? leaderService.getByUser(user.getId()) : null);
 
@@ -38,8 +36,6 @@ public abstract class UserRelatedController extends BaseController {
     }
 
     protected UserDto buildUserDto(User user, int type, boolean showToken, List<Participant> children, Leader leader) {
-        if (!user.exists()) return UserDto.NOT_EXIST_USER;
-
         UserDto userDto = new UserDto();
         switch (type) {
             case User.Type.FULL:

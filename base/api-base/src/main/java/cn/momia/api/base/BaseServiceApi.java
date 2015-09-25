@@ -68,28 +68,28 @@ public class BaseServiceApi extends AbstractServiceApi {
     }
 
     public static class SmsServiceApi extends BaseServiceApi {
-        public void send(String mobile, String type) {
+        public boolean send(String mobile, String type) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("mobile", mobile)
                     .add("type", type);
             MomiaHttpRequest request = MomiaHttpRequest.POST(url("sms/send"), builder.build());
-            executeRequest(request);
+            return (Boolean) executeRequest(request);
         }
 
-        public void verify(String mobile, String code) {
+        public boolean verify(String mobile, String code) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("mobile", mobile)
                     .add("code", code);
             MomiaHttpRequest request = MomiaHttpRequest.POST(url("sms/verify"), builder.build());
-            executeRequest(request);
+            return (Boolean) executeRequest(request);
         }
 
-        public void notify(String mobile, String msg) {
+        public boolean notify(String mobile, String msg) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("mobile", mobile)
                     .add("msg", msg);
             MomiaHttpRequest request = MomiaHttpRequest.POST(url("sms/notify"), builder.build());
-            executeRequest(request);
+            return (Boolean) executeRequest(request);
         }
     }
 }

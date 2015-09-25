@@ -232,7 +232,7 @@ public class FeedController extends BaseController {
         if (!feed.exists()) return MomiaHttpResponse.FAILED("无效的Feed");
 
         UserDto feedUser = UserServiceApi.USER.get(feed.getUserId());
-        if (feedUser.getId() <= 0) return MomiaHttpResponse.FAILED("无效的Feed");
+        if (!feedUser.exists()) return MomiaHttpResponse.FAILED("无效的Feed");
 
         FeedTopic topic = feed.getTopicId() <= 0 ? FeedTopic.NOT_EXIST_FEED_TOPIC : feedServiceFacade.getTopic(feed.getTopicId());
 
