@@ -56,14 +56,14 @@ public class BaseServiceApi extends AbstractServiceApi {
     }
 
     public static class RecommendServiceApi extends BaseServiceApi {
-        public void addRecommend(String content, String time, String address, String contacts) {
+        public boolean addRecommend(String content, String time, String address, String contacts) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("content", content)
                     .add("time", time)
                     .add("address", address)
                     .add("contacts", contacts);
             MomiaHttpRequest request = MomiaHttpRequest.POST(url("recommend"), builder.build());
-            executeRequest(request);
+            return (Boolean) executeRequest(request);
         }
     }
 
