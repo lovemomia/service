@@ -48,8 +48,9 @@ public class FeedServiceApi extends AbstractServiceApi {
         return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedDto.class);
     }
 
-    public PagedList<FeedTopicDto> listTopic(int start, int count) {
+    public PagedList<FeedTopicDto> listTopic(int type, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("type", type)
                 .add("start", start)
                 .add("count", count);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("feed/topic/list"), builder.build());

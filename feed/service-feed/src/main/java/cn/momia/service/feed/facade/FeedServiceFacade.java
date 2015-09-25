@@ -28,8 +28,8 @@ public interface FeedServiceFacade {
     long queryCountByTopic(long topicId);
     List<Feed> queryByTopic(long topicId, int start, int count);
 
-    long queryTopicCount();
-    List<FeedTopic> queryTopic(int start, int count);
+    long queryTopicCount(int type);
+    List<FeedTopic> queryTopic(int type, int start, int count);
 
     boolean addComment(long userId, long feedId, String content);
     boolean deleteComment(long userId, long feedId, long commentId);

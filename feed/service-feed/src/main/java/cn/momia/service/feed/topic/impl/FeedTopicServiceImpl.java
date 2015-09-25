@@ -18,7 +18,7 @@ import java.util.List;
 public class FeedTopicServiceImpl extends DbAccessService implements FeedTopicService {
     private static final Logger LOGGER = LoggerFactory.getLogger(FeedTopicServiceImpl.class);
 
-    private static final String[] BASE_FEED_FIELDS = { "id", "title", "productId" };
+    private static final String[] BASE_FEED_FIELDS = { "id", "type", "refId", "title" };
 
     @Override
     public FeedTopic get(long id) {
@@ -41,8 +41,9 @@ public class FeedTopicServiceImpl extends DbAccessService implements FeedTopicSe
         try {
             FeedTopic feedTopic = new FeedTopic();
             feedTopic.setId(rs.getLong("id"));
+            feedTopic.setType(rs.getInt("type"));
+            feedTopic.setRefId(rs.getLong("refId"));
             feedTopic.setTitle(rs.getString("title"));
-            feedTopic.setProductId(rs.getLong("productId"));
 
             return feedTopic;
         } catch (Exception e) {
@@ -52,10 +53,10 @@ public class FeedTopicServiceImpl extends DbAccessService implements FeedTopicSe
     }
 
     @Override
-    public long queryCount() {
-        String sql = "SELECT COUNT(1) FROM t_feed_topic WHERE status=1";
+    public long queryCount(int type) {
+        String sql = "SELECT COUNT(1) FROM t_feed_topic WHERE type=? AND status=1";
 
-        return jdbcTemplate.query(sql, new ResultSetExtractor<Long>() {
+        return jdbcTemplate.query(sql, new Object[] { type }, new ResultSetExtractor<Long>() {
             @Override
             public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
                 return rs.next() ? rs.getLong(1) : 0;
@@ -64,10 +65,10 @@ public class FeedTopicServiceImpl extends DbAccessService implements FeedTopicSe
     }
 
     @Override
-    public List<FeedTopic> query(int start, int count) {
+    public List<FeedTopic> query(int type, int start, int count) {
         final List<FeedTopic> topics = new ArrayList<FeedTopic>();
-        String sql = "SELECT " + joinFields() + " FROM t_feed_topic WHERE status=1 LIMIT ?,?";
-        jdbcTemplate.query(sql, new Object[] { start, count }, new RowCallbackHandler() {
+        String sql = "SELECT " + joinFields() + " FROM t_feed_topic WHERE type=? AND status=1 LIMIT ?,?";
+        jdbcTemplate.query(sql, new Object[] { type, start, count }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 FeedTopic topic = buildFeedTopic(rs);

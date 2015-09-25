@@ -1,9 +1,16 @@
 package cn.momia.api.feed.dto;
 
 public class FeedTopicDto {
+    public static class Type {
+        public static final int PRODUCT = 1;
+        public static final int COURSE = 2;
+    }
+
     private long id;
+    private int topicType;
+    private long refId;
+
     private String title;
-    private long productId;
     private String scheduler;
     private String region;
 
@@ -15,20 +22,28 @@ public class FeedTopicDto {
         this.id = id;
     }
 
+    public int getTopicType() {
+        return topicType;
+    }
+
+    public void setTopicType(int topicType) {
+        this.topicType = topicType;
+    }
+
+    public long getRefId() {
+        return refId;
+    }
+
+    public void setRefId(long refId) {
+        this.refId = refId;
+    }
+
     public String getTitle() {
         return title;
     }
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public long getProductId() {
-        return productId;
-    }
-
-    public void setProductId(long productId) {
-        this.productId = productId;
     }
 
     public String getScheduler() {

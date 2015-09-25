@@ -16,6 +16,7 @@ import cn.momia.service.feed.facade.FeedServiceFacade;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.UserDto;
 import cn.momia.service.feed.topic.FeedTopic;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -154,25 +155,31 @@ public class FeedController extends BaseController {
     }
 
     @RequestMapping(value = "/topic/list", method = RequestMethod.GET)
-    public MomiaHttpResponse listTopic(@RequestParam int start, @RequestParam int count) {
+    public MomiaHttpResponse listTopic(@RequestParam int type, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
-        long totalCount = feedServiceFacade.queryTopicCount();
-        List<FeedTopic> topics = feedServiceFacade.queryTopic(start, count);
-
-        Set<Long> productIds = new HashSet<Long>();
-        for (FeedTopic feedTopic : topics) productIds.add(feedTopic.getProductId());
-
-        List<ProductDto> products = ProductServiceApi.PRODUCT.list(productIds, ProductDto.Type.BASE);
-        Map<Long, ProductDto> productsMap = new HashMap<Long, ProductDto>();
-        for (ProductDto product : products) productsMap.put(product.getId(), product);
+        long totalCount = feedServiceFacade.queryTopicCount(type);
+        List<FeedTopic> topics = feedServiceFacade.queryTopic(type, start, count);
 
         PagedList<FeedTopicDto> pagedFeedTopicDtos = new PagedList(totalCount, start, count);
         List<FeedTopicDto> feedTopicDtos = new ArrayList<FeedTopicDto>();
-        for (FeedTopic feedTopic : topics) {
-            ProductDto product = productsMap.get(feedTopic.getProductId());
-            if (product != null) feedTopicDtos.add(buildFeedTopicDto(feedTopic, product));
+
+        Set<Long> refIds = new HashSet<Long>();
+        for (FeedTopic feedTopic : topics) refIds.add(feedTopic.getRefId());
+
+        if (type == FeedTopic.Type.PRODUCT) {
+            List<ProductDto> products = ProductServiceApi.PRODUCT.list(refIds, ProductDto.Type.BASE);
+            Map<Long, ProductDto> productsMap = new HashMap<Long, ProductDto>();
+            for (ProductDto product : products) productsMap.put(product.getId(), product);
+
+            for (FeedTopic feedTopic : topics) {
+                ProductDto product = productsMap.get(feedTopic.getRefId());
+                if (product != null) feedTopicDtos.add(buildFeedTopicDto(feedTopic, product));
+            }
+        } else if (type == FeedTopic.Type.COURSE) {
+            // TODO course
         }
+
         pagedFeedTopicDtos.setList(feedTopicDtos);
 
         return MomiaHttpResponse.SUCCESS(pagedFeedTopicDtos);
@@ -181,8 +188,9 @@ public class FeedController extends BaseController {
     private FeedTopicDto buildFeedTopicDto(FeedTopic feedTopic, ProductDto product) {
         FeedTopicDto feedTopicDto = new FeedTopicDto();
         feedTopicDto.setId(feedTopic.getId());
-        feedTopicDto.setTitle(feedTopic.getTitle());
-        feedTopicDto.setProductId(feedTopic.getProductId());
+        feedTopicDto.setTopicType(feedTopic.getType());
+        feedTopicDto.setRefId(feedTopic.getRefId());
+        feedTopicDto.setTitle(StringUtils.isBlank(feedTopic.getTitle()) ? product.getTitle() : feedTopic.getTitle());
         feedTopicDto.setScheduler(product.getScheduler());
         feedTopicDto.setRegion(product.getRegion());
 

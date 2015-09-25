@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface FeedTopicService {
     FeedTopic get(long id);
-    long queryCount();
-    List<FeedTopic> query(int start, int count);
+    long queryCount(int type);
+    List<FeedTopic> query(int type, int start, int count);
 }

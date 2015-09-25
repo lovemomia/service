@@ -220,14 +220,14 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
     }
 
     @Override
-    public long queryTopicCount() {
-        return feedTopicService.queryCount();
+    public long queryTopicCount(int type) {
+        return feedTopicService.queryCount(type);
     }
 
     @Override
-    public List<FeedTopic> queryTopic(int start, int count) {
+    public List<FeedTopic> queryTopic(int type, int start, int count) {
         if (start < 0 || count <= 0) return new ArrayList<FeedTopic>();
-        return feedTopicService.query(start, count);
+        return feedTopicService.query(type, start, count);
     }
 
     @Override
