@@ -1,7 +1,7 @@
 package cn.momia.service.product.web.ctrl;
 
 import cn.momia.api.product.dto.ProductDto;
-import cn.momia.api.product.dto.ProductGroupDto;
+import cn.momia.api.product.dto.ProductsOfDayDto;
 import cn.momia.api.product.dto.SkuDto;
 import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.api.http.MomiaHttpResponse;
@@ -114,12 +114,12 @@ public class ProductController extends ProductRelatedController {
     public MomiaHttpResponse queryByMonth(@RequestParam(value = "city") int cityId, @RequestParam int month) {
         List<Product> products = productServiceFacade.queryByMonth(cityId, month);
 
-        return MomiaHttpResponse.SUCCESS(buildProductGroupDtos(month, products));
+        return MomiaHttpResponse.SUCCESS(buildProductsOfDayDtos(month, products));
     }
 
-    private List<ProductGroupDto> buildProductGroupDtos(int month, List<Product> products) {
+    private List<ProductsOfDayDto> buildProductsOfDayDtos(int month, List<Product> products) {
         try {
-            List<ProductGroupDto> productGroupDtos = new ArrayList<ProductGroupDto>();
+            List<ProductsOfDayDto> productsOfDayDtos = new ArrayList<ProductsOfDayDto>();
 
             DateFormat monthFormat = new SimpleDateFormat("yyyy-MM");
             DateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -131,19 +131,19 @@ public class ProductController extends ProductRelatedController {
             Date end = monthFormat.parse(TimeUtil.formatNextYearMonth(month));
 
             int pageSize = Configuration.getInt("Product.Month.PageSize");
-            Map<String, ProductGroupDto> productsOfDayDtoMap = new HashMap<String, ProductGroupDto>();
+            Map<String, ProductsOfDayDto> productsOfDayDtoMap = new HashMap<String, ProductsOfDayDto>();
             for (Product product : products) {
                 for (Sku sku : product.getSkus()) {
                     Date startTime = sku.getStartTime();
                     if (startTime.after(start) && startTime.before(end)) {
                         String day = dayFormat.format(startTime);
-                        ProductGroupDto productsOfDayDto = productsOfDayDtoMap.get(day);
+                        ProductsOfDayDto productsOfDayDto = productsOfDayDtoMap.get(day);
                         if (productsOfDayDto == null) {
-                            productsOfDayDto = new ProductGroupDto();
+                            productsOfDayDto = new ProductsOfDayDto();
                             productsOfDayDtoMap.put(day, productsOfDayDto);
 
                             productsOfDayDto.setDate(startTime);
-                            productGroupDtos.add(productsOfDayDto);
+                            productsOfDayDtos.add(productsOfDayDto);
                         }
                         ProductDto productDto = buildProductDto(product, Product.Type.BASE, false);
                         productDto.setScheduler(sku.getFormatedTime());
@@ -152,17 +152,17 @@ public class ProductController extends ProductRelatedController {
                 }
             }
 
-            Collections.sort(productGroupDtos, new Comparator<Object>() {
+            Collections.sort(productsOfDayDtos, new Comparator<Object>() {
                 @Override
                 public int compare(Object o1, Object o2) {
-                    ProductGroupDto productsOfDayDto1 = (ProductGroupDto) o1;
-                    ProductGroupDto productsOfDayDto2 = (ProductGroupDto) o2;
+                    ProductsOfDayDto productsOfDayDto1 = (ProductsOfDayDto) o1;
+                    ProductsOfDayDto productsOfDayDto2 = (ProductsOfDayDto) o2;
 
                     return productsOfDayDto1.getDate().compareTo(productsOfDayDto2.getDate());
                 }
             });
 
-            return productGroupDtos;
+            return productsOfDayDtos;
         } catch (ParseException e) {
             throw new MomiaFailedException("获取数据失败");
         }

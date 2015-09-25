@@ -2,7 +2,7 @@ package cn.momia.api.product;
 
 import cn.momia.api.product.dto.CommentDto;
 import cn.momia.api.product.dto.ProductDto;
-import cn.momia.api.product.dto.ProductGroupDto;
+import cn.momia.api.product.dto.ProductsOfDayDto;
 import cn.momia.api.product.dto.SkuDto;
 import cn.momia.api.product.dto.TopicDto;
 import cn.momia.api.product.dto.BannerDto;
@@ -80,13 +80,13 @@ public class ProductServiceApi extends AbstractServiceApi {
             return CastUtil.toPagedList((JSONObject) executeRequest(request), ProductDto.class);
         }
 
-        public List<ProductGroupDto> listByMonth(int cityId, int month) {
+        public List<ProductsOfDayDto> listByMonth(int cityId, int month) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("city", cityId)
                     .add("month", month);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("product/month"), builder.build());
 
-            return CastUtil.toList((JSONArray) executeRequest(request), ProductGroupDto.class);
+            return CastUtil.toList((JSONArray) executeRequest(request), ProductsOfDayDto.class);
         }
 
         public PagedList<ProductDto> listNeedLeader(int cityId, int start, int count) {

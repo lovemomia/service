@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ProductGroupDto {
+public class ProductsOfDayDto {
     @JSONField(format = "yyyy-MM-dd") private Date date;
     private List<ProductDto> products = new ArrayList<ProductDto>();
 
