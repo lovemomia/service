@@ -1,7 +1,7 @@
-package cn.momia.service.product.facade.impl;
+package cn.momia.service.promo.facade.impl;
 
 import cn.momia.service.coupon.UserCouponService;
-import cn.momia.service.product.facade.PromoServiceFacade;
+import cn.momia.service.promo.facade.PromoServiceFacade;
 import cn.momia.service.coupon.Coupon;
 import cn.momia.service.coupon.CouponService;
 import cn.momia.service.coupon.UserCoupon;
@@ -90,13 +90,14 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
         if (userId <= 0 || orderId <= 0 || userCouponId <= 0) return Coupon.NOT_EXIST_COUPON;
 
         UserCoupon userCoupon = userCouponService.query(userId, orderId, userCouponId);
-        if (!userCoupon.exists()) return Coupon.NOT_EXIST_COUPON;
+        if (!userCoupon.exists() || userCoupon.getCouponId() <= 0) return Coupon.NOT_EXIST_COUPON;
 
         return couponService.get(userCoupon.getCouponId());
     }
 
     @Override
     public List<Coupon> listCoupons(Collection<Integer> couponIds) {
+        if (couponIds == null || couponIds.isEmpty()) return new ArrayList<Coupon>();
         return couponService.list(couponIds);
     }
 
@@ -118,12 +119,13 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
 
     @Override
     public List<UserCoupon> queryUserCoupon(long userId, long orderId, BigDecimal totalFee, int status, int start, int count) {
-        if (userId <= 0) return new ArrayList<UserCoupon>();
+        if (userId <= 0 || start < 0 || count <= 0) return new ArrayList<UserCoupon>();
         return userCouponService.queryByUser(userId, orderId, totalFee, status, start, count);
     }
 
     @Override
     public UserCoupon getNotUsedUserCouponByOrder(long orderId) {
+        if (orderId <= 0) return UserCoupon.NOT_EXIST_USER_COUPON;
         return userCouponService.queryNotUsedByOrder(orderId);
     }
 

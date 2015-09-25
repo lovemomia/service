@@ -21,7 +21,7 @@ import cn.momia.api.product.dto.SkuDto;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.ParticipantDto;
 import cn.momia.api.user.dto.UserDto;
-import cn.momia.service.product.facade.PromoServiceFacade;
+import cn.momia.service.promo.facade.PromoServiceFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

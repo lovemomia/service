@@ -25,8 +25,6 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
 
     @Override
     public Coupon get(int couponId) {
-        if (couponId <= 0) return Coupon.NOT_EXIST_COUPON;
-
         String sql = "SELECT " + joinCouponFields() + " FROM t_coupon WHERE id=? AND status=1 AND endTime>NOW()";
 
         return jdbcTemplate.query(sql, new Object[] { couponId }, new ResultSetExtractor<Coupon>() {
@@ -59,14 +57,12 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
             return coupon;
         } catch (Exception e) {
             LOGGER.error("fail to build coupon: {}", rs.getInt("id"), e);
-            return Coupon.INVALID_COUPON;
+            return Coupon.NOT_EXIST_COUPON;
         }
     }
 
     @Override
     public List<Coupon> list(Collection<Integer> couponIds) {
-        if (couponIds.isEmpty()) return new ArrayList<Coupon>();
-
         final List<Coupon> coupons = new ArrayList<Coupon>();
         String sql = "SELECT " + joinCouponFields() + " FROM t_coupon WHERE id IN(" + StringUtils.join(Sets.newHashSet(couponIds), ",") + ") AND status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {

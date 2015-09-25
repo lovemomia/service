@@ -19,7 +19,7 @@
 
     <bean id="couponService" class="cn.momia.service.coupon.impl.CouponServiceImpl" parent="dbAccessService" />
     <bean id="userCouponService" class="cn.momia.service.coupon.impl.UserCouponServiceImpl" parent="dbAccessService" />
-    <bean id="promoServiceFacade" class="cn.momia.service.product.facade.impl.PromoServiceFacadeImpl">
+    <bean id="promoServiceFacade" class="cn.momia.service.promo.facade.impl.PromoServiceFacadeImpl">
         <property name="couponService" ref="couponService" />
         <property name="userCouponService" ref="userCouponService" />
     </bean>

@@ -11,11 +11,6 @@ public class UserCoupon {
     }
 
     public static final UserCoupon NOT_EXIST_USER_COUPON = new UserCoupon();
-    public static final UserCoupon INVALID_USER_COUPON = new UserCoupon();
-    static {
-        NOT_EXIST_USER_COUPON.setId(0);
-        INVALID_USER_COUPON.setId(0);
-    }
 
     private long id;
     private long userId;
@@ -81,23 +76,8 @@ public class UserCoupon {
         this.status = status;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof UserCoupon)) return false;
-
-        UserCoupon that = (UserCoupon) o;
-
-        return getId() == that.getId();
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (getId() ^ (getId() >>> 32));
-    }
-
     public boolean exists() {
-        return !this.equals(NOT_EXIST_USER_COUPON);
+        return id > 0;
     }
 
     public boolean isExpired() {

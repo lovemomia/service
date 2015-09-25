@@ -10,7 +10,7 @@ import cn.momia.service.order.Order;
 import cn.momia.service.order.OrderService;
 import cn.momia.service.coupon.Coupon;
 import cn.momia.service.coupon.UserCoupon;
-import cn.momia.service.product.facade.PromoServiceFacade;
+import cn.momia.service.promo.facade.PromoServiceFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;

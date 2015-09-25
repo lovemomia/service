@@ -246,6 +246,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public List<Order> queryByUserAndSku(long userId, long skuId) {
+        if (userId <= 0 || skuId <= 0) return new ArrayList<Order>();
+
         final List<Order> orders = new ArrayList<Order>();
         String sql = "SELECT " + joinFields() + " FROM t_order WHERE customerId=? AND skuId=? AND status<>0";
         jdbcTemplate.query(sql, new Object[] { userId, skuId }, new RowCallbackHandler() {
@@ -261,8 +263,10 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public List<Order> queryAllCustomerOrderByProduct(long productId) {
-        String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status<>0 AND status<=? ORDER BY addTime DESC";
+        if (productId <= 0) return new ArrayList<Order>();
+
         final List<Order> orders = new ArrayList<Order>();
+        String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status<>0 AND status<=? ORDER BY addTime DESC";
         jdbcTemplate.query(sql, new Object[] { productId, Order.Status.FINISHED }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -276,8 +280,10 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public List<Order> queryDistinctCustomerOrderByProduct(long productId, int start, int count) {
-        String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status<>0 AND status<=? GROUP BY customerId ORDER BY addTime DESC LIMIT ?,?";
+        if (productId <= 0 || start < 0 || count <= 0) return new ArrayList<Order>();
+
         final List<Order> orders = new ArrayList<Order>();
+        String sql = "SELECT " + joinFields() + " FROM t_order WHERE productId=? AND status<>0 AND status<=? GROUP BY customerId ORDER BY addTime DESC LIMIT ?,?";
         jdbcTemplate.query(sql, new Object[] { productId, Order.Status.FINISHED, start, count }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -314,6 +320,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public boolean prepay(long id) {
+        if (id <= 0) return false;
+
         String sql = "UPDATE t_order SET status=? WHERE id=? AND (status=? OR status=?)";
         int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PRE_PAYED, id, Order.Status.NOT_PAYED, Order.Status.PRE_PAYED });
 
@@ -322,6 +330,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public boolean pay(long id) {
+        if (id <= 0) return false;
+
         try {
             payOrder(id);
         } catch (Exception e) {

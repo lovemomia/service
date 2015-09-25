@@ -1,4 +1,4 @@
-package cn.momia.service.product.facade;
+package cn.momia.service.promo.facade;
 
 import cn.momia.service.coupon.Coupon;
 import cn.momia.service.coupon.UserCoupon;

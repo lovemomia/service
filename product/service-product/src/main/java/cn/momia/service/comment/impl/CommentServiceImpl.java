@@ -51,9 +51,7 @@ public class CommentServiceImpl extends DbAccessService implements CommentServic
         }, keyHolder);
 
         long commentId = keyHolder.getKey().longValue();
-        if (commentId > 0) {
-            addImgs(commentId, comment.getImgs());
-        }
+        if (commentId > 0) addImgs(commentId, comment.getImgs());
 
         return commentId;
     }
@@ -87,6 +85,8 @@ public class CommentServiceImpl extends DbAccessService implements CommentServic
 
     @Override
     public List<Comment> queryByProduct(long productId, int start, int count) {
+        if (productId <= 0 || start < 0 || count <= 0) return new ArrayList<Comment>();
+        
         final List<Comment> comments = new ArrayList<Comment>();
         String sql = "SELECT " + joinFields()+ " FROM t_product_comment WHERE productId=? AND status=1 ORDER BY addTime DESC LIMIT ?,?";
         jdbcTemplate.query(sql, new Object[] { productId, start, count }, new RowCallbackHandler() {

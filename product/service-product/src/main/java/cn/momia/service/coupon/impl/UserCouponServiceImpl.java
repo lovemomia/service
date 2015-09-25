@@ -58,7 +58,7 @@ public class UserCouponServiceImpl extends DbAccessService implements UserCoupon
             return userCoupon;
         } catch (Exception e) {
             LOGGER.error("fail to build user coupon: {}", rs.getLong("id"), e);
-            return UserCoupon.INVALID_USER_COUPON;
+            return UserCoupon.NOT_EXIST_USER_COUPON;
         }
     }
 

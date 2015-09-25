@@ -39,6 +39,8 @@ public class FavoriteServiceImpl extends DbAccessService implements FavoriteServ
     }
 
     private long getId(long userId, long productId) {
+        if (userId <= 0 || productId <= 0) return 0;
+
         String sql = "SELECT id FROM t_favorite WHERE userId=? AND productId=?";
 
         return jdbcTemplate.query(sql, new Object[] { userId, productId }, new ResultSetExtractor<Long>() {
@@ -51,6 +53,8 @@ public class FavoriteServiceImpl extends DbAccessService implements FavoriteServ
 
     @Override
     public boolean unFavor(long userId, long productId) {
+        if (userId <= 0 || productId <= 0) return true;
+
         String sql = "UPDATE t_favorite SET status=0 WHERE userId=? AND productId=?";
         return jdbcTemplate.update(sql, new Object[] { userId, productId }) > 0;
     }

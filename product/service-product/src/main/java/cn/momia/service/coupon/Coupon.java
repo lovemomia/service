@@ -11,11 +11,6 @@ public class Coupon {
     }
 
     public static final Coupon NOT_EXIST_COUPON = new Coupon();
-    public static final Coupon INVALID_COUPON = new Coupon();
-    static {
-        NOT_EXIST_COUPON.setId(0);
-        INVALID_COUPON.setId(0);
-    }
 
     private int id;
     private int type;
@@ -108,26 +103,7 @@ public class Coupon {
         this.endTime = endTime;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Coupon)) return false;
-
-        Coupon coupon = (Coupon) o;
-
-        return getId() == coupon.getId();
-    }
-
-    @Override
-    public int hashCode() {
-        return getId();
-    }
-
     public boolean exists() {
-        return !this.equals(NOT_EXIST_COUPON);
-    }
-
-    public boolean invalid() {
-        return this == INVALID_COUPON;
+        return id > 0;
     }
 }
