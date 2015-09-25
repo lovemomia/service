@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class BaseFeed {
     public static class Type {
-        public static final int PUBLIC = 1;
+        public static final int OFFICIAL = 0;
     }
 
     public static final BaseFeed NOT_EXIST_BASE_FEED = new BaseFeed();
@@ -12,9 +12,7 @@ public class BaseFeed {
     private long id;
     private int type;
     private long userId;
-    private long productId;
     private long topicId;
-    private String topic = "";
     private String content = "";
     private double lng;
     private double lat;
@@ -46,28 +44,12 @@ public class BaseFeed {
         this.userId = userId;
     }
 
-    public long getProductId() {
-        return productId;
-    }
-
-    public void setProductId(long productId) {
-        this.productId = productId;
-    }
-
     public long getTopicId() {
         return topicId;
     }
 
     public void setTopicId(long topicId) {
         this.topicId = topicId;
-    }
-
-    public String getTopic() {
-        return topic;
-    }
-
-    public void setTopic(String topic) {
-        this.topic = topic;
     }
 
     public String getContent() {

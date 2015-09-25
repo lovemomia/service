@@ -49,23 +49,19 @@ public class FeedController extends BaseController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public MomiaHttpResponse list(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
+    public MomiaHttpResponse list(@RequestParam(value = "uid") long userId,
+                                  @RequestParam(value = "tid", required = false, defaultValue = "0") long topicId,
+                                  @RequestParam int start,
+                                  @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
-        long totalCount;
-        List<Feed> feeds;
-        if (userId > 0) {
-            totalCount = feedServiceFacade.queryFollowedCountByUser(userId);
-            feeds = feedServiceFacade.queryFollowedByUser(userId, start, count);
-        } else {
-            totalCount = feedServiceFacade.queryPublicFeedsCount();
-            feeds = feedServiceFacade.queryPublicFeeds(start, count);
-        }
+        long totalCount = topicId > 0 ? feedServiceFacade.queryCountByTopic(topicId) : feedServiceFacade.queryFollowedCountByUser(userId);
+        List<Feed> feeds = topicId > 0 ? feedServiceFacade.queryByTopic(topicId, start, count) : feedServiceFacade.queryFollowedByUser(userId, start, count);
 
-        return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(userId, feeds, totalCount, start, count));
+        return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(userId, totalCount, feeds, start, count));
     }
 
-    private PagedList<FeedDto> buildPagedFeedDtos(long userId, List<Feed> feeds, long totalCount, @RequestParam int start, @RequestParam int count) {
+    private PagedList<FeedDto> buildPagedFeedDtos(long userId, long totalCount, List<Feed> feeds, int start, int count) {
         Set<Long> staredFeedIds = new HashSet<Long>();
         if (userId > 0) {
             Set<Long> feedIds = new HashSet<Long>();
@@ -74,10 +70,19 @@ public class FeedController extends BaseController {
         }
 
         Set<Long> userIds = new HashSet<Long>();
-        for (Feed feed : feeds) userIds.add(feed.getUserId());
+        Set<Long> topicIds = new HashSet<Long>();
+        for (Feed feed : feeds) {
+            userIds.add(feed.getUserId());
+            topicIds.add(feed.getTopicId());
+        }
+
         List<UserDto> users = UserServiceApi.USER.list(userIds, UserDto.Type.FULL);
         Map<Long, UserDto> usersMap = new HashMap<Long, UserDto>();
         for (UserDto user : users) usersMap.put(user.getId(), user);
+
+        List<FeedTopic> topics = feedServiceFacade.list(topicIds);
+        Map<Long, FeedTopic> topicsMap = new HashMap<Long, FeedTopic>();
+        for (FeedTopic topic : topics) topicsMap.put(topic.getId(), topic);
 
         PagedList<FeedDto> pagedFeedDtos = new PagedList(totalCount, start, count);
         List<FeedDto> feedDtos = new ArrayList<FeedDto>();
@@ -85,20 +90,25 @@ public class FeedController extends BaseController {
             UserDto user = usersMap.get(feed.getUserId());
             if (user == null) continue;
 
-            feedDtos.add(buildFeedDto(feed, user, staredFeedIds.contains(feed.getId())));
+            feedDtos.add(buildFeedDto(feed, user, topicsMap.get(feed.getTopicId()), staredFeedIds.contains(feed.getId())));
         }
         pagedFeedDtos.setList(feedDtos);
 
         return pagedFeedDtos;
     }
 
-    private FeedDto buildFeedDto(Feed feed, UserDto user, boolean stared) {
+    private FeedDto buildFeedDto(Feed feed, UserDto user, FeedTopic topic, boolean stared) {
         FeedDto feedDto = new FeedDto();
         feedDto.setId(feed.getId());
         feedDto.setType(feed.getType());
         feedDto.setTopicId(feed.getTopicId());
-        feedDto.setTopicProductId(feed.getTopicProductId());
-        feedDto.setTopic(feed.getTopic());
+
+        if (topic != null && topic.exists()) {
+            feedDto.setTopicType(topic.getType());
+            feedDto.setTopic(topic.getTitle());
+            feedDto.setRefId(topic.getRefId());
+        }
+
         feedDto.setImgs(getImgs(feed));
         feedDto.setContent(feed.getContent());
         feedDto.setAddTime(feed.getAddTime());
@@ -141,20 +151,23 @@ public class FeedController extends BaseController {
         return children;
     }
 
-    @RequestMapping(value = "/topic", method = RequestMethod.GET)
-    public MomiaHttpResponse topic(@RequestParam(value = "uid") long userId,
-                                   @RequestParam(value = "tid") long topicId,
-                                   @RequestParam int start,
-                                   @RequestParam int count) {
-        if (topicId <= 0 || isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+    @RequestMapping(value = "/topic/{tid}", method = RequestMethod.GET)
+    public MomiaHttpResponse topic(@PathVariable(value = "tid") long topicId) {
+        if (topicId <= 0) return MomiaHttpResponse.BAD_REQUEST;
 
-        long totalCount = feedServiceFacade.queryCountByTopic(topicId);
-        List<Feed> feeds = feedServiceFacade.queryByTopic(topicId, start, count);
+        FeedTopic feedTopic = feedServiceFacade.getTopic(topicId);
+        FeedTopicDto feedTopicDto = null;
+        if (feedTopic.getType() == FeedTopic.Type.PRODUCT) {
+            ProductDto product = ProductServiceApi.PRODUCT.get(feedTopic.getRefId(), ProductDto.Type.BASE);
+            feedTopicDto = buildFeedTopicDto(feedTopic, product);
+        } else if (feedTopic.getType() == FeedTopic.Type.COURSE) {
+            // TODO course
+        }
 
-        return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(userId, feeds, totalCount, start, count));
+        return MomiaHttpResponse.SUCCESS(feedTopicDto);
     }
 
-    @RequestMapping(value = "/topic/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/topic", method = RequestMethod.GET)
     public MomiaHttpResponse listTopic(@RequestParam int type, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
@@ -188,7 +201,7 @@ public class FeedController extends BaseController {
     private FeedTopicDto buildFeedTopicDto(FeedTopic feedTopic, ProductDto product) {
         FeedTopicDto feedTopicDto = new FeedTopicDto();
         feedTopicDto.setId(feedTopic.getId());
-        feedTopicDto.setTopicType(feedTopic.getType());
+        feedTopicDto.setType(feedTopic.getType());
         feedTopicDto.setRefId(feedTopic.getRefId());
         feedTopicDto.setTitle(StringUtils.isBlank(feedTopic.getTitle()) ? product.getTitle() : feedTopic.getTitle());
         feedTopicDto.setScheduler(product.getScheduler());
@@ -221,9 +234,11 @@ public class FeedController extends BaseController {
         UserDto feedUser = UserServiceApi.USER.get(feed.getUserId());
         if (feedUser.getId() <= 0) return MomiaHttpResponse.FAILED("无效的Feed");
 
+        FeedTopic topic = feed.getTopicId() <= 0 ? FeedTopic.NOT_EXIST_FEED_TOPIC : feedServiceFacade.getTopic(feed.getTopicId());
+
         boolean stared = feedServiceFacade.isStared(userId, id);
 
-        return MomiaHttpResponse.SUCCESS(buildFeedDto(feed, feedUser, stared));
+        return MomiaHttpResponse.SUCCESS(buildFeedDto(feed, feedUser, topic, stared));
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)

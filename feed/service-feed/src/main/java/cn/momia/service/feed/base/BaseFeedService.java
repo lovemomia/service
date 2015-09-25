@@ -13,8 +13,8 @@ public interface BaseFeedService {
     List<Long> getFollowedIds(long userId);
     long queryFollowedCountByUser(long userId);
     List<BaseFeed> queryFollowedByUser(long userId, int start, int count);
-    long queryPublicFeedsCount();
-    List<BaseFeed> queryPublicFeeds(int start, int count);
+    long queryOfficialFeedsCount();
+    List<BaseFeed> queryOfficialFeeds(int start, int count);
 
     long queryCountByTopic(long topicId);
     List<BaseFeed> queryByTopic(long topicId, int start, int count);

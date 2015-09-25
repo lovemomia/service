@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 
 public class UserDto {
+    public static final UserDto NOT_EXIST_USER = new UserDto();
+
     public static class Type {
         public static final int MINI = 1;
         public static final int BASE = 2;

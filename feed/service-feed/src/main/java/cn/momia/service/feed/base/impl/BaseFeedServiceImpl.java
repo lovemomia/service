@@ -26,7 +26,7 @@ import java.util.Map;
 public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedService {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseFeedServiceImpl.class);
 
-    private static final String[] BASE_FEED_FIELDS = { "id", "`type`", "userId", "productId", "topicId", "topic", "content", "lng", "lat", "commentCount", "starCount", "addTime" };
+    private static final String[] BASE_FEED_FIELDS = { "id", "`type`", "userId", "topicId", "content", "lng", "lat", "commentCount", "starCount", "addTime" };
 
     @Override
     public boolean isFollowed(long ownUserId, long otherUserId) {
@@ -52,15 +52,13 @@ public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedServ
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO t_feed(userId, productId, topicId, topic, content, lng, lat, addTime) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO t_feed(userId, topicId, content, lng, lat, addTime) VALUES (?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setLong(1, baseFeed.getUserId());
-                ps.setLong(2, baseFeed.getProductId());
-                ps.setLong(3, baseFeed.getTopicId());
-                ps.setString(4, baseFeed.getTopic());
-                ps.setString(5, baseFeed.getContent());
-                ps.setDouble(6, baseFeed.getLng());
-                ps.setDouble(7, baseFeed.getLat());
+                ps.setLong(2, baseFeed.getTopicId());
+                ps.setString(3, baseFeed.getContent());
+                ps.setDouble(4, baseFeed.getLng());
+                ps.setDouble(5, baseFeed.getLat());
 
                 return ps;
             }
@@ -92,9 +90,7 @@ public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedServ
             baseFeed.setId(rs.getLong("id"));
             baseFeed.setType(rs.getInt("type"));
             baseFeed.setUserId(rs.getLong("userId"));
-            baseFeed.setProductId(rs.getLong("productId"));
             baseFeed.setTopicId(rs.getLong("topicId"));
-            baseFeed.setTopic(rs.getString("topic"));
             baseFeed.setContent(rs.getString("content"));
             baseFeed.setLng(rs.getDouble("lng"));
             baseFeed.setLat(rs.getLong("lat"));
@@ -176,10 +172,10 @@ public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedServ
     }
 
     @Override
-    public long queryPublicFeedsCount() {
+    public long queryOfficialFeedsCount() {
         String sql = "SELECT COUNT(1) FROM t_feed WHERE type=? AND status=1";
 
-        return jdbcTemplate.query(sql, new Object[] { BaseFeed.Type.PUBLIC }, new ResultSetExtractor<Long>() {
+        return jdbcTemplate.query(sql, new Object[] { BaseFeed.Type.OFFICIAL }, new ResultSetExtractor<Long>() {
             @Override
             public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
                 return rs.next() ? rs.getLong(1) : 0;
@@ -188,10 +184,10 @@ public class BaseFeedServiceImpl extends DbAccessService implements BaseFeedServ
     }
 
     @Override
-    public List<BaseFeed> queryPublicFeeds(int start, int count) {
+    public List<BaseFeed> queryOfficialFeeds(int start, int count) {
         final List<BaseFeed> baseFeeds = new ArrayList<BaseFeed>();
         String sql = "SELECT " + joinFields() + " FROM t_feed WHERE type=? AND status=1 ORDER BY addTime DESC LIMIT ?,?";
-        jdbcTemplate.query(sql, new Object[] { BaseFeed.Type.PUBLIC, start, count }, new RowCallbackHandler() {
+        jdbcTemplate.query(sql, new Object[] { BaseFeed.Type.OFFICIAL, start, count }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 BaseFeed baseFeed = buildBaseFeed(rs);

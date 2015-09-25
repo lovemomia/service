@@ -7,7 +7,7 @@ public class FeedTopicDto {
     }
 
     private long id;
-    private int topicType;
+    private int type;
     private long refId;
 
     private String title;
@@ -22,12 +22,12 @@ public class FeedTopicDto {
         this.id = id;
     }
 
-    public int getTopicType() {
-        return topicType;
+    public int getType() {
+        return type;
     }
 
-    public void setTopicType(int topicType) {
-        this.topicType = topicType;
+    public void setType(int type) {
+        this.type = type;
     }
 
     public long getRefId() {

@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class FeedTopicServiceImpl extends DbAccessService implements FeedTopicService {
@@ -50,6 +51,21 @@ public class FeedTopicServiceImpl extends DbAccessService implements FeedTopicSe
             LOGGER.error("fail to build feed topic: {}", rs.getLong("id"), e);
             return FeedTopic.NOT_EXIST_FEED_TOPIC;
         }
+    }
+
+    @Override
+    public List<FeedTopic> list(Collection<Long> ids) {
+        final List<FeedTopic> topics = new ArrayList<FeedTopic>();
+        String sql = "SELECT " + joinFields() + " FROM t_feed_topic WHERE id IN(" + StringUtils.join(ids, ",") + ") AND status=1";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                FeedTopic feedTopic = buildFeedTopic(rs);
+                if (feedTopic.exists()) topics.add(feedTopic);
+            }
+        });
+
+        return topics;
     }
 
     @Override

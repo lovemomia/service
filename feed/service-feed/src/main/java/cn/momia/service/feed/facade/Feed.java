@@ -48,14 +48,6 @@ public class Feed {
         return baseFeed.getTopicId();
     }
 
-    public long getTopicProductId() {
-        return baseFeed.getProductId();
-    }
-
-    public String getTopic() {
-        return baseFeed.getTopic();
-    }
-
     public String getContent() {
         return baseFeed.getContent();
     }

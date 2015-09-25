@@ -17,13 +17,14 @@ public interface FeedServiceFacade {
     List<Long> queryFollowedIds(long userId);
     long queryFollowedCountByUser(long userId);
     List<Feed> queryFollowedByUser(long userId, int start, int count);
-    long queryPublicFeedsCount();
-    List<Feed> queryPublicFeeds(int start, int count);
 
     long queryCommentsCount(long feedId);
     List<FeedComment> queryComments(long feedId, int start, int count);
     long queryStaredUsersCount(long feedId);
     List<Long> queryStaredUserIds(long feedId, int start, int count);
+
+    FeedTopic getTopic(long topicId);
+    List<FeedTopic> list(Collection<Long> topicIds);
 
     long queryCountByTopic(long topicId);
     List<Feed> queryByTopic(long topicId, int start, int count);

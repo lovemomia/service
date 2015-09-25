@@ -10,8 +10,9 @@ public class FeedDto {
     private long id;
     private int type;
     private long topicId;
-    private long topicProductId;
+    private int topicType;
     private String topic = "";
+    private long refId;
     private List<String> imgs = new ArrayList<String>();
     private String content;
     @JSONField(format = "yyyy-MM-dd") private Date addTime;
@@ -48,12 +49,12 @@ public class FeedDto {
         this.topicId = topicId;
     }
 
-    public long getTopicProductId() {
-        return topicProductId;
+    public int getTopicType() {
+        return topicType;
     }
 
-    public void setTopicProductId(long topicProductId) {
-        this.topicProductId = topicProductId;
+    public void setTopicType(int topicType) {
+        this.topicType = topicType;
     }
 
     public String getTopic() {
@@ -62,6 +63,14 @@ public class FeedDto {
 
     public void setTopic(String topic) {
         this.topic = topic;
+    }
+
+    public long getRefId() {
+        return refId;
+    }
+
+    public void setRefId(long refId) {
+        this.refId = refId;
     }
 
     public List<String> getImgs() {

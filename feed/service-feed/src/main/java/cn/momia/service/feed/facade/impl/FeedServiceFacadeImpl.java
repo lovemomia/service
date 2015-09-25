@@ -142,31 +142,14 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
 
     @Override
     public long queryFollowedCountByUser(long userId) {
-        if (userId <= 0) return 0;
+        if (userId <= 0) return baseFeedService.queryOfficialFeedsCount();
         return baseFeedService.queryFollowedCountByUser(userId);
     }
 
     @Override
     public List<Feed> queryFollowedByUser(long userId, int start, int count) {
-        if (userId <= 0 || start < 0 || count <= 0) return new ArrayList<Feed>();
-        List<BaseFeed> baseFeeds = baseFeedService.queryFollowedByUser(userId, start, count);
-        List<Feed> feeds = new ArrayList<Feed>();
-        for (BaseFeed baseFeed : baseFeeds) {
-            feeds.add(buildFeed(baseFeed));
-        }
-
-        return feeds;
-    }
-
-    @Override
-    public long queryPublicFeedsCount() {
-        return baseFeedService.queryPublicFeedsCount();
-    }
-
-    @Override
-    public List<Feed> queryPublicFeeds(int start, int count) {
         if (start < 0 || count <= 0) return new ArrayList<Feed>();
-        List<BaseFeed> baseFeeds = baseFeedService.queryPublicFeeds(start, count);
+        List<BaseFeed> baseFeeds = userId <= 0 ? baseFeedService.queryOfficialFeeds(start, count) : baseFeedService.queryFollowedByUser(userId, start, count);
         List<Feed> feeds = new ArrayList<Feed>();
         for (BaseFeed baseFeed : baseFeeds) {
             feeds.add(buildFeed(baseFeed));
@@ -197,6 +180,17 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
     public List<Long> queryStaredUserIds(long feedId, int start, int count) {
         if (feedId <= 0 || start < 0 || count <= 0) return new ArrayList<Long>();
         return feedStarService.queryUserIds(feedId, start, count);
+    }
+
+    @Override
+    public FeedTopic getTopic(long topicId) {
+        return feedTopicService.get(topicId);
+    }
+
+    @Override
+    public List<FeedTopic> list(Collection<Long> topicIds) {
+        if (topicIds == null || topicIds.isEmpty()) return new ArrayList<FeedTopic>();
+        return feedTopicService.list(topicIds);
     }
 
     @Override
