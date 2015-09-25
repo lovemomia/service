@@ -90,9 +90,10 @@ public class ImController {
             if (id > 0) userIds.add(id);
         }
 
-        if (!imService.joinGroup(groupId, userIds)) return MomiaHttpResponse.FAILED;
-
-        imService.logGroupUsers(groupId, userIds);
+        if (!userIds.isEmpty()) {
+            if (!imService.joinGroup(groupId, userIds)) return MomiaHttpResponse.FAILED;
+            imService.logGroupUsers(groupId, userIds);
+        }
 
         return MomiaHttpResponse.SUCCESS;
     }

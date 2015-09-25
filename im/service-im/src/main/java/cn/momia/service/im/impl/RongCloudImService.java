@@ -44,7 +44,6 @@ public class RongCloudImService extends DbAccessService implements ImService {
 
     @Override
     public String getToken(long userId) {
-        if (userId <= 0) return "";
         String sql = "SELECT token FROM t_im_token WHERE userId=? AND status=1";
         return jdbcTemplate.query(sql, new Object[] { userId }, new ResultSetExtractor<String>() {
             @Override
@@ -107,9 +106,8 @@ public class RongCloudImService extends DbAccessService implements ImService {
 
     @Override
     public Group queryGroup(long productId, long skuId) {
-        if (productId <= 0 || skuId <= 0) return Group.NOT_EXIST_GROUP;
-
         String sql = "SELECT id, name, productId, skuId FROM t_im_group WHERE productId=? AND skuId=? AND status=1";
+
         return jdbcTemplate.query(sql, new Object[] { productId, skuId }, new ResultSetExtractor<Group>() {
             @Override
             public Group extractData(ResultSet rs) throws SQLException, DataAccessException {
