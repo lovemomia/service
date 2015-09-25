@@ -46,12 +46,12 @@ public class BaseServiceApi extends AbstractServiceApi {
     }
 
     public static class FeedbackServiceApi extends BaseServiceApi {
-        public void addFeedback(String content, String email) {
+        public boolean addFeedback(String content, String email) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("content", content)
                     .add("email", email);
             MomiaHttpRequest request = MomiaHttpRequest.POST(url("feedback"), builder.build());
-            executeRequest(request);
+            return (Boolean) executeRequest(request);
         }
     }
 
