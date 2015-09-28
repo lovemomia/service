@@ -11,7 +11,6 @@ import cn.momia.service.feed.comment.FeedCommentService;
 import cn.momia.service.feed.star.FeedStarService;
 import cn.momia.service.feed.topic.FeedTopic;
 import cn.momia.service.feed.topic.FeedTopicService;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -90,8 +89,6 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
 
     @Override
     public Feed getFeed(long feedId) {
-        if (feedId <= 0) return Feed.NOT_EXIST_FEED;
-
         BaseFeed baseFeed = baseFeedService.get(feedId);
         if (!baseFeed.exists()) return Feed.NOT_EXIST_FEED;
 
@@ -130,13 +127,11 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
 
     @Override
     public boolean deleteFeed(long userId, long feedId) {
-        if (userId <= 0 || feedId <= 0) return false;
         return baseFeedService.delete(userId, feedId);
     }
 
     @Override
     public List<Long> queryFollowedIds(long userId) {
-        if (userId <= 0) return new ArrayList<Long>();
         return baseFeedService.getFollowedIds(userId);
     }
 
@@ -160,25 +155,21 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
 
     @Override
     public long queryCommentsCount(long feedId) {
-        if (feedId <= 0) return 0;
         return feedCommentService.queryCount(feedId);
     }
 
     @Override
     public List<FeedComment> queryComments(long feedId, int start, int count) {
-        if (feedId <= 0 || start < 0 || count <= 0) return new ArrayList<FeedComment>();
         return feedCommentService.query(feedId, start, count);
     }
 
     @Override
     public long queryStaredUsersCount(long feedId) {
-        if (feedId <= 0) return 0;
         return feedStarService.queryUserCount(feedId);
     }
 
     @Override
     public List<Long> queryStaredUserIds(long feedId, int start, int count) {
-        if (feedId <= 0 || start < 0 || count <= 0) return new ArrayList<Long>();
         return feedStarService.queryUserIds(feedId, start, count);
     }
 
@@ -189,19 +180,17 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
 
     @Override
     public List<FeedTopic> list(Collection<Long> topicIds) {
-        if (topicIds == null || topicIds.isEmpty()) return new ArrayList<FeedTopic>();
+        if (topicIds.isEmpty()) return new ArrayList<FeedTopic>();
         return feedTopicService.list(topicIds);
     }
 
     @Override
     public long queryCountByTopic(long topicId) {
-        if (topicId <= 0) return 0;
         return baseFeedService.queryCountByTopic(topicId);
     }
 
     @Override
     public List<Feed> queryByTopic(long topicId, int start, int count) {
-        if (topicId <= 0 || start < 0 || count <= 0) return new ArrayList<Feed>();
         List<BaseFeed> baseFeeds = baseFeedService.queryByTopic(topicId, start, count);
 
         List<Feed> feeds = new ArrayList<Feed>();
@@ -220,67 +209,57 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
 
     @Override
     public List<FeedTopic> queryTopic(int type, int start, int count) {
-        if (start < 0 || count <= 0) return new ArrayList<FeedTopic>();
         return feedTopicService.query(type, start, count);
     }
 
     @Override
     public boolean addComment(long userId, long feedId, String content) {
-        if (userId <= 0 || feedId <= 0 || StringUtils.isBlank(content)) return false;
         return feedCommentService.add(userId, feedId, content);
     }
 
     @Override
     public boolean deleteComment(long userId, long feedId, long commentId) {
-        if (userId <= 0 || feedId <= 0 || commentId <= 0) return false;
         return feedCommentService.delete(userId, feedId, commentId);
     }
 
     @Override
     public void increaseCommentCount(long feedId) {
-        if (feedId <= 0) return;
         baseFeedService.increaseCommentCount(feedId);
     }
 
     @Override
     public void decreaseCommentCount(long feedId) {
-        if (feedId <= 0) return;
         baseFeedService.decreaseCommentCount(feedId);
     }
 
     @Override
     public boolean isStared(long userId, long feedId) {
-        if (userId <= 0 || feedId <= 0) return false;
         return feedStarService.isStared(userId, feedId);
     }
 
     @Override
     public List<Long> queryStaredFeeds(long userId, Collection<Long> feedIds) {
-        if (userId <= 0 || feedIds == null || feedIds.isEmpty()) return new ArrayList<Long>();
+        if (feedIds.isEmpty()) return new ArrayList<Long>();
         return feedStarService.queryStaredFeeds(userId, feedIds);
     }
 
     @Override
     public boolean star(long userId, long feedId) {
-        if (userId <= 0 || feedId <= 0) return false;
         return feedStarService.add(userId, feedId);
     }
 
     @Override
     public boolean unstar(long userId, long feedId) {
-        if (userId <= 0 || feedId <= 0) return false;
         return feedStarService.delete(userId, feedId);
     }
 
     @Override
     public void increaseStarCount(long feedId) {
-        if (feedId <= 0) return;
         baseFeedService.increaseStarCount(feedId);
     }
 
     @Override
     public void decreaseStarCount(long feedId) {
-        if (feedId <= 0) return;
         baseFeedService.decreaseStarCount(feedId);
     }
 }

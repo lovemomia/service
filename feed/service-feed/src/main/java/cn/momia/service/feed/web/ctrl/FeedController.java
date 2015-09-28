@@ -236,13 +236,14 @@ public class FeedController extends BaseController {
 
         FeedTopic topic = feed.getTopicId() <= 0 ? FeedTopic.NOT_EXIST_FEED_TOPIC : feedServiceFacade.getTopic(feed.getTopicId());
 
-        boolean stared = feedServiceFacade.isStared(userId, id);
+        boolean stared = userId > 0 && feedServiceFacade.isStared(userId, id);
 
         return MomiaHttpResponse.SUCCESS(buildFeedDto(feed, feedUser, topic, stared));
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public MomiaHttpResponse delete(@RequestParam(value = "uid") long userId, @PathVariable long id) {
+        if (userId <= 0 || id <= 0) return MomiaHttpResponse.FAILED("无效的Feed");
         if (!feedServiceFacade.deleteFeed(userId, id)) return MomiaHttpResponse.FAILED("删除Feed失败");
         return MomiaHttpResponse.SUCCESS;
     }

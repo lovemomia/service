@@ -9,6 +9,7 @@ import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.feed.comment.FeedComment;
 import cn.momia.service.feed.facade.Feed;
 import cn.momia.service.feed.facade.FeedServiceFacade;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -73,7 +74,8 @@ public class FeedCommentController extends BaseController {
         Feed feed = feedServiceFacade.getFeed(id);
         if (!feed.exists()) return MomiaHttpResponse.FAILED("无效的Feed");
 
-        if (!feedServiceFacade.addComment(userId, id, content)) return MomiaHttpResponse.FAILED("发表评论失败");
+        if (userId <= 0 || StringUtils.isBlank(content) ||
+                !feedServiceFacade.addComment(userId, id, content)) return MomiaHttpResponse.FAILED("发表评论失败");
 
         feedServiceFacade.increaseCommentCount(id);
         return MomiaHttpResponse.SUCCESS;
@@ -81,7 +83,8 @@ public class FeedCommentController extends BaseController {
 
     @RequestMapping(value = "/{id}/comment/{cmid}", method = RequestMethod.DELETE)
     public MomiaHttpResponse deleteComment(@RequestParam(value = "uid") long userId, @PathVariable long id, @PathVariable(value = "cmid") long commentId) {
-        if (!feedServiceFacade.deleteComment(userId, id, commentId)) return MomiaHttpResponse.FAILED("删除评论失败");
+        if (userId <= 0 || id <= 0 || commentId <= 0 ||
+                !feedServiceFacade.deleteComment(userId, id, commentId)) return MomiaHttpResponse.FAILED("删除评论失败");
 
         feedServiceFacade.decreaseCommentCount(id);
         return MomiaHttpResponse.SUCCESS;

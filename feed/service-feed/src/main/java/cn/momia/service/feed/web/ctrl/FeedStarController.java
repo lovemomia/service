@@ -50,7 +50,7 @@ public class FeedStarController extends BaseController {
         Feed feed = feedServiceFacade.getFeed(id);
         if (!feed.exists()) return MomiaHttpResponse.FAILED("无效的Feed");
 
-        if (!feedServiceFacade.star(userId, id)) return MomiaHttpResponse.FAILED("赞失败");
+        if (userId <= 0 || !feedServiceFacade.star(userId, id)) return MomiaHttpResponse.FAILED("赞失败");
 
         feedServiceFacade.increaseStarCount(id);
         return MomiaHttpResponse.SUCCESS;
@@ -58,7 +58,7 @@ public class FeedStarController extends BaseController {
 
     @RequestMapping(value = "/{id}/unstar", method = RequestMethod.POST)
     public MomiaHttpResponse unstar(@RequestParam(value = "uid") long userId, @PathVariable long id) {
-        if (!feedServiceFacade.unstar(userId, id)) return MomiaHttpResponse.FAILED("取消赞失败");
+        if (userId <= 0 || id <= 0 || !feedServiceFacade.unstar(userId, id)) return MomiaHttpResponse.FAILED("取消赞失败");
 
         feedServiceFacade.decreaseStarCount(id);
         return MomiaHttpResponse.SUCCESS;
