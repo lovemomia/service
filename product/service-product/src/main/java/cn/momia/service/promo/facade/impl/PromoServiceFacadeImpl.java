@@ -29,8 +29,6 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
 
     @Override
     public void distributeRegisterCoupon(long userId) {
-        if (userId <= 0) return;
-
         try {
             if (userCouponService.queryCountByUserAndSrc(userId, Coupon.Src.REGISTER) > 0) return;
 
@@ -52,8 +50,6 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
 
     @Override
     public void distributeShareCoupon(long customerId, long sharerId, BigDecimal totalFee) {
-        if (customerId <= 0 || sharerId <=0) return;
-
         int discount = calcDiscount(totalFee.intValue());
         if (discount <= 0) return;
 
@@ -87,8 +83,6 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
 
     @Override
     public Coupon getCoupon(long userId, long orderId, long userCouponId) {
-        if (userId <= 0 || orderId <= 0 || userCouponId <= 0) return Coupon.NOT_EXIST_COUPON;
-
         UserCoupon userCoupon = userCouponService.query(userId, orderId, userCouponId);
         if (!userCoupon.exists() || userCoupon.getCouponId() <= 0) return Coupon.NOT_EXIST_COUPON;
 
@@ -97,7 +91,7 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
 
     @Override
     public List<Coupon> listCoupons(Collection<Integer> couponIds) {
-        if (couponIds == null || couponIds.isEmpty()) return new ArrayList<Coupon>();
+        if (couponIds.isEmpty()) return new ArrayList<Coupon>();
         return couponService.list(couponIds);
     }
 
@@ -113,38 +107,31 @@ public class PromoServiceFacadeImpl implements PromoServiceFacade {
 
     @Override
     public int queryUserCouponCount(long userId, long orderId, BigDecimal totalFee, int status) {
-        if (userId <= 0) return 0;
         return userCouponService.queryCountByUser(userId, orderId, totalFee, status);
     }
 
     @Override
     public List<UserCoupon> queryUserCoupon(long userId, long orderId, BigDecimal totalFee, int status, int start, int count) {
-        if (userId <= 0 || start < 0 || count <= 0) return new ArrayList<UserCoupon>();
         return userCouponService.queryByUser(userId, orderId, totalFee, status, start, count);
     }
 
     @Override
     public UserCoupon getNotUsedUserCouponByOrder(long orderId) {
-        if (orderId <= 0) return UserCoupon.NOT_EXIST_USER_COUPON;
         return userCouponService.queryNotUsedByOrder(orderId);
     }
 
     @Override
     public boolean lockUserCoupon(long userId, long orderId, long userCouponId) {
-        if (userId <= 0 || orderId <= 0 || userCouponId <= 0) return true;
         return userCouponService.lock(userId, orderId, userCouponId);
     }
 
     @Override
     public boolean useUserCoupon(long userId, long orderId, long userCouponId) {
-        if (userId <= 0 || orderId <= 0 || userCouponId <= 0) return true;
         return userCouponService.use(userId, orderId, userCouponId);
     }
 
     @Override
     public boolean releaseUserCoupon(long userId, long orderId) {
-        if (userId <= 0 || orderId <= 0) return true;
-
         try {
             UserCoupon userCoupon = userCouponService.queryNotUsedByOrder(orderId);
             if (!userCoupon.exists() || userCoupon.getUserId() != userId) return true;

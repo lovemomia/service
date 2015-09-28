@@ -47,7 +47,6 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
 
     @Override
     public boolean follow(long ownUserId, long otherUserId) {
-        if (ownUserId <= 0 || otherUserId <= 0) return false;
         if (baseFeedService.isFollowed(ownUserId, otherUserId)) return true;
         return baseFeedService.follow(ownUserId, otherUserId);
     }
@@ -78,7 +77,6 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
 
     @Override
     public void pushFeed(long feedId, Collection<Long> followedIds) {
-        if (feedId <= 0 || followedIds == null || followedIds.isEmpty()) return;
         String sql = "INSERT INTO t_feed_follow(userId, feedId, addTime) VALUES (?, ?, NOW())";
         List<Object[]> args = new ArrayList<Object[]>();
         for (long followedId : followedIds) {
@@ -143,7 +141,6 @@ public class FeedServiceFacadeImpl extends DbAccessService implements FeedServic
 
     @Override
     public List<Feed> queryFollowedByUser(long userId, int start, int count) {
-        if (start < 0 || count <= 0) return new ArrayList<Feed>();
         List<BaseFeed> baseFeeds = userId <= 0 ? baseFeedService.queryOfficialFeeds(start, count) : baseFeedService.queryFollowedByUser(userId, start, count);
         List<Feed> feeds = new ArrayList<Feed>();
         for (BaseFeed baseFeed : baseFeeds) {
