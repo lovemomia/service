@@ -55,8 +55,6 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
     @Override
     public Product get(long productId, boolean mini) {
-        if (productId <= 0) return Product.NOT_EXIST_PRODUCT;
-
         BaseProduct baseProduct = baseProductService.get(productId);
         if (!baseProduct.exists()) return Product.NOT_EXIST_PRODUCT;
 
@@ -66,7 +64,7 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
         if (!mini) {
             product.setImgs(getProductImgs(baseProduct.getId()));
 
-            List<Place> places = placeService.get(baseProduct.getPlaces());
+            List<Place> places = placeService.list(baseProduct.getPlaces());
             if (places.isEmpty()) return Product.NOT_EXIST_PRODUCT;
 
             product.setPlaces(places);
@@ -79,7 +77,7 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     private List<Sku> buildFullSkus(List<Sku> skus) {
         List<Integer> placeIds = new ArrayList<Integer>();
         for (Sku sku : skus) placeIds.add(sku.getPlaceId());
-        List<Place> places = placeService.get(placeIds);
+        List<Place> places = placeService.list(placeIds);
         Map<Integer, Place> placesMap = new HashMap<Integer, Place>();
         for (Place place : places) placesMap.put(place.getId(), place);
 
@@ -112,9 +110,9 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
     @Override
     public List<Product> list(Collection<Long> productIds) {
-        if (productIds == null || productIds.isEmpty()) return new ArrayList<Product>();
+        if (productIds.isEmpty()) return new ArrayList<Product>();
 
-        List<BaseProduct> baseProducts = baseProductService.get(productIds);
+        List<BaseProduct> baseProducts = baseProductService.list(productIds);
         return buildProducts(baseProducts);
     }
 
@@ -132,7 +130,7 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
         Map<Long, List<ProductImage>> imgsOfProducts = getProductsImgs(productIds);
         Map<Integer, Place> placesOfProducts = new HashMap<Integer, Place>();
-        for (Place place : placeService.get(placeIds)) placesOfProducts.put(place.getId(), place);
+        for (Place place : placeService.list(placeIds)) placesOfProducts.put(place.getId(), place);
         List<Sku> skus = buildFullSkus(skuService.queryByProducts(productIds));
         Map<Long, List<Sku>> skusOfProducts = new HashMap<Long, List<Sku>>();
         for (Sku sku : skus) {
@@ -217,75 +215,66 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
     @Override
     public String getDetail(long productId) {
-        if (productId <= 0) return "";
         return baseProductService.getDetail(productId);
     }
 
     @Override
     public long queryCount(int cityId) {
-        if (cityId < 0) return 0;
         return baseProductService.queryCount(cityId);
     }
 
     @Override
     public List<Product> query(int cityId, int start, int count, ProductSort productSort) {
-        if (cityId < 0 || start < 0 || count <= 0) return new ArrayList<Product>();
         return buildProducts(baseProductService.query(cityId, start, count, productSort));
     }
 
     @Override
     public long queryCountByWeekend(int cityId) {
-        if (cityId < 0) return 0;
         return baseProductService.queryCountByWeekend(cityId);
     }
 
     @Override
     public List<Product> queryByWeekend(int cityId, int start, int count) {
-        if (cityId < 0 || start < 0 || count <= 0) return new ArrayList<Product>();
         return buildProducts(baseProductService.queryByWeekend(cityId, start, count));
     }
 
     @Override
     public List<Product> queryByMonth(int cityId, int month) {
-        if (cityId < 0 || month <= 0 || month > 12) return new ArrayList<Product>();
         return buildProducts(baseProductService.queryByMonth(cityId, TimeUtil.formatYearMonth(month), TimeUtil.formatNextYearMonth(month)));
     }
 
     @Override
     public long queryCountNeedLeader(int cityId) {
-        if (cityId < 0) return 0;
         return baseProductService.queryCountNeedLeader(cityId);
     }
 
     @Override
     public List<Product> queryNeedLeader(int cityId, int start, int count) {
-        if (cityId < 0 || start < 0 || count <= 0) return new ArrayList<Product>();
         return buildProducts(baseProductService.queryNeedLeader(cityId, start, count));
     }
 
     @Override
     public boolean sold(long productId, int count) {
-        if (productId <= 0 || count <= 0) return true;
         return baseProductService.sold(productId, count);
     }
 
     @Override
     public List<Sku> listSkus(long productId) {
-        if (productId <= 0) return new ArrayList<Sku>();
         return buildFullSkus(skuService.queryByProduct(productId));
     }
 
     @Override
     public Sku getSku(long skuId) {
-        if (skuId <= 0) return Sku.NOT_EXIST_SKU;
         return buildFullSku(skuService.get(skuId));
     }
 
     private Sku buildFullSku(Sku sku) {
-        int placeId = sku.getPlaceId();
-        if (placeId > 0) {
-            Place place = placeService.get(placeId);
-            if (place.exists()) sku.setPlace(place);
+        if (sku.exists()) {
+            int placeId = sku.getPlaceId();
+            if (placeId > 0) {
+                Place place = placeService.get(placeId);
+                if (place.exists()) sku.setPlace(place);
+            }
         }
 
         return sku;
@@ -293,8 +282,6 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
     @Override
     public boolean lockStock(long productId, long skuId, int count, int joined) {
-        if (productId <= 0 || skuId <= 0 || count <= 0) return false;
-
         boolean successful = skuService.lock(skuId, count);
         if (successful) {
             try {
@@ -309,11 +296,9 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     }
 
     // TODO 高并发下 soldOut状态的更新不稳定，容易出问题
-    private boolean isSoldOut(long id) {
-        if (id <= 0) return true;
-
+    private boolean isSoldOut(long productId) {
         int unlockedStock = 0;
-        List<Sku> skus = Sku.filterClosed(listSkus(id));
+        List<Sku> skus = Sku.filterClosed(listSkus(productId));
         for (Sku sku : skus) {
             if (sku.getType() == Sku.Type.NO_CEILING) return false;
             unlockedStock += sku.getUnlockedStock();
@@ -324,8 +309,6 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
     @Override
     public boolean unlockStock(long productId, long skuId, int count, int joined) {
-        if (productId <= 0 || skuId <= 0 || count <= 0) return true;
-
         boolean successful = skuService.unlock(skuId, count);
         if (successful) {
             try {
@@ -341,8 +324,6 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
     @Override
     public boolean addSkuLeader(long userId, long productId, long skuId) {
-        if (userId <= 0 || productId <= 0 || skuId <= 0) return false;
-
         Sku sku = skuService.get(skuId);
         if (!sku.exists() || sku.isClosed(new Date()) || !sku.isNeedLeader()) throw new MomiaFailedException("活动已结束或不需要领队");
 
@@ -351,13 +332,11 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
 
     @Override
     public long queryCountOfLedSkus(long userId) {
-        if (userId <= 0) return 0;
         return skuService.queryCountOfLedSkus(userId);
     }
 
     @Override
     public List<Sku> queryLedSkus(long userId, int start, int count) {
-        if (userId <= 0 || start < 0 || count <= 0) return new ArrayList<Sku>();
         return buildFullSkus(skuService.queryLedSkus(userId, start, count));
     }
 }

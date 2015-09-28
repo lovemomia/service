@@ -19,8 +19,6 @@ import java.util.Map;
 public class TopicServiceImpl extends DbAccessService implements TopicService {
     @Override
     public Topic get(long id) {
-        if (id <= 0) return Topic.NOT_EXIST_TOPIC;
-
         String sql = "SELECT id, cover, title FROM t_topic WHERE id=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Topic>() {
@@ -43,8 +41,6 @@ public class TopicServiceImpl extends DbAccessService implements TopicService {
 
     @Override
     public List<TopicGroup> listTopicGroups(long id) {
-        if (id <= 0) return new ArrayList<TopicGroup>();
-
         final List<TopicGroup> topicGroups = new ArrayList<TopicGroup>();
         String sql = "SELECT id, topicId, title FROM t_topic_group WHERE topicId=? AND status=1 ORDER BY ordinal DESC, addTime ASC";
         jdbcTemplate.query(sql, new Object[] { id }, new RowCallbackHandler() {

@@ -11,7 +11,6 @@ import cn.momia.service.order.OrderService;
 import cn.momia.service.coupon.Coupon;
 import cn.momia.service.coupon.UserCoupon;
 import cn.momia.service.promo.facade.PromoServiceFacade;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -106,8 +105,6 @@ public class CouponController extends BaseController {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public MomiaHttpResponse registerCoupon(@RequestParam String utoken) {
-        if (StringUtils.isBlank(utoken)) return MomiaHttpResponse.BAD_REQUEST;
-
         UserDto user = UserServiceApi.USER.get(utoken);
         promoServiceFacade.distributeRegisterCoupon(user.getId());
 

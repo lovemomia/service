@@ -53,7 +53,7 @@ public class ProductController extends ProductRelatedController {
                                    @RequestParam int start,
                                    @RequestParam int count,
                                    @RequestParam(required = false) String sort) {
-        if (cityId < 0 || isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
         long totalCount = productServiceFacade.queryCount(cityId);
         List<Product> products = productServiceFacade.query(cityId, start, count, parseSort(sort));
@@ -89,7 +89,7 @@ public class ProductController extends ProductRelatedController {
     public MomiaHttpResponse queryByWeekend(@RequestParam(value = "city") int cityId,
                                             @RequestParam int start,
                                             @RequestParam int count) {
-        if (cityId <0 || isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
         long totalCount = productServiceFacade.queryCountByWeekend(cityId);
         List<Product> products = productServiceFacade.queryByWeekend(cityId, start, count);
@@ -113,7 +113,6 @@ public class ProductController extends ProductRelatedController {
     @RequestMapping(value = "/month", method = RequestMethod.GET)
     public MomiaHttpResponse queryByMonth(@RequestParam(value = "city") int cityId, @RequestParam int month) {
         List<Product> products = productServiceFacade.queryByMonth(cityId, month);
-
         return MomiaHttpResponse.SUCCESS(buildProductsOfDayDtos(month, products));
     }
 
@@ -172,7 +171,7 @@ public class ProductController extends ProductRelatedController {
     public MomiaHttpResponse queryNeedLeader(@RequestParam(value = "city") int cityId,
                                              @RequestParam int start,
                                              @RequestParam int count) {
-        if (cityId < 0 || isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
         long totalCount = productServiceFacade.queryCountNeedLeader(cityId);
         List<Product> products = productServiceFacade.queryNeedLeader(cityId, start, count);

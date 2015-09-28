@@ -59,10 +59,10 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     }
 
     @Override
-    public List<Place> get(Collection<Integer> ids) {
-        final List<Place> places = new ArrayList<Place>();
-        if (ids == null || ids.isEmpty()) return places;
+    public List<Place> list(Collection<Integer> ids) {
+        if (ids.isEmpty()) return new ArrayList<Place>();
 
+        final List<Place> places = new ArrayList<Place>();
         String sql = "SELECT " + joinFields() + " FROM t_place WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override

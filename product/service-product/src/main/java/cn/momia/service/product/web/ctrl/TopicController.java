@@ -1,7 +1,6 @@
 package cn.momia.service.product.web.ctrl;
 
 import cn.momia.common.api.http.MomiaHttpResponse;
-import cn.momia.service.banner.Banner;
 import cn.momia.service.banner.BannerService;
 import cn.momia.service.product.facade.Product;
 import cn.momia.service.topic.Topic;
@@ -23,14 +22,11 @@ import java.util.Map;
 @RestController
 @RequestMapping("/topic")
 public class TopicController extends ProductRelatedController {
-    private static final int MAX_BANNER_COUNT = 20;
-
     @Autowired private BannerService bannerService;
     @Autowired private TopicService topicService;
 
     @RequestMapping(value = "/banner", method = RequestMethod.GET)
     public MomiaHttpResponse listBanners(@RequestParam(value = "city") int cityId, @RequestParam int count) {
-        if (cityId < 0 || count <= 0 || count > MAX_BANNER_COUNT) return MomiaHttpResponse.EMPTY_ARRAY;
         return MomiaHttpResponse.SUCCESS(bannerService.list(cityId, count));
     }
 

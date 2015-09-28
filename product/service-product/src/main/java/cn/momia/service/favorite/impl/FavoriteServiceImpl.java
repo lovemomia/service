@@ -14,8 +14,6 @@ import java.util.List;
 public class FavoriteServiceImpl extends DbAccessService implements FavoriteService {
     @Override
     public boolean isFavoried(long userId, long productId) {
-        if (userId <= 0 || productId <= 0) return false;
-
         String sql = "SELECT COUNT(1) FROM t_favorite WHERE userId=? AND productId=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { userId, productId }, new ResultSetExtractor<Boolean>() {
@@ -39,8 +37,6 @@ public class FavoriteServiceImpl extends DbAccessService implements FavoriteServ
     }
 
     private long getId(long userId, long productId) {
-        if (userId <= 0 || productId <= 0) return 0;
-
         String sql = "SELECT id FROM t_favorite WHERE userId=? AND productId=?";
 
         return jdbcTemplate.query(sql, new Object[] { userId, productId }, new ResultSetExtractor<Long>() {
@@ -53,16 +49,12 @@ public class FavoriteServiceImpl extends DbAccessService implements FavoriteServ
 
     @Override
     public boolean unFavor(long userId, long productId) {
-        if (userId <= 0 || productId <= 0) return true;
-
         String sql = "UPDATE t_favorite SET status=0 WHERE userId=? AND productId=?";
         return jdbcTemplate.update(sql, new Object[] { userId, productId }) > 0;
     }
 
     @Override
     public long queryCount(long userId) {
-        if (userId <= 0) return 0;
-
         String sql = "SELECT COUNT(1) FROM t_favorite WHERE userId=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { userId }, new ResultSetExtractor<Long>() {
@@ -75,8 +67,6 @@ public class FavoriteServiceImpl extends DbAccessService implements FavoriteServ
 
     @Override
     public List<Long> query(long userId, int start, int count) {
-        if (userId <= 0) return new ArrayList<Long>();
-
         final List<Long> productIds = new ArrayList<Long>();
         String sql = "SELECT productId FROM t_favorite WHERE userId=? AND status=1 ORDER BY updateTime DESC LIMIT ?,?";
         jdbcTemplate.query(sql, new Object[] { userId, start, count }, new RowCallbackHandler() {

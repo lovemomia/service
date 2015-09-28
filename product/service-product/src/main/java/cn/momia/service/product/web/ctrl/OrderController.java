@@ -240,7 +240,8 @@ public class OrderController extends BaseController {
                                    @RequestParam(value = "sid") long skuId) {
         UserDto user = UserServiceApi.USER.get(utoken);
         Order order = orderService.get(id);
-        if (!order.isPayed() ||
+        if (!order.exists() ||
+                !order.isPayed() ||
                 order.getCustomerId() != user.getId() ||
                 order.getProductId() != productId ||
                 order.getSkuId() != skuId) return MomiaHttpResponse.SUCCESS(false);
@@ -264,8 +265,6 @@ public class OrderController extends BaseController {
 
     @RequestMapping(value = "/customer", method = RequestMethod.GET)
     public MomiaHttpResponse getProductCustomersInfo(@RequestParam(value = "pid") long productId, @RequestParam int count) {
-        if (productId <= 0 || count <= 0) return MomiaHttpResponse.BAD_REQUEST;
-
         List<Order> orders = orderService.queryDistinctCustomerOrderByProduct(productId, 0, count);
         if (orders.isEmpty()) return MomiaHttpResponse.EMPTY_ARRAY;
 
@@ -291,7 +290,7 @@ public class OrderController extends BaseController {
 
     @RequestMapping(value = "/playmate", method = RequestMethod.GET)
     public MomiaHttpResponse listPlaymates(@RequestParam(value = "pid") long productId, @RequestParam int start, @RequestParam int count) {
-        if (productId <= 0 || isInvalidLimit(start, count)) return MomiaHttpResponse.BAD_REQUEST;
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.BAD_REQUEST;
 
         List<SkuDto> skus = querySkus(productId, start, count);
         if (skus.isEmpty()) return MomiaHttpResponse.EMPTY_ARRAY;

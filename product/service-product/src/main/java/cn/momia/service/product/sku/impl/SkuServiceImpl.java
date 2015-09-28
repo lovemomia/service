@@ -112,9 +112,9 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
 
     @Override
     public List<Sku> queryByProducts(Collection<Long> productIds) {
-        final List<Sku> skus = new ArrayList<Sku>();
-        if (productIds == null || productIds.isEmpty()) return skus;
+        if (productIds.isEmpty()) return new ArrayList<Sku>();
 
+        final List<Sku> skus = new ArrayList<Sku>();
         String sql = "SELECT " + joinFields() + " FROM t_sku WHERE productId IN (" + StringUtils.join(productIds, ",") + ") AND status=1 ORDER BY startTime ASC";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
@@ -162,7 +162,6 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
     @Override
     public boolean addLeader(long userId, long productId, long id) {
         String sql = "UPDATE t_sku SET leaderUserId=? WHERE id=? AND productId=? AND status=1 AND (leaderUserId<=0 OR leaderUserId=?)";
-
         return jdbcTemplate.update(sql, new Object[] { userId, id, productId, userId }) == 1;
     }
 

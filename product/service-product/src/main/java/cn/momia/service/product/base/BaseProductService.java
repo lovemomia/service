@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface BaseProductService {
     BaseProduct get(long id);
-    List<BaseProduct> get(Collection<Long> ids);
+    List<BaseProduct> list(Collection<Long> ids);
     String getDetail(long id);
 
     long queryCount(int cityId);

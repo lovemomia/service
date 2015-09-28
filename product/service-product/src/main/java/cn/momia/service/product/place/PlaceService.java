@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface PlaceService {
     Place get(int id);
-    List<Place> get(Collection<Integer> ids);
+    List<Place> list(Collection<Integer> ids);
 }

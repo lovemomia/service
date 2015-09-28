@@ -114,7 +114,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
     }
 
     @Override
-    public List<BaseProduct> get(Collection<Long> ids) {
+    public List<BaseProduct> list(Collection<Long> ids) {
         List<BaseProduct> baseProducts = new ArrayList<BaseProduct>();
         if (ids == null || ids.isEmpty()) return baseProducts;
 
@@ -216,7 +216,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
             }
         });
 
-        return get(ids);
+        return list(ids);
     }
 
     @Override
@@ -252,7 +252,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
             }
         });
 
-        return get(ids);
+        return list(ids);
     }
 
     @Override
@@ -289,7 +289,7 @@ public class BaseProductServiceImpl extends DbAccessService implements BaseProdu
             }
         });
 
-        return get(ids);
+        return list(ids);
     }
 
     @Override
