@@ -23,7 +23,7 @@ import java.util.List;
 
 public class SkuServiceImpl extends DbAccessService implements SkuService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SkuServiceImpl.class);
-    private static final String[] SKU_FIELDS = { "id", "productId", "`desc`", "`type`", "anyTime", "startTime", "endTime", "properties", "prices", "`limit`", "needRealName", "stock", "unlockedStock", "lockedStock", "onlineTime", "offlineTime", "onWeekend", "needLeader", "leaderUserId" };
+    private static final String[] SKU_FIELDS = { "id", "productId", "`desc`", "`type`", "anyTime", "startTime", "endTime", "properties", "prices", "`limit`", "needRealName", "stock", "unlockedStock", "lockedStock", "onlineTime", "offlineTime", "onWeekend", "needLeader", "leaderUserId", "forNewUser" };
 
     @Override
     public Sku get(long id) {
@@ -64,6 +64,7 @@ public class SkuServiceImpl extends DbAccessService implements SkuService {
             sku.setOnWeekend(rs.getBoolean("onWeekend"));
             sku.setNeedLeader(rs.getBoolean("needLeader"));
             sku.setLeaderUserId(rs.getLong("leaderUserId"));
+            sku.setForNewUser(rs.getBoolean("forNewUser"));
 
             return sku;
         }

@@ -127,14 +127,17 @@ public abstract class ProductRelatedController extends BaseController {
         skuDto.setPlaceName(sku.getPlaceName());
         skuDto.setRegionId(sku.getRegionId());
         skuDto.setAddress(sku.getAddress());
-        skuDto.setNeedLeader(sku.isNeedLeader());
-        skuDto.setHasLeader(!sku.isNeedLeader() || sku.hasLeader());
-        skuDto.setLeaderUserId(sku.getLeaderUserId());
         skuDto.setFull(sku.isFull());
 
         Date now = new Date();
         skuDto.setFinished(sku.isFinished(now));
         skuDto.setClosed(sku.isClosed(now));
+
+        skuDto.setNeedLeader(sku.isNeedLeader());
+        skuDto.setHasLeader(!sku.isNeedLeader() || sku.hasLeader());
+        skuDto.setLeaderUserId(sku.getLeaderUserId());
+
+        skuDto.setForNewUser(sku.isForNewUser());
 
         return skuDto;
     }

@@ -129,6 +129,7 @@ public class Sku implements Serializable {
     private boolean onWeekend;
     private boolean needLeader;
     private long leaderUserId;
+    private boolean forNewUser;
 
     private Place place;
 
@@ -282,6 +283,14 @@ public class Sku implements Serializable {
 
     public void setLeaderUserId(long leaderUserId) {
         this.leaderUserId = leaderUserId;
+    }
+
+    public boolean isForNewUser() {
+        return forNewUser;
+    }
+
+    public void setForNewUser(boolean forNewUser) {
+        this.forNewUser = forNewUser;
     }
 
     public void setPlace(Place place) {

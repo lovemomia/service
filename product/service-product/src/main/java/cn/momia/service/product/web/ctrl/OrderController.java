@@ -96,6 +96,8 @@ public class OrderController extends BaseController {
         for (OrderPrice price : order.getPrices()) {
             if (!sku.findPrice(price.getAdult(), price.getChild(), price.getPrice())) throw new MomiaFailedException("无效的订单，套餐不正确");
         }
+
+        if (sku.isForNewUser() && UserServiceApi.USER.isPayed(order.getCustomerId())) throw new MomiaFailedException("本活动仅供新用户专享");
     }
 
     private boolean lockSku(Order order) {

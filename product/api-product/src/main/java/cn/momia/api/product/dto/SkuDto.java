@@ -24,13 +24,16 @@ public class SkuDto {
     private String placeName;
     private int regionId;
     private String address;
+    private boolean full;
+    private boolean finished;
+    private boolean closed;
+
     private boolean needLeader;
     private boolean hasLeader;
     private long leaderUserId;
     private String leaderInfo;
-    private boolean full;
-    private boolean finished;
-    private boolean closed;
+
+    private boolean forNewUser;
 
     private Boolean needRealName;
     private List<SkuPriceDto> prices;
@@ -139,6 +142,30 @@ public class SkuDto {
         this.address = address;
     }
 
+    public boolean isFull() {
+        return full;
+    }
+
+    public void setFull(boolean full) {
+        this.full = full;
+    }
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public void setFinished(boolean finished) {
+        this.finished = finished;
+    }
+
+    public boolean isClosed() {
+        return closed;
+    }
+
+    public void setClosed(boolean closed) {
+        this.closed = closed;
+    }
+
     public boolean isNeedLeader() {
         return needLeader;
     }
@@ -171,28 +198,12 @@ public class SkuDto {
         this.leaderInfo = leaderInfo;
     }
 
-    public boolean isFull() {
-        return full;
+    public boolean isForNewUser() {
+        return forNewUser;
     }
 
-    public void setFull(boolean full) {
-        this.full = full;
-    }
-
-    public boolean isFinished() {
-        return finished;
-    }
-
-    public void setFinished(boolean finished) {
-        this.finished = finished;
-    }
-
-    public boolean isClosed() {
-        return closed;
-    }
-
-    public void setClosed(boolean closed) {
-        this.closed = closed;
+    public void setForNewUser(boolean forNewUser) {
+        this.forNewUser = forNewUser;
     }
 
     public Boolean isNeedRealName() {
