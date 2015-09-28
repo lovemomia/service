@@ -215,6 +215,9 @@ public class ProductController extends ProductRelatedController {
             case Sku.Status.ALL:
                 skus = Sku.sortByStartTime(skus);
                 break;
+            case Sku.Status.AVALIABLE:
+                skus = Sku.sort(Sku.filterUnavaliable(skus));
+                break;
             default:
                 skus = Sku.sort(Sku.filterFinished(skus));
         }

@@ -86,6 +86,18 @@ public class Sku implements Serializable {
         return skus;
     }
 
+    public static List<Sku> filterUnavaliable(List<Sku> skus) {
+        List<Sku> filteredSkus = new ArrayList<Sku>();
+
+        Date now = new Date();
+        for (Sku sku : skus) {
+            if (sku.deadline.before(now) || sku.isFinished(now)) continue;
+            filteredSkus.add(sku);
+        }
+
+        return filteredSkus;
+    }
+
     public static List<Sku> filterFinished(List<Sku> skus) {
         List<Sku> filteredSkus = new ArrayList<Sku>();
 
@@ -126,6 +138,7 @@ public class Sku implements Serializable {
     private int unlockedStock;
     private Date onlineTime;
     private Date offlineTime;
+    private Date deadline;
     private boolean onWeekend;
     private boolean needLeader;
     private long leaderUserId;
@@ -259,6 +272,14 @@ public class Sku implements Serializable {
 
     public void setOfflineTime(Date offlineTime) {
         this.offlineTime = offlineTime;
+    }
+
+    public Date getDeadline() {
+        return deadline;
+    }
+
+    public void setDeadline(Date deadline) {
+        this.deadline = deadline;
     }
 
     public boolean isOnWeekend() {
@@ -422,7 +443,7 @@ public class Sku implements Serializable {
     }
 
     public boolean isClosed(Date now) {
-        if (isFull() || isFinished(now)) return true;
+        if (isFull() || deadline.before(now) || isFinished(now)) return true;
 
         return false;
     }
