@@ -14,6 +14,7 @@ public class FeedDto {
     private String topic = "";
     private long refId;
     private List<String> imgs = new ArrayList<String>();
+    private List<String> largeImgs = new ArrayList<String>();
     private String content;
     @JSONField(format = "yyyy-MM-dd") private Date addTime;
     private String poi = "";
@@ -79,6 +80,14 @@ public class FeedDto {
 
     public void setImgs(List<String> imgs) {
         this.imgs = imgs;
+    }
+
+    public List<String> getLargeImgs() {
+        return largeImgs;
+    }
+
+    public void setLargeImgs(List<String> largeImgs) {
+        this.largeImgs = largeImgs;
     }
 
     public String getContent() {

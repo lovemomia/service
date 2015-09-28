@@ -13,6 +13,7 @@ public class CommentDto {
     private String content;
     @JSONField(format = "yyyy-MM-dd HH:mm:ss") private Date addTime;
     private List<String> imgs;
+    private List<String> largeImgs;
 
     public long getUserId() {
         return userId;
@@ -68,5 +69,13 @@ public class CommentDto {
 
     public void setImgs(List<String> imgs) {
         this.imgs = imgs;
+    }
+
+    public List<String> getLargeImgs() {
+        return largeImgs;
+    }
+
+    public void setLargeImgs(List<String> largeImgs) {
+        this.largeImgs = largeImgs;
     }
 }
