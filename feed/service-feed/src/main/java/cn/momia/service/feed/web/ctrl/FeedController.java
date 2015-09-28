@@ -44,7 +44,6 @@ public class FeedController extends BaseController {
     @RequestMapping(value = "/follow", method = RequestMethod.POST)
     public MomiaHttpResponse follow(@RequestParam(value = "uid") long userId, @RequestParam(value = "fuid") long followedId) {
         if (!feedServiceFacade.follow(userId, followedId)) return MomiaHttpResponse.FAILED("关注失败");
-
         return MomiaHttpResponse.SUCCESS;
     }
 
@@ -131,7 +130,7 @@ public class FeedController extends BaseController {
         return imgs;
     }
 
-    public List<String> getChildren(UserDto user) {
+    private List<String> getChildren(UserDto user) {
         List<String> children = new ArrayList<String>();
 
         if (user.getChildren() != null) {
@@ -214,6 +213,7 @@ public class FeedController extends BaseController {
     public MomiaHttpResponse add(@RequestBody Feed feed) {
         long feedId = feedServiceFacade.addFeed(feed);
         if (feedId <= 0) return MomiaHttpResponse.FAILED("发表Feed失败");
+
         try {
             // TODO 异步推送
             List<Long> followedIds = feedServiceFacade.queryFollowedIds(feed.getUserId());
