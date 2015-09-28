@@ -45,6 +45,7 @@ public class RongCloudImService extends DbAccessService implements ImService {
     @Override
     public String getToken(long userId) {
         String sql = "SELECT token FROM t_im_token WHERE userId=? AND status=1";
+
         return jdbcTemplate.query(sql, new Object[] { userId }, new ResultSetExtractor<String>() {
             @Override
             public String extractData(ResultSet rs) throws SQLException, DataAccessException {

@@ -75,8 +75,7 @@ public class ParticipantController extends UserRelatedController {
             ids.add(Long.valueOf(id));
         }
 
-        List<Participant> participants = participantService.list(ids);
-        return MomiaHttpResponse.SUCCESS(buildParticipantDtos(participants));
+        return MomiaHttpResponse.SUCCESS(buildParticipantDtos(participantService.list(ids)));
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.GET)

@@ -53,8 +53,6 @@ public class LeaderServiceImpl extends DbAccessService implements LeaderService 
 
     @Override
     public Leader getByUser(long userId) {
-        if (userId <= 0) return Leader.NOT_EXIST_LEADER;
-
         String sql = "SELECT " + joinFields() + " FROM t_user_leader WHERE userId=? LIMIT 1";
 
         return jdbcTemplate.query(sql, new Object[] { userId }, new ResultSetExtractor<Leader>() {

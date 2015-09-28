@@ -52,8 +52,6 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
 
     @Override
     public Participant get(long id) {
-        if (id <= 0) return Participant.NOT_EXIST_PARTICIPANT;
-
         String sql = "SELECT " + joinFields() + " FROM t_user_participant WHERE id=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Participant>() {
@@ -106,8 +104,6 @@ public class ParticipantServiceImpl extends DbAccessService implements Participa
 
     @Override
     public List<Participant> listByUser(long userId) {
-        if (userId <= 0) return new ArrayList<Participant>();
-
         final List<Participant> participants = new ArrayList<Participant>();
         String sql = "SELECT " + joinFields() + " FROM t_user_participant WHERE userId=? AND status=1";
         jdbcTemplate.query(sql, new Object[] { userId }, new RowCallbackHandler() {

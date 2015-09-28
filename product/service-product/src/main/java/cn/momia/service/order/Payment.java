@@ -5,11 +5,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class Payment implements Serializable {
-
     public static final Payment NOT_EXIST_PAYMENT = new Payment();
-    static {
-        NOT_EXIST_PAYMENT.setId(0);
-    }
 
     private long id;
     private long orderId;
@@ -73,21 +69,6 @@ public class Payment implements Serializable {
 
     public void setFee(BigDecimal fee) {
         this.fee = fee;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Payment)) return false;
-
-        Payment payment = (Payment) o;
-
-        return getId() == payment.getId();
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (getId() ^ (getId() >>> 32));
     }
 
     public boolean exists() {

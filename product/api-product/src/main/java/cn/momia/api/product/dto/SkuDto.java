@@ -10,9 +10,6 @@ public class SkuDto {
     }
 
     public static final SkuDto NOT_EXIST_SKU = new SkuDto();
-    static {
-        NOT_EXIST_SKU.setSkuId(0);
-    }
 
     private long productId;
     private long skuId;

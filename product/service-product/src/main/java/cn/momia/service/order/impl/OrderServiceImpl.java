@@ -156,7 +156,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
             return order;
         } catch (Exception e) {
             LOGGER.error("fail to build order: {}", rs.getLong("id"), e);
-            return Order.INVALID_ORDER;
+            return Order.NOT_EXIST_ORDER;
         }
     }
 

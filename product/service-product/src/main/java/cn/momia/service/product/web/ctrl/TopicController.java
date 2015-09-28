@@ -30,7 +30,7 @@ public class TopicController extends ProductRelatedController {
 
     @RequestMapping(value = "/banner", method = RequestMethod.GET)
     public MomiaHttpResponse listBanners(@RequestParam(value = "city") int cityId, @RequestParam int count) {
-        if (cityId < 0 || count <= 0 || count > MAX_BANNER_COUNT) return MomiaHttpResponse.SUCCESS(new ArrayList<Banner>());
+        if (cityId < 0 || count <= 0 || count > MAX_BANNER_COUNT) return MomiaHttpResponse.EMPTY_ARRAY;
         return MomiaHttpResponse.SUCCESS(bannerService.list(cityId, count));
     }
 

@@ -21,11 +21,6 @@ public class Order implements Serializable {
     }
 
     public static final Order NOT_EXIST_ORDER = new Order();
-    public static final Order INVALID_ORDER = new Order();
-    static {
-        NOT_EXIST_ORDER.setId(0);
-        INVALID_ORDER.setId(0);
-    }
 
     private long id;
     private long customerId;
@@ -134,21 +129,6 @@ public class Order implements Serializable {
 
     public void setAddTime(Date addTime) {
         this.addTime = addTime;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Order)) return false;
-
-        Order order = (Order) o;
-
-        return getId() == order.getId();
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (getId() ^ (getId() >>> 32));
     }
 
     public boolean exists() {

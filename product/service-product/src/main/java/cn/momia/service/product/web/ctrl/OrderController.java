@@ -267,7 +267,7 @@ public class OrderController extends BaseController {
         if (productId <= 0 || count <= 0) return MomiaHttpResponse.BAD_REQUEST;
 
         List<Order> orders = orderService.queryDistinctCustomerOrderByProduct(productId, 0, count);
-        if (orders.isEmpty()) return MomiaHttpResponse.SUCCESS(new ArrayList<String>());
+        if (orders.isEmpty()) return MomiaHttpResponse.EMPTY_ARRAY;
 
         List<Long> customerIds = new ArrayList<Long>();
         for (Order order : orders) customerIds.add(order.getCustomerId());

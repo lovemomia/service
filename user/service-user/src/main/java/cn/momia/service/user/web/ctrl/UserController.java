@@ -287,6 +287,7 @@ public class UserController extends UserRelatedController {
     public MomiaHttpResponse listUsers(@RequestParam String uids, @RequestParam(defaultValue = "" + User.Type.BASE) int type) {
         List<Long> ids = new ArrayList<Long>();
         for (String id : Splitter.on(",").trimResults().omitEmptyStrings().split(uids)) ids.add(Long.valueOf(id));
+        if (ids.isEmpty()) return MomiaHttpResponse.EMPTY_ARRAY;
 
         List<User> users = userService.list(ids);
         List<UserDto> userDtos = new ArrayList<UserDto>();
