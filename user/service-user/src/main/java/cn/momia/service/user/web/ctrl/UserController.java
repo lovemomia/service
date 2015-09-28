@@ -42,9 +42,14 @@ public class UserController extends UserRelatedController {
         return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL, false));
     }
 
+    @RequestMapping(value = "/{id}/exists", method = RequestMethod.GET)
+    public MomiaHttpResponse exists(@PathVariable long id) {
+        User user = userService.get(id);
+        return MomiaHttpResponse.SUCCESS(user.exists());
+    }
+
     @RequestMapping(value = "/nickname", method = RequestMethod.PUT)
     public MomiaHttpResponse updateNickName(@RequestParam String utoken, @RequestParam(value = "nickname") String nickName) {
-        if (StringUtils.isBlank(nickName)) return MomiaHttpResponse.FAILED("昵称不能为空");
         if (userService.exists("nickName", nickName)) return MomiaHttpResponse.FAILED("昵称已存在，不能使用");
 
         User user = userService.getByToken(utoken);
@@ -62,8 +67,6 @@ public class UserController extends UserRelatedController {
 
     @RequestMapping(value = "/avatar", method = RequestMethod.PUT)
     public MomiaHttpResponse updateAvatar(@RequestParam String utoken, @RequestParam String avatar) {
-        if (StringUtils.isBlank(avatar)) return MomiaHttpResponse.FAILED("头像不能为空");
-
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
@@ -76,8 +79,6 @@ public class UserController extends UserRelatedController {
 
     @RequestMapping(value = "/name", method = RequestMethod.PUT)
     public MomiaHttpResponse updateName(@RequestParam String utoken, @RequestParam String name) {
-        if (StringUtils.isBlank(name)) return MomiaHttpResponse.FAILED("姓名不能为空");
-
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
@@ -90,8 +91,6 @@ public class UserController extends UserRelatedController {
 
     @RequestMapping(value = "/sex", method = RequestMethod.PUT)
     public MomiaHttpResponse updateSex(@RequestParam String utoken, @RequestParam String sex) {
-        if (StringUtils.isBlank(sex) || SexUtil.isInvalid(sex)) return MomiaHttpResponse.FAILED("无效的性别");
-
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
@@ -116,8 +115,6 @@ public class UserController extends UserRelatedController {
 
     @RequestMapping(value = "/city", method = RequestMethod.PUT)
     public MomiaHttpResponse updateCity(@RequestParam String utoken, @RequestParam(value = "city") int cityId) {
-        if (cityId <= 0) return MomiaHttpResponse.FAILED("无效的城市");
-
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
@@ -130,8 +127,6 @@ public class UserController extends UserRelatedController {
 
     @RequestMapping(value = "/region", method = RequestMethod.PUT)
     public MomiaHttpResponse updateRegion(@RequestParam String utoken, @RequestParam(value = "region") int regionId) {
-        if (regionId <= 0) return MomiaHttpResponse.FAILED("无效的地区");
-
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
@@ -144,8 +139,6 @@ public class UserController extends UserRelatedController {
 
     @RequestMapping(value = "/address", method = RequestMethod.PUT)
     public MomiaHttpResponse updateAddress(@RequestParam String utoken, @RequestParam String address) {
-        if (StringUtils.isBlank(address)) return MomiaHttpResponse.FAILED("住址不能为空");
-
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
@@ -196,8 +189,6 @@ public class UserController extends UserRelatedController {
     public MomiaHttpResponse updateChildName(@RequestParam String utoken,
                                              @PathVariable(value = "cid") long childId,
                                              @RequestParam String name) {
-        if (StringUtils.isBlank(name)) return MomiaHttpResponse.FAILED("孩子姓名不能为空");
-
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
@@ -211,8 +202,6 @@ public class UserController extends UserRelatedController {
     public MomiaHttpResponse updateChildSex(@RequestParam String utoken,
                                             @PathVariable(value = "cid") long childId,
                                             @RequestParam String sex) {
-        if (StringUtils.isBlank(sex) || SexUtil.isInvalid(sex)) return MomiaHttpResponse.FAILED("无效的孩子性别");
-
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
@@ -287,7 +276,6 @@ public class UserController extends UserRelatedController {
     public MomiaHttpResponse listUsers(@RequestParam String uids, @RequestParam(defaultValue = "" + User.Type.BASE) int type) {
         List<Long> ids = new ArrayList<Long>();
         for (String id : Splitter.on(",").trimResults().omitEmptyStrings().split(uids)) ids.add(Long.valueOf(id));
-        if (ids.isEmpty()) return MomiaHttpResponse.EMPTY_ARRAY;
 
         List<User> users = userService.list(ids);
         List<UserDto> userDtos = new ArrayList<UserDto>();

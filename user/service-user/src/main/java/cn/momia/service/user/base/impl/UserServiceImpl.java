@@ -111,8 +111,6 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public User get(long id) {
-        if (id <= 0) return User.NOT_EXIST_USER;
-
         String sql = "SELECT " + joinFields() + " FROM t_user WHERE id=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<User>() {
@@ -166,7 +164,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public List<User> list(Collection<Long> ids) {
-        if (ids == null || ids.isEmpty()) return new ArrayList<User>();
+        if (ids.isEmpty()) return new ArrayList<User>();
 
         final List<User> users = new ArrayList<User>();
         String sql = "SELECT " + joinFields() + " FROM t_user WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
@@ -183,8 +181,6 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public User getByToken(String token) {
-        if (StringUtils.isBlank(token)) return User.NOT_EXIST_USER;
-
         String sql = "SELECT " + joinFields() + " FROM t_user WHERE token=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { token }, new ResultSetExtractor<User>() {
@@ -198,8 +194,6 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public User getByMobile(String mobile) {
-        if (MobileUtil.isInvalid(mobile)) return User.NOT_EXIST_USER;
-
         String sql = "SELECT " + joinFields() + " FROM t_user WHERE mobile=? AND status=1";
 
         return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<User>() {

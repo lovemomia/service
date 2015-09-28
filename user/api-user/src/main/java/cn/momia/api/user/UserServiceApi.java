@@ -85,6 +85,11 @@ public class UserServiceApi extends AbstractServiceApi {
             return JSON.toJavaObject((JSON) executeRequest(request), UserDto.class);
         }
 
+        public boolean exists(long userId) {
+            MomiaHttpRequest request = MomiaHttpRequest.GET(url("user", userId, "exists"));
+            return (Boolean) executeRequest(request);
+        }
+
         public UserDto updateNickName(String utoken, String nickName) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("utoken", utoken)
