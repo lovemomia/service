@@ -4,7 +4,6 @@ import cn.momia.api.product.dto.CommentDto;
 import cn.momia.api.product.dto.ProductDto;
 import cn.momia.api.product.dto.ProductsOfDayDto;
 import cn.momia.api.product.dto.SkuDto;
-import cn.momia.api.product.dto.TopicDto;
 import cn.momia.api.product.dto.BannerDto;
 import cn.momia.common.api.AbstractServiceApi;
 import cn.momia.common.api.dto.PagedList;
@@ -42,11 +41,6 @@ public class ProductServiceApi extends AbstractServiceApi {
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("topic/banner"), builder.build());
 
             return CastUtil.toList((JSONArray) executeRequest(request), BannerDto.class);
-        }
-
-        public TopicDto get(long topicId) {
-            MomiaHttpRequest request = MomiaHttpRequest.GET(url("topic", topicId));
-            return JSON.toJavaObject((JSON) executeRequest(request), TopicDto.class);
         }
     }
 
