@@ -5,7 +5,6 @@ import cn.momia.api.product.dto.ProductsOfDayDto;
 import cn.momia.api.product.dto.SkuDto;
 import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.api.http.MomiaHttpResponse;
-import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.service.product.base.ProductSort;
@@ -23,6 +22,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -112,8 +112,29 @@ public class ProductController extends ProductRelatedController {
 
     @RequestMapping(value = "/month", method = RequestMethod.GET)
     public MomiaHttpResponse queryByMonth(@RequestParam(value = "city") int cityId, @RequestParam int month) {
-        List<Product> products = productServiceFacade.queryByMonth(cityId, month);
+        List<Product> products = productServiceFacade.queryByMonth(cityId, formatCurrentMonth(month), formatNextMonth(month));
         return MomiaHttpResponse.SUCCESS(buildProductsOfDayDtos(month, products));
+    }
+
+    private String formatCurrentMonth(int month) {
+        Calendar calendar = Calendar.getInstance();
+        int currentYear = calendar.get(Calendar.YEAR);
+        int currentMonth = calendar.get(Calendar.MONTH) + 1;
+
+        if (month < currentMonth) return String.format("%d-%02d", currentYear + 1, month);
+        return String.format("%d-%02d", currentYear, month);
+    }
+
+    private String formatNextMonth(int month) {
+        Calendar calendar = Calendar.getInstance();
+        int currentYear = calendar.get(Calendar.YEAR);
+        int currentMonth = calendar.get(Calendar.MONTH) + 1;
+
+        int nextMonth = month + 1;
+        nextMonth = nextMonth > 12 ? nextMonth - 12 : nextMonth;
+
+        if (month < currentMonth || nextMonth < month) return String.format("%d-%02d", currentYear + 1, nextMonth);
+        return String.format("%d-%02d", currentYear, nextMonth);
     }
 
     private List<ProductsOfDayDto> buildProductsOfDayDtos(int month, List<Product> products) {
@@ -124,10 +145,10 @@ public class ProductController extends ProductRelatedController {
             DateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
 
             Date now = new Date();
-            Date currentMonth = monthFormat.parse(TimeUtil.formatYearMonth(month));
+            Date currentMonth = monthFormat.parse(formatCurrentMonth(month));
 
             Date start = now.before(currentMonth) ? currentMonth : now;
-            Date end = monthFormat.parse(TimeUtil.formatNextYearMonth(month));
+            Date end = monthFormat.parse(formatNextMonth(month));
 
             int pageSize = Configuration.getInt("Product.Month.PageSize");
             Map<String, ProductsOfDayDto> productsOfDayDtoMap = new HashMap<String, ProductsOfDayDto>();

@@ -2,7 +2,6 @@ package cn.momia.service.product.facade.impl;
 
 import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.service.DbAccessService;
-import cn.momia.common.util.TimeUtil;
 import cn.momia.service.product.facade.Product;
 import cn.momia.service.product.facade.ProductImage;
 import cn.momia.service.product.facade.ProductServiceFacade;
@@ -239,8 +238,8 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     }
 
     @Override
-    public List<Product> queryByMonth(int cityId, int month) {
-        return buildProducts(baseProductService.queryByMonth(cityId, TimeUtil.formatYearMonth(month), TimeUtil.formatNextYearMonth(month)));
+    public List<Product> queryByMonth(int cityId, String currentMonth, String nextMonth) {
+        return buildProducts(baseProductService.queryByMonth(cityId, currentMonth, nextMonth));
     }
 
     @Override

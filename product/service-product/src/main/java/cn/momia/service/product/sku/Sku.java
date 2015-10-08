@@ -18,6 +18,7 @@ import java.util.List;
 
 public class Sku implements Serializable {
     private static final Splitter TIME_SPLITTER = Splitter.on("~").trimResults().omitEmptyStrings();
+    private static final DateFormat MONTH_DATE_FORMATTER = new SimpleDateFormat("M月d日");
     private static final DateFormat TIME_FORMATTER = new SimpleDateFormat("h:mm");
 
     public static class Status {
@@ -356,7 +357,7 @@ public class Sku implements Serializable {
             for (String timeStr : timeStrs) {
                 Date time = TimeUtil.castToDate(timeStr);
                 if (time != null) {
-                    builder.append(TimeUtil.formatMonthDateWithWeekDay(time));
+                    builder.append(formatMonthDateWithWeekDay(time));
                     if (timeStr.contains(":"))
                         builder.append(TimeUtil.getAmPm(time))
                                 .append(TIME_FORMATTER.format(time));
@@ -364,10 +365,20 @@ public class Sku implements Serializable {
                 }
             }
         } else {
-            builder.append(TimeUtil.formatMonthDateWithWeekDay(start))
+            builder.append(formatMonthDateWithWeekDay(start))
                     .append("~")
-                    .append(TimeUtil.formatMonthDateWithWeekDay(end));
+                    .append(formatMonthDateWithWeekDay(end));
         }
+
+        return builder.toString();
+    }
+
+    private String formatMonthDateWithWeekDay(Date time) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(MONTH_DATE_FORMATTER.format(time))
+                .append("(")
+                .append(TimeUtil.getWeekDay(time))
+                .append(")");
 
         return builder.toString();
     }
@@ -437,14 +448,10 @@ public class Sku implements Serializable {
     }
 
     public boolean isFinished(Date now) {
-        if (offlineTime.before(now) || (startTime.before(now) && !anyTime)) return true;
-
-        return false;
+        return offlineTime.before(now) || (startTime.before(now) && !anyTime);
     }
 
     public boolean isClosed(Date now) {
-        if (isFull() || deadline.before(now) || isFinished(now)) return true;
-
-        return false;
+        return isFull() || deadline.before(now) || isFinished(now);
     }
 }
