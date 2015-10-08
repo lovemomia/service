@@ -1,5 +1,6 @@
 package cn.momia.service.product.web.ctrl;
 
+import cn.momia.api.base.BaseServiceApi;
 import cn.momia.api.base.MetaUtil;
 import cn.momia.api.product.dto.OrderDto;
 import cn.momia.api.product.dto.PlaymateDto;
@@ -60,6 +61,7 @@ public class OrderController extends BaseController {
             processContacts(order.getCustomerId(), order.getMobile(), order.getContacts());
             orderService.checkLimit(order.getCustomerId(), sku.getSkuId(), order.getCount(), sku.getLimit());
 
+            order.setTicketNumber(BaseServiceApi.TICKET.generate());
             orderId = orderService.add(order);
             if (orderId > 0) {
                 order.setId(orderId);

@@ -16,6 +16,7 @@ public class BaseServiceApi extends AbstractServiceApi {
     public static RegionServiceApi REGION = new RegionServiceApi();
     public static FeedbackServiceApi FEEDBACK = new FeedbackServiceApi();
     public static RecommendServiceApi RECOMMEND = new RecommendServiceApi();
+    public static TicketServiceApi TICKET = new TicketServiceApi();
     public static SmsServiceApi SMS = new SmsServiceApi();
 
     public void init() {
@@ -64,6 +65,13 @@ public class BaseServiceApi extends AbstractServiceApi {
                     .add("contacts", contacts);
             MomiaHttpRequest request = MomiaHttpRequest.POST(url("recommend"), builder.build());
             return (Boolean) executeRequest(request);
+        }
+    }
+
+    public static class TicketServiceApi extends BaseServiceApi {
+        public String generate() {
+            MomiaHttpRequest request = MomiaHttpRequest.POST(url("ticket"));
+            return (String) executeRequest(request);
         }
     }
 
