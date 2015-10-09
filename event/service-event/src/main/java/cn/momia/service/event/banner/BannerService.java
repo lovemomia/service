@@ -1,4 +1,4 @@
-package cn.momia.service.banner;
+package cn.momia.service.event.banner;
 
 import java.util.List;
 

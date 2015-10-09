@@ -4,7 +4,6 @@ import cn.momia.api.product.dto.CommentDto;
 import cn.momia.api.product.dto.ProductDto;
 import cn.momia.api.product.dto.ProductsOfDayDto;
 import cn.momia.api.product.dto.SkuDto;
-import cn.momia.api.product.dto.BannerDto;
 import cn.momia.common.api.AbstractServiceApi;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
@@ -19,29 +18,16 @@ import java.util.Collection;
 import java.util.List;
 
 public class ProductServiceApi extends AbstractServiceApi {
-    public static TopicServiceApi TOPIC = new TopicServiceApi();
     public static BaseProductServiceApi PRODUCT = new BaseProductServiceApi();
     public static CommentServiceApi COMMENT = new CommentServiceApi();
     public static SkuServiceApi SKU = new SkuServiceApi();
     public static FavoriteServiceApi FAVORITE = new FavoriteServiceApi();
 
     public void init() {
-        TOPIC.setService(service);
         PRODUCT.setService(service);
         COMMENT.setService(service);
         SKU.setService(service);
         FAVORITE.setService(service);
-    }
-
-    public static class TopicServiceApi extends ProductServiceApi {
-        public List<BannerDto> listBanners(int cityId, int count) {
-            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                    .add("city", cityId)
-                    .add("count", count);
-            MomiaHttpRequest request = MomiaHttpRequest.GET(url("topic/banner"), builder.build());
-
-            return CastUtil.toList((JSONArray) executeRequest(request), BannerDto.class);
-        }
     }
 
     public static class BaseProductServiceApi extends ProductServiceApi {

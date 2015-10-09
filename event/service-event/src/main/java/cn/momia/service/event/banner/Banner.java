@@ -1,6 +1,8 @@
-package cn.momia.api.product.dto;
+package cn.momia.service.event.banner;
 
-public class BannerDto {
+import java.io.Serializable;
+
+public class Banner implements Serializable {
     private String cover;
     private String action;
 

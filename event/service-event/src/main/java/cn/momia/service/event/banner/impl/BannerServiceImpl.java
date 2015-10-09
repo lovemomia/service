@@ -1,8 +1,8 @@
-package cn.momia.service.banner.impl;
+package cn.momia.service.event.banner.impl;
 
 import cn.momia.common.service.DbAccessService;
-import cn.momia.service.banner.Banner;
-import cn.momia.service.banner.BannerService;
+import cn.momia.service.event.banner.Banner;
+import cn.momia.service.event.banner.BannerService;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;
