@@ -1,7 +1,7 @@
 package cn.momia.service.product.sku;
 
+import cn.momia.api.poi.dto.PlaceDto;
 import cn.momia.common.util.TimeUtil;
-import cn.momia.service.product.place.Place;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
@@ -145,7 +145,7 @@ public class Sku implements Serializable {
     private long leaderUserId;
     private boolean forNewUser;
 
-    private Place place;
+    private PlaceDto place;
 
     public long getId() {
         return id;
@@ -315,7 +315,7 @@ public class Sku implements Serializable {
         this.forNewUser = forNewUser;
     }
 
-    public void setPlace(Place place) {
+    public void setPlace(PlaceDto place) {
         this.place = place;
     }
 

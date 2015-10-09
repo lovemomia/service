@@ -1,9 +1,9 @@
 package cn.momia.service.product.facade;
 
 import cn.momia.api.base.dto.RegionDto;
+import cn.momia.api.poi.dto.PlaceDto;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.service.product.base.BaseProduct;
-import cn.momia.service.product.place.Place;
 import cn.momia.service.product.sku.Sku;
 import com.alibaba.fastjson.JSONArray;
 
@@ -35,7 +35,7 @@ public class Product implements Serializable {
 
     private BaseProduct baseProduct;
     private List<ProductImage> imgs;
-    private List<Place> places;
+    private List<PlaceDto> places;
     private List<Sku> skus;
 
     public long getId() {
@@ -128,15 +128,15 @@ public class Product implements Serializable {
     }
 
     public String getPoi() {
-        Place nearestPlace = places.get(0); // TODO 选最近的
+        PlaceDto nearestPlace = places.get(0); // TODO 选最近的
         return nearestPlace.getLng() + ":" + nearestPlace.getLat();
     }
 
-    public List<Place> getPlaces() {
+    public List<PlaceDto> getPlaces() {
         return places;
     }
 
-    public void setPlaces(List<Place> places) {
+    public void setPlaces(List<PlaceDto> places) {
         this.places = places;
     }
 

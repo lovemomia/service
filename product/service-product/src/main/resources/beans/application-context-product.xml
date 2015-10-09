@@ -13,7 +13,6 @@
     <bean id="favoriteService" class="cn.momia.service.favorite.impl.FavoriteServiceImpl" parent="dbAccessService" />
     <bean id="productServiceFacade" class="cn.momia.service.product.facade.impl.ProductServiceFacadeImpl" parent="dbAccessService">
         <property name="baseProductService" ref="baseProductService" />
-        <property name="placeService" ref="placeService" />
         <property name="skuService" ref="skuService" />
     </bean>
 

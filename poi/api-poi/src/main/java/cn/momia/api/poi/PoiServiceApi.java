@@ -18,11 +18,19 @@ public class PoiServiceApi extends AbstractServiceApi {
         POI.setService(service);
     }
 
+    public PlaceDto get(int placeId) {
+        return get(placeId, PlaceDto.Type.BASE);
+    }
+
     public PlaceDto get(int placeId, int type) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("type", type);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("poi", placeId), builder.build());
 
         return JSON.toJavaObject((JSON) executeRequest(request), PlaceDto.class);
+    }
+
+    public List<PlaceDto> list(Collection<Integer> placeIds) {
+        return list(placeIds, PlaceDto.Type.BASE);
     }
 
     public List<PlaceDto> list(Collection<Integer> placeIds, int type) {

@@ -1,5 +1,7 @@
 package cn.momia.service.product.facade.impl;
 
+import cn.momia.api.poi.PoiServiceApi;
+import cn.momia.api.poi.dto.PlaceDto;
 import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.service.DbAccessService;
 import cn.momia.service.product.facade.Product;
@@ -8,8 +10,6 @@ import cn.momia.service.product.facade.ProductServiceFacade;
 import cn.momia.service.product.base.BaseProduct;
 import cn.momia.service.product.base.BaseProductService;
 import cn.momia.service.product.base.ProductSort;
-import cn.momia.service.product.place.Place;
-import cn.momia.service.product.place.PlaceService;
 import cn.momia.service.product.sku.Sku;
 import cn.momia.service.product.sku.SkuService;
 import org.apache.commons.lang3.StringUtils;
@@ -32,15 +32,10 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductServiceFacadeImpl.class);
 
     private BaseProductService baseProductService;
-    private PlaceService placeService;
     private SkuService skuService;
 
     public void setBaseProductService(BaseProductService baseProductService) {
         this.baseProductService = baseProductService;
-    }
-
-    public void setPlaceService(PlaceService placeService) {
-        this.placeService = placeService;
     }
 
     public void setSkuService(SkuService skuService) {
@@ -63,7 +58,7 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
         if (!mini) {
             product.setImgs(getProductImgs(baseProduct.getId()));
 
-            List<Place> places = placeService.list(baseProduct.getPlaces());
+            List<PlaceDto> places = PoiServiceApi.POI.list(baseProduct.getPlaces());
             if (places.isEmpty()) return Product.NOT_EXIST_PRODUCT;
 
             product.setPlaces(places);
@@ -76,9 +71,9 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
     private List<Sku> buildFullSkus(List<Sku> skus) {
         List<Integer> placeIds = new ArrayList<Integer>();
         for (Sku sku : skus) placeIds.add(sku.getPlaceId());
-        List<Place> places = placeService.list(placeIds);
-        Map<Integer, Place> placesMap = new HashMap<Integer, Place>();
-        for (Place place : places) placesMap.put(place.getId(), place);
+        List<PlaceDto> places = PoiServiceApi.POI.list(placeIds);
+        Map<Integer, PlaceDto> placesMap = new HashMap<Integer, PlaceDto>();
+        for (PlaceDto place : places) placesMap.put(place.getId(), place);
 
         for (Sku sku : skus) sku.setPlace(placesMap.get(sku.getPlaceId()));
 
@@ -128,8 +123,8 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
         }
 
         Map<Long, List<ProductImage>> imgsOfProducts = getProductsImgs(productIds);
-        Map<Integer, Place> placesOfProducts = new HashMap<Integer, Place>();
-        for (Place place : placeService.list(placeIds)) placesOfProducts.put(place.getId(), place);
+        Map<Integer, PlaceDto> placesOfProducts = new HashMap<Integer, PlaceDto>();
+        for (PlaceDto place : PoiServiceApi.POI.list(placeIds)) placesOfProducts.put(place.getId(), place);
         List<Sku> skus = buildFullSkus(skuService.queryByProducts(productIds));
         Map<Long, List<Sku>> skusOfProducts = new HashMap<Long, List<Sku>>();
         for (Sku sku : skus) {
@@ -146,9 +141,9 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
             Product product = new Product();
             product.setBaseProduct(baseProduct);
             product.setImgs(imgsOfProducts.get(baseProduct.getId()));
-            List<Place> places = new ArrayList<Place>();
+            List<PlaceDto> places = new ArrayList<PlaceDto>();
             for (int placeId : baseProduct.getPlaces()) {
-                Place place = placesOfProducts.get(placeId);
+                PlaceDto place = placesOfProducts.get(placeId);
                 if (place != null) places.add(place);
             }
             product.setPlaces(places);
@@ -271,7 +266,7 @@ public class ProductServiceFacadeImpl extends DbAccessService implements Product
         if (sku.exists()) {
             int placeId = sku.getPlaceId();
             if (placeId > 0) {
-                Place place = placeService.get(placeId);
+                PlaceDto place = PoiServiceApi.POI.get(placeId);;
                 if (place.exists()) sku.setPlace(place);
             }
         }
