@@ -91,25 +91,6 @@ public class ProductServiceApi extends AbstractServiceApi {
             return (String) executeRequest(request);
         }
 
-        public void favor(long userId, long productId) {
-            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
-            MomiaHttpRequest request = MomiaHttpRequest.POST(url("product", productId, "favor"), builder.build());
-            executeRequest(request);
-        }
-
-        public void unfavor(long userId, long productId) {
-            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
-            MomiaHttpRequest request = MomiaHttpRequest.POST(url("product", productId, "unfavor"), builder.build());
-            executeRequest(request);
-        }
-
-        public boolean favored(long userId, long productId) {
-            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
-            MomiaHttpRequest request = MomiaHttpRequest.GET(url("product", productId, "favored"), builder.build());
-
-            return (Boolean) executeRequest(request);
-        }
-
         public void sold(long productId, int count) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("count", count);
             MomiaHttpRequest request = MomiaHttpRequest.POST(url("product", productId, "sold"), builder.build());
@@ -187,6 +168,25 @@ public class ProductServiceApi extends AbstractServiceApi {
     }
 
     public static class FavoriteServiceApi extends ProductServiceApi {
+        public void favor(long userId, long productId) {
+            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+            MomiaHttpRequest request = MomiaHttpRequest.POST(url("product", productId, "favor"), builder.build());
+            executeRequest(request);
+        }
+
+        public void unfavor(long userId, long productId) {
+            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+            MomiaHttpRequest request = MomiaHttpRequest.POST(url("product", productId, "unfavor"), builder.build());
+            executeRequest(request);
+        }
+
+        public boolean favored(long userId, long productId) {
+            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+            MomiaHttpRequest request = MomiaHttpRequest.GET(url("product", productId, "favored"), builder.build());
+
+            return (Boolean) executeRequest(request);
+        }
+
         public PagedList<ProductDto> listFavorites(long userId, int start, int count) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                     .add("uid", userId)
