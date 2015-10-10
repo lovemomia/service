@@ -41,6 +41,6 @@ public class RegionDto {
     }
 
     public boolean exists() {
-        return id > 0;
+        return id == MULTI_REGION_ID || id > 0;
     }
 }

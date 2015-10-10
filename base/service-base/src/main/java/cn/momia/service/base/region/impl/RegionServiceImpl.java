@@ -21,15 +21,15 @@ public class RegionServiceImpl extends DbAccessService implements RegionService 
         final List<Region> newRegionsCache = new ArrayList<Region>();
         final Map<Integer, Integer> newRegionsMap = new HashMap<Integer, Integer>();
 
-        String sql = "SELECT id, cityId, name, parentId FROM t_region WHERE status=1";
+        String sql = "SELECT Id, CityId, Name, ParentId FROM SG_Region WHERE Status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 Region region = new Region();
-                region.setId(rs.getInt("id"));
-                region.setCityId(rs.getInt("cityId"));
-                region.setName(rs.getString("name"));
-                region.setParentId(rs.getInt("parentId"));
+                region.setId(rs.getInt("Id"));
+                region.setCityId(rs.getInt("CityId"));
+                region.setName(rs.getString("Name"));
+                region.setParentId(rs.getInt("ParentId"));
                 newRegionsCache.add(region);
                 newRegionsMap.put(region.getId(), newRegionsCache.size() - 1);
             }

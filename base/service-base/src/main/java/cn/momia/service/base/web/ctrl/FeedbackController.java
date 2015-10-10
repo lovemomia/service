@@ -15,7 +15,7 @@ public class FeedbackController extends BaseController {
     @Autowired private FeedbackService feedbackService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public MomiaHttpResponse add(@RequestParam String content, @RequestParam String email) {
-        return MomiaHttpResponse.SUCCESS(feedbackService.add(content, email) > 0);
+    public MomiaHttpResponse add(@RequestParam String content, @RequestParam String contact) {
+        return MomiaHttpResponse.SUCCESS(feedbackService.add(content, contact) > 0);
     }
 }

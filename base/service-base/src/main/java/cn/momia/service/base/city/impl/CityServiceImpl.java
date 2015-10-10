@@ -21,13 +21,13 @@ public class CityServiceImpl extends DbAccessService implements CityService {
         final List<City> newCitiesCache = new ArrayList<City>();
         final Map<Integer, Integer> newCitysMap = new HashMap<Integer, Integer>();
 
-        String sql = "SELECT id, name FROM t_city WHERE status=1";
+        String sql = "SELECT Id, Name FROM SG_City WHERE Status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 City city = new City();
-                city.setId(rs.getInt("id"));
-                city.setName(rs.getString("name"));
+                city.setId(rs.getInt("Id"));
+                city.setName(rs.getString("Name"));
                 newCitiesCache.add(city);
                 newCitysMap.put(city.getId(), newCitiesCache.size() - 1);
             }

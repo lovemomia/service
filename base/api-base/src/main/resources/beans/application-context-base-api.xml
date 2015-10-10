@@ -4,7 +4,11 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean class="cn.momia.api.base.BaseServiceApi" init-method="init">
+    <bean id="abstractBaseApi" class="cn.momia.common.api.AbstractServiceApi" abstract="true">
         <property name="service" value="${Service.Base}" />
     </bean>
+    <bean class="cn.momia.api.base.CityServiceApi" parent="abstractBaseApi" />
+    <bean class="cn.momia.api.base.RegionServiceApi" parent="abstractBaseApi" />
+    <bean class="cn.momia.api.base.FeedbackServiceApi" parent="abstractBaseApi" />
+    <bean class="cn.momia.api.base.SmsServiceApi" parent="abstractBaseApi" />
 </beans>

@@ -43,12 +43,12 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
     }
 
     private Date getLastSendTime(String mobile) {
-        String sql = "SELECT sendTime FROM t_verify WHERE mobile=?";
+        String sql = "SELECT SendTime FROM SG_Verify WHERE Mobile=?";
 
         return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<Date>() {
             @Override
             public Date extractData(ResultSet rs) throws SQLException, DataAccessException {
-                return rs.next() ? rs.getTimestamp("sendTime") : null;
+                return rs.next() ? rs.getTimestamp("SendTime") : null;
             }
         });
     }
@@ -64,7 +64,7 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
     }
 
     private String getGeneratedCode(String mobile) {
-        String sql = "SELECT code FROM t_verify WHERE mobile=? AND generateTime>? AND status=1";
+        String sql = "SELECT Code FROM SG_Verify WHERE Mobile=? AND GenerateTime>? AND Status=1";
 
         return jdbcTemplate.query(sql, new Object[] { mobile, new Date(new Date().getTime() - 30 * 60 * 1000) }, new ResultSetExtractor<String>() {
             @Override
@@ -81,16 +81,16 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
 
     private void updateCode(String mobile, String code) {
         if (exists(mobile)) {
-            String sql = "UPDATE t_verify SET mobile=?, code=?, generateTime=NOW(), sendTime=NULL, status=1 WHERE mobile=?";
+            String sql = "UPDATE SG_Verify SET Mobile=?, Code=?, GenerateTime=NOW(), SendTime=NULL, Status=1 WHERE Mobile=?";
             jdbcTemplate.update(sql, new Object[] { mobile, code, mobile });
         } else {
-            String sql = "INSERT INTO t_verify(mobile, code, generateTime) VALUES (?, ?, NOW())";
+            String sql = "INSERT INTO SG_Verify(Mobile, Code, GenerateTime) VALUES (?, ?, NOW())";
             jdbcTemplate.update(sql, new Object[] { mobile, code });
         }
     }
 
     private boolean exists(String mobile) {
-        String sql = "SELECT COUNT(1) FROM t_verify WHERE mobile=?";
+        String sql = "SELECT COUNT(1) FROM SG_Verify WHERE Mobile=?";
 
         return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<Boolean>() {
             @Override
@@ -127,13 +127,13 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
     }
 
     private boolean updateSendTime(String mobile) {
-        String sql = "UPDATE t_verify SET sendTime=NOW() WHERE mobile=?";
+        String sql = "UPDATE SG_Verify SET SendTime=NOW() WHERE Mobile=?";
         return jdbcTemplate.update(sql, new Object[] { mobile }) == 1;
     }
 
     @Override
     public boolean verifyCode(String mobile, String code) {
-        String sql = "SELECT COUNT(1) FROM t_verify WHERE mobile=? AND code=? AND generateTime>? AND status=1";
+        String sql = "SELECT COUNT(1) FROM SG_Verify WHERE Mobile=? AND Code=? AND GenerateTime>? AND Status=1";
         boolean successful = jdbcTemplate.query(sql, new Object[] { mobile, code, new Date(new Date().getTime() - 30 * 60 * 1000) }, new ResultSetExtractor<Boolean>() {
             @Override
             public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -147,7 +147,7 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
     }
 
     private void disable(String mobile, String code) {
-        String sql = "UPDATE t_verify SET status=0 WHERE mobile=? AND code=?";
+        String sql = "UPDATE SG_Verify SET Status=0 WHERE Mobile=? AND Code=?";
         jdbcTemplate.update(sql, new Object[] { mobile, code });
     }
 
