@@ -10,6 +10,7 @@
 
     <Service>
         <Base>http://localhost:7070</Base>
+        <Course>http://localhost:7070</Course>
         <Event>http://localhost:7070</Event>
         <Poi>http://localhost:7070</Poi>
         <User>http://localhost:7070</User>

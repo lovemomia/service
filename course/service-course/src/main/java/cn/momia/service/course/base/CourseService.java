@@ -1,0 +1,11 @@
+package cn.momia.service.course.base;
+
+import java.util.Collection;
+import java.util.List;
+
+public interface CourseService {
+    List<Course> list(Collection<Long> ids);
+
+    long queryRecommendCount(int cityId);
+    List<Course> queryRecommend(int cityId, int start, int count);
+}
