@@ -5,7 +5,7 @@ import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;
 
 public class SmsServiceApi extends AbstractServiceApi {
-    public boolean send(String mobile, String type) {
+    public boolean send(String mobile) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("mobile", mobile);
         MomiaHttpRequest request = MomiaHttpRequest.POST(url("sms/send"), builder.build());
 
