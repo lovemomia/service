@@ -5,6 +5,4 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="userService" class="cn.momia.service.user.base.impl.UserServiceImpl" parent="dbAccessService" />
-    <bean id="participantService" class="cn.momia.service.user.participant.impl.ParticipantServiceImpl" parent="dbAccessService" />
-    <bean id="leaderService" class="cn.momia.service.user.leader.impl.LeaderServiceImpl" parent="dbAccessService" />
 </beans>

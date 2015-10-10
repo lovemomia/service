@@ -14,7 +14,7 @@ public class EventServiceImpl extends DbAccessService implements EventService {
     @Override
     public List<Event> list(int cityId, int count) {
         final List<Event> events = new ArrayList<Event>();
-        String sql = "SELECT Title, Img, Desc, Action FROM SG_Event WHERE Status=1 AND (CityId=? OR CityId=0) ORDER BY Weight DESC, AddTime DESC LIMIT ?";
+        String sql = "SELECT Title, Img, `Desc`, Action FROM SG_Event WHERE Status=1 AND (CityId=? OR CityId=0) ORDER BY Weight DESC, AddTime DESC LIMIT ?";
         jdbcTemplate.query(sql, new Object[] { cityId, count }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
