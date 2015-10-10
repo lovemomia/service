@@ -10,5 +10,4 @@ public interface LeaderService {
     List<Leader> listByUsers(Collection<Long> userIds);
 
     boolean update(Leader leader);
-    boolean deleteByUser(long userId);
 }
