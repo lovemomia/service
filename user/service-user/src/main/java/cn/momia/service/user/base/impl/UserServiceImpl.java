@@ -2,11 +2,10 @@ package cn.momia.service.user.base.impl;
 
 import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.service.DbAccessService;
-import cn.momia.common.util.MobileUtil;
+import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
-import com.google.common.base.Splitter;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -25,25 +24,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class UserServiceImpl extends DbAccessService implements UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static final Splitter CHILDREN_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
-    private static final String[] USER_FIELDS = { "id", "token", "nickName", "mobile", "password", "avatar", "name", "sex", "birthday", "cityId", "regionId", "address", "children", "payed", "inviteCode" };
+    private static final String[] USER_FIELDS = { "Id", "NickName", "Avatar", "Mobile", "Name", "Sex", "Birthday", "CityId", "RegionId", "Address", "Token" };
 
     @Override
     public boolean exists(String field, String value) {
-        String sql = "SELECT COUNT(1) FROM t_user WHERE " + field + "=?";
+        String sql = "SELECT COUNT(1) FROM SG_User WHERE " + field + "=?";
 
         return jdbcTemplate.query(sql, new Object[] { value }, new ResultSetExtractor<Boolean>() {
             @Override
@@ -59,7 +52,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO t_user(nickName, mobile, password, token, inviteCode, addTime) VALUES (?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO SG_User(NickName, Mobile, Password, Token, InviteCode, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, nickName);
                 ps.setString(2, mobile);
@@ -93,12 +86,12 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     private String generateInviteCode(String nickName, String mobile) {
-        return DigestUtils.md5Hex(StringUtils.join(new String[] { nickName, mobile, DATE_FORMAT.format(new Date()), Configuration.getString("SecretKey.UToken") }, "|"));
+        return DigestUtils.md5Hex(StringUtils.join(new String[] { nickName, mobile, TimeUtil.STANDARD_FORMAT.format(new Date()), Configuration.getString("SecretKey.UToken") }, "|"));
     }
 
     @Override
     public boolean validatePassword(String mobile, String password) {
-        String sql = "SELECT mobile, password FROM t_user WHERE mobile=? AND password=?";
+        String sql = "SELECT Mobile, Password FROM SG_User WHERE Mobile=? AND Password=?";
 
         return jdbcTemplate.query(sql, new Object[] { mobile, encryptPassword(mobile, password, Configuration.getString("SecretKey.Password")) }, new ResultSetExtractor<Boolean>() {
             @Override
@@ -111,7 +104,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public User get(long id) {
-        String sql = "SELECT " + joinFields() + " FROM t_user WHERE id=? AND status=1";
+        String sql = "SELECT " + joinFields() + " FROM SG_User WHERE Id=? AND Status=1";
 
         return jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<User>() {
             @Override
@@ -129,20 +122,17 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     private User buildUser(ResultSet rs) throws SQLException {
         try {
             User user = new User();
-            user.setId(rs.getLong("id"));
-            user.setToken(rs.getString("token"));
-            user.setNickName(rs.getString("nickName"));
-            user.setMobile(rs.getString("mobile"));
-            user.setAvatar(rs.getString("avatar"));
-            user.setName(rs.getString("name"));
-            user.setSex(rs.getString("sex"));
-            user.setBirthday(rs.getDate("birthday"));
-            user.setCityId(rs.getInt("cityId"));
-            user.setRegionId(rs.getInt("regionId"));
-            user.setAddress(rs.getString("address"));
-            user.setChildren(parseChildren(rs.getString("children")));
-            user.setPayed(rs.getBoolean("payed"));
-            user.setInviteCode(rs.getString("inviteCode"));
+            user.setId(rs.getLong("Id"));
+            user.setNickName(rs.getString("NickName"));
+            user.setAvatar(rs.getString("Avatar"));
+            user.setMobile(rs.getString("Mobile"));
+            user.setName(rs.getString("Name"));
+            user.setSex(rs.getString("Sex"));
+            user.setBirthday(rs.getDate("Birthday"));
+            user.setCityId(rs.getInt("CityId"));
+            user.setRegionId(rs.getInt("RegionId"));
+            user.setAddress(rs.getString("Address"));
+            user.setToken(rs.getString("Token"));
 
             return user;
         } catch (Exception e) {
@@ -151,23 +141,12 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         }
     }
 
-    private Set<Long> parseChildren(String children) {
-        Set<Long> childrenIds = new HashSet<Long>();
-        if (!StringUtils.isBlank(children)) {
-            for (String childId : CHILDREN_SPLITTER.split(children)) {
-                childrenIds.add(Long.valueOf(childId));
-            }
-        }
-
-        return childrenIds;
-    }
-
     @Override
     public List<User> list(Collection<Long> ids) {
         if (ids.isEmpty()) return new ArrayList<User>();
 
         final List<User> users = new ArrayList<User>();
-        String sql = "SELECT " + joinFields() + " FROM t_user WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
+        String sql = "SELECT " + joinFields() + " FROM SG_User WHERE Id IN (" + StringUtils.join(ids, ",") + ") AND Status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -181,7 +160,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public User getByToken(String token) {
-        String sql = "SELECT " + joinFields() + " FROM t_user WHERE token=? AND status=1";
+        String sql = "SELECT " + joinFields() + " FROM SG_User WHERE Token=? AND Status=1";
 
         return jdbcTemplate.query(sql, new Object[] { token }, new ResultSetExtractor<User>() {
             @Override
@@ -194,7 +173,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public User getByMobile(String mobile) {
-        String sql = "SELECT " + joinFields() + " FROM t_user WHERE mobile=? AND status=1";
+        String sql = "SELECT " + joinFields() + " FROM SG_User WHERE Mobile=? AND Status=1";
 
         return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<User>() {
             @Override
@@ -207,7 +186,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public boolean updateNickName(long id, String nickName) {
-        String sql = "UPDATE t_user SET nickName=? WHERE id=?";
+        String sql = "UPDATE SG_User SET NickName=? WHERE Id=?";
         return update(sql, new Object[] { nickName, id });
     }
 
@@ -217,73 +196,49 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public boolean updateAvatar(long id, String avatar) {
-        String sql = "UPDATE t_user SET avatar=? WHERE id=?";
+        String sql = "UPDATE SG_User SET Avatar=? WHERE Id=?";
         return update(sql, new Object[] { avatar, id });
     }
 
     @Override
     public boolean updateName(long id, String name) {
-        String sql = "UPDATE t_user SET name=? WHERE id=?";
+        String sql = "UPDATE SG_User SET Name=? WHERE Id=?";
         return update(sql, new Object[] { name, id });
     }
 
     @Override
     public boolean updateSex(long id, String sex) {
-        String sql = "UPDATE t_user SET sex=? WHERE id=?";
+        String sql = "UPDATE SG_User SET Sex=? WHERE Id=?";
         return update(sql, new Object[] { sex, id });
     }
 
     @Override
     public boolean updateBirthday(long id, Date birthday) {
-        String sql = "UPDATE t_user SET `birthday`=? WHERE id=?";
+        String sql = "UPDATE SG_User SET Birthday=? WHERE Id=?";
         return update(sql, new Object[] { birthday, id });
     }
 
     @Override
     public boolean updateCityId(long id, int cityId) {
-        String sql = "UPDATE t_user SET `cityId`=? WHERE id=?";
+        String sql = "UPDATE SG_User SET CityId=? WHERE Id=?";
         return update(sql, new Object[] { cityId, id });
     }
 
     @Override
     public boolean updateRegionId(long id, int regionId) {
-        String sql = "UPDATE t_user SET `regionId`=? WHERE id=?";
+        String sql = "UPDATE SG_User SET RegionId=? WHERE Id=?";
         return update(sql, new Object[] { regionId, id });
     }
 
     @Override
     public boolean updateAddress(long id, String address) {
-        String sql = "UPDATE t_user SET address=? WHERE id=?";
+        String sql = "UPDATE SG_User SET Address=? WHERE Id=?";
         return update(sql, new Object[] { address, id });
     }
 
     @Override
-    public boolean updateChildren(long id, Set<Long> children) {
-        String sql = "UPDATE t_user SET children=? WHERE id=?";
-        return update(sql, new Object[] { StringUtils.join(children, ","), id });
-    }
-
-    @Override
     public boolean updatePassword(long id, String mobile, String password) {
-        String sql = "UPDATE t_user SET password=? WHERE id=?";
+        String sql = "UPDATE SG_User SET Password=? WHERE Id=?";
         return update(sql, new Object[] { encryptPassword(mobile, password, Configuration.getString("SecretKey.Password")), id });
-    }
-
-    @Override
-    public boolean setPayed(long id) {
-        String sql = "UPDATE t_user SET payed=? WHERE id=? AND payed=?";
-        return update(sql, new Object[] { true, id, false });
-    }
-
-    @Override
-    public long getIdByCode(String inviteCode) {
-        String sql = "SELECT id FROM t_user WHERE inviteCode=? AND status=1";
-
-        return jdbcTemplate.query(sql, new Object[] { inviteCode }, new ResultSetExtractor<Long>() {
-            @Override
-            public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
-                return rs.next() ? rs.getLong("id") : 0;
-            }
-        });
     }
 }

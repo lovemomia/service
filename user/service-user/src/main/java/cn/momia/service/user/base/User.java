@@ -2,7 +2,6 @@ package cn.momia.service.user.base;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Set;
 
 public class User implements Serializable {
     public static class Type {
@@ -14,19 +13,18 @@ public class User implements Serializable {
     public static final User NOT_EXIST_USER = new User();
 
     private long id;
-    private String token;
     private String nickName;
-    private String mobile;
     private String avatar;
+
+    private String mobile;
     private String name;
     private String sex;
     private Date birthday;
     private int cityId;
     private int regionId;
     private String address;
-    private Set<Long> children;
-    private boolean payed;
-    private String inviteCode;
+
+    private String token;
 
     public long getId() {
         return id;
@@ -34,14 +32,6 @@ public class User implements Serializable {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
     }
 
     public String getNickName() {
@@ -52,20 +42,20 @@ public class User implements Serializable {
         this.nickName = nickName;
     }
 
-    public String getMobile() {
-        return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
-    }
-
     public String getAvatar() {
         return avatar;
     }
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 
     public String getName() {
@@ -116,28 +106,12 @@ public class User implements Serializable {
         this.address = address;
     }
 
-    public Set<Long> getChildren() {
-        return children;
+    public String getToken() {
+        return token;
     }
 
-    public void setChildren(Set<Long> children) {
-        this.children = children;
-    }
-
-    public boolean isPayed() {
-        return payed;
-    }
-
-    public void setPayed(boolean payed) {
-        this.payed = payed;
-    }
-
-    public String getInviteCode() {
-        return inviteCode;
-    }
-
-    public void setInviteCode(String inviteCode) {
-        this.inviteCode = inviteCode;
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public boolean exists() {

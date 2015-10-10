@@ -3,11 +3,8 @@ package cn.momia.api.user.dto;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
-import java.util.List;
 
 public class UserDto {
-    public static final UserDto NOT_EXIST_USER = new UserDto();
-
     public static class Type {
         public static final int MINI = 1;
         public static final int BASE = 2;
@@ -18,19 +15,15 @@ public class UserDto {
     private String nickName;
     private String avatar;
 
-    private String token;
     private String mobile;
     private String name;
     private String sex;
-    @JSONField(format = "yyyy-MM-dd") private Date birthday;
-    @Deprecated private Integer city;
+    private Date birthday;
     private Integer cityId;
     private Integer regionId;
     private String address;
-    private String inviteCode;
 
-    private List<ParticipantDto> children;
-    private Boolean leader;
+    private String token;
 
     public long getId() {
         return id;
@@ -54,14 +47,6 @@ public class UserDto {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
     }
 
     public String getMobile() {
@@ -88,20 +73,13 @@ public class UserDto {
         this.sex = sex;
     }
 
+    @JSONField(format = "yyyy-MM-dd")
     public Date getBirthday() {
         return birthday;
     }
 
     public void setBirthday(Date birthday) {
         this.birthday = birthday;
-    }
-
-    public Integer getCity() {
-        return city;
-    }
-
-    public void setCity(Integer city) {
-        this.city = city;
     }
 
     public Integer getCityId() {
@@ -128,28 +106,12 @@ public class UserDto {
         this.address = address;
     }
 
-    public String getInviteCode() {
-        return inviteCode;
+    public String getToken() {
+        return token;
     }
 
-    public void setInviteCode(String inviteCode) {
-        this.inviteCode = inviteCode;
-    }
-
-    public List<ParticipantDto> getChildren() {
-        return children;
-    }
-
-    public void setChildren(List<ParticipantDto> children) {
-        this.children = children;
-    }
-
-    public Boolean isLeader() {
-        return leader;
-    }
-
-    public void setLeader(Boolean leader) {
-        this.leader = leader;
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public boolean exists() {

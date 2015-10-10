@@ -1,6 +1,6 @@
 package cn.momia.api.user.dto;
 
-public class ContactsDto {
+public class ContactDto {
     private String name;
     private String mobile;
 
