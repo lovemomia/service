@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -49,27 +48,6 @@ public class LeaderController extends UserRelatedController {
         if (!leader.exists()) return MomiaHttpResponse.FAILED("您还没注册为领队");
 
         return MomiaHttpResponse.SUCCESS(buildLeaderDto(leader));
-    }
-
-    @RequestMapping(method = RequestMethod.PUT, consumes = "application/json")
-    public MomiaHttpResponse update(@RequestBody Leader leader) {
-        if (MobileUtil.isInvalid(leader.getMobile())) return MomiaHttpResponse.FAILED("无效的手机号码");
-        if (leader.isInvalid()) return MomiaHttpResponse.FAILED("领队信息不完整或不正确");
-
-        if (!leaderService.getByUser(leader.getUserId()).exists()) return MomiaHttpResponse.FAILED("您还没有注册成为领队");
-        if (!leaderService.update(leader)) return MomiaHttpResponse.FAILED("更新领队信息失败");
-
-        return MomiaHttpResponse.SUCCESS;
-    }
-
-    @RequestMapping(method = RequestMethod.DELETE)
-    public MomiaHttpResponse delete(@RequestParam String utoken) {
-        User user = userService.getByToken(utoken);
-        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
-
-        if (!leaderService.deleteByUser(user.getId())) return MomiaHttpResponse.FAILED("删除领队信息失败");
-
-        return MomiaHttpResponse.SUCCESS;
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)

@@ -319,6 +319,11 @@ public class UserServiceApi extends AbstractServiceApi {
             return JSON.toJavaObject((JSON) executeRequest(request), LeaderStatusDto.class);
         }
 
+        public void add(LeaderDto leaderDto) {
+            MomiaHttpRequest request = MomiaHttpRequest.POST(url("leader"), JSON.toJSONString(leaderDto));
+            executeRequest(request);
+        }
+
         public LeaderDto get(String utoken) {
             MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("leader"), builder.build());
@@ -331,22 +336,6 @@ public class UserServiceApi extends AbstractServiceApi {
             MomiaHttpRequest request = MomiaHttpRequest.GET(url("leader/list"), builder.build());
 
             return CastUtil.toList((JSONArray) executeRequest(request), LeaderDto.class);
-        }
-
-        public void add(LeaderDto leaderDto) {
-            MomiaHttpRequest request = MomiaHttpRequest.POST(url("leader"), JSON.toJSONString(leaderDto));
-            executeRequest(request);
-        }
-
-        public void update(LeaderDto leaderDto) {
-            MomiaHttpRequest request = MomiaHttpRequest.PUT(url("leader"), JSON.toJSONString(leaderDto));
-            executeRequest(request);
-        }
-
-        public void delete(String utoken) {
-            MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-            MomiaHttpRequest request = MomiaHttpRequest.DELETE(url("leader"), builder.build());
-            executeRequest(request);
         }
     }
 }
