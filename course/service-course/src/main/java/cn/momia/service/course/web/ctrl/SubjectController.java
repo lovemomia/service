@@ -1,6 +1,7 @@
 package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.course.dto.SubjectDto;
+import cn.momia.api.course.dto.SubjectSkuDto;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
@@ -10,6 +11,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/subject")
@@ -39,5 +43,24 @@ public class SubjectController {
         }
 
         return subjectDto;
+    }
+
+    @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
+    public MomiaHttpResponse listSkus(@PathVariable long id) {
+        return MomiaHttpResponse.SUCCESS(buildSubjectSkuDtos(subjectService.listSkus(id)));
+    }
+
+    private List<SubjectSkuDto> buildSubjectSkuDtos(List<SubjectSku> skus) {
+        List<SubjectSkuDto> skuDtos = new ArrayList<SubjectSkuDto>();
+        for (SubjectSku sku : skus) {
+            SubjectSkuDto skuDto = new SubjectSkuDto();
+            skuDto.setId(sku.getId());
+            skuDto.setPrice(sku.getPrice());
+            skuDto.setDesc(sku.getDesc());
+
+            skuDtos.add(skuDto);
+        }
+
+        return skuDtos;
     }
 }

@@ -112,6 +112,11 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
     }
 
     @Override
+    public List<SubjectSku> listSkus(long id) {
+        return getSkus(id);
+    }
+
+    @Override
     public Map<Long, String> queryTitlesByCourse(Set<Long> courseIds) {
         if (courseIds.isEmpty()) return new HashMap<Long, String>();
 

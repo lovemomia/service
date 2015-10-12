@@ -38,7 +38,7 @@ public abstract class UserRelatedController extends BaseController {
         return userDto;
     }
 
-    protected ContactDto buildContactsDto(User user) {
+    protected ContactDto buildContactDto(User user) {
         ContactDto contactDto = new ContactDto();
         contactDto.setName(user.getName());
         contactDto.setMobile(user.getMobile());

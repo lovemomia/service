@@ -140,12 +140,12 @@ public class UserController extends UserRelatedController {
         return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL));
     }
 
-    @RequestMapping(value = "/contacts", method = RequestMethod.GET)
-    public MomiaHttpResponse getContacts(@RequestParam String utoken) {
+    @RequestMapping(value = "/contact", method = RequestMethod.GET)
+    public MomiaHttpResponse getContact(@RequestParam String utoken) {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
-        return MomiaHttpResponse.SUCCESS(buildContactsDto(user));
+        return MomiaHttpResponse.SUCCESS(buildContactDto(user));
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
