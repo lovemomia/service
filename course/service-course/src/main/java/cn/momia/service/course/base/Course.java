@@ -17,7 +17,7 @@ public class Course {
 
     public static class Type {
         public static final int BASE = 1;
-        public static final int FULL = 1;
+        public static final int FULL = 2;
     }
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("M月d日");

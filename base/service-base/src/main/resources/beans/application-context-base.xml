@@ -4,8 +4,11 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <bean id="ageRangeService" class="cn.momia.service.base.age.impl.AgeRangeServiceImpl" parent="dbAccessService" />
     <bean id="cityService" class="cn.momia.service.base.city.impl.CityServiceImpl" parent="dbAccessService" />
     <bean id="regionService" class="cn.momia.service.base.region.impl.RegionServiceImpl" parent="dbAccessService" />
+    <bean id="sortTypeService" class="cn.momia.service.base.sort.impl.SortTypeServiceImpl" parent="dbAccessService" />
+
     <bean id="feedbackService" class="cn.momia.service.base.feedback.impl.FeedbackServiceImpl" parent="dbAccessService" />
     <bean id="smsSender" class="cn.momia.service.base.sms.impl.LuosimaoSmsSender" />
     <bean id="smsService" class="cn.momia.service.base.sms.impl.SmsServiceImpl" parent="dbAccessService">

@@ -155,8 +155,12 @@ public class CourseController {
 
     @RequestMapping(value = "/subject", method = RequestMethod.GET)
     public MomiaHttpResponse listBySubject(@RequestParam(value = "suid") int subjectId,
+                                           @RequestParam(value = "min", required = false, defaultValue = "0") int minAge,
+                                           @RequestParam(value = "max", required = false, defaultValue = "0") int maxAge,
+                                           @RequestParam(value = "sort", required = false, defaultValue = "0") int sortTypeId,
                                            @RequestParam int start,
                                            @RequestParam int count) {
+        // TODO filter and sort
         long totalCount = courseService.queryCountBySubject(subjectId);
         List<Course> courses = courseService.queryBySubject(subjectId, start, count);
         PagedList<CourseDto> pagedCourseDtos = buildPagedCourseDtos(totalCount, start, count, courses);
