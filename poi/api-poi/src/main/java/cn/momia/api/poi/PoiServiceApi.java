@@ -7,6 +7,7 @@ import cn.momia.common.api.http.MomiaHttpRequest;
 import cn.momia.common.api.util.CastUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -35,7 +36,7 @@ public class PoiServiceApi extends AbstractServiceApi {
 
     public List<PlaceDto> list(Collection<Integer> placeIds, int type) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("plids", placeIds)
+                .add("plids", StringUtils.join(placeIds, ","))
                 .add("type", type);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("poi/list"), builder.build());
 

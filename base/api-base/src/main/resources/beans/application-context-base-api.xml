@@ -7,8 +7,13 @@
     <bean id="abstractBaseApi" class="cn.momia.common.api.AbstractServiceApi" abstract="true">
         <property name="service" value="${Service.Base}" />
     </bean>
-    <bean class="cn.momia.api.base.CityServiceApi" parent="abstractBaseApi" />
-    <bean class="cn.momia.api.base.RegionServiceApi" parent="abstractBaseApi" />
+    <bean id="cityServiceApi" class="cn.momia.api.base.CityServiceApi" parent="abstractBaseApi" />
+    <bean id="regionServiceApi" class="cn.momia.api.base.RegionServiceApi" parent="abstractBaseApi" />
     <bean class="cn.momia.api.base.FeedbackServiceApi" parent="abstractBaseApi" />
     <bean class="cn.momia.api.base.SmsServiceApi" parent="abstractBaseApi" />
+
+    <bean class="cn.momia.api.base.MetaUtil">
+        <property name="cityServiceApi" ref="cityServiceApi" />
+        <property name="regionServiceApi" ref="regionServiceApi" />
+    </bean>
 </beans>

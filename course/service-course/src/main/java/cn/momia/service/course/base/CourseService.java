@@ -8,4 +8,7 @@ public interface CourseService {
 
     long queryRecommendCount(int cityId);
     List<Course> queryRecommend(int cityId, int start, int count);
+
+    long queryCountBySubject(int subjectId);
+    List<Course> queryBySubject(int subjectId, int start, int count);
 }

@@ -1,8 +1,15 @@
 package cn.momia.service.course.base;
 
+import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.common.util.TimeUtil;
 import com.alibaba.fastjson.JSONArray;
 
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class Course {
@@ -13,6 +20,8 @@ public class Course {
         public static final int FULL = 1;
     }
 
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("M月d日");
+
     private long id;
     private String title;
     private String cover;
@@ -20,11 +29,9 @@ public class Course {
     private int maxAge;
     private int joined;
     private BigDecimal price;
-    private JSONArray recommend;
+    private JSONArray goal;
     private JSONArray flow;
     private JSONArray extra;
-
-    private List<Long> subjects;
 
     private CourseBook book;
     private List<CourseSku> skus;
@@ -85,12 +92,12 @@ public class Course {
         this.price = price;
     }
 
-    public JSONArray getRecommend() {
-        return recommend;
+    public JSONArray getGoal() {
+        return goal;
     }
 
-    public void setRecommend(JSONArray recommend) {
-        this.recommend = recommend;
+    public void setGoal(JSONArray goal) {
+        this.goal = goal;
     }
 
     public JSONArray getFlow() {
@@ -109,14 +116,6 @@ public class Course {
         this.extra = extra;
     }
 
-    public List<Long> getSubjects() {
-        return subjects;
-    }
-
-    public void setSubjects(List<Long> subjects) {
-        this.subjects = subjects;
-    }
-
     public CourseBook getBook() {
         return book;
     }
@@ -131,6 +130,57 @@ public class Course {
 
     public void setSkus(List<CourseSku> skus) {
         this.skus = skus;
+    }
+
+    public String getAge() {
+        if (minAge <= 0 && maxAge <= 0) throw new MomiaFailedException("invalid age of course: " + id);
+        if (minAge <= 0) return maxAge + "岁";
+        if (maxAge <= 0) return minAge + "岁";
+        if (minAge == maxAge) return minAge + "岁";
+        return minAge + "-" + maxAge + "岁";
+    }
+
+    public String getScheduler() {
+        if (skus == null || skus.isEmpty()) return "";
+
+        Date now = new Date();
+        List<Date> times = new ArrayList<Date>();
+        for (CourseSku sku : skus) {
+            if (sku.isAvaliable(now)) {
+                times.add(sku.getStartTime());
+                times.add(sku.getEndTime());
+            }
+        }
+        Collections.sort(times);
+
+        return format(times);
+    }
+
+    private String format(List<Date> times) {
+        if (times.isEmpty()) return "";
+        if (times.size() == 1) {
+            Date start = times.get(0);
+            return DATE_FORMAT.format(start) + " " + TimeUtil.getWeekDay(start);
+        } else {
+            Date start = times.get(0);
+            Date end = times.get(times.size() - 1);
+            if (TimeUtil.isSameDay(start, end)) {
+                return DATE_FORMAT.format(start) + " " + TimeUtil.getWeekDay(start);
+            } else {
+                return DATE_FORMAT.format(start) + "-" + DATE_FORMAT.format(end);
+            }
+        }
+    }
+
+    public List<Integer> getPlaceIds() {
+        if (skus == null || skus.isEmpty()) return new ArrayList<Integer>();
+
+        List<Integer> placeIds = new ArrayList<Integer>();
+        for (CourseSku sku : skus) {
+            placeIds.add(sku.getPlaceId());
+        }
+
+        return placeIds;
     }
 
     public boolean exists() {

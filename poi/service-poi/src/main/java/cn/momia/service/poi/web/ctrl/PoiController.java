@@ -25,7 +25,7 @@ public class PoiController extends BaseController {
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public MomiaHttpResponse get(@RequestParam String plids, @RequestParam int type) {
+    public MomiaHttpResponse list(@RequestParam String plids, @RequestParam int type) {
         Set<Integer> ids = new HashSet<Integer>();
         for (String id : Splitter.on(",").trimResults().omitEmptyStrings().split(plids)) {
             ids.add(Integer.valueOf(id));

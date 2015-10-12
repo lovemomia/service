@@ -22,12 +22,12 @@ import java.util.Map;
 public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PlaceServiceImpl.class);
 
-    private static final String[] PLACE_FIELDS = { "id", "cityId", "regionId", "name", "address", "`desc`", "cover", "lng", "lat" };
+    private static final String[] PLACE_FIELDS = { "Id", "CityId", "RegionId", "Name", "Address", "`Desc`", "Cover", "Lng", "Lat" };
 
     @Override
     public Place get(int id, int type) {
-        String sql = "SELECT " + joinFields() + " FROM t_place WHERE id=? AND status=1";
-        Place place = jdbcTemplate.query(sql, new Object[]{id}, new ResultSetExtractor<Place>() {
+        String sql = "SELECT " + joinFields() + " FROM SG_Place WHERE Id=? AND Status=1";
+        Place place = jdbcTemplate.query(sql, new Object[]{ id }, new ResultSetExtractor<Place>() {
             @Override
             public Place extractData(ResultSet rs) throws SQLException, DataAccessException {
                 return rs.next() ? buildPlace(rs) : Place.NOT_EXIST_PLACE;
@@ -46,15 +46,15 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
     private Place buildPlace(ResultSet rs) throws SQLException {
         try {
             Place place = new Place();
-            place.setId(rs.getInt("id"));
-            place.setCityId(rs.getInt("cityId"));
-            place.setRegionId(rs.getInt("regionId"));
-            place.setName(rs.getString("name"));
-            place.setAddress(rs.getString("address"));
-            place.setDesc(rs.getString("desc"));
-            place.setCover(rs.getString("cover"));
-            place.setLng(rs.getDouble("lng"));
-            place.setLat(rs.getDouble("lat"));
+            place.setId(rs.getInt("Id"));
+            place.setCityId(rs.getInt("CityId"));
+            place.setRegionId(rs.getInt("RegionId"));
+            place.setName(rs.getString("Name"));
+            place.setAddress(rs.getString("Address"));
+            place.setDesc(rs.getString("Desc"));
+            place.setCover(rs.getString("Cover"));
+            place.setLng(rs.getDouble("Lng"));
+            place.setLat(rs.getDouble("Lat"));
 
             return place;
         }
@@ -66,7 +66,7 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
 
     private List<PlaceImage> getImgs(int id) {
         final List<PlaceImage> imgs = new ArrayList<PlaceImage>();
-        String sql = "SELECT url, width, height FROM t_place_img WHERE placeId=? AND status=1 ORDER BY addTime DESC";
+        String sql = "SELECT Url, Width, Height FROM SG_PlaceImg WHERE PlaceId=? AND Status=1 ORDER BY AddTime DESC";
         jdbcTemplate.query(sql, new Object[] { id }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -79,9 +79,9 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
 
     private PlaceImage buildPlaceImage(ResultSet rs) throws SQLException {
         PlaceImage img = new PlaceImage();
-        img.setUrl(rs.getString("url"));
-        img.setWidth(rs.getInt("width"));
-        img.setHeight(rs.getInt("height"));
+        img.setUrl(rs.getString("Url"));
+        img.setWidth(rs.getInt("Width"));
+        img.setHeight(rs.getInt("Height"));
 
         return img;
     }
@@ -91,7 +91,7 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
         if (ids.isEmpty()) return new ArrayList<Place>();
 
         final List<Place> places = new ArrayList<Place>();
-        String sql = "SELECT " + joinFields() + " FROM t_place WHERE id IN (" + StringUtils.join(ids, ",") + ") AND status=1";
+        String sql = "SELECT " + joinFields() + " FROM SG_Place WHERE Id IN (" + StringUtils.join(ids, ",") + ") AND Status=1";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -113,11 +113,11 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
 
     private Map<Integer, List<PlaceImage>> getImgs(Collection<Integer> ids) {
         final Map<Integer, List<PlaceImage>> placeImgsMap = new HashMap<Integer, List<PlaceImage>>();
-        String sql = "SELECT placeId, url, width, height FROM t_place_img WHERE placeId IN (" + StringUtils.join(ids, ",") + ") AND status=1 ORDER BY addTime DESC";
+        String sql = "SELECT PlaceId, Url, Width, Height FROM SG_PlaceImg WHERE PlaceId IN (" + StringUtils.join(ids, ",") + ") AND Status=1 ORDER BY AddTime DESC";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
-                int placeId = rs.getInt("placeId");
+                int placeId = rs.getInt("PlaceId");
                 PlaceImage img = buildPlaceImage(rs);
                 List<PlaceImage> imgs = placeImgsMap.get(placeId);
                 if (imgs == null) {

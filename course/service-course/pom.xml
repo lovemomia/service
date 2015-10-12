@@ -16,7 +16,17 @@
         <!-- Momia API -->
         <dependency>
             <groupId>cn.momia</groupId>
+            <artifactId>duola-api-base</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.momia</groupId>
             <artifactId>duola-api-course</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.momia</groupId>
+            <artifactId>duola-api-poi</artifactId>
             <version>1.1.0</version>
         </dependency>
 
