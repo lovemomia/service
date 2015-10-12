@@ -96,7 +96,7 @@ public class CourseController {
             courseDto.setGoal(course.getGoal());
             courseDto.setFlow(course.getFlow());
             courseDto.setExtra(course.getExtra());
-            courseDto.setPlaces(buildCoursePlaceDtos(placesOfCourse));
+            courseDto.setPlaces(buildCoursePlaceDtos(placesOfCourse, 1));
             courseDto.setImgs(course.getImgs());
             courseDto.setBook(buildCourseBookDto(course.getBook()));
         }
@@ -104,7 +104,8 @@ public class CourseController {
         return courseDto;
     }
 
-    private List<CoursePlaceDto> buildCoursePlaceDtos(List<PlaceDto> places) {
+    private List<CoursePlaceDto> buildCoursePlaceDtos(List<PlaceDto> places, int count) {
+        int index = 0;
         List<CoursePlaceDto> coursePlaceDtos = new ArrayList<CoursePlaceDto>();
         for (PlaceDto place : places) {
             CoursePlaceDto coursePlaceDto = new CoursePlaceDto();
@@ -115,6 +116,9 @@ public class CourseController {
             coursePlaceDto.setLat(place.getLat());
 
             coursePlaceDtos.add(coursePlaceDto);
+
+            index++;
+            if (index >= count) break;
         }
 
         return coursePlaceDtos;
