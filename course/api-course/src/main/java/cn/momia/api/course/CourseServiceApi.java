@@ -6,9 +6,15 @@ import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;
 import cn.momia.common.api.util.CastUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 public class CourseServiceApi extends AbstractServiceApi {
+    public CourseDto get(long courseId) {
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("course", courseId));
+        return JSON.toJavaObject((JSON) executeRequest(request), CourseDto.class);
+    }
+
     public PagedList<CourseDto> listRecommend(int cityId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)

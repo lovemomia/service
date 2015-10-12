@@ -2,15 +2,19 @@ package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.base.MetaUtil;
 import cn.momia.api.base.dto.RegionDto;
+import cn.momia.api.course.dto.CourseBookDto;
 import cn.momia.api.course.dto.CourseDto;
+import cn.momia.api.course.dto.CoursePlaceDto;
 import cn.momia.api.poi.PoiServiceApi;
 import cn.momia.api.poi.dto.PlaceDto;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.service.course.base.Course;
+import cn.momia.service.course.base.CourseBook;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.subject.SubjectService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,18 +34,16 @@ public class CourseController {
     @Autowired private SubjectService subjectService;
     @Autowired private PoiServiceApi poiServiceApi;
 
-    @RequestMapping(value = "/recommend", method = RequestMethod.GET)
-    public MomiaHttpResponse listRecommend(@RequestParam(value = "city") int cityId,
-                                           @RequestParam int start,
-                                           @RequestParam int count) {
-        long totalCount = courseService.queryRecommendCount(cityId);
-        List<Course> courses = courseService.queryRecommend(cityId, start, count);
-        PagedList<CourseDto> pagedCourseDtos = buildPagedCourseDtos(start, count, totalCount, courses);
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public MomiaHttpResponse get(@PathVariable long id) {
+        List<Course> courses = new ArrayList<Course>();
+        courses.add(courseService.get(id));
+        List<CourseDto> courseDtos = buildCourseDtos(courses, Course.Type.FULL);
 
-        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
+        return MomiaHttpResponse.SUCCESS(courseDtos.get(0));
     }
 
-    private PagedList<CourseDto> buildPagedCourseDtos(@RequestParam int start, @RequestParam int count, long totalCount, List<Course> courses) {
+    private List<CourseDto> buildCourseDtos(List<Course> courses, int type) {
         Set<Long> courseIds = new HashSet<Long>();
         Set<Integer> placeIds = new HashSet<Integer>();
         for (Course course : courses) {
@@ -53,42 +55,98 @@ public class CourseController {
         List<PlaceDto> places = poiServiceApi.list(placeIds);
         Map<Integer, PlaceDto> placesMap = new HashMap<Integer, PlaceDto>();
         for (PlaceDto place : places) placesMap.put(place.getId(), place);
-        PagedList<CourseDto> pagedCourseDtos = new PagedList<CourseDto>(totalCount, start, count);
+
         List<CourseDto> courseDtos = new ArrayList<CourseDto>();
         for (Course course : courses) {
-            courseDtos.add(buildCourseDto(course, subjectNames, placesMap));
+            courseDtos.add(buildCourseDto(course, subjectNames, placesMap, type));
         }
-        pagedCourseDtos.setList(courseDtos);
 
-        return pagedCourseDtos;
+        return courseDtos;
     }
 
-    private CourseDto buildCourseDto(Course course, Map<Long, String> subjectNames, Map<Integer, PlaceDto> places) {
+    private CourseDto buildCourseDto(Course course, Map<Long, String> subjectNames, Map<Integer, PlaceDto> places, int type) {
         CourseDto courseDto = new CourseDto();
         courseDto.setId(course.getId());
         courseDto.setTitle(course.getTitle());
         courseDto.setCover(course.getCover());
         courseDto.setAge(course.getAge());
+        courseDto.setJoined(course.getJoined());
+        courseDto.setPrice(course.getPrice());
         courseDto.setScheduler(course.getScheduler());
 
-        int regionId = 0;
         List<Integer> placeIds = course.getPlaceIds();
-        if (placeIds.size() > 1) {
-            regionId = RegionDto.MULTI_REGION_ID;
-        } else if (!placeIds.isEmpty()) {
-            int placeId = placeIds.get(0);
+        List<PlaceDto> placesOfCourse = new ArrayList<PlaceDto>();
+        for (int placeId : placeIds) {
             PlaceDto place = places.get(placeId);
-            if (place != null) regionId = place.getRegionId();
+            if (place != null) placesOfCourse.add(place);
+        }
+
+        int regionId = 0;
+        if (placesOfCourse.size() > 1) {
+            regionId = RegionDto.MULTI_REGION_ID;
+        } else if (!placesOfCourse.isEmpty()) {
+            regionId = placesOfCourse.get(0).getRegionId();
         }
         courseDto.setRegion(MetaUtil.getRegionName(regionId));
 
         String subject = subjectNames.get(course.getId());
         courseDto.setSubject(subject == null ? "" : subject);
 
-        courseDto.setPrice(course.getPrice());
-        courseDto.setJoined(course.getJoined());
+        if (type == Course.Type.FULL) {
+            courseDto.setGoal(course.getGoal());
+            courseDto.setFlow(course.getFlow());
+            courseDto.setExtra(course.getExtra());
+            courseDto.setPlaces(buildCoursePlaceDtos(placesOfCourse));
+            courseDto.setImgs(course.getImgs());
+            courseDto.setBook(buildCourseBookDto(course.getBook()));
+        }
 
         return courseDto;
+    }
+
+    private List<CoursePlaceDto> buildCoursePlaceDtos(List<PlaceDto> places) {
+        List<CoursePlaceDto> coursePlaceDtos = new ArrayList<CoursePlaceDto>();
+        for (PlaceDto place : places) {
+            CoursePlaceDto coursePlaceDto = new CoursePlaceDto();
+            coursePlaceDto.setId(place.getId());
+            coursePlaceDto.setName(place.getName());
+            coursePlaceDto.setAddress(place.getAddress());
+            coursePlaceDto.setLng(place.getLng());
+            coursePlaceDto.setLat(place.getLat());
+
+            coursePlaceDtos.add(coursePlaceDto);
+        }
+
+        return coursePlaceDtos;
+    }
+
+    private CourseBookDto buildCourseBookDto(CourseBook book) {
+        if (book == null) return null;
+
+        CourseBookDto courseBookDto = new CourseBookDto();
+        courseBookDto.setImgs(book.getImgs());
+
+        return courseBookDto;
+    }
+
+    @RequestMapping(value = "/recommend", method = RequestMethod.GET)
+    public MomiaHttpResponse listRecommend(@RequestParam(value = "city") int cityId,
+                                           @RequestParam int start,
+                                           @RequestParam int count) {
+        long totalCount = courseService.queryRecommendCount(cityId);
+        List<Course> courses = courseService.queryRecommend(cityId, start, count);
+        PagedList<CourseDto> pagedCourseDtos = buildPagedCourseDtos(totalCount, start, count, courses);
+
+        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
+    }
+
+    private PagedList<CourseDto> buildPagedCourseDtos(long totalCount, int start, int count, List<Course> courses) {
+        List<CourseDto> courseDtos = buildCourseDtos(courses, Course.Type.BASE);
+
+        PagedList<CourseDto> pagedCourseDtos = new PagedList<CourseDto>(totalCount, start, count);
+        pagedCourseDtos.setList(courseDtos);
+
+        return pagedCourseDtos;
     }
 
     @RequestMapping(value = "/subject", method = RequestMethod.GET)
@@ -97,7 +155,7 @@ public class CourseController {
                                            @RequestParam int count) {
         long totalCount = courseService.queryCountBySubject(subjectId);
         List<Course> courses = courseService.queryBySubject(subjectId, start, count);
-        PagedList<CourseDto> pagedCourseDtos = buildPagedCourseDtos(start, count, totalCount, courses);
+        PagedList<CourseDto> pagedCourseDtos = buildPagedCourseDtos(totalCount, start, count, courses);
 
         return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
     }

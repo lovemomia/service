@@ -2,6 +2,7 @@ package cn.momia.service.course.base.impl;
 
 import cn.momia.common.service.DbAccessService;
 import cn.momia.service.course.base.Course;
+import cn.momia.service.course.base.CourseBook;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.base.CourseSku;
 import com.alibaba.fastjson.JSON;
@@ -21,6 +22,91 @@ import java.util.Map;
 public class CourseServiceImpl extends DbAccessService implements CourseService {
     private static final String[] COURSE_FIELDS = { "Id", "Title", "Cover", "MinAge", "MaxAge", "Joined", "Price", "Goal", "Flow", "Extra" };
     private static final String[] COURSE_SKU_FIELDS = { "Id", "CourseId", "StartTime", "EndTime", "Deadline", "Stock", "UnlockedStock", "LockedStock", "PlaceId" };
+
+    @Override
+    public Course get(long id) {
+        String sql = "SELECT " + joinFields() + " FROM SG_Course WHERE Id=? AND Status=1";
+        Course course = jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<Course>() {
+            @Override
+            public Course extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? buildCourse(rs) : Course.NOT_EXIST_COURSE;
+            }
+        });
+
+        if (course.exists()) {
+            course.setSkus(getSkus(id));
+            course.setImgs(getImgs(id));
+            course.setBook(getBook(id));
+        }
+
+        return course;
+    }
+
+    private String joinSkuFields() {
+        return StringUtils.join(COURSE_SKU_FIELDS, ",");
+    }
+
+    private CourseSku buildCourseSku(ResultSet rs) {
+        try {
+            CourseSku sku = new CourseSku();
+            sku.setId(rs.getLong("Id"));
+            sku.setCourseId(rs.getLong("CourseId"));
+            sku.setStartTime(rs.getTimestamp("StartTime"));
+            sku.setEndTime(rs.getTimestamp("EndTime"));
+            sku.setDeadline(rs.getTimestamp("Deadline"));
+            sku.setStock(rs.getInt("Stock"));
+            sku.setUnlockedStock(rs.getInt("UnlockedStock"));
+            sku.setLockedStock(rs.getInt("LockedStock"));
+            sku.setPlaceId(rs.getInt("PlaceId"));
+
+            return sku;
+        } catch (Exception e) {
+            return CourseSku.NOT_EXIST_COURSE_SKU;
+        }
+    }
+
+    private List<CourseSku> getSkus(long id) {
+        final List<CourseSku> skus = new ArrayList<CourseSku>();
+        String sql = "SELECT " + joinSkuFields() + " FROM SG_CourseSku WHERE CourseId=? AND Status=1";
+        jdbcTemplate.query(sql, new Object[] { id }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                CourseSku sku = buildCourseSku(rs);
+                if (sku.exists()) skus.add(sku);
+            }
+        });
+
+        return skus;
+    }
+
+    private List<String> getImgs(long id) {
+        final List<String> imgs = new ArrayList<String>();
+        String sql = "SELECT Url FROM SG_CourseImg WHERE CourseId=? AND Status=1";
+        jdbcTemplate.query(sql, new Object[] { id }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                imgs.add(rs.getString("Url"));
+            }
+        });
+
+        return imgs;
+    }
+
+    private CourseBook getBook(long id) {
+        final List<String> imgs = new ArrayList<String>();
+        String sql = "SELECT Img FROM SG_CourseBook WHERE CourseId=? AND Status=1 ORDER BY `Order` ASC, AddTime DESC";
+        jdbcTemplate.query(sql, new Object[] { id }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                imgs.add(rs.getString("Img"));
+            }
+        });
+
+        CourseBook book = new CourseBook();
+        book.setImgs(imgs);
+
+        return book;
+    }
 
     @Override
     public List<Course> list(Collection<Long> ids) {
@@ -69,8 +155,8 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
             course.setMaxAge(rs.getInt("MaxAge"));
             course.setJoined(rs.getInt("Joined"));
             course.setPrice(rs.getBigDecimal("Price"));
-            course.setGoal(JSON.parseArray(rs.getString("Goal")));
-            course.setFlow(JSON.parseArray(rs.getString("Flow")));
+            course.setGoal(rs.getString("Goal"));
+            course.setFlow(rs.getString("Flow"));
             course.setExtra(JSON.parseArray(rs.getString("Extra")));
 
             return course;
@@ -93,29 +179,6 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         });
 
         return skus;
-    }
-
-    private String joinSkuFields() {
-        return StringUtils.join(COURSE_SKU_FIELDS, ",");
-    }
-
-    private CourseSku buildCourseSku(ResultSet rs) {
-        try {
-            CourseSku sku = new CourseSku();
-            sku.setId(rs.getLong("Id"));
-            sku.setCourseId(rs.getLong("CourseId"));
-            sku.setStartTime(rs.getTimestamp("StartTime"));
-            sku.setEndTime(rs.getTimestamp("EndTime"));
-            sku.setDeadline(rs.getTimestamp("Deadline"));
-            sku.setStock(rs.getInt("Stock"));
-            sku.setUnlockedStock(rs.getInt("UnlockedStock"));
-            sku.setLockedStock(rs.getInt("LockedStock"));
-            sku.setPlaceId(rs.getInt("PlaceId"));
-
-            return sku;
-        } catch (Exception e) {
-            return CourseSku.NOT_EXIST_COURSE_SKU;
-        }
     }
 
     @Override

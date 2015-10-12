@@ -14,7 +14,7 @@ public class Subject {
     private int minAge;
     private int maxAge;
     private int joined;
-    private JSONArray intro;
+    private String intro;
     private JSONArray notice;
     private List<String> imgs;
     private List<SubjectSku> skus;
@@ -67,11 +67,11 @@ public class Subject {
         this.joined = joined;
     }
 
-    public JSONArray getIntro() {
+    public String getIntro() {
         return intro;
     }
 
-    public void setIntro(JSONArray intro) {
+    public void setIntro(String intro) {
         this.intro = intro;
     }
 

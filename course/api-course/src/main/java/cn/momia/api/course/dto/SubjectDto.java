@@ -12,7 +12,7 @@ public class SubjectDto {
     private BigDecimal originalPrice;
     private String age;
     private int joined;
-    private JSONArray intro;
+    private String intro;
     private JSONArray notice;
     private List<String> imgs;
 
@@ -64,11 +64,11 @@ public class SubjectDto {
         this.joined = joined;
     }
 
-    public JSONArray getIntro() {
+    public String getIntro() {
         return intro;
     }
 
-    public void setIntro(JSONArray intro) {
+    public void setIntro(String intro) {
         this.intro = intro;
     }
 

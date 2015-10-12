@@ -54,7 +54,7 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
             subject.setMinAge(rs.getInt("MinAge"));
             subject.setMaxAge(rs.getInt("MaxAge"));
             subject.setJoined(rs.getInt("Joined"));
-            subject.setIntro(JSON.parseArray(rs.getString("Intro")));
+            subject.setIntro(rs.getString("Intro"));
             subject.setNotice(JSON.parseArray(rs.getString("Notice")));
 
             return subject;

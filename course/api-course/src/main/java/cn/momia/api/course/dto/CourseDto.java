@@ -1,6 +1,9 @@
 package cn.momia.api.course.dto;
 
+import com.alibaba.fastjson.JSONArray;
+
 import java.math.BigDecimal;
+import java.util.List;
 
 public class CourseDto {
     private long id;
@@ -12,6 +15,13 @@ public class CourseDto {
     private String scheduler;
     private String region;
     private String subject;
+
+    private String goal;
+    private String flow;
+    private JSONArray extra;
+    private List<CoursePlaceDto> places;
+    private List<String> imgs;
+    private CourseBookDto book;
 
     public long getId() {
         return id;
@@ -83,5 +93,53 @@ public class CourseDto {
 
     public void setSubject(String subject) {
         this.subject = subject;
+    }
+
+    public String getGoal() {
+        return goal;
+    }
+
+    public void setGoal(String goal) {
+        this.goal = goal;
+    }
+
+    public String getFlow() {
+        return flow;
+    }
+
+    public void setFlow(String flow) {
+        this.flow = flow;
+    }
+
+    public JSONArray getExtra() {
+        return extra;
+    }
+
+    public void setExtra(JSONArray extra) {
+        this.extra = extra;
+    }
+
+    public List<CoursePlaceDto> getPlaces() {
+        return places;
+    }
+
+    public void setPlaces(List<CoursePlaceDto> places) {
+        this.places = places;
+    }
+
+    public List<String> getImgs() {
+        return imgs;
+    }
+
+    public void setImgs(List<String> imgs) {
+        this.imgs = imgs;
+    }
+
+    public CourseBookDto getBook() {
+        return book;
+    }
+
+    public void setBook(CourseBookDto book) {
+        this.book = book;
     }
 }

@@ -1,8 +1,8 @@
-package cn.momia.service.course.base;
+package cn.momia.api.course.dto;
 
 import java.util.List;
 
-public class CourseBook {
+public class CourseBookDto {
     private List<String> imgs;
     private List<String> largeImgs;
 

@@ -29,12 +29,14 @@ public class Course {
     private int maxAge;
     private int joined;
     private BigDecimal price;
-    private JSONArray goal;
-    private JSONArray flow;
+    private String goal;
+    private String flow;
     private JSONArray extra;
 
-    private CourseBook book;
     private List<CourseSku> skus;
+
+    private List<String> imgs;
+    private CourseBook book;
 
     public long getId() {
         return id;
@@ -92,19 +94,19 @@ public class Course {
         this.price = price;
     }
 
-    public JSONArray getGoal() {
+    public String getGoal() {
         return goal;
     }
 
-    public void setGoal(JSONArray goal) {
+    public void setGoal(String goal) {
         this.goal = goal;
     }
 
-    public JSONArray getFlow() {
+    public String getFlow() {
         return flow;
     }
 
-    public void setFlow(JSONArray flow) {
+    public void setFlow(String flow) {
         this.flow = flow;
     }
 
@@ -116,20 +118,28 @@ public class Course {
         this.extra = extra;
     }
 
-    public CourseBook getBook() {
-        return book;
-    }
-
-    public void setBook(CourseBook book) {
-        this.book = book;
-    }
-
     public List<CourseSku> getSkus() {
         return skus;
     }
 
     public void setSkus(List<CourseSku> skus) {
         this.skus = skus;
+    }
+
+    public List<String> getImgs() {
+        return imgs;
+    }
+
+    public void setImgs(List<String> imgs) {
+        this.imgs = imgs;
+    }
+
+    public CourseBook getBook() {
+        return book;
+    }
+
+    public void setBook(CourseBook book) {
+        this.book = book;
     }
 
     public String getAge() {

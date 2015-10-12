@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 public interface CourseService {
+    Course get(long id);
     List<Course> list(Collection<Long> ids);
 
     long queryRecommendCount(int cityId);
