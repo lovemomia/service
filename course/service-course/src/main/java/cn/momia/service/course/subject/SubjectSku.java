@@ -87,11 +87,11 @@ public class SubjectSku {
         this.time = time;
     }
 
-    public int getJoinCount() {
-        return adult + child;
-    }
-
     public boolean exists() {
         return id > 0;
+    }
+
+    public int getJoinCount() {
+        return adult + child;
     }
 }

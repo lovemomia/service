@@ -2,6 +2,7 @@ package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.course.dto.OrderDto;
 import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.subject.SubjectSku;
 import cn.momia.service.course.subject.order.Order;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/subject/order")
-public class OrderController {
+public class OrderController extends BaseController {
     @Autowired private SubjectService subjectService;
     @Autowired private OrderService orderService;
 

@@ -1,8 +1,19 @@
 package cn.momia.service.course.subject.order;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 public class Order {
+    public static class Status {
+        public static final int DELETED = 0;
+        public static final int NOT_PAYED = 1; // 已下单未付款
+        public static final int PRE_PAYED = 2; // 准备付款
+        public static final int PAYED = 3;     // 已付款
+        public static final int FINISHED = 4;  // 已完成
+        public static final int TO_REFUND = 5; // 申请退款
+        public static final int REFUNDED = 6;  // 已退款
+    }
+
     public static final Order NOT_EXIST_ORDER = new Order();
 
     private long id;
@@ -12,6 +23,8 @@ public class Order {
     private BigDecimal price;
     private int count;
     private OrderContact contact;
+    private int status;
+    private Date addTime;
 
     public long getId() {
         return id;
@@ -73,11 +86,31 @@ public class Order {
         return price.multiply(new BigDecimal(count));
     }
 
-    public boolean isInvalid() {
-        return userId <= 0 || subjectId <= 0 || skuId <= 0 || price == null || count <= 0;
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public Date getAddTime() {
+        return addTime;
+    }
+
+    public void setAddTime(Date addTime) {
+        this.addTime = addTime;
     }
 
     public boolean exists() {
         return id > 0;
+    }
+
+    public boolean isInvalid() {
+        return userId <= 0 || subjectId <= 0 || skuId <= 0 || price == null || count <= 0;
+    }
+
+    public boolean isPayed() {
+        return status >= Status.PAYED;
     }
 }

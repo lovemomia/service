@@ -3,6 +3,7 @@ package cn.momia.service.course.web.ctrl;
 import cn.momia.api.course.dto.SubjectDto;
 import cn.momia.api.course.dto.SubjectSkuDto;
 import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.subject.SubjectSku;
@@ -17,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/subject")
-public class SubjectController {
+public class SubjectController extends BaseController {
     @Autowired private SubjectService subjectService;
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)

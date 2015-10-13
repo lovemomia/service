@@ -87,11 +87,11 @@ public class CourseSku {
         this.placeId = placeId;
     }
 
-    public boolean isAvaliable(Date now) {
-        return deadline.after(now);
-    }
-
     public boolean exists() {
         return id > 0;
+    }
+
+    public boolean isAvaliable(Date now) {
+        return deadline.after(now);
     }
 }

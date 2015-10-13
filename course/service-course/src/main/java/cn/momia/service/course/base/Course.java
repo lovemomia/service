@@ -142,6 +142,10 @@ public class Course {
         this.book = book;
     }
 
+    public boolean exists() {
+        return id > 0;
+    }
+
     public String getAge() {
         if (minAge <= 0 && maxAge <= 0) throw new MomiaFailedException("invalid age of course: " + id);
         if (minAge <= 0) return maxAge + "岁";
@@ -191,9 +195,5 @@ public class Course {
         }
 
         return placeIds;
-    }
-
-    public boolean exists() {
-        return id > 0;
     }
 }

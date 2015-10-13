@@ -9,6 +9,7 @@ import cn.momia.api.poi.PoiServiceApi;
 import cn.momia.api.poi.dto.PlaceDto;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseBook;
 import cn.momia.service.course.base.CourseService;
@@ -29,7 +30,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/course")
-public class CourseController {
+public class CourseController extends BaseController {
     @Autowired private CourseService courseService;
     @Autowired private SubjectService subjectService;
     @Autowired private PoiServiceApi poiServiceApi;

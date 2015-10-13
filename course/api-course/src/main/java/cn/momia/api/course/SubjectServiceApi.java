@@ -13,6 +13,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 
 public class SubjectServiceApi extends AbstractServiceApi {
     public SubjectDto get(long subjectId) {
@@ -46,8 +47,18 @@ public class SubjectServiceApi extends AbstractServiceApi {
                 .add("oid", orderId)
                 .add("type", type);
         if (!StringUtils.isBlank(code)) builder.add("code", code);
-        MomiaHttpRequest request = MomiaHttpRequest.POST(url("subject/payment/prepay/wechatpay"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("subject/payment/prepay/weixin"), builder.build());
 
         return executeRequest(request);
+    }
+
+    public boolean callbackAlipay(Map<String, String> params) {
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("subject/payment/callback/alipay"), params);
+        return "OK".equalsIgnoreCase((String) executeRequest(request));
+    }
+
+    public boolean callbackWeixin(Map<String, String> params) {
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("subject/payment/callback/weixin"), params);
+        return "OK".equalsIgnoreCase((String) executeRequest(request));
     }
 }
