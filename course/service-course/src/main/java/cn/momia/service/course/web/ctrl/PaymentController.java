@@ -1,5 +1,6 @@
 package cn.momia.service.course.web.ctrl;
 
+import cn.momia.api.course.dto.PaymentDto;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.UserDto;
 import cn.momia.common.api.exception.MomiaFailedException;
@@ -22,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -164,5 +166,21 @@ public class PaymentController extends BaseController {
     @RequestMapping(value = "/callback/weixin", method = RequestMethod.POST)
     public MomiaHttpResponse wechatpayCallback(HttpServletRequest request) {
         return callback(request, PayType.WECHATPAY);
+    }
+
+    @RequestMapping(value = "/check", method = RequestMethod.POST)
+    public MomiaHttpResponse check(@RequestParam String utoken, @RequestParam(value = "oid") long orderId) {
+        UserDto user = userServiceApi.get(utoken);
+        Order order = orderService.get(orderId);
+
+        PaymentDto paymentDto = new PaymentDto();
+        if (order.exists() && order.getUserId() == user.getId()) {
+            paymentDto.setSuccessful(true);
+            paymentDto.setSubjectId(order.getSubjectId());
+        } else {
+            paymentDto.setSuccessful(false);
+        }
+
+        return MomiaHttpResponse.SUCCESS(paymentDto);
     }
 }

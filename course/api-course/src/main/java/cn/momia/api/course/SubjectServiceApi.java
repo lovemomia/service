@@ -1,6 +1,7 @@
 package cn.momia.api.course;
 
 import cn.momia.api.course.dto.OrderDto;
+import cn.momia.api.course.dto.PaymentDto;
 import cn.momia.api.course.dto.SubjectDto;
 import cn.momia.api.course.dto.SubjectSkuDto;
 import cn.momia.common.api.AbstractServiceApi;
@@ -60,5 +61,14 @@ public class SubjectServiceApi extends AbstractServiceApi {
     public boolean callbackWeixin(Map<String, String> params) {
         MomiaHttpRequest request = MomiaHttpRequest.POST(url("subject/payment/callback/weixin"), params);
         return "OK".equalsIgnoreCase((String) executeRequest(request));
+    }
+
+    public PaymentDto checkPayment(String utoken, long orderId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("oid", orderId);
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("subject/payment/check"), builder.build());
+
+        return JSON.toJavaObject((JSON) executeRequest(request), PaymentDto.class);
     }
 }
