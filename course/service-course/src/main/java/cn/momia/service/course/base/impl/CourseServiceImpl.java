@@ -232,4 +232,19 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
 
         return list(courseIds);
     }
+
+    @Override
+    public List<CourseSku> listSkus(long id, String start, String end) {
+        final List<CourseSku> skus = new ArrayList<CourseSku>();
+        String sql = "SELECT " + joinSkuFields() + " FROM SG_CourseSku WHERE CourseId=? AND StartTime>=? AND EndTime<? AND Status=1";
+        jdbcTemplate.query(sql, new Object[] { id, start, end }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                CourseSku sku = buildCourseSku(rs);
+                if (sku.exists()) skus.add(sku);
+            }
+        });
+
+        return skus;
+    }
 }

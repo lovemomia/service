@@ -12,4 +12,6 @@ public interface CourseService {
 
     long queryCountBySubject(int subjectId);
     List<Course> queryBySubject(int subjectId, int start, int count);
+
+    List<CourseSku> listSkus(long id, String start, String end);
 }

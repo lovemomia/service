@@ -5,6 +5,7 @@ import cn.momia.api.base.dto.RegionDto;
 import cn.momia.api.course.dto.CourseBookDto;
 import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.CoursePlaceDto;
+import cn.momia.api.course.dto.DatedCourseSkusDto;
 import cn.momia.api.poi.PoiServiceApi;
 import cn.momia.api.poi.dto.PlaceDto;
 import cn.momia.common.api.dto.PagedList;
@@ -13,6 +14,7 @@ import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseBook;
 import cn.momia.service.course.base.CourseService;
+import cn.momia.service.course.base.CourseSku;
 import cn.momia.service.course.subject.SubjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,7 +23,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,6 +37,8 @@ import java.util.Set;
 @RestController
 @RequestMapping("/course")
 public class CourseController extends BaseController {
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
     @Autowired private CourseService courseService;
     @Autowired private SubjectService subjectService;
     @Autowired private PoiServiceApi poiServiceApi;
@@ -168,4 +176,54 @@ public class CourseController extends BaseController {
 
         return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
     }
-}
+
+    @RequestMapping(value = "/{id}/sku/week", method = RequestMethod.GET)
+    public MomiaHttpResponse listWeekSkus(@PathVariable long id) {
+        Date now = new Date();
+        String start = DATE_FORMAT.format(now);
+        String end = DATE_FORMAT.format(new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000));
+        List<CourseSku> skus = courseService.listSkus(id, start, end);
+
+        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkusDtos(skus));
+    }
+
+    private List<DatedCourseSkusDto> buildDatedCourseSkusDtos(List<CourseSku> skus) {
+        List<DatedCourseSkusDto> datedCourseSkusDtos = new ArrayList<DatedCourseSkusDto>();
+        Date now = new Date();
+        for (CourseSku sku : skus) {
+            if (!sku.isAvaliable(now)) continue;
+            // TODO
+        }
+
+        return datedCourseSkusDtos;
+    }
+
+    @RequestMapping(value = "/{id}/sku/month", method = RequestMethod.GET)
+    public MomiaHttpResponse listWeekSkus(@PathVariable long id, @RequestParam int month) {
+        String start = formatCurrentMonth(month);
+        String end = formatNextMonth(month);
+        List<CourseSku> skus = courseService.listSkus(id, start, end);
+
+        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkusDtos(skus));
+    }
+
+    private String formatCurrentMonth(int month) {
+        Calendar calendar = Calendar.getInstance();
+        int currentYear = calendar.get(Calendar.YEAR);
+        int currentMonth = calendar.get(Calendar.MONTH) + 1;
+
+        if (month < currentMonth) return String.format("%d-%02d", currentYear + 1, month);
+        return String.format("%d-%02d", currentYear, month);
+    }
+
+    private String formatNextMonth(int month) {
+        Calendar calendar = Calendar.getInstance();
+        int currentYear = calendar.get(Calendar.YEAR);
+        int currentMonth = calendar.get(Calendar.MONTH) + 1;
+
+        int nextMonth = month + 1;
+        nextMonth = nextMonth > 12 ? nextMonth - 12 : nextMonth;
+
+        if (month < currentMonth || nextMonth < month) return String.format("%d-%02d", currentYear + 1, nextMonth);
+        return String.format("%d-%02d", currentYear, nextMonth);
+    }}
