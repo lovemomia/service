@@ -1,21 +1,17 @@
 package cn.momia.api.course.dto;
 
-import com.alibaba.fastjson.annotation.JSONField;
-
-import java.util.Date;
 import java.util.List;
 
 public class DatedCourseSkusDto {
-    private Date date;
+    private String date;
     private List<CourseSkuDto> skus;
     private Boolean more;
 
-    @JSONField(format = "yyyy-MM-dd")
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 

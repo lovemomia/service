@@ -5,6 +5,7 @@ import cn.momia.api.base.dto.RegionDto;
 import cn.momia.api.course.dto.CourseBookDto;
 import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.CoursePlaceDto;
+import cn.momia.api.course.dto.CourseSkuDto;
 import cn.momia.api.course.dto.DatedCourseSkusDto;
 import cn.momia.api.poi.PoiServiceApi;
 import cn.momia.api.poi.dto.PlaceDto;
@@ -188,14 +189,48 @@ public class CourseController extends BaseController {
     }
 
     private List<DatedCourseSkusDto> buildDatedCourseSkusDtos(List<CourseSku> skus) {
-        List<DatedCourseSkusDto> datedCourseSkusDtos = new ArrayList<DatedCourseSkusDto>();
+        Map<String, List<CourseSku>> skusMap = new HashMap<String, List<CourseSku>>();
         Date now = new Date();
         for (CourseSku sku : skus) {
             if (!sku.isAvaliable(now)) continue;
-            // TODO
+
+            String date = DATE_FORMAT.format(sku.getStartTime());
+            List<CourseSku> skusOfDay = skusMap.get(date);
+            if (skusOfDay == null) {
+                skusOfDay = new ArrayList<CourseSku>();
+                skusMap.put(date, skusOfDay);
+            }
+            skusOfDay.add(sku);
+        }
+
+        // TODO 顺序
+        List<DatedCourseSkusDto> datedCourseSkusDtos = new ArrayList<DatedCourseSkusDto>();
+        for (Map.Entry<String, List<CourseSku>> entry : skusMap.entrySet()) {
+            String date = entry.getKey();
+            List<CourseSku> skusOfDay = entry.getValue();
+
+            DatedCourseSkusDto datedCourseSkusDto = new DatedCourseSkusDto();
+            datedCourseSkusDto.setDate(date);
+            datedCourseSkusDto.setSkus(buildCourseSkuDtos(skusOfDay.subList(0, Math.min(skusOfDay.size(), 2))));
+            if (skusOfDay.size() > 2) datedCourseSkusDto.setMore(true);
+
+            datedCourseSkusDtos.add(datedCourseSkusDto);
         }
 
         return datedCourseSkusDtos;
+    }
+
+    private List<CourseSkuDto> buildCourseSkuDtos(List<CourseSku> skus) {
+        List<CourseSkuDto> courseSkuDtos = new ArrayList<CourseSkuDto>();
+        for (CourseSku sku : skus) {
+            CourseSkuDto courseSkuDto = new CourseSkuDto();
+            courseSkuDto.setId(sku.getId());
+            // TODO place
+
+            courseSkuDtos.add(courseSkuDto);
+        }
+
+        return courseSkuDtos;
     }
 
     @RequestMapping(value = "/{id}/sku/month", method = RequestMethod.GET)
