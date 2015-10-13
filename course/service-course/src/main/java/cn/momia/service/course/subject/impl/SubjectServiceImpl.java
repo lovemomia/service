@@ -22,7 +22,7 @@ import java.util.Set;
 
 public class SubjectServiceImpl extends DbAccessService implements SubjectService {
     private static final String[] SUBJECT_FIELDS = { "Id", "Title", "Cover", "MinAge", "MaxAge", "Joined", "Intro", "Notice" };
-    private static final String[] SUBJECT_SKU_FIELDS = { "Id", "SubjectId", "`Desc`", "Price", "OriginalPrice", "CourseCount", "Time" };
+    private static final String[] SUBJECT_SKU_FIELDS = { "Id", "SubjectId", "`Desc`", "Price", "OriginalPrice", "Adult", "Child", "CourseCount", "Time" };
 
     @Override
     public Subject get(long id) {
@@ -102,6 +102,8 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
             sku.setDesc(rs.getString("Desc"));
             sku.setPrice(rs.getBigDecimal("Price"));
             sku.setOriginalPrice(rs.getBigDecimal("OriginalPrice"));
+            sku.setAdult(rs.getInt("Adult"));
+            sku.setChild(rs.getInt("Child"));
             sku.setCourseCount(rs.getInt("CourseCount"));
             sku.setTime(rs.getInt("Time"));
 
@@ -109,6 +111,18 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
         } catch (Exception e) {
             return SubjectSku.NOT_EXIST_SUBJECT_SKU;
         }
+    }
+
+    @Override
+    public SubjectSku getSku(long skuId) {
+        String sql = "SELECT " + joinSkuFields() + " FROM SG_SubjectSku WHERE Id=? AND Status=1";
+
+        return jdbcTemplate.query(sql, new Object[] { skuId }, new ResultSetExtractor<SubjectSku>() {
+            @Override
+            public SubjectSku extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? buildSubjectSku(rs) : SubjectSku.NOT_EXIST_SUBJECT_SKU;
+            }
+        });
     }
 
     @Override
@@ -163,5 +177,11 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
         }
 
         return courseSubjects;
+    }
+
+    @Override
+    public void increaseJoined(long id, int count) {
+        String sql = "UPDATE SG_Subject SET Joined=Joined+? WHERE Id=?";
+        jdbcTemplate.update(sql, new Object[] { count, id });
     }
 }

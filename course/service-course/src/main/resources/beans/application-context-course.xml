@@ -6,4 +6,5 @@
 
     <bean class="cn.momia.service.course.base.impl.CourseServiceImpl" parent="dbAccessService" />
     <bean class="cn.momia.service.course.subject.impl.SubjectServiceImpl" parent="dbAccessService" />
+    <bean class="cn.momia.service.course.subject.order.impl.OrderServiceImpl" parent="dbAccessService" />
 </beans>

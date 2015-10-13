@@ -10,6 +10,8 @@ public class SubjectSku {
     private String desc;
     private BigDecimal price;
     private BigDecimal originalPrice;
+    private int adult;
+    private int child;
     private int courseCount;
     private int time;
 
@@ -53,6 +55,22 @@ public class SubjectSku {
         this.originalPrice = originalPrice;
     }
 
+    public int getAdult() {
+        return adult;
+    }
+
+    public void setAdult(int adult) {
+        this.adult = adult;
+    }
+
+    public int getChild() {
+        return child;
+    }
+
+    public void setChild(int child) {
+        this.child = child;
+    }
+
     public int getCourseCount() {
         return courseCount;
     }
@@ -67,6 +85,10 @@ public class SubjectSku {
 
     public void setTime(int time) {
         this.time = time;
+    }
+
+    public int getJoinCount() {
+        return adult + child;
     }
 
     public boolean exists() {

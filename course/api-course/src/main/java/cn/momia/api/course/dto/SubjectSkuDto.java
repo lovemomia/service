@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 public class SubjectSkuDto {
     private long id;
+    private long subjectId;
     private BigDecimal price;
     private String desc;
 
@@ -13,6 +14,14 @@ public class SubjectSkuDto {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getSubjectId() {
+        return subjectId;
+    }
+
+    public void setSubjectId(long subjectId) {
+        this.subjectId = subjectId;
     }
 
     public BigDecimal getPrice() {

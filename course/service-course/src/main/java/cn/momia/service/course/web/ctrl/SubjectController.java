@@ -55,6 +55,7 @@ public class SubjectController {
         for (SubjectSku sku : skus) {
             SubjectSkuDto skuDto = new SubjectSkuDto();
             skuDto.setId(sku.getId());
+            skuDto.setSubjectId(sku.getSubjectId());
             skuDto.setPrice(sku.getPrice());
             skuDto.setDesc(sku.getDesc());
 
