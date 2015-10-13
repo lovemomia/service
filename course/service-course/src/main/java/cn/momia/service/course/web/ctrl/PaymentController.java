@@ -174,11 +174,11 @@ public class PaymentController extends BaseController {
         Order order = orderService.get(orderId);
 
         PaymentDto paymentDto = new PaymentDto();
-        if (order.exists() && order.getUserId() == user.getId()) {
-            paymentDto.setSuccessful(true);
+        if (order.exists() && order.getUserId() == user.getId() && order.isPayed()) {
+            paymentDto.setPayed(true);
             paymentDto.setSubjectId(order.getSubjectId());
         } else {
-            paymentDto.setSuccessful(false);
+            paymentDto.setPayed(false);
         }
 
         return MomiaHttpResponse.SUCCESS(paymentDto);

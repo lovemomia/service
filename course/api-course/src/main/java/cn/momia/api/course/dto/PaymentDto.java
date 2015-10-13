@@ -1,15 +1,15 @@
 package cn.momia.api.course.dto;
 
 public class PaymentDto {
-    private boolean successful;
+    private boolean payed;
     private Long subjectId;
 
-    public boolean isSuccessful() {
-        return successful;
+    public boolean isPayed() {
+        return payed;
     }
 
-    public void setSuccessful(boolean successful) {
-        this.successful = successful;
+    public void setPayed(boolean payed) {
+        this.payed = payed;
     }
 
     public Long getSubjectId() {
