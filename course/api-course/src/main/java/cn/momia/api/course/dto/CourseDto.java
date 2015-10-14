@@ -14,6 +14,7 @@ public class CourseDto {
     private BigDecimal price;
     private String scheduler;
     private String region;
+    private String address;
     private String subject;
 
     private String goal;
@@ -86,6 +87,14 @@ public class CourseDto {
 
     public void setRegion(String region) {
         this.region = region;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getSubject() {

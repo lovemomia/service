@@ -63,4 +63,18 @@ public class CourseServiceApi extends AbstractServiceApi {
 
         return CastUtil.toList((JSONArray) executeRequest(request), CourseSkuDto.class);
     }
+
+    public PagedList<CourseDto> queryNotFinishedByUser(long userId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("course/notfinished"), builder.build());
+
+        return CastUtil.toPagedList((JSONObject) executeRequest(request), CourseDto.class);
+    }
+
+    public PagedList<CourseDto> queryFinishedByUser(long userId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("course/finished"), builder.build());
+
+        return CastUtil.toPagedList((JSONObject) executeRequest(request), CourseDto.class);
+    }
 }

@@ -15,8 +15,13 @@ public interface CourseService {
     long queryCountBySubject(int subjectId);
     List<Course> queryBySubject(int subjectId, int start, int count);
 
+    long queryNotFinishedSkuCountByUser(long userId);
+    List<CourseSku> queryNotFinishedSkuByUser(long userId);
+    long queryFinishedSkuCountByUser(long userId);
+    List<CourseSku> queryFinishedSkuByUser(long userId);
+
     List<CourseSku> querySkus(long id, String start, String end);
 
-    Map<Long,Integer> queryBookedCourseCounts(Set<Long> orderIds);
-    Map<Long,Integer> queryFinishedCourseCounts(Set<Long> orderIds);
+    Map<Long, Integer> queryBookedCourseCounts(Set<Long> orderIds);
+    Map<Long, Integer> queryFinishedCourseCounts(Set<Long> orderIds);
 }

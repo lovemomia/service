@@ -52,12 +52,12 @@ public class CourseController extends BaseController {
     public MomiaHttpResponse get(@PathVariable long id) {
         List<Course> courses = new ArrayList<Course>();
         courses.add(courseService.get(id));
-        List<CourseDto> courseDtos = buildCourseDtos(courses, Course.Type.FULL);
+        List<CourseDto> courseDtos = buildCourseDtos(courses, null, Course.Type.FULL);
 
         return MomiaHttpResponse.SUCCESS(courseDtos.get(0));
     }
 
-    private List<CourseDto> buildCourseDtos(List<Course> courses, int type) {
+    private List<CourseDto> buildCourseDtos(List<Course> courses, Map<Long, CourseSku> skus, int type) {
         Set<Long> courseIds = new HashSet<Long>();
         Set<Integer> placeIds = new HashSet<Integer>();
         for (Course course : courses) {
@@ -323,5 +323,33 @@ public class CourseController extends BaseController {
         for (PlaceDto place : places) placesMap.put(place.getId(), place);
 
         return MomiaHttpResponse.SUCCESS(buildCourseSkuDtos(includedSkus, placesMap));
+    }
+
+    @RequestMapping(value = "/notfinished", method = RequestMethod.GET)
+    public MomiaHttpResponse notFinished(@RequestParam(value = "uid") long userId) {
+        long totalCount = courseService.queryNotFinishedSkuCountByUser(userId);
+        List<CourseSku> skus = courseService.queryNotFinishedSkuByUser(userId);
+
+        Set<Long> courseIds = new HashSet<Long>();
+        Map<Long, CourseSku> courseSkuMap = new HashMap<Long, CourseSku>();
+        for (CourseSku sku : skus) {
+            courseIds.add(sku.getCourseId());
+            courseSkuMap.put(sku.getCourseId(), sku);
+        }
+        List<Course> courses = courseService.list(courseIds);
+        List<CourseDto> courseDtos = buildCourseDtos(courses, courseSkuMap, Course.Type.BASE);
+
+        PagedList<Course> pagedCourseDtos = new PagedList<Course>(totalCount, start, count)
+        // TODO
+        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
+    }
+
+    @RequestMapping(value = "/finished", method = RequestMethod.GET)
+    public MomiaHttpResponse finished(@RequestParam(value = "uid") long userId) {
+        long totalCount = courseService.queryFinishedSkuCountByUser(userId);
+        List<CourseSku> skus = courseService.queryFinishedSkuByUser(userId);
+
+        // TODO
+        return MomiaHttpResponse.SUCCESS;
     }
 }
