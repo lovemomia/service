@@ -28,6 +28,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -190,6 +192,7 @@ public class CourseController extends BaseController {
 
     private List<DatedCourseSkusDto> buildDatedCourseSkusDtos(List<CourseSku> skus) {
         Map<String, List<CourseSku>> skusMap = new HashMap<String, List<CourseSku>>();
+        List<Integer> placeIds = new ArrayList<Integer>();
         Date now = new Date();
         for (CourseSku sku : skus) {
             if (!sku.isAvaliable(now)) continue;
@@ -201,9 +204,14 @@ public class CourseController extends BaseController {
                 skusMap.put(date, skusOfDay);
             }
             skusOfDay.add(sku);
+
+            placeIds.add(sku.getPlaceId());
         }
 
-        // TODO 顺序
+        List<PlaceDto> places = poiServiceApi.list(placeIds);
+        Map<Integer, PlaceDto> placesMap = new HashMap<Integer, PlaceDto>();
+        for (PlaceDto place : places) placesMap.put(place.getId(), place);
+
         List<DatedCourseSkusDto> datedCourseSkusDtos = new ArrayList<DatedCourseSkusDto>();
         for (Map.Entry<String, List<CourseSku>> entry : skusMap.entrySet()) {
             String date = entry.getKey();
@@ -211,26 +219,47 @@ public class CourseController extends BaseController {
 
             DatedCourseSkusDto datedCourseSkusDto = new DatedCourseSkusDto();
             datedCourseSkusDto.setDate(date);
-            datedCourseSkusDto.setSkus(buildCourseSkuDtos(skusOfDay.subList(0, Math.min(skusOfDay.size(), 2))));
+            datedCourseSkusDto.setSkus(buildCourseSkuDtos(skusOfDay.subList(0, Math.min(skusOfDay.size(), 2)), placesMap));
             if (skusOfDay.size() > 2) datedCourseSkusDto.setMore(true);
 
             datedCourseSkusDtos.add(datedCourseSkusDto);
         }
 
+        Collections.sort(datedCourseSkusDtos, new Comparator<DatedCourseSkusDto>() {
+            @Override
+            public int compare(DatedCourseSkusDto o1, DatedCourseSkusDto o2) {
+                return o1.getDate().compareTo(o2.getDate());
+            }
+        });
+
         return datedCourseSkusDtos;
     }
 
-    private List<CourseSkuDto> buildCourseSkuDtos(List<CourseSku> skus) {
+    private List<CourseSkuDto> buildCourseSkuDtos(List<CourseSku> skus, Map<Integer, PlaceDto> places) {
         List<CourseSkuDto> courseSkuDtos = new ArrayList<CourseSkuDto>();
         for (CourseSku sku : skus) {
+            PlaceDto place = places.get(sku.getPlaceId());
+            if (place == null) continue;
+
             CourseSkuDto courseSkuDto = new CourseSkuDto();
             courseSkuDto.setId(sku.getId());
-            // TODO place
+            courseSkuDto.setPlace(buildCoursePlaceDto(place));
 
             courseSkuDtos.add(courseSkuDto);
         }
 
         return courseSkuDtos;
+    }
+
+    private CoursePlaceDto buildCoursePlaceDto(PlaceDto place) {
+        CoursePlaceDto coursePlaceDto = new CoursePlaceDto();
+        coursePlaceDto.setId(place.getId());
+        coursePlaceDto.setName(place.getName());
+        coursePlaceDto.setAddress(place.getAddress());
+        coursePlaceDto.setLng(place.getLng());
+        coursePlaceDto.setLat(place.getLat());
+
+        return coursePlaceDto;
     }
 
     @RequestMapping(value = "/{id}/sku/month", method = RequestMethod.GET)

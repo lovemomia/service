@@ -4,7 +4,7 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean class="cn.momia.api.poi.PoiServiceApi" init-method="init">
+    <bean class="cn.momia.api.poi.PoiServiceApi">
         <property name="service" value="${Service.Poi}" />
     </bean>
 </beans>

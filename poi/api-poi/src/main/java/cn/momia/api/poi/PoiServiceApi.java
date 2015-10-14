@@ -13,12 +13,6 @@ import java.util.Collection;
 import java.util.List;
 
 public class PoiServiceApi extends AbstractServiceApi {
-    public static PoiServiceApi POI = new PoiServiceApi();
-
-    public void init() {
-        POI.setService(service);
-    }
-
     public PlaceDto get(int placeId) {
         return get(placeId, PlaceDto.Type.BASE);
     }
