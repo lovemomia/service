@@ -18,6 +18,16 @@ import java.util.List;
 import java.util.Map;
 
 public class SubjectServiceApi extends AbstractServiceApi {
+    public PagedList<SubjectDto> listFree(int cityId, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("city", cityId)
+                .add("start", start)
+                .add("count", count);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("subject/free"), builder.build());
+
+        return CastUtil.toPagedList((JSONObject) executeRequest(request), SubjectDto.class);
+    }
+
     public SubjectDto get(long subjectId) {
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("subject", subjectId));
         return JSON.toJavaObject((JSON) executeRequest(request), SubjectDto.class);

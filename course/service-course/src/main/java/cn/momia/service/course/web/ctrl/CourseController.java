@@ -147,26 +147,6 @@ public class CourseController extends BaseController {
         return courseBookDto;
     }
 
-    @RequestMapping(value = "/recommend", method = RequestMethod.GET)
-    public MomiaHttpResponse listRecommend(@RequestParam(value = "city") int cityId,
-                                           @RequestParam int start,
-                                           @RequestParam int count) {
-        long totalCount = courseService.queryRecommendCount(cityId);
-        List<Course> courses = courseService.queryRecommend(cityId, start, count);
-        PagedList<CourseDto> pagedCourseDtos = buildPagedCourseDtos(totalCount, start, count, courses);
-
-        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
-    }
-
-    private PagedList<CourseDto> buildPagedCourseDtos(long totalCount, int start, int count, List<Course> courses) {
-        List<CourseDto> courseDtos = buildCourseDtos(courses, Course.Type.BASE);
-
-        PagedList<CourseDto> pagedCourseDtos = new PagedList<CourseDto>(totalCount, start, count);
-        pagedCourseDtos.setList(courseDtos);
-
-        return pagedCourseDtos;
-    }
-
     @RequestMapping(value = "/subject", method = RequestMethod.GET)
     public MomiaHttpResponse listBySubject(@RequestParam(value = "suid") int subjectId,
                                            @RequestParam(value = "min", required = false, defaultValue = "0") int minAge,
@@ -180,6 +160,15 @@ public class CourseController extends BaseController {
         PagedList<CourseDto> pagedCourseDtos = buildPagedCourseDtos(totalCount, start, count, courses);
 
         return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
+    }
+
+    private PagedList<CourseDto> buildPagedCourseDtos(long totalCount, int start, int count, List<Course> courses) {
+        List<CourseDto> courseDtos = buildCourseDtos(courses, Course.Type.BASE);
+
+        PagedList<CourseDto> pagedCourseDtos = new PagedList<CourseDto>(totalCount, start, count);
+        pagedCourseDtos.setList(courseDtos);
+
+        return pagedCourseDtos;
     }
 
     @RequestMapping(value = "/{id}/sku/week", method = RequestMethod.GET)

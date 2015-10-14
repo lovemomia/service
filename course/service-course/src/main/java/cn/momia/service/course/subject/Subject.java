@@ -6,11 +6,17 @@ import com.alibaba.fastjson.JSONArray;
 import java.util.List;
 
 public class Subject {
+    public static class Type {
+        public static final int NORMAL = 1;
+        public static final int FREE = 2;
+    }
+
     public static final Subject NOT_EXIST_SUBJECT = new Subject();
 
     private long id;
     private String title;
     private String cover;
+    private String tags;
     private int minAge;
     private int maxAge;
     private int joined;
@@ -41,6 +47,14 @@ public class Subject {
 
     public void setCover(String cover) {
         this.cover = cover;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 
     public int getMinAge() {

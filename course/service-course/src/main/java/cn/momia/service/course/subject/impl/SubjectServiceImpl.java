@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class SubjectServiceImpl extends DbAccessService implements SubjectService {
-    private static final String[] SUBJECT_FIELDS = { "Id", "Title", "Cover", "MinAge", "MaxAge", "Joined", "Intro", "Notice" };
+    private static final String[] SUBJECT_FIELDS = { "Id", "Title", "Cover", "Tags", "MinAge", "MaxAge", "Joined", "Intro", "Notice" };
     private static final String[] SUBJECT_SKU_FIELDS = { "Id", "SubjectId", "`Desc`", "Price", "OriginalPrice", "Adult", "Child", "CourseCount", "Time" };
 
     @Override
@@ -51,6 +51,7 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
             subject.setId(rs.getLong("Id"));
             subject.setTitle(rs.getString("Title"));
             subject.setCover(rs.getString("Cover"));
+            subject.setTags(rs.getString("Tags"));
             subject.setMinAge(rs.getInt("MinAge"));
             subject.setMaxAge(rs.getInt("MaxAge"));
             subject.setJoined(rs.getInt("Joined"));
@@ -127,7 +128,76 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
             }
         });
 
+        Map<Long, List<String>> imgs = getImgs(ids);
+        Map<Long, List<SubjectSku>> skus = getSkus(ids);
+        for (Subject subject : subjects) {
+            subject.setImgs(imgs.get(subject.getId()));
+            subject.setSkus(skus.get(subject.getId()));
+        }
+
         return subjects;
+    }
+
+    private Map<Long, List<String>> getImgs(Collection<Long> ids) {
+        if (ids.isEmpty()) return new HashMap<Long, List<String>>();
+
+        final Map<Long, List<String>> imgs = new HashMap<Long, List<String>>();
+        for (long id : ids) imgs.put(id, new ArrayList<String>());
+        String sql = "SELECT SubjectId, Url FROM SG_SubjectImg WHERE SubjectId IN (" + StringUtils.join(ids, ",") + ") AND Status=1";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                long subjectId = rs.getLong("SubjectId");
+                String img = rs.getString("Url");
+                imgs.get(subjectId).add(img);
+            }
+        });
+
+        return imgs;
+    }
+
+    private Map<Long, List<SubjectSku>> getSkus(Collection<Long> ids) {
+        if (ids.isEmpty()) return new HashMap<Long, List<SubjectSku>>();
+
+        final Map<Long, List<SubjectSku>> skus = new HashMap<Long, List<SubjectSku>>();
+        for (long id : ids) skus.put(id, new ArrayList<SubjectSku>());
+        String sql = "SELECT " + joinSkuFields() + " FROM SG_SubjectSku WHERE SubjectId IN (" + StringUtils.join(ids, ",") + ") AND Status=1";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                SubjectSku sku = buildSubjectSku(rs);
+                if (sku.exists()) skus.get(sku.getSubjectId()).add(sku);
+            }
+        });
+
+        return skus;
+    }
+
+    @Override
+    public long queryFreeCount(long cityId) {
+        String sql = "SELECT COUNT(1) FROM SG_Subject WHERE `Type`=? AND CityId=? AND Status=1";
+
+        return jdbcTemplate.query(sql, new Object[] { Subject.Type.FREE, cityId }, new ResultSetExtractor<Long>() {
+            @Override
+            public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
+                return rs.next() ? rs.getLong(1) : 0;
+            }
+        });
+    }
+
+    @Override
+    public List<Subject> queryFree(long cityId, int start, int count) {
+        final List<Long> subjectIds = new ArrayList<Long>();
+        String sql = "SELECT Id FROM SG_Subject WHERE `Type`=? AND CityId=? AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
+        jdbcTemplate.query(sql, new Object[] { Subject.Type.FREE, cityId, start, count }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                subjectIds.add(rs.getLong("Id"));
+            }
+        });
+
+
+        return list(subjectIds);
     }
 
     @Override
