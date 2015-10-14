@@ -17,6 +17,7 @@ import cn.momia.service.course.base.CourseBook;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.base.CourseSku;
 import cn.momia.service.course.subject.SubjectService;
+import com.google.common.base.Splitter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -185,27 +187,39 @@ public class CourseController extends BaseController {
         Date now = new Date();
         String start = DATE_FORMAT.format(now);
         String end = DATE_FORMAT.format(new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000));
-        List<CourseSku> skus = courseService.listSkus(id, start, end);
+        List<CourseSku> skus = courseService.querySkus(id, start, end);
 
-        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkusDtos(skus));
+        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkusDtos(filterUnavaliableSkus(skus)));
+    }
+
+    private List<CourseSku> filterUnavaliableSkus(List<CourseSku> skus) {
+        List<CourseSku> avaliableSkus = new ArrayList<CourseSku>();
+        Date now = new Date();
+        for (CourseSku sku : skus) {
+            if (sku.isAvaliable(now)) avaliableSkus.add(sku);
+        }
+
+        return avaliableSkus;
     }
 
     private List<DatedCourseSkusDto> buildDatedCourseSkusDtos(List<CourseSku> skus) {
         Map<String, List<CourseSku>> skusMap = new HashMap<String, List<CourseSku>>();
         List<Integer> placeIds = new ArrayList<Integer>();
-        Date now = new Date();
+        Set<String> hasMore = new HashSet<String>();
         for (CourseSku sku : skus) {
-            if (!sku.isAvaliable(now)) continue;
-
             String date = DATE_FORMAT.format(sku.getStartTime());
             List<CourseSku> skusOfDay = skusMap.get(date);
             if (skusOfDay == null) {
                 skusOfDay = new ArrayList<CourseSku>();
                 skusMap.put(date, skusOfDay);
             }
-            skusOfDay.add(sku);
 
-            placeIds.add(sku.getPlaceId());
+            if (skusOfDay.size() < 2) {
+                skusOfDay.add(sku);
+                placeIds.add(sku.getPlaceId());
+            } else {
+                hasMore.add(date);
+            }
         }
 
         List<PlaceDto> places = poiServiceApi.list(placeIds);
@@ -219,8 +233,8 @@ public class CourseController extends BaseController {
 
             DatedCourseSkusDto datedCourseSkusDto = new DatedCourseSkusDto();
             datedCourseSkusDto.setDate(date);
-            datedCourseSkusDto.setSkus(buildCourseSkuDtos(skusOfDay.subList(0, Math.min(skusOfDay.size(), 2)), placesMap));
-            if (skusOfDay.size() > 2) datedCourseSkusDto.setMore(true);
+            datedCourseSkusDto.setSkus(buildCourseSkuDtos(skusOfDay, placesMap));
+            if (hasMore.contains(date)) datedCourseSkusDto.setMore(true);
 
             datedCourseSkusDtos.add(datedCourseSkusDto);
         }
@@ -244,6 +258,7 @@ public class CourseController extends BaseController {
             CourseSkuDto courseSkuDto = new CourseSkuDto();
             courseSkuDto.setId(sku.getId());
             courseSkuDto.setPlace(buildCoursePlaceDto(place));
+            courseSkuDto.setStock(sku.getUnlockedStock());
 
             courseSkuDtos.add(courseSkuDto);
         }
@@ -266,9 +281,9 @@ public class CourseController extends BaseController {
     public MomiaHttpResponse listWeekSkus(@PathVariable long id, @RequestParam int month) {
         String start = formatCurrentMonth(month);
         String end = formatNextMonth(month);
-        List<CourseSku> skus = courseService.listSkus(id, start, end);
+        List<CourseSku> skus = courseService.querySkus(id, start, end);
 
-        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkusDtos(skus));
+        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkusDtos(filterUnavaliableSkus(skus)));
     }
 
     private String formatCurrentMonth(int month) {
@@ -290,4 +305,33 @@ public class CourseController extends BaseController {
 
         if (month < currentMonth || nextMonth < month) return String.format("%d-%02d", currentYear + 1, nextMonth);
         return String.format("%d-%02d", currentYear, nextMonth);
-    }}
+    }
+
+    @RequestMapping(value = "/{id}/sku/more", method = RequestMethod.GET)
+    public MomiaHttpResponse listWeekSkus(@PathVariable long id, @RequestParam String date, @RequestParam String excludes) throws ParseException {
+        String start = date;
+        String end = DATE_FORMAT.format(new Date(DATE_FORMAT.parse(date).getTime() + 24 * 60 * 60 * 1000));
+
+        List<CourseSku> skus = filterUnavaliableSkus(courseService.querySkus(id, start, end));
+
+        Set<Long> excludeIds = new HashSet<Long>();
+        for (String excludeId : Splitter.on(",").trimResults().omitEmptyStrings().split(excludes)) {
+            excludeIds.add(Long.valueOf(excludeId));
+        }
+
+        List<CourseSku> includedSkus = new ArrayList<CourseSku>();
+        Set<Integer> placeIds = new HashSet<Integer>();
+        for (CourseSku sku : skus) {
+            if (!excludeIds.contains(sku.getId())) {
+                includedSkus.add(sku);
+                placeIds.add(sku.getPlaceId());
+            }
+        }
+
+        List<PlaceDto> places = poiServiceApi.list(placeIds);
+        Map<Integer, PlaceDto> placesMap = new HashMap<Integer, PlaceDto>();
+        for (PlaceDto place : places) placesMap.put(place.getId(), place);
+
+        return MomiaHttpResponse.SUCCESS(buildCourseSkuDtos(includedSkus, placesMap));
+    }
+}

@@ -1,6 +1,7 @@
 package cn.momia.api.course;
 
 import cn.momia.api.course.dto.CourseDto;
+import cn.momia.api.course.dto.CourseSkuDto;
 import cn.momia.api.course.dto.DatedCourseSkusDto;
 import cn.momia.common.api.AbstractServiceApi;
 import cn.momia.common.api.dto.PagedList;
@@ -53,14 +54,23 @@ public class CourseServiceApi extends AbstractServiceApi {
     }
 
     public List<DatedCourseSkusDto> listWeekSkus(long courseId) {
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("course", courseId, "/sku/week"));
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("course", courseId, "sku/week"));
         return CastUtil.toList((JSONArray) executeRequest(request), DatedCourseSkusDto.class);
     }
 
     public List<DatedCourseSkusDto> listMonthSkus(long courseId, int month) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("month", month);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("course", courseId, "/sku/month"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("course", courseId, "sku/month"), builder.build());
 
         return CastUtil.toList((JSONArray) executeRequest(request), DatedCourseSkusDto.class);
+    }
+
+    public List<CourseSkuDto> listMoreSkus(long courseId, String date, String excludes) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("date", date)
+                .add("excludes", excludes);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("course", courseId, "sku/more"), builder.build());
+
+        return CastUtil.toList((JSONArray) executeRequest(request), CourseSkuDto.class);
     }
 }

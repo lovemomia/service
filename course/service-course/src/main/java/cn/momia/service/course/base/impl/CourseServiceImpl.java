@@ -235,9 +235,9 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     }
 
     @Override
-    public List<CourseSku> listSkus(long id, String start, String end) {
+    public List<CourseSku> querySkus(long id, String start, String end) {
         final List<CourseSku> skus = new ArrayList<CourseSku>();
-        String sql = "SELECT " + joinSkuFields() + " FROM SG_CourseSku WHERE CourseId=? AND StartTime>=? AND EndTime<? AND Status=1";
+        String sql = "SELECT " + joinSkuFields() + " FROM SG_CourseSku WHERE CourseId=? AND StartTime>=? AND EndTime<? AND Status=1 ORDER BY StartTime ASC";
         jdbcTemplate.query(sql, new Object[] { id, start, end }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
