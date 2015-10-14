@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class CourseServiceImpl extends DbAccessService implements CourseService {
-    private static final String[] COURSE_FIELDS = { "Id", "Title", "Cover", "MinAge", "MaxAge", "Joined", "Price", "Goal", "Flow", "Extra" };
+    private static final String[] COURSE_FIELDS = { "Id", "Title", "Cover", "MinAge", "MaxAge", "Joined", "Price", "Goal", "Flow", "Tips", "Institution" };
     private static final String[] COURSE_SKU_FIELDS = { "Id", "CourseId", "StartTime", "EndTime", "Deadline", "Stock", "UnlockedStock", "LockedStock", "PlaceId" };
 
     @Override
@@ -41,6 +41,45 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         }
 
         return course;
+    }
+
+    private String joinFields() {
+        return StringUtils.join(COURSE_FIELDS, ",");
+    }
+
+    private Course buildCourse(ResultSet rs) {
+        try {
+            Course course = new Course();
+            course.setId(rs.getLong("Id"));
+            course.setTitle(rs.getString("Title"));
+            course.setCover(rs.getString("Cover"));
+            course.setMinAge(rs.getInt("MinAge"));
+            course.setMaxAge(rs.getInt("MaxAge"));
+            course.setJoined(rs.getInt("Joined"));
+            course.setPrice(rs.getBigDecimal("Price"));
+            course.setGoal(rs.getString("Goal"));
+            course.setFlow(rs.getString("Flow"));
+            course.setTips(rs.getString("Tips"));
+            course.setInstitution(rs.getString("Institution"));
+
+            return course;
+        } catch (Exception e) {
+            return Course.NOT_EXIST_COURSE;
+        }
+    }
+
+    private List<CourseSku> getSkus(long id) {
+        final List<CourseSku> skus = new ArrayList<CourseSku>();
+        String sql = "SELECT " + joinSkuFields() + " FROM SG_CourseSku WHERE CourseId=? AND Status=1";
+        jdbcTemplate.query(sql, new Object[] { id }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                CourseSku sku = buildCourseSku(rs);
+                if (sku.exists()) skus.add(sku);
+            }
+        });
+
+        return skus;
     }
 
     private String joinSkuFields() {
@@ -64,20 +103,6 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         } catch (Exception e) {
             return CourseSku.NOT_EXIST_COURSE_SKU;
         }
-    }
-
-    private List<CourseSku> getSkus(long id) {
-        final List<CourseSku> skus = new ArrayList<CourseSku>();
-        String sql = "SELECT " + joinSkuFields() + " FROM SG_CourseSku WHERE CourseId=? AND Status=1";
-        jdbcTemplate.query(sql, new Object[] { id }, new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                CourseSku sku = buildCourseSku(rs);
-                if (sku.exists()) skus.add(sku);
-            }
-        });
-
-        return skus;
     }
 
     private List<String> getImgs(long id) {
@@ -140,30 +165,6 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         }
 
         return courses;
-    }
-
-    private String joinFields() {
-        return StringUtils.join(COURSE_FIELDS, ",");
-    }
-
-    private Course buildCourse(ResultSet rs) {
-        try {
-            Course course = new Course();
-            course.setId(rs.getLong("Id"));
-            course.setTitle(rs.getString("Title"));
-            course.setCover(rs.getString("Cover"));
-            course.setMinAge(rs.getInt("MinAge"));
-            course.setMaxAge(rs.getInt("MaxAge"));
-            course.setJoined(rs.getInt("Joined"));
-            course.setPrice(rs.getBigDecimal("Price"));
-            course.setGoal(rs.getString("Goal"));
-            course.setFlow(rs.getString("Flow"));
-            course.setExtra(JSON.parseArray(rs.getString("Extra")));
-
-            return course;
-        } catch (Exception e) {
-            return Course.NOT_EXIST_COURSE;
-        }
     }
 
     private List<CourseSku> getSkus(Collection<Long> ids) {

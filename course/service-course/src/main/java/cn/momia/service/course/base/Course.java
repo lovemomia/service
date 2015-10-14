@@ -2,7 +2,6 @@ package cn.momia.service.course.base;
 
 import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.util.TimeUtil;
-import com.alibaba.fastjson.JSONArray;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -31,7 +30,8 @@ public class Course {
     private BigDecimal price;
     private String goal;
     private String flow;
-    private JSONArray extra;
+    private String tips;
+    private String institution;
 
     private List<CourseSku> skus;
 
@@ -110,12 +110,20 @@ public class Course {
         this.flow = flow;
     }
 
-    public JSONArray getExtra() {
-        return extra;
+    public String getTips() {
+        return tips;
     }
 
-    public void setExtra(JSONArray extra) {
-        this.extra = extra;
+    public void setTips(String tips) {
+        this.tips = tips;
+    }
+
+    public String getInstitution() {
+        return institution;
+    }
+
+    public void setInstitution(String institution) {
+        this.institution = institution;
     }
 
     public List<CourseSku> getSkus() {

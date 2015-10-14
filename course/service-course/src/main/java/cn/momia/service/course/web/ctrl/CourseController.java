@@ -109,7 +109,8 @@ public class CourseController extends BaseController {
         if (type == Course.Type.FULL) {
             courseDto.setGoal(course.getGoal());
             courseDto.setFlow(course.getFlow());
-            courseDto.setExtra(course.getExtra());
+            courseDto.setTips(course.getTips());
+            courseDto.setInstitution(course.getInstitution());
             courseDto.setPlaces(buildCoursePlaceDtos(placesOfCourse, 1));
             courseDto.setImgs(course.getImgs());
             courseDto.setBook(buildCourseBookDto(course.getBook()));

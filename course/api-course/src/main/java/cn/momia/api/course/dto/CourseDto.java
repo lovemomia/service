@@ -18,7 +18,8 @@ public class CourseDto {
 
     private String goal;
     private String flow;
-    private JSONArray extra;
+    private String tips;
+    private String institution;
     private List<CoursePlaceDto> places;
     private List<String> imgs;
     private CourseBookDto book;
@@ -111,12 +112,20 @@ public class CourseDto {
         this.flow = flow;
     }
 
-    public JSONArray getExtra() {
-        return extra;
+    public String getTips() {
+        return tips;
     }
 
-    public void setExtra(JSONArray extra) {
-        this.extra = extra;
+    public void setTips(String tips) {
+        this.tips = tips;
+    }
+
+    public String getInstitution() {
+        return institution;
+    }
+
+    public void setInstitution(String institution) {
+        this.institution = institution;
     }
 
     public List<CoursePlaceDto> getPlaces() {
