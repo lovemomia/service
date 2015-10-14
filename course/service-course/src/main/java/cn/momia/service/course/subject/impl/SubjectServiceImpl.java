@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class SubjectServiceImpl extends DbAccessService implements SubjectService {
-    private static final String[] SUBJECT_FIELDS = { "Id", "Title", "Cover", "Tags", "MinAge", "MaxAge", "Joined", "Intro", "Notice" };
+    private static final String[] SUBJECT_FIELDS = { "Id", "CityId", "RegionId", "Title", "Cover", "Tags", "MinAge", "MaxAge", "Joined", "Intro", "Notice", "StartTime", "EndTime" };
     private static final String[] SUBJECT_SKU_FIELDS = { "Id", "SubjectId", "`Desc`", "Price", "OriginalPrice", "Adult", "Child", "CourseCount", "Time" };
 
     @Override
@@ -49,12 +49,16 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
         try {
             Subject subject = new Subject();
             subject.setId(rs.getLong("Id"));
+            subject.setCityId(rs.getInt("CityId"));
+            subject.setRegionId(rs.getInt("RegionId"));
             subject.setTitle(rs.getString("Title"));
             subject.setCover(rs.getString("Cover"));
             subject.setTags(rs.getString("Tags"));
             subject.setMinAge(rs.getInt("MinAge"));
             subject.setMaxAge(rs.getInt("MaxAge"));
             subject.setJoined(rs.getInt("Joined"));
+            subject.setStartTime(rs.getTimestamp("StartTime"));
+            subject.setEndTime(rs.getTimestamp("EndTime"));
             subject.setIntro(rs.getString("Intro"));
             subject.setNotice(JSON.parseArray(rs.getString("Notice")));
 

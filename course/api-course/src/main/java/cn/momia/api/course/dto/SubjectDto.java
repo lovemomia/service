@@ -14,6 +14,8 @@ public class SubjectDto {
     private BigDecimal originalPrice;
     private String age;
     private int joined;
+    private String scheduler;
+    private String region;
     private String intro;
     private JSONArray notice;
     private List<String> imgs;
@@ -80,6 +82,22 @@ public class SubjectDto {
 
     public void setJoined(int joined) {
         this.joined = joined;
+    }
+
+    public String getScheduler() {
+        return scheduler;
+    }
+
+    public void setScheduler(String scheduler) {
+        this.scheduler = scheduler;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
     }
 
     public String getIntro() {

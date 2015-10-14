@@ -5,7 +5,6 @@ import cn.momia.api.course.dto.SubjectSkuDto;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.subject.SubjectSku;
@@ -22,7 +21,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/subject")
 public class SubjectController extends BaseController {
-    @Autowired private CourseService courseService;
     @Autowired private SubjectService subjectService;
 
     @RequestMapping(value = "/free", method = RequestMethod.GET)
@@ -53,6 +51,8 @@ public class SubjectController extends BaseController {
 
         subjectDto.setAge(subject.getAge());
         subjectDto.setJoined(subject.getJoined());
+        subjectDto.setScheduler(subject.getScheduler());
+        subjectDto.setRegion(subject.getRegion());
 
         return subjectDto;
     }
