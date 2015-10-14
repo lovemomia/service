@@ -28,7 +28,7 @@ import java.util.List;
 public class OrderServiceImpl extends DbAccessService implements OrderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
 
-    private static final String[] ORDER_FIELDS = { "Id", "UserId", "SubjectId", "SkuId", "Price", "Count", "Contact", "Mobile", "BookedCourseCount", "Status", "AddTime" };
+    private static final String[] ORDER_FIELDS = { "Id", "UserId", "SubjectId", "SkuId", "Price", "Count", "Contact", "Mobile", "Status", "AddTime" };
 
     @Override
     public long add(final Order order) {
@@ -85,7 +85,6 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
             contact.setMobile(rs.getString("Mobile"));
             order.setContact(contact);
 
-            order.setBookCourseCount(rs.getInt("BookedCourseCount"));
             order.setStatus(rs.getInt("status"));
             order.setAddTime(rs.getTimestamp("addTime"));
 

@@ -6,6 +6,7 @@ import cn.momia.api.user.dto.UserDto;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
+import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.subject.SubjectSku;
@@ -28,6 +29,7 @@ import java.util.Set;
 @RestController
 @RequestMapping(value = "/subject/order")
 public class OrderController extends BaseController {
+    @Autowired private CourseService courseService;
     @Autowired private SubjectService subjectService;
     @Autowired private OrderService orderService;
     @Autowired private UserServiceApi userServiceApi;
@@ -73,12 +75,17 @@ public class OrderController extends BaseController {
         long totalCount = orderService.queryCountByUser(user.getId(), status);
         List<Order> orders = orderService.queryByUser(user.getId(), status, start, count);
 
+        Set<Long> orderIds = new HashSet<Long>();
         Set<Long> subjectIds = new HashSet<Long>();
         Set<Long> skuIds = new HashSet<Long>();
         for (Order order : orders) {
+            orderIds.add(order.getId());
             subjectIds.add(order.getSubjectId());
             skuIds.add(order.getSkuId());
         }
+
+        Map<Long, Integer> bookedCourceCounts = courseService.queryBookedCourseCounts(orderIds);
+        Map<Long, Integer> finishedCourceCounts = courseService.queryFinishedCourseCounts(orderIds);
 
         List<Subject> subjects = subjectService.list(subjectIds);
         Map<Long, Subject> subjectsMap = new HashMap<Long, Subject>();
@@ -94,7 +101,7 @@ public class OrderController extends BaseController {
             SubjectSku sku = skusMap.get(order.getSkuId());
             if (subject == null || sku == null) continue;
 
-            orderDtos.add(buildOrderDetailDto(order, subject, sku));
+            orderDtos.add(buildOrderDetailDto(order, subject, sku, bookedCourceCounts, finishedCourceCounts));
         }
 
         PagedList<OrderDto> pagedOrderDtos = new PagedList<OrderDto>(totalCount, start, count);
@@ -103,10 +110,11 @@ public class OrderController extends BaseController {
         return MomiaHttpResponse.SUCCESS(pagedOrderDtos);
     }
 
-    private OrderDto buildOrderDetailDto(Order order, Subject subject, SubjectSku sku) {
+    private OrderDto buildOrderDetailDto(Order order, Subject subject, SubjectSku sku, Map<Long, Integer> bookedCourceCounts, Map<Long, Integer> finishedCourceCounts) {
         OrderDto orderDto = buildOrderDto(order);
         orderDto.setTotalCourseCount(order.getCount() * sku.getCourseCount());
-        orderDto.setBookedCourseCount(order.getBookCourseCount());
+        orderDto.setBookedCourseCount(bookedCourceCounts.get(order.getId()));
+        orderDto.setFinishedCourseCount(finishedCourceCounts.get(order.getId()));
 
         orderDto.setTitle(subject.getTitle());
         orderDto.setCover(subject.getCover());

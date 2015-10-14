@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class CourseServiceImpl extends DbAccessService implements CourseService {
     private static final String[] COURSE_FIELDS = { "Id", "Title", "Cover", "MinAge", "MaxAge", "Joined", "Price", "Goal", "Flow", "Extra" };
@@ -246,5 +247,43 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         });
 
         return skus;
+    }
+
+    @Override
+    public Map<Long, Integer> queryBookedCourseCounts(Set<Long> orderIds) {
+        if (orderIds.isEmpty()) return new HashMap<Long, Integer>();
+
+        final Map<Long, Integer> map = new HashMap<Long, Integer>();
+        for (long orderId : orderIds) map.put(orderId, 0);
+        String sql = "SELECT OrderId, Count FROM SG_BookedCourse WHERE OrderId IN (" + StringUtils.join(orderIds, ",") + ") AND Status=1";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                long orderId = rs.getLong("OrderId");
+                int count = rs.getInt("Count");
+                map.put(orderId, map.get(orderId) + count);
+            }
+        });
+
+        return map;
+    }
+
+    @Override
+    public Map<Long, Integer> queryFinishedCourseCounts(Set<Long> orderIds) {
+        if (orderIds.isEmpty()) return new HashMap<Long, Integer>();
+
+        final Map<Long, Integer> map = new HashMap<Long, Integer>();
+        for (long orderId : orderIds) map.put(orderId, 0);
+        String sql = "SELECT OrderId, Count FROM SG_BookedCourse WHERE OrderId IN (" + StringUtils.join(orderIds, ",") + ") AND EndTime<=NOW() AND Status=1";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                long orderId = rs.getLong("OrderId");
+                int count = rs.getInt("Count");
+                map.put(orderId, map.get(orderId) + count);
+            }
+        });
+
+        return map;
     }
 }

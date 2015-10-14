@@ -10,7 +10,8 @@ public class OrderDto {
     private BigDecimal totalFee;
 
     private Integer totalCourseCount;
-    private Integer BookedCourseCount;
+    private Integer bookedCourseCount;
+    private Integer finishedCourseCount;
 
     private String title;
     private String cover;
@@ -64,11 +65,19 @@ public class OrderDto {
     }
 
     public Integer getBookedCourseCount() {
-        return BookedCourseCount;
+        return bookedCourseCount;
     }
 
     public void setBookedCourseCount(Integer bookedCourseCount) {
-        BookedCourseCount = bookedCourseCount;
+        this.bookedCourseCount = bookedCourseCount;
+    }
+
+    public Integer getFinishedCourseCount() {
+        return finishedCourseCount;
+    }
+
+    public void setFinishedCourseCount(Integer finishedCourseCount) {
+        this.finishedCourseCount = finishedCourseCount;
     }
 
     public String getTitle() {
