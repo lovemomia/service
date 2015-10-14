@@ -5,6 +5,7 @@ import cn.momia.api.course.dto.PaymentDto;
 import cn.momia.api.course.dto.SubjectDto;
 import cn.momia.api.course.dto.SubjectSkuDto;
 import cn.momia.common.api.AbstractServiceApi;
+import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;
 import cn.momia.common.api.util.CastUtil;
@@ -70,5 +71,16 @@ public class SubjectServiceApi extends AbstractServiceApi {
         MomiaHttpRequest request = MomiaHttpRequest.POST(url("subject/payment/check"), builder.build());
 
         return JSON.toJavaObject((JSON) executeRequest(request), PaymentDto.class);
+    }
+
+    public PagedList<OrderDto> listOrders(String utoken, int status, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("status", status)
+                .add("start", start)
+                .add("count", count);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("subject/order/list"), builder.build());
+
+        return CastUtil.toPagedList((JSONObject) executeRequest(request), OrderDto.class);
     }
 }

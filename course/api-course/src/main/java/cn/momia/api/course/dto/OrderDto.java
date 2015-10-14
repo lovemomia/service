@@ -9,6 +9,12 @@ public class OrderDto {
     private int count;
     private BigDecimal totalFee;
 
+    private Integer totalCourseCount;
+    private Integer BookedCourseCount;
+
+    private String title;
+    private String cover;
+
     public long getId() {
         return id;
     }
@@ -47,5 +53,37 @@ public class OrderDto {
 
     public void setTotalFee(BigDecimal totalFee) {
         this.totalFee = totalFee;
+    }
+
+    public Integer getTotalCourseCount() {
+        return totalCourseCount;
+    }
+
+    public void setTotalCourseCount(Integer totalCourseCount) {
+        this.totalCourseCount = totalCourseCount;
+    }
+
+    public Integer getBookedCourseCount() {
+        return BookedCourseCount;
+    }
+
+    public void setBookedCourseCount(Integer bookedCourseCount) {
+        BookedCourseCount = bookedCourseCount;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
     }
 }

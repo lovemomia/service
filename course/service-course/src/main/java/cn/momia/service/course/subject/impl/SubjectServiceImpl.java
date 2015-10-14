@@ -114,6 +114,23 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
     }
 
     @Override
+    public List<Subject> list(Collection<Long> ids) {
+        if (ids.isEmpty()) return new ArrayList<Subject>();
+
+        final List<Subject> subjects = new ArrayList<Subject>();
+        String sql = "SELECT " + joinFields() + " FROM SG_Subject WHERE Id IN (" + StringUtils.join(ids, ",") + ") AND Status=1";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                Subject subject = buildSubject(rs);
+                if (subject.exists()) subjects.add(subject);
+            }
+        });
+
+        return subjects;
+    }
+
+    @Override
     public SubjectSku getSku(long skuId) {
         String sql = "SELECT " + joinSkuFields() + " FROM SG_SubjectSku WHERE Id=? AND Status=1";
 
@@ -126,7 +143,24 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
     }
 
     @Override
-    public List<SubjectSku> listSkus(long id) {
+    public List<SubjectSku> listSkus(Collection<Long> skuIds) {
+        if (skuIds.isEmpty()) return new ArrayList<SubjectSku>();
+
+        final List<SubjectSku> skus = new ArrayList<SubjectSku>();
+        String sql = "SELECT " + joinSkuFields() + " FROM SG_SubjectSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status=1";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                SubjectSku sku = buildSubjectSku(rs);
+                if (sku.exists()) skus.add(sku);
+            }
+        });
+
+        return skus;
+    }
+
+    @Override
+    public List<SubjectSku> querySkus(long id) {
         return getSkus(id);
     }
 

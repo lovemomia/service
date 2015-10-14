@@ -1,8 +1,12 @@
 package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.course.dto.OrderDto;
+import cn.momia.api.user.UserServiceApi;
+import cn.momia.api.user.dto.UserDto;
+import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
+import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.subject.SubjectSku;
 import cn.momia.service.course.subject.order.Order;
@@ -11,13 +15,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping(value = "/subject/order")
 public class OrderController extends BaseController {
     @Autowired private SubjectService subjectService;
     @Autowired private OrderService orderService;
+    @Autowired private UserServiceApi userServiceApi;
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public MomiaHttpResponse placeOrder(@RequestBody Order order) {
@@ -46,6 +59,57 @@ public class OrderController extends BaseController {
         orderDto.setSkuId(order.getSkuId());
         orderDto.setCount(order.getCount());
         orderDto.setTotalFee(order.getTotalFee());
+
+        return orderDto;
+    }
+
+    @RequestMapping(value = "list", method = RequestMethod.GET)
+    public MomiaHttpResponse listOrders(@RequestParam String utoken,
+                                        @RequestParam int status,
+                                        @RequestParam int start,
+                                        @RequestParam int count) {
+        UserDto user = userServiceApi.get(utoken);
+
+        long totalCount = orderService.queryCountByUser(user.getId(), status);
+        List<Order> orders = orderService.queryByUser(user.getId(), status, start, count);
+
+        Set<Long> subjectIds = new HashSet<Long>();
+        Set<Long> skuIds = new HashSet<Long>();
+        for (Order order : orders) {
+            subjectIds.add(order.getSubjectId());
+            skuIds.add(order.getSkuId());
+        }
+
+        List<Subject> subjects = subjectService.list(subjectIds);
+        Map<Long, Subject> subjectsMap = new HashMap<Long, Subject>();
+        for (Subject subject : subjects) subjectsMap.put(subject.getId(), subject);
+
+        List<SubjectSku> skus = subjectService.listSkus(skuIds);
+        Map<Long, SubjectSku> skusMap = new HashMap<Long, SubjectSku>();
+        for (SubjectSku sku : skus) skusMap.put(sku.getId(), sku);
+
+        List<OrderDto> orderDtos = new ArrayList<OrderDto>();
+        for (Order order : orders) {
+            Subject subject = subjectsMap.get(order.getSubjectId());
+            SubjectSku sku = skusMap.get(order.getSkuId());
+            if (subject == null || sku == null) continue;
+
+            orderDtos.add(buildOrderDetailDto(order, subject, sku));
+        }
+
+        PagedList<OrderDto> pagedOrderDtos = new PagedList<OrderDto>(totalCount, start, count);
+        pagedOrderDtos.setList(orderDtos);
+
+        return MomiaHttpResponse.SUCCESS(pagedOrderDtos);
+    }
+
+    private OrderDto buildOrderDetailDto(Order order, Subject subject, SubjectSku sku) {
+        OrderDto orderDto = buildOrderDto(order);
+        orderDto.setTotalCourseCount(order.getCount() * sku.getCourseCount());
+        orderDto.setBookedCourseCount(order.getBookCourseCount());
+
+        orderDto.setTitle(subject.getTitle());
+        orderDto.setCover(subject.getCover());
 
         return orderDto;
     }

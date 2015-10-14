@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.TransactionStatus;
@@ -21,11 +22,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OrderServiceImpl extends DbAccessService implements OrderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
 
-    private static final String[] ORDER_FIELDS = { "Id", "UserId", "SubjectId", "SkuId", "Price", "Count", "Contact", "Mobile", "Status", "AddTime" };
+    private static final String[] ORDER_FIELDS = { "Id", "UserId", "SubjectId", "SkuId", "Price", "Count", "Contact", "Mobile", "BookedCourseCount", "Status", "AddTime" };
 
     @Override
     public long add(final Order order) {
@@ -66,7 +69,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         return StringUtils.join(ORDER_FIELDS, ",");
     }
 
-    private Order buildOrder(ResultSet rs) {
+    private static Order buildOrder(ResultSet rs) {
         try {
             Order order = new Order();
 
@@ -82,12 +85,67 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
             contact.setMobile(rs.getString("Mobile"));
             order.setContact(contact);
 
+            order.setBookCourseCount(rs.getInt("BookedCourseCount"));
             order.setStatus(rs.getInt("status"));
             order.setAddTime(rs.getTimestamp("addTime"));
 
             return order;
         } catch (Exception e) {
             return Order.NOT_EXIST_ORDER;
+        }
+    }
+
+    @Override
+    public long queryCountByUser(long userId, int status) {
+        if (status == 1) {
+            String sql = "SELECT COUNT(1) FROM SG_SubjectOrder WHERE UserId=? AND Status>0";
+            return jdbcTemplate.query(sql, new Object[] { userId }, new CountResultSetExtractor());
+        } else if (status == 2) {
+            String sql = "SELECT COUNT(1) FROM SG_SubjectOrder WHERE UserId=? AND Status>0 AND Status<?";
+            return jdbcTemplate.query(sql, new Object[] { userId, Order.Status.PAYED }, new CountResultSetExtractor());
+        } else if (status == 3) {
+            String sql = "SELECT COUNT(1) FROM SG_SubjectOrder WHERE UserId=? AND Status>=?";
+            return jdbcTemplate.query(sql, new Object[] { userId, Order.Status.PAYED }, new CountResultSetExtractor());
+        }
+
+        return 0;
+    }
+
+    private static class CountResultSetExtractor implements ResultSetExtractor<Long> {
+        @Override
+        public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
+            return rs.next() ? rs.getLong(1) : 0;
+        }
+    }
+
+    @Override
+    public List<Order> queryByUser(long userId, int status, int start, int count) {
+        List<Order> orders = new ArrayList<Order>();
+        if (status == 1) {
+            String sql = "SELECT " + joinFields() + " FROM SG_SubjectOrder WHERE UserId=? AND Status>0 ORDER BY AddTime DESC LIMIT ?,?";
+            jdbcTemplate.query(sql, new Object[] { userId, start, count }, new OrdersRowCallbackHandler(orders));
+        } else if (status == 2) {
+            String sql = "SELECT " + joinFields() + " FROM SG_SubjectOrder WHERE UserId=? AND Status>0 AND Status<? ORDER BY AddTime DESC LIMIT ?,?";
+            jdbcTemplate.query(sql, new Object[] { userId, Order.Status.PAYED, start, count }, new OrdersRowCallbackHandler(orders));
+        } else if (status == 3) {
+            String sql = "SELECT " + joinFields() + " FROM SG_SubjectOrder WHERE UserId=? AND Status>=? ORDER BY AddTime DESC LIMIT ?,?";
+            jdbcTemplate.query(sql, new Object[] { userId, Order.Status.PAYED, start, count }, new OrdersRowCallbackHandler(orders));
+        }
+
+        return orders;
+    }
+
+    private static class OrdersRowCallbackHandler implements RowCallbackHandler {
+        private List<Order> orders;
+
+        public OrdersRowCallbackHandler(List<Order> orders) {
+            this.orders = orders;
+        }
+
+        @Override
+        public void processRow(ResultSet rs) throws SQLException {
+            Order order = buildOrder(rs);
+            if (order.exists()) orders.add(order);
         }
     }
 

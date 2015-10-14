@@ -23,6 +23,7 @@ public class Order {
     private BigDecimal price;
     private int count;
     private OrderContact contact;
+    private int bookCourseCount;
     private int status;
     private Date addTime;
 
@@ -84,6 +85,14 @@ public class Order {
 
     public BigDecimal getTotalFee() {
         return price.multiply(new BigDecimal(count));
+    }
+
+    public int getBookCourseCount() {
+        return bookCourseCount;
+    }
+
+    public void setBookCourseCount(int bookCourseCount) {
+        this.bookCourseCount = bookCourseCount;
     }
 
     public int getStatus() {
