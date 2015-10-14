@@ -93,4 +93,14 @@ public class SubjectServiceApi extends AbstractServiceApi {
 
         return CastUtil.toPagedList((JSONObject) executeRequest(request), OrderDto.class);
     }
+
+    public PagedList<OrderDto> listBookableOrders(String utoken, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("start", start)
+                .add("count", count);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("subject/order/bookable"), builder.build());
+
+        return CastUtil.toPagedList((JSONObject) executeRequest(request), OrderDto.class);
+    }
 }

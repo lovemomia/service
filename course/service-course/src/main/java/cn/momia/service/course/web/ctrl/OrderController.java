@@ -61,11 +61,12 @@ public class OrderController extends BaseController {
         orderDto.setSkuId(order.getSkuId());
         orderDto.setCount(order.getCount());
         orderDto.setTotalFee(order.getTotalFee());
+        orderDto.setAddTime(order.getAddTime());
 
         return orderDto;
     }
 
-    @RequestMapping(value = "list", method = RequestMethod.GET)
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
     public MomiaHttpResponse listOrders(@RequestParam String utoken,
                                         @RequestParam int status,
                                         @RequestParam int start,
@@ -75,6 +76,12 @@ public class OrderController extends BaseController {
         long totalCount = orderService.queryCountByUser(user.getId(), status);
         List<Order> orders = orderService.queryByUser(user.getId(), status, start, count);
 
+        PagedList<OrderDto> pagedOrderDtos = buildPagedOrderDtos(totalCount, start, count, orders);
+
+        return MomiaHttpResponse.SUCCESS(pagedOrderDtos);
+    }
+
+    private PagedList<OrderDto> buildPagedOrderDtos(long totalCount, @RequestParam int start, @RequestParam int count, List<Order> orders) {
         Set<Long> orderIds = new HashSet<Long>();
         Set<Long> subjectIds = new HashSet<Long>();
         Set<Long> skuIds = new HashSet<Long>();
@@ -107,7 +114,7 @@ public class OrderController extends BaseController {
         PagedList<OrderDto> pagedOrderDtos = new PagedList<OrderDto>(totalCount, start, count);
         pagedOrderDtos.setList(orderDtos);
 
-        return MomiaHttpResponse.SUCCESS(pagedOrderDtos);
+        return pagedOrderDtos;
     }
 
     private OrderDto buildOrderDetailDto(Order order, Subject subject, SubjectSku sku, Map<Long, Integer> bookedCourceCounts, Map<Long, Integer> finishedCourceCounts) {
@@ -120,5 +127,19 @@ public class OrderController extends BaseController {
         orderDto.setCover(subject.getCover());
 
         return orderDto;
+    }
+
+    @RequestMapping(value = "/bookable", method = RequestMethod.GET)
+    public MomiaHttpResponse listBookableOrders(@RequestParam String utoken,
+                                                @RequestParam int start,
+                                                @RequestParam int count) {
+        UserDto user = userServiceApi.get(utoken);
+
+        long totalCount = orderService.queryBookableCountByUser(user.getId());
+        List<Order> orders = orderService.queryBookableByUser(user.getId(), start, count);
+
+        PagedList<OrderDto> pagedOrderDtos = buildPagedOrderDtos(totalCount, start, count, orders);
+
+        return MomiaHttpResponse.SUCCESS(pagedOrderDtos);
     }
 }

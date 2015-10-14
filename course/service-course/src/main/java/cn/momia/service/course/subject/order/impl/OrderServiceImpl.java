@@ -149,6 +149,21 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
+    public long queryBookableCountByUser(long userId) {
+        String sql = "SELECT COUNT(1) FROM SG_SubjectOrder WHERE UserId=? AND Status>=? AND Bookable=1";
+        return jdbcTemplate.query(sql, new Object[] { userId, Order.Status.PAYED }, new CountResultSetExtractor());
+    }
+
+    @Override
+    public List<Order> queryBookableByUser(long userId, int start, int count) {
+        List<Order> orders = new ArrayList<Order>();
+        String sql = "SELECT " + joinFields() + " FROM SG_SubjectOrder WHERE UserId=? AND Status>=? AND Bookable=1 ORDER BY AddTime DESC LIMIT ?,?";
+        jdbcTemplate.query(sql, new Object[] { userId, Order.Status.PAYED, start, count }, new OrdersRowCallbackHandler(orders));
+
+        return orders;
+    }
+
+    @Override
     public boolean prepay(long id) {
         String sql = "UPDATE SG_SubjectOrder SET Status=? WHERE Id=? AND (Status=? OR Status=?)";
         int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PRE_PAYED, id, Order.Status.NOT_PAYED, Order.Status.PRE_PAYED });

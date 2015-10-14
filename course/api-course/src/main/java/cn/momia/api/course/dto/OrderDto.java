@@ -1,6 +1,9 @@
 package cn.momia.api.course.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import java.math.BigDecimal;
+import java.util.Date;
 
 public class OrderDto {
     private long id;
@@ -8,6 +11,7 @@ public class OrderDto {
     private long skuId;
     private int count;
     private BigDecimal totalFee;
+    private Date addTime;
 
     private Integer totalCourseCount;
     private Integer bookedCourseCount;
@@ -54,6 +58,15 @@ public class OrderDto {
 
     public void setTotalFee(BigDecimal totalFee) {
         this.totalFee = totalFee;
+    }
+
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    public Date getAddTime() {
+        return addTime;
+    }
+
+    public void setAddTime(Date addTime) {
+        this.addTime = addTime;
     }
 
     public Integer getTotalCourseCount() {

@@ -9,6 +9,9 @@ public interface OrderService {
     long queryCountByUser(long userId, int status);
     List<Order> queryByUser(long userId, int status, int start, int count);
 
+    long queryBookableCountByUser(long userId);
+    List<Order> queryBookableByUser(long userId, int start, int count);
+
     boolean prepay(long id);
     boolean pay(Payment payment);
 }
