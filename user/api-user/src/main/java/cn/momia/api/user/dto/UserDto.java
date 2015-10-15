@@ -3,6 +3,7 @@ package cn.momia.api.user.dto;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
+import java.util.List;
 
 public class UserDto {
     public static class Type {
@@ -24,6 +25,8 @@ public class UserDto {
     private String address;
 
     private String token;
+
+    private List<UserChildDto> children;
 
     public long getId() {
         return id;
@@ -112,6 +115,14 @@ public class UserDto {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public List<UserChildDto> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<UserChildDto> children) {
+        this.children = children;
     }
 
     public boolean exists() {

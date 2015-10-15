@@ -25,4 +25,12 @@ public interface UserService {
     boolean updateRegionId(long id, int regionId);
     boolean updateAddress(long id, String address);
     boolean updatePassword(long id, String mobile, String password);
+
+    void addChild(UserChild child);
+    UserChild getChild(long childId);
+    boolean updateChildAvatar(long id, long childId, String avatar);
+    boolean updateChildName(long id, long childId, String name);
+    boolean updateChildSex(long id, long childId, String sex);
+    boolean updateChildBirthday(long id, long childId, Date birthday);
+    boolean deleteChild(long id, long childId);
 }

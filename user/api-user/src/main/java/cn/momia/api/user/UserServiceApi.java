@@ -1,6 +1,7 @@
 package cn.momia.api.user;
 
 import cn.momia.api.user.dto.ContactDto;
+import cn.momia.api.user.dto.UserChildDto;
 import cn.momia.api.user.dto.UserDto;
 import cn.momia.common.api.AbstractServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
@@ -161,5 +162,67 @@ public class UserServiceApi extends AbstractServiceApi {
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/list"), builder.build());
 
         return CastUtil.toList((JSONArray) executeRequest(request), UserDto.class);
+    }
+
+    public UserDto addChildren(List<UserChildDto> children) {
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("user/child"), JSON.toJSONString(children));
+        return JSON.toJavaObject((JSON) executeRequest(request), UserDto.class);
+    }
+
+    public UserChildDto getChild(String utoken, long childId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/child", childId), builder.build());
+
+        return JSON.toJavaObject((JSON) executeRequest(request), UserChildDto.class);
+    }
+
+    public UserDto updateChildAvatar(String utoken, long childId, String avatar) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("avatar", avatar);
+        MomiaHttpRequest request = MomiaHttpRequest.PUT(url("user/child", childId, "avatar"), builder.build());
+
+        return JSON.toJavaObject((JSON) executeRequest(request), UserDto.class);
+    }
+
+    public UserDto updateChildName(String utoken, long childId, String name) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("name", name);
+        MomiaHttpRequest request = MomiaHttpRequest.PUT(url("user/child", childId, "name"), builder.build());
+
+        return JSON.toJavaObject((JSON) executeRequest(request), UserDto.class);
+    }
+
+    public UserDto updateChildSex(String utoken, long childId, String sex) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("sex", sex);
+        MomiaHttpRequest request = MomiaHttpRequest.PUT(url("user/child", childId, "sex"), builder.build());
+
+        return JSON.toJavaObject((JSON) executeRequest(request), UserDto.class);
+    }
+
+    public UserDto updateChildBirthday(String utoken, long childId, Date birthday) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("birthday", DATE_FORMAT.format(birthday));
+        MomiaHttpRequest request = MomiaHttpRequest.PUT(url("user/child", childId, "birthday"), builder.build());
+
+        return JSON.toJavaObject((JSON) executeRequest(request), UserDto.class);
+    }
+
+    public UserDto deleteChild(String utoken, long childId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        MomiaHttpRequest request = MomiaHttpRequest.DELETE(url("user/child", childId), builder.build());
+
+        return JSON.toJavaObject((JSON) executeRequest(request), UserDto.class);
+    }
+
+    public List<UserChildDto> listChildren(String utoken) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("user/child"), builder.build());
+
+        return CastUtil.toList((JSONArray) executeRequest(request), UserChildDto.class);
     }
 }

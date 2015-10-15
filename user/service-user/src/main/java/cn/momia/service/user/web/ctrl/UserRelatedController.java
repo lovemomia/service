@@ -1,12 +1,17 @@
 package cn.momia.service.user.web.ctrl;
 
 import cn.momia.api.user.dto.ContactDto;
+import cn.momia.api.user.dto.UserChildDto;
 import cn.momia.api.user.dto.UserDto;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.user.base.User;
+import cn.momia.service.user.base.UserChild;
 import cn.momia.service.user.base.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class UserRelatedController extends BaseController {
     @Autowired protected UserService userService;
@@ -19,6 +24,7 @@ public abstract class UserRelatedController extends BaseController {
         UserDto userDto = new UserDto();
         switch (type) {
             case User.Type.FULL:
+                userDto.setChildren(buildUserChildDtos(user.getChildren()));
             case User.Type.BASE:
                 userDto.setMobile(user.getMobile());
                 userDto.setName(user.getName());
@@ -36,6 +42,24 @@ public abstract class UserRelatedController extends BaseController {
         }
 
         return userDto;
+    }
+
+    protected List<UserChildDto> buildUserChildDtos(List<UserChild> children) {
+        List<UserChildDto> childDtos = new ArrayList<UserChildDto>();
+        for (UserChild child : children) childDtos.add(buildUserChildDto(child));
+
+        return childDtos;
+    }
+
+    protected UserChildDto buildUserChildDto(UserChild child) {
+        UserChildDto childDto = new UserChildDto();
+        childDto.setId(child.getId());
+        childDto.setUserId(child.getUserId());
+        childDto.setAvatar(child.getAvatar());
+        childDto.setName(child.getName());
+        childDto.setSex(child.getSex());
+        childDto.setBirthday(child.getBirthday());
+        return childDto;
     }
 
     protected ContactDto buildContactDto(User user) {

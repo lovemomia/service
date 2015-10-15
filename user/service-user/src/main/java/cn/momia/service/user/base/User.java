@@ -1,9 +1,12 @@
 package cn.momia.service.user.base;
 
+import cn.momia.common.service.Entity;
+
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
-public class User implements Serializable {
+public class User implements Entity {
     public static class Type {
         public static final int MINI = 1;
         public static final int BASE = 2;
@@ -25,6 +28,8 @@ public class User implements Serializable {
     private String address;
 
     private String token;
+
+    private List<UserChild> children;
 
     public long getId() {
         return id;
@@ -106,6 +111,14 @@ public class User implements Serializable {
         this.address = address;
     }
 
+    public List<UserChild> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<UserChild> children) {
+        this.children = children;
+    }
+
     public String getToken() {
         return token;
     }
@@ -114,6 +127,7 @@ public class User implements Serializable {
         this.token = token;
     }
 
+    @Override
     public boolean exists() {
         return id > 0;
     }
