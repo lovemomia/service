@@ -20,12 +20,12 @@ public class CourseServiceApi extends AbstractServiceApi {
         return JSON.toJavaObject((JSON) executeRequest(request), CourseDto.class);
     }
 
-    public PagedList<CourseDto> listBySubject(long subjectId, int start, int count) {
+    public PagedList<CourseDto> query(long subjectId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("suid", subjectId)
                 .add("start", start)
                 .add("count", count);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("course/subject"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("course/query"), builder.build());
 
         return CastUtil.toPagedList((JSONObject) executeRequest(request), CourseDto.class);
     }
