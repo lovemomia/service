@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class SubjectServiceImpl extends DbAccessService implements SubjectService {
-    private static final String[] SUBJECT_FIELDS = { "Id", "CityId", "RegionId", "Title", "Cover", "Tags", "MinAge", "MaxAge", "Joined", "Intro", "Notice", "StartTime", "EndTime" };
+    private static final String[] SUBJECT_FIELDS = { "Id", "CityId", "Title", "Cover", "Tags", "Intro", "Notice" };
     private static final String[] SUBJECT_IMG_FIELDS = { "Id", "SubjectId", "Url", "Width", "Height" };
     private static final String[] SUBJECT_SKU_FIELDS = { "Id", "SubjectId", "`Desc`", "Price", "OriginalPrice", "Adult", "Child", "CourseCount", "Time" };
 
