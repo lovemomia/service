@@ -16,7 +16,5 @@ public interface SubjectService {
     List<SubjectSku> listSkus(Collection<Long> skuIds);
     List<SubjectSku> querySkus(long id);
 
-    Map<Long, String> queryTitlesByCourse(Set<Long> courseIds);
-
     void increaseJoined(long id, int count);
 }

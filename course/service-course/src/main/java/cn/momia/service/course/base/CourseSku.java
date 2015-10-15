@@ -1,8 +1,10 @@
 package cn.momia.service.course.base;
 
+import cn.momia.common.service.Entity;
+
 import java.util.Date;
 
-public class CourseSku {
+public class CourseSku implements Entity {
     public static final CourseSku NOT_EXIST_COURSE_SKU = new CourseSku();
 
     private long id;
@@ -14,6 +16,7 @@ public class CourseSku {
     private int unlockedStock;
     private int lockedStock;
     private int placeId;
+    private CourseSkuPlace place;
 
     public long getId() {
         return id;
@@ -85,6 +88,14 @@ public class CourseSku {
 
     public void setPlaceId(int placeId) {
         this.placeId = placeId;
+    }
+
+    public CourseSkuPlace getPlace() {
+        return place;
+    }
+
+    public void setPlace(CourseSkuPlace place) {
+        this.place = place;
     }
 
     public boolean exists() {

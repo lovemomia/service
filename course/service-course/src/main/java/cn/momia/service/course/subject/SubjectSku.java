@@ -1,8 +1,10 @@
 package cn.momia.service.course.subject;
 
+import cn.momia.common.service.Entity;
+
 import java.math.BigDecimal;
 
-public class SubjectSku {
+public class SubjectSku implements Entity {
     public static final SubjectSku NOT_EXIST_SUBJECT_SKU = new SubjectSku();
 
     private long id;
@@ -14,6 +16,7 @@ public class SubjectSku {
     private int child;
     private int courseCount;
     private int time;
+    private String timeUnit;
 
     public long getId() {
         return id;
@@ -87,6 +90,15 @@ public class SubjectSku {
         this.time = time;
     }
 
+    public String getTimeUnit() {
+        return timeUnit;
+    }
+
+    public void setTimeUnit(String timeUnit) {
+        this.timeUnit = timeUnit;
+    }
+
+    @Override
     public boolean exists() {
         return id > 0;
     }

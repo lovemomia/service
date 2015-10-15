@@ -14,16 +14,15 @@ public class CourseDto {
     private BigDecimal price;
     private String scheduler;
     private String region;
-    private String address;
-    private String subject;
 
     private String goal;
     private String flow;
     private String tips;
     private String institution;
-    private List<CoursePlaceDto> places;
     private List<String> imgs;
     private CourseBookDto book;
+
+    private CoursePlaceDto place;
 
     public long getId() {
         return id;
@@ -89,22 +88,6 @@ public class CourseDto {
         this.region = region;
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
     public String getGoal() {
         return goal;
     }
@@ -137,14 +120,6 @@ public class CourseDto {
         this.institution = institution;
     }
 
-    public List<CoursePlaceDto> getPlaces() {
-        return places;
-    }
-
-    public void setPlaces(List<CoursePlaceDto> places) {
-        this.places = places;
-    }
-
     public List<String> getImgs() {
         return imgs;
     }
@@ -159,5 +134,13 @@ public class CourseDto {
 
     public void setBook(CourseBookDto book) {
         this.book = book;
+    }
+
+    public CoursePlaceDto getPlace() {
+        return place;
+    }
+
+    public void setPlace(CoursePlaceDto place) {
+        this.place = place;
     }
 }

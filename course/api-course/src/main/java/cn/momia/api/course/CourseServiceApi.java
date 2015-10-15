@@ -38,7 +38,7 @@ public class CourseServiceApi extends AbstractServiceApi {
                 .add("sort", sortTypeId)
                 .add("start", start)
                 .add("count", count);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("course/subject"), builder.build());
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("course/query"), builder.build());
 
         return CastUtil.toPagedList((JSONObject) executeRequest(request), CourseDto.class);
     }

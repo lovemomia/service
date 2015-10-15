@@ -1,6 +1,8 @@
 package cn.momia.service.course.base;
 
+import cn.momia.api.base.dto.RegionDto;
 import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.common.service.Entity;
 import cn.momia.common.util.TimeUtil;
 
 import java.math.BigDecimal;
@@ -11,7 +13,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-public class Course {
+public class Course implements Entity{
     public static final Course NOT_EXIST_COURSE = new Course();
 
     public static class Type {
@@ -22,6 +24,7 @@ public class Course {
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("M月d日");
 
     private long id;
+    private long subjectId;
     private String title;
     private String cover;
     private int minAge;
@@ -33,10 +36,9 @@ public class Course {
     private String tips;
     private String institution;
 
-    private List<CourseSku> skus;
-
-    private List<String> imgs;
+    private List<CourseImage> imgs;
     private CourseBook book;
+    private List<CourseSku> skus;
 
     public long getId() {
         return id;
@@ -44,6 +46,14 @@ public class Course {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getSubjectId() {
+        return subjectId;
+    }
+
+    public void setSubjectId(long subjectId) {
+        this.subjectId = subjectId;
     }
 
     public String getTitle() {
@@ -126,19 +136,11 @@ public class Course {
         this.institution = institution;
     }
 
-    public List<CourseSku> getSkus() {
-        return skus;
-    }
-
-    public void setSkus(List<CourseSku> skus) {
-        this.skus = skus;
-    }
-
-    public List<String> getImgs() {
+    public List<CourseImage> getImgs() {
         return imgs;
     }
 
-    public void setImgs(List<String> imgs) {
+    public void setImgs(List<CourseImage> imgs) {
         this.imgs = imgs;
     }
 
@@ -150,8 +152,50 @@ public class Course {
         this.book = book;
     }
 
+    public List<CourseSku> getSkus() {
+        return skus;
+    }
+
+    public void setSkus(List<CourseSku> skus) {
+        this.skus = skus;
+    }
+
+    @Override
     public boolean exists() {
         return id > 0;
+    }
+
+    public Date getStartTime() {
+        Date now = new Date();
+        List<Date> startTimes = new ArrayList<Date>();
+        for (CourseSku sku : skus) {
+            if (sku.isAvaliable(now)) startTimes.add(sku.getStartTime());
+        }
+        Collections.sort(startTimes);
+
+        return startTimes.get(0);
+    }
+
+    public Date getEndTime() {
+        Date now = new Date();
+        List<Date> endTimes = new ArrayList<Date>();
+        for (CourseSku sku : skus) {
+            if (sku.isAvaliable(now)) endTimes.add(sku.getEndTime());
+        }
+        Collections.sort(endTimes);
+
+        return endTimes.get(endTimes.size() - 1);
+    }
+
+    public int getRegionId() {
+        List<Integer> regionIds = new ArrayList<Integer>();
+        for (CourseSku sku : skus) {
+            CourseSkuPlace place = sku.getPlace();
+            int regionId = place.getRegionId();
+            if (!regionIds.contains(regionId)) regionIds.add(regionId);
+        }
+
+        return regionIds.size() > 1 ? RegionDto.MULTI_REGION_ID : regionIds.get(0);
     }
 
     public String getAge() {
@@ -163,8 +207,6 @@ public class Course {
     }
 
     public String getScheduler() {
-        if (skus == null || skus.isEmpty()) return "";
-
         Date now = new Date();
         List<Date> times = new ArrayList<Date>();
         for (CourseSku sku : skus) {
@@ -192,16 +234,5 @@ public class Course {
                 return DATE_FORMAT.format(start) + "-" + DATE_FORMAT.format(end);
             }
         }
-    }
-
-    public List<Integer> getPlaceIds() {
-        if (skus == null || skus.isEmpty()) return new ArrayList<Integer>();
-
-        List<Integer> placeIds = new ArrayList<Integer>();
-        for (CourseSku sku : skus) {
-            placeIds.add(sku.getPlaceId());
-        }
-
-        return placeIds;
     }
 }

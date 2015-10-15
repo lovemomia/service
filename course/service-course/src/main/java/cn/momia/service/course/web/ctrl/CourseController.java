@@ -1,21 +1,21 @@
 package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.base.MetaUtil;
-import cn.momia.api.base.dto.RegionDto;
 import cn.momia.api.course.dto.CourseBookDto;
 import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.CoursePlaceDto;
 import cn.momia.api.course.dto.CourseSkuDto;
 import cn.momia.api.course.dto.DatedCourseSkusDto;
 import cn.momia.api.poi.PoiServiceApi;
-import cn.momia.api.poi.dto.PlaceDto;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseBook;
+import cn.momia.service.course.base.CourseImage;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.base.CourseSku;
+import cn.momia.service.course.base.CourseSkuPlace;
 import cn.momia.service.course.subject.SubjectService;
 import com.google.common.base.Splitter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,35 +50,13 @@ public class CourseController extends BaseController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public MomiaHttpResponse get(@PathVariable long id) {
-        List<Course> courses = new ArrayList<Course>();
-        courses.add(courseService.get(id));
-        List<CourseDto> courseDtos = buildCourseDtos(courses, null, Course.Type.FULL);
+        Course course = courseService.get(id);
+        CourseDto courseDto = buildCourseDto(course, Course.Type.FULL);
 
-        return MomiaHttpResponse.SUCCESS(courseDtos.get(0));
+        return MomiaHttpResponse.SUCCESS(courseDto);
     }
 
-    private List<CourseDto> buildCourseDtos(List<Course> courses, Map<Long, CourseSku> skus, int type) {
-        Set<Long> courseIds = new HashSet<Long>();
-        Set<Integer> placeIds = new HashSet<Integer>();
-        for (Course course : courses) {
-            courseIds.add(course.getId());
-            placeIds.addAll(course.getPlaceIds());
-        }
-
-        Map<Long, String> subjectNames = subjectService.queryTitlesByCourse(courseIds);
-        List<PlaceDto> places = poiServiceApi.list(placeIds);
-        Map<Integer, PlaceDto> placesMap = new HashMap<Integer, PlaceDto>();
-        for (PlaceDto place : places) placesMap.put(place.getId(), place);
-
-        List<CourseDto> courseDtos = new ArrayList<CourseDto>();
-        for (Course course : courses) {
-            courseDtos.add(buildCourseDto(course, subjectNames, placesMap, type));
-        }
-
-        return courseDtos;
-    }
-
-    private CourseDto buildCourseDto(Course course, Map<Long, String> subjectNames, Map<Integer, PlaceDto> places, int type) {
+    private CourseDto buildCourseDto(Course course, int type) {
         CourseDto courseDto = new CourseDto();
         courseDto.setId(course.getId());
         courseDto.setTitle(course.getTitle());
@@ -87,56 +65,26 @@ public class CourseController extends BaseController {
         courseDto.setJoined(course.getJoined());
         courseDto.setPrice(course.getPrice());
         courseDto.setScheduler(course.getScheduler());
-
-        List<Integer> placeIds = course.getPlaceIds();
-        List<PlaceDto> placesOfCourse = new ArrayList<PlaceDto>();
-        for (int placeId : placeIds) {
-            PlaceDto place = places.get(placeId);
-            if (place != null) placesOfCourse.add(place);
-        }
-
-        int regionId = 0;
-        if (placesOfCourse.size() > 1) {
-            regionId = RegionDto.MULTI_REGION_ID;
-        } else if (!placesOfCourse.isEmpty()) {
-            regionId = placesOfCourse.get(0).getRegionId();
-        }
-        courseDto.setRegion(MetaUtil.getRegionName(regionId));
-
-        String subject = subjectNames.get(course.getId());
-        courseDto.setSubject(subject == null ? "" : subject);
+        courseDto.setRegion(MetaUtil.getRegionName(course.getRegionId()));
 
         if (type == Course.Type.FULL) {
             courseDto.setGoal(course.getGoal());
             courseDto.setFlow(course.getFlow());
             courseDto.setTips(course.getTips());
             courseDto.setInstitution(course.getInstitution());
-            courseDto.setPlaces(buildCoursePlaceDtos(placesOfCourse, 1));
-            courseDto.setImgs(course.getImgs());
+            courseDto.setImgs(extractImgUrls(course.getImgs()));
             courseDto.setBook(buildCourseBookDto(course.getBook()));
+            courseDto.setPlace(buildCoursePlaceDto(course.getSkus()));
         }
 
         return courseDto;
     }
 
-    private List<CoursePlaceDto> buildCoursePlaceDtos(List<PlaceDto> places, int count) {
-        int index = 0;
-        List<CoursePlaceDto> coursePlaceDtos = new ArrayList<CoursePlaceDto>();
-        for (PlaceDto place : places) {
-            CoursePlaceDto coursePlaceDto = new CoursePlaceDto();
-            coursePlaceDto.setId(place.getId());
-            coursePlaceDto.setName(place.getName());
-            coursePlaceDto.setAddress(place.getAddress());
-            coursePlaceDto.setLng(place.getLng());
-            coursePlaceDto.setLat(place.getLat());
+    private List<String> extractImgUrls(List<CourseImage> imgs) {
+        List<String> urls = new ArrayList<String>();
+        for (CourseImage img : imgs) urls.add(img.getUrl());
 
-            coursePlaceDtos.add(coursePlaceDto);
-
-            index++;
-            if (index >= count) break;
-        }
-
-        return coursePlaceDtos;
+        return urls;
     }
 
     private CourseBookDto buildCourseBookDto(CourseBook book) {
@@ -148,13 +96,18 @@ public class CourseController extends BaseController {
         return courseBookDto;
     }
 
-    @RequestMapping(value = "/subject", method = RequestMethod.GET)
-    public MomiaHttpResponse listBySubject(@RequestParam(value = "suid") int subjectId,
-                                           @RequestParam(value = "min", required = false, defaultValue = "0") int minAge,
-                                           @RequestParam(value = "max", required = false, defaultValue = "0") int maxAge,
-                                           @RequestParam(value = "sort", required = false, defaultValue = "0") int sortTypeId,
-                                           @RequestParam int start,
-                                           @RequestParam int count) {
+    private CoursePlaceDto buildCoursePlaceDto(List<CourseSku> skus) {
+        // TODO
+        return null;
+    }
+
+    @RequestMapping(value = "/query", method = RequestMethod.GET)
+    public MomiaHttpResponse query(@RequestParam(value = "suid") int subjectId,
+                                   @RequestParam(value = "min", required = false, defaultValue = "0") int minAge,
+                                   @RequestParam(value = "max", required = false, defaultValue = "0") int maxAge,
+                                   @RequestParam(value = "sort", required = false, defaultValue = "0") int sortTypeId,
+                                   @RequestParam int start,
+                                   @RequestParam int count) {
         // TODO filter and sort
         long totalCount = courseService.queryCountBySubject(subjectId);
         List<Course> courses = courseService.queryBySubject(subjectId, start, count);
@@ -165,11 +118,17 @@ public class CourseController extends BaseController {
 
     private PagedList<CourseDto> buildPagedCourseDtos(long totalCount, int start, int count, List<Course> courses) {
         List<CourseDto> courseDtos = buildCourseDtos(courses, Course.Type.BASE);
-
         PagedList<CourseDto> pagedCourseDtos = new PagedList<CourseDto>(totalCount, start, count);
         pagedCourseDtos.setList(courseDtos);
 
         return pagedCourseDtos;
+    }
+
+    private List<CourseDto> buildCourseDtos(List<Course> courses, int type) {
+        List<CourseDto> courseDtos = new ArrayList<CourseDto>();
+        for (Course course : courses) courseDtos.add(buildCourseDto(course, type));
+
+        return courseDtos;
     }
 
     @RequestMapping(value = "/{id}/sku/week", method = RequestMethod.GET)
@@ -194,7 +153,6 @@ public class CourseController extends BaseController {
 
     private List<DatedCourseSkusDto> buildDatedCourseSkusDtos(List<CourseSku> skus) {
         Map<String, List<CourseSku>> skusMap = new HashMap<String, List<CourseSku>>();
-        List<Integer> placeIds = new ArrayList<Integer>();
         Set<String> hasMore = new HashSet<String>();
         for (CourseSku sku : skus) {
             String date = DATE_FORMAT.format(sku.getStartTime());
@@ -204,17 +162,9 @@ public class CourseController extends BaseController {
                 skusMap.put(date, skusOfDay);
             }
 
-            if (skusOfDay.size() < 2) {
-                skusOfDay.add(sku);
-                placeIds.add(sku.getPlaceId());
-            } else {
-                hasMore.add(date);
-            }
+            if (skusOfDay.size() < 2) skusOfDay.add(sku);
+            else hasMore.add(date);
         }
-
-        List<PlaceDto> places = poiServiceApi.list(placeIds);
-        Map<Integer, PlaceDto> placesMap = new HashMap<Integer, PlaceDto>();
-        for (PlaceDto place : places) placesMap.put(place.getId(), place);
 
         List<DatedCourseSkusDto> datedCourseSkusDtos = new ArrayList<DatedCourseSkusDto>();
         for (Map.Entry<String, List<CourseSku>> entry : skusMap.entrySet()) {
@@ -223,7 +173,7 @@ public class CourseController extends BaseController {
 
             DatedCourseSkusDto datedCourseSkusDto = new DatedCourseSkusDto();
             datedCourseSkusDto.setDate(date);
-            datedCourseSkusDto.setSkus(buildCourseSkuDtos(skusOfDay, placesMap));
+            datedCourseSkusDto.setSkus(buildCourseSkuDtos(skusOfDay));
             if (hasMore.contains(date)) datedCourseSkusDto.setMore(true);
 
             datedCourseSkusDtos.add(datedCourseSkusDto);
@@ -239,15 +189,12 @@ public class CourseController extends BaseController {
         return datedCourseSkusDtos;
     }
 
-    private List<CourseSkuDto> buildCourseSkuDtos(List<CourseSku> skus, Map<Integer, PlaceDto> places) {
+    private List<CourseSkuDto> buildCourseSkuDtos(List<CourseSku> skus) {
         List<CourseSkuDto> courseSkuDtos = new ArrayList<CourseSkuDto>();
         for (CourseSku sku : skus) {
-            PlaceDto place = places.get(sku.getPlaceId());
-            if (place == null) continue;
-
             CourseSkuDto courseSkuDto = new CourseSkuDto();
             courseSkuDto.setId(sku.getId());
-            courseSkuDto.setPlace(buildCoursePlaceDto(place));
+            courseSkuDto.setPlace(buildCoursePlaceDto(sku.getPlace()));
             courseSkuDto.setStock(sku.getUnlockedStock());
 
             courseSkuDtos.add(courseSkuDto);
@@ -256,7 +203,7 @@ public class CourseController extends BaseController {
         return courseSkuDtos;
     }
 
-    private CoursePlaceDto buildCoursePlaceDto(PlaceDto place) {
+    private CoursePlaceDto buildCoursePlaceDto(CourseSkuPlace place) {
         CoursePlaceDto coursePlaceDto = new CoursePlaceDto();
         coursePlaceDto.setId(place.getId());
         coursePlaceDto.setName(place.getName());
@@ -310,38 +257,33 @@ public class CourseController extends BaseController {
         }
 
         List<CourseSku> includedSkus = new ArrayList<CourseSku>();
-        Set<Integer> placeIds = new HashSet<Integer>();
         for (CourseSku sku : skus) {
             if (!excludeIds.contains(sku.getId())) {
                 includedSkus.add(sku);
-                placeIds.add(sku.getPlaceId());
             }
         }
 
-        List<PlaceDto> places = poiServiceApi.list(placeIds);
-        Map<Integer, PlaceDto> placesMap = new HashMap<Integer, PlaceDto>();
-        for (PlaceDto place : places) placesMap.put(place.getId(), place);
-
-        return MomiaHttpResponse.SUCCESS(buildCourseSkuDtos(includedSkus, placesMap));
+        return MomiaHttpResponse.SUCCESS(buildCourseSkuDtos(includedSkus));
     }
 
     @RequestMapping(value = "/notfinished", method = RequestMethod.GET)
     public MomiaHttpResponse notFinished(@RequestParam(value = "uid") long userId) {
-        long totalCount = courseService.queryNotFinishedSkuCountByUser(userId);
-        List<CourseSku> skus = courseService.queryNotFinishedSkuByUser(userId);
-
-        Set<Long> courseIds = new HashSet<Long>();
-        Map<Long, CourseSku> courseSkuMap = new HashMap<Long, CourseSku>();
-        for (CourseSku sku : skus) {
-            courseIds.add(sku.getCourseId());
-            courseSkuMap.put(sku.getCourseId(), sku);
-        }
-        List<Course> courses = courseService.list(courseIds);
-        List<CourseDto> courseDtos = buildCourseDtos(courses, courseSkuMap, Course.Type.BASE);
-
-        PagedList<Course> pagedCourseDtos = new PagedList<Course>(totalCount, start, count)
-        // TODO
-        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
+//        long totalCount = courseService.queryNotFinishedSkuCountByUser(userId);
+//        List<CourseSku> skus = courseService.queryNotFinishedSkuByUser(userId);
+//
+//        Set<Long> courseIds = new HashSet<Long>();
+//        Map<Long, CourseSku> courseSkuMap = new HashMap<Long, CourseSku>();
+//        for (CourseSku sku : skus) {
+//            courseIds.add(sku.getCourseId());
+//            courseSkuMap.put(sku.getCourseId(), sku);
+//        }
+//        List<Course> courses = courseService.list(courseIds);
+//        List<CourseDto> courseDtos = buildCourseDtos(courses, Course.Type.BASE);
+//
+//        PagedList<Course> pagedCourseDtos = new PagedList<Course>(totalCount, start, count)
+//        // TODO
+//        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
+        return null;
     }
 
     @RequestMapping(value = "/finished", method = RequestMethod.GET)
