@@ -77,4 +77,25 @@ public class CourseServiceApi extends AbstractServiceApi {
 
         return CastUtil.toPagedList((JSONObject) executeRequest(request), CourseDto.class);
     }
+
+    public boolean isFavored(long userId, long courseId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("course", courseId, "favored"), builder.build());
+
+        return (Boolean) executeRequest(request);
+    }
+
+    public boolean favor(long userId, long courseId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("course", courseId, "favor"), builder.build());
+
+        return (Boolean) executeRequest(request);
+    }
+
+    public boolean unfavor(long userId, long courseId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+        MomiaHttpRequest request = MomiaHttpRequest.POST(url("course", courseId, "unfavor"), builder.build());
+
+        return (Boolean) executeRequest(request);
+    }
 }

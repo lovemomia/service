@@ -7,6 +7,7 @@ import cn.momia.api.course.dto.CoursePlaceDto;
 import cn.momia.api.course.dto.CourseSkuDto;
 import cn.momia.api.course.dto.DatedCourseSkusDto;
 import cn.momia.api.poi.PoiServiceApi;
+import cn.momia.api.user.dto.UserDto;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
@@ -293,5 +294,20 @@ public class CourseController extends BaseController {
 
         // TODO
         return MomiaHttpResponse.SUCCESS;
+    }
+
+    @RequestMapping(value = "/{id}/favored", method = RequestMethod.GET)
+    public MomiaHttpResponse favored(@RequestParam(value = "uid") long userId, @PathVariable long id) {
+        return MomiaHttpResponse.SUCCESS(courseService.isFavored(userId, id));
+    }
+
+    @RequestMapping(value = "/{id}/favor", method = RequestMethod.POST)
+    public MomiaHttpResponse favor(@RequestParam(value = "uid") long userId, @PathVariable long id) {
+        return MomiaHttpResponse.SUCCESS(courseService.favor(userId, id));
+    }
+
+    @RequestMapping(value = "/{id}/unfavor", method = RequestMethod.POST)
+    public MomiaHttpResponse unfavor(@RequestParam(value = "uid") long userId, @PathVariable long id) {
+        return MomiaHttpResponse.SUCCESS(courseService.unfavor(userId, id));
     }
 }

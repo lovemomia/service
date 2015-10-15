@@ -13,7 +13,6 @@ import cn.momia.service.course.base.CourseSkuPlace;
 import com.google.common.base.Function;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -358,5 +357,35 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         });
 
         return map;
+    }
+
+    @Override
+    public boolean isFavored(long userId, long id) {
+        String sql = "SELECT COUNT(1) FROM SG_Favorite WHERE UserId=? AND `Type`=1 AND RefId=? AND Status=1";
+        return jdbcTemplate.query(sql, new Object[] { userId, id }, new CountResultSetExtractor()) > 0;
+    }
+
+    @Override
+    public boolean favor(long userId, long id) {
+        long favoretId = getFavoretId(userId, id);
+        if (favoretId > 0) {
+            String sql = "UPDATE SG_Favorite SET Status=1 WHERE Id=? AND UserId=? AND `Type`=1 AND RefId=?";
+            return jdbcTemplate.update(sql, new Object[] { favoretId, userId, id }) == 1;
+        } else {
+            String sql = "INSERT INTO SG_Favorite(UserId, `Type`, RefId, AddTime) VALUES (?, 1, ?, NOW())";
+            return jdbcTemplate.update(sql, new Object[] { userId, id }) == 1;
+        }
+    }
+
+
+    private long getFavoretId(long userId, long id) {
+        String sql = "SELECT Id FROM SG_Favorite WHERE UserId=? AND `Type`=1 AND RefId=?";
+        return jdbcTemplate.query(sql, new Object[] { userId, id }, new LongResultSetExtractor());
+    }
+
+    @Override
+    public boolean unfavor(long userId, long id) {
+        String sql = "UPDATE SG_Favorite SET Status=0 WHERE UserId=? AND `Type`=1 AND RefId=?";
+        return jdbcTemplate.update(sql, new Object[] { userId, id }) > 0;
     }
 }

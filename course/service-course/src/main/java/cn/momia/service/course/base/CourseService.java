@@ -24,4 +24,8 @@ public interface CourseService {
 
     Map<Long, Integer> queryBookedCourseCounts(Set<Long> orderIds);
     Map<Long, Integer> queryFinishedCourseCounts(Set<Long> orderIds);
+
+    boolean isFavored(long userId, long id);
+    boolean favor(long userId, long id);
+    boolean unfavor(long userId, long id);
 }

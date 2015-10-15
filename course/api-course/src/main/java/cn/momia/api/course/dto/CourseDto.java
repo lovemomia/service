@@ -24,6 +24,8 @@ public class CourseDto {
 
     private CoursePlaceDto place;
 
+    private boolean favored;
+
     public long getId() {
         return id;
     }
@@ -142,5 +144,13 @@ public class CourseDto {
 
     public void setPlace(CoursePlaceDto place) {
         this.place = place;
+    }
+
+    public boolean isFavored() {
+        return favored;
+    }
+
+    public void setFavored(boolean favored) {
+        this.favored = favored;
     }
 }
