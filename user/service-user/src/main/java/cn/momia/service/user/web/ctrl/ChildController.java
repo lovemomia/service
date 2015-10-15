@@ -16,7 +16,7 @@ import java.util.Date;
 @RestController
 @RequestMapping("/user/child")
 public class ChildController extends UserRelatedController {
-    @RequestMapping(value = "/child", method = RequestMethod.POST, consumes = "application/json")
+    @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public MomiaHttpResponse addChild(@RequestBody UserChild[] children) {
         for(UserChild child : children) if (child.isInvalid()) return MomiaHttpResponse.FAILED("添加孩子信息失败");
 
@@ -40,7 +40,7 @@ public class ChildController extends UserRelatedController {
         return MomiaHttpResponse.SUCCESS(buildUserChildDto(child));
     }
 
-    @RequestMapping(value = "/child/{cid}/avatar",method = RequestMethod.PUT)
+    @RequestMapping(value = "/{cid}/avatar",method = RequestMethod.PUT)
     public MomiaHttpResponse updateChildAvatar(@RequestParam String utoken,
                                                @PathVariable(value = "cid") long childId,
                                                @RequestParam String avatar) {
@@ -52,7 +52,7 @@ public class ChildController extends UserRelatedController {
         return MomiaHttpResponse.SUCCESS(buildUserDto(userService.get(user.getId()), User.Type.FULL));
     }
 
-    @RequestMapping(value = "/child/{cid}/name",method = RequestMethod.PUT)
+    @RequestMapping(value = "/{cid}/name",method = RequestMethod.PUT)
     public MomiaHttpResponse updateChildName(@RequestParam String utoken,
                                              @PathVariable(value = "cid") long childId,
                                              @RequestParam String name) {
@@ -64,7 +64,7 @@ public class ChildController extends UserRelatedController {
         return MomiaHttpResponse.SUCCESS(buildUserDto(userService.get(user.getId()), User.Type.FULL));
     }
 
-    @RequestMapping(value = "/child/{cid}/sex",method = RequestMethod.PUT)
+    @RequestMapping(value = "/{cid}/sex",method = RequestMethod.PUT)
     public MomiaHttpResponse updateChildSex(@RequestParam String utoken,
                                             @PathVariable(value = "cid") long childId,
                                             @RequestParam String sex) {
@@ -76,7 +76,7 @@ public class ChildController extends UserRelatedController {
         return MomiaHttpResponse.SUCCESS(buildUserDto(userService.get(user.getId()), User.Type.FULL));
     }
 
-    @RequestMapping(value = "/child/{cid}/birthday",method = RequestMethod.PUT)
+    @RequestMapping(value = "/{cid}/birthday",method = RequestMethod.PUT)
     public MomiaHttpResponse updateChildBirthday(@RequestParam String utoken,
                                                  @PathVariable(value = "cid") long childId,
                                                  @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date birthday) {
@@ -88,7 +88,7 @@ public class ChildController extends UserRelatedController {
         return MomiaHttpResponse.SUCCESS(buildUserDto(userService.get(user.getId()), User.Type.FULL));
     }
 
-    @RequestMapping(value = "/child/{cid}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{cid}", method = RequestMethod.DELETE)
     public MomiaHttpResponse deleteChild(@RequestParam String utoken, @PathVariable(value = "cid") long childId) {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
@@ -98,7 +98,7 @@ public class ChildController extends UserRelatedController {
         return MomiaHttpResponse.SUCCESS(buildUserDto(userService.get(user.getId()), User.Type.FULL));
     }
 
-    @RequestMapping(value = "/child", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public MomiaHttpResponse listChildren(@RequestParam String utoken) {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
