@@ -193,10 +193,4 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
 
         return skus.get(id);
     }
-
-    @Override
-    public void increaseJoined(long id, int count) {
-        String sql = "UPDATE SG_Subject SET Joined=Joined+? WHERE Id=?";
-        jdbcTemplate.update(sql, new Object[] { count, id });
-    }
 }

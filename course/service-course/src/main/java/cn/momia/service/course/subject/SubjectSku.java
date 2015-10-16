@@ -4,7 +4,7 @@ import cn.momia.common.service.Entity;
 
 import java.math.BigDecimal;
 
-public class SubjectSku implements Entity {
+public class SubjectSku implements Entity, Cloneable {
     public static final SubjectSku NOT_EXIST_SUBJECT_SKU = new SubjectSku();
 
     private long id;
@@ -105,5 +105,14 @@ public class SubjectSku implements Entity {
 
     public int getJoinCount() {
         return adult + child;
+    }
+
+    @Override
+    public SubjectSku clone() {
+        try {
+            return (SubjectSku) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

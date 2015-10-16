@@ -7,6 +7,7 @@ public class SubjectSkuDto {
     private long subjectId;
     private BigDecimal price;
     private String desc;
+    private int count;
 
     public long getId() {
         return id;
@@ -38,5 +39,13 @@ public class SubjectSkuDto {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 }

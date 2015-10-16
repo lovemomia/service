@@ -280,6 +280,8 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
 
     @Override
     public Map<Long, List<Course>> queryAllBySubjects(Collection<Long> subjectIds) {
+        if (subjectIds.isEmpty()) return new HashMap<Long, List<Course>>();
+
         List<Long> courseIds = new ArrayList<Long>();
         String sql = "SELECT Id FROM SG_Course WHERE SubjectId IN (" + StringUtils.join(subjectIds, ",") + ") AND Status=1";
         jdbcTemplate.query(sql, new LongListResultSetExtractor(courseIds));
