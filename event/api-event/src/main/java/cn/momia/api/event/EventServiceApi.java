@@ -2,7 +2,7 @@ package cn.momia.api.event;
 
 import cn.momia.api.event.dto.BannerDto;
 import cn.momia.api.event.dto.EventDto;
-import cn.momia.common.api.AbstractServiceApi;
+import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;
 import cn.momia.common.api.util.CastUtil;
@@ -10,7 +10,7 @@ import com.alibaba.fastjson.JSONArray;
 
 import java.util.List;
 
-public class EventServiceApi extends AbstractServiceApi {
+public class EventServiceApi extends ServiceApi {
     public List<BannerDto> listBanners(int cityId, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)

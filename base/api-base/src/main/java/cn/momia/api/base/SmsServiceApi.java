@@ -1,10 +1,10 @@
 package cn.momia.api.base;
 
-import cn.momia.common.api.AbstractServiceApi;
+import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;
 
-public class SmsServiceApi extends AbstractServiceApi {
+public class SmsServiceApi extends ServiceApi {
     public boolean send(String mobile) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("mobile", mobile);
         MomiaHttpRequest request = MomiaHttpRequest.POST(url("sms/send"), builder.build());

@@ -3,7 +3,7 @@ package cn.momia.api.user;
 import cn.momia.api.user.dto.ContactDto;
 import cn.momia.api.user.dto.UserChildDto;
 import cn.momia.api.user.dto.UserDto;
-import cn.momia.common.api.AbstractServiceApi;
+import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;
 import cn.momia.common.api.util.CastUtil;
@@ -17,7 +17,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-public class UserServiceApi extends AbstractServiceApi {
+public class UserServiceApi extends ServiceApi {
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     public UserDto register(String nickName, String mobile, String password, String code) {

@@ -1,7 +1,7 @@
 package cn.momia.api.poi;
 
 import cn.momia.api.poi.dto.PlaceDto;
-import cn.momia.common.api.AbstractServiceApi;
+import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;
 import cn.momia.common.api.util.CastUtil;
@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Collection;
 import java.util.List;
 
-public class PoiServiceApi extends AbstractServiceApi {
+public class PoiServiceApi extends ServiceApi {
     public PlaceDto get(int placeId) {
         return get(placeId, PlaceDto.Type.BASE);
     }

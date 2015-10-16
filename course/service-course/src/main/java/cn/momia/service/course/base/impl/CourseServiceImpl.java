@@ -10,6 +10,7 @@ import cn.momia.service.course.base.CourseImage;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.base.CourseSku;
 import cn.momia.service.course.base.CourseSkuPlace;
+import cn.momia.service.course.base.Teacher;
 import com.google.common.base.Function;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
@@ -253,6 +254,28 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         courseSkuPlace.setLat(place.getLat());
 
         return courseSkuPlace;
+    }
+
+    @Override
+    public long queryTeacherCount(long id) {
+        String sql = "SELECT COUNT(1) FROM SG_CourseTeacher WHERE CourseId=? AND Status=1";
+        return jdbcTemplate.queryForObject(sql, new Object[] { id }, Long.class);
+    }
+
+    @Override
+    public List<Teacher> queryTeachers(long id, int start, int count) {
+        String sql = "SELECT TeacherId FROM SG_CourseTeacher WHERE CourseId=? AND Status=1 LIMIT ?,?";
+        List<Long> teacherIds = jdbcTemplate.queryForList(sql, new Object[] { id, start, count }, Long.class);
+
+        return listTeachers(teacherIds);
+    }
+
+    private List<Teacher> listTeachers(List<Long> teacherIds) {
+//        if (teacherIds.isEmpty()) return new ArrayList<Teacher>();
+//
+//        String sql = "SELECT * FROM SG_Teacher WHERE Id IN (" + StringUtils.join(teacherIds, ",") + ") AND Status=1";
+//        jdbcTemplate.queryForList(sql)
+        return null;
     }
 
     @Override

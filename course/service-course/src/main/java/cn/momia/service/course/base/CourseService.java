@@ -9,6 +9,9 @@ public interface CourseService {
     Course get(long id);
     List<Course> list(Collection<Long> ids);
 
+    long queryTeacherCount(long id);
+    List<Teacher> queryTeachers(long id, int start, int count);
+
     long queryCountBySubject(int subjectId);
     List<Course> queryBySubject(int subjectId, int start, int count);
 

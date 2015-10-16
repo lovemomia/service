@@ -17,6 +17,7 @@ import cn.momia.service.course.base.CourseImage;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.base.CourseSku;
 import cn.momia.service.course.base.CourseSkuPlace;
+import cn.momia.service.course.base.Teacher;
 import cn.momia.service.course.subject.SubjectService;
 import com.google.common.base.Splitter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -273,6 +274,16 @@ public class CourseController extends BaseController {
         if (!course.exists()) return MomiaHttpResponse.FAILED("课程不存在");
 
         return MomiaHttpResponse.SUCCESS(course.getBook().getImgs());
+    }
+
+    @RequestMapping(value = "/{id}/teacher", method = RequestMethod.GET)
+    public MomiaHttpResponse teacher(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
+        long totalCount = courseService.queryTeacherCount(id);
+        List<Teacher> teachers = courseService.queryTeachers(id, start, count);
+        PagedList<Teacher> pagedTeachers = new PagedList<Teacher>(totalCount, start, count);
+        pagedTeachers.setList(teachers);
+
+        return MomiaHttpResponse.SUCCESS(pagedTeachers);
     }
 
     @RequestMapping(value = "/notfinished", method = RequestMethod.GET)

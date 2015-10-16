@@ -3,7 +3,8 @@ package cn.momia.api.course;
 import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.CourseSkuDto;
 import cn.momia.api.course.dto.DatedCourseSkusDto;
-import cn.momia.common.api.AbstractServiceApi;
+import cn.momia.api.course.dto.TeacherDto;
+import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequest;
@@ -14,7 +15,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import java.util.List;
 
-public class CourseServiceApi extends AbstractServiceApi {
+public class CourseServiceApi extends ServiceApi {
     public CourseDto get(long courseId) {
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("course", courseId));
         return JSON.toJavaObject((JSON) executeRequest(request), CourseDto.class);
@@ -67,6 +68,15 @@ public class CourseServiceApi extends AbstractServiceApi {
     public List<String> book(long courseId) {
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("course", courseId, "book"));
         return CastUtil.toList((JSONArray) executeRequest(request), String.class);
+    }
+
+    public List<TeacherDto> queryTeachers(long courseId, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("start", start)
+                .add("count", count);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("course", courseId, "teacher"), builder.build());
+
+        return CastUtil.toList((JSONArray) executeRequest(request), TeacherDto.class);
     }
 
     public PagedList<CourseDto> queryNotFinishedByUser(long userId) {

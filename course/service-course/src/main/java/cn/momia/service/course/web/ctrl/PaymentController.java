@@ -14,12 +14,12 @@ import cn.momia.common.deal.gateway.PrepayResult;
 import cn.momia.common.deal.gateway.factory.CallbackParamFactory;
 import cn.momia.common.deal.gateway.factory.PaymentGatewayFactory;
 import cn.momia.common.webapp.ctrl.BaseController;
+import cn.momia.common.webapp.util.RequestUtil;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.subject.order.Order;
 import cn.momia.service.course.subject.order.OrderService;
 import cn.momia.service.course.subject.order.Payment;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -72,14 +72,14 @@ public class PaymentController extends BaseController {
             case PayType.ALIPAY:
                 prepayParam.setTotalFee(order.getTotalFee());
                 break;
-            case PayType.WECHATPAY:
+            case PayType.WEIXIN:
                 prepayParam.setTotalFee(new BigDecimal(order.getTotalFee().multiply(new BigDecimal(100)).intValue()));
                 break;
             default: throw new MomiaFailedException("无效的支付类型: " + payType);
         }
 
         prepayParam.addAll(extractParams(request));
-        prepayParam.add("userIp", getRemoteIp(request));
+        prepayParam.add("userIp", RequestUtil.getRemoteIp(request));
 
         return prepayParam;
     }
@@ -91,7 +91,7 @@ public class PaymentController extends BaseController {
                 if ("app".equalsIgnoreCase(type)) return ClientType.APP;
                 else if ("wap".equalsIgnoreCase(type)) return ClientType.WAP;
                 else throw new MomiaFailedException("not supported type: " + type);
-            case PayType.WECHATPAY:
+            case PayType.WEIXIN:
                 String tradeType = request.getParameter("type");
                 if ("APP".equalsIgnoreCase(tradeType)) return ClientType.APP;
                 else if ("JSAPI".equalsIgnoreCase(tradeType)) return ClientType.WAP;
@@ -100,23 +100,9 @@ public class PaymentController extends BaseController {
         }
     }
 
-    private String getRemoteIp(HttpServletRequest request) {
-        String ip = request.getHeader("X-Real-IP");
-        if (isInvalidIp(ip)) ip = request.getHeader("X-Forwarded-For");
-        if (isInvalidIp(ip)) ip = request.getHeader("Proxy-Client-IP");
-        if (isInvalidIp(ip)) ip = request.getHeader("WL-Proxy-Client-IP");
-        if (isInvalidIp(ip)) ip = request.getRemoteAddr();
-
-        return ip;
-    }
-
-    private boolean isInvalidIp(String ip) {
-        return StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip);
-    }
-
     @RequestMapping(value = "/prepay/weixin", method = RequestMethod.POST)
     public MomiaHttpResponse prepayWeixin(HttpServletRequest request) {
-        return prepay(request, PayType.WECHATPAY);
+        return prepay(request, PayType.WEIXIN);
     }
 
     @RequestMapping(value = "/callback/alipay", method = RequestMethod.POST)
@@ -165,7 +151,7 @@ public class PaymentController extends BaseController {
 
     @RequestMapping(value = "/callback/weixin", method = RequestMethod.POST)
     public MomiaHttpResponse wechatpayCallback(HttpServletRequest request) {
-        return callback(request, PayType.WECHATPAY);
+        return callback(request, PayType.WEIXIN);
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.POST)

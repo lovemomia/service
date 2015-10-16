@@ -32,11 +32,11 @@
     </Limit>
 
     <Database>
-        <Tongqu>
+        <SogoKids>
             <JdbcUrl><![CDATA[jdbc:mysql://120.55.102.12:3306/sogokids?characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull]]></JdbcUrl>
             <Username>sogokids</Username>
             <Password>SogoKids</Password>
-        </Tongqu>
+        </SogoKids>
     </Database>
 
     <SecretKey>
