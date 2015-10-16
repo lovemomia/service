@@ -41,7 +41,7 @@ public class OrderController extends BaseController {
         for (SubjectSku sku : orderSkus) skuIds.add(sku.getId());
         List<SubjectSku> skus = subjectService.listSkus(skuIds);
 
-        if (!checkOrder(order, skus)) return MomiaHttpResponse.FAILED("无效的订单数据");
+        if (!checkAndCompleteOrder(order, skus)) return MomiaHttpResponse.FAILED("无效的订单数据");
 
         long orderId = orderService.add(order);
         if (orderId < 0) return MomiaHttpResponse.FAILED("下单失败");
@@ -50,7 +50,7 @@ public class OrderController extends BaseController {
         return MomiaHttpResponse.SUCCESS(buildOrderDto(order));
     }
 
-    private boolean checkOrder(Order order, List<SubjectSku> skus) {
+    private boolean checkAndCompleteOrder(Order order, List<SubjectSku> skus) {
         if (order.isInvalid()) return false;
 
         List<SubjectSku> orderSkus = order.getSkus();
@@ -60,7 +60,7 @@ public class OrderController extends BaseController {
         for (SubjectSku orderSku : orderSkus) {
             SubjectSku sku = skusMap.get(orderSku.getId());
             if (sku == null) return  false;
-            if (orderSku.getPrice().compareTo(sku.getPrice()) != 0) return false;
+            orderSku.setPrice(sku.getPrice());
         }
 
         return true;

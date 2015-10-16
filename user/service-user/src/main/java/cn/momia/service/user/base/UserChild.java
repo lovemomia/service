@@ -70,6 +70,6 @@ public class UserChild implements Entity {
     }
 
     public boolean isInvalid() {
-        return userId <= 0 || StringUtils.isBlank(avatar) || StringUtils.isBlank(name) || SexUtil.isInvalid(sex) || birthday == null;
+        return userId <= 0 || StringUtils.isBlank(name) || SexUtil.isInvalid(sex) || birthday == null;
     }
 }

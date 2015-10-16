@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 
 @RestController
-@RequestMapping(value = "/subject/payment")
+@RequestMapping(value = "/payment")
 public class PaymentController extends BaseController {
     @Autowired private SubjectService subjectService;
     @Autowired private OrderService orderService;
