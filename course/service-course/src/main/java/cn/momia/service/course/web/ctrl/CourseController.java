@@ -267,6 +267,14 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(buildCourseSkuDtos(includedSkus));
     }
 
+    @RequestMapping(value = "/{id}/book", method = RequestMethod.GET)
+    public MomiaHttpResponse book(@PathVariable long id) {
+        Course course = courseService.get(id);
+        if (!course.exists()) return MomiaHttpResponse.FAILED("课程不存在");
+
+        return MomiaHttpResponse.SUCCESS(course.getBook().getImgs());
+    }
+
     @RequestMapping(value = "/notfinished", method = RequestMethod.GET)
     public MomiaHttpResponse notFinished(@RequestParam(value = "uid") long userId) {
 //        long totalCount = courseService.queryNotFinishedSkuCountByUser(userId);
