@@ -151,19 +151,28 @@ public class UserController extends UserRelatedController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public MomiaHttpResponse listUsers(@RequestParam String uids, @RequestParam(defaultValue = "" + User.Type.BASE) int type) {
         List<Long> ids = new ArrayList<Long>();
-        for (String id : Splitter.on(",").trimResults().omitEmptyStrings().split(uids)) ids.add(Long.valueOf(id));
+        for (String id : Splitter.on(",").trimResults().omitEmptyStrings().split(uids)) {
+            ids.add(Long.valueOf(id));
+        }
 
         List<User> users = userService.list(ids);
         List<UserDto> userDtos = new ArrayList<UserDto>();
 
         switch (type) {
             case User.Type.MINI:
-                for (User user : users) userDtos.add(buildUserDto(user, User.Type.MINI));
+                for (User user : users) {
+                    userDtos.add(buildUserDto(user, User.Type.MINI));
+                }
                 break;
             case User.Type.FULL:
-                for (User user : users) userDtos.add(buildUserDto(user, User.Type.FULL, false));
+                for (User user : users) {
+                    userDtos.add(buildUserDto(user, User.Type.FULL, false));
+                }
                 break;
-            default: for (User user : users) userDtos.add(buildUserDto(user, User.Type.BASE, false));
+            default:
+                for (User user : users) {
+                    userDtos.add(buildUserDto(user, User.Type.BASE, false));
+                }
         }
 
         return MomiaHttpResponse.SUCCESS(userDtos);

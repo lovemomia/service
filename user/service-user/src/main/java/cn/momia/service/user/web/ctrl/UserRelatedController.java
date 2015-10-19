@@ -46,7 +46,9 @@ public abstract class UserRelatedController extends BaseController {
 
     protected List<UserChildDto> buildUserChildDtos(List<UserChild> children) {
         List<UserChildDto> childDtos = new ArrayList<UserChildDto>();
-        for (UserChild child : children) childDtos.add(buildUserChildDto(child));
+        for (UserChild child : children) {
+            childDtos.add(buildUserChildDto(child));
+        }
 
         return childDtos;
     }
