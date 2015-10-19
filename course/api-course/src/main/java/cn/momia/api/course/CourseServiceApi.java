@@ -1,7 +1,6 @@
 package cn.momia.api.course;
 
 import cn.momia.api.course.dto.CourseDto;
-import cn.momia.api.course.dto.CourseSkuDto;
 import cn.momia.api.course.dto.DatedCourseSkusDto;
 import cn.momia.api.course.dto.TeacherDto;
 import cn.momia.common.api.ServiceApi;
@@ -56,15 +55,6 @@ public class CourseServiceApi extends ServiceApi {
         return CastUtil.toList((JSONArray) executeRequest(request), DatedCourseSkusDto.class);
     }
 
-    public List<CourseSkuDto> listMoreSkus(long courseId, String date, String excludes) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("date", date)
-                .add("excludes", excludes);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("course", courseId, "sku/more"), builder.build());
-
-        return CastUtil.toList((JSONArray) executeRequest(request), CourseSkuDto.class);
-    }
-
     public PagedList<String> book(long courseId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
@@ -83,15 +73,21 @@ public class CourseServiceApi extends ServiceApi {
         return CastUtil.toPagedList((JSONObject) executeRequest(request), TeacherDto.class);
     }
 
-    public PagedList<CourseDto> queryNotFinishedByUser(long userId) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+    public PagedList<CourseDto> queryNotFinishedByUser(long userId, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("uid", userId)
+                .add("start", start)
+                .add("count", count);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("course/notfinished"), builder.build());
 
         return CastUtil.toPagedList((JSONObject) executeRequest(request), CourseDto.class);
     }
 
-    public PagedList<CourseDto> queryFinishedByUser(long userId) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+    public PagedList<CourseDto> queryFinishedByUser(long userId, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("uid", userId)
+                .add("start", start)
+                .add("count", count);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("course/finished"), builder.build());
 
         return CastUtil.toPagedList((JSONObject) executeRequest(request), CourseDto.class);

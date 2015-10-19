@@ -12,6 +12,7 @@ public class OrderSku implements Entity {
     private long skuId;
     private BigDecimal price;
     private int count;
+    private int bookableCount;
 
     public long getId() {
         return id;
@@ -51,6 +52,14 @@ public class OrderSku implements Entity {
 
     public void setCount(int count) {
         this.count = count;
+    }
+
+    public int getBookableCount() {
+        return bookableCount;
+    }
+
+    public void setBookableCount(int bookableCount) {
+        this.bookableCount = bookableCount;
     }
 
     @Override

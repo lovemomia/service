@@ -5,7 +5,6 @@ import java.util.List;
 public class DatedCourseSkusDto {
     private String date;
     private List<CourseSkuDto> skus;
-    private Boolean more;
 
     public String getDate() {
         return date;
@@ -21,13 +20,5 @@ public class DatedCourseSkusDto {
 
     public void setSkus(List<CourseSkuDto> skus) {
         this.skus = skus;
-    }
-
-    public Boolean getMore() {
-        return more;
-    }
-
-    public void setMore(Boolean more) {
-        this.more = more;
     }
 }

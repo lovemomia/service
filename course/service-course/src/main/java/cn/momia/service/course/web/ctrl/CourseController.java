@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -35,10 +34,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/course")
@@ -154,7 +151,6 @@ public class CourseController extends BaseController {
 
     private List<DatedCourseSkusDto> buildDatedCourseSkusDtos(List<CourseSku> skus) {
         Map<String, List<CourseSku>> skusMap = new HashMap<String, List<CourseSku>>();
-        Set<String> hasMore = new HashSet<String>();
         for (CourseSku sku : skus) {
             String date = DATE_FORMAT.format(sku.getStartTime());
             List<CourseSku> skusOfDay = skusMap.get(date);
@@ -162,9 +158,7 @@ public class CourseController extends BaseController {
                 skusOfDay = new ArrayList<CourseSku>();
                 skusMap.put(date, skusOfDay);
             }
-
-            if (skusOfDay.size() < 2) skusOfDay.add(sku);
-            else hasMore.add(date);
+            skusOfDay.add(sku);
         }
 
         List<DatedCourseSkusDto> datedCourseSkusDtos = new ArrayList<DatedCourseSkusDto>();
@@ -175,7 +169,6 @@ public class CourseController extends BaseController {
             DatedCourseSkusDto datedCourseSkusDto = new DatedCourseSkusDto();
             datedCourseSkusDto.setDate(date);
             datedCourseSkusDto.setSkus(buildCourseSkuDtos(skusOfDay));
-            if (hasMore.contains(date)) datedCourseSkusDto.setMore(true);
 
             datedCourseSkusDtos.add(datedCourseSkusDto);
         }
@@ -245,28 +238,6 @@ public class CourseController extends BaseController {
         return String.format("%d-%02d", currentYear, nextMonth);
     }
 
-    @RequestMapping(value = "/{id}/sku/more", method = RequestMethod.GET)
-    public MomiaHttpResponse listWeekSkus(@PathVariable long id, @RequestParam String date, @RequestParam String excludes) throws ParseException {
-        String start = date;
-        String end = DATE_FORMAT.format(new Date(DATE_FORMAT.parse(date).getTime() + 24 * 60 * 60 * 1000));
-
-        List<CourseSku> skus = filterUnavaliableSkus(courseService.querySkus(id, start, end));
-
-        Set<Long> excludeIds = new HashSet<Long>();
-        for (String excludeId : Splitter.on(",").trimResults().omitEmptyStrings().split(excludes)) {
-            excludeIds.add(Long.valueOf(excludeId));
-        }
-
-        List<CourseSku> includedSkus = new ArrayList<CourseSku>();
-        for (CourseSku sku : skus) {
-            if (!excludeIds.contains(sku.getId())) {
-                includedSkus.add(sku);
-            }
-        }
-
-        return MomiaHttpResponse.SUCCESS(buildCourseSkuDtos(includedSkus));
-    }
-
     @RequestMapping(value = "/{id}/book", method = RequestMethod.GET)
     public MomiaHttpResponse book(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
         long totalCount = courseService.queryBookImgCount(id);
@@ -302,9 +273,8 @@ public class CourseController extends BaseController {
 //        List<CourseDto> courseDtos = buildCourseDtos(courses, Course.Type.BASE);
 //
 //        PagedList<Course> pagedCourseDtos = new PagedList<Course>(totalCount, start, count)
-//        // TODO
-//        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
-        return null;
+        // TODO
+        return MomiaHttpResponse.SUCCESS;
     }
 
     @RequestMapping(value = "/finished", method = RequestMethod.GET)

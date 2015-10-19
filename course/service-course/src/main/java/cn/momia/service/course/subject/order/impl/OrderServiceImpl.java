@@ -40,7 +40,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     private static final String[] ORDER_FIELDS = { "Id", "UserId", "SubjectId", "Contact", "Mobile", "Status", "AddTime" };
-    private static final String[] ORDER_SKU_FIELDS = { "Id", "OrderId", "SkuId", "Price", "Count" };
+    private static final String[] ORDER_SKU_FIELDS = { "Id", "OrderId", "SkuId", "Price", "Count", "BookableCount" };
 
     private SubjectService subjectService;
 
@@ -84,6 +84,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
                 orderSku.setSkuId(rs.getLong("SkuId"));
                 orderSku.setPrice(rs.getBigDecimal("Price"));
                 orderSku.setCount(rs.getInt("Count"));
+                orderSku.setBookableCount(rs.getInt("BookableCount"));
 
                 return orderSku;
             } catch (Exception e) {
@@ -118,12 +119,12 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     private void addOrderSkus(long orderId, Order order) {
-        String sql = "INSERT INTO SG_SubjectOrderSku (OrderId, SkuId, Price, `Count`, AddTime) VALUES (?, ?, ?, ?, NOW())";
+        String sql = "INSERT INTO SG_SubjectOrderSku (OrderId, SubjectId, SkuId, Price, `Count`, BookableCount, AddTime) VALUES (?, ?, ?, ?, ?, ?, NOW())";
         List<Object[]> args = new ArrayList<Object[]>();
         for (SubjectSku sku : order.getSkus()) {
             int count = order.getCounts().get(sku.getId());
             if (count <= 0) continue;
-            args.add(new Object[] { orderId, sku.getId(), sku.getPrice(), count });
+            args.add(new Object[] { orderId, order.getSubjectId(), sku.getId(), sku.getPrice(), count, sku.getCourseCount() * count  });
         }
         jdbcTemplate.batchUpdate(sql, args);
     }
@@ -141,7 +142,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         if (ids.isEmpty()) return new ArrayList<Order>();
 
         List<Order> orders = new ArrayList<Order>();
-        String sql = "SELECT " + joinFields() + " FROM SG_SubjectOrder WHERE Id IN (" + StringUtils.join(ids, ",") + ") AND Status=1";
+        String sql = "SELECT " + joinFields() + " FROM SG_SubjectOrder WHERE Id IN (" + StringUtils.join(ids, ",") + ") AND Status>0";
         jdbcTemplate.query(sql, new ListResultSetExtractor<Order>(orders, orderFunc));
 
         Map<Long, List<OrderSku>> orderSkusMap = queryOrderSkus(ids);
@@ -229,17 +230,26 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public long queryBookableCountByUser(long userId) {
-        String sql = "SELECT COUNT(1) FROM SG_SubjectOrder WHERE UserId=? AND Status>=? AND Bookable=1";
+        String sql = "SELECT COUNT(1) FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderSku B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Status>=? AND B.Status=1 AND B.BookableCount>0";
         return jdbcTemplate.query(sql, new Object[] { userId, Order.Status.PAYED }, new CountResultSetExtractor());
     }
 
     @Override
-    public List<Order> queryBookableByUser(long userId, int start, int count) {
-        List<Long> ids = new ArrayList<Long>();
-        String sql = "SELECT Id FROM SG_SubjectOrder WHERE UserId=? AND Status>=? AND Bookable=1 ORDER BY AddTime DESC LIMIT ?,?";
-        jdbcTemplate.query(sql, new Object[] { userId, Order.Status.PAYED, start, count }, new LongListResultSetExtractor(ids));
+    public List<OrderSku> queryBookableByUser(long userId, int start, int count) {
+        String sql = "SELECT B.Id FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderSku B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Status>=? AND B.Status=1 AND B.BookableCount>0 ORDER BY B.AddTime ASC LIMIT ?,?";
+        List<Long> orderSkuIds = jdbcTemplate.queryForList(sql, new Object[] { userId, Order.Status.PAYED, start, count }, Long.class);
 
-        return list(ids);
+        return listOrderSkus(orderSkuIds);
+    }
+
+    private List<OrderSku> listOrderSkus(List<Long> orderSkuIds) {
+        if (orderSkuIds.isEmpty()) return new ArrayList<OrderSku>();
+
+        List<OrderSku> orderSkus = new ArrayList<OrderSku>();
+        String sql = "SELECT " + joinSkuFields() + " FROM SG_SubjectOrderSku WHERE Id IN (" + StringUtils.join(orderSkuIds, ",") + ") AND Status=1";
+        jdbcTemplate.query(sql, new ListResultSetExtractor<OrderSku>(orderSkus, orderSkuFunc));
+
+        return orderSkus;
     }
 
     @Override

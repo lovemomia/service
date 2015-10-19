@@ -1,6 +1,7 @@
 package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.course.dto.OrderDto;
+import cn.momia.api.course.dto.OrderSkuDto;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.UserDto;
 import cn.momia.common.api.dto.PagedList;
@@ -12,6 +13,7 @@ import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.subject.SubjectSku;
 import cn.momia.service.course.subject.order.Order;
 import cn.momia.service.course.subject.order.OrderService;
+import cn.momia.service.course.subject.order.OrderSku;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -139,10 +141,53 @@ public class OrderController extends BaseController {
         UserDto user = userServiceApi.get(utoken);
 
         long totalCount = orderService.queryBookableCountByUser(user.getId());
-        List<Order> orders = orderService.queryBookableByUser(user.getId(), start, count);
+        List<OrderSku> orderSkus = orderService.queryBookableByUser(user.getId(), start, count);
 
-        PagedList<OrderDto> pagedOrderDtos = buildPagedOrderDtos(totalCount, start, count, orders);
+        PagedList<OrderSkuDto> pagedOrderSkuDtos = buildPagedOrderSkuDtos(totalCount, start, count, orderSkus);
 
-        return MomiaHttpResponse.SUCCESS(pagedOrderDtos);
+        return MomiaHttpResponse.SUCCESS(pagedOrderSkuDtos);
+    }
+
+    private PagedList<OrderSkuDto> buildPagedOrderSkuDtos(long totalCount, int start, int count, List<OrderSku> orderSkus) {
+        Set<Long> orderIds = new HashSet<Long>();
+        for (OrderSku orderSku : orderSkus) {
+            orderIds.add(orderSku.getOrderId());
+        }
+
+        List<Order> orders = orderService.list(orderIds);
+        Set<Long> subjectIds = new HashSet<Long>();
+        Map<Long, Order> ordersMap = new HashMap<Long, Order>();
+        for (Order order : orders) {
+            subjectIds.add(order.getSubjectId());
+            ordersMap.put(order.getId(), order);
+        }
+
+        List<Subject> subjects = subjectService.list(subjectIds);
+        Map<Long, Subject> subjectsMap = new HashMap<Long, Subject>();
+        for (Subject subject : subjects) {
+            subjectsMap.put(subject.getId(), subject);
+        }
+
+        List<OrderSkuDto> orderSkuDtos = new ArrayList<OrderSkuDto>();
+        for (OrderSku orderSku : orderSkus) {
+            Order order = ordersMap.get(orderSku.getOrderId());
+            if (order == null) continue;
+            Subject subject = subjectsMap.get(order.getSubjectId());
+            if (subject == null) continue;
+
+            OrderSkuDto orderSkuDto = new OrderSkuDto();
+            orderSkuDto.setSubjectId(order.getSubjectId());
+            orderSkuDto.setTitle(subject.getTitle());
+            orderSkuDto.setCover(subject.getCover());
+            orderSkuDto.setBookableCourseCount(orderSku.getBookableCount());
+            // expire time
+
+            orderSkuDtos.add(orderSkuDto);
+        }
+
+        PagedList<OrderSkuDto> pagedOrderSkuDtos = new PagedList<OrderSkuDto>(totalCount, start, count);
+        pagedOrderSkuDtos.setList(orderSkuDtos);
+
+        return pagedOrderSkuDtos;
     }
 }
