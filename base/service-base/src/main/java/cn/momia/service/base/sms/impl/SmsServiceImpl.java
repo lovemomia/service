@@ -6,11 +6,7 @@ import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.base.sms.SmsSender;
 import cn.momia.service.base.sms.SmsService;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ResultSetExtractor;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -44,13 +40,7 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
 
     private Date getLastSendTime(String mobile) {
         String sql = "SELECT SendTime FROM SG_Verify WHERE Mobile=?";
-
-        return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<Date>() {
-            @Override
-            public Date extractData(ResultSet rs) throws SQLException, DataAccessException {
-                return rs.next() ? rs.getTimestamp("SendTime") : null;
-            }
-        });
+        return queryObject(sql, new Object[] { mobile }, Date.class, null);
     }
 
     private String getOrGenerateCode(String mobile) {
@@ -65,13 +55,7 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
 
     private String getGeneratedCode(String mobile) {
         String sql = "SELECT Code FROM SG_Verify WHERE Mobile=? AND GenerateTime>? AND Status=1";
-
-        return jdbcTemplate.query(sql, new Object[] { mobile, new Date(new Date().getTime() - 30 * 60 * 1000) }, new ResultSetExtractor<String>() {
-            @Override
-            public String extractData(ResultSet rs) throws SQLException, DataAccessException {
-                return rs.next() ? rs.getString(1) : null;
-            }
-        });
+        return queryObject(sql, new Object[] { mobile, new Date(new Date().getTime() - 30 * 60 * 1000) }, String.class, null);
     }
 
     private String generateCode(String mobile) {
@@ -91,13 +75,7 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
 
     private boolean exists(String mobile) {
         String sql = "SELECT COUNT(1) FROM SG_Verify WHERE Mobile=?";
-
-        return jdbcTemplate.query(sql, new Object[] { mobile }, new ResultSetExtractor<Boolean>() {
-            @Override
-            public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
-                return rs.next() ? rs.getInt(1) > 0 : false;
-            }
-        });
+        return queryInt(sql, new Object[] { mobile }) > 0;
     }
 
     private String buildCodeMsg(String code) {
@@ -134,12 +112,7 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
     @Override
     public boolean verifyCode(String mobile, String code) {
         String sql = "SELECT COUNT(1) FROM SG_Verify WHERE Mobile=? AND Code=? AND GenerateTime>? AND Status=1";
-        boolean successful = jdbcTemplate.query(sql, new Object[] { mobile, code, new Date(new Date().getTime() - 30 * 60 * 1000) }, new ResultSetExtractor<Boolean>() {
-            @Override
-            public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
-                return rs.next() ? rs.getInt(1) > 0 : false;
-            }
-        });
+        boolean successful = queryInt(sql, new Object[] { mobile, code, new Date(new Date().getTime() - 30 * 60 * 1000) }) > 0;
 
         if (successful) disable(mobile, code);
 

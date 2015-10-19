@@ -48,18 +48,28 @@ public class MetaUtil {
 
         try {
             List<AgeRangeDto> newAgeRanges = ageRangeServiceApi.listAll();
+            newAgeRanges.add(AgeRangeDto.DEFAULT);
             Map<Integer, AgeRangeDto> newAgeRangesMap = new HashMap<Integer, AgeRangeDto>();
-            for (AgeRangeDto ageRange : newAgeRanges) newAgeRangesMap.put(ageRange.getId(), ageRange);
+            for (AgeRangeDto ageRange : newAgeRanges) {
+                newAgeRangesMap.put(ageRange.getId(), ageRange);
+            }
 
             Map<Integer, CityDto> newCitiesMap = new HashMap<Integer, CityDto>();
-            for (CityDto city : cityServiceApi.listAll()) newCitiesMap.put(city.getId(), city);
+            for (CityDto city : cityServiceApi.listAll()) {
+                newCitiesMap.put(city.getId(), city);
+            }
 
             Map<Integer, RegionDto> newRegionsMap = new HashMap<Integer, RegionDto>();
-            for (RegionDto region : regionServiceApi.listAll()) newRegionsMap.put(region.getId(), region);
+            for (RegionDto region : regionServiceApi.listAll()) {
+                newRegionsMap.put(region.getId(), region);
+            }
 
             List<SortTypeDto> newSortTypes = sortTypeServiceApi.listAll();
+            newSortTypes.add(SortTypeDto.DEFAULT);
             Map<Integer, SortTypeDto> newSortTypesMap = new HashMap<Integer, SortTypeDto>();
-            for (SortTypeDto sortType : newSortTypes) newSortTypesMap.put(sortType.getId(), sortType);
+            for (SortTypeDto sortType : newSortTypes) {
+                newSortTypesMap.put(sortType.getId(), sortType);
+            }
 
             ageRangesCache = newAgeRanges;
             sortTypesCache = newSortTypes;

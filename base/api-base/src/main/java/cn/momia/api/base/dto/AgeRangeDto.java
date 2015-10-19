@@ -4,8 +4,8 @@ public class AgeRangeDto {
     public static final AgeRangeDto DEFAULT = new AgeRangeDto();
     static {
         DEFAULT.setId(0);
-        DEFAULT.setMin(3);
-        DEFAULT.setMax(6);
+        DEFAULT.setMin(1);
+        DEFAULT.setMax(100);
     }
 
     private int id;
@@ -37,6 +37,11 @@ public class AgeRangeDto {
     }
 
     public String getText() {
+        if (id == 0) return "全部";
+        if (min <= 0 && max <= 0) return "";
+        if (min <= 0) return max + "岁";
+        if (max <= 0) return min + "岁";
+        if (min == max) return min + "岁";
         return min + "-" + max + "岁";
     }
 }
