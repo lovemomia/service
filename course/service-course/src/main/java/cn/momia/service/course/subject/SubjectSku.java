@@ -10,8 +10,8 @@ public class SubjectSku implements Entity, Cloneable {
     private long id;
     private long subjectId;
     private String desc;
-    private BigDecimal price;
-    private BigDecimal originalPrice;
+    private BigDecimal price = new BigDecimal(0);
+    private BigDecimal originalPrice = new BigDecimal(0);
     private int adult;
     private int child;
     private int courseCount;

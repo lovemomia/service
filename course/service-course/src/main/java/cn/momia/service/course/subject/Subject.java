@@ -103,9 +103,9 @@ public class Subject implements Entity {
     }
 
     public SubjectSku getMinPriceSku() {
-        SubjectSku minPriceSubjectSku = null;
+        SubjectSku minPriceSubjectSku = SubjectSku.NOT_EXIST_SUBJECT_SKU;
         for (SubjectSku sku : skus) {
-            if (minPriceSubjectSku == null) {
+            if (!minPriceSubjectSku.exists()) {
                 minPriceSubjectSku = sku;
             } else {
                 if (minPriceSubjectSku.getPrice().compareTo(sku.getPrice()) > 0) minPriceSubjectSku = sku;
