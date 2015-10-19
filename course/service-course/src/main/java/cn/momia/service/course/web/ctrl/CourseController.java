@@ -18,7 +18,6 @@ import cn.momia.service.course.base.CourseSku;
 import cn.momia.service.course.base.CourseSkuPlace;
 import cn.momia.service.course.base.Teacher;
 import cn.momia.service.course.subject.SubjectService;
-import com.google.common.base.Splitter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -259,31 +258,27 @@ public class CourseController extends BaseController {
     }
 
     @RequestMapping(value = "/notfinished", method = RequestMethod.GET)
-    public MomiaHttpResponse notFinished(@RequestParam(value = "uid") long userId) {
-//        long totalCount = courseService.queryNotFinishedSkuCountByUser(userId);
-//        List<CourseSku> skus = courseService.queryNotFinishedSkuByUser(userId);
-//
-//        Set<Long> courseIds = new HashSet<Long>();
-//        Map<Long, CourseSku> courseSkuMap = new HashMap<Long, CourseSku>();
-//        for (CourseSku sku : skus) {
-//            courseIds.add(sku.getCourseId());
-//            courseSkuMap.put(sku.getCourseId(), sku);
-//        }
-//        List<Course> courses = courseService.list(courseIds);
-//        List<CourseDto> courseDtos = buildCourseDtos(courses, Course.Type.BASE);
-//
-//        PagedList<Course> pagedCourseDtos = new PagedList<Course>(totalCount, start, count)
-        // TODO
-        return MomiaHttpResponse.SUCCESS;
+    public MomiaHttpResponse notFinished(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
+        long totalCount = courseService.queryNotFinishedCountByUser(userId);
+        List<Course> courses = courseService.queryNotFinishedByUser(userId, start, count);
+        List<CourseDto> courseDtos = buildCourseDtos(courses, Course.Type.BASE);
+
+        PagedList<CourseDto> pagedCourseDtos = new PagedList<CourseDto>(totalCount, start, count);
+        pagedCourseDtos.setList(courseDtos);
+
+        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
     }
 
     @RequestMapping(value = "/finished", method = RequestMethod.GET)
-    public MomiaHttpResponse finished(@RequestParam(value = "uid") long userId) {
-        long totalCount = courseService.queryFinishedSkuCountByUser(userId);
-        List<CourseSku> skus = courseService.queryFinishedSkuByUser(userId);
+    public MomiaHttpResponse finished(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
+        long totalCount = courseService.queryFinishedCountByUser(userId);
+        List<Course> courses = courseService.queryFinishedByUser(userId, start, count);
+        List<CourseDto> courseDtos = buildCourseDtos(courses, Course.Type.BASE);
 
-        // TODO
-        return MomiaHttpResponse.SUCCESS;
+        PagedList<CourseDto> pagedCourseDtos = new PagedList<CourseDto>(totalCount, start, count);
+        pagedCourseDtos.setList(courseDtos);
+
+        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
     }
 
     @RequestMapping(value = "/{id}/favored", method = RequestMethod.GET)

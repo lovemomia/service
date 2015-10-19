@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-public class Course implements Entity{
+public class Course implements Entity, Cloneable {
     public static final Course NOT_EXIST_COURSE = new Course();
 
     public static class Type {
@@ -158,6 +158,15 @@ public class Course implements Entity{
 
     public void setSkus(List<CourseSku> skus) {
         this.skus = skus;
+    }
+
+    @Override
+    public Course clone() {
+        try {
+            return (Course) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

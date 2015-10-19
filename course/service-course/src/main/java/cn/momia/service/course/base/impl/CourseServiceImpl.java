@@ -12,6 +12,7 @@ import cn.momia.service.course.base.CourseSku;
 import cn.momia.service.course.base.CourseSkuPlace;
 import cn.momia.service.course.base.Teacher;
 import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -359,23 +360,85 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     }
 
     @Override
-    public long queryNotFinishedSkuCountByUser(long userId) {
-        return 0;
+    public long queryNotFinishedCountByUser(long userId) {
+        String sql = "SELECT COUNT(1) FROM SG_BookedCourse WHERE UserId=? AND Status=1 AND StartTime>NOW()";
+        return jdbcTemplate.queryForObject(sql, new Object[] { userId }, Long.class);
     }
 
     @Override
-    public List<CourseSku> queryNotFinishedSkuByUser(long userId) {
-        return null;
+    public List<Course> queryNotFinishedByUser(long userId, int start, int count) {
+        String sql = "SELECT CourseSkuId FROM SG_BookedCourse WHERE UserId=? AND Status=1 AND StartTime>NOW() LIMIT ?,?";
+        List<Long> skuIds = jdbcTemplate.queryForList(sql, new Object[] { userId, start, count }, Long.class);
+        List<CourseSku> skus = listSkus(skuIds);
+
+        Set<Long> ids = new HashSet<Long>();
+        for (CourseSku sku : skus) {
+            ids.add(sku.getCourseId());
+        }
+        List<Course> courses = list(ids);
+        Map<Long, Course> coursesMap = new HashMap<Long, Course>();
+        for (Course course : courses) {
+            coursesMap.put(course.getId(), course);
+        }
+
+        List<Course> notFinishedCourses = new ArrayList<Course>();
+        for (CourseSku sku : skus) {
+            Course course = coursesMap.get(sku.getCourseId());
+            if (course == null) continue;
+
+            Course notFinishedCourse = course.clone();
+            notFinishedCourse.setSkus(Lists.newArrayList(sku));
+
+            notFinishedCourses.add(notFinishedCourse);
+        }
+
+        return notFinishedCourses;
+    }
+
+    private List<CourseSku> listSkus(List<Long> skuIds) {
+        if (skuIds.isEmpty()) return new ArrayList<CourseSku>();
+
+        List<CourseSku> skus = new ArrayList<CourseSku>();
+        String sql = "SELECT " + joinSkuFields() + " FROM SG_CourseSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status=1";
+        jdbcTemplate.query(sql, new ListResultSetExtractor<CourseSku>(skus, courseSkuFunc));
+
+        return completeSkus(skus);
     }
 
     @Override
-    public long queryFinishedSkuCountByUser(long userId) {
-        return 0;
+    public long queryFinishedCountByUser(long userId) {
+        String sql = "SELECT COUNT(1) FROM SG_BookedCourse WHERE UserId=? AND Status=1 AND StartTime>NOW()";
+        return jdbcTemplate.queryForObject(sql, new Object[] { userId }, Long.class);
     }
 
     @Override
-    public List<CourseSku> queryFinishedSkuByUser(long userId) {
-        return null;
+    public List<Course> queryFinishedByUser(long userId, int start, int count) {
+        String sql = "SELECT CourseSkuId FROM SG_BookedCourse WHERE UserId=? AND Status=1 AND StartTime<=NOW() LIMIT ?,?";
+        List<Long> skuIds = jdbcTemplate.queryForList(sql, new Object[] { userId, start, count }, Long.class);
+        List<CourseSku> skus = listSkus(skuIds);
+
+        Set<Long> ids = new HashSet<Long>();
+        for (CourseSku sku : skus) {
+            ids.add(sku.getCourseId());
+        }
+        List<Course> courses = list(ids);
+        Map<Long, Course> coursesMap = new HashMap<Long, Course>();
+        for (Course course : courses) {
+            coursesMap.put(course.getId(), course);
+        }
+
+        List<Course> finishedCourses = new ArrayList<Course>();
+        for (CourseSku sku : skus) {
+            Course course = coursesMap.get(sku.getCourseId());
+            if (course == null) continue;
+
+            Course finishedCourse = course.clone();
+            finishedCourse.setSkus(Lists.newArrayList(sku));
+
+            finishedCourses.add(finishedCourse);
+        }
+
+        return finishedCourses;
     }
 
     @Override
