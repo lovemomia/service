@@ -65,18 +65,22 @@ public class CourseServiceApi extends ServiceApi {
         return CastUtil.toList((JSONArray) executeRequest(request), CourseSkuDto.class);
     }
 
-    public List<String> book(long courseId) {
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("course", courseId, "book"));
-        return CastUtil.toList((JSONArray) executeRequest(request), String.class);
+    public PagedList<String> book(long courseId, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("start", start)
+                .add("count", count);
+        MomiaHttpRequest request = MomiaHttpRequest.GET(url("course", courseId, "book"), builder.build());
+
+        return CastUtil.toPagedList((JSONObject) executeRequest(request), String.class);
     }
 
-    public List<TeacherDto> queryTeachers(long courseId, int start, int count) {
+    public PagedList<TeacherDto> queryTeachers(long courseId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
                 .add("count", count);
         MomiaHttpRequest request = MomiaHttpRequest.GET(url("course", courseId, "teacher"), builder.build());
 
-        return CastUtil.toList((JSONArray) executeRequest(request), TeacherDto.class);
+        return CastUtil.toPagedList((JSONObject) executeRequest(request), TeacherDto.class);
     }
 
     public PagedList<CourseDto> queryNotFinishedByUser(long userId) {

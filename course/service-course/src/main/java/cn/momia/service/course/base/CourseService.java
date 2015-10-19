@@ -9,6 +9,9 @@ public interface CourseService {
     Course get(long id);
     List<Course> list(Collection<Long> ids);
 
+    long queryBookImgCount(long id);
+    List<String> queryBookImgs(long id, int start, int count);
+
     long queryTeacherCount(long id);
     List<Teacher> queryTeachers(long id, int start, int count);
 

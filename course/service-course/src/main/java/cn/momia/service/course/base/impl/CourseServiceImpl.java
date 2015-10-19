@@ -14,8 +14,6 @@ import cn.momia.service.course.base.Teacher;
 import com.google.common.base.Function;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 import java.sql.ResultSet;
@@ -92,6 +90,24 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
                 return img;
             } catch (Exception e) {
                 return CourseBookImage.NOT_EXIST_COURSE_BOOK_IMAGE;
+            }
+        }
+    };
+
+    private Function<ResultSet, Teacher> teacherFunc = new Function<ResultSet, Teacher>() {
+        @Override
+        public Teacher apply(ResultSet rs) {
+            try {
+                Teacher teacher = new Teacher();
+                teacher.setId(rs.getInt("Id"));
+                teacher.setName(rs.getString("Name"));
+                teacher.setAvatar(rs.getString("Avatar"));
+                teacher.setEducation(rs.getString("Education"));
+                teacher.setExperience(rs.getString("Experience"));
+
+                return teacher;
+            } catch (Exception e) {
+                return Teacher.NOT_EXIST_TEACHER;
             }
         }
     };
@@ -257,6 +273,20 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     }
 
     @Override
+    public long queryBookImgCount(long id) {
+        String sql = "SELECT COUNT(1) FROM SG_CourseBook WHERE CourseId=? AND Status=1";
+        return jdbcTemplate.queryForObject(sql, new Object[] { id }, Long.class);
+    }
+
+    @Override
+    public List<String> queryBookImgs(long id, int start, int count) {
+        String sql = "SELECT Img FROM SG_CourseBook WHERE CourseId=? AND Status=1 ORDER BY `Order` ASC LIMIT ?,?";
+        List<String> bookImgs = jdbcTemplate.queryForList(sql, new Object[] { id, start, count }, String.class);
+
+        return bookImgs;
+    }
+
+    @Override
     public long queryTeacherCount(long id) {
         String sql = "SELECT COUNT(1) FROM SG_CourseTeacher WHERE CourseId=? AND Status=1";
         return jdbcTemplate.queryForObject(sql, new Object[] { id }, Long.class);
@@ -265,17 +295,19 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     @Override
     public List<Teacher> queryTeachers(long id, int start, int count) {
         String sql = "SELECT TeacherId FROM SG_CourseTeacher WHERE CourseId=? AND Status=1 LIMIT ?,?";
-        List<Long> teacherIds = jdbcTemplate.queryForList(sql, new Object[] { id, start, count }, Long.class);
+        List<Integer> teacherIds = jdbcTemplate.queryForList(sql, new Object[] { id, start, count }, Integer.class);
 
         return listTeachers(teacherIds);
     }
 
-    private List<Teacher> listTeachers(List<Long> teacherIds) {
-//        if (teacherIds.isEmpty()) return new ArrayList<Teacher>();
-//
-//        String sql = "SELECT * FROM SG_Teacher WHERE Id IN (" + StringUtils.join(teacherIds, ",") + ") AND Status=1";
-//        jdbcTemplate.queryForList(sql)
-        return null;
+    private List<Teacher> listTeachers(List<Integer> teacherIds) {
+        if (teacherIds.isEmpty()) return new ArrayList<Teacher>();
+
+        List<Teacher> teachers = new ArrayList<Teacher>();
+        String sql = "SELECT Id, Name, Avatar, Education, Experience FROM SG_Teacher WHERE Id IN (" + StringUtils.join(teacherIds, ",") + ") AND Status=1";
+        jdbcTemplate.query(sql, new ListResultSetExtractor<Teacher>(teachers, teacherFunc));
+
+        return teachers;
     }
 
     @Override

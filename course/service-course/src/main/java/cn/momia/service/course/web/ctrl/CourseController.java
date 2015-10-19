@@ -7,7 +7,6 @@ import cn.momia.api.course.dto.CoursePlaceDto;
 import cn.momia.api.course.dto.CourseSkuDto;
 import cn.momia.api.course.dto.DatedCourseSkusDto;
 import cn.momia.api.poi.PoiServiceApi;
-import cn.momia.api.user.dto.UserDto;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
@@ -269,11 +268,13 @@ public class CourseController extends BaseController {
     }
 
     @RequestMapping(value = "/{id}/book", method = RequestMethod.GET)
-    public MomiaHttpResponse book(@PathVariable long id) {
-        Course course = courseService.get(id);
-        if (!course.exists()) return MomiaHttpResponse.FAILED("课程不存在");
+    public MomiaHttpResponse book(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
+        long totalCount = courseService.queryBookImgCount(id);
+        List<String> bookImgs = courseService.queryBookImgs(id, start, count);
+        PagedList<String> pagedBookImgs = new PagedList<String>(totalCount, start, count);
+        pagedBookImgs.setList(bookImgs);
 
-        return MomiaHttpResponse.SUCCESS(course.getBook().getImgs());
+        return MomiaHttpResponse.SUCCESS(pagedBookImgs);
     }
 
     @RequestMapping(value = "/{id}/teacher", method = RequestMethod.GET)

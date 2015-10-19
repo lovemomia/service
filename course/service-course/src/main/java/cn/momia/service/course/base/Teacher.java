@@ -1,6 +1,10 @@
 package cn.momia.service.course.base;
 
-public class Teacher {
+import cn.momia.common.service.Entity;
+
+public class Teacher implements Entity {
+    public static final Teacher NOT_EXIST_TEACHER = new Teacher();
+
     private int id;
     private String name;
     private String avatar;
@@ -45,5 +49,10 @@ public class Teacher {
 
     public void setExperience(String experience) {
         this.experience = experience;
+    }
+
+    @Override
+    public boolean exists() {
+        return id > 0;
     }
 }
