@@ -79,7 +79,9 @@ public class CourseController extends BaseController {
 
     private List<String> extractImgUrls(List<CourseImage> imgs) {
         List<String> urls = new ArrayList<String>();
-        for (CourseImage img : imgs) urls.add(img.getUrl());
+        for (CourseImage img : imgs) {
+            urls.add(img.getUrl());
+        }
 
         return urls;
     }
@@ -123,7 +125,9 @@ public class CourseController extends BaseController {
 
     private List<CourseDto> buildCourseDtos(List<Course> courses, int type) {
         List<CourseDto> courseDtos = new ArrayList<CourseDto>();
-        for (Course course : courses) courseDtos.add(buildCourseDto(course, type));
+        for (Course course : courses) {
+            courseDtos.add(buildCourseDto(course, type));
+        }
 
         return courseDtos;
     }

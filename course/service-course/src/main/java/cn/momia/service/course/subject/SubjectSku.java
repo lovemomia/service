@@ -16,7 +16,7 @@ public class SubjectSku implements Entity, Cloneable {
     private int child;
     private int courseCount;
     private int time;
-    private String timeUnit;
+    private int timeUnit;
 
     public long getId() {
         return id;
@@ -90,11 +90,11 @@ public class SubjectSku implements Entity, Cloneable {
         this.time = time;
     }
 
-    public String getTimeUnit() {
+    public int getTimeUnit() {
         return timeUnit;
     }
 
-    public void setTimeUnit(String timeUnit) {
+    public void setTimeUnit(int timeUnit) {
         this.timeUnit = timeUnit;
     }
 

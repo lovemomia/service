@@ -40,7 +40,9 @@ public class OrderController extends BaseController {
     public MomiaHttpResponse placeOrder(@RequestBody Order order) {
         List<SubjectSku> orderSkus = order.getSkus();
         Set<Long> skuIds = new HashSet<Long>();
-        for (SubjectSku sku : orderSkus) skuIds.add(sku.getId());
+        for (SubjectSku sku : orderSkus) {
+            skuIds.add(sku.getId());
+        }
         List<SubjectSku> skus = subjectService.listSkus(skuIds);
 
         if (!checkAndCompleteOrder(order, skus)) return MomiaHttpResponse.FAILED("无效的订单数据");
@@ -57,7 +59,9 @@ public class OrderController extends BaseController {
 
         List<SubjectSku> orderSkus = order.getSkus();
         Map<Long, SubjectSku> skusMap = new HashMap<Long, SubjectSku>();
-        for (SubjectSku sku : skus) skusMap.put(sku.getId(), sku);
+        for (SubjectSku sku : skus) {
+            skusMap.put(sku.getId(), sku);
+        }
 
         for (SubjectSku orderSku : orderSkus) {
             SubjectSku sku = skusMap.get(orderSku.getId());
@@ -106,7 +110,9 @@ public class OrderController extends BaseController {
 
         List<Subject> subjects = subjectService.list(subjectIds);
         Map<Long, Subject> subjectsMap = new HashMap<Long, Subject>();
-        for (Subject subject : subjects) subjectsMap.put(subject.getId(), subject);
+        for (Subject subject : subjects) {
+            subjectsMap.put(subject.getId(), subject);
+        }
 
         List<OrderDto> orderDtos = new ArrayList<OrderDto>();
         for (Order order : orders) {

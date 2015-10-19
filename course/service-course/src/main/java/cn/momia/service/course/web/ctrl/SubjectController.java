@@ -47,11 +47,15 @@ public class SubjectController extends BaseController {
         List<Subject> subjects = subjectService.queryFree(cityId, start, count);
 
         Set<Long> subjectIds = new HashSet<Long>();
-        for (Subject subject : subjects) subjectIds.add(subject.getId());
+        for (Subject subject : subjects) {
+            subjectIds.add(subject.getId());
+        }
         Map<Long, List<Course>> coursesMap = courseService.queryAllBySubjects(subjectIds);
 
         List<SubjectDto> subjectDtos = new ArrayList<SubjectDto>();
-        for (Subject subject : subjects) subjectDtos.add(buildBaseSubjectDto(subject, coursesMap.get(subject.getId())));
+        for (Subject subject : subjects) {
+            subjectDtos.add(buildBaseSubjectDto(subject, coursesMap.get(subject.getId())));
+        }
         PagedList<SubjectDto> pagedSubjectDtos = new PagedList<SubjectDto>(totalCount, start, count);
         pagedSubjectDtos.setList(subjectDtos);
 
@@ -97,7 +101,9 @@ public class SubjectController extends BaseController {
 
     private int getJoined(List<Course> courses) {
         int joined = 0;
-        for (Course course : courses) joined += course.getJoined();
+        for (Course course : courses) {
+            joined += course.getJoined();
+        }
 
         return joined;
     }
@@ -162,7 +168,9 @@ public class SubjectController extends BaseController {
 
     private List<String> extractImgUrls(List<SubjectImage> imgs) {
         List<String> urls = new ArrayList<String>();
-        for (SubjectImage img : imgs) urls.add(img.getUrl());
+        for (SubjectImage img : imgs) {
+            urls.add(img.getUrl());
+        }
 
         return urls;
     }
