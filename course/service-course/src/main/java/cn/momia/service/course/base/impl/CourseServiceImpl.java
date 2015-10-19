@@ -314,7 +314,7 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     @Override
     public long queryCountBySubject(int subjectId) {
         String sql = "SELECT COUNT(1) FROM SG_Course WHERE SubjectId=? AND Status=1";
-        return jdbcTemplate.query(sql, new Object[] { subjectId }, new CountResultSetExtractor());
+        return jdbcTemplate.queryForObject(sql, new Object[] { subjectId }, Long.class);
     }
 
     @Override
@@ -482,7 +482,7 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     @Override
     public boolean isFavored(long userId, long id) {
         String sql = "SELECT COUNT(1) FROM SG_Favorite WHERE UserId=? AND `Type`=1 AND RefId=? AND Status=1";
-        return jdbcTemplate.query(sql, new Object[] { userId, id }, new CountResultSetExtractor()) > 0;
+        return jdbcTemplate.queryForObject(sql, new Object[] { userId, id }, Long.class) > 0;
     }
 
     @Override
@@ -500,7 +500,7 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
 
     private long getFavoretId(long userId, long id) {
         String sql = "SELECT Id FROM SG_Favorite WHERE UserId=? AND `Type`=1 AND RefId=?";
-        return jdbcTemplate.query(sql, new Object[] { userId, id }, new LongResultSetExtractor());
+        return jdbcTemplate.queryForObject(sql, new Object[] { userId, id }, Long.class);
     }
 
     @Override

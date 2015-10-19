@@ -82,7 +82,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     @Override
     public boolean exists(String field, String value) {
         String sql = "SELECT COUNT(1) FROM SG_User WHERE " + field + "=?";
-        return jdbcTemplate.query(sql, new Object[] { value }, new CountResultSetExtractor()) > 0;
+        return jdbcTemplate.queryForObject(sql, new Object[] { value }, Long.class) > 0;
     }
 
     @Override

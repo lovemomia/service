@@ -199,13 +199,13 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     public long queryCountByUser(long userId, int status) {
         if (status == 1) {
             String sql = "SELECT COUNT(1) FROM SG_SubjectOrder WHERE UserId=? AND Status>0";
-            return jdbcTemplate.query(sql, new Object[] { userId }, new CountResultSetExtractor());
+            return jdbcTemplate.queryForObject(sql, new Object[] { userId }, Long.class);
         } else if (status == 2) {
             String sql = "SELECT COUNT(1) FROM SG_SubjectOrder WHERE UserId=? AND Status>0 AND Status<?";
-            return jdbcTemplate.query(sql, new Object[] { userId, Order.Status.PAYED }, new CountResultSetExtractor());
+            return jdbcTemplate.queryForObject(sql, new Object[] { userId, Order.Status.PAYED }, Long.class);
         } else if (status == 3) {
             String sql = "SELECT COUNT(1) FROM SG_SubjectOrder WHERE UserId=? AND Status>=?";
-            return jdbcTemplate.query(sql, new Object[] { userId, Order.Status.PAYED }, new CountResultSetExtractor());
+            return jdbcTemplate.queryForObject(sql, new Object[] { userId, Order.Status.PAYED }, Long.class);
         }
 
         return 0;
@@ -231,7 +231,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     @Override
     public long queryBookableCountByUser(long userId) {
         String sql = "SELECT COUNT(1) FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderSku B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Status>=? AND B.Status=1 AND B.BookableCount>0";
-        return jdbcTemplate.query(sql, new Object[] { userId, Order.Status.PAYED }, new CountResultSetExtractor());
+        return jdbcTemplate.queryForObject(sql, new Object[] { userId, Order.Status.PAYED }, Long.class);
     }
 
     @Override

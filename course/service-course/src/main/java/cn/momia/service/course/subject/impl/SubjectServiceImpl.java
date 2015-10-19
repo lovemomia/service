@@ -155,7 +155,7 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
     @Override
     public long queryFreeCount(long cityId) {
         String sql = "SELECT COUNT(1) FROM SG_Subject WHERE `Type`=? AND CityId=? AND Status=1";
-        return jdbcTemplate.query(sql, new Object[] { Subject.Type.FREE, cityId }, new CountResultSetExtractor());
+        return jdbcTemplate.queryForObject(sql, new Object[] { Subject.Type.FREE, cityId }, Long.class);
     }
 
     @Override

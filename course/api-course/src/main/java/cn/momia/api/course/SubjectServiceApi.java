@@ -7,11 +7,11 @@ import cn.momia.api.course.dto.SubjectSkuDto;
 import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
-import cn.momia.common.api.http.MomiaHttpRequest;
+import cn.momia.common.api.http.MomiaHttpRequestBuilder;
 import cn.momia.common.api.util.CastUtil;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.List;
 
@@ -21,24 +21,24 @@ public class SubjectServiceApi extends ServiceApi {
                 .add("city", cityId)
                 .add("start", start)
                 .add("count", count);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("subject/free"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/free"), builder.build());
 
-        return CastUtil.toPagedList((JSONObject) executeRequest(request), SubjectDto.class);
+        return CastUtil.toPagedList((JSON) executeRequest(request), SubjectDto.class);
     }
 
     public SubjectDto get(long subjectId) {
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("subject", subjectId));
-        return JSON.toJavaObject((JSON) executeRequest(request), SubjectDto.class);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject", subjectId));
+        return CastUtil.toObject((JSON) executeRequest(request), SubjectDto.class);
     }
 
     public List<SubjectSkuDto> querySkus(long subjectId) {
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("subject", subjectId, "sku"));
-        return CastUtil.toList((JSONArray) executeRequest(request), SubjectSkuDto.class);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject", subjectId, "sku"));
+        return CastUtil.toList((JSON) executeRequest(request), SubjectSkuDto.class);
     }
 
     public OrderDto placeOrder(JSONObject orderJson) {
-        MomiaHttpRequest request = MomiaHttpRequest.POST(url("subject/order"), orderJson.toString());
-        return JSON.toJavaObject((JSON) executeRequest(request), OrderDto.class);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("subject/order"), orderJson.toString());
+        return CastUtil.toObject((JSON) executeRequest(request), OrderDto.class);
     }
 
     public PagedList<OrderDto> listOrders(String utoken, int status, int start, int count) {
@@ -47,9 +47,9 @@ public class SubjectServiceApi extends ServiceApi {
                 .add("status", status)
                 .add("start", start)
                 .add("count", count);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("subject/order/list"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/order/list"), builder.build());
 
-        return CastUtil.toPagedList((JSONObject) executeRequest(request), OrderDto.class);
+        return CastUtil.toPagedList((JSON) executeRequest(request), OrderDto.class);
     }
 
     public PagedList<OrderSkuDto> listBookableOrders(String utoken, int start, int count) {
@@ -57,8 +57,8 @@ public class SubjectServiceApi extends ServiceApi {
                 .add("utoken", utoken)
                 .add("start", start)
                 .add("count", count);
-        MomiaHttpRequest request = MomiaHttpRequest.GET(url("subject/order/bookable"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/order/bookable"), builder.build());
 
-        return CastUtil.toPagedList((JSONObject) executeRequest(request), OrderSkuDto.class);
+        return CastUtil.toPagedList((JSON) executeRequest(request), OrderSkuDto.class);
     }
 }
