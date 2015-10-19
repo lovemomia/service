@@ -1,7 +1,5 @@
 package cn.momia.api.course.dto;
 
-import com.alibaba.fastjson.JSONArray;
-
 import java.math.BigDecimal;
 import java.util.List;
 

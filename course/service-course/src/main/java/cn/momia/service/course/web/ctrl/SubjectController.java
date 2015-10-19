@@ -15,6 +15,7 @@ import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectImage;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.subject.SubjectSku;
+import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -153,7 +154,7 @@ public class SubjectController extends BaseController {
     private SubjectDto buildSubjectDto(Subject subject, List<Course> courses) {
         SubjectDto subjectDto = buildBaseSubjectDto(subject, courses);
         subjectDto.setIntro(subject.getIntro());
-        subjectDto.setNotice(subject.getNotice());
+        subjectDto.setNotice(JSON.parseArray(subject.getNotice()));
         subjectDto.setImgs(extractImgUrls(subject.getImgs()));
 
         return subjectDto;

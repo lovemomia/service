@@ -21,7 +21,7 @@ public class Subject implements Entity {
     private String cover;
     private String tags;
     private String intro;
-    private JSONArray notice;
+    private String notice;
     private List<SubjectImage> imgs;
     private List<SubjectSku> skus;
 
@@ -73,11 +73,11 @@ public class Subject implements Entity {
         this.intro = intro;
     }
 
-    public JSONArray getNotice() {
+    public String getNotice() {
         return notice;
     }
 
-    public void setNotice(JSONArray notice) {
+    public void setNotice(String notice) {
         this.notice = notice;
     }
 
