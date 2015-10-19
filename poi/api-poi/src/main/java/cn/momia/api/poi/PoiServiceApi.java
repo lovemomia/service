@@ -14,24 +14,12 @@ import java.util.List;
 
 public class PoiServiceApi extends ServiceApi {
     public PlaceDto get(int placeId) {
-        return get(placeId, PlaceDto.Type.BASE);
-    }
-
-    public PlaceDto get(int placeId, int type) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("type", type);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("poi", placeId), builder.build());
-
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("poi", placeId));
         return CastUtil.toObject((JSON) executeRequest(request), PlaceDto.class);
     }
 
     public List<PlaceDto> list(Collection<Integer> placeIds) {
-        return list(placeIds, PlaceDto.Type.BASE);
-    }
-
-    public List<PlaceDto> list(Collection<Integer> placeIds, int type) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("plids", StringUtils.join(placeIds, ","))
-                .add("type", type);
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("plids", StringUtils.join(placeIds, ","));
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("poi/list"), builder.build());
 
         return CastUtil.toList((JSON) executeRequest(request), PlaceDto.class);

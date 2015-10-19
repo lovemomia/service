@@ -20,17 +20,17 @@ public class PoiController extends BaseController {
     @Autowired private PlaceService placeService;
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public MomiaHttpResponse get(@PathVariable int id, @RequestParam int type) {
-        return MomiaHttpResponse.SUCCESS(placeService.get(id, type));
+    public MomiaHttpResponse get(@PathVariable int id) {
+        return MomiaHttpResponse.SUCCESS(placeService.get(id));
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public MomiaHttpResponse list(@RequestParam String plids, @RequestParam int type) {
+    public MomiaHttpResponse list(@RequestParam String plids) {
         Set<Integer> ids = new HashSet<Integer>();
         for (String id : Splitter.on(",").trimResults().omitEmptyStrings().split(plids)) {
             ids.add(Integer.valueOf(id));
         }
 
-        return MomiaHttpResponse.SUCCESS(placeService.list(ids, type));
+        return MomiaHttpResponse.SUCCESS(placeService.list(ids));
     }
 }

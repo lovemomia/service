@@ -4,104 +4,34 @@ import cn.momia.common.service.DbAccessService;
 import cn.momia.service.poi.Place;
 import cn.momia.service.poi.PlaceImage;
 import cn.momia.service.poi.PlaceService;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowCallbackHandler;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class PlaceServiceImpl extends DbAccessService implements PlaceService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PlaceServiceImpl.class);
-
-    private static final String[] PLACE_FIELDS = { "Id", "CityId", "RegionId", "Name", "Address", "`Desc`", "Cover", "Lng", "Lat" };
-
     @Override
-    public Place get(int id, int type) {
-        String sql = "SELECT " + joinFields() + " FROM SG_Place WHERE Id=? AND Status=1";
-        Place place = jdbcTemplate.query(sql, new Object[]{ id }, new ResultSetExtractor<Place>() {
-            @Override
-            public Place extractData(ResultSet rs) throws SQLException, DataAccessException {
-                return rs.next() ? buildPlace(rs) : Place.NOT_EXIST_PLACE;
-            }
-        });
+    public Place get(int id) {
+        Set<Integer> ids = Sets.newHashSet(id);
+        List<Place> places = list(ids);
 
-        if (place.exists() && type == Place.Type.FULL) place.setImgs(getImgs(id));
-
-        return place;
-    }
-
-    private String joinFields() {
-        return StringUtils.join(PLACE_FIELDS, ",");
-    }
-
-    private Place buildPlace(ResultSet rs) throws SQLException {
-        try {
-            Place place = new Place();
-            place.setId(rs.getInt("Id"));
-            place.setCityId(rs.getInt("CityId"));
-            place.setRegionId(rs.getInt("RegionId"));
-            place.setName(rs.getString("Name"));
-            place.setAddress(rs.getString("Address"));
-            place.setDesc(rs.getString("Desc"));
-            place.setCover(rs.getString("Cover"));
-            place.setLng(rs.getDouble("Lng"));
-            place.setLat(rs.getDouble("Lat"));
-
-            return place;
-        }
-        catch (Exception e) {
-            LOGGER.error("fail to build place: {}", rs.getLong("id"), e);
-            return Place.NOT_EXIST_PLACE;
-        }
-    }
-
-    private List<PlaceImage> getImgs(int id) {
-        final List<PlaceImage> imgs = new ArrayList<PlaceImage>();
-        String sql = "SELECT Url, Width, Height FROM SG_PlaceImg WHERE PlaceId=? AND Status=1 ORDER BY AddTime DESC";
-        jdbcTemplate.query(sql, new Object[] { id }, new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                imgs.add(buildPlaceImage(rs));
-            }
-        });
-
-        return imgs;
-    }
-
-    private PlaceImage buildPlaceImage(ResultSet rs) throws SQLException {
-        PlaceImage img = new PlaceImage();
-        img.setUrl(rs.getString("Url"));
-        img.setWidth(rs.getInt("Width"));
-        img.setHeight(rs.getInt("Height"));
-
-        return img;
+        return places.isEmpty() ? Place.NOT_EXIST_PLACE : places.get(0);
     }
 
     @Override
-    public List<Place> list(Collection<Integer> ids, int type) {
+    public List<Place> list(Collection<Integer> ids) {
         if (ids.isEmpty()) return new ArrayList<Place>();
 
-        final List<Place> places = new ArrayList<Place>();
-        String sql = "SELECT " + joinFields() + " FROM SG_Place WHERE Id IN (" + StringUtils.join(ids, ",") + ") AND Status=1";
-        jdbcTemplate.query(sql, new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                Place place = buildPlace(rs);
-                if (place.exists()) places.add(place);
-            }
-        });
+        String sql = "SELECT * FROM SG_Place WHERE Id IN (" + StringUtils.join(ids, ",") + ") AND Status=1";
+        List<Place> places = queryList(sql, Place.class);
 
-        if (!places.isEmpty() && type == Place.Type.FULL) {
-            Map<Integer, List<PlaceImage>> placeImgsMap = getImgs(ids);
+        if (!places.isEmpty()) {
+            Map<Integer, List<PlaceImage>> placeImgsMap = queryImgs(ids);
             for (Place place : places) {
                 List<PlaceImage> imgs = placeImgsMap.get(place.getId());
                 place.setImgs(imgs == null ? new ArrayList<PlaceImage>() : imgs);
@@ -111,23 +41,18 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
         return places;
     }
 
-    private Map<Integer, List<PlaceImage>> getImgs(Collection<Integer> ids) {
-        final Map<Integer, List<PlaceImage>> placeImgsMap = new HashMap<Integer, List<PlaceImage>>();
-        String sql = "SELECT PlaceId, Url, Width, Height FROM SG_PlaceImg WHERE PlaceId IN (" + StringUtils.join(ids, ",") + ") AND Status=1 ORDER BY AddTime DESC";
-        jdbcTemplate.query(sql, new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                int placeId = rs.getInt("PlaceId");
-                PlaceImage img = buildPlaceImage(rs);
-                List<PlaceImage> imgs = placeImgsMap.get(placeId);
-                if (imgs == null) {
-                    imgs = new ArrayList<PlaceImage>();
-                    placeImgsMap.put(placeId, imgs);
-                }
-                imgs.add(img);
-            }
-        });
+    private Map<Integer, List<PlaceImage>> queryImgs(Collection<Integer> ids) {
+        String sql = "SELECT * FROM SG_PlaceImg WHERE PlaceId IN (" + StringUtils.join(ids, ",") + ") AND Status=1 ORDER BY AddTime DESC";
+        List<PlaceImage> imgs = queryList(sql, PlaceImage.class);
 
-        return placeImgsMap;
+        Map<Integer, List<PlaceImage>> imgsMap = new HashMap<Integer, List<PlaceImage>>();
+        for (int id : ids) {
+            imgsMap.put(id, new ArrayList<PlaceImage>());
+        }
+        for (PlaceImage img : imgs) {
+            imgsMap.get(img.getPlaceId()).add(img);
+        }
+
+        return imgsMap;
     }
 }

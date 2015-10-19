@@ -3,11 +3,6 @@ package cn.momia.service.poi;
 import java.util.List;
 
 public class Place {
-    public static class Type {
-        public static final int BASE = 1;
-        public static final int FULL = 2;
-    }
-
     public static final Place NOT_EXIST_PLACE = new Place();
 
     private int id;

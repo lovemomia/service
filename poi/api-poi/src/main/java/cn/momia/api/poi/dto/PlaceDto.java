@@ -3,11 +3,6 @@ package cn.momia.api.poi.dto;
 import java.util.List;
 
 public class PlaceDto {
-    public static class Type {
-        public static final int BASE = 1;
-        public static final int FULL = 2;
-    }
-
     private int id;
     private int cityId;
     private int regionId;

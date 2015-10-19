@@ -1,9 +1,27 @@
 package cn.momia.service.poi;
 
 public class PlaceImage {
+    private long id;
+    private int placeId;
     private String url;
     private int width;
     private int height;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public int getPlaceId() {
+        return placeId;
+    }
+
+    public void setPlaceId(int placeId) {
+        this.placeId = placeId;
+    }
 
     public String getUrl() {
         return url;
