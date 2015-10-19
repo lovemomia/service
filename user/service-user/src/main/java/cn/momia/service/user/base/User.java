@@ -1,12 +1,9 @@
 package cn.momia.service.user.base;
 
-import cn.momia.common.service.Entity;
-
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class User implements Entity {
+public class User {
     public static class Type {
         public static final int MINI = 1;
         public static final int BASE = 2;
@@ -127,7 +124,6 @@ public class User implements Entity {
         this.token = token;
     }
 
-    @Override
     public boolean exists() {
         return id > 0;
     }

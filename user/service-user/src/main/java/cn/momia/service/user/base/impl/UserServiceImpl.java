@@ -7,21 +7,17 @@ import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserChild;
 import cn.momia.service.user.base.UserService;
-import com.google.common.base.Function;
 import com.google.common.collect.Sets;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -33,56 +29,10 @@ import java.util.Map;
 import java.util.Set;
 
 public class UserServiceImpl extends DbAccessService implements UserService {
-    private static final String[] USER_FIELDS = { "Id", "NickName", "Avatar", "Mobile", "Name", "Sex", "Birthday", "CityId", "RegionId", "Address", "Token" };
-    private static final String[] USER_CHILD_FIELDS = { "Id", "UserId", "Avatar", "Name", "Sex", "Birthday" };
-
-    private Function<ResultSet, User> userFunc =  new Function<ResultSet, User>() {
-        @Override
-        public User apply(ResultSet rs) {
-            try {
-                User user = new User();
-                user.setId(rs.getLong("Id"));
-                user.setNickName(rs.getString("NickName"));
-                user.setAvatar(rs.getString("Avatar"));
-                user.setMobile(rs.getString("Mobile"));
-                user.setName(rs.getString("Name"));
-                user.setSex(rs.getString("Sex"));
-                user.setBirthday(rs.getDate("Birthday"));
-                user.setCityId(rs.getInt("CityId"));
-                user.setRegionId(rs.getInt("RegionId"));
-                user.setAddress(rs.getString("Address"));
-                user.setToken(rs.getString("Token"));
-
-                return user;
-            } catch (Exception e) {
-                return User.NOT_EXIST_USER;
-            }
-        }
-    };
-
-    private Function<ResultSet, UserChild> userChildFunc =  new Function<ResultSet, UserChild>() {
-        @Override
-        public UserChild apply(ResultSet rs) {
-            try {
-                UserChild child = new UserChild();
-                child.setId(rs.getLong("Id"));
-                child.setUserId(rs.getLong("UserId"));
-                child.setAvatar(rs.getString("Avatar"));
-                child.setName(rs.getString("Name"));
-                child.setSex(rs.getString("Sex"));
-                child.setBirthday(rs.getDate("Birthday"));
-
-                return child;
-            } catch (Exception e) {
-                return UserChild.NOT_EXIST_USER_CHILD;
-            }
-        }
-    };
-
     @Override
     public boolean exists(String field, String value) {
         String sql = "SELECT COUNT(1) FROM SG_User WHERE " + field + "=?";
-        return jdbcTemplate.queryForObject(sql, new Object[] { value }, Long.class) > 0;
+        return queryInt(sql, new Object[] { value }) > 0;
     }
 
     @Override
@@ -130,14 +80,8 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public boolean validatePassword(String mobile, String password) {
-        String sql = "SELECT Mobile, Password FROM SG_User WHERE Mobile=? AND Password=?";
-
-        return jdbcTemplate.query(sql, new Object[] { mobile, encryptPassword(mobile, password, Configuration.getString("SecretKey.Password")) }, new ResultSetExtractor<Boolean>() {
-            @Override
-            public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
-                return rs.next();
-            }
-        });
+        String sql = "SELECT COUNT(1) FROM SG_User WHERE Mobile=? AND Password=?";
+        return queryInt(sql, new Object[] { mobile, encryptPassword(mobile, password, Configuration.getString("SecretKey.Password")) }) == 1;
     }
 
     @Override
@@ -152,43 +96,46 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     public List<User> list(Collection<Long> ids) {
         if (ids.isEmpty()) return new ArrayList<User>();
 
-        List<User> users = new ArrayList<User>();
-        String sql = "SELECT " + joinFields() + " FROM SG_User WHERE Id IN (" + StringUtils.join(ids, ",") + ") AND Status=1";
-        jdbcTemplate.query(sql, new ListResultSetExtractor<User>(users, userFunc));
+        String sql = "SELECT * FROM SG_User WHERE Id IN (" + StringUtils.join(ids, ",") + ") AND Status=1";
+        List<User> users = queryList(sql, User.class);
 
         Map<Long, List<UserChild>> childrenMap = queryChildren(ids);
-        for (User user : users) user.setChildren(childrenMap.get(user.getId()));
+        for (User user : users) {
+            user.setChildren(childrenMap.get(user.getId()));
+        }
 
         return users;
-    }
-
-    private String joinFields() {
-        return StringUtils.join(USER_FIELDS, ",");
     }
 
     private Map<Long, List<UserChild>> queryChildren(Collection<Long> ids) {
         if (ids.isEmpty()) return new HashMap<Long, List<UserChild>>();
 
-        List<UserChild> children = new ArrayList<UserChild>();
-        String sql = "SELECT " + joinChildFields() + " FROM SG_UserChild WHERE UserId IN (" + StringUtils.join(ids, ",") + ") AND Status=1";
-        jdbcTemplate.query(sql, new ListResultSetExtractor<UserChild>(children, userChildFunc));
+        String sql = "SELECT Id FROM SG_UserChild WHERE UserId IN (" + StringUtils.join(ids, ",") + ") AND Status=1";
+        List<Long> childIds = queryLongList(sql);
+        List<UserChild> children = listChildren(childIds);
 
         Map<Long, List<UserChild>> childrenMap = new HashMap<Long, List<UserChild>>();
-        for (long id : ids) childrenMap.put(id, new ArrayList<UserChild>());
-        for (UserChild child : children) childrenMap.get(child.getUserId()).add(child);
+        for (long id : ids) {
+            childrenMap.put(id, new ArrayList<UserChild>());
+        }
+        for (UserChild child : children) {
+            childrenMap.get(child.getUserId()).add(child);
+        }
 
         return childrenMap;
     }
 
-    private String joinChildFields() {
-        return StringUtils.join(USER_CHILD_FIELDS, ",");
+    private List<UserChild> listChildren(Collection<Long> childIds) {
+        if (childIds.isEmpty()) return new ArrayList<UserChild>();
+
+        String sql = "SELECT * FROM SG_UserChild WHERE UserId IN (" + StringUtils.join(childIds, ",") + ") AND Status=1";
+        return queryList(sql, UserChild.class);
     }
 
     @Override
     public User getByToken(String token) {
-        List<Long> ids = new ArrayList<Long>();
         String sql = "SELECT Id FROM SG_User WHERE Token=? AND Status=1";
-        jdbcTemplate.query(sql, new Object[] { token }, new LongListResultSetExtractor(ids));
+        List<Long> ids = queryLongList(sql, new Object[] { token });
         List<User> users = list(ids);
 
         return ids.isEmpty() ? User.NOT_EXIST_USER : users.get(0);
@@ -196,9 +143,8 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public User getByMobile(String mobile) {
-        List<Long> ids = new ArrayList<Long>();
         String sql = "SELECT Id FROM SG_User WHERE Mobile=? AND Status=1";
-        jdbcTemplate.query(sql, new Object[] { mobile }, new LongListResultSetExtractor(ids));
+        List<Long> ids = queryLongList(sql, new Object[] { mobile });
         List<User> users = list(ids);
 
         return ids.isEmpty() ? User.NOT_EXIST_USER : users.get(0);
@@ -276,8 +222,10 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public UserChild getChild(long childId) {
-        String sql = "SELECT " + joinChildFields() + " FROM SG_UserChild WHERE Id=? AND Status=1";
-        return jdbcTemplate.query(sql, new Object[] { childId }, new ObjectResultSetExtractor<UserChild>(userChildFunc, UserChild.NOT_EXIST_USER_CHILD));
+        Set<Long> childIds = Sets.newHashSet(childId);
+        List<UserChild> children = listChildren(childIds);
+
+        return children.isEmpty() ? UserChild.NOT_EXIST_USER_CHILD : children.get(0);
     }
 
     @Override

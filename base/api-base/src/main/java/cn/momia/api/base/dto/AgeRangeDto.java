@@ -35,4 +35,8 @@ public class AgeRangeDto {
     public void setMax(int max) {
         this.max = max;
     }
+
+    public String getText() {
+        return min + "-" + max + "岁";
+    }
 }

@@ -1,12 +1,11 @@
 package cn.momia.service.user.base;
 
-import cn.momia.common.service.Entity;
 import cn.momia.common.util.SexUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
-public class UserChild implements Entity {
+public class UserChild {
     public static final UserChild NOT_EXIST_USER_CHILD = new UserChild();
 
     private long id;
@@ -64,7 +63,6 @@ public class UserChild implements Entity {
         this.birthday = birthday;
     }
 
-    @Override
     public boolean exists() {
         return id > 0;
     }
