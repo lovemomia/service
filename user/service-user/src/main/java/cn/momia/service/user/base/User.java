@@ -1,5 +1,7 @@
 package cn.momia.service.user.base;
 
+import cn.momia.service.user.base.child.Child;
+
 import java.util.Date;
 import java.util.List;
 
@@ -26,7 +28,7 @@ public class User {
 
     private String token;
 
-    private List<UserChild> children;
+    private List<Child> children;
 
     public long getId() {
         return id;
@@ -108,20 +110,20 @@ public class User {
         this.address = address;
     }
 
-    public List<UserChild> getChildren() {
-        return children;
-    }
-
-    public void setChildren(List<UserChild> children) {
-        this.children = children;
-    }
-
     public String getToken() {
         return token;
     }
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public List<Child> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<Child> children) {
+        this.children = children;
     }
 
     public boolean exists() {

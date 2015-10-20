@@ -2,7 +2,9 @@ package cn.momia.service.user.web.ctrl;
 
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.service.user.base.User;
-import cn.momia.service.user.base.UserChild;
+import cn.momia.service.user.base.child.Child;
+import cn.momia.service.user.base.child.ChildService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,14 +18,18 @@ import java.util.Date;
 @RestController
 @RequestMapping("/user/child")
 public class ChildController extends UserRelatedController {
+    @Autowired private ChildService childService;
+
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
-    public MomiaHttpResponse addChild(@RequestBody UserChild[] children) {
-        for(UserChild child : children) if (child.isInvalid()) return MomiaHttpResponse.FAILED("添加孩子信息失败");
+    public MomiaHttpResponse addChild(@RequestBody Child[] children) {
+        for(Child child : children) {
+            if (child.isInvalid()) return MomiaHttpResponse.FAILED("添加孩子信息失败");
+        }
 
         long userId = 0;
-        for(UserChild child : children) {
+        for(Child child : children) {
             userId = child.getUserId();
-            userService.addChild(child);
+            childService.add(child);
         }
 
         return MomiaHttpResponse.SUCCESS(buildUserDto(userService.get(userId), User.Type.FULL));
@@ -34,7 +40,7 @@ public class ChildController extends UserRelatedController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
-        UserChild child = userService.getChild(childId);
+        Child child = childService.get(childId);
         if (!child.exists() || child.getUserId() != user.getId()) return MomiaHttpResponse.FAILED("孩子不存在");
 
         return MomiaHttpResponse.SUCCESS(buildUserChildDto(child));
@@ -47,7 +53,7 @@ public class ChildController extends UserRelatedController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
-        if (!userService.updateChildAvatar(user.getId(), childId, avatar)) return MomiaHttpResponse.FAILED("更新孩子头像失败");
+        if (!childService.updateAvatar(user.getId(), childId, avatar)) return MomiaHttpResponse.FAILED("更新孩子头像失败");
 
         return MomiaHttpResponse.SUCCESS(buildUserDto(userService.get(user.getId()), User.Type.FULL));
     }
@@ -59,7 +65,7 @@ public class ChildController extends UserRelatedController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
-        if (!userService.updateChildName(user.getId(), childId, name)) return MomiaHttpResponse.FAILED("更新孩子姓名失败");
+        if (!childService.updateName(user.getId(), childId, name)) return MomiaHttpResponse.FAILED("更新孩子姓名失败");
 
         return MomiaHttpResponse.SUCCESS(buildUserDto(userService.get(user.getId()), User.Type.FULL));
     }
@@ -71,7 +77,7 @@ public class ChildController extends UserRelatedController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
-        if (!userService.updateChildSex(user.getId(), childId, sex)) return MomiaHttpResponse.FAILED("更新孩子性别失败");
+        if (!childService.updateSex(user.getId(), childId, sex)) return MomiaHttpResponse.FAILED("更新孩子性别失败");
 
         return MomiaHttpResponse.SUCCESS(buildUserDto(userService.get(user.getId()), User.Type.FULL));
     }
@@ -83,7 +89,7 @@ public class ChildController extends UserRelatedController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
-        if (!userService.updateChildBirthday(user.getId(), childId, birthday)) return MomiaHttpResponse.FAILED("更新孩子生日失败");
+        if (!childService.updateBirthday(user.getId(), childId, birthday)) return MomiaHttpResponse.FAILED("更新孩子生日失败");
 
         return MomiaHttpResponse.SUCCESS(buildUserDto(userService.get(user.getId()), User.Type.FULL));
     }
@@ -93,7 +99,7 @@ public class ChildController extends UserRelatedController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
-        if (!userService.deleteChild(user.getId(), childId)) return MomiaHttpResponse.FAILED("删除孩子信息失败");
+        if (!childService.delete(user.getId(), childId)) return MomiaHttpResponse.FAILED("删除孩子信息失败");
 
         return MomiaHttpResponse.SUCCESS(buildUserDto(userService.get(user.getId()), User.Type.FULL));
     }

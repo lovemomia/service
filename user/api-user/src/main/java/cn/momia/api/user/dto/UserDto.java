@@ -27,7 +27,7 @@ public class UserDto {
 
     private String token;
 
-    private List<UserChildDto> children;
+    private List<ChildDto> children;
 
     public long getId() {
         return id;
@@ -118,11 +118,11 @@ public class UserDto {
         this.token = token;
     }
 
-    public List<UserChildDto> getChildren() {
+    public List<ChildDto> getChildren() {
         return children;
     }
 
-    public void setChildren(List<UserChildDto> children) {
+    public void setChildren(List<ChildDto> children) {
         this.children = children;
     }
 

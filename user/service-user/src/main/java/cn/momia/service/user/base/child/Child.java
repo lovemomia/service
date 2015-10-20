@@ -1,12 +1,12 @@
-package cn.momia.service.user.base;
+package cn.momia.service.user.base.child;
 
 import cn.momia.common.util.SexUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
-public class UserChild {
-    public static final UserChild NOT_EXIST_USER_CHILD = new UserChild();
+public class Child {
+    public static final Child NOT_EXIST_USER_CHILD = new Child();
 
     private long id;
     private long userId;

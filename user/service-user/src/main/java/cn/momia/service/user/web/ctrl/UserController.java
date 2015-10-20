@@ -41,8 +41,6 @@ public class UserController extends UserRelatedController {
 
     @RequestMapping(value = "/nickname", method = RequestMethod.PUT)
     public MomiaHttpResponse updateNickName(@RequestParam String utoken, @RequestParam(value = "nickname") String nickName) {
-        if (userService.exists("nickName", nickName)) return MomiaHttpResponse.FAILED("昵称已存在，不能使用");
-
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 

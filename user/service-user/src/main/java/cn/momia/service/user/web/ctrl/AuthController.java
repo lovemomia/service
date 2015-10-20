@@ -19,9 +19,6 @@ public class AuthController extends UserRelatedController {
                                       @RequestParam String mobile,
                                       @RequestParam String password,
                                       @RequestParam String code){
-        if (userService.exists("nickName", nickName)) return MomiaHttpResponse.FAILED("昵称已存在，不能使用");
-        if (userService.exists("mobile", mobile)) return MomiaHttpResponse.FAILED("手机号已经注册过");
-
         if (!smsServiceApi.verify(mobile, code)) return MomiaHttpResponse.FAILED("验证码不正确");
 
         long userId = userService.add(nickName, mobile, password);
