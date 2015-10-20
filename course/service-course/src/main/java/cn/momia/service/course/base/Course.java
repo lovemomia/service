@@ -33,6 +33,7 @@ public class Course implements Cloneable {
     private String goal;
     private String flow;
     private String tips;
+    private int institutionId;
     private String institution;
 
     private List<CourseImage> imgs;
@@ -125,6 +126,14 @@ public class Course implements Cloneable {
 
     public void setTips(String tips) {
         this.tips = tips;
+    }
+
+    public int getInstitutionId() {
+        return institutionId;
+    }
+
+    public void setInstitutionId(int institutionId) {
+        this.institutionId = institutionId;
     }
 
     public String getInstitution() {

@@ -4,7 +4,7 @@ public class SortTypeDto {
     public static final SortTypeDto DEFAULT = new SortTypeDto();
     static {
         DEFAULT.setId(0);
-        DEFAULT.setText("无");
+        DEFAULT.setText("默认");
     }
 
     private int id;

@@ -36,4 +36,5 @@ public interface CourseService {
     boolean unfavor(long userId, long courseId);
 
     CourseDetail getDetail(long courseId);
+    Institution getInstitution(long courseId);
 }

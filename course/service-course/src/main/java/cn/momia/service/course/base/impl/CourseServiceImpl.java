@@ -11,6 +11,7 @@ import cn.momia.service.course.base.CourseImage;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.base.CourseSku;
 import cn.momia.service.course.base.CourseSkuPlace;
+import cn.momia.service.course.base.Institution;
 import cn.momia.service.course.base.Teacher;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -46,20 +47,41 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     public List<Course> list(Collection<Long> courseIds) {
         if (courseIds.isEmpty()) return new ArrayList<Course>();
 
-        String sql = "SELECT Id, SubjectId, Title, Cover, MinAge, MaxAge, Joined, Price, Goal, Flow, Tips, Institution FROM SG_Course WHERE Id IN (" + StringUtils.join(courseIds, ",") + ") AND Status=1";
+        String sql = "SELECT Id, SubjectId, Title, Cover, MinAge, MaxAge, Joined, Price, Goal, Flow, Tips, InstitutionId FROM SG_Course WHERE Id IN (" + StringUtils.join(courseIds, ",") + ") AND Status=1";
         List<Course> courses = queryList(sql, Course.class);
 
-        Map<Long, List<CourseSku>> skusMap = querySkus(courseIds);
+        Set<Integer> institutionIds = new HashSet<Integer>();
+        for (Course course : courses) {
+            institutionIds.add(course.getInstitutionId());
+        }
+        Map<Integer, Institution> institutionsMap = queryInstitutions(institutionIds);
         Map<Long, List<CourseImage>> imgsMap = queryImgs(courseIds);
         Map<Long, CourseBook> booksMap = queryBooks(courseIds);
+        Map<Long, List<CourseSku>> skusMap = querySkus(courseIds);
 
         for (Course course : courses) {
+            Institution institution = institutionsMap.get(course.getInstitutionId());
+            if (institution != null) course.setInstitution(institution.getIntro());
             course.setImgs(imgsMap.get(course.getId()));
             course.setBook(booksMap.get(course.getId()));
             course.setSkus(skusMap.get(course.getId()));
         }
 
         return courses;
+    }
+
+    private Map<Integer, Institution> queryInstitutions(Collection<Integer> institutionIds) {
+        if (institutionIds.isEmpty()) return new HashMap<Integer, Institution>();
+
+        String sql = "SELECT Id, Name, Cover, Intro FROM SG_Institution WHERE Id IN (" + StringUtils.join(institutionIds, ",") + ") AND Status=1";
+        List<Institution> institutions = queryList(sql, Institution.class);
+
+        Map<Integer, Institution> institutionsMap = new HashMap<Integer, Institution>();
+        for (Institution institution : institutions) {
+            institutionsMap.put(institution.getId(), institution);
+        }
+
+        return institutionsMap;
     }
 
     private Map<Long, List<CourseImage>> queryImgs(Collection<Long> courseIds) {
@@ -378,5 +400,11 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     public CourseDetail getDetail(long courseId) {
         String sql = "SELECT Id, CourseId, Abstracts, Detail FROM SG_CourseDetail WHERE CourseId=? AND Status=1";
         return queryObject(sql, new Object[] { courseId }, CourseDetail.class, CourseDetail.NOT_EXIST_COURSE_DETAIL);
+    }
+
+    @Override
+    public Institution getInstitution(long courseId) {
+        String sql = "SELECT B.Id, B.Name, B.Cover, B.Intro FROM SG_Course A INNER JOIN SG_Institution B ON A.InstitutionId=B.Id WHERE A.Id=? AND A.Status=1 AND B.Status=1";
+        return queryObject(sql, new Object[] { courseId }, Institution.class, Institution.NOT_EXIST_INSTITUTION);
     }
 }

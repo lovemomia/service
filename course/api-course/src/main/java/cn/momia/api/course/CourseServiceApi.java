@@ -3,6 +3,7 @@ package cn.momia.api.course;
 import cn.momia.api.course.dto.CourseDetailDto;
 import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.DatedCourseSkusDto;
+import cn.momia.api.course.dto.InstitutionDto;
 import cn.momia.api.course.dto.TeacherDto;
 import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.dto.PagedList;
@@ -18,11 +19,6 @@ public class CourseServiceApi extends ServiceApi {
     public CourseDto get(long courseId) {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId));
         return CastUtil.toObject((JSON) executeRequest(request), CourseDto.class);
-    }
-
-    public CourseDetailDto detail(long courseId) {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "detail"));
-        return CastUtil.toObject((JSON) executeRequest(request), CourseDetailDto.class);
     }
 
     public PagedList<CourseDto> query(long subjectId, int start, int count) {
@@ -48,16 +44,9 @@ public class CourseServiceApi extends ServiceApi {
         return CastUtil.toPagedList((JSON) executeRequest(request), CourseDto.class);
     }
 
-    public List<DatedCourseSkusDto> listWeekSkus(long courseId) {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "sku/week"));
-        return CastUtil.toList((JSON) executeRequest(request), DatedCourseSkusDto.class);
-    }
-
-    public List<DatedCourseSkusDto> listMonthSkus(long courseId, int month) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("month", month);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "sku/month"), builder.build());
-
-        return CastUtil.toList((JSON) executeRequest(request), DatedCourseSkusDto.class);
+    public CourseDetailDto detail(long courseId) {
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "detail"));
+        return CastUtil.toObject((JSON) executeRequest(request), CourseDetailDto.class);
     }
 
     public PagedList<String> book(long courseId, int start, int count) {
@@ -76,6 +65,23 @@ public class CourseServiceApi extends ServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "teacher"), builder.build());
 
         return CastUtil.toPagedList((JSON) executeRequest(request), TeacherDto.class);
+    }
+
+    public InstitutionDto institution(long courseId) {
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "institution"));
+        return CastUtil.toObject((JSON) executeRequest(request), InstitutionDto.class);
+    }
+
+    public List<DatedCourseSkusDto> listWeekSkus(long courseId) {
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "sku/week"));
+        return CastUtil.toList((JSON) executeRequest(request), DatedCourseSkusDto.class);
+    }
+
+    public List<DatedCourseSkusDto> listMonthSkus(long courseId, int month) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("month", month);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "sku/month"), builder.build());
+
+        return CastUtil.toList((JSON) executeRequest(request), DatedCourseSkusDto.class);
     }
 
     public PagedList<CourseDto> queryNotFinishedByUser(long userId, int start, int count) {

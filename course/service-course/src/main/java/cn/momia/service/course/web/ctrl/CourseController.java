@@ -17,6 +17,7 @@ import cn.momia.service.course.base.CourseImage;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.base.CourseSku;
 import cn.momia.service.course.base.CourseSkuPlace;
+import cn.momia.service.course.base.Institution;
 import cn.momia.service.course.base.Teacher;
 import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +87,7 @@ public class CourseController extends BaseController {
     }
 
     private CourseBookDto buildCourseBookDto(CourseBook book) {
-        if (book == null) return null;
+        if (book == null || book.getImgs().isEmpty()) return null;
 
         CourseBookDto courseBookDto = new CourseBookDto();
         courseBookDto.setImgs(book.getImgs());
@@ -97,24 +98,6 @@ public class CourseController extends BaseController {
     private CoursePlaceDto buildCoursePlaceDto(List<CourseSku> skus) {
         // TODO
         return null;
-    }
-
-    @RequestMapping(value = "/{coid}/detail", method = RequestMethod.GET)
-    public MomiaHttpResponse detail(@PathVariable(value = "coid") long courseId) {
-        CourseDetail courseDetail = courseService.getDetail(courseId);
-        if (!courseDetail.exists()) return MomiaHttpResponse.FAILED("课程详情不存在");
-
-        return MomiaHttpResponse.SUCCESS(buildCourseDetailDto(courseDetail));
-    }
-
-    private CourseDetailDto buildCourseDetailDto(CourseDetail detail) {
-        CourseDetailDto courseDetailDto = new CourseDetailDto();
-        courseDetailDto.setId(detail.getId());
-        courseDetailDto.setCourseId(detail.getCourseId());
-        courseDetailDto.setAbstracts(detail.getAbstracts());
-        courseDetailDto.setDetail(JSON.parseArray(detail.getDetail()));
-
-        return courseDetailDto;
     }
 
     @RequestMapping(value = "/query", method = RequestMethod.GET)
@@ -147,6 +130,52 @@ public class CourseController extends BaseController {
         }
 
         return courseDtos;
+    }
+
+    @RequestMapping(value = "/{coid}/detail", method = RequestMethod.GET)
+    public MomiaHttpResponse detail(@PathVariable(value = "coid") long courseId) {
+        CourseDetail courseDetail = courseService.getDetail(courseId);
+        if (!courseDetail.exists()) return MomiaHttpResponse.FAILED("课程详情不存在");
+
+        return MomiaHttpResponse.SUCCESS(buildCourseDetailDto(courseDetail));
+    }
+
+    private CourseDetailDto buildCourseDetailDto(CourseDetail detail) {
+        CourseDetailDto courseDetailDto = new CourseDetailDto();
+        courseDetailDto.setId(detail.getId());
+        courseDetailDto.setCourseId(detail.getCourseId());
+        courseDetailDto.setAbstracts(detail.getAbstracts());
+        courseDetailDto.setDetail(JSON.parseArray(detail.getDetail()));
+
+        return courseDetailDto;
+    }
+
+    @RequestMapping(value = "/{coid}/institution", method = RequestMethod.GET)
+    public MomiaHttpResponse institution(@PathVariable(value = "coid") long courseId) {
+        Institution institution = courseService.getInstitution(courseId);
+        if (!institution.exists()) return MomiaHttpResponse.FAILED("机构不存在");
+
+        return MomiaHttpResponse.SUCCESS(institution);
+    }
+
+    @RequestMapping(value = "/{coid}/book", method = RequestMethod.GET)
+    public MomiaHttpResponse book(@PathVariable(value = "coid") long courseId, @RequestParam int start, @RequestParam int count) {
+        long totalCount = courseService.queryBookImgCount(courseId);
+        List<String> bookImgs = courseService.queryBookImgs(courseId, start, count);
+        PagedList<String> pagedBookImgs = new PagedList<String>(totalCount, start, count);
+        pagedBookImgs.setList(bookImgs);
+
+        return MomiaHttpResponse.SUCCESS(pagedBookImgs);
+    }
+
+    @RequestMapping(value = "/{coid}/teacher", method = RequestMethod.GET)
+    public MomiaHttpResponse teacher(@PathVariable(value = "coid") long courseId, @RequestParam int start, @RequestParam int count) {
+        long totalCount = courseService.queryTeacherCount(courseId);
+        List<Teacher> teachers = courseService.queryTeachers(courseId, start, count);
+        PagedList<Teacher> pagedTeachers = new PagedList<Teacher>(totalCount, start, count);
+        pagedTeachers.setList(teachers);
+
+        return MomiaHttpResponse.SUCCESS(pagedTeachers);
     }
 
     @RequestMapping(value = "/{coid}/sku/week", method = RequestMethod.GET)
@@ -256,26 +285,6 @@ public class CourseController extends BaseController {
 
         if (month < currentMonth || nextMonth < month) return String.format("%d-%02d", currentYear + 1, nextMonth);
         return String.format("%d-%02d", currentYear, nextMonth);
-    }
-
-    @RequestMapping(value = "/{coid}/book", method = RequestMethod.GET)
-    public MomiaHttpResponse book(@PathVariable(value = "coid") long courseId, @RequestParam int start, @RequestParam int count) {
-        long totalCount = courseService.queryBookImgCount(courseId);
-        List<String> bookImgs = courseService.queryBookImgs(courseId, start, count);
-        PagedList<String> pagedBookImgs = new PagedList<String>(totalCount, start, count);
-        pagedBookImgs.setList(bookImgs);
-
-        return MomiaHttpResponse.SUCCESS(pagedBookImgs);
-    }
-
-    @RequestMapping(value = "/{coid}/teacher", method = RequestMethod.GET)
-    public MomiaHttpResponse teacher(@PathVariable(value = "coid") long courseId, @RequestParam int start, @RequestParam int count) {
-        long totalCount = courseService.queryTeacherCount(courseId);
-        List<Teacher> teachers = courseService.queryTeachers(courseId, start, count);
-        PagedList<Teacher> pagedTeachers = new PagedList<Teacher>(totalCount, start, count);
-        pagedTeachers.setList(teachers);
-
-        return MomiaHttpResponse.SUCCESS(pagedTeachers);
     }
 
     @RequestMapping(value = "/notfinished", method = RequestMethod.GET)
