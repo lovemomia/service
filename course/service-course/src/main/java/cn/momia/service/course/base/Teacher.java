@@ -1,8 +1,6 @@
 package cn.momia.service.course.base;
 
-import cn.momia.common.service.Entity;
-
-public class Teacher implements Entity {
+public class Teacher {
     public static final Teacher NOT_EXIST_TEACHER = new Teacher();
 
     private int id;
@@ -51,7 +49,6 @@ public class Teacher implements Entity {
         this.experience = experience;
     }
 
-    @Override
     public boolean exists() {
         return id > 0;
     }

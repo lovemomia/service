@@ -1,8 +1,6 @@
 package cn.momia.service.course.base;
 
-import cn.momia.common.service.Entity;
-
-public class CourseBookImage implements Entity {
+public class CourseBookImage {
     public static final CourseBookImage NOT_EXIST_COURSE_BOOK_IMAGE = new CourseBookImage();
 
     private long id;
@@ -42,7 +40,6 @@ public class CourseBookImage implements Entity {
         this.order = order;
     }
 
-    @Override
     public boolean exists() {
         return id > 0;
     }

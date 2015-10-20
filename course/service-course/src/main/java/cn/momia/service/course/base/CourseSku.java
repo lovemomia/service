@@ -1,10 +1,8 @@
 package cn.momia.service.course.base;
 
-import cn.momia.common.service.Entity;
-
 import java.util.Date;
 
-public class CourseSku implements Entity {
+public class CourseSku {
     public static final CourseSku NOT_EXIST_COURSE_SKU = new CourseSku();
 
     private long id;

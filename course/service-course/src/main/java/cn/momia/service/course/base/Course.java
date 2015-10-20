@@ -2,7 +2,6 @@ package cn.momia.service.course.base;
 
 import cn.momia.api.base.dto.RegionDto;
 import cn.momia.common.api.exception.MomiaFailedException;
-import cn.momia.common.service.Entity;
 import cn.momia.common.util.TimeUtil;
 
 import java.math.BigDecimal;
@@ -13,7 +12,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-public class Course implements Entity, Cloneable {
+public class Course implements Cloneable {
     public static final Course NOT_EXIST_COURSE = new Course();
 
     public static class Type {
@@ -169,7 +168,6 @@ public class Course implements Entity, Cloneable {
         }
     }
 
-    @Override
     public boolean exists() {
         return id > 0;
     }

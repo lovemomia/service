@@ -1,7 +1,5 @@
 package cn.momia.service.course.subject.order;
 
-import cn.momia.common.service.Entity;
-import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectSku;
 
 import java.math.BigDecimal;
@@ -9,7 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class Order implements Entity {
+public class Order {
     public static class Status {
         public static final int DELETED = 0;
         public static final int NOT_PAYED = 1; // 已下单未付款
@@ -96,7 +94,6 @@ public class Order implements Entity {
         this.addTime = addTime;
     }
 
-    @Override
     public boolean exists() {
         return id > 0;
     }

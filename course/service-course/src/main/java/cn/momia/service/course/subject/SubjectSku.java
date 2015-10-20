@@ -1,10 +1,8 @@
 package cn.momia.service.course.subject;
 
-import cn.momia.common.service.Entity;
-
 import java.math.BigDecimal;
 
-public class SubjectSku implements Entity, Cloneable {
+public class SubjectSku implements Cloneable {
     public static final SubjectSku NOT_EXIST_SUBJECT_SKU = new SubjectSku();
 
     private long id;
@@ -98,7 +96,6 @@ public class SubjectSku implements Entity, Cloneable {
         this.timeUnit = timeUnit;
     }
 
-    @Override
     public boolean exists() {
         return id > 0;
     }

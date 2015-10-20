@@ -1,13 +1,8 @@
 package cn.momia.service.course.subject;
 
-import cn.momia.common.service.Entity;
-import com.alibaba.fastjson.JSONArray;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
-public class Subject implements Entity {
+public class Subject {
     public static class Type {
         public static final int NORMAL = 1;
         public static final int FREE = 2;
@@ -97,7 +92,6 @@ public class Subject implements Entity {
         this.skus = skus;
     }
 
-    @Override
     public boolean exists() {
         return id > 0;
     }

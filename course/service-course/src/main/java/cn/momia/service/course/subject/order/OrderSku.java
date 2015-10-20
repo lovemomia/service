@@ -1,10 +1,8 @@
 package cn.momia.service.course.subject.order;
 
-import cn.momia.common.service.Entity;
-
 import java.math.BigDecimal;
 
-public class OrderSku implements Entity {
+public class OrderSku {
     public static final OrderSku NOT_EXIST_ORDER_SKU = new OrderSku();
 
     private long id;
@@ -62,7 +60,6 @@ public class OrderSku implements Entity {
         this.bookableCount = bookableCount;
     }
 
-    @Override
     public boolean exists() {
         return id > 0;
     }

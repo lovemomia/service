@@ -1,8 +1,6 @@
 package cn.momia.service.course.subject;
 
-import cn.momia.common.service.Entity;
-
-public class SubjectImage implements Entity {
+public class SubjectImage {
     public static final SubjectImage NOT_EXIST_SUBJECT_IMAGE = new SubjectImage();
 
     private long id;
@@ -51,7 +49,6 @@ public class SubjectImage implements Entity {
         this.height = height;
     }
 
-    @Override
     public boolean exists() {
         return id > 0;
     }
