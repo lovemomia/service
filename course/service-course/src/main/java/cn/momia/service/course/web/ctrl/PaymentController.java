@@ -67,7 +67,7 @@ public class PaymentController extends BaseController {
         prepayParam.setOrderId(order.getId());
         prepayParam.setProductId(subject.getId());
         prepayParam.setProductTitle(subject.getTitle());
-        prepayParam.setProductUrl(Configuration.getString("AppConf.WapDomain") + "/m/subject/" + order.getSubjectId());  // TODO url
+        prepayParam.setProductUrl(Configuration.getString("AppConf.ProductUrl") + order.getSubjectId());
 
         switch (payType) {
             case PayType.ALIPAY:
