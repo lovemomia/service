@@ -1,11 +1,20 @@
 package cn.momia.api.course.dto;
 
 public class OrderSkuDto {
+    private long packageId;
     private long subjectId;
     private String title;
     private String cover;
     private int bookableCourseCount;
     private String expireTime;
+
+    public long getPackageId() {
+        return packageId;
+    }
+
+    public void setPackageId(long packageId) {
+        this.packageId = packageId;
+    }
 
     public long getSubjectId() {
         return subjectId;

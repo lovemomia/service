@@ -70,7 +70,9 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         for (SubjectSku sku : order.getSkus()) {
             int count = order.getCounts().get(sku.getId());
             if (count <= 0) continue;
-            args.add(new Object[] { orderId, sku.getId(), sku.getPrice(), count, sku.getCourseCount() * count  });
+            for (int i = 0; i < count; i++) {
+                args.add(new Object[] { orderId, sku.getId(), sku.getPrice(), 1, sku.getCourseCount() });
+            }
         }
         jdbcTemplate.batchUpdate(sql, args);
     }

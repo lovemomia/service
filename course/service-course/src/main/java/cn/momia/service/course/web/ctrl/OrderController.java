@@ -125,6 +125,7 @@ public class OrderController extends BaseController {
             if (subject == null) continue;
 
             OrderSkuDto orderSkuDto = new OrderSkuDto();
+            orderSkuDto.setPackageId(orderSku.getId());
             orderSkuDto.setSubjectId(order.getSubjectId());
             orderSkuDto.setTitle(subject.getTitle());
             orderSkuDto.setCover(subject.getCover());
