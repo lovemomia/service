@@ -25,7 +25,8 @@ public class Order {
     private long subjectId;
     private List<SubjectSku> skus;
     private Map<Long, Integer> counts;
-    private OrderContact contact;
+    private String contact;
+    private String mobile;
 
     private int status;
     private Date addTime;
@@ -70,12 +71,20 @@ public class Order {
         this.counts = counts;
     }
 
-    public OrderContact getContact() {
+    public String getContact() {
         return contact;
     }
 
-    public void setContact(OrderContact contact) {
+    public void setContact(String contact) {
         this.contact = contact;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 
     public int getStatus() {

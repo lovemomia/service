@@ -20,6 +20,7 @@ import org.springframework.transaction.support.TransactionCallback;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -49,8 +50,8 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setLong(1, order.getUserId());
                 ps.setLong(2, order.getSubjectId());
-                ps.setString(3, order.getContact().getName());
-                ps.setString(4, order.getContact().getMobile());
+                ps.setString(3, order.getContact());
+                ps.setString(4, order.getMobile());
 
                 return ps;
             }
@@ -87,7 +88,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     public List<Order> list(Collection<Long> ids) {
         if (ids.isEmpty()) return new ArrayList<Order>();
 
-        String sql = "SELECT * FROM SG_SubjectOrder WHERE Id IN (" + StringUtils.join(ids, ",") + ") AND Status>0";
+        String sql = "SELECT Id, UserId, SubjectId, Contact, Mobile, Status, AddTime FROM SG_SubjectOrder WHERE Id IN (" + StringUtils.join(ids, ",") + ") AND Status>0";
         List<Order> orders = queryList(sql, Order.class);
 
         Map<Long, List<OrderSku>> orderSkusMap = queryOrderSkus(ids);
@@ -121,8 +122,9 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     private Map<Long, List<OrderSku>> queryOrderSkus(Collection<Long> ids) {
         if (ids.isEmpty()) return new HashMap<Long, List<OrderSku>>();
 
-        String sql = "SELECT * FROM SG_SubjectOrderSku WHERE OrderId IN (" + StringUtils.join(ids, ",") + ") AND Status=1";
-        List<OrderSku> orderSkus = queryList(sql, OrderSku.class);
+        String sql = "SELECT Id FROM SG_SubjectOrderSku WHERE OrderId IN (" + StringUtils.join(ids, ",") + ") AND Status=1";
+        List<Long> orderSkuIds = queryLongList(sql);
+        List<OrderSku> orderSkus = listOrderSkus(orderSkuIds);
 
         Map<Long, List<OrderSku>> orderSkusMap = new HashMap<Long, List<OrderSku>>();
         for (long id : ids) orderSkusMap.put(id, new ArrayList<OrderSku>());
@@ -181,7 +183,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     private List<OrderSku> listOrderSkus(List<Long> orderSkuIds) {
         if (orderSkuIds.isEmpty()) return new ArrayList<OrderSku>();
 
-        String sql = "SELECT * FROM SG_SubjectOrderSku WHERE Id IN (" + StringUtils.join(orderSkuIds, ",") + ") AND Status=1";
+        String sql = "SELECT Id, OrderId, SkuId, Price, Count, BookableCount FROM SG_SubjectOrderSku WHERE Id IN (" + StringUtils.join(orderSkuIds, ",") + ") AND Status=1";
         List<OrderSku> orderSkus = queryList(sql, OrderSku.class);
 
         return orderSkus;

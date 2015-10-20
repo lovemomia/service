@@ -156,7 +156,7 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     @Override
     public List<String> queryBookImgs(long id, int start, int count) {
         String sql = "SELECT Img FROM SG_CourseBook WHERE CourseId=? AND Status=1 ORDER BY `Order` ASC LIMIT ?,?";
-        return queryList(sql, new Object[] { id, start, count }, String.class);
+        return queryStringList(sql, new Object[] { id, start, count });
     }
 
     @Override

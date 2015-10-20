@@ -3,6 +3,7 @@ package cn.momia.service.user.web.ctrl;
 import cn.momia.api.user.dto.ContactDto;
 import cn.momia.api.user.dto.ChildDto;
 import cn.momia.api.user.dto.UserDto;
+import cn.momia.common.util.MobileUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.child.Child;
@@ -30,7 +31,7 @@ public abstract class UserRelatedController extends BaseController {
             case User.Type.FULL:
                 userDto.setChildren(buildUserDtos(user.getChildren()));
             case User.Type.BASE:
-                userDto.setMobile(user.getMobile());
+                userDto.setMobile(MobileUtil.encrypt(user.getMobile()));
                 userDto.setName(user.getName());
                 userDto.setSex(user.getSex());
                 userDto.setBirthday(user.getBirthday());

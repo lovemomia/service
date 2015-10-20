@@ -41,6 +41,16 @@ public class SubjectServiceApi extends ServiceApi {
         return CastUtil.toObject((JSON) executeRequest(request), OrderDto.class);
     }
 
+    public PagedList<OrderSkuDto> listBookableOrders(String utoken, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("start", start)
+                .add("count", count);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/order/bookable"), builder.build());
+
+        return CastUtil.toPagedList((JSON) executeRequest(request), OrderSkuDto.class);
+    }
+
     public PagedList<OrderDto> listOrders(String utoken, int status, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -50,15 +60,5 @@ public class SubjectServiceApi extends ServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/order/list"), builder.build());
 
         return CastUtil.toPagedList((JSON) executeRequest(request), OrderDto.class);
-    }
-
-    public PagedList<OrderSkuDto> listBookableOrders(String utoken, int start, int count) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("utoken", utoken)
-                .add("start", start)
-                .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/order/bookable"), builder.build());
-
-        return CastUtil.toPagedList((JSON) executeRequest(request), OrderSkuDto.class);
     }
 }

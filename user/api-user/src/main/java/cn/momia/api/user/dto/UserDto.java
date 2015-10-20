@@ -1,6 +1,5 @@
 package cn.momia.api.user.dto;
 
-import cn.momia.common.util.MobileUtil;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
@@ -54,7 +53,7 @@ public class UserDto {
     }
 
     public String getMobile() {
-        return MobileUtil.encrypt(mobile);
+        return mobile;
     }
 
     public void setMobile(String mobile) {

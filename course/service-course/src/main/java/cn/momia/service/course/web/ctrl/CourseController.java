@@ -48,9 +48,9 @@ public class CourseController extends BaseController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public MomiaHttpResponse get(@PathVariable long id) {
         Course course = courseService.get(id);
-        CourseDto courseDto = buildCourseDto(course, Course.Type.FULL);
+        if (!course.exists()) return MomiaHttpResponse.FAILED("课程不存在");
 
-        return MomiaHttpResponse.SUCCESS(courseDto);
+        return MomiaHttpResponse.SUCCESS(buildCourseDto(course, Course.Type.FULL));
     }
 
     private CourseDto buildCourseDto(Course course, int type) {

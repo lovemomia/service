@@ -152,6 +152,8 @@ public class SubjectController extends BaseController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public MomiaHttpResponse get(@PathVariable long id) {
         Subject subject = subjectService.get(id);
+        if (!subject.exists()) return MomiaHttpResponse.FAILED("课程体系不存在");
+
         List<Course> courses = courseService.queryAllBySubject(subject.getId());
 
         return MomiaHttpResponse.SUCCESS(buildSubjectDto(subject, courses));
