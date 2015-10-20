@@ -34,4 +34,6 @@ public interface CourseService {
     boolean isFavored(long userId, long courseId);
     boolean favor(long userId, long courseId);
     boolean unfavor(long userId, long courseId);
+
+    CourseDetail getDetail(long courseId);
 }

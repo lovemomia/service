@@ -1,5 +1,6 @@
 package cn.momia.api.course;
 
+import cn.momia.api.course.dto.CourseDetailDto;
 import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.DatedCourseSkusDto;
 import cn.momia.api.course.dto.TeacherDto;
@@ -17,6 +18,11 @@ public class CourseServiceApi extends ServiceApi {
     public CourseDto get(long courseId) {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId));
         return CastUtil.toObject((JSON) executeRequest(request), CourseDto.class);
+    }
+
+    public CourseDetailDto detail(long courseId) {
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "detail"));
+        return CastUtil.toObject((JSON) executeRequest(request), CourseDetailDto.class);
     }
 
     public PagedList<CourseDto> query(long subjectId, int start, int count) {

@@ -6,6 +6,7 @@ import cn.momia.common.service.DbAccessService;
 import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseBook;
 import cn.momia.service.course.base.CourseBookImage;
+import cn.momia.service.course.base.CourseDetail;
 import cn.momia.service.course.base.CourseImage;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.base.CourseSku;
@@ -371,5 +372,11 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     public boolean unfavor(long userId, long courseId) {
         String sql = "UPDATE SG_Favorite SET Status=0 WHERE UserId=? AND `Type`=1 AND RefId=?";
         return jdbcTemplate.update(sql, new Object[] { userId, courseId }) > 0;
+    }
+
+    @Override
+    public CourseDetail getDetail(long courseId) {
+        String sql = "SELECT Id, CourseId, Abstracts, Detail FROM SG_CourseDetail WHERE CourseId=? AND Status=1";
+        return queryObject(sql, new Object[] { courseId }, CourseDetail.class, CourseDetail.NOT_EXIST_COURSE_DETAIL);
     }
 }

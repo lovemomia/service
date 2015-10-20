@@ -2,6 +2,7 @@ package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.base.MetaUtil;
 import cn.momia.api.course.dto.CourseBookDto;
+import cn.momia.api.course.dto.CourseDetailDto;
 import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.CoursePlaceDto;
 import cn.momia.api.course.dto.CourseSkuDto;
@@ -11,11 +12,13 @@ import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseBook;
+import cn.momia.service.course.base.CourseDetail;
 import cn.momia.service.course.base.CourseImage;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.base.CourseSku;
 import cn.momia.service.course.base.CourseSkuPlace;
 import cn.momia.service.course.base.Teacher;
+import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -94,6 +97,24 @@ public class CourseController extends BaseController {
     private CoursePlaceDto buildCoursePlaceDto(List<CourseSku> skus) {
         // TODO
         return null;
+    }
+
+    @RequestMapping(value = "/{coid}/detail", method = RequestMethod.GET)
+    public MomiaHttpResponse detail(@PathVariable(value = "coid") long courseId) {
+        CourseDetail courseDetail = courseService.getDetail(courseId);
+        if (!courseDetail.exists()) return MomiaHttpResponse.FAILED("课程详情不存在");
+
+        return MomiaHttpResponse.SUCCESS(buildCourseDetailDto(courseDetail));
+    }
+
+    private CourseDetailDto buildCourseDetailDto(CourseDetail detail) {
+        CourseDetailDto courseDetailDto = new CourseDetailDto();
+        courseDetailDto.setId(detail.getId());
+        courseDetailDto.setCourseId(detail.getCourseId());
+        courseDetailDto.setAbstracts(detail.getAbstracts());
+        courseDetailDto.setDetail(JSON.parseArray(detail.getDetail()));
+
+        return courseDetailDto;
     }
 
     @RequestMapping(value = "/query", method = RequestMethod.GET)
