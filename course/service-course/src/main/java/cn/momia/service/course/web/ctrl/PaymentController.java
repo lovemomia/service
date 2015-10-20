@@ -13,6 +13,7 @@ import cn.momia.common.deal.gateway.PrepayParam;
 import cn.momia.common.deal.gateway.PrepayResult;
 import cn.momia.common.deal.gateway.factory.CallbackParamFactory;
 import cn.momia.common.deal.gateway.factory.PaymentGatewayFactory;
+import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.webapp.util.RequestUtil;
 import cn.momia.service.course.subject.Subject;
@@ -66,7 +67,7 @@ public class PaymentController extends BaseController {
         prepayParam.setOrderId(order.getId());
         prepayParam.setProductId(subject.getId());
         prepayParam.setProductTitle(subject.getTitle());
-        prepayParam.setProductUrl("");  // TODO url
+        prepayParam.setProductUrl(Configuration.getString("AppConf.WapDomain") + "/m/subject/" + order.getSubjectId());  // TODO url
 
         switch (payType) {
             case PayType.ALIPAY:
