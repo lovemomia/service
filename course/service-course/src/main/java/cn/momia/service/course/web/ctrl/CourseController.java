@@ -7,6 +7,8 @@ import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.CoursePlaceDto;
 import cn.momia.api.course.dto.CourseSkuDto;
 import cn.momia.api.course.dto.DatedCourseSkusDto;
+import cn.momia.api.user.UserServiceApi;
+import cn.momia.api.user.dto.UserDto;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
@@ -20,6 +22,7 @@ import cn.momia.service.course.base.CourseSkuPlace;
 import cn.momia.service.course.base.Institution;
 import cn.momia.service.course.base.Teacher;
 import com.alibaba.fastjson.JSON;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,6 +47,7 @@ public class CourseController extends BaseController {
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     @Autowired private CourseService courseService;
+    @Autowired private UserServiceApi userServiceApi;
 
     @RequestMapping(value = "/{coid}", method = RequestMethod.GET)
     public MomiaHttpResponse get(@PathVariable(value = "coid") long courseId) {
@@ -309,6 +313,14 @@ public class CourseController extends BaseController {
         pagedCourseDtos.setList(courseDtos);
 
         return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
+    }
+
+    @RequestMapping(value = "/booking", method = RequestMethod.POST)
+    public MomiaHttpResponse booking(@RequestParam String utoken,
+                                     @RequestParam(value = "pkgid") long packageId,
+                                     @RequestParam(value = "sid") long skuId) {
+        UserDto user = userServiceApi.get(utoken);
+        return MomiaHttpResponse.SUCCESS(courseService.booking(user.getId(), packageId, skuId));
     }
 
     @RequestMapping(value = "/{coid}/favored", method = RequestMethod.GET)

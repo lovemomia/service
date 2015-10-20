@@ -367,6 +367,11 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     }
 
     @Override
+    public boolean booking(long userId, long packageId, long skuId) {
+        return false;
+    }
+
+    @Override
     public boolean isFavored(long userId, long courseId) {
         String sql = "SELECT COUNT(1) FROM SG_Favorite WHERE UserId=? AND `Type`=1 AND RefId=? AND Status=1";
         return queryInt(sql, new Object[] { userId, courseId }) > 0;
