@@ -24,19 +24,13 @@ public class UserController extends UserRelatedController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL));
+        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public MomiaHttpResponse getUser(@PathVariable long id) {
         User user = userService.get(id);
         return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL, false));
-    }
-
-    @RequestMapping(value = "/{id}/exists", method = RequestMethod.GET)
-    public MomiaHttpResponse exists(@PathVariable long id) {
-        User user = userService.get(id);
-        return MomiaHttpResponse.SUCCESS(user.exists());
     }
 
     @RequestMapping(value = "/nickname", method = RequestMethod.PUT)
@@ -51,7 +45,7 @@ public class UserController extends UserRelatedController {
         }
 
         user.setNickName(nickName);
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL));
+        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
     }
 
     @RequestMapping(value = "/avatar", method = RequestMethod.PUT)
@@ -63,7 +57,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return MomiaHttpResponse.FAILED("更新用户头像失败");
 
         user.setAvatar(avatar);
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL));
+        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
     }
 
     @RequestMapping(value = "/name", method = RequestMethod.PUT)
@@ -75,7 +69,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return MomiaHttpResponse.FAILED("更新用户名字失败");
 
         user.setName(name);
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL));
+        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
     }
 
     @RequestMapping(value = "/sex", method = RequestMethod.PUT)
@@ -87,7 +81,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return MomiaHttpResponse.FAILED("更新用户性别失败");
 
         user.setSex(sex);
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL));
+        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
     }
 
     @RequestMapping(value = "/birthday", method = RequestMethod.PUT)
@@ -99,7 +93,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return MomiaHttpResponse.FAILED("更新用户生日失败");
 
         user.setBirthday(birthday);
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL));
+        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
     }
 
     @RequestMapping(value = "/city", method = RequestMethod.PUT)
@@ -111,7 +105,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return MomiaHttpResponse.FAILED("更新用户城市失败");
 
         user.setCityId(cityId);
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL));
+        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
     }
 
     @RequestMapping(value = "/region", method = RequestMethod.PUT)
@@ -123,7 +117,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return MomiaHttpResponse.FAILED("更新用户所在区域失败");
 
         user.setRegionId(regionId);
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL));
+        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
     }
 
     @RequestMapping(value = "/address", method = RequestMethod.PUT)
@@ -135,7 +129,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return MomiaHttpResponse.FAILED("更新用户地址失败");
 
         user.setAddress(address);
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL));
+        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
     }
 
     @RequestMapping(value = "/contact", method = RequestMethod.GET)

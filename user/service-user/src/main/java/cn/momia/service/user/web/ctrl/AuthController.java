@@ -24,7 +24,7 @@ public class AuthController extends UserRelatedController {
         long userId = userService.add(nickName, mobile, password);
         if (userId <= 0) return MomiaHttpResponse.FAILED("注册失败");
 
-        return MomiaHttpResponse.SUCCESS(buildUserDto(userService.get(userId), User.Type.FULL));
+        return MomiaHttpResponse.SUCCESS(buildUserDto(userService.get(userId)));
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -33,7 +33,7 @@ public class AuthController extends UserRelatedController {
         if (!user.exists()) return MomiaHttpResponse.FAILED("用户不存在，请先注册");
         if (!userService.validatePassword(mobile, password)) return MomiaHttpResponse.FAILED("登录失败，密码不正确");
 
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL));
+        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
     }
 
     @RequestMapping(value = "/login/code", method = RequestMethod.POST)
@@ -43,7 +43,7 @@ public class AuthController extends UserRelatedController {
         User user = userService.getByMobile(mobile);
         if (!user.exists()) return MomiaHttpResponse.FAILED("用户不存在，请先注册");
 
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL));
+        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
     }
 
     @RequestMapping(value = "/password", method = RequestMethod.PUT)
@@ -54,6 +54,6 @@ public class AuthController extends UserRelatedController {
         if (!user.exists()) return MomiaHttpResponse.FAILED("用户不存在，请先注册");
         if (!userService.updatePassword(user.getId(), mobile, password)) return MomiaHttpResponse.FAILED("更改密码失败");
 
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL));
+        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
     }
 }

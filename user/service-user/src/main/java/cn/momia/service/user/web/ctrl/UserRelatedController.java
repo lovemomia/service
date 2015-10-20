@@ -16,6 +16,10 @@ import java.util.List;
 public abstract class UserRelatedController extends BaseController {
     @Autowired protected UserService userService;
 
+    protected UserDto buildUserDto(User user) {
+        return buildUserDto(user, User.Type.FULL, true);
+    }
+
     protected UserDto buildUserDto(User user, int type) {
         return buildUserDto(user, type, true);
     }
@@ -24,7 +28,7 @@ public abstract class UserRelatedController extends BaseController {
         UserDto userDto = new UserDto();
         switch (type) {
             case User.Type.FULL:
-                userDto.setChildren(buildUserChildDtos(user.getChildren()));
+                userDto.setChildren(buildUserDtos(user.getChildren()));
             case User.Type.BASE:
                 userDto.setMobile(user.getMobile());
                 userDto.setName(user.getName());
@@ -44,16 +48,16 @@ public abstract class UserRelatedController extends BaseController {
         return userDto;
     }
 
-    protected List<ChildDto> buildUserChildDtos(List<Child> children) {
+    protected List<ChildDto> buildUserDtos(List<Child> children) {
         List<ChildDto> childDtos = new ArrayList<ChildDto>();
         for (Child child : children) {
-            childDtos.add(buildUserChildDto(child));
+            childDtos.add(buildChildDto(child));
         }
 
         return childDtos;
     }
 
-    protected ChildDto buildUserChildDto(Child child) {
+    protected ChildDto buildChildDto(Child child) {
         ChildDto childDto = new ChildDto();
         childDto.setId(child.getId());
         childDto.setUserId(child.getUserId());
