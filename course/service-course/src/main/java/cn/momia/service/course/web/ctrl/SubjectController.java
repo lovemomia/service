@@ -149,9 +149,9 @@ public class SubjectController extends BaseController {
         return MetaUtil.getRegionName(regionIds.size() > 1 ? RegionDto.MULTI_REGION_ID : regionIds.get(0));
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public MomiaHttpResponse get(@PathVariable long id) {
-        Subject subject = subjectService.get(id);
+    @RequestMapping(value = "/{suid}", method = RequestMethod.GET)
+    public MomiaHttpResponse get(@PathVariable(value = "suid") long subjectId) {
+        Subject subject = subjectService.get(subjectId);
         if (!subject.exists()) return MomiaHttpResponse.FAILED("课程体系不存在");
 
         List<Course> courses = courseService.queryAllBySubject(subject.getId());
@@ -177,9 +177,9 @@ public class SubjectController extends BaseController {
         return urls;
     }
 
-    @RequestMapping(value = "/{id}/sku", method = RequestMethod.GET)
-    public MomiaHttpResponse listSkus(@PathVariable long id) {
-        return MomiaHttpResponse.SUCCESS(buildSubjectSkuDtos(subjectService.querySkus(id)));
+    @RequestMapping(value = "/{suid}/sku", method = RequestMethod.GET)
+    public MomiaHttpResponse listSkus(@PathVariable(value = "suid") long subjectId) {
+        return MomiaHttpResponse.SUCCESS(buildSubjectSkuDtos(subjectService.querySkus(subjectId)));
     }
 
     private List<SubjectSkuDto> buildSubjectSkuDtos(List<SubjectSku> skus) {

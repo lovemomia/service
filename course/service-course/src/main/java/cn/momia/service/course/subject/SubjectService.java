@@ -6,13 +6,13 @@ import java.util.Map;
 import java.util.Set;
 
 public interface SubjectService {
-    Subject get(long id);
-    List<Subject> list(Collection<Long> ids);
+    Subject get(long subjectId);
+    List<Subject> list(Collection<Long> subjectIds);
 
     long queryFreeCount(long cityId);
     List<Subject> queryFree(long cityId, int start, int count);
 
     SubjectSku getSku(long skuId);
     List<SubjectSku> listSkus(Collection<Long> skuIds);
-    List<SubjectSku> querySkus(long id);
+    List<SubjectSku> querySkus(long subjectId);
 }

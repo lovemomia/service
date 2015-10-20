@@ -3,8 +3,6 @@ package cn.momia.service.course.subject.order;
 import java.math.BigDecimal;
 
 public class OrderSku {
-    public static final OrderSku NOT_EXIST_ORDER_SKU = new OrderSku();
-
     private long id;
     private long orderId;
     private long skuId;
@@ -58,9 +56,5 @@ public class OrderSku {
 
     public void setBookableCount(int bookableCount) {
         this.bookableCount = bookableCount;
-    }
-
-    public boolean exists() {
-        return id > 0;
     }
 }

@@ -1,8 +1,6 @@
 package cn.momia.service.course.base;
 
 public class CourseImage {
-    public static final CourseImage NOT_EXIST_COURSE_IMAGE = new CourseImage();
-
     private long id;
     private long courseId;
     private String url;
@@ -47,9 +45,5 @@ public class CourseImage {
 
     public void setHeight(int height) {
         this.height = height;
-    }
-
-    public boolean exists() {
-        return id > 0;
     }
 }

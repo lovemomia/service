@@ -6,7 +6,6 @@ import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.CoursePlaceDto;
 import cn.momia.api.course.dto.CourseSkuDto;
 import cn.momia.api.course.dto.DatedCourseSkusDto;
-import cn.momia.api.poi.PoiServiceApi;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
@@ -17,7 +16,6 @@ import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.base.CourseSku;
 import cn.momia.service.course.base.CourseSkuPlace;
 import cn.momia.service.course.base.Teacher;
-import cn.momia.service.course.subject.SubjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,12 +40,10 @@ public class CourseController extends BaseController {
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     @Autowired private CourseService courseService;
-    @Autowired private SubjectService subjectService;
-    @Autowired private PoiServiceApi poiServiceApi;
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public MomiaHttpResponse get(@PathVariable long id) {
-        Course course = courseService.get(id);
+    @RequestMapping(value = "/{coid}", method = RequestMethod.GET)
+    public MomiaHttpResponse get(@PathVariable(value = "coid") long courseId) {
+        Course course = courseService.get(courseId);
         if (!course.exists()) return MomiaHttpResponse.FAILED("课程不存在");
 
         return MomiaHttpResponse.SUCCESS(buildCourseDto(course, Course.Type.FULL));
@@ -132,12 +128,12 @@ public class CourseController extends BaseController {
         return courseDtos;
     }
 
-    @RequestMapping(value = "/{id}/sku/week", method = RequestMethod.GET)
-    public MomiaHttpResponse listWeekSkus(@PathVariable long id) {
+    @RequestMapping(value = "/{coid}/sku/week", method = RequestMethod.GET)
+    public MomiaHttpResponse listWeekSkus(@PathVariable(value = "coid") long courseId) {
         Date now = new Date();
         String start = DATE_FORMAT.format(now);
         String end = DATE_FORMAT.format(new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000));
-        List<CourseSku> skus = courseService.querySkus(id, start, end);
+        List<CourseSku> skus = courseService.querySkus(courseId, start, end);
 
         return MomiaHttpResponse.SUCCESS(buildDatedCourseSkusDtos(filterUnavaliableSkus(skus)));
     }
@@ -211,11 +207,11 @@ public class CourseController extends BaseController {
         return coursePlaceDto;
     }
 
-    @RequestMapping(value = "/{id}/sku/month", method = RequestMethod.GET)
-    public MomiaHttpResponse listWeekSkus(@PathVariable long id, @RequestParam int month) {
+    @RequestMapping(value = "/{coid}/sku/month", method = RequestMethod.GET)
+    public MomiaHttpResponse listWeekSkus(@PathVariable(value = "coid") long courseId, @RequestParam int month) {
         String start = formatCurrentMonth(month);
         String end = formatNextMonth(month);
-        List<CourseSku> skus = courseService.querySkus(id, start, end);
+        List<CourseSku> skus = courseService.querySkus(courseId, start, end);
 
         return MomiaHttpResponse.SUCCESS(buildDatedCourseSkusDtos(filterUnavaliableSkus(skus)));
     }
@@ -241,20 +237,20 @@ public class CourseController extends BaseController {
         return String.format("%d-%02d", currentYear, nextMonth);
     }
 
-    @RequestMapping(value = "/{id}/book", method = RequestMethod.GET)
-    public MomiaHttpResponse book(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
-        long totalCount = courseService.queryBookImgCount(id);
-        List<String> bookImgs = courseService.queryBookImgs(id, start, count);
+    @RequestMapping(value = "/{coid}/book", method = RequestMethod.GET)
+    public MomiaHttpResponse book(@PathVariable(value = "coid") long courseId, @RequestParam int start, @RequestParam int count) {
+        long totalCount = courseService.queryBookImgCount(courseId);
+        List<String> bookImgs = courseService.queryBookImgs(courseId, start, count);
         PagedList<String> pagedBookImgs = new PagedList<String>(totalCount, start, count);
         pagedBookImgs.setList(bookImgs);
 
         return MomiaHttpResponse.SUCCESS(pagedBookImgs);
     }
 
-    @RequestMapping(value = "/{id}/teacher", method = RequestMethod.GET)
-    public MomiaHttpResponse teacher(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
-        long totalCount = courseService.queryTeacherCount(id);
-        List<Teacher> teachers = courseService.queryTeachers(id, start, count);
+    @RequestMapping(value = "/{coid}/teacher", method = RequestMethod.GET)
+    public MomiaHttpResponse teacher(@PathVariable(value = "coid") long courseId, @RequestParam int start, @RequestParam int count) {
+        long totalCount = courseService.queryTeacherCount(courseId);
+        List<Teacher> teachers = courseService.queryTeachers(courseId, start, count);
         PagedList<Teacher> pagedTeachers = new PagedList<Teacher>(totalCount, start, count);
         pagedTeachers.setList(teachers);
 
@@ -285,18 +281,18 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
     }
 
-    @RequestMapping(value = "/{id}/favored", method = RequestMethod.GET)
-    public MomiaHttpResponse favored(@RequestParam(value = "uid") long userId, @PathVariable long id) {
-        return MomiaHttpResponse.SUCCESS(courseService.isFavored(userId, id));
+    @RequestMapping(value = "/{coid}/favored", method = RequestMethod.GET)
+    public MomiaHttpResponse favored(@RequestParam(value = "uid") long userId, @PathVariable(value = "coid") long courseId) {
+        return MomiaHttpResponse.SUCCESS(courseService.isFavored(userId, courseId));
     }
 
-    @RequestMapping(value = "/{id}/favor", method = RequestMethod.POST)
-    public MomiaHttpResponse favor(@RequestParam(value = "uid") long userId, @PathVariable long id) {
-        return MomiaHttpResponse.SUCCESS(courseService.favor(userId, id));
+    @RequestMapping(value = "/{coid}/favor", method = RequestMethod.POST)
+    public MomiaHttpResponse favor(@RequestParam(value = "uid") long userId, @PathVariable(value = "coid") long courseId) {
+        return MomiaHttpResponse.SUCCESS(courseService.favor(userId, courseId));
     }
 
-    @RequestMapping(value = "/{id}/unfavor", method = RequestMethod.POST)
-    public MomiaHttpResponse unfavor(@RequestParam(value = "uid") long userId, @PathVariable long id) {
-        return MomiaHttpResponse.SUCCESS(courseService.unfavor(userId, id));
+    @RequestMapping(value = "/{coid}/unfavor", method = RequestMethod.POST)
+    public MomiaHttpResponse unfavor(@RequestParam(value = "uid") long userId, @PathVariable(value = "coid") long courseId) {
+        return MomiaHttpResponse.SUCCESS(courseService.unfavor(userId, courseId));
     }
 }

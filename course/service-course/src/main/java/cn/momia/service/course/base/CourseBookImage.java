@@ -1,8 +1,6 @@
 package cn.momia.service.course.base;
 
 public class CourseBookImage {
-    public static final CourseBookImage NOT_EXIST_COURSE_BOOK_IMAGE = new CourseBookImage();
-
     private long id;
     private long courseId;
     private String img;
@@ -38,9 +36,5 @@ public class CourseBookImage {
 
     public void setOrder(int order) {
         this.order = order;
-    }
-
-    public boolean exists() {
-        return id > 0;
     }
 }

@@ -6,14 +6,14 @@ import java.util.Map;
 import java.util.Set;
 
 public interface CourseService {
-    Course get(long id);
-    List<Course> list(Collection<Long> ids);
+    Course get(long courseId);
+    List<Course> list(Collection<Long> courseIds);
 
-    long queryBookImgCount(long id);
-    List<String> queryBookImgs(long id, int start, int count);
+    long queryBookImgCount(long courseId);
+    List<String> queryBookImgs(long courseId, int start, int count);
 
-    long queryTeacherCount(long id);
-    List<Teacher> queryTeachers(long id, int start, int count);
+    long queryTeacherCount(long courseId);
+    List<Teacher> queryTeachers(long courseId, int start, int count);
 
     long queryCountBySubject(int subjectId);
     List<Course> queryBySubject(int subjectId, int start, int count);
@@ -21,7 +21,7 @@ public interface CourseService {
     List<Course> queryAllBySubject(long subjectId);
     Map<Long, List<Course>> queryAllBySubjects(Collection<Long> subjectIds);
 
-    List<CourseSku> querySkus(long id, String start, String end);
+    List<CourseSku> querySkus(long courseId, String start, String end);
 
     long queryNotFinishedCountByUser(long userId);
     List<Course> queryNotFinishedByUser(long userId, int start, int count);
@@ -31,7 +31,7 @@ public interface CourseService {
     Map<Long, Integer> queryBookedCourseCounts(Set<Long> orderIds);
     Map<Long, Integer> queryFinishedCourseCounts(Set<Long> orderIds);
 
-    boolean isFavored(long userId, long id);
-    boolean favor(long userId, long id);
-    boolean unfavor(long userId, long id);
+    boolean isFavored(long userId, long courseId);
+    boolean favor(long userId, long courseId);
+    boolean unfavor(long userId, long courseId);
 }

@@ -1,8 +1,6 @@
 package cn.momia.service.course.subject;
 
 public class SubjectImage {
-    public static final SubjectImage NOT_EXIST_SUBJECT_IMAGE = new SubjectImage();
-
     private long id;
     private long subjectId;
     private String url;
@@ -47,9 +45,5 @@ public class SubjectImage {
 
     public void setHeight(int height) {
         this.height = height;
-    }
-
-    public boolean exists() {
-        return id > 0;
     }
 }

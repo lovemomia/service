@@ -20,7 +20,6 @@ import org.springframework.transaction.support.TransactionCallback;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -77,21 +76,21 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
-    public Order get(long id) {
-        Set<Long> ids = Sets.newHashSet(id);
-        List<Order> orders = list(ids);
+    public Order get(long orderId) {
+        Set<Long> orderIds = Sets.newHashSet(orderId);
+        List<Order> orders = list(orderIds);
 
         return orders.isEmpty() ? Order.NOT_EXIST_ORDER : orders.get(0);
     }
 
     @Override
-    public List<Order> list(Collection<Long> ids) {
-        if (ids.isEmpty()) return new ArrayList<Order>();
+    public List<Order> list(Collection<Long> orderIds) {
+        if (orderIds.isEmpty()) return new ArrayList<Order>();
 
-        String sql = "SELECT Id, UserId, SubjectId, Contact, Mobile, Status, AddTime FROM SG_SubjectOrder WHERE Id IN (" + StringUtils.join(ids, ",") + ") AND Status>0";
+        String sql = "SELECT Id, UserId, SubjectId, Contact, Mobile, Status, AddTime FROM SG_SubjectOrder WHERE Id IN (" + StringUtils.join(orderIds, ",") + ") AND Status>0";
         List<Order> orders = queryList(sql, Order.class);
 
-        Map<Long, List<OrderSku>> orderSkusMap = queryOrderSkus(ids);
+        Map<Long, List<OrderSku>> orderSkusMap = queryOrderSkus(orderIds);
         Set<Long> skuIds = new HashSet<Long>();
         for (List<OrderSku> orderSkus : orderSkusMap.values()) {
             for (OrderSku orderSku : orderSkus) skuIds.add(orderSku.getSkuId());
@@ -119,15 +118,15 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         return orders;
     }
 
-    private Map<Long, List<OrderSku>> queryOrderSkus(Collection<Long> ids) {
-        if (ids.isEmpty()) return new HashMap<Long, List<OrderSku>>();
+    private Map<Long, List<OrderSku>> queryOrderSkus(Collection<Long> orderIds) {
+        if (orderIds.isEmpty()) return new HashMap<Long, List<OrderSku>>();
 
-        String sql = "SELECT Id FROM SG_SubjectOrderSku WHERE OrderId IN (" + StringUtils.join(ids, ",") + ") AND Status=1";
+        String sql = "SELECT Id FROM SG_SubjectOrderSku WHERE OrderId IN (" + StringUtils.join(orderIds, ",") + ") AND Status=1";
         List<Long> orderSkuIds = queryLongList(sql);
         List<OrderSku> orderSkus = listOrderSkus(orderSkuIds);
 
         Map<Long, List<OrderSku>> orderSkusMap = new HashMap<Long, List<OrderSku>>();
-        for (long id : ids) orderSkusMap.put(id, new ArrayList<OrderSku>());
+        for (long orderId : orderIds) orderSkusMap.put(orderId, new ArrayList<OrderSku>());
         for (OrderSku orderSku : orderSkus) orderSkusMap.get(orderSku.getOrderId()).add(orderSku);
 
         return orderSkusMap;
@@ -151,19 +150,19 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public List<Order> queryByUser(long userId, int status, int start, int count) {
-        List<Long> ids = new ArrayList<Long>();
+        List<Long> orderIds = new ArrayList<Long>();
         if (status == 1) {
             String sql = "SELECT Id FROM SG_SubjectOrder WHERE UserId=? AND Status>0 ORDER BY AddTime DESC LIMIT ?,?";
-            ids = queryLongList(sql, new Object[] { userId, start, count });
+            orderIds = queryLongList(sql, new Object[] { userId, start, count });
         } else if (status == 2) {
             String sql = "SELECT Id FROM SG_SubjectOrder WHERE UserId=? AND Status>0 AND Status<? ORDER BY AddTime DESC LIMIT ?,?";
-            ids = queryLongList(sql, new Object[] { userId, Order.Status.PAYED, start, count });
+            orderIds = queryLongList(sql, new Object[] { userId, Order.Status.PAYED, start, count });
         } else if (status == 3) {
             String sql = "SELECT Id FROM SG_SubjectOrder WHERE UserId=? AND Status>=? ORDER BY AddTime DESC LIMIT ?,?";
-            ids = queryLongList(sql, new Object[] { userId, Order.Status.PAYED, start, count });
+            orderIds = queryLongList(sql, new Object[] { userId, Order.Status.PAYED, start, count });
         }
 
-        return list(ids);
+        return list(orderIds);
     }
 
     @Override
@@ -190,9 +189,9 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
-    public boolean prepay(long id) {
+    public boolean prepay(long orderId) {
         String sql = "UPDATE SG_SubjectOrder SET Status=? WHERE Id=? AND (Status=? OR Status=?)";
-        int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PRE_PAYED, id, Order.Status.NOT_PAYED, Order.Status.PRE_PAYED });
+        int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PRE_PAYED, orderId, Order.Status.NOT_PAYED, Order.Status.PRE_PAYED });
 
         return updateCount == 1;
     }
@@ -217,11 +216,11 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         return true;
     }
 
-    private void payOrder(long id) {
+    private void payOrder(long orderId) {
         String sql = "UPDATE SG_SubjectOrder SET Status=? WHERE Id=? AND Status=?";
-        int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PAYED, id, Order.Status.PRE_PAYED });
+        int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PAYED, orderId, Order.Status.PRE_PAYED });
 
-        if (updateCount != 1) throw new RuntimeException("fail to pay order: {}" + id);
+        if (updateCount != 1) throw new RuntimeException("fail to pay order: {}" + orderId);
     }
 
     private void logPayment(final Payment payment) {
