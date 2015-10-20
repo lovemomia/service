@@ -130,7 +130,8 @@ public class OrderController extends BaseController {
             orderSkuDto.setTitle(subject.getTitle());
             orderSkuDto.setCover(subject.getCover());
             orderSkuDto.setBookableCourseCount(orderSku.getBookableCount());
-            // expire time
+            // TODO expire time
+            orderSkuDto.setExpireTime("");
 
             orderSkuDtos.add(orderSkuDto);
         }
