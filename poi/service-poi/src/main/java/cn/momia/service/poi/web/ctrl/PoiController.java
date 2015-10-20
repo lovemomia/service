@@ -24,9 +24,9 @@ import java.util.Set;
 public class PoiController extends BaseController {
     @Autowired private PlaceService placeService;
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public MomiaHttpResponse get(@PathVariable int id) {
-        return MomiaHttpResponse.SUCCESS(buildPlaceDto(placeService.get(id)));
+    @RequestMapping(value = "/{plid}", method = RequestMethod.GET)
+    public MomiaHttpResponse get(@PathVariable(value = "plid") int placeId) {
+        return MomiaHttpResponse.SUCCESS(buildPlaceDto(placeService.get(placeId)));
     }
 
     private PlaceDto buildPlaceDto(Place place) {
@@ -52,12 +52,12 @@ public class PoiController extends BaseController {
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public MomiaHttpResponse list(@RequestParam String plids) {
-        Set<Integer> ids = new HashSet<Integer>();
-        for (String id : Splitter.on(",").trimResults().omitEmptyStrings().split(plids)) {
-            ids.add(Integer.valueOf(id));
+        Set<Integer> placeIds = new HashSet<Integer>();
+        for (String placeId : Splitter.on(",").trimResults().omitEmptyStrings().split(plids)) {
+            placeIds.add(Integer.valueOf(placeId));
         }
 
-        return MomiaHttpResponse.SUCCESS(buildPlaceDtos(placeService.list(ids)));
+        return MomiaHttpResponse.SUCCESS(buildPlaceDtos(placeService.list(placeIds)));
     }
 
     private List<PlaceDto> buildPlaceDtos(List<Place> places) {
