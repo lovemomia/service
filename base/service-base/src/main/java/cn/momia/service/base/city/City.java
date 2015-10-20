@@ -1,8 +1,6 @@
 package cn.momia.service.base.city;
 
 public class City {
-    public static final City NOT_EXIST_CITY = new City();
-
     private int id;
     private String name;
 

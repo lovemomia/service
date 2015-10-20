@@ -28,7 +28,7 @@ public class ChildServiceImpl extends DbAccessService implements ChildService {
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO SG_UserChild (UserId, Avatar, Name, Sex, Birthday, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO SG_Child (UserId, Avatar, Name, Sex, Birthday, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setLong(1, child.getUserId());
                 ps.setString(2, child.getAvatar());
@@ -55,7 +55,7 @@ public class ChildServiceImpl extends DbAccessService implements ChildService {
     public List<Child> list(Collection<Long> childIds) {
         if (childIds.isEmpty()) return new ArrayList<Child>();
 
-        String sql = "SELECT Id, UserId, Avatar, Name, Sex, Birthday FROM SG_UserChild WHERE UserId IN (" + StringUtils.join(childIds, ",") + ") AND Status=1";
+        String sql = "SELECT Id, UserId, Avatar, Name, Sex, Birthday FROM SG_Child WHERE UserId IN (" + StringUtils.join(childIds, ",") + ") AND Status=1";
         return queryList(sql, Child.class);
     }
 
@@ -63,7 +63,7 @@ public class ChildServiceImpl extends DbAccessService implements ChildService {
     public Map<Long, List<Child>> queryByUsers(Collection<Long> userIds) {
         if (userIds.isEmpty()) return new HashMap<Long, List<Child>>();
 
-        String sql = "SELECT Id FROM SG_UserChild WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND Status=1";
+        String sql = "SELECT Id FROM SG_Child WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND Status=1";
         List<Long> childIds = queryLongList(sql);
         List<Child> children = list(childIds);
 
@@ -80,31 +80,31 @@ public class ChildServiceImpl extends DbAccessService implements ChildService {
 
     @Override
     public boolean updateAvatar(long userId, long childId, String avatar) {
-        String sql = "UPDATE SG_UserChild SET Avatar=? WHERE UserId=? AND Id=?";
+        String sql = "UPDATE SG_Child SET Avatar=? WHERE UserId=? AND Id=?";
         return update(sql, new Object[] { avatar, userId, childId });
     }
 
     @Override
     public boolean updateName(long userId, long childId, String name) {
-        String sql = "UPDATE SG_UserChild SET Name=? WHERE UserId=? AND Id=?";
+        String sql = "UPDATE SG_Child SET Name=? WHERE UserId=? AND Id=?";
         return update(sql, new Object[] { name, userId, childId });
     }
 
     @Override
     public boolean updateSex(long userId, long childId, String sex) {
-        String sql = "UPDATE SG_UserChild SET Sex=? WHERE UserId=? AND Id=?";
+        String sql = "UPDATE SG_Child SET Sex=? WHERE UserId=? AND Id=?";
         return update(sql, new Object[] { sex, userId, childId });
     }
 
     @Override
     public boolean updateBirthday(long userId, long childId, Date birthday) {
-        String sql = "UPDATE SG_UserChild SET Birthday=? WHERE UserId=? AND Id=?";
+        String sql = "UPDATE SG_Child SET Birthday=? WHERE UserId=? AND Id=?";
         return update(sql, new Object[] { birthday, userId, childId });
     }
 
     @Override
     public boolean delete(long userId, long childId) {
-        String sql = "UPDATE SG_UserChild SET Status=0 WHERE UserId=? AND Id=?";
+        String sql = "UPDATE SG_Child SET Status=0 WHERE UserId=? AND Id=?";
         return update(sql, new Object[] { userId, childId });
     }
 }

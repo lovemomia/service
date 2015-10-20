@@ -65,12 +65,12 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     private void addOrderSkus(long orderId, Order order) {
-        String sql = "INSERT INTO SG_SubjectOrderSku (OrderId, SubjectId, SkuId, Price, `Count`, BookableCount, AddTime) VALUES (?, ?, ?, ?, ?, ?, NOW())";
+        String sql = "INSERT INTO SG_SubjectOrderSku (OrderId, SkuId, Price, `Count`, BookableCount, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
         List<Object[]> args = new ArrayList<Object[]>();
         for (SubjectSku sku : order.getSkus()) {
             int count = order.getCounts().get(sku.getId());
             if (count <= 0) continue;
-            args.add(new Object[] { orderId, order.getSubjectId(), sku.getId(), sku.getPrice(), count, sku.getCourseCount() * count  });
+            args.add(new Object[] { orderId, sku.getId(), sku.getPrice(), count, sku.getCourseCount() * count  });
         }
         jdbcTemplate.batchUpdate(sql, args);
     }

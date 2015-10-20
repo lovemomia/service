@@ -1,8 +1,6 @@
 package cn.momia.service.base.region;
 
 public class Region {
-    public static final Region NOT_EXIST_REGION = new Region();
-
     private int id;
     private int cityId;
     private String name;

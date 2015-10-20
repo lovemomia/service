@@ -67,6 +67,7 @@ public class OrderController extends BaseController {
             SubjectSku sku = skusMap.get(orderSku.getId());
             if (sku == null) return  false;
             orderSku.setPrice(sku.getPrice());
+            orderSku.setCourseCount(sku.getCourseCount());
         }
 
         return true;
