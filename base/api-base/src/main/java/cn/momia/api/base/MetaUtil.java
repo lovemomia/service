@@ -6,6 +6,8 @@ import cn.momia.api.base.dto.CityDto;
 import cn.momia.api.base.dto.SortTypeDto;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +51,12 @@ public class MetaUtil {
         try {
             List<AgeRangeDto> newAgeRanges = ageRangeServiceApi.listAll();
             newAgeRanges.add(AgeRangeDto.DEFAULT);
+            Collections.sort(newAgeRanges, new Comparator<AgeRangeDto>() {
+                @Override
+                public int compare(AgeRangeDto ageRange1, AgeRangeDto ageRange2) {
+                    return ageRange1.getId() - ageRange2.getId();
+                }
+            });
             Map<Integer, AgeRangeDto> newAgeRangesMap = new HashMap<Integer, AgeRangeDto>();
             for (AgeRangeDto ageRange : newAgeRanges) {
                 newAgeRangesMap.put(ageRange.getId(), ageRange);
@@ -66,6 +74,12 @@ public class MetaUtil {
 
             List<SortTypeDto> newSortTypes = sortTypeServiceApi.listAll();
             newSortTypes.add(SortTypeDto.DEFAULT);
+            Collections.sort(newSortTypes, new Comparator<SortTypeDto>() {
+                @Override
+                public int compare(SortTypeDto sortType1, SortTypeDto sortType2) {
+                    return sortType1.getId() - sortType2.getId();
+                }
+            });
             Map<Integer, SortTypeDto> newSortTypesMap = new HashMap<Integer, SortTypeDto>();
             for (SortTypeDto sortType : newSortTypes) {
                 newSortTypesMap.put(sortType.getId(), sortType);
