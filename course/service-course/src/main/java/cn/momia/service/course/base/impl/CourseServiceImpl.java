@@ -146,7 +146,7 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     private List<CourseSku> listSkus(Collection<Long> skuIds) {
         if (skuIds.isEmpty()) return new ArrayList<CourseSku>();
 
-        String sql = "SELECT Id, CourseId, StartTime, EndTime, Deadline, Stock, UnlockedStock, LockedStock, PlaceId FROM SG_CourseSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status=1";
+        String sql = "SELECT Id, CourseId, StartTime, EndTime, Deadline, Stock, UnlockedStock, LockedStock, PlaceId, Adult, Child FROM SG_CourseSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status=1";
         List<CourseSku> skus = queryList(sql, CourseSku.class);
 
         return completeSkus(skus);
@@ -413,6 +413,12 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         }, keyHolder);
 
         return keyHolder.getKey().longValue();
+    }
+
+    @Override
+    public void increaseJoined(long courseId, int joinCount) {
+        String sql = "UPDATE SG_Course SET Joined=Joined+? WHERE Id=? AND Status=1";
+        update(sql, new Object[] { joinCount, courseId });
     }
 
     @Override

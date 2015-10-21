@@ -15,6 +15,8 @@ public class CourseSku {
     private int lockedStock;
     private int placeId;
     private CourseSkuPlace place;
+    private int adult;
+    private int child;
 
     public long getId() {
         return id;
@@ -96,11 +98,31 @@ public class CourseSku {
         this.place = place;
     }
 
-    public boolean isAvaliable(Date now) {
-        return deadline.after(now);
+    public int getAdult() {
+        return adult;
+    }
+
+    public void setAdult(int adult) {
+        this.adult = adult;
+    }
+
+    public int getChild() {
+        return child;
+    }
+
+    public void setChild(int child) {
+        this.child = child;
     }
 
     public boolean exists() {
         return id > 0;
+    }
+
+    public int getJoinCount() {
+        return adult + child;
+    }
+
+    public boolean isAvaliable(Date now) {
+        return deadline.after(now);
     }
 }

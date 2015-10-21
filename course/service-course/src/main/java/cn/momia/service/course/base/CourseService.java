@@ -36,6 +36,7 @@ public interface CourseService {
     Map<Long, Integer> queryFinishedCourseCounts(Set<Long> orderIds);
 
     long booking(long userId, long orderId, long packageId, CourseSku sku);
+    void increaseJoined(long courseId, int joinCount);
 
     boolean isFavored(long userId, long courseId);
     boolean favor(long userId, long courseId);

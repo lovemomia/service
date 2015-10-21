@@ -436,18 +436,20 @@ public class CourseController extends BaseController {
         try {
             if (orderService.decreaseBookableCount(packageId)) {
                 bookingId = courseService.booking(user.getId(), order.getId(), packageId, sku);
-                return MomiaHttpResponse.SUCCESS(true);
+                if (bookingId > 0) {
+                    courseService.increaseJoined(sku.getCourseId(), sku.getJoinCount());
+                }
             } else {
                 return MomiaHttpResponse.FAILED("本课程包的课程已经约满");
             }
         } catch (Exception e) {
-            LOGGER.error("fail to booking course, {}/{}/{}", new Object[] { user.getId(), packageId, skuId, e });
+            LOGGER.error("exception when booking course, {}/{}/{}", new Object[] { user.getId(), packageId, skuId, e });
         } finally {
             // TODO 需要告警
             if (bookingId <= 0 && !courseService.unlockSku(skuId)) LOGGER.error("fail to unlock course sku, skuId: {}", skuId);
         }
 
-        return MomiaHttpResponse.FAILED("下单失败");
+        return MomiaHttpResponse.SUCCESS(bookingId > 0);
     }
 
     @RequestMapping(value = "/{coid}/favored", method = RequestMethod.GET)
