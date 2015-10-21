@@ -429,6 +429,8 @@ public class CourseController extends BaseController {
         UserDto user = userServiceApi.get(utoken);
         if (!order.exists() || !order.isPayed() || order.getUserId() != user.getId()) return MomiaHttpResponse.FAILED("预约失败，无效的订单");
 
+        if (!courseService.matched(order.getSubjectId(), sku.getCourseId())) return MomiaHttpResponse.FAILED("课程不匹配");
+
         if (!courseService.lockSku(skuId)) return MomiaHttpResponse.FAILED("库存不足");
         LOGGER.info("course sku locked: {}/{}/{}", new Object[] { user, packageId, skuId });
 

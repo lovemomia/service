@@ -44,4 +44,6 @@ public interface CourseService {
 
     CourseDetail getDetail(long courseId);
     Institution getInstitution(long courseId);
+
+    boolean matched(long subjectId, long courseId);
 }

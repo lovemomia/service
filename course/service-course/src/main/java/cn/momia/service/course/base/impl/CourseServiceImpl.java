@@ -449,4 +449,10 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         String sql = "SELECT B.Id, B.Name, B.Cover, B.Intro FROM SG_Course A INNER JOIN SG_Institution B ON A.InstitutionId=B.Id WHERE A.Id=? AND A.Status=1 AND B.Status=1";
         return queryObject(sql, new Object[] { courseId }, Institution.class, Institution.NOT_EXIST_INSTITUTION);
     }
+
+    @Override
+    public boolean matched(long subjectId, long courseId) {
+        String sql = "SELECT COUNT(1) FROM SG_Course WHERE Id=? AND SubjectId=? AND Status=1";
+        return queryInt(sql, new Object[] { courseId, subjectId }) > 0;
+    }
 }
