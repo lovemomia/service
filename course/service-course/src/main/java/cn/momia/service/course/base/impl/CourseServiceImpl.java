@@ -293,11 +293,18 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     public List<Course> queryNotFinishedByUser(long userId, int start, int count) {
         String sql = "SELECT CourseSkuId FROM SG_BookedCourse WHERE UserId=? AND Status=1 AND StartTime>NOW() LIMIT ?,?";
         List<Long> skuIds = queryLongList(sql, new Object[] { userId, start, count });
+
+        return queryCoursesBySkus(skuIds);
+    }
+
+    private List<Course> queryCoursesBySkus(List<Long> skuIds) {
         List<CourseSku> skus = listSkus(skuIds);
 
         Set<Long> courseIds = new HashSet<Long>();
+        Map<Long, CourseSku> skusMap = new HashMap<Long, CourseSku>();
         for (CourseSku sku : skus) {
             courseIds.add(sku.getCourseId());
+            skusMap.put(sku.getId(), sku);
         }
         List<Course> courses = list(courseIds);
         Map<Long, Course> coursesMap = new HashMap<Long, Course>();
@@ -306,22 +313,22 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         }
 
         List<Course> notFinishedCourses = new ArrayList<Course>();
-        for (CourseSku sku : skus) {
-            Course course = coursesMap.get(sku.getCourseId());
-            if (course == null) continue;
+        for (long skuId : skuIds) {
+            Course course = coursesMap.get(skuId);
+            CourseSku sku = skusMap.get(skuId);
+            if (course == null || sku == null) continue;
 
             Course notFinishedCourse = course.clone();
             notFinishedCourse.setSkus(Lists.newArrayList(sku));
 
             notFinishedCourses.add(notFinishedCourse);
         }
-
         return notFinishedCourses;
     }
 
     @Override
     public long queryFinishedCountByUser(long userId) {
-        String sql = "SELECT COUNT(1) FROM SG_BookedCourse WHERE UserId=? AND Status=1 AND StartTime>NOW()";
+        String sql = "SELECT COUNT(1) FROM SG_BookedCourse WHERE UserId=? AND Status=1 AND StartTime<=NOW()";
         return queryLong(sql, new Object[] { userId });
     }
 
@@ -329,30 +336,8 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     public List<Course> queryFinishedByUser(long userId, int start, int count) {
         String sql = "SELECT CourseSkuId FROM SG_BookedCourse WHERE UserId=? AND Status=1 AND StartTime<=NOW() LIMIT ?,?";
         List<Long> skuIds = queryLongList(sql, new Object[] { userId, start, count });
-        List<CourseSku> skus = listSkus(skuIds);
 
-        Set<Long> courseIds = new HashSet<Long>();
-        for (CourseSku sku : skus) {
-            courseIds.add(sku.getCourseId());
-        }
-        List<Course> courses = list(courseIds);
-        Map<Long, Course> coursesMap = new HashMap<Long, Course>();
-        for (Course course : courses) {
-            coursesMap.put(course.getId(), course);
-        }
-
-        List<Course> finishedCourses = new ArrayList<Course>();
-        for (CourseSku sku : skus) {
-            Course course = coursesMap.get(sku.getCourseId());
-            if (course == null) continue;
-
-            Course finishedCourse = course.clone();
-            finishedCourse.setSkus(Lists.newArrayList(sku));
-
-            finishedCourses.add(finishedCourse);
-        }
-
-        return finishedCourses;
+        return queryCoursesBySkus(skuIds);
     }
 
     @Override
