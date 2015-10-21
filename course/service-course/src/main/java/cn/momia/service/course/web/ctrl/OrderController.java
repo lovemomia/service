@@ -1,11 +1,12 @@
 package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.course.dto.OrderDto;
-import cn.momia.api.course.dto.OrderSkuDto;
+import cn.momia.api.course.dto.OrderPackageDto;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.UserDto;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.subject.Subject;
@@ -13,7 +14,7 @@ import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.subject.SubjectSku;
 import cn.momia.service.course.subject.order.Order;
 import cn.momia.service.course.subject.order.OrderService;
-import cn.momia.service.course.subject.order.OrderSku;
+import cn.momia.service.course.subject.order.OrderPackage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -90,18 +92,22 @@ public class OrderController extends BaseController {
         UserDto user = userServiceApi.get(utoken);
 
         long totalCount = orderService.queryBookableCountByUser(user.getId());
-        List<OrderSku> orderSkus = orderService.queryBookableByUser(user.getId(), start, count);
+        List<OrderPackage> orderPackages = orderService.queryBookableByUser(user.getId(), start, count);
 
-        PagedList<OrderSkuDto> pagedOrderSkuDtos = buildPagedOrderSkuDtos(totalCount, start, count, orderSkus);
+        PagedList<OrderPackageDto> pagedOrderSkuDtos = buildPagedOrderSkuDtos(totalCount, start, count, orderPackages);
 
         return MomiaHttpResponse.SUCCESS(pagedOrderSkuDtos);
     }
 
-    private PagedList<OrderSkuDto> buildPagedOrderSkuDtos(long totalCount, int start, int count, List<OrderSku> orderSkus) {
+    private PagedList<OrderPackageDto> buildPagedOrderSkuDtos(long totalCount, int start, int count, List<OrderPackage> orderPackages) {
+        Set<Long> packageIds = new HashSet<Long>();
         Set<Long> orderIds = new HashSet<Long>();
-        for (OrderSku orderSku : orderSkus) {
-            orderIds.add(orderSku.getOrderId());
+        for (OrderPackage orderPackage : orderPackages) {
+            packageIds.add(orderPackage.getId());
+            orderIds.add(orderPackage.getOrderId());
         }
+
+        Map<Long, Date> startTimes = orderService.queryStartTimesByPackages(packageIds);
 
         List<Order> orders = orderService.list(orderIds);
         Set<Long> subjectIds = new HashSet<Long>();
@@ -117,27 +123,35 @@ public class OrderController extends BaseController {
             subjectsMap.put(subject.getId(), subject);
         }
 
-        List<OrderSkuDto> orderSkuDtos = new ArrayList<OrderSkuDto>();
-        for (OrderSku orderSku : orderSkus) {
-            Order order = ordersMap.get(orderSku.getOrderId());
+        List<OrderPackageDto> orderPackageDtos = new ArrayList<OrderPackageDto>();
+        for (OrderPackage orderPackage : orderPackages) {
+            Order order = ordersMap.get(orderPackage.getOrderId());
             if (order == null) continue;
             Subject subject = subjectsMap.get(order.getSubjectId());
             if (subject == null) continue;
+            SubjectSku sku = subject.getSku(orderPackage.getSkuId());
+            if (!sku.exists()) continue;
 
-            OrderSkuDto orderSkuDto = new OrderSkuDto();
-            orderSkuDto.setPackageId(orderSku.getId());
-            orderSkuDto.setSubjectId(order.getSubjectId());
-            orderSkuDto.setTitle(subject.getTitle());
-            orderSkuDto.setCover(subject.getCover());
-            orderSkuDto.setBookableCourseCount(orderSku.getBookableCount());
-            // TODO expire time
-            orderSkuDto.setExpireTime("");
+            OrderPackageDto orderPackageDto = new OrderPackageDto();
+            orderPackageDto.setPackageId(orderPackage.getId());
+            orderPackageDto.setSubjectId(order.getSubjectId());
+            orderPackageDto.setTitle(subject.getTitle());
+            orderPackageDto.setCover(subject.getCover());
+            orderPackageDto.setBookableCourseCount(orderPackage.getBookableCount());
 
-            orderSkuDtos.add(orderSkuDto);
+            Date startTime = startTimes.get(orderPackage.getId());
+            if (startTime == null) {
+                orderPackageDto.setExpireTime("购买日期: " + TimeUtil.DATE_FORMAT.format(order.getAddTime()));
+            } else {
+                Date endTime = TimeUtil.add(startTime, sku.getTime(), sku.getTimeUnit());
+                orderPackageDto.setExpireTime("有效期至: " + TimeUtil.DATE_FORMAT.format(endTime));
+            }
+
+            orderPackageDtos.add(orderPackageDto);
         }
 
-        PagedList<OrderSkuDto> pagedOrderSkuDtos = new PagedList<OrderSkuDto>(totalCount, start, count);
-        pagedOrderSkuDtos.setList(orderSkuDtos);
+        PagedList<OrderPackageDto> pagedOrderSkuDtos = new PagedList<OrderPackageDto>(totalCount, start, count);
+        pagedOrderSkuDtos.setList(orderPackageDtos);
 
         return pagedOrderSkuDtos;
     }

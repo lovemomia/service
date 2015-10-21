@@ -6,13 +6,14 @@ import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.subject.SubjectSku;
 import cn.momia.service.course.subject.order.Order;
 import cn.momia.service.course.subject.order.OrderService;
-import cn.momia.service.course.subject.order.OrderSku;
+import cn.momia.service.course.subject.order.OrderPackage;
 import cn.momia.service.course.subject.order.Payment;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.TransactionStatus;
@@ -20,10 +21,12 @@ import org.springframework.transaction.support.TransactionCallback;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -65,7 +68,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     private void addOrderSkus(long orderId, Order order) {
-        String sql = "INSERT INTO SG_SubjectOrderSku (OrderId, SkuId, Price, `Count`, BookableCount, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
+        String sql = "INSERT INTO SG_SubjectOrderPackage (OrderId, SkuId, Price, `Count`, BookableCount, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
         List<Object[]> args = new ArrayList<Object[]>();
         for (SubjectSku sku : order.getSkus()) {
             int count = order.getCounts().get(sku.getId());
@@ -92,25 +95,25 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         String sql = "SELECT Id, UserId, SubjectId, Contact, Mobile, Status, AddTime FROM SG_SubjectOrder WHERE Id IN (" + StringUtils.join(orderIds, ",") + ") AND Status>0";
         List<Order> orders = queryList(sql, Order.class);
 
-        Map<Long, List<OrderSku>> orderSkusMap = queryOrderSkus(orderIds);
+        Map<Long, List<OrderPackage>> orderSkusMap = queryOrderSkus(orderIds);
         Set<Long> skuIds = new HashSet<Long>();
-        for (List<OrderSku> orderSkus : orderSkusMap.values()) {
-            for (OrderSku orderSku : orderSkus) skuIds.add(orderSku.getSkuId());
+        for (List<OrderPackage> orderPackages : orderSkusMap.values()) {
+            for (OrderPackage orderPackage : orderPackages) skuIds.add(orderPackage.getSkuId());
         }
         List<SubjectSku> skus = subjectService.listSkus(skuIds);
         Map<Long, SubjectSku> skusMap = new HashMap<Long, SubjectSku>();
         for (SubjectSku sku : skus) skusMap.put(sku.getId(), sku);
 
         for (Order order : orders) {
-            List<OrderSku> orderSkus = orderSkusMap.get(order.getId());
+            List<OrderPackage> orderPackages = orderSkusMap.get(order.getId());
             List<SubjectSku> subjectSkus = new ArrayList<SubjectSku>();
             Map<Long, Integer> counts = new HashMap<Long, Integer>();
-            for (OrderSku orderSku : orderSkus) {
-                SubjectSku subjectSku = skusMap.get(orderSku.getSkuId()).clone();
-                subjectSku.setPrice(orderSku.getPrice());
+            for (OrderPackage orderPackage : orderPackages) {
+                SubjectSku subjectSku = skusMap.get(orderPackage.getSkuId()).clone();
+                subjectSku.setPrice(orderPackage.getPrice());
                 subjectSkus.add(subjectSku);
 
-                counts.put(orderSku.getSkuId(), orderSku.getCount());
+                counts.put(orderPackage.getSkuId(), orderPackage.getCount());
             }
 
             order.setSkus(subjectSkus);
@@ -120,16 +123,16 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         return orders;
     }
 
-    private Map<Long, List<OrderSku>> queryOrderSkus(Collection<Long> orderIds) {
-        if (orderIds.isEmpty()) return new HashMap<Long, List<OrderSku>>();
+    private Map<Long, List<OrderPackage>> queryOrderSkus(Collection<Long> orderIds) {
+        if (orderIds.isEmpty()) return new HashMap<Long, List<OrderPackage>>();
 
-        String sql = "SELECT Id FROM SG_SubjectOrderSku WHERE OrderId IN (" + StringUtils.join(orderIds, ",") + ") AND Status=1";
+        String sql = "SELECT Id FROM SG_SubjectOrderPackage WHERE OrderId IN (" + StringUtils.join(orderIds, ",") + ") AND Status=1";
         List<Long> orderSkuIds = queryLongList(sql);
-        List<OrderSku> orderSkus = listOrderSkus(orderSkuIds);
+        List<OrderPackage> orderPackages = listOrderSkus(orderSkuIds);
 
-        Map<Long, List<OrderSku>> orderSkusMap = new HashMap<Long, List<OrderSku>>();
-        for (long orderId : orderIds) orderSkusMap.put(orderId, new ArrayList<OrderSku>());
-        for (OrderSku orderSku : orderSkus) orderSkusMap.get(orderSku.getOrderId()).add(orderSku);
+        Map<Long, List<OrderPackage>> orderSkusMap = new HashMap<Long, List<OrderPackage>>();
+        for (long orderId : orderIds) orderSkusMap.put(orderId, new ArrayList<OrderPackage>());
+        for (OrderPackage orderPackage : orderPackages) orderSkusMap.get(orderPackage.getOrderId()).add(orderPackage);
 
         return orderSkusMap;
     }
@@ -169,25 +172,41 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public long queryBookableCountByUser(long userId) {
-        String sql = "SELECT COUNT(1) FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderSku B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Status>=? AND B.Status=1 AND B.BookableCount>0";
+        String sql = "SELECT COUNT(1) FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Status>=? AND B.Status=1 AND B.BookableCount>0";
         return queryLong(sql, new Object[] { userId, Order.Status.PAYED });
     }
 
     @Override
-    public List<OrderSku> queryBookableByUser(long userId, int start, int count) {
-        String sql = "SELECT B.Id FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderSku B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Status>=? AND B.Status=1 AND B.BookableCount>0 ORDER BY B.AddTime ASC LIMIT ?,?";
+    public List<OrderPackage> queryBookableByUser(long userId, int start, int count) {
+        String sql = "SELECT B.Id FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Status>=? AND B.Status=1 AND B.BookableCount>0 ORDER BY B.AddTime ASC LIMIT ?,?";
         List<Long> orderSkuIds = queryLongList(sql, new Object[] { userId, Order.Status.PAYED, start, count });
 
         return listOrderSkus(orderSkuIds);
     }
 
-    private List<OrderSku> listOrderSkus(List<Long> orderSkuIds) {
-        if (orderSkuIds.isEmpty()) return new ArrayList<OrderSku>();
+    private List<OrderPackage> listOrderSkus(List<Long> orderSkuIds) {
+        if (orderSkuIds.isEmpty()) return new ArrayList<OrderPackage>();
 
-        String sql = "SELECT Id, OrderId, SkuId, Price, Count, BookableCount FROM SG_SubjectOrderSku WHERE Id IN (" + StringUtils.join(orderSkuIds, ",") + ") AND Status=1";
-        List<OrderSku> orderSkus = queryList(sql, OrderSku.class);
+        String sql = "SELECT Id, OrderId, SkuId, Price, Count, BookableCount FROM SG_SubjectOrderPackage WHERE Id IN (" + StringUtils.join(orderSkuIds, ",") + ") AND Status=1";
+        List<OrderPackage> orderPackages = queryList(sql, OrderPackage.class);
 
-        return orderSkus;
+        return orderPackages;
+    }
+
+    @Override
+    public Map<Long, Date> queryStartTimesByPackages(Set<Long> packageIds) {
+        if (packageIds.isEmpty()) return new HashMap<Long, Date>();
+
+        final Map<Long, Date> startTimesMap = new HashMap<Long, Date>();
+        String sql = "SELECT PackageId, MIN(StartTime) AS StartTime FROM SG_BookedCourse WHERE PackageId IN (" + StringUtils.join(packageIds, ",") + ") AND Status=1 GROUP BY PackageId";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                startTimesMap.put(rs.getLong("PackageId"), rs.getTimestamp("StartTime"));
+            }
+        });
+
+        return startTimesMap;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package cn.momia.api.course.dto;
 
-public class OrderSkuDto {
+public class OrderPackageDto {
     private long packageId;
     private long subjectId;
     private String title;

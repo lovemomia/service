@@ -2,7 +2,7 @@ package cn.momia.service.course.subject.order;
 
 import java.math.BigDecimal;
 
-public class OrderSku {
+public class OrderPackage {
     private long id;
     private long orderId;
     private long skuId;

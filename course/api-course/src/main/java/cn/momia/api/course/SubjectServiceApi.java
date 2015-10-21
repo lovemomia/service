@@ -1,6 +1,6 @@
 package cn.momia.api.course;
 
-import cn.momia.api.course.dto.OrderSkuDto;
+import cn.momia.api.course.dto.OrderPackageDto;
 import cn.momia.api.course.dto.OrderDto;
 import cn.momia.api.course.dto.SubjectDto;
 import cn.momia.api.course.dto.SubjectSkuDto;
@@ -41,14 +41,14 @@ public class SubjectServiceApi extends ServiceApi {
         return CastUtil.toObject((JSON) executeRequest(request), OrderDto.class);
     }
 
-    public PagedList<OrderSkuDto> listBookableOrders(String utoken, int start, int count) {
+    public PagedList<OrderPackageDto> listBookableOrders(String utoken, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("start", start)
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/order/bookable"), builder.build());
 
-        return CastUtil.toPagedList((JSON) executeRequest(request), OrderSkuDto.class);
+        return CastUtil.toPagedList((JSON) executeRequest(request), OrderPackageDto.class);
     }
 
     public PagedList<OrderDto> listOrders(String utoken, int status, int start, int count) {

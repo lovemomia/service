@@ -108,4 +108,12 @@ public class Subject {
 
         return minPriceSubjectSku;
     }
+
+    public SubjectSku getSku(long skuId) {
+        for (SubjectSku sku : skus) {
+            if (sku.getId() == skuId) return sku;
+        }
+
+        return SubjectSku.NOT_EXIST_SUBJECT_SKU;
+    }
 }
