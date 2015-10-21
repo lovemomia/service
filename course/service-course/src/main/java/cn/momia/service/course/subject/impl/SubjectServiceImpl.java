@@ -38,7 +38,18 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
             subject.setSkus(skus.get(subject.getId()));
         }
 
-        return subjects;
+        Map<Long, Subject> subjectsMap = new HashMap<Long, Subject>();
+        for (Subject subject : subjects) {
+            subjectsMap.put(subject.getId(), subject);
+        }
+
+        List<Subject> result = new ArrayList<Subject>();
+        for (long subjectId : subjectIds) {
+            Subject subject = subjectsMap.get(subjectId);
+            if (subject != null) result.add(subject);
+        }
+
+        return result;
     }
 
     private Map<Long, List<SubjectImage>> queryImgs(Collection<Long> subjectIds) {
@@ -62,8 +73,12 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
         List<SubjectSku> skus = listSkus(skuIds);
 
         Map<Long, List<SubjectSku>> skusMap = new HashMap<Long, List<SubjectSku>>();
-        for (long subjectId : subjectIds) skusMap.put(subjectId, new ArrayList<SubjectSku>());
-        for (SubjectSku sku : skus) skusMap.get(sku.getSubjectId()).add(sku);
+        for (long subjectId : subjectIds) {
+            skusMap.put(subjectId, new ArrayList<SubjectSku>());
+        }
+        for (SubjectSku sku : skus) {
+            skusMap.get(sku.getSubjectId()).add(sku);
+        }
 
         return skusMap;
     }
@@ -97,7 +112,18 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
         String sql = "SELECT Id, SubjectId, `Desc`, Price, OriginalPrice, Adult, Child, CourseCount, Time, TimeUnit FROM SG_SubjectSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status=1";
         List<SubjectSku> skus = queryList(sql, SubjectSku.class);
 
-        return skus;
+        Map<Long, SubjectSku> skusMap = new HashMap<Long, SubjectSku>();
+        for (SubjectSku sku : skus) {
+            skusMap.put(sku.getId(), sku);
+        }
+
+        List<SubjectSku> result = new ArrayList<SubjectSku>();
+        for (long skuId : skuIds) {
+            SubjectSku sku = skusMap.get(skuId);
+            if (sku != null) result.add(sku);
+        }
+
+        return result;
     }
 
     @Override

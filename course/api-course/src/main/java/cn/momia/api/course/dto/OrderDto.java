@@ -7,6 +7,7 @@ import java.util.Date;
 
 public class OrderDto {
     private long id;
+    private long subjectId;
     private int count;
     private BigDecimal totalFee;
 
@@ -25,6 +26,14 @@ public class OrderDto {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getSubjectId() {
+        return subjectId;
+    }
+
+    public void setSubjectId(long subjectId) {
+        this.subjectId = subjectId;
     }
 
     public int getCount() {

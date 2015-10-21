@@ -79,6 +79,7 @@ public class OrderController extends BaseController {
     private OrderDto buildOrderDto(Order order) {
         OrderDto orderDto = new OrderDto();
         orderDto.setId(order.getId());
+        orderDto.setSubjectId(order.getSubjectId());
         orderDto.setCount(order.getCount());
         orderDto.setTotalFee(order.getTotalFee());
         orderDto.setStatus(order.getStatus() <= Order.Status.PRE_PAYED ? Order.Status.PRE_PAYED : order.getStatus());

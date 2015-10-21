@@ -33,6 +33,36 @@ public class UserController extends UserRelatedController {
         return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL, false));
     }
 
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public MomiaHttpResponse listUsers(@RequestParam String uids, @RequestParam(defaultValue = "" + User.Type.BASE) int type) {
+        List<Long> userIds = new ArrayList<Long>();
+        for (String userId : Splitter.on(",").trimResults().omitEmptyStrings().split(uids)) {
+            userIds.add(Long.valueOf(userId));
+        }
+
+        List<User> users = userService.list(userIds);
+        List<UserDto> userDtos = new ArrayList<UserDto>();
+
+        switch (type) {
+            case User.Type.MINI:
+                for (User user : users) {
+                    userDtos.add(buildUserDto(user, User.Type.MINI));
+                }
+                break;
+            case User.Type.FULL:
+                for (User user : users) {
+                    userDtos.add(buildUserDto(user, User.Type.FULL, false));
+                }
+                break;
+            default:
+                for (User user : users) {
+                    userDtos.add(buildUserDto(user, User.Type.BASE, false));
+                }
+        }
+
+        return MomiaHttpResponse.SUCCESS(userDtos);
+    }
+
     @RequestMapping(value = "/nickname", method = RequestMethod.PUT)
     public MomiaHttpResponse updateNickName(@RequestParam String utoken, @RequestParam(value = "nickname") String nickName) {
         User user = userService.getByToken(utoken);
@@ -138,35 +168,5 @@ public class UserController extends UserRelatedController {
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
         return MomiaHttpResponse.SUCCESS(buildContactDto(user));
-    }
-
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public MomiaHttpResponse listUsers(@RequestParam String uids, @RequestParam(defaultValue = "" + User.Type.BASE) int type) {
-        List<Long> userIds = new ArrayList<Long>();
-        for (String userId : Splitter.on(",").trimResults().omitEmptyStrings().split(uids)) {
-            userIds.add(Long.valueOf(userId));
-        }
-
-        List<User> users = userService.list(userIds);
-        List<UserDto> userDtos = new ArrayList<UserDto>();
-
-        switch (type) {
-            case User.Type.MINI:
-                for (User user : users) {
-                    userDtos.add(buildUserDto(user, User.Type.MINI));
-                }
-                break;
-            case User.Type.FULL:
-                for (User user : users) {
-                    userDtos.add(buildUserDto(user, User.Type.FULL, false));
-                }
-                break;
-            default:
-                for (User user : users) {
-                    userDtos.add(buildUserDto(user, User.Type.BASE, false));
-                }
-        }
-
-        return MomiaHttpResponse.SUCCESS(userDtos);
     }
 }

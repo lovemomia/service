@@ -105,7 +105,18 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
             order.setPackages(packages);
         }
 
-        return orders;
+        Map<Long, Order> ordersMap = new HashMap<Long, Order>();
+        for (Order order : orders) {
+            ordersMap.put(order.getId(), order);
+        }
+
+        List<Order> result = new ArrayList<Order>();
+        for (long orderId : orderIds) {
+            Order order = ordersMap.get(orderId);
+            if (order != null) result.add(order);
+        }
+
+        return result;
     }
 
     private Map<Long, List<OrderPackage>> queryOrderPackages(Collection<Long> orderIds) {
@@ -124,6 +135,26 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         }
 
         return packagesMap;
+    }
+
+    private List<OrderPackage> listOrderPackages(Collection<Long> packageIds) {
+        if (packageIds.isEmpty()) return new ArrayList<OrderPackage>();
+
+        String sql = "SELECT Id, OrderId, SkuId, Price, CourseCount, BookableCount FROM SG_SubjectOrderPackage WHERE Id IN (" + StringUtils.join(packageIds, ",") + ") AND Status=1";
+        List<OrderPackage> packages = queryList(sql, OrderPackage.class);
+
+        Map<Long, OrderPackage> packagesMap = new HashMap<Long, OrderPackage>();
+        for (OrderPackage orderPackage : packages) {
+            packagesMap.put(orderPackage.getId(), orderPackage);
+        }
+
+        List<OrderPackage> result = new ArrayList<OrderPackage>();
+        for (long packageId : packageIds) {
+            OrderPackage orderPackage = packagesMap.get(packageId);
+            if (orderPackage != null) result.add(orderPackage);
+        }
+
+        return result;
     }
 
     @Override
@@ -171,15 +202,6 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         List<Long> packageIds = queryLongList(sql, new Object[] { userId, Order.Status.PAYED, start, count });
 
         return listOrderPackages(packageIds);
-    }
-
-    private List<OrderPackage> listOrderPackages(Collection<Long> packageIds) {
-        if (packageIds.isEmpty()) return new ArrayList<OrderPackage>();
-
-        String sql = "SELECT Id, OrderId, SkuId, Price, CourseCount, BookableCount FROM SG_SubjectOrderPackage WHERE Id IN (" + StringUtils.join(packageIds, ",") + ") AND Status=1";
-        List<OrderPackage> packages = queryList(sql, OrderPackage.class);
-
-        return packages;
     }
 
     @Override
