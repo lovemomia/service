@@ -195,6 +195,20 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
+    public long queryBookableCountByUserAndOrder(long userId, long orderId) {
+        String sql = "SELECT COUNT(1) FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Id=? AND A.Status>=? AND B.Status=1 AND B.BookableCount>0";
+        return queryLong(sql, new Object[] { userId, orderId, Order.Status.PAYED });
+    }
+
+    @Override
+    public List<OrderPackage> queryBookableByUserAndOrder(long userId, long orderId, int start, int count) {
+        String sql = "SELECT B.Id FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Id=? AND A.Status>=? AND B.Status=1 AND B.BookableCount>0 ORDER BY B.AddTime ASC LIMIT ?,?";
+        List<Long> packageIds = queryLongList(sql, new Object[] { userId, orderId, Order.Status.PAYED, start, count });
+
+        return listOrderPackages(packageIds);
+    }
+
+    @Override
     public long queryBookableCountByUser(long userId) {
         String sql = "SELECT COUNT(1) FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Status>=? AND B.Status=1 AND B.BookableCount>0";
         return queryLong(sql, new Object[] { userId, Order.Status.PAYED });

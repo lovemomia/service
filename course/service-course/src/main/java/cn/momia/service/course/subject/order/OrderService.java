@@ -14,6 +14,8 @@ public interface OrderService {
     long queryCountByUser(long userId, int status);
     List<Order> queryByUser(long userId, int status, int start, int count);
 
+    long queryBookableCountByUserAndOrder(long userId, long orderId);
+    List<OrderPackage> queryBookableByUserAndOrder(long userId, long orderId, int start, int count);
     long queryBookableCountByUser(long userId);
     List<OrderPackage> queryBookableByUser(long userId, int start, int count);
 

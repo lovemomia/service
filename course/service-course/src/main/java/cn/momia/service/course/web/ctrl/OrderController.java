@@ -90,12 +90,13 @@ public class OrderController extends BaseController {
 
     @RequestMapping(value = "/bookable", method = RequestMethod.GET)
     public MomiaHttpResponse listBookableOrders(@RequestParam String utoken,
+                                                @RequestParam(value = "oid") long orderId,
                                                 @RequestParam int start,
                                                 @RequestParam int count) {
         UserDto user = userServiceApi.get(utoken);
 
-        long totalCount = orderService.queryBookableCountByUser(user.getId());
-        List<OrderPackage> orderPackages = orderService.queryBookableByUser(user.getId(), start, count);
+        long totalCount = orderId > 0 ? orderService.queryBookableCountByUserAndOrder(user.getId(), orderId) : orderService.queryBookableCountByUser(user.getId());
+        List<OrderPackage> orderPackages = orderId > 0 ? orderService.queryBookableByUserAndOrder(user.getId(), orderId, start, count) : orderService.queryBookableByUser(user.getId(), start, count);
 
         PagedList<OrderPackageDto> pagedOrderSkuDtos = buildPagedOrderSkuDtos(totalCount, start, count, orderPackages);
 
