@@ -1,6 +1,5 @@
 package cn.momia.service.course.subject.order;
 
-
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -107,6 +106,15 @@ public class Order {
         }
 
         return totalFee;
+    }
+
+    public int getTotalCourseCount() {
+        int totalCourseCount = 0;
+        for (OrderPackage orderPackage : packages) {
+            totalCourseCount += orderPackage.getCourseCount();
+        }
+
+        return totalCourseCount;
     }
 
     public int getBookableCourseCount() {

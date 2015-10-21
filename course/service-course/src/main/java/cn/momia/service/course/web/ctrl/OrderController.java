@@ -180,7 +180,6 @@ public class OrderController extends BaseController {
             subjectIds.add(order.getSubjectId());
         }
 
-        Map<Long, Integer> bookedCourceCounts = courseService.queryBookedCourseCounts(orderIds);
         Map<Long, Integer> finishedCourceCounts = courseService.queryFinishedCourseCounts(orderIds);
 
         List<Subject> subjects = subjectService.list(subjectIds);
@@ -194,7 +193,7 @@ public class OrderController extends BaseController {
             Subject subject = subjectsMap.get(order.getSubjectId());
             if (subject == null) continue;
 
-            orderDtos.add(buildOrderDetailDto(order, subject, bookedCourceCounts, finishedCourceCounts));
+            orderDtos.add(buildOrderDetailDto(order, subject, finishedCourceCounts));
         }
 
         PagedList<OrderDto> pagedOrderDtos = new PagedList<OrderDto>(totalCount, start, count);
@@ -203,12 +202,17 @@ public class OrderController extends BaseController {
         return pagedOrderDtos;
     }
 
-    private OrderDto buildOrderDetailDto(Order order, Subject subject, Map<Long, Integer> bookedCourceCounts, Map<Long, Integer> finishedCourceCounts) {
+    private OrderDto buildOrderDetailDto(Order order, Subject subject, Map<Long, Integer> finishedCourceCounts) {
         OrderDto orderDto = buildOrderDto(order);
-        orderDto.setBookableCourseCount(order.getBookableCourseCount());
-        orderDto.setBookedCourseCount(bookedCourceCounts.get(order.getId()));
-        orderDto.setFinishedCourseCount(finishedCourceCounts.get(order.getId()));
-
+        int bookableCourseCount = order.getBookableCourseCount();
+        if (bookableCourseCount > 0) {
+            orderDto.setBookingStatus(1);
+        } else {
+            int totalCourseCount = order.getTotalCourseCount();
+            int finishedCourseCount = finishedCourceCounts.get(order.getId());
+            if (finishedCourseCount < totalCourseCount) orderDto.setBookingStatus(2);
+            else orderDto.setBookingStatus(3);
+        }
         orderDto.setTitle(subject.getTitle());
         orderDto.setCover(subject.getCover());
 

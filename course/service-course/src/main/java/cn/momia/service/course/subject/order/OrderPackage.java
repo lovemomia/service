@@ -9,6 +9,7 @@ public class OrderPackage {
     private long orderId;
     private long skuId;
     private BigDecimal price;
+    private int courseCount;
     private int bookableCount;
 
     public long getId() {
@@ -41,6 +42,14 @@ public class OrderPackage {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public int getCourseCount() {
+        return courseCount;
+    }
+
+    public void setCourseCount(int courseCount) {
+        this.courseCount = courseCount;
     }
 
     public int getBookableCount() {

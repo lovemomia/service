@@ -12,9 +12,7 @@ public class OrderDto {
 
     private Date addTime;
 
-    private Integer bookableCourseCount;
-    private Integer bookedCourseCount;
-    private Integer finishedCourseCount;
+    private Integer bookingStatus;
 
     // 课程体系的内容
     private String title;
@@ -53,28 +51,12 @@ public class OrderDto {
         this.addTime = addTime;
     }
 
-    public Integer getBookableCourseCount() {
-        return bookableCourseCount;
+    public Integer getBookingStatus() {
+        return bookingStatus;
     }
 
-    public void setBookableCourseCount(Integer bookableCourseCount) {
-        this.bookableCourseCount = bookableCourseCount;
-    }
-
-    public Integer getBookedCourseCount() {
-        return bookedCourseCount;
-    }
-
-    public void setBookedCourseCount(Integer bookedCourseCount) {
-        this.bookedCourseCount = bookedCourseCount;
-    }
-
-    public Integer getFinishedCourseCount() {
-        return finishedCourseCount;
-    }
-
-    public void setFinishedCourseCount(Integer finishedCourseCount) {
-        this.finishedCourseCount = finishedCourseCount;
+    public void setBookingStatus(Integer bookingStatus) {
+        this.bookingStatus = bookingStatus;
     }
 
     public String getTitle() {
