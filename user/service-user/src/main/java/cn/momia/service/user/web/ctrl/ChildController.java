@@ -22,12 +22,12 @@ public class ChildController extends UserRelatedController {
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public MomiaHttpResponse addChild(@RequestBody Child[] children) {
-        for(Child child : children) {
+        for (Child child : children) {
             if (child.isInvalid()) return MomiaHttpResponse.FAILED("添加孩子信息失败");
         }
 
         long userId = 0;
-        for(Child child : children) {
+        for (Child child : children) {
             userId = child.getUserId();
             childService.add(child);
         }

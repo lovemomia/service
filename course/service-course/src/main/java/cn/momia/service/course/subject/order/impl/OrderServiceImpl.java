@@ -94,11 +94,15 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         Map<Long, List<OrderPackage>> packagesMap = queryOrderPackages(orderIds);
         Set<Long> skuIds = new HashSet<Long>();
         for (List<OrderPackage> packages : packagesMap.values()) {
-            for (OrderPackage orderPackage : packages) skuIds.add(orderPackage.getSkuId());
+            for (OrderPackage orderPackage : packages) {
+                skuIds.add(orderPackage.getSkuId());
+            }
         }
         List<SubjectSku> skus = subjectService.listSkus(skuIds);
         Map<Long, SubjectSku> skusMap = new HashMap<Long, SubjectSku>();
-        for (SubjectSku sku : skus) skusMap.put(sku.getId(), sku);
+        for (SubjectSku sku : skus) {
+            skusMap.put(sku.getId(), sku);
+        }
 
         for (Order order : orders) {
             List<OrderPackage> packages = packagesMap.get(order.getId());

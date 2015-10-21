@@ -59,8 +59,12 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
         List<SubjectImage> imgs = queryList(sql, SubjectImage.class);
 
         final Map<Long, List<SubjectImage>> imgsMap = new HashMap<Long, List<SubjectImage>>();
-        for (long subjectId : subjectIds) imgsMap.put(subjectId, new ArrayList<SubjectImage>());
-        for (SubjectImage img : imgs) imgsMap.get(img.getSubjectId()).add(img);
+        for (long subjectId : subjectIds) {
+            imgsMap.put(subjectId, new ArrayList<SubjectImage>());
+        }
+        for (SubjectImage img : imgs) {
+            imgsMap.get(img.getSubjectId()).add(img);
+        }
 
         return imgsMap;
     }

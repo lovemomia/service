@@ -109,8 +109,12 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         List<CourseImage> imgs = queryList(sql, CourseImage.class);
 
         final Map<Long, List<CourseImage>> imgsMap = new HashMap<Long, List<CourseImage>>();
-        for (long courseId : courseIds) imgsMap.put(courseId, new ArrayList<CourseImage>());
-        for (CourseImage img : imgs) imgsMap.get(img.getCourseId()).add(img);
+        for (long courseId : courseIds) {
+            imgsMap.put(courseId, new ArrayList<CourseImage>());
+        }
+        for (CourseImage img : imgs) {
+            imgsMap.get(img.getCourseId()).add(img);
+        }
 
         return imgsMap;
     }
@@ -186,7 +190,9 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
 
     private List<CourseSku> completeSkus(List<CourseSku> skus) {
         Set<Integer> placeIds = new HashSet<Integer>();
-        for (CourseSku sku : skus) placeIds.add(sku.getPlaceId());
+        for (CourseSku sku : skus) {
+            placeIds.add(sku.getPlaceId());
+        }
 
         List<PlaceDto> places = poiServiceApi.list(placeIds);
         Map<Integer, PlaceDto> placesMap = new HashMap<Integer, PlaceDto>();
@@ -385,7 +391,9 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         if (orderIds.isEmpty()) return new HashMap<Long, Integer>();
 
         final Map<Long, Integer> map = new HashMap<Long, Integer>();
-        for (long orderId : orderIds) map.put(orderId, 0);
+        for (long orderId : orderIds) {
+            map.put(orderId, 0);
+        }
         String sql = "SELECT OrderId, COUNT(1) AS Count FROM SG_BookedCourse WHERE OrderId IN (" + StringUtils.join(orderIds, ",") + ") AND Status=1 GROUP BY OrderId";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
@@ -404,7 +412,9 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         if (orderIds.isEmpty()) return new HashMap<Long, Integer>();
 
         final Map<Long, Integer> map = new HashMap<Long, Integer>();
-        for (long orderId : orderIds) map.put(orderId, 0);
+        for (long orderId : orderIds) {
+            map.put(orderId, 0);
+        }
         String sql = "SELECT OrderId, COUNT(1) AS Count FROM SG_BookedCourse WHERE OrderId IN (" + StringUtils.join(orderIds, ",") + ") AND EndTime<=NOW() AND Status=1 GROUP BY OrderId";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
