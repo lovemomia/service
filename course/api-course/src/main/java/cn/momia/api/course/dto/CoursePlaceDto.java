@@ -6,6 +6,7 @@ public class CoursePlaceDto {
     private String address;
     private double lng;
     private double lat;
+    private String scheduler;
 
     public int getId() {
         return id;
@@ -45,5 +46,13 @@ public class CoursePlaceDto {
 
     public void setLat(double lat) {
         this.lat = lat;
+    }
+
+    public String getScheduler() {
+        return scheduler;
+    }
+
+    public void setScheduler(String scheduler) {
+        this.scheduler = scheduler;
     }
 }

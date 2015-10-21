@@ -64,4 +64,8 @@ public class CourseSkuPlace {
     public void setLat(double lat) {
         this.lat = lat;
     }
+
+    public boolean hasNoPosition() {
+        return lng < -180 || lng > 180 || lat < -90 || lat > 90;
+    }
 }

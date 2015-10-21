@@ -16,8 +16,10 @@ import org.apache.http.client.methods.HttpUriRequest;
 import java.util.List;
 
 public class CourseServiceApi extends ServiceApi {
-    public CourseDto get(long courseId) {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId));
+    public CourseDto get(long courseId, String pos) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("pos", pos);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId), builder.build());
+
         return CastUtil.toObject((JSON) executeRequest(request), CourseDto.class);
     }
 
