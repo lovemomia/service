@@ -10,6 +10,7 @@ public class OrderDto {
     private int count;
     private BigDecimal totalFee;
 
+    private int status;
     private Date addTime;
 
     private Integer bookingStatus;
@@ -40,6 +41,14 @@ public class OrderDto {
 
     public void setTotalFee(BigDecimal totalFee) {
         this.totalFee = totalFee;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")

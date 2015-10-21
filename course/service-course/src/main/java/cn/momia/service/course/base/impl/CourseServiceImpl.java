@@ -158,7 +158,9 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
 
         List<PlaceDto> places = poiServiceApi.list(placeIds);
         Map<Integer, PlaceDto> placesMap = new HashMap<Integer, PlaceDto>();
-        for (PlaceDto place : places) placesMap.put(place.getId(), place);
+        for (PlaceDto place : places) {
+            placesMap.put(place.getId(), place);
+        }
 
         List<CourseSku> completedSkus = new ArrayList<CourseSku>();
         for (CourseSku sku : skus) {
