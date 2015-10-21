@@ -417,7 +417,7 @@ public class CourseController extends BaseController {
 
     @RequestMapping(value = "/booking", method = RequestMethod.POST)
     public MomiaHttpResponse booking(@RequestParam String utoken,
-                                     @RequestParam(value = "pkgid") long packageId,
+                                     @RequestParam(value = "pid") long packageId,
                                      @RequestParam(value = "sid") long skuId) {
         OrderPackage orderPackage = orderService.getOrderPackage(packageId);
         if (!orderPackage.exists()) return MomiaHttpResponse.FAILED("预约失败，无效的课程包");
