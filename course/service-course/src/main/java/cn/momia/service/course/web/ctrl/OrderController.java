@@ -40,10 +40,10 @@ public class OrderController extends BaseController {
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public MomiaHttpResponse placeOrder(@RequestBody Order order) {
-        List<SubjectSku> orderSkus = order.getSkus();
+        List<OrderPackage> orderPackages = order.getPackages();
         Set<Long> skuIds = new HashSet<Long>();
-        for (SubjectSku sku : orderSkus) {
-            skuIds.add(sku.getId());
+        for (OrderPackage orderPackage : orderPackages) {
+            skuIds.add(orderPackage.getSkuId());
         }
         List<SubjectSku> skus = subjectService.listSkus(skuIds);
 
@@ -59,17 +59,18 @@ public class OrderController extends BaseController {
     private boolean checkAndCompleteOrder(Order order, List<SubjectSku> skus) {
         if (order.isInvalid()) return false;
 
-        List<SubjectSku> orderSkus = order.getSkus();
         Map<Long, SubjectSku> skusMap = new HashMap<Long, SubjectSku>();
         for (SubjectSku sku : skus) {
             skusMap.put(sku.getId(), sku);
         }
 
-        for (SubjectSku orderSku : orderSkus) {
-            SubjectSku sku = skusMap.get(orderSku.getId());
+        List<OrderPackage> orderPackages = order.getPackages();
+        for (OrderPackage orderPackage : orderPackages) {
+            SubjectSku sku = skusMap.get(orderPackage.getSkuId());
             if (sku == null) return  false;
-            orderSku.setPrice(sku.getPrice());
-            orderSku.setCourseCount(sku.getCourseCount());
+
+            orderPackage.setPrice(sku.getPrice());
+            orderPackage.setBookableCount(sku.getCourseCount());
         }
 
         return true;
@@ -204,7 +205,7 @@ public class OrderController extends BaseController {
 
     private OrderDto buildOrderDetailDto(Order order, Subject subject, Map<Long, Integer> bookedCourceCounts, Map<Long, Integer> finishedCourceCounts) {
         OrderDto orderDto = buildOrderDto(order);
-        orderDto.setTotalCourseCount(order.getTotalCourseCount());
+        orderDto.setBookableCourseCount(order.getBookableCourseCount());
         orderDto.setBookedCourseCount(bookedCourceCounts.get(order.getId()));
         orderDto.setFinishedCourseCount(finishedCourceCounts.get(order.getId()));
 

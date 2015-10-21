@@ -3,11 +3,12 @@ package cn.momia.service.course.subject.order;
 import java.math.BigDecimal;
 
 public class OrderPackage {
+    public static final OrderPackage NOT_EXIST_ORDER_PACKAGE = new OrderPackage();
+
     private long id;
     private long orderId;
     private long skuId;
     private BigDecimal price;
-    private int count;
     private int bookableCount;
 
     public long getId() {
@@ -42,19 +43,15 @@ public class OrderPackage {
         this.price = price;
     }
 
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
-
     public int getBookableCount() {
         return bookableCount;
     }
 
     public void setBookableCount(int bookableCount) {
         this.bookableCount = bookableCount;
+    }
+
+    public boolean exists() {
+        return id > 0;
     }
 }

@@ -23,9 +23,14 @@ import cn.momia.service.course.base.CourseSku;
 import cn.momia.service.course.base.CourseSkuPlace;
 import cn.momia.service.course.base.Institution;
 import cn.momia.service.course.base.Teacher;
+import cn.momia.service.course.subject.order.Order;
+import cn.momia.service.course.subject.order.OrderPackage;
+import cn.momia.service.course.subject.order.OrderService;
 import com.alibaba.fastjson.JSON;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,10 +52,13 @@ import java.util.Map;
 @RestController
 @RequestMapping("/course")
 public class CourseController extends BaseController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CourseController.class);
+
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private static final Splitter POS_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
 
     @Autowired private CourseService courseService;
+    @Autowired private OrderService orderService;
     @Autowired private UserServiceApi userServiceApi;
 
     @RequestMapping(value = "/{coid}", method = RequestMethod.GET)
@@ -411,8 +419,35 @@ public class CourseController extends BaseController {
     public MomiaHttpResponse booking(@RequestParam String utoken,
                                      @RequestParam(value = "pkgid") long packageId,
                                      @RequestParam(value = "sid") long skuId) {
+        OrderPackage orderPackage = orderService.getOrderPackage(packageId);
+        if (!orderPackage.exists()) return MomiaHttpResponse.FAILED("预约失败，无效的课程包");
+
+        CourseSku sku = courseService.getSku(skuId);
+        if (!sku.exists() || !sku.isAvaliable(new Date())) return MomiaHttpResponse.FAILED("预约失败，无效的课程地点");
+
+        Order order = orderService.get(orderPackage.getOrderId());
         UserDto user = userServiceApi.get(utoken);
-        return MomiaHttpResponse.SUCCESS(courseService.booking(user.getId(), packageId, skuId));
+        if (!order.exists() || !order.isPayed() || order.getUserId() != user.getId()) return MomiaHttpResponse.FAILED("预约失败，无效的订单");
+
+        if (!courseService.lockSku(skuId)) return MomiaHttpResponse.FAILED("库存不足");
+        LOGGER.info("course sku locked: {}/{}/{}", new Object[] { user, packageId, skuId });
+
+        long bookingId = 0;
+        try {
+            if (orderService.decreaseBookableCount(packageId)) {
+                bookingId = courseService.booking(user.getId(), order.getId(), packageId, sku);
+                return MomiaHttpResponse.SUCCESS(true);
+            } else {
+                return MomiaHttpResponse.FAILED("本课程包的课程已经约满");
+            }
+        } catch (Exception e) {
+            LOGGER.error("fail to booking course, {}/{}/{}", new Object[] { user.getId(), packageId, skuId, e });
+        } finally {
+            // TODO 需要告警
+            if (bookingId <= 0 && !courseService.unlockSku(skuId)) LOGGER.error("fail to unlock course sku, skuId: {}", skuId);
+        }
+
+        return MomiaHttpResponse.FAILED("下单失败");
     }
 
     @RequestMapping(value = "/{coid}/favored", method = RequestMethod.GET)

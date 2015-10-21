@@ -1,11 +1,9 @@
 package cn.momia.service.course.subject.order;
 
-import cn.momia.service.course.subject.SubjectSku;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public class Order {
     public static class Status {
@@ -23,8 +21,7 @@ public class Order {
     private long id;
     private long userId;
     private long subjectId;
-    private List<SubjectSku> skus;
-    private Map<Long, Integer> counts;
+    private List<OrderPackage> packages;
     private String contact;
     private String mobile;
 
@@ -55,20 +52,12 @@ public class Order {
         this.subjectId = subjectId;
     }
 
-    public List<SubjectSku> getSkus() {
-        return skus;
+    public List<OrderPackage> getPackages() {
+        return packages;
     }
 
-    public void setSkus(List<SubjectSku> skus) {
-        this.skus = skus;
-    }
-
-    public Map<Long, Integer> getCounts() {
-        return counts;
-    }
-
-    public void setCounts(Map<Long, Integer> counts) {
-        this.counts = counts;
+    public void setPackages(List<OrderPackage> packages) {
+        this.packages = packages;
     }
 
     public String getContact() {
@@ -108,43 +97,29 @@ public class Order {
     }
 
     public int getCount() {
-        int count = 0;
-        for (int skuCount : counts.values()) {
-            count += skuCount;
-        }
-
-        return count;
-    }
-
-    public int getJoinCount() {
-        int joinCount = 0;
-        for (SubjectSku sku : skus) {
-            joinCount += sku.getJoinCount();
-        }
-
-        return joinCount;
+        return packages.size();
     }
 
     public BigDecimal getTotalFee() {
         BigDecimal totalFee = new BigDecimal(0);
-        for (SubjectSku sku : skus) {
-            totalFee = totalFee.add(sku.getPrice().multiply(new BigDecimal(counts.get(sku.getId()))));
+        for (OrderPackage orderPackage : packages) {
+            totalFee = totalFee.add(orderPackage.getPrice());
         }
 
         return totalFee;
     }
 
-    public int getTotalCourseCount() {
-        int totalCourseCount = 0;
-        for (SubjectSku sku : skus) {
-            totalCourseCount += sku.getCourseCount() * counts.get(sku.getId());
+    public int getBookableCourseCount() {
+        int bookableCourseCount = 0;
+        for (OrderPackage orderPackage : packages) {
+            bookableCourseCount += orderPackage.getBookableCount();
         }
 
-        return totalCourseCount;
+        return bookableCourseCount;
     }
 
     public boolean isInvalid() {
-        return userId <= 0 || subjectId <= 0 || skus == null || skus.isEmpty();
+        return userId <= 0 || subjectId <= 0 || packages == null || packages.isEmpty();
     }
 
     public boolean isPayed() {

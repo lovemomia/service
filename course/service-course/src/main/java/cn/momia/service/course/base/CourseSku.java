@@ -3,6 +3,8 @@ package cn.momia.service.course.base;
 import java.util.Date;
 
 public class CourseSku {
+    public static final CourseSku NOT_EXIST_COURSE_SKU = new CourseSku();
+
     private long id;
     private long courseId;
     private Date startTime;
@@ -96,5 +98,9 @@ public class CourseSku {
 
     public boolean isAvaliable(Date now) {
         return deadline.after(now);
+    }
+
+    public boolean exists() {
+        return id > 0;
     }
 }

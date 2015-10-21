@@ -22,6 +22,10 @@ public interface CourseService {
     Map<Long, List<Course>> queryAllBySubjects(Collection<Long> subjectIds);
 
     List<CourseSku> querySkus(long courseId, String start, String end);
+    CourseSku getSku(long skuId);
+
+    boolean lockSku(long skuId);
+    boolean unlockSku(long skuId);
 
     long queryNotFinishedCountByUser(long userId);
     List<Course> queryNotFinishedByUser(long userId, int start, int count);
@@ -31,7 +35,7 @@ public interface CourseService {
     Map<Long, Integer> queryBookedCourseCounts(Set<Long> orderIds);
     Map<Long, Integer> queryFinishedCourseCounts(Set<Long> orderIds);
 
-    boolean booking(long userId, long packageId, long skuId);
+    long booking(long userId, long orderId, long packageId, CourseSku sku);
 
     boolean isFavored(long userId, long courseId);
     boolean favor(long userId, long courseId);

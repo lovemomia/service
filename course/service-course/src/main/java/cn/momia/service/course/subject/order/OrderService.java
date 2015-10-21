@@ -17,8 +17,12 @@ public interface OrderService {
     long queryBookableCountByUser(long userId);
     List<OrderPackage> queryBookableByUser(long userId, int start, int count);
 
+    OrderPackage getOrderPackage(long packageId);
+
     Map<Long, Date> queryStartTimesByPackages(Set<Long> packageIds);
 
     boolean prepay(long orderId);
     boolean pay(Payment payment);
+
+    boolean decreaseBookableCount(long packageId);
 }

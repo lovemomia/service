@@ -12,7 +12,7 @@ public class OrderDto {
 
     private Date addTime;
 
-    private Integer totalCourseCount;
+    private Integer bookableCourseCount;
     private Integer bookedCourseCount;
     private Integer finishedCourseCount;
 
@@ -53,12 +53,12 @@ public class OrderDto {
         this.addTime = addTime;
     }
 
-    public Integer getTotalCourseCount() {
-        return totalCourseCount;
+    public Integer getBookableCourseCount() {
+        return bookableCourseCount;
     }
 
-    public void setTotalCourseCount(Integer totalCourseCount) {
-        this.totalCourseCount = totalCourseCount;
+    public void setBookableCourseCount(Integer bookableCourseCount) {
+        this.bookableCourseCount = bookableCourseCount;
     }
 
     public Integer getBookedCourseCount() {

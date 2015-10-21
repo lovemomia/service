@@ -16,10 +16,17 @@ import cn.momia.service.course.base.Teacher;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -136,7 +143,7 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         return skusMap;
     }
 
-    private List<CourseSku> listSkus(List<Long> skuIds) {
+    private List<CourseSku> listSkus(Collection<Long> skuIds) {
         if (skuIds.isEmpty()) return new ArrayList<CourseSku>();
 
         String sql = "SELECT Id, CourseId, StartTime, EndTime, Deadline, Stock, UnlockedStock, LockedStock, PlaceId FROM SG_CourseSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status=1";
@@ -257,6 +264,26 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     }
 
     @Override
+    public CourseSku getSku(long skuId) {
+        Set<Long> skuIds = Sets.newHashSet(skuId);
+        List<CourseSku> skus = listSkus(skuIds);
+
+        return skus.isEmpty() ? CourseSku.NOT_EXIST_COURSE_SKU : skus.get(0);
+    }
+
+    @Override
+    public boolean lockSku(long skuId) {
+        String sql = "UPDATE SG_CourseSku SET UnlockedStock=UnlockedStock-1, LockedStock=LockedStock+1 WHERE Id=? AND Status=1 AND UnlockedStock>=1";
+        return update(sql, new Object[] { skuId });
+    }
+
+    @Override
+    public boolean unlockSku(long skuId) {
+        String sql = "UPDATE SG_CourseSku SET UnlockedStock=UnlockedStock+1, LockedStock=LockedStock-1 WHERE Id=? AND Status=1 AND LockedStock>=1";
+        return update(sql, new Object[] { skuId });
+    }
+
+    @Override
     public long queryNotFinishedCountByUser(long userId) {
         String sql = "SELECT COUNT(1) FROM SG_BookedCourse WHERE UserId=? AND Status=1 AND StartTime>NOW()";
         return queryLong(sql, new Object[] { userId });
@@ -334,13 +361,13 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
 
         final Map<Long, Integer> map = new HashMap<Long, Integer>();
         for (long orderId : orderIds) map.put(orderId, 0);
-        String sql = "SELECT OrderId, Count FROM SG_BookedCourse WHERE OrderId IN (" + StringUtils.join(orderIds, ",") + ") AND Status=1";
+        String sql = "SELECT OrderId, COUNT(1) AS Count FROM SG_BookedCourse WHERE OrderId IN (" + StringUtils.join(orderIds, ",") + ") AND Status=1 GROUP BY OrderId";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 long orderId = rs.getLong("OrderId");
                 int count = rs.getInt("Count");
-                map.put(orderId, map.get(orderId) + count);
+                map.put(orderId, count);
             }
         });
 
@@ -353,13 +380,13 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
 
         final Map<Long, Integer> map = new HashMap<Long, Integer>();
         for (long orderId : orderIds) map.put(orderId, 0);
-        String sql = "SELECT OrderId, Count FROM SG_BookedCourse WHERE OrderId IN (" + StringUtils.join(orderIds, ",") + ") AND EndTime<=NOW() AND Status=1";
+        String sql = "SELECT OrderId, COUNT(1) AS Count FROM SG_BookedCourse WHERE OrderId IN (" + StringUtils.join(orderIds, ",") + ") AND EndTime<=NOW() AND Status=1 GROUP BY OrderId";
         jdbcTemplate.query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 long orderId = rs.getLong("OrderId");
                 int count = rs.getInt("Count");
-                map.put(orderId, map.get(orderId) + count);
+                map.put(orderId, count);
             }
         });
 
@@ -367,8 +394,25 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     }
 
     @Override
-    public boolean booking(long userId, long packageId, long skuId) {
-        return false;
+    public long booking(final long userId, final long orderId, final long packageId, final CourseSku sku) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                String sql = "INSERT INTO SG_BookedCourse(UserId, OrderId, PackageId, CourseSkuId, StartTime, EndTime, AddTime) VALUES(?, ?, ?, ?, ?, ?, NOW())";
+                PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ps.setLong(1, userId);
+                ps.setLong(2, orderId);
+                ps.setLong(3, packageId);
+                ps.setLong(4, sku.getId());
+                ps.setDate(5, new Date(sku.getStartTime().getTime()));
+                ps.setDate(6, new Date(sku.getEndTime().getTime()));
+
+                return ps;
+            }
+        }, keyHolder);
+
+        return keyHolder.getKey().longValue();
     }
 
     @Override
