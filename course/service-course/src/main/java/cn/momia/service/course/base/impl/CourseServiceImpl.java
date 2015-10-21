@@ -312,18 +312,20 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
             coursesMap.put(course.getId(), course);
         }
 
-        List<Course> notFinishedCourses = new ArrayList<Course>();
+        List<Course> queriedCourses = new ArrayList<Course>();
         for (long skuId : skuIds) {
-            Course course = coursesMap.get(skuId);
             CourseSku sku = skusMap.get(skuId);
-            if (course == null || sku == null) continue;
+            if (sku == null) continue;
+            Course course = coursesMap.get(sku.getCourseId());
+            if (course == null) continue;
 
             Course notFinishedCourse = course.clone();
             notFinishedCourse.setSkus(Lists.newArrayList(sku));
 
-            notFinishedCourses.add(notFinishedCourse);
+            queriedCourses.add(notFinishedCourse);
         }
-        return notFinishedCourses;
+
+        return queriedCourses;
     }
 
     @Override
