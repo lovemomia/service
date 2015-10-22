@@ -395,7 +395,7 @@ public class CourseController extends BaseController {
     public MomiaHttpResponse notFinished(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
         long totalCount = courseService.queryNotFinishedCountByUser(userId);
         List<Course> courses = courseService.queryNotFinishedByUser(userId, start, count);
-        List<CourseDto> courseDtos = buildCourseDtos(courses);
+        List<CourseDto> courseDtos = buildBookedCourseDtos(courses);
 
         PagedList<CourseDto> pagedCourseDtos = new PagedList<CourseDto>(totalCount, start, count);
         pagedCourseDtos.setList(courseDtos);
@@ -403,11 +403,26 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
     }
 
+    private List<CourseDto> buildBookedCourseDtos(List<Course> courses) {
+        List<CourseDto> courseDtos = new ArrayList<CourseDto>();
+        for (Course course : courses) {
+            CourseDto courseDto = buildBaseCourseDto(course);
+            List<CourseSku> skus = course.getSkus();
+            if (skus.isEmpty()) continue;
+            CourseSkuPlace place = skus.get(0).getPlace();
+            courseDto.setPlace(buildCoursePlaceDto(place));
+
+            courseDtos.add(courseDto);
+        }
+
+        return courseDtos;
+    }
+
     @RequestMapping(value = "/finished", method = RequestMethod.GET)
     public MomiaHttpResponse finished(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
         long totalCount = courseService.queryFinishedCountByUser(userId);
         List<Course> courses = courseService.queryFinishedByUser(userId, start, count);
-        List<CourseDto> courseDtos = buildCourseDtos(courses);
+        List<CourseDto> courseDtos = buildBookedCourseDtos(courses);
 
         PagedList<CourseDto> pagedCourseDtos = new PagedList<CourseDto>(totalCount, start, count);
         pagedCourseDtos.setList(courseDtos);
@@ -429,6 +444,7 @@ public class CourseController extends BaseController {
         UserDto user = userServiceApi.get(utoken);
         if (!order.exists() || !order.isPayed() || order.getUserId() != user.getId()) return MomiaHttpResponse.FAILED("预约失败，无效的订单");
 
+        if (orderService.booked(packageId, sku.getCourseId())) return MomiaHttpResponse.FAILED("一门课程在一个课程包内只能约一次");
         if (!courseService.matched(order.getSubjectId(), sku.getCourseId())) return MomiaHttpResponse.FAILED("课程不匹配");
 
         if (!courseService.lockSku(skuId)) return MomiaHttpResponse.FAILED("库存不足");
