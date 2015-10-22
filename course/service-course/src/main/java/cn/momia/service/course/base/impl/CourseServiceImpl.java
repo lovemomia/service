@@ -14,7 +14,6 @@ import cn.momia.service.course.base.CourseSku;
 import cn.momia.service.course.base.CourseSkuPlace;
 import cn.momia.service.course.base.Institution;
 import cn.momia.service.course.base.Teacher;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -329,20 +328,14 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     }
 
     @Override
-    public long queryNotFinishedCountByUser(long userId) {
-        String sql = "SELECT COUNT(1) FROM SG_BookedCourse WHERE UserId=? AND Status=1 AND StartTime>NOW()";
-        return queryLong(sql, new Object[] { userId });
+    public BookedCourse getBookedCourse(long bookingId) {
+        Set<Long> bookingIds = Sets.newHashSet(bookingId);
+        List<BookedCourse> bookedCourses = listBookedCourses(bookingIds);
+
+        return bookedCourses.isEmpty() ? BookedCourse.NOT_EXIST_BOOKED_COURSE : bookedCourses.get(0);
     }
 
-    @Override
-    public List<BookedCourse> queryNotFinishedByUser(long userId, int start, int count) {
-        String sql = "SELECT Id FROM SG_BookedCourse WHERE UserId=? AND Status=1 AND StartTime>NOW() ORDER BY StartTime ASC LIMIT ?,?";
-        List<Long> bookingIds = queryLongList(sql, new Object[] { userId, start, count });
-
-        return listBookedCourses(bookingIds);
-    }
-
-    private List<BookedCourse> listBookedCourses(List<Long> bookingIds) {
+    private List<BookedCourse> listBookedCourses(Collection<Long> bookingIds) {
         if (bookingIds.isEmpty()) return new ArrayList<BookedCourse>();
 
         String sql = "SELECT Id, UserId, OrderId, PackageId, CourseId, CourseSkuId, StartTime, EndTime FROM SG_BookedCourse WHERE Id IN (" + StringUtils.join(bookingIds, ",") + ") AND Status=1";
@@ -362,35 +355,18 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         return result;
     }
 
-    private List<Course> queryCoursesBySkus(List<Long> skuIds) {
-        List<CourseSku> skus = listSkus(skuIds);
+    @Override
+    public long queryNotFinishedCountByUser(long userId) {
+        String sql = "SELECT COUNT(1) FROM SG_BookedCourse WHERE UserId=? AND Status=1 AND StartTime>NOW()";
+        return queryLong(sql, new Object[] { userId });
+    }
 
-        Set<Long> courseIds = new HashSet<Long>();
-        Map<Long, CourseSku> skusMap = new HashMap<Long, CourseSku>();
-        for (CourseSku sku : skus) {
-            courseIds.add(sku.getCourseId());
-            skusMap.put(sku.getId(), sku);
-        }
-        List<Course> courses = list(courseIds);
-        Map<Long, Course> coursesMap = new HashMap<Long, Course>();
-        for (Course course : courses) {
-            coursesMap.put(course.getId(), course);
-        }
+    @Override
+    public List<BookedCourse> queryNotFinishedByUser(long userId, int start, int count) {
+        String sql = "SELECT Id FROM SG_BookedCourse WHERE UserId=? AND Status=1 AND StartTime>NOW() ORDER BY StartTime ASC LIMIT ?,?";
+        List<Long> bookingIds = queryLongList(sql, new Object[] { userId, start, count });
 
-        List<Course> queriedCourses = new ArrayList<Course>();
-        for (long skuId : skuIds) {
-            CourseSku sku = skusMap.get(skuId);
-            if (sku == null) continue;
-            Course course = coursesMap.get(sku.getCourseId());
-            if (course == null) continue;
-
-            Course queriedCourse = course.clone();
-            queriedCourse.setSkus(Lists.newArrayList(sku));
-
-            queriedCourses.add(queriedCourse);
-        }
-
-        return queriedCourses;
+        return listBookedCourses(bookingIds);
     }
 
     @Override
@@ -482,6 +458,18 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     public void increaseJoined(long courseId, int joinCount) {
         String sql = "UPDATE SG_Course SET Joined=Joined+? WHERE Id=? AND Status=1";
         update(sql, new Object[] { joinCount, courseId });
+    }
+
+    @Override
+    public boolean cancel(long userId, long bookingId) {
+        String sql = "UPDATE SG_BookedCourse SET Status=0 WHERE Id=? AND UserId=? AND Status=1";
+        return update(sql, new Object[] { bookingId, userId });
+    }
+
+    @Override
+    public void decreaseJoined(long courseId, int joinCount) {
+        String sql = "UPDATE SG_Course SET Joined=Joined-? WHERE Id=? AND Status=1 AND Joined>=?";
+        update(sql, new Object[] { joinCount, courseId, joinCount });
     }
 
     @Override

@@ -27,6 +27,8 @@ public interface CourseService {
     boolean lockSku(long skuId);
     boolean unlockSku(long skuId);
 
+    BookedCourse getBookedCourse(long bookingId);
+
     long queryNotFinishedCountByUser(long userId);
     List<BookedCourse> queryNotFinishedByUser(long userId, int start, int count);
     long queryFinishedCountByUser(long userId);
@@ -38,6 +40,8 @@ public interface CourseService {
     boolean booked(long packageId, long courseId);
     long booking(long userId, long orderId, long packageId, CourseSku sku);
     void increaseJoined(long courseId, int joinCount);
+    boolean cancel(long userId, long bookingId);
+    void decreaseJoined(long courseId, int joinCount);
 
     boolean isFavored(long userId, long courseId);
     boolean favor(long userId, long courseId);

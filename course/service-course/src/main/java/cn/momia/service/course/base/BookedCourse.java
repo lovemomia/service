@@ -3,6 +3,8 @@ package cn.momia.service.course.base;
 import java.util.Date;
 
 public class BookedCourse {
+    public static final BookedCourse NOT_EXIST_BOOKED_COURSE = new BookedCourse();
+
     private long id;
     private long userId;
     private long orderId;
@@ -74,5 +76,13 @@ public class BookedCourse {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public boolean exists() {
+        return id > 0;
+    }
+
+    public boolean canCancel() {
+        return startTime.getTime() - new Date().getTime() > 2 * 24 * 60 * 60 * 1000;
     }
 }

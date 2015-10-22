@@ -498,7 +498,20 @@ public class CourseController extends BaseController {
 
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     public MomiaHttpResponse cancel(@RequestParam String utoken, @RequestParam(value = "bid") long bookingId) {
-        return null;
+        UserDto user = userServiceApi.get(utoken);
+        BookedCourse bookedCourse = courseService.getBookedCourse(bookingId);
+        if (!bookedCourse.exists()) return MomiaHttpResponse.FAILED("预约的课程不存在");
+        if (!bookedCourse.canCancel()) return MomiaHttpResponse.FAILED("课程开始前2天内无法取消课程");
+        if (!courseService.cancel(user.getId(), bookingId)) return MomiaHttpResponse.FAILED("取消选课失败");
+
+        if (!courseService.unlockSku(bookedCourse.getCourseSkuId())) {
+            LOGGER.error("fail to unlock course sku, booking id: {}", bookingId);
+        } else {
+            CourseSku sku = courseService.getSku(bookedCourse.getCourseSkuId());
+            courseService.decreaseJoined(bookedCourse.getCourseId(), sku.getJoinCount());
+        }
+
+        return MomiaHttpResponse.SUCCESS(true);
     }
 
     @RequestMapping(value = "/{coid}/favored", method = RequestMethod.GET)
