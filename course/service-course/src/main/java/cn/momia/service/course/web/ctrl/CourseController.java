@@ -1,6 +1,7 @@
 package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.base.MetaUtil;
+import cn.momia.api.course.dto.BookedCourseDto;
 import cn.momia.api.course.dto.CourseBookDto;
 import cn.momia.api.course.dto.CourseDetailDto;
 import cn.momia.api.course.dto.CourseDto;
@@ -14,6 +15,7 @@ import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.PoiUtil;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
+import cn.momia.service.course.base.BookedCourse;
 import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseBook;
 import cn.momia.service.course.base.CourseDetail;
@@ -46,8 +48,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/course")
@@ -84,6 +88,12 @@ public class CourseController extends BaseController {
 
     private CourseDto buildBaseCourseDto(Course course) {
         CourseDto courseDto = new CourseDto();
+        setFieldValue(courseDto, course);
+
+        return courseDto;
+    }
+
+    private void setFieldValue(CourseDto courseDto, Course course) {
         courseDto.setId(course.getId());
         courseDto.setTitle(course.getTitle());
         courseDto.setCover(course.getCover());
@@ -92,8 +102,6 @@ public class CourseController extends BaseController {
         courseDto.setPrice(course.getPrice());
         courseDto.setScheduler(course.getScheduler());
         courseDto.setRegion(MetaUtil.getRegionName(course.getRegionId()));
-
-        return courseDto;
     }
 
     private List<String> extractImgUrls(List<CourseImage> imgs) {
@@ -394,40 +402,58 @@ public class CourseController extends BaseController {
     @RequestMapping(value = "/notfinished", method = RequestMethod.GET)
     public MomiaHttpResponse notFinished(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
         long totalCount = courseService.queryNotFinishedCountByUser(userId);
-        List<Course> courses = courseService.queryNotFinishedByUser(userId, start, count);
-        List<CourseDto> courseDtos = buildBookedCourseDtos(courses);
+        List<BookedCourse> bookedCourses = courseService.queryNotFinishedByUser(userId, start, count);
+        List<BookedCourseDto> bookedCourseDtos = buildBookedCourseDtos(bookedCourses);
 
-        PagedList<CourseDto> pagedCourseDtos = new PagedList<CourseDto>(totalCount, start, count);
-        pagedCourseDtos.setList(courseDtos);
+        PagedList<BookedCourseDto> pagedCourseDtos = new PagedList<BookedCourseDto>(totalCount, start, count);
+        pagedCourseDtos.setList(bookedCourseDtos);
 
         return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
     }
 
-    private List<CourseDto> buildBookedCourseDtos(List<Course> courses) {
-        List<CourseDto> courseDtos = new ArrayList<CourseDto>();
-        for (Course course : courses) {
-            CourseDto courseDto = buildBaseCourseDto(course);
-            List<CourseSku> skus = course.getSkus();
-            if (skus.isEmpty()) continue;
-            CourseSkuPlace place = skus.get(0).getPlace();
-            courseDto.setPlace(buildCoursePlaceDto(place));
-
-            courseDtos.add(courseDto);
+    private List<BookedCourseDto> buildBookedCourseDtos(List<BookedCourse> bookedCourses) {
+        Set<Long> courseIds = new HashSet<Long>();
+        for (BookedCourse bookedCourse : bookedCourses) {
+            courseIds.add(bookedCourse.getCourseId());
         }
 
-        return courseDtos;
+        List<Course> courses = courseService.list(courseIds);
+        Map<Long, Course> coursesMap = new HashMap<Long, Course>();
+        for (Course course : courses) {
+            coursesMap.put(course.getId(), course);
+        }
+
+        List<BookedCourseDto> bookedCourseDtos = new ArrayList<BookedCourseDto>();
+        for (BookedCourse bookedCourse : bookedCourses) {
+            Course course = coursesMap.get(bookedCourse.getCourseId());
+            if (course == null) continue;
+            List<CourseSku> skus = course.getSkus();
+            if (skus.isEmpty()) continue;
+
+            BookedCourseDto bookedCourseDto = new BookedCourseDto();
+            bookedCourseDto.setBookingId(bookedCourse.getId());
+            setFieldValue(bookedCourseDto, course);
+
+            CourseSkuPlace place = course.getPlace(bookedCourse.getCourseSkuId());
+            if (place == null) continue;
+            bookedCourseDto.setPlace(buildCoursePlaceDto(place));
+
+            bookedCourseDtos.add(bookedCourseDto);
+        }
+
+        return bookedCourseDtos;
     }
 
     @RequestMapping(value = "/finished", method = RequestMethod.GET)
     public MomiaHttpResponse finished(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
         long totalCount = courseService.queryFinishedCountByUser(userId);
-        List<Course> courses = courseService.queryFinishedByUser(userId, start, count);
-        List<CourseDto> courseDtos = buildBookedCourseDtos(courses);
+        List<BookedCourse> bookedCourses = courseService.queryFinishedByUser(userId, start, count);
+        List<BookedCourseDto> bookedCourseDtos = buildBookedCourseDtos(bookedCourses);
 
-        PagedList<CourseDto> pagedCourseDtos = new PagedList<CourseDto>(totalCount, start, count);
-        pagedCourseDtos.setList(courseDtos);
+        PagedList<BookedCourseDto> pagedBookedCourseDtos = new PagedList<BookedCourseDto>(totalCount, start, count);
+        pagedBookedCourseDtos.setList(bookedCourseDtos);
 
-        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
+        return MomiaHttpResponse.SUCCESS(pagedBookedCourseDtos);
     }
 
     @RequestMapping(value = "/booking", method = RequestMethod.POST)
@@ -468,6 +494,11 @@ public class CourseController extends BaseController {
         }
 
         return MomiaHttpResponse.SUCCESS(bookingId > 0);
+    }
+
+    @RequestMapping(value = "/cancel", method = RequestMethod.POST)
+    public MomiaHttpResponse cancel(@RequestParam String utoken, @RequestParam(value = "bid") long bookingId) {
+        return null;
     }
 
     @RequestMapping(value = "/{coid}/favored", method = RequestMethod.GET)

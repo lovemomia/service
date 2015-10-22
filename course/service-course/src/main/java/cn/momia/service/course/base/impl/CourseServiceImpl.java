@@ -3,6 +3,7 @@ package cn.momia.service.course.base.impl;
 import cn.momia.api.poi.PoiServiceApi;
 import cn.momia.api.poi.dto.PlaceDto;
 import cn.momia.common.service.DbAccessService;
+import cn.momia.service.course.base.BookedCourse;
 import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseBook;
 import cn.momia.service.course.base.CourseBookImage;
@@ -334,11 +335,31 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     }
 
     @Override
-    public List<Course> queryNotFinishedByUser(long userId, int start, int count) {
-        String sql = "SELECT CourseSkuId FROM SG_BookedCourse WHERE UserId=? AND Status=1 AND StartTime>NOW() ORDER BY StartTime ASC LIMIT ?,?";
-        List<Long> skuIds = queryLongList(sql, new Object[] { userId, start, count });
+    public List<BookedCourse> queryNotFinishedByUser(long userId, int start, int count) {
+        String sql = "SELECT Id FROM SG_BookedCourse WHERE UserId=? AND Status=1 AND StartTime>NOW() ORDER BY StartTime ASC LIMIT ?,?";
+        List<Long> bookingIds = queryLongList(sql, new Object[] { userId, start, count });
 
-        return queryCoursesBySkus(skuIds);
+        return listBookedCourses(bookingIds);
+    }
+
+    private List<BookedCourse> listBookedCourses(List<Long> bookingIds) {
+        if (bookingIds.isEmpty()) return new ArrayList<BookedCourse>();
+
+        String sql = "SELECT Id, UserId, OrderId, PackageId, CourseId, CourseSkuId, StartTime, EndTime FROM SG_BookedCourse WHERE Id IN (" + StringUtils.join(bookingIds, ",") + ") AND Status=1";
+        List<BookedCourse> bookedCourses = queryList(sql, BookedCourse.class);
+
+        Map<Long, BookedCourse> bookedCoursesMap = new HashMap<Long, BookedCourse>();
+        for (BookedCourse bookedCourse : bookedCourses) {
+            bookedCoursesMap.put(bookedCourse.getId(), bookedCourse);
+        }
+
+        List<BookedCourse> result = new ArrayList<BookedCourse>();
+        for (long bookingId : bookingIds) {
+            BookedCourse bookedCourse = bookedCoursesMap.get(bookingId);
+            if (bookedCourse != null) result.add(bookedCourse);
+        }
+
+        return result;
     }
 
     private List<Course> queryCoursesBySkus(List<Long> skuIds) {
@@ -379,11 +400,11 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     }
 
     @Override
-    public List<Course> queryFinishedByUser(long userId, int start, int count) {
-        String sql = "SELECT CourseSkuId FROM SG_BookedCourse WHERE UserId=? AND Status=1 AND StartTime<=NOW() ORDER BY StartTime ASC LIMIT ?,?";
-        List<Long> skuIds = queryLongList(sql, new Object[] { userId, start, count });
+    public List<BookedCourse> queryFinishedByUser(long userId, int start, int count) {
+        String sql = "SELECT Id FROM SG_BookedCourse WHERE UserId=? AND Status=1 AND StartTime<=NOW() ORDER BY StartTime ASC LIMIT ?,?";
+        List<Long> bookingIds = queryLongList(sql, new Object[] { userId, start, count });
 
-        return queryCoursesBySkus(skuIds);
+        return listBookedCourses(bookingIds);
     }
 
     @Override
@@ -440,14 +461,15 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO SG_BookedCourse(UserId, OrderId, PackageId, CourseSkuId, StartTime, EndTime, AddTime) VALUES(?, ?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO SG_BookedCourse(UserId, OrderId, PackageId, CourseId, CourseSkuId, StartTime, EndTime, AddTime) VALUES(?, ?, ?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setLong(1, userId);
                 ps.setLong(2, orderId);
                 ps.setLong(3, packageId);
-                ps.setLong(4, sku.getId());
-                ps.setDate(5, new Date(sku.getStartTime().getTime()));
-                ps.setDate(6, new Date(sku.getEndTime().getTime()));
+                ps.setLong(4, sku.getCourseId());
+                ps.setLong(5, sku.getId());
+                ps.setDate(6, new Date(sku.getStartTime().getTime()));
+                ps.setDate(7, new Date(sku.getEndTime().getTime()));
 
                 return ps;
             }

@@ -251,4 +251,12 @@ public class Course implements Cloneable {
             }
         }
     }
+
+    public CourseSkuPlace getPlace(long skuId) {
+        for (CourseSku sku : skus) {
+            if (sku.getId() == skuId) return sku.getPlace();
+        }
+
+        return null;
+    }
 }

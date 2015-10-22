@@ -1,5 +1,6 @@
 package cn.momia.api.course;
 
+import cn.momia.api.course.dto.BookedCourseDto;
 import cn.momia.api.course.dto.CourseDetailDto;
 import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.DatedCourseSkusDto;
@@ -86,24 +87,24 @@ public class CourseServiceApi extends ServiceApi {
         return CastUtil.toList((JSON) executeRequest(request), DatedCourseSkusDto.class);
     }
 
-    public PagedList<CourseDto> queryNotFinishedByUser(long userId, int start, int count) {
+    public PagedList<BookedCourseDto> queryNotFinishedByUser(long userId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
                 .add("start", start)
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course/notfinished"), builder.build());
 
-        return CastUtil.toPagedList((JSON) executeRequest(request), CourseDto.class);
+        return CastUtil.toPagedList((JSON) executeRequest(request), BookedCourseDto.class);
     }
 
-    public PagedList<CourseDto> queryFinishedByUser(long userId, int start, int count) {
+    public PagedList<BookedCourseDto> queryFinishedByUser(long userId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
                 .add("start", start)
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course/finished"), builder.build());
 
-        return CastUtil.toPagedList((JSON) executeRequest(request), CourseDto.class);
+        return CastUtil.toPagedList((JSON) executeRequest(request), BookedCourseDto.class);
     }
 
     public boolean booking(String utoken, long packageId, long skuId) {
@@ -112,6 +113,15 @@ public class CourseServiceApi extends ServiceApi {
                 .add("pid", packageId)
                 .add("sid", skuId);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("course/booking"), builder.build());
+
+        return (Boolean) executeRequest(request);
+    }
+
+    public boolean cancel(String utoken, long bookingId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("bid", bookingId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("course/cancel"), builder.build());
 
         return (Boolean) executeRequest(request);
     }

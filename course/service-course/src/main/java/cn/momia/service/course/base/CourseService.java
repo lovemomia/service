@@ -28,9 +28,9 @@ public interface CourseService {
     boolean unlockSku(long skuId);
 
     long queryNotFinishedCountByUser(long userId);
-    List<Course> queryNotFinishedByUser(long userId, int start, int count);
+    List<BookedCourse> queryNotFinishedByUser(long userId, int start, int count);
     long queryFinishedCountByUser(long userId);
-    List<Course> queryFinishedByUser(long userId, int start, int count);
+    List<BookedCourse> queryFinishedByUser(long userId, int start, int count);
 
     Map<Long, Integer> queryBookedCourseCounts(Set<Long> orderIds);
     Map<Long, Integer> queryFinishedCourseCounts(Set<Long> orderIds);
