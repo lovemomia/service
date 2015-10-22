@@ -444,7 +444,7 @@ public class CourseController extends BaseController {
         UserDto user = userServiceApi.get(utoken);
         if (!order.exists() || !order.isPayed() || order.getUserId() != user.getId()) return MomiaHttpResponse.FAILED("预约失败，无效的订单");
 
-        if (orderService.booked(packageId, sku.getCourseId())) return MomiaHttpResponse.FAILED("一门课程在一个课程包内只能约一次");
+        if (courseService.booked(packageId, sku.getCourseId())) return MomiaHttpResponse.FAILED("一门课程在一个课程包内只能约一次");
         if (!courseService.matched(order.getSubjectId(), sku.getCourseId())) return MomiaHttpResponse.FAILED("课程不匹配");
 
         if (!courseService.lockSku(skuId)) return MomiaHttpResponse.FAILED("库存不足");

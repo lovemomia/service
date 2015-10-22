@@ -429,6 +429,12 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     }
 
     @Override
+    public boolean booked(long packageId, long courseId) {
+        String sql = "SELECT COUNT(1) FROM SG_BookedCourse WHERE PackageId=? AND CourseId=? AND Status=1";
+        return queryInt(sql, new Object[] { packageId, courseId }) > 0;
+    }
+
+    @Override
     public long booking(final long userId, final long orderId, final long packageId, final CourseSku sku) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {

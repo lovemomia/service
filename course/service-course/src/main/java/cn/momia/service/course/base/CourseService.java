@@ -35,6 +35,7 @@ public interface CourseService {
     Map<Long, Integer> queryBookedCourseCounts(Set<Long> orderIds);
     Map<Long, Integer> queryFinishedCourseCounts(Set<Long> orderIds);
 
+    boolean booked(long packageId, long courseId);
     long booking(long userId, long orderId, long packageId, CourseSku sku);
     void increaseJoined(long courseId, int joinCount);
 
