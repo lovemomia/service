@@ -109,7 +109,7 @@ public class CourseServiceApi extends ServiceApi {
     public boolean booking(String utoken, long packageId, long skuId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
-                .add("pkgid", packageId)
+                .add("pid", packageId)
                 .add("sid", skuId);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("course/booking"), builder.build());
 
