@@ -27,4 +27,5 @@ public interface OrderService {
     boolean pay(Payment payment);
 
     boolean decreaseBookableCount(long packageId);
+    boolean increaseBookableCount(long packageId);
 }

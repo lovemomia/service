@@ -504,11 +504,13 @@ public class CourseController extends BaseController {
         if (!bookedCourse.canCancel()) return MomiaHttpResponse.FAILED("课程开始前2天内无法取消课程");
         if (!courseService.cancel(user.getId(), bookingId)) return MomiaHttpResponse.FAILED("取消选课失败");
 
-        if (!courseService.unlockSku(bookedCourse.getCourseSkuId())) {
-            LOGGER.error("fail to unlock course sku, booking id: {}", bookingId);
-        } else {
+        try {
+            if (!orderService.increaseBookableCount(bookedCourse.getPackageId())) LOGGER.error("fail to increase bookable count, booking id: {}", bookingId);
+            if (!courseService.unlockSku(bookedCourse.getCourseSkuId())) LOGGER.error("fail to unlock course sku, booking id: {}", bookingId);
             CourseSku sku = courseService.getSku(bookedCourse.getCourseSkuId());
             courseService.decreaseJoined(bookedCourse.getCourseId(), sku.getJoinCount());
+        } catch (Exception e) {
+            LOGGER.error("error when cancel booked course, {}", bookingId, e);
         }
 
         return MomiaHttpResponse.SUCCESS(true);
