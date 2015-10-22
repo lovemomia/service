@@ -111,7 +111,7 @@ public class OrderController extends BaseController {
             orderIds.add(orderPackage.getOrderId());
         }
 
-        Map<Long, Date> startTimes = orderService.queryStartTimesByPackages(packageIds);
+        Map<Long, Date> startTimes = courseService.queryStartTimesByPackages(packageIds);
 
         List<Order> orders = orderService.list(orderIds);
         Set<Long> subjectIds = new HashSet<Long>();

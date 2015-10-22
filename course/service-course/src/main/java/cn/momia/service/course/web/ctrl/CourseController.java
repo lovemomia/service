@@ -500,7 +500,7 @@ public class CourseController extends BaseController {
     public MomiaHttpResponse cancel(@RequestParam String utoken, @RequestParam(value = "bid") long bookingId) {
         UserDto user = userServiceApi.get(utoken);
         BookedCourse bookedCourse = courseService.getBookedCourse(bookingId);
-        if (!bookedCourse.exists()) return MomiaHttpResponse.FAILED("预约的课程不存在");
+        if (!bookedCourse.exists()) return MomiaHttpResponse.FAILED("取消预约的课程不存在");
         if (!bookedCourse.canCancel()) return MomiaHttpResponse.FAILED("课程开始前2天内无法取消课程");
         if (!courseService.cancel(user.getId(), bookingId)) return MomiaHttpResponse.FAILED("取消选课失败");
 

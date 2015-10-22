@@ -1,6 +1,7 @@
 package cn.momia.service.course.base;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +27,8 @@ public interface CourseService {
 
     boolean lockSku(long skuId);
     boolean unlockSku(long skuId);
+
+    Map<Long, Date> queryStartTimesByPackages(Set<Long> packageIds);
 
     BookedCourse getBookedCourse(long bookingId);
 

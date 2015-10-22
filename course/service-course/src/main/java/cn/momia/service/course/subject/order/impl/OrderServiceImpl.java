@@ -13,7 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.TransactionStatus;
@@ -21,12 +20,10 @@ import org.springframework.transaction.support.TransactionCallback;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -228,22 +225,6 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         List<OrderPackage> packages = listOrderPackages(packageIds);
 
         return packages.isEmpty() ? OrderPackage.NOT_EXIST_ORDER_PACKAGE : packages.get(0);
-    }
-
-    @Override
-    public Map<Long, Date> queryStartTimesByPackages(Set<Long> packageIds) {
-        if (packageIds.isEmpty()) return new HashMap<Long, Date>();
-
-        final Map<Long, Date> startTimesMap = new HashMap<Long, Date>();
-        String sql = "SELECT PackageId, MIN(StartTime) AS StartTime FROM SG_BookedCourse WHERE PackageId IN (" + StringUtils.join(packageIds, ",") + ") AND Status=1 GROUP BY PackageId";
-        jdbcTemplate.query(sql, new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                startTimesMap.put(rs.getLong("PackageId"), rs.getTimestamp("StartTime"));
-            }
-        });
-
-        return startTimesMap;
     }
 
     @Override

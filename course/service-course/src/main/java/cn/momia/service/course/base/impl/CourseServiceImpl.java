@@ -22,13 +22,13 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -328,6 +328,22 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     }
 
     @Override
+    public Map<Long, Date> queryStartTimesByPackages(Set<Long> packageIds) {
+        if (packageIds.isEmpty()) return new HashMap<Long, Date>();
+
+        final Map<Long, Date> startTimesMap = new HashMap<Long, Date>();
+        String sql = "SELECT PackageId, MIN(StartTime) AS StartTime FROM SG_BookedCourse WHERE PackageId IN (" + StringUtils.join(packageIds, ",") + ") AND Status=1 GROUP BY PackageId";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                startTimesMap.put(rs.getLong("PackageId"), rs.getTimestamp("StartTime"));
+            }
+        });
+
+        return startTimesMap;
+    }
+
+    @Override
     public BookedCourse getBookedCourse(long bookingId) {
         Set<Long> bookingIds = Sets.newHashSet(bookingId);
         List<BookedCourse> bookedCourses = listBookedCourses(bookingIds);
@@ -444,8 +460,8 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
                 ps.setLong(3, packageId);
                 ps.setLong(4, sku.getCourseId());
                 ps.setLong(5, sku.getId());
-                ps.setDate(6, new Date(sku.getStartTime().getTime()));
-                ps.setDate(7, new Date(sku.getEndTime().getTime()));
+                ps.setDate(6, new java.sql.Date(sku.getStartTime().getTime()));
+                ps.setDate(7, new java.sql.Date(sku.getEndTime().getTime()));
 
                 return ps;
             }
