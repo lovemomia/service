@@ -16,6 +16,8 @@ import cn.momia.service.course.subject.SubjectImage;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.subject.SubjectSku;
 import com.alibaba.fastjson.JSON;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +38,8 @@ import java.util.Set;
 @RestController
 @RequestMapping("/subject")
 public class SubjectController extends BaseController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SubjectController.class);
+
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("M月d日");
 
     @Autowired private CourseService courseService;
@@ -54,7 +58,8 @@ public class SubjectController extends BaseController {
 
         List<SubjectDto> subjectDtos = new ArrayList<SubjectDto>();
         for (Subject subject : subjects) {
-            subjectDtos.add(buildBaseSubjectDto(subject, coursesMap.get(subject.getId())));
+            SubjectDto subjectDto = buildBaseSubjectDto(subject, coursesMap.get(subject.getId()));
+            if (subjectDto != null) subjectDtos.add(subjectDto);
         }
         PagedList<SubjectDto> pagedSubjectDtos = new PagedList<SubjectDto>(totalCount, start, count);
         pagedSubjectDtos.setList(subjectDtos);
@@ -63,22 +68,27 @@ public class SubjectController extends BaseController {
     }
 
     private SubjectDto buildBaseSubjectDto(Subject subject, List<Course> courses) {
-        SubjectDto subjectDto = new SubjectDto();
-        subjectDto.setId(subject.getId());
-        subjectDto.setTitle(subject.getTitle());
-        subjectDto.setCover(subject.getCover());
-        subjectDto.setTags(subject.getTags());
+        try {
+            SubjectDto subjectDto = new SubjectDto();
+            subjectDto.setId(subject.getId());
+            subjectDto.setTitle(subject.getTitle());
+            subjectDto.setCover(subject.getCover());
+            subjectDto.setTags(subject.getTags());
 
-        SubjectSku minPriceSku = subject.getMinPriceSku();
-        subjectDto.setPrice(minPriceSku.getPrice());
-        subjectDto.setOriginalPrice(minPriceSku.getOriginalPrice());
+            SubjectSku minPriceSku = subject.getMinPriceSku();
+            subjectDto.setPrice(minPriceSku.getPrice());
+            subjectDto.setOriginalPrice(minPriceSku.getOriginalPrice());
 
-        subjectDto.setAge(getAgeRange(courses));
-        subjectDto.setJoined(getJoined(courses));
-        subjectDto.setScheduler(getScheduler(courses));
-        subjectDto.setRegion(getRegion(courses));
+            subjectDto.setAge(getAgeRange(courses));
+            subjectDto.setJoined(getJoined(courses));
+            subjectDto.setScheduler(getScheduler(courses));
+            subjectDto.setRegion(getRegion(courses));
 
-        return subjectDto;
+            return subjectDto;
+        } catch (Exception e) {
+            LOGGER.error("invalid subject: {}", subject.getId(), e);
+            return null;
+        }
     }
 
     private String getAgeRange(List<Course> courses) {
