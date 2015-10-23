@@ -55,7 +55,7 @@ public class ChildServiceImpl extends DbAccessService implements ChildService {
     public List<Child> list(Collection<Long> childIds) {
         if (childIds.isEmpty()) return new ArrayList<Child>();
 
-        String sql = "SELECT Id, UserId, Avatar, Name, Sex, Birthday FROM SG_Child WHERE UserId IN (" + StringUtils.join(childIds, ",") + ") AND Status=1";
+        String sql = "SELECT Id, UserId, Avatar, Name, Sex, Birthday FROM SG_Child WHERE Id IN (" + StringUtils.join(childIds, ",") + ") AND Status=1";
         return queryList(sql, Child.class);
     }
 
