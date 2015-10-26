@@ -123,8 +123,10 @@ public class SubjectController extends BaseController {
 
         List<Date> times = new ArrayList<Date>();
         for (Course course : courses) {
-            times.add(course.getStartTime());
-            times.add(course.getEndTime());
+            Date startTime = course.getStartTime();
+            Date endTime = course.getEndTime();
+            if (startTime != null) times.add(startTime);
+            if (endTime != null) times.add(endTime);
         }
         Collections.sort(times);
 

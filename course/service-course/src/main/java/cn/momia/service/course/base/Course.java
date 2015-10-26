@@ -189,7 +189,7 @@ public class Course implements Cloneable {
         }
         Collections.sort(startTimes);
 
-        return startTimes.get(0);
+        return startTimes.isEmpty() ? null : startTimes.get(0);
     }
 
     public Date getEndTime() {
@@ -200,7 +200,7 @@ public class Course implements Cloneable {
         }
         Collections.sort(endTimes);
 
-        return endTimes.get(endTimes.size() - 1);
+        return endTimes.isEmpty() ? null : endTimes.get(endTimes.size() - 1);
     }
 
     public int getRegionId() {
