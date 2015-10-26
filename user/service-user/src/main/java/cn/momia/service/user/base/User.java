@@ -25,7 +25,7 @@ public class User {
     private int cityId;
     private int regionId;
     private String address;
-    private boolean payed;
+    private int payed;
 
     private String token;
 
@@ -111,11 +111,11 @@ public class User {
         this.address = address;
     }
 
-    public boolean isPayed() {
+    public int getPayed() {
         return payed;
     }
 
-    public void setPayed(boolean payed) {
+    public void setPayed(int payed) {
         this.payed = payed;
     }
 

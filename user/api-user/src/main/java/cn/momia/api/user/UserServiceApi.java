@@ -157,4 +157,9 @@ public class UserServiceApi extends ServiceApi {
 
         return CastUtil.toObject((JSON) executeRequest(request), ContactDto.class);
     }
+
+    public void payed(long userId) {
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("user", userId, "payed"));
+        executeRequest(request);
+    }
 }

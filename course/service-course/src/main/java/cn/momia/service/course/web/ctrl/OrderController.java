@@ -16,6 +16,8 @@ import cn.momia.service.course.subject.SubjectSku;
 import cn.momia.service.course.subject.order.Order;
 import cn.momia.service.course.subject.order.OrderService;
 import cn.momia.service.course.subject.order.OrderPackage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +36,8 @@ import java.util.Set;
 @RestController
 @RequestMapping(value = "/subject/order")
 public class OrderController extends BaseController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
+
     @Autowired private CourseService courseService;
     @Autowired private SubjectService subjectService;
     @Autowired private OrderService orderService;
@@ -53,6 +57,12 @@ public class OrderController extends BaseController {
 
         long orderId = orderService.add(order);
         if (orderId < 0) return MomiaHttpResponse.FAILED("下单失败");
+
+        try {
+            userServiceApi.payed(order.getUserId());
+        } catch (Exception e) {
+            LOGGER.error("fail to set payed of user: {}", order.getUserId(), e);
+        }
 
         order.setId(orderId);
         return MomiaHttpResponse.SUCCESS(buildOrderDto(order));

@@ -23,4 +23,6 @@ public interface UserService {
 
     boolean validatePassword(String mobile, String password);
     boolean updatePassword(long userId, String mobile, String password);
+
+    void payed(long userId);
 }

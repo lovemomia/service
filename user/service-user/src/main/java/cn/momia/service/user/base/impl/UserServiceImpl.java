@@ -188,4 +188,10 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         String sql = "UPDATE SG_User SET Password=? WHERE Id=?";
         return update(sql, new Object[] { encryptPassword(mobile, password, Configuration.getString("SecretKey.Password")), userId });
     }
+
+    @Override
+    public void payed(long userId) {
+        String sql = "UPDATE SG_User SET Payed=1 WHERE Id=?";
+        update(sql, new Object[] { userId });
+    }
 }
