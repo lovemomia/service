@@ -5,6 +5,7 @@ import cn.momia.api.course.dto.OrderPackageDto;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.UserDto;
 import cn.momia.common.api.dto.PagedList;
+import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
@@ -41,6 +42,7 @@ public class OrderController extends BaseController {
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public MomiaHttpResponse placeOrder(@RequestBody Order order) {
         List<OrderPackage> orderPackages = order.getPackages();
+
         Set<Long> skuIds = new HashSet<Long>();
         for (OrderPackage orderPackage : orderPackages) {
             skuIds.add(orderPackage.getSkuId());
@@ -58,6 +60,9 @@ public class OrderController extends BaseController {
 
     private boolean checkAndCompleteOrder(Order order, List<SubjectSku> skus) {
         if (order.isInvalid()) return false;
+
+        UserDto user = userServiceApi.get(order.getUserId());
+        if (user.isPayed() && subjectService.isForNewUser(order.getSubjectId())) throw new MomiaFailedException("本课程包只供新用户专享");
 
         Map<Long, SubjectSku> skusMap = new HashMap<Long, SubjectSku>();
         for (SubjectSku sku : skus) {

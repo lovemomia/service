@@ -23,6 +23,7 @@ public class UserDto {
     private Integer cityId;
     private Integer regionId;
     private String address;
+    private Boolean payed;
 
     private String token;
 
@@ -107,6 +108,14 @@ public class UserDto {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public Boolean isPayed() {
+        return payed;
+    }
+
+    public void setPayed(Boolean payed) {
+        this.payed = payed;
     }
 
     public String getToken() {

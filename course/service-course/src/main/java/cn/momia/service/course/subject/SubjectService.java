@@ -13,4 +13,6 @@ public interface SubjectService {
     SubjectSku getSku(long skuId);
     List<SubjectSku> listSkus(Collection<Long> skuIds);
     List<SubjectSku> querySkus(long subjectId);
+
+    boolean isForNewUser(long subjectId);
 }

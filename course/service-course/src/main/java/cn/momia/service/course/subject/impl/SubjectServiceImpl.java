@@ -137,4 +137,10 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
 
         return skus.get(subjectId);
     }
+
+    @Override
+    public boolean isForNewUser(long subjectId) {
+        String sql = "SELECT Type FROM SG_Subject WHERE Id=?";
+        return queryInt(sql, new Object[] { subjectId }) == Subject.Type.FREE;
+    }
 }
