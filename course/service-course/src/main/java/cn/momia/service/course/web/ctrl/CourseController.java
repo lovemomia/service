@@ -257,7 +257,7 @@ public class CourseController extends BaseController {
         courseDetailDto.setId(detail.getId());
         courseDetailDto.setCourseId(detail.getCourseId());
         courseDetailDto.setAbstracts(detail.getAbstracts());
-        courseDetailDto.setDetail(JSON.parseArray(detail.getDetail()));
+        courseDetailDto.setDetail(detail.getDetail());
 
         return courseDetailDto;
     }

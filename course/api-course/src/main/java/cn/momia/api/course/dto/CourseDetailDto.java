@@ -1,12 +1,10 @@
 package cn.momia.api.course.dto;
 
-import com.alibaba.fastjson.JSONArray;
-
 public class CourseDetailDto {
     private long id;
     private long courseId;
     private String abstracts;
-    private JSONArray detail;
+    private String detail;
 
     public long getId() {
         return id;
@@ -32,11 +30,11 @@ public class CourseDetailDto {
         this.abstracts = abstracts;
     }
 
-    public JSONArray getDetail() {
+    public String getDetail() {
         return detail;
     }
 
-    public void setDetail(JSONArray detail) {
+    public void setDetail(String detail) {
         this.detail = detail;
     }
 }
