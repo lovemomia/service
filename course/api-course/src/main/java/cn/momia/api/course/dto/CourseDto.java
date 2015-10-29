@@ -8,6 +8,7 @@ public class CourseDto {
     private String title;
     private String cover;
     private String age;
+    private boolean insurance;
     private int joined;
     private BigDecimal price;
     private String scheduler;
@@ -54,6 +55,14 @@ public class CourseDto {
 
     public void setAge(String age) {
         this.age = age;
+    }
+
+    public boolean isInsurance() {
+        return insurance;
+    }
+
+    public void setInsurance(boolean insurance) {
+        this.insurance = insurance;
     }
 
     public int getJoined() {

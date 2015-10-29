@@ -98,6 +98,7 @@ public class CourseController extends BaseController {
         courseDto.setTitle(course.getTitle());
         courseDto.setCover(course.getCover());
         courseDto.setAge(course.getAge());
+        courseDto.setInsurance(course.getInsurance() > 0);
         courseDto.setJoined(course.getJoined());
         courseDto.setPrice(course.getPrice());
         courseDto.setScheduler(course.getScheduler());

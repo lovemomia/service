@@ -54,7 +54,7 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     public List<Course> list(Collection<Long> courseIds) {
         if (courseIds.isEmpty()) return new ArrayList<Course>();
 
-        String sql = "SELECT Id, SubjectId, Title, Cover, MinAge, MaxAge, Joined, Price, Goal, Flow, Tips, InstitutionId FROM SG_Course WHERE Id IN (" + StringUtils.join(courseIds, ",") + ") AND Status=1";
+        String sql = "SELECT Id, SubjectId, Title, Cover, MinAge, MaxAge, Insurance, Joined, Price, Goal, Flow, Tips, InstitutionId FROM SG_Course WHERE Id IN (" + StringUtils.join(courseIds, ",") + ") AND Status=1";
         List<Course> courses = queryList(sql, Course.class);
 
         Set<Integer> institutionIds = new HashSet<Integer>();

@@ -28,6 +28,7 @@ public class Course implements Cloneable {
     private String cover;
     private int minAge;
     private int maxAge;
+    private int insurance;
     private int joined;
     private BigDecimal price;
     private String goal;
@@ -86,6 +87,14 @@ public class Course implements Cloneable {
 
     public void setMaxAge(int maxAge) {
         this.maxAge = maxAge;
+    }
+
+    public int getInsurance() {
+        return insurance;
+    }
+
+    public void setInsurance(int insurance) {
+        this.insurance = insurance;
     }
 
     public int getJoined() {
