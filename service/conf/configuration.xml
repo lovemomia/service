@@ -46,7 +46,7 @@
 
     <Wap>
         <Domain>m.momia.cn</Domain>
-        <ProductUrl>http://m.momia.cn/m/subject/</ProductUrl>
+        <ProductUrl>http://m.momia.cn/subjectdetail?id=</ProductUrl>
     </Wap>
 
     <Payment>
