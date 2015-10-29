@@ -76,6 +76,7 @@ public class OrderController extends BaseController {
 
         Map<Long, SubjectSku> skusMap = new HashMap<Long, SubjectSku>();
         for (SubjectSku sku : skus) {
+            if (sku.getSubjectId() != order.getSubjectId()) return false;
             skusMap.put(sku.getId(), sku);
         }
 
