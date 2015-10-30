@@ -169,6 +169,8 @@ public class CourseController extends BaseController {
             }
         }
 
+        if (places.isEmpty()) return null;
+
         CourseSkuPlace place = places.get(0);
 
         CoursePlaceDto coursePlaceDto = new CoursePlaceDto();
