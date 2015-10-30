@@ -220,6 +220,7 @@ public class Course implements Cloneable {
             if (!regionIds.contains(regionId)) regionIds.add(regionId);
         }
 
+        if (regionIds.isEmpty()) return 0;
         return regionIds.size() > 1 ? RegionDto.MULTI_REGION_ID : regionIds.get(0);
     }
 
