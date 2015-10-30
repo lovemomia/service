@@ -39,7 +39,7 @@ public class Course implements Cloneable {
 
     private List<CourseImage> imgs;
     private CourseBook book;
-    private List<CourseSku> skus;
+    private List<CourseSku> skus = new ArrayList<CourseSku>();
 
     public long getId() {
         return id;
