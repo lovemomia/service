@@ -170,7 +170,7 @@ public class UserController extends UserRelatedController {
         return MomiaHttpResponse.SUCCESS(buildContactDto(user));
     }
 
-    @RequestMapping(value = "/{uid}/payed", method = RequestMethod.GET)
+    @RequestMapping(value = "/{uid}/payed", method = RequestMethod.POST)
     public MomiaHttpResponse payed(@PathVariable(value = "uid") long userId) {
         userService.payed(userId);
         return MomiaHttpResponse.SUCCESS;
