@@ -75,7 +75,7 @@ public abstract class UserRelatedController extends BaseController {
         contactDto.setName(user.getName());
         contactDto.setMobile(user.getMobile());
 
-        if (StringUtils.isBlank(contactDto.getName())) contactDto.setName(user.getName());
+        if (StringUtils.isBlank(contactDto.getName())) contactDto.setName(user.getNickName());
 
         return contactDto;
     }
