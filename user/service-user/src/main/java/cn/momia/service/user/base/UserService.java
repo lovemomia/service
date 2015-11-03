@@ -3,30 +3,26 @@ package cn.momia.service.user.base;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 public interface UserService {
-    boolean exists(String field, String value);
-
     long add(String nickName, String mobile, String password);
-    boolean validatePassword(String mobile, String password);
 
-    User get(long id);
-    List<User> list(Collection<Long> ids);
+    User get(long userId);
+    List<User> list(Collection<Long> userIds);
     User getByToken(String token);
     User getByMobile(String mobile);
 
-    boolean updateNickName(long id, String nickName);
-    boolean updateAvatar(long id, String avatar);
-    boolean updateName(long id, String name);
-    boolean updateSex(long id, String sex);
-    boolean updateBirthday(long id, Date birthday);
-    boolean updateCityId(long id, int cityId);
-    boolean updateRegionId(long id, int regionId);
-    boolean updateAddress(long id, String address);
-    boolean updateChildren(long id, Set<Long> children);
-    boolean updatePassword(long id, String mobile, String password);
+    boolean updateNickName(long userId, String nickName);
+    boolean updateAvatar(long userId, String avatar);
+    boolean updateName(long userId, String name);
+    boolean updateSex(long userId, String sex);
+    boolean updateBirthday(long userId, Date birthday);
+    boolean updateCityId(long userId, int cityId);
+    boolean updateRegionId(long userId, int regionId);
+    boolean updateAddress(long userId, String address);
 
-    boolean setPayed(long id);
-    long getIdByCode(String inviteCode);
+    boolean validatePassword(String mobile, String password);
+    boolean updatePassword(long userId, String mobile, String password);
+
+    void payed(long userId);
 }

@@ -4,7 +4,9 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean class="cn.momia.api.user.UserServiceApi" init-method="init">
+    <bean id="abstractUserApi" class="cn.momia.common.api.ServiceApi" abstract="true">
         <property name="service" value="${Service.User}" />
     </bean>
+    <bean class="cn.momia.api.user.ChildServiceApi" parent="abstractUserApi" />
+    <bean class="cn.momia.api.user.UserServiceApi" parent="abstractUserApi" />
 </beans>

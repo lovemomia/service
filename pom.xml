@@ -6,7 +6,7 @@
 
     <groupId>cn.momia</groupId>
     <artifactId>service</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <packaging>pom</packaging>
 
     <name>Momia Service</name>
@@ -14,16 +14,11 @@
 
     <modules>
         <module>base</module>
-        <module>deal</module>
-        <module>feed</module>
-        <module>product</module>
+        <module>course</module>
+        <module>event</module>
+        <module>poi</module>
         <module>user</module>
 
         <module>service</module>
-
-        <module>external</module>
-        <module>internal</module>
-
-        <module>activity</module>
     </modules>
 </project>

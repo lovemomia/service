@@ -1,12 +1,6 @@
 package cn.momia.service.base.region;
 
 public class Region {
-    public static final Region NOT_EXIST_REGION = new Region();
-    static {
-        NOT_EXIST_REGION.setId(0);
-        NOT_EXIST_REGION.setName("不存在");
-    }
-
     private int id;
     private int cityId;
     private String name;
@@ -44,22 +38,7 @@ public class Region {
         this.parentId = parentId;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Region)) return false;
-
-        Region region = (Region) o;
-
-        return getId() == region.getId();
-    }
-
-    @Override
-    public int hashCode() {
-        return getId();
-    }
-
     public boolean exists() {
-        return !this.equals(NOT_EXIST_REGION);
+        return id > 0;
     }
 }

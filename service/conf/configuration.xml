@@ -4,9 +4,15 @@
         <Level>INFO</Level>
     </Logger>
 
+    <Image>
+        <Domain>http://s.momia.cn</Domain>
+    </Image>
+
     <Service>
         <Base>http://localhost:7070</Base>
-        <Product>http://localhost:7070</Product>
+        <Course>http://localhost:7070</Course>
+        <Event>http://localhost:7070</Event>
+        <Poi>http://localhost:7070</Poi>
         <User>http://localhost:7070</User>
     </Service>
 
@@ -26,11 +32,11 @@
     </Limit>
 
     <Database>
-        <Tongqu>
-            <JdbcUrl><![CDATA[jdbc:mysql://120.55.102.12:3306/tongqu?characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull]]></JdbcUrl>
-            <Username>tongqu</Username>
-            <Password>Tongqu!@#456</Password>
-        </Tongqu>
+        <SogoKids>
+            <JdbcUrl><![CDATA[jdbc:mysql://120.55.102.12:3306/sogokids?characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull]]></JdbcUrl>
+            <Username>sogokids</Username>
+            <Password>SogoKids</Password>
+        </SogoKids>
     </Database>
 
     <SecretKey>
@@ -40,7 +46,8 @@
 
     <Wap>
         <Domain>m.momia.cn</Domain>
-        <ProductUrl>http://m.momia.cn/actsDetail.html</ProductUrl>
+        <ProductUrl>http://m.momia.cn/subjectdetail?id=</ProductUrl>
+        <PaymentResultUrl>http://m.momia.cn/payment/result?oid=</PaymentResultUrl>
     </Wap>
 
     <Payment>
@@ -50,7 +57,7 @@
             <AppService>mobile.securitypay.pay</AppService>
             <WapService>alipay.wap.create.direct.pay.by.user</WapService>
             <Partner>2088911944697039</Partner>
-            <NotifyUrl>https://i.momia.cn/callback/alipay</NotifyUrl>
+            <NotifyUrl>https://i.momia.cn/payment/callback/alipay</NotifyUrl>
             <VerifyUrl><![CDATA[https://mapi.alipay.com/gateway.do?service=notify_verify&]]></VerifyUrl>
         </Ali>
         <Wechat>
@@ -63,7 +70,7 @@
             <JsApiMchId>1251671101</JsApiMchId>
             <JsApiKey></JsApiKey>
             <JsApiSecret></JsApiSecret>
-            <NotifyUrl>https://i.momia.cn/callback/wechatpay</NotifyUrl>
+            <NotifyUrl>https://i.momia.cn/payment/callback/weixin</NotifyUrl>
         </Wechat>
     </Payment>
 
@@ -75,4 +82,17 @@
             <PageSize>20</PageSize>
         </Playmate>
     </Product>
+
+    <Im>
+        <RongCloud>
+            <Service>
+                <GetToken>https://api.cn.ronghub.com/user/getToken.json</GetToken>
+                <CreateGroup>https://api.cn.ronghub.com/group/create.json</CreateGroup>
+                <JoinGroup>https://api.cn.ronghub.com/group/join.json</JoinGroup>
+                <DeleteGroup>https://api.cn.ronghub.com/group/dismiss.json</DeleteGroup>
+            </Service>
+            <AppKey>lmxuhwagxybkd</AppKey>
+            <AppSecret>ZFpOktg33dzF</AppSecret>
+        </RongCloud>
+    </Im>
 </Configuration>

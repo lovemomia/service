@@ -1,10 +1,11 @@
 package cn.momia.service.user.base;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.Set;
+import cn.momia.service.user.base.child.Child;
 
-public class User implements Serializable {
+import java.util.Date;
+import java.util.List;
+
+public class User {
     public static class Type {
         public static final int MINI = 1;
         public static final int BASE = 2;
@@ -12,27 +13,23 @@ public class User implements Serializable {
     }
 
     public static final User NOT_EXIST_USER = new User();
-    public static final User INVALID_USER = new User();
-
-    static {
-        NOT_EXIST_USER.setId(0);
-        INVALID_USER.setId(0);
-    }
 
     private long id;
-    private String token;
     private String nickName;
-    private String mobile;
     private String avatar;
+
+    private String mobile;
     private String name;
     private String sex;
     private Date birthday;
     private int cityId;
     private int regionId;
     private String address;
-    private Set<Long> children;
-    private boolean payed;
-    private String inviteCode;
+    private int payed;
+
+    private String token;
+
+    private List<Child> children;
 
     public long getId() {
         return id;
@@ -40,14 +37,6 @@ public class User implements Serializable {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
     }
 
     public String getNickName() {
@@ -58,20 +47,20 @@ public class User implements Serializable {
         this.nickName = nickName;
     }
 
-    public String getMobile() {
-        return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
-    }
-
     public String getAvatar() {
         return avatar;
     }
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 
     public String getName() {
@@ -122,46 +111,31 @@ public class User implements Serializable {
         this.address = address;
     }
 
-    public Set<Long> getChildren() {
-        return children;
-    }
-
-    public void setChildren(Set<Long> children) {
-        this.children = children;
-    }
-
-    public boolean isPayed() {
+    public int getPayed() {
         return payed;
     }
 
-    public void setPayed(boolean payed) {
+    public void setPayed(int payed) {
         this.payed = payed;
     }
 
-    public String getInviteCode() {
-        return inviteCode;
+    public String getToken() {
+        return token;
     }
 
-    public void setInviteCode(String inviteCode) {
-        this.inviteCode = inviteCode;
+    public void setToken(String token) {
+        this.token = token;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof User)) return false;
-
-        User user = (User) o;
-
-        return getId() == user.getId();
+    public List<Child> getChildren() {
+        return children;
     }
 
-    @Override
-    public int hashCode() {
-        return (int) (getId() ^ (getId() >>> 32));
+    public void setChildren(List<Child> children) {
+        this.children = children;
     }
 
     public boolean exists() {
-        return !this.equals(NOT_EXIST_USER);
+        return id > 0;
     }
 }

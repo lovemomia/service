@@ -44,7 +44,7 @@ public class LuosimaoSmsSender implements SmsSender {
             HttpClient httpClient = HttpClientBuilder.create().build();
             HttpResponse response = httpClient.execute(httpPost);
             if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                LOGGER.error("fail to send msg to user, {}/{}", mobile, msg);
+                LOGGER.error("fail to send msg to user, {}/{}, http response code: {}", mobile, msg, response.getStatusLine().getStatusCode());
                 return false;
             }
 

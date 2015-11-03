@@ -1,45 +1,82 @@
 package cn.momia.service.user.web.ctrl;
 
+import cn.momia.api.user.dto.ContactDto;
+import cn.momia.api.user.dto.ChildDto;
+import cn.momia.api.user.dto.UserDto;
+import cn.momia.common.util.MobileUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.common.webapp.ctrl.dto.ListDto;
 import cn.momia.service.user.base.User;
+import cn.momia.service.user.base.child.Child;
 import cn.momia.service.user.base.UserService;
-import cn.momia.service.user.leader.LeaderService;
-import cn.momia.service.user.participant.Participant;
-import cn.momia.service.user.participant.ParticipantService;
-import cn.momia.service.user.web.ctrl.dto.FullUserDto;
-import cn.momia.service.user.web.ctrl.dto.ParticipantDto;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public abstract class UserRelatedController extends BaseController {
-    protected static final Set<String> SEX = new HashSet<String>();
-    static {
-        SEX.add("男");
-        SEX.add("女");
-    }
-
     @Autowired protected UserService userService;
-    @Autowired protected LeaderService leaderService;
-    @Autowired protected ParticipantService participantService;
 
-    protected FullUserDto buildUserResponse(User user) {
-        return buildUserResponse(user, true);
+    protected UserDto buildUserDto(User user) {
+        return buildUserDto(user, User.Type.FULL, true);
     }
 
-    protected FullUserDto buildUserResponse(User user, boolean showToken) {
-        return new FullUserDto(user, participantService.list(user.getChildren()), leaderService.getByUser(user.getId()), showToken);
+    protected UserDto buildUserDto(User user, int type) {
+        return buildUserDto(user, type, true);
     }
 
-    protected ListDto buildParticipantsResponse(List<Participant> participants) {
-        ListDto participantsDto = new ListDto();
-        for (Participant participant : participants) {
-            participantsDto.add(new ParticipantDto(participant));
+    protected UserDto buildUserDto(User user, int type, boolean showToken) {
+        UserDto userDto = new UserDto();
+        switch (type) {
+            case User.Type.FULL:
+                userDto.setChildren(buildUserDtos(user.getChildren()));
+            case User.Type.BASE:
+                userDto.setMobile(MobileUtil.encrypt(user.getMobile()));
+                userDto.setName(user.getName());
+                userDto.setSex(user.getSex());
+                userDto.setBirthday(user.getBirthday());
+                userDto.setCityId(user.getCityId());
+                userDto.setRegionId(user.getRegionId());
+                userDto.setAddress(user.getAddress());
+                userDto.setPayed(user.getPayed() == 1);
+                if (showToken) userDto.setToken(user.getToken());
+            case User.Type.MINI:
+                userDto.setId(user.getId());
+                userDto.setNickName(user.getNickName());
+                userDto.setAvatar(user.getAvatar());
+            default: break;
         }
 
-        return participantsDto;
+        return userDto;
+    }
+
+    protected List<ChildDto> buildUserDtos(List<Child> children) {
+        List<ChildDto> childDtos = new ArrayList<ChildDto>();
+        for (Child child : children) {
+            childDtos.add(buildChildDto(child));
+        }
+
+        return childDtos;
+    }
+
+    protected ChildDto buildChildDto(Child child) {
+        ChildDto childDto = new ChildDto();
+        childDto.setId(child.getId());
+        childDto.setUserId(child.getUserId());
+        childDto.setAvatar(child.getAvatar());
+        childDto.setName(child.getName());
+        childDto.setSex(child.getSex());
+        childDto.setBirthday(child.getBirthday());
+        return childDto;
+    }
+
+    protected ContactDto buildContactDto(User user) {
+        ContactDto contactDto = new ContactDto();
+        contactDto.setName(user.getName());
+        contactDto.setMobile(user.getMobile());
+
+        if (StringUtils.isBlank(contactDto.getName())) contactDto.setName(user.getNickName());
+
+        return contactDto;
     }
 }

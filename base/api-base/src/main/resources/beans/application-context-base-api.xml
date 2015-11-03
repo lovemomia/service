@@ -4,7 +4,21 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean class="cn.momia.api.base.BaseServiceApi" init-method="init">
+    <bean id="abstractBaseApi" class="cn.momia.common.api.ServiceApi" abstract="true">
         <property name="service" value="${Service.Base}" />
+    </bean>
+    <bean id="ageRangeServiceApi" class="cn.momia.api.base.AgeRangeServiceApi" parent="abstractBaseApi" />
+    <bean id="cityServiceApi" class="cn.momia.api.base.CityServiceApi" parent="abstractBaseApi" />
+    <bean id="regionServiceApi" class="cn.momia.api.base.RegionServiceApi" parent="abstractBaseApi" />
+    <bean id="sortTypeServiceApi" class="cn.momia.api.base.SortTypeServiceApi" parent="abstractBaseApi" />
+
+    <bean class="cn.momia.api.base.FeedbackServiceApi" parent="abstractBaseApi" />
+    <bean class="cn.momia.api.base.SmsServiceApi" parent="abstractBaseApi" />
+
+    <bean class="cn.momia.api.base.MetaUtil">
+        <property name="ageRangeServiceApi" ref="ageRangeServiceApi" />
+        <property name="cityServiceApi" ref="cityServiceApi" />
+        <property name="regionServiceApi" ref="regionServiceApi" />
+        <property name="sortTypeServiceApi" ref="sortTypeServiceApi" />
     </bean>
 </beans>

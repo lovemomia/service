@@ -13,15 +13,15 @@ import java.sql.Statement;
 
 public class FeedbackServiceImpl extends DbAccessService implements FeedbackService {
     @Override
-    public long add(final String content, final String email) {
+    public long add(final String content, final String contact) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO t_feedback(content, email, addTime) VALUES(?, ?, NOW())";
+                String sql = "INSERT INTO SG_Feedback(Content, Contact, AddTime) VALUES(?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, content);
-                ps.setString(2, email);
+                ps.setString(2, contact);
 
                 return ps;
             }
