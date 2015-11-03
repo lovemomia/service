@@ -57,4 +57,7 @@ public interface CourseService {
 
     boolean canComment(long userId, long courseId);
     boolean comment(CourseComment comment);
+
+    long queryCommentCountByCourse(long courseId);
+    List<CourseComment> queryCommentsByCourse(long courseId, int start, int count);
 }

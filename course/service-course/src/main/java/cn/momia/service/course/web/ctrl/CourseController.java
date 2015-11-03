@@ -3,12 +3,14 @@ package cn.momia.service.course.web.ctrl;
 import cn.momia.api.base.MetaUtil;
 import cn.momia.api.course.dto.BookedCourseDto;
 import cn.momia.api.course.dto.CourseBookDto;
+import cn.momia.api.course.dto.CourseCommentDto;
 import cn.momia.api.course.dto.CourseDetailDto;
 import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.CoursePlaceDto;
 import cn.momia.api.course.dto.CourseSkuDto;
 import cn.momia.api.course.dto.DatedCourseSkusDto;
 import cn.momia.api.user.UserServiceApi;
+import cn.momia.api.user.dto.ChildDto;
 import cn.momia.api.user.dto.UserDto;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
@@ -276,6 +278,8 @@ public class CourseController extends BaseController {
 
     @RequestMapping(value = "/{coid}/book", method = RequestMethod.GET)
     public MomiaHttpResponse book(@PathVariable(value = "coid") long courseId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
         long totalCount = courseService.queryBookImgCount(courseId);
         List<String> bookImgs = courseService.queryBookImgs(courseId, start, count);
         PagedList<String> pagedBookImgs = new PagedList<String>(totalCount, start, count);
@@ -286,6 +290,8 @@ public class CourseController extends BaseController {
 
     @RequestMapping(value = "/{coid}/teacher", method = RequestMethod.GET)
     public MomiaHttpResponse teacher(@PathVariable(value = "coid") long courseId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
         long totalCount = courseService.queryTeacherCount(courseId);
         List<Teacher> teachers = courseService.queryTeachers(courseId, start, count);
         PagedList<Teacher> pagedTeachers = new PagedList<Teacher>(totalCount, start, count);
@@ -405,6 +411,8 @@ public class CourseController extends BaseController {
 
     @RequestMapping(value = "/notfinished", method = RequestMethod.GET)
     public MomiaHttpResponse notFinished(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
         long totalCount = courseService.queryNotFinishedCountByUser(userId);
         List<BookedCourse> bookedCourses = courseService.queryNotFinishedByUser(userId, start, count);
         List<BookedCourseDto> bookedCourseDtos = buildBookedCourseDtos(bookedCourses);
@@ -450,6 +458,8 @@ public class CourseController extends BaseController {
 
     @RequestMapping(value = "/finished", method = RequestMethod.GET)
     public MomiaHttpResponse finished(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
         long totalCount = courseService.queryFinishedCountByUser(userId);
         List<BookedCourse> bookedCourses = courseService.queryFinishedByUser(userId, start, count);
         List<BookedCourseDto> bookedCourseDtos = buildBookedCourseDtos(bookedCourses);
@@ -526,6 +536,61 @@ public class CourseController extends BaseController {
         if (comment.getImgs() != null && comment.getImgs().size() > 9) return MomiaHttpResponse.FAILED("上传的图片过多，1条评论最多上传9张图片");
 
         return MomiaHttpResponse.SUCCESS(courseService.comment(comment));
+    }
+
+    @RequestMapping(value = "/{coid}/comment", method = RequestMethod.GET)
+    public MomiaHttpResponse listComment(@PathVariable(value = "coid") long courseId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = courseService.queryCommentCountByCourse(courseId);
+        List<CourseComment> comments = courseService.queryCommentsByCourse(courseId, start, count);
+
+        Set<Long> userIds = new HashSet<Long>();
+        for (CourseComment comment : comments) {
+            userIds.add(comment.getUserId());
+        }
+
+        List<UserDto> users = userServiceApi.list(userIds, UserDto.Type.FULL);
+        Map<Long, UserDto> usersMap = new HashMap<Long, UserDto>();
+        for (UserDto user : users) {
+            usersMap.put(user.getId(), user);
+        }
+
+        List<CourseCommentDto> commentDtos = new ArrayList<CourseCommentDto>();
+        for (CourseComment comment : comments) {
+            UserDto user = usersMap.get(comment.getUserId());
+            if (user == null) continue;
+            commentDtos.add(buildCourseCommentDto(comment, user));
+        }
+
+        PagedList<CourseCommentDto> pagedCommentDtos = new PagedList<CourseCommentDto>(totalCount, start, count);
+        pagedCommentDtos.setList(commentDtos);
+
+        return MomiaHttpResponse.SUCCESS(pagedCommentDtos);
+    }
+
+    private CourseCommentDto buildCourseCommentDto(CourseComment comment, UserDto user) {
+        CourseCommentDto courseCommentDto = new CourseCommentDto();
+        courseCommentDto.setId(comment.getId());
+        courseCommentDto.setUserId(user.getId());
+        courseCommentDto.setNickName(user.getNickName());
+        courseCommentDto.setAvatar(user.getAvatar());
+        courseCommentDto.setChildren(formatChildren(user.getChildren()));
+        courseCommentDto.setAddTime(comment.getAddTime());
+        courseCommentDto.setStar(comment.getStar());
+        courseCommentDto.setImgs(comment.getImgs());
+
+        return courseCommentDto;
+    }
+
+    private List<String> formatChildren(List<ChildDto> children) {
+        List<String> formatedChildren = new ArrayList<String>();
+        for (int i = 0; i < Math.min(2, children.size()); i++) {
+            ChildDto child = children.get(i);
+            formatedChildren.add(child.getSex() + "孩" + TimeUtil.formatAge(child.getBirthday()));
+        }
+
+        return formatedChildren;
     }
 
     @RequestMapping(value = "/{coid}/favored", method = RequestMethod.GET)

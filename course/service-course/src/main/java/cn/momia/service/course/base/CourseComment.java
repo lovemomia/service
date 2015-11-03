@@ -1,5 +1,6 @@
 package cn.momia.service.course.base;
 
+import java.util.Date;
 import java.util.List;
 
 public class CourseComment {
@@ -11,6 +12,7 @@ public class CourseComment {
     private int environment;
     private String content;
     private List<String> imgs;
+    private Date addTime;
 
     public long getId() {
         return id;
@@ -74,5 +76,13 @@ public class CourseComment {
 
     public void setImgs(List<String> imgs) {
         this.imgs = imgs;
+    }
+
+    public Date getAddTime() {
+        return addTime;
+    }
+
+    public void setAddTime(Date addTime) {
+        this.addTime = addTime;
     }
 }

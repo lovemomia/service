@@ -1,6 +1,7 @@
 package cn.momia.api.course;
 
 import cn.momia.api.course.dto.BookedCourseDto;
+import cn.momia.api.course.dto.CourseCommentDto;
 import cn.momia.api.course.dto.CourseDetailDto;
 import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.DatedCourseSkusDto;
@@ -131,6 +132,15 @@ public class CourseServiceApi extends ServiceApi {
     public boolean comment(JSONObject commentJson) {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("course/comment"), commentJson.toString());
         return (Boolean) executeRequest(request);
+    }
+
+    public PagedList<CourseCommentDto> listComment(long courseId, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("start", start)
+                .add("count", count);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "comment"), builder.build());
+        
+        return CastUtil.toPagedList((JSON) executeRequest(request), CourseCommentDto.class);
     }
 
     public boolean isFavored(long userId, long courseId) {

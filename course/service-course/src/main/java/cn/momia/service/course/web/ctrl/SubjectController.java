@@ -47,6 +47,8 @@ public class SubjectController extends BaseController {
 
     @RequestMapping(value = "/free", method = RequestMethod.GET)
     public MomiaHttpResponse listFree(@RequestParam(value = "city") long cityId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
         long totalCount = subjectService.queryFreeCount(cityId);
         List<Subject> subjects = subjectService.queryFree(cityId, start, count);
 

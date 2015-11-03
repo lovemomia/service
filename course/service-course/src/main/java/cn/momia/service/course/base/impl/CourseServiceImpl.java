@@ -582,4 +582,62 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         String sql = "INSERT INTO SG_CourseCommentImg (CommentId, Url, AddTime) VALUES (?, ?, NOW())";
         jdbcTemplate.batchUpdate(sql, params);
     }
+
+    @Override
+    public long queryCommentCountByCourse(long courseId) {
+        String sql = "SELECT COUNT(1) FROM SG_CourseComment WHERE CourseId=? AND Status=1";
+        return queryInt(sql, new Object[] { courseId });
+    }
+
+    @Override
+    public List<CourseComment> queryCommentsByCourse(long courseId, int start, int count) {
+        String sql = "SELECT Id FROM SG_CourseComment WHERE CourseId=? AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
+        List<Long> commentIds = queryLongList(sql, new Object[] { courseId, start, count });
+
+        return listComments(commentIds);
+    }
+
+    private List<CourseComment> listComments(List<Long> commentIds) {
+        if (commentIds.isEmpty()) return new ArrayList<CourseComment>();
+
+        String sql = "SELECT Id, UserId, CourseId, Star, Teacher, Environment, Content, AddTime FROM SG_CourseComment WHERE Id IN (" + StringUtils.join(commentIds, ",") + ") AND Status=1";
+        List<CourseComment> comments = queryList(sql, CourseComment.class);
+
+        Map<Long, List<String>> imgsMap = queryCommentImgs(commentIds);
+
+        Map<Long, CourseComment> commentsMap = new HashMap<Long, CourseComment>();
+        for (CourseComment comment : comments) {
+            comment.setImgs(imgsMap.get(comment.getId()));
+            commentsMap.put(comment.getId(), comment);
+        }
+
+        List<CourseComment> result = new ArrayList<CourseComment>();
+        for (long commentId : commentIds) {
+            CourseComment comment = commentsMap.get(commentId);
+            if (comment != null) result.add(comment);
+        }
+
+        return result;
+    }
+
+    private Map<Long, List<String>> queryCommentImgs(List<Long> commentIds) {
+        if (commentIds.isEmpty()) return new HashMap<Long, List<String>>();
+
+        final Map<Long, List<String>> imgsMap = new HashMap<Long, List<String>>();
+        for (long commentId : commentIds) {
+            imgsMap.put(commentId, new ArrayList<String>());
+        }
+
+        String sql = "SELECT CommentId, Url FROM SG_CourseCommentImg WHERE CommentId IN (" + StringUtils.join(commentIds, ",") + ") AND Status=1";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                long commentId = rs.getLong("CommentId");
+                String url = rs.getString("Url");
+                imgsMap.get(commentId).add(url);
+            }
+        });
+
+        return imgsMap;
+    }
 }

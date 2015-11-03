@@ -103,6 +103,8 @@ public class OrderController extends BaseController {
                                                 @RequestParam(value = "oid") long orderId,
                                                 @RequestParam int start,
                                                 @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
         UserDto user = userServiceApi.get(utoken);
 
         long totalCount = orderId > 0 ? orderService.queryBookableCountByUserAndOrder(user.getId(), orderId) : orderService.queryBookableCountByUser(user.getId());
@@ -175,6 +177,8 @@ public class OrderController extends BaseController {
                                         @RequestParam int status,
                                         @RequestParam int start,
                                         @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
         UserDto user = userServiceApi.get(utoken);
 
         long totalCount = orderService.queryCountByUser(user.getId(), status);
