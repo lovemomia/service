@@ -18,6 +18,7 @@ import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.BookedCourse;
 import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseBook;
+import cn.momia.service.course.base.CourseComment;
 import cn.momia.service.course.base.CourseDetail;
 import cn.momia.service.course.base.CourseImage;
 import cn.momia.service.course.base.CourseService;
@@ -28,13 +29,13 @@ import cn.momia.service.course.base.Teacher;
 import cn.momia.service.course.subject.order.Order;
 import cn.momia.service.course.subject.order.OrderPackage;
 import cn.momia.service.course.subject.order.OrderService;
-import com.alibaba.fastjson.JSON;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -517,6 +518,14 @@ public class CourseController extends BaseController {
         }
 
         return MomiaHttpResponse.SUCCESS(true);
+    }
+
+    @RequestMapping(value = "/comment", method = RequestMethod.POST, consumes = "application/json")
+    public MomiaHttpResponse comment(@RequestBody CourseComment comment) {
+        if (!courseService.canComment(comment.getUserId(), comment.getCourseId())) return MomiaHttpResponse.FAILED("你还没有上过这门课，无法评论");
+        if (comment.getImgs() != null && comment.getImgs().size() > 9) return MomiaHttpResponse.FAILED("上传的图片过多，1条评论最多上传9张图片");
+
+        return MomiaHttpResponse.SUCCESS(courseService.comment(comment));
     }
 
     @RequestMapping(value = "/{coid}/favored", method = RequestMethod.GET)

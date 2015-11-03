@@ -54,4 +54,7 @@ public interface CourseService {
     Institution getInstitution(long courseId);
 
     boolean matched(long subjectId, long courseId);
+
+    boolean canComment(long userId, long courseId);
+    boolean comment(CourseComment comment);
 }

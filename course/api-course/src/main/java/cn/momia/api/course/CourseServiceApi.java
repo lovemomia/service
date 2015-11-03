@@ -12,6 +12,8 @@ import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
 import cn.momia.common.api.util.CastUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.List;
@@ -123,6 +125,11 @@ public class CourseServiceApi extends ServiceApi {
                 .add("bid", bookingId);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("course/cancel"), builder.build());
 
+        return (Boolean) executeRequest(request);
+    }
+
+    public boolean comment(JSONObject commentJson) {
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("course/comment"), commentJson.toString());
         return (Boolean) executeRequest(request);
     }
 

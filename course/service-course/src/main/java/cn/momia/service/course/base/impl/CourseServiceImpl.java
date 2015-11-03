@@ -7,6 +7,7 @@ import cn.momia.service.course.base.BookedCourse;
 import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseBook;
 import cn.momia.service.course.base.CourseBookImage;
+import cn.momia.service.course.base.CourseComment;
 import cn.momia.service.course.base.CourseDetail;
 import cn.momia.service.course.base.CourseImage;
 import cn.momia.service.course.base.CourseService;
@@ -534,5 +535,51 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     public boolean matched(long subjectId, long courseId) {
         String sql = "SELECT COUNT(1) FROM SG_Course WHERE Id=? AND SubjectId=? AND Status=1";
         return queryInt(sql, new Object[] { courseId, subjectId }) > 0;
+    }
+
+    @Override
+    public boolean canComment(long userId, long courseId) {
+        String sql = "SELECT COUNT(1) FROM SG_BookedCourse WHERE UserId=? AND CourseId=? AND Status=1 AND StartTime<=NOW()";
+        return queryInt(sql, new Object[] { userId, courseId }) > 0;
+    }
+
+    @Override
+    public boolean comment(CourseComment comment) {
+        long commentId = addComment(comment);
+        if (commentId <= 0) return false;
+
+        addCommentImgs(commentId, comment.getImgs());
+
+        return true;
+    }
+
+    private long addComment(final CourseComment comment) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                String sql = "INSERT INTO SG_CourseComment(UserId, CourseId, Star, Teacher, Environment, Content, AddTime) VALUES(?, ?, ?, ?, ?, ?, NOW())";
+                PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ps.setLong(1, comment.getUserId());
+                ps.setLong(2, comment.getCourseId());
+                ps.setInt(3, comment.getStar());
+                ps.setInt(4, comment.getTeacher());
+                ps.setInt(5, comment.getEnvironment());
+                ps.setString(6, comment.getContent());
+
+                return ps;
+            }
+        }, keyHolder);
+
+        return keyHolder.getKey().longValue();
+    }
+
+    private void addCommentImgs(long commentId, List<String> imgs) {
+        List<Object[]> params = new ArrayList<Object[]>();
+        for (String img : imgs) {
+            params.add(new Object[] { commentId, img });
+        }
+        String sql = "INSERT INTO SG_CourseCommentImg (CommentId, Url, AddTime) VALUES (?, ?, NOW())";
+        jdbcTemplate.batchUpdate(sql, params);
     }
 }
