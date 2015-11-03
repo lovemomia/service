@@ -5,6 +5,7 @@ import cn.momia.api.course.dto.CourseCommentDto;
 import cn.momia.api.course.dto.CourseDetailDto;
 import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.DatedCourseSkusDto;
+import cn.momia.api.course.dto.FavoriteDto;
 import cn.momia.api.course.dto.InstitutionDto;
 import cn.momia.api.course.dto.TeacherDto;
 import cn.momia.common.api.ServiceApi;
@@ -170,5 +171,10 @@ public class CourseServiceApi extends ServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("course", courseId, "unfavor"), builder.build());
 
         return (Boolean) executeRequest(request);
+    }
+
+    public PagedList<FavoriteDto> listFavorites(String utoken, int start, int count) {
+        // TODO
+        return null;
     }
 }

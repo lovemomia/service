@@ -1,5 +1,6 @@
 package cn.momia.api.course;
 
+import cn.momia.api.course.dto.FavoriteDto;
 import cn.momia.api.course.dto.OrderPackageDto;
 import cn.momia.api.course.dto.OrderDto;
 import cn.momia.api.course.dto.SubjectDto;
@@ -84,5 +85,10 @@ public class SubjectServiceApi extends ServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("subject", subjectId, "unfavor"), builder.build());
 
         return (Boolean) executeRequest(request);
+    }
+
+    public PagedList<FavoriteDto> listFavorites(String utoken, int start, int count) {
+        // TODO
+        return null;
     }
 }
