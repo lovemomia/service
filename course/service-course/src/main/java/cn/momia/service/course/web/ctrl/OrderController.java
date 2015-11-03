@@ -94,6 +94,12 @@ public class OrderController extends BaseController {
         return orderDto;
     }
 
+    @RequestMapping(method = RequestMethod.DELETE)
+    public MomiaHttpResponse delete(@RequestParam String utoken, @RequestParam(value = "oid") long orderId) {
+        UserDto user = userServiceApi.get(utoken);
+        return MomiaHttpResponse.SUCCESS(orderService.delete(user.getId(), orderId));
+    }
+
     @RequestMapping(value = "/bookable", method = RequestMethod.GET)
     public MomiaHttpResponse listBookableOrders(@RequestParam String utoken,
                                                 @RequestParam(value = "oid") long orderId,

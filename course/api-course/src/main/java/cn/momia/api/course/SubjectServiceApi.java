@@ -41,6 +41,15 @@ public class SubjectServiceApi extends ServiceApi {
         return CastUtil.toObject((JSON) executeRequest(request), OrderDto.class);
     }
 
+    public boolean deleteOrder(String utoken, long orderId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("oid", orderId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.DELETE(url("subject/order"), builder.build());
+
+        return (Boolean) executeRequest(request);
+    }
+
     public PagedList<OrderPackageDto> listBookableOrders(String utoken, long orderId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
