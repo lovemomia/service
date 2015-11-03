@@ -497,6 +497,8 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
 
     @Override
     public boolean favor(long userId, long courseId) {
+        if (!exists(courseId)) return false;
+
         long favoretId = getFavoretId(userId, courseId);
         if (favoretId > 0) {
             String sql = "UPDATE SG_Favorite SET Status=1 WHERE Id=? AND UserId=? AND `Type`=1 AND RefId=?";
@@ -505,6 +507,11 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
             String sql = "INSERT INTO SG_Favorite(UserId, `Type`, RefId, AddTime) VALUES (?, 1, ?, NOW())";
             return jdbcTemplate.update(sql, new Object[] { userId, courseId }) == 1;
         }
+    }
+
+    private boolean exists(long courseId) {
+        String sql = "SELECT COUNT(1) FROM SG_Course WHERE Id=? AND Status=1";
+        return queryInt(sql, new Object[] { courseId }) > 0;
     }
 
     private long getFavoretId(long userId, long courseId) {

@@ -152,6 +152,8 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
 
     @Override
     public boolean favor(long userId, long subjectId) {
+        if (!exists(subjectId)) return false;
+
         long favoretId = getFavoretId(userId, subjectId);
         if (favoretId > 0) {
             String sql = "UPDATE SG_Favorite SET Status=1 WHERE Id=? AND UserId=? AND `Type`=2 AND RefId=?";
@@ -160,6 +162,11 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
             String sql = "INSERT INTO SG_Favorite(UserId, `Type`, RefId, AddTime) VALUES (?, 2, ?, NOW())";
             return jdbcTemplate.update(sql, new Object[] { userId, subjectId }) == 1;
         }
+    }
+
+    private boolean exists(long subjectId) {
+        String sql = "SELECT COUNT(1) FROM SG_Subject WHERE Id=? AND Status=1";
+        return queryInt(sql, new Object[] { subjectId }) > 0;
     }
 
     private long getFavoretId(long userId, long subjectId) {
