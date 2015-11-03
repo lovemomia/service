@@ -585,14 +585,30 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
 
     @Override
     public long queryCommentCountByCourse(long courseId) {
-        String sql = "SELECT COUNT(1) FROM SG_CourseComment WHERE CourseId=? AND Status=1";
-        return queryInt(sql, new Object[] { courseId });
+        Set<Long> courseIds = Sets.newHashSet(courseId);
+        return queryCommentCountByCourses(courseIds);
+    }
+
+    private long queryCommentCountByCourses(Collection<Long> courseIds) {
+        if (courseIds.isEmpty()) return 0;
+
+        String sql = "SELECT COUNT(1) FROM SG_CourseComment WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Status=1";
+        return queryInt(sql, null);
     }
 
     @Override
     public List<CourseComment> queryCommentsByCourse(long courseId, int start, int count) {
         String sql = "SELECT Id FROM SG_CourseComment WHERE CourseId=? AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
         List<Long> commentIds = queryLongList(sql, new Object[] { courseId, start, count });
+
+        return listComments(commentIds);
+    }
+
+    private List<CourseComment> queryCommentsByCourses(Collection<Long> courseIds, int start, int count) {
+        if (courseIds.isEmpty()) return new ArrayList<CourseComment>();
+
+        String sql = "SELECT Id FROM SG_CourseComment WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
+        List<Long> commentIds = queryLongList(sql, new Object[] { start, count });
 
         return listComments(commentIds);
     }
@@ -639,5 +655,21 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         });
 
         return imgsMap;
+    }
+
+    @Override
+    public long queryCommentCountBySubject(long subjectId) {
+        String sql = "SELECT Id FROM SG_Course WHERE SubjectId=? AND Status=1";
+        List<Long> courseIds = queryLongList(sql, new Object[] { subjectId });
+
+        return queryCommentCountByCourses(courseIds);
+    }
+
+    @Override
+    public List<CourseComment> queryCommentsBySubject(long subjectId, int start, int count) {
+        String sql = "SELECT Id FROM SG_Course WHERE SubjectId=? AND Status=1";
+        List<Long> courseIds = queryLongList(sql, new Object[] { subjectId });
+
+        return queryCommentsByCourses(courseIds, start, count);
     }
 }

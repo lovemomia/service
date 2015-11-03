@@ -2,14 +2,19 @@ package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.base.MetaUtil;
 import cn.momia.api.base.dto.RegionDto;
+import cn.momia.api.course.dto.CourseCommentDto;
 import cn.momia.api.course.dto.SubjectDto;
 import cn.momia.api.course.dto.SubjectSkuDto;
+import cn.momia.api.user.UserServiceApi;
+import cn.momia.api.user.dto.ChildDto;
+import cn.momia.api.user.dto.UserDto;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.Course;
+import cn.momia.service.course.base.CourseComment;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectImage;
@@ -30,6 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +50,8 @@ public class SubjectController extends BaseController {
 
     @Autowired private CourseService courseService;
     @Autowired private SubjectService subjectService;
+
+    @Autowired private UserServiceApi userServiceApi;
 
     @RequestMapping(value = "/free", method = RequestMethod.GET)
     public MomiaHttpResponse listFree(@RequestParam(value = "city") long cityId, @RequestParam int start, @RequestParam int count) {
@@ -209,5 +217,60 @@ public class SubjectController extends BaseController {
         }
 
         return skuDtos;
+    }
+
+    @RequestMapping(value = "/{suid}/comment", method = RequestMethod.GET)
+    public MomiaHttpResponse listComments(@PathVariable(value = "suid") long subjectId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = courseService.queryCommentCountBySubject(subjectId);
+        List<CourseComment> comments = courseService.queryCommentsBySubject(subjectId, start, count);
+
+        Set<Long> userIds = new HashSet<Long>();
+        for (CourseComment comment : comments) {
+            userIds.add(comment.getUserId());
+        }
+
+        List<UserDto> users = userServiceApi.list(userIds, UserDto.Type.FULL);
+        Map<Long, UserDto> usersMap = new HashMap<Long, UserDto>();
+        for (UserDto user : users) {
+            usersMap.put(user.getId(), user);
+        }
+
+        List<CourseCommentDto> commentDtos = new ArrayList<CourseCommentDto>();
+        for (CourseComment comment : comments) {
+            UserDto user = usersMap.get(comment.getUserId());
+            if (user == null) continue;
+            commentDtos.add(buildCourseCommentDto(comment, user));
+        }
+
+        PagedList<CourseCommentDto> pagedCommentDtos = new PagedList<CourseCommentDto>(totalCount, start, count);
+        pagedCommentDtos.setList(commentDtos);
+
+        return MomiaHttpResponse.SUCCESS(pagedCommentDtos);
+    }
+
+    private CourseCommentDto buildCourseCommentDto(CourseComment comment, UserDto user) {
+        CourseCommentDto courseCommentDto = new CourseCommentDto();
+        courseCommentDto.setId(comment.getId());
+        courseCommentDto.setUserId(user.getId());
+        courseCommentDto.setNickName(user.getNickName());
+        courseCommentDto.setAvatar(user.getAvatar());
+        courseCommentDto.setChildren(formatChildren(user.getChildren()));
+        courseCommentDto.setAddTime(comment.getAddTime());
+        courseCommentDto.setStar(comment.getStar());
+        courseCommentDto.setImgs(comment.getImgs());
+
+        return courseCommentDto;
+    }
+
+    private List<String> formatChildren(List<ChildDto> children) {
+        List<String> formatedChildren = new ArrayList<String>();
+        for (int i = 0; i < Math.min(2, children.size()); i++) {
+            ChildDto child = children.get(i);
+            formatedChildren.add(child.getSex() + "孩" + TimeUtil.formatAge(child.getBirthday()));
+        }
+
+        return formatedChildren;
     }
 }

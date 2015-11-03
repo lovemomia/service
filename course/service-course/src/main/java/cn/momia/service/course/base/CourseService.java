@@ -60,4 +60,6 @@ public interface CourseService {
 
     long queryCommentCountByCourse(long courseId);
     List<CourseComment> queryCommentsByCourse(long courseId, int start, int count);
+    long queryCommentCountBySubject(long subjectId);
+    List<CourseComment> queryCommentsBySubject(long subjectId, int start, int count);
 }
