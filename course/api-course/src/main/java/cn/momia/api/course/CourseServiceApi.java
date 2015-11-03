@@ -14,7 +14,6 @@ import cn.momia.common.api.http.MomiaHttpRequestBuilder;
 import cn.momia.common.api.util.CastUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.List;
