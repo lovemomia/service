@@ -58,12 +58,6 @@ public class OrderController extends BaseController {
         long orderId = orderService.add(order);
         if (orderId < 0) return MomiaHttpResponse.FAILED("下单失败");
 
-        try {
-            userServiceApi.payed(order.getUserId());
-        } catch (Exception e) {
-            LOGGER.error("fail to set payed of user: {}", order.getUserId(), e);
-        }
-
         order.setId(orderId);
         return MomiaHttpResponse.SUCCESS(buildOrderDto(order));
     }

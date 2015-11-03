@@ -21,6 +21,8 @@ import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.subject.order.Order;
 import cn.momia.service.course.subject.order.OrderService;
 import cn.momia.service.course.subject.order.Payment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -33,6 +35,8 @@ import java.math.BigDecimal;
 @RestController
 @RequestMapping(value = "/payment")
 public class PaymentController extends BaseController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PaymentController.class);
+
     @Autowired private SubjectService subjectService;
     @Autowired private OrderService orderService;
     @Autowired private UserServiceApi userServiceApi;
@@ -148,7 +152,17 @@ public class PaymentController extends BaseController {
 
     private boolean finishPayment(Order order, Payment payment) {
         // TODO 后续的一些操作
-        return orderService.pay(payment);
+        if (orderService.pay(payment)) {
+            try {
+                userServiceApi.payed(order.getUserId());
+            } catch (Exception e) {
+                LOGGER.error("fail to set payed of user: {}", order.getUserId(), e);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     @RequestMapping(value = "/callback/weixin", method = RequestMethod.POST)
