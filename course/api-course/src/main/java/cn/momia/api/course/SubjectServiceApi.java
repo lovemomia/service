@@ -71,4 +71,18 @@ public class SubjectServiceApi extends ServiceApi {
 
         return CastUtil.toPagedList((JSON) executeRequest(request), OrderDto.class);
     }
+
+    public boolean favor(long userId, long subjectId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("subject", subjectId, "favor"), builder.build());
+
+        return (Boolean) executeRequest(request);
+    }
+
+    public boolean unfavor(long userId, long subjectId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("subject", subjectId, "unfavor"), builder.build());
+
+        return (Boolean) executeRequest(request);
+    }
 }

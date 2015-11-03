@@ -273,4 +273,19 @@ public class SubjectController extends BaseController {
 
         return formatedChildren;
     }
+
+    @RequestMapping(value = "/{suid}/favored", method = RequestMethod.GET)
+    public MomiaHttpResponse favored(@RequestParam(value = "uid") long userId, @PathVariable(value = "suid") long subjectId) {
+        return MomiaHttpResponse.SUCCESS(subjectService.isFavored(userId, subjectId));
+    }
+
+    @RequestMapping(value = "/{suid}/favor", method = RequestMethod.POST)
+    public MomiaHttpResponse favor(@RequestParam(value = "uid") long userId, @PathVariable(value = "suid") long subjectId) {
+        return MomiaHttpResponse.SUCCESS(subjectService.favor(userId, subjectId));
+    }
+
+    @RequestMapping(value = "/{suid}/unfavor", method = RequestMethod.POST)
+    public MomiaHttpResponse unfavor(@RequestParam(value = "uid") long userId, @PathVariable(value = "suid") long subjectId) {
+        return MomiaHttpResponse.SUCCESS(subjectService.unfavor(userId, subjectId));
+    }
 }

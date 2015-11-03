@@ -15,4 +15,8 @@ public interface SubjectService {
     List<SubjectSku> querySkus(long subjectId);
 
     boolean isForNewUser(long subjectId);
+
+    boolean isFavored(long userId, long subjectId);
+    boolean favor(long userId, long subjectId);
+    boolean unfavor(long userId, long subjectId);
 }

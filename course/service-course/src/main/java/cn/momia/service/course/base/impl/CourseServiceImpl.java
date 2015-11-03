@@ -507,7 +507,6 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         }
     }
 
-
     private long getFavoretId(long userId, long courseId) {
         String sql = "SELECT Id FROM SG_Favorite WHERE UserId=? AND `Type`=1 AND RefId=?";
         return queryLong(sql, new Object[] { userId, courseId });

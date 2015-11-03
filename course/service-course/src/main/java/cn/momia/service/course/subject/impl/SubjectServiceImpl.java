@@ -143,4 +143,33 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
         String sql = "SELECT Type FROM SG_Subject WHERE Id=?";
         return queryInt(sql, new Object[] { subjectId }) == Subject.Type.FREE;
     }
+
+    @Override
+    public boolean isFavored(long userId, long subjectId) {
+        String sql = "SELECT COUNT(1) FROM SG_Favorite WHERE UserId=? AND `Type`=2 AND RefId=? AND Status=1";
+        return queryInt(sql, new Object[] { userId, subjectId }) > 0;
+    }
+
+    @Override
+    public boolean favor(long userId, long subjectId) {
+        long favoretId = getFavoretId(userId, subjectId);
+        if (favoretId > 0) {
+            String sql = "UPDATE SG_Favorite SET Status=1 WHERE Id=? AND UserId=? AND `Type`=2 AND RefId=?";
+            return jdbcTemplate.update(sql, new Object[] { favoretId, userId, subjectId }) == 1;
+        } else {
+            String sql = "INSERT INTO SG_Favorite(UserId, `Type`, RefId, AddTime) VALUES (?, 2, ?, NOW())";
+            return jdbcTemplate.update(sql, new Object[] { userId, subjectId }) == 1;
+        }
+    }
+
+    private long getFavoretId(long userId, long subjectId) {
+        String sql = "SELECT Id FROM SG_Favorite WHERE UserId=? AND `Type`=2 AND RefId=?";
+        return queryLong(sql, new Object[] { userId, subjectId });
+    }
+
+    @Override
+    public boolean unfavor(long userId, long subjectId) {
+        String sql = "UPDATE SG_Favorite SET Status=0 WHERE UserId=? AND `Type`=2 AND RefId=?";
+        return jdbcTemplate.update(sql, new Object[] { userId, subjectId }) > 0;
+    }
 }
