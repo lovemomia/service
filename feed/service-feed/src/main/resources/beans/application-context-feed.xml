@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="baseFeedService" class="cn.momia.service.feed.base.impl.FeedServiceImpl" parent="dbAccessService" />
+    <bean id="feedTopicService" class="cn.momia.service.feed.topic.impl.FeedTopicServiceImpl" parent="dbAccessService" />
+    <bean id="feedCommentService" class="cn.momia.service.feed.comment.impl.FeedCommentServiceImpl" parent="dbAccessService" />
+    <bean id="feedStarService" class="cn.momia.service.feed.star.impl.FeedStarServiceImpl" parent="dbAccessService" />
+    <bean id="feedServiceFacade" class="cn.momia.service.feed.facade.impl.FeedServiceFacadeImpl" parent="dbAccessService">
+        <property name="feedService" ref="baseFeedService" />
+        <property name="feedTopicService" ref="feedTopicService" />
+        <property name="feedCommentService" ref="feedCommentService" />
+        <property name="feedStarService" ref="feedStarService" />
+    </bean>
+</beans>
