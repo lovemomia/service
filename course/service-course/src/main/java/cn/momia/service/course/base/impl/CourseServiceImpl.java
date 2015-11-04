@@ -490,42 +490,6 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     }
 
     @Override
-    public boolean isFavored(long userId, long courseId) {
-        String sql = "SELECT COUNT(1) FROM SG_Favorite WHERE UserId=? AND `Type`=1 AND RefId=? AND Status=1";
-        return queryInt(sql, new Object[] { userId, courseId }) > 0;
-    }
-
-    @Override
-    public boolean favor(long userId, long courseId) {
-        if (!exists(courseId)) return false;
-
-        long favoretId = getFavoretId(userId, courseId);
-        if (favoretId > 0) {
-            String sql = "UPDATE SG_Favorite SET Status=1 WHERE Id=? AND UserId=? AND `Type`=1 AND RefId=?";
-            return jdbcTemplate.update(sql, new Object[] { favoretId, userId, courseId }) == 1;
-        } else {
-            String sql = "INSERT INTO SG_Favorite(UserId, `Type`, RefId, AddTime) VALUES (?, 1, ?, NOW())";
-            return jdbcTemplate.update(sql, new Object[] { userId, courseId }) == 1;
-        }
-    }
-
-    private boolean exists(long courseId) {
-        String sql = "SELECT COUNT(1) FROM SG_Course WHERE Id=? AND Status=1";
-        return queryInt(sql, new Object[] { courseId }) > 0;
-    }
-
-    private long getFavoretId(long userId, long courseId) {
-        String sql = "SELECT Id FROM SG_Favorite WHERE UserId=? AND `Type`=1 AND RefId=?";
-        return queryLong(sql, new Object[] { userId, courseId });
-    }
-
-    @Override
-    public boolean unfavor(long userId, long courseId) {
-        String sql = "UPDATE SG_Favorite SET Status=0 WHERE UserId=? AND `Type`=1 AND RefId=?";
-        return jdbcTemplate.update(sql, new Object[] { userId, courseId }) > 0;
-    }
-
-    @Override
     public CourseDetail getDetail(long courseId) {
         String sql = "SELECT Id, CourseId, Abstracts, Detail FROM SG_CourseDetail WHERE CourseId=? AND Status=1";
         return queryObject(sql, new Object[] { courseId }, CourseDetail.class, CourseDetail.NOT_EXIST_COURSE_DETAIL);

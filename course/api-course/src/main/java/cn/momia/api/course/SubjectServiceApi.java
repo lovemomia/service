@@ -88,7 +88,12 @@ public class SubjectServiceApi extends ServiceApi {
     }
 
     public PagedList<FavoriteDto> listFavorites(String utoken, int start, int count) {
-        // TODO
-        return null;
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("start", start)
+                .add("count", count);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/favorite"), builder.build());
+
+        return CastUtil.toPagedList((JSON) executeRequest(request), FavoriteDto.class);
     }
 }

@@ -9,6 +9,7 @@ import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.CoursePlaceDto;
 import cn.momia.api.course.dto.CourseSkuDto;
 import cn.momia.api.course.dto.DatedCourseSkusDto;
+import cn.momia.api.course.dto.FavoriteDto;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.ChildDto;
 import cn.momia.api.user.dto.UserDto;
@@ -28,9 +29,13 @@ import cn.momia.service.course.base.CourseSku;
 import cn.momia.service.course.base.CourseSkuPlace;
 import cn.momia.service.course.base.Institution;
 import cn.momia.service.course.base.Teacher;
+import cn.momia.service.course.favorite.Favorite;
+import cn.momia.service.course.favorite.FavoriteService;
 import cn.momia.service.course.subject.order.Order;
 import cn.momia.service.course.subject.order.OrderPackage;
 import cn.momia.service.course.subject.order.OrderService;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -66,6 +71,8 @@ public class CourseController extends BaseController {
 
     @Autowired private CourseService courseService;
     @Autowired private OrderService orderService;
+    @Autowired private FavoriteService favoriteService;
+
     @Autowired private UserServiceApi userServiceApi;
 
     @RequestMapping(value = "/{coid}", method = RequestMethod.GET)
@@ -595,16 +602,58 @@ public class CourseController extends BaseController {
 
     @RequestMapping(value = "/{coid}/favored", method = RequestMethod.GET)
     public MomiaHttpResponse favored(@RequestParam(value = "uid") long userId, @PathVariable(value = "coid") long courseId) {
-        return MomiaHttpResponse.SUCCESS(courseService.isFavored(userId, courseId));
+        return MomiaHttpResponse.SUCCESS(favoriteService.isFavored(userId, Favorite.Type.COURSE, courseId));
     }
 
     @RequestMapping(value = "/{coid}/favor", method = RequestMethod.POST)
     public MomiaHttpResponse favor(@RequestParam(value = "uid") long userId, @PathVariable(value = "coid") long courseId) {
-        return MomiaHttpResponse.SUCCESS(courseService.favor(userId, courseId));
+        return MomiaHttpResponse.SUCCESS(favoriteService.favor(userId, Favorite.Type.COURSE, courseId));
     }
 
     @RequestMapping(value = "/{coid}/unfavor", method = RequestMethod.POST)
     public MomiaHttpResponse unfavor(@RequestParam(value = "uid") long userId, @PathVariable(value = "coid") long courseId) {
-        return MomiaHttpResponse.SUCCESS(courseService.unfavor(userId, courseId));
+        return MomiaHttpResponse.SUCCESS(favoriteService.unfavor(userId, Favorite.Type.COURSE, courseId));
+    }
+
+    @RequestMapping(value = "/favorite", method = RequestMethod.GET)
+    public MomiaHttpResponse favorite(@RequestParam String utoken, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        UserDto user = userServiceApi.get(utoken);
+        long totalCount = favoriteService.queryFavoriteCount(user.getId(), Favorite.Type.COURSE);
+        List<Favorite> favorites = favoriteService.queryFavorites(user.getId(), Favorite.Type.COURSE, start, count);
+
+        PagedList<FavoriteDto> pagedFavoriteDtos = new PagedList<FavoriteDto>(totalCount, start, count);
+        pagedFavoriteDtos.setList(buildFavoriteDtos(favorites));
+
+        return MomiaHttpResponse.SUCCESS(pagedFavoriteDtos);
+    }
+
+    private List<FavoriteDto> buildFavoriteDtos(List<Favorite> favorites) {
+        Set<Long> courseIds = new HashSet<Long>();
+        for (Favorite favorite: favorites) {
+            courseIds.add(favorite.getRefId());
+        }
+
+        List<Course> courses = courseService.list(courseIds);
+        Map<Long, CourseDto> courseDtosMap = new HashMap<Long, CourseDto>();
+        for (Course course : courses) {
+            courseDtosMap.put(course.getId(), buildBaseCourseDto(course));
+        }
+
+        List<FavoriteDto> favoriteDtos = new ArrayList<FavoriteDto>();
+        for (Favorite favorite : favorites) {
+            CourseDto courseDto = courseDtosMap.get(favorite.getRefId());
+            if (courseDto == null) continue;
+
+            FavoriteDto favoriteDto = new FavoriteDto();
+            favoriteDto.setId(favorite.getId());
+            favoriteDto.setType(favorite.getType());
+            favoriteDto.setRef((JSONObject) JSON.toJSON(courseDto));
+
+            favoriteDtos.add(favoriteDto);
+        }
+
+        return favoriteDtos;
     }
 }
