@@ -130,7 +130,7 @@ public class CourseController extends BaseController {
         if (book == null || book.getImgs().isEmpty()) return null;
 
         CourseBookDto courseBookDto = new CourseBookDto();
-        courseBookDto.setImgs(book.getImgs());
+        courseBookDto.setImgs(book.getImgs().subList(0, Math.min(10, book.getImgs().size())));
 
         return courseBookDto;
     }
