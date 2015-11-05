@@ -70,6 +70,11 @@ public class UserServiceApi extends ServiceApi {
         return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
     }
 
+    public boolean exists(long userId) {
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("user", userId, "exists"));
+        return (Boolean) executeRequest(request);
+    }
+
     public List<UserDto> list(Collection<Long> userIds, int type) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uids", StringUtils.join(userIds, ","))

@@ -20,7 +20,7 @@ import java.util.List;
 @RequestMapping("/user")
 public class UserController extends UserRelatedController {
     @RequestMapping(method = RequestMethod.GET)
-    public MomiaHttpResponse getUser(@RequestParam String utoken) {
+    public MomiaHttpResponse get(@RequestParam String utoken) {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
@@ -28,13 +28,18 @@ public class UserController extends UserRelatedController {
     }
 
     @RequestMapping(value = "/{uid}", method = RequestMethod.GET)
-    public MomiaHttpResponse getUser(@PathVariable(value = "uid") long userId) {
+    public MomiaHttpResponse get(@PathVariable(value = "uid") long userId) {
         User user = userService.get(userId);
         return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL, false));
     }
 
+    @RequestMapping(value = "/{uid}/exists", method = RequestMethod.GET)
+    public MomiaHttpResponse exist(@PathVariable(value = "uid") long userId) {
+        return MomiaHttpResponse.SUCCESS(userService.exists(userId));
+    }
+
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public MomiaHttpResponse listUsers(@RequestParam String uids, @RequestParam(defaultValue = "" + User.Type.BASE) int type) {
+    public MomiaHttpResponse list(@RequestParam String uids, @RequestParam(defaultValue = "" + User.Type.BASE) int type) {
         List<Long> userIds = new ArrayList<Long>();
         for (String userId : Splitter.on(",").trimResults().omitEmptyStrings().split(uids)) {
             userIds.add(Long.valueOf(userId));
