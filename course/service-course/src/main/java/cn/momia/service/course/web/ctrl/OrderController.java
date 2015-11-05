@@ -75,11 +75,18 @@ public class OrderController extends BaseController {
             SubjectSku sku = skusMap.get(orderPackage.getSkuId());
             if (sku == null) return  false;
 
+            if (sku.getLimit() > 0) checkLimit(order.getUserId(), sku.getId(), sku.getLimit());
+
             orderPackage.setPrice(sku.getPrice());
             orderPackage.setBookableCount(sku.getCourseCount());
         }
 
         return true;
+    }
+
+    private void checkLimit(long userId, long skuId, int limit) {
+        int boughtCount = orderService.getBoughtCount(userId, skuId);
+        if (boughtCount > limit) throw new MomiaFailedException("超出购买限额");
     }
 
     private OrderDto buildOrderDto(Order order) {

@@ -286,4 +286,10 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         String sql = "UPDATE SG_SubjectOrderPackage SET BookableCount=BookableCount+1 WHERE Id=? AND Status=1 AND BookableCount<CourseCount";
         return update(sql, new Object[] { packageId });
     }
+
+    @Override
+    public int getBoughtCount(long userId, long skuId) {
+        String sql = "SELECT COUNT(1) FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND B.SkuId=? AND A.Status>0 AND B.Status=1";
+        return queryInt(sql, new Object[] { userId, skuId });
+    }
 }

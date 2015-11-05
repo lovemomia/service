@@ -24,4 +24,6 @@ public interface OrderService {
 
     boolean decreaseBookableCount(long packageId);
     boolean increaseBookableCount(long packageId);
+
+    int getBoughtCount(long userId, long skuId);
 }
