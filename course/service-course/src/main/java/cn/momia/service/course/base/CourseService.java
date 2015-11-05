@@ -51,7 +51,7 @@ public interface CourseService {
 
     boolean matched(long subjectId, long courseId);
 
-    boolean canComment(long userId, long courseId);
+    boolean finished(long userId, long courseId);
     boolean comment(CourseComment comment);
 
     long queryCommentCountByCourse(long courseId);

@@ -295,12 +295,11 @@ public class SubjectController extends BaseController {
     }
 
     @RequestMapping(value = "/favorite", method = RequestMethod.GET)
-    public MomiaHttpResponse favorite(@RequestParam String utoken, @RequestParam int start, @RequestParam int count) {
+    public MomiaHttpResponse favorite(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
-        UserDto user = userServiceApi.get(utoken);
-        long totalCount = favoriteService.queryFavoriteCount(user.getId(), Favorite.Type.SUBJECT);
-        List<Favorite> favorites = favoriteService.queryFavorites(user.getId(), Favorite.Type.SUBJECT, start, count);
+        long totalCount = favoriteService.queryFavoriteCount(userId, Favorite.Type.SUBJECT);
+        List<Favorite> favorites = favoriteService.queryFavorites(userId, Favorite.Type.SUBJECT, start, count);
 
         PagedList<FavoriteDto> pagedFavoriteDtos = new PagedList<FavoriteDto>(totalCount, start, count);
         pagedFavoriteDtos.setList(buildFavoriteDtos(favorites));

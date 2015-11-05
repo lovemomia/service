@@ -479,6 +479,11 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(pagedBookedCourseDtos);
     }
 
+    @RequestMapping(value = "/{coid}/finished", method = RequestMethod.GET)
+    public MomiaHttpResponse finished(@RequestParam(value = "uid") long userId, @PathVariable(value = "coid") long courseId) {
+        return MomiaHttpResponse.SUCCESS(courseService.finished(userId, courseId));
+    }
+
     @RequestMapping(value = "/booking", method = RequestMethod.POST)
     public MomiaHttpResponse booking(@RequestParam String utoken,
                                      @RequestParam(value = "pid") long packageId,
@@ -541,7 +546,7 @@ public class CourseController extends BaseController {
 
     @RequestMapping(value = "/comment", method = RequestMethod.POST, consumes = "application/json")
     public MomiaHttpResponse comment(@RequestBody CourseComment comment) {
-        if (!courseService.canComment(comment.getUserId(), comment.getCourseId())) return MomiaHttpResponse.FAILED("你还没有上过这门课，无法评论");
+        if (!courseService.finished(comment.getUserId(), comment.getCourseId())) return MomiaHttpResponse.FAILED("你还没有上过这门课，无法评论");
         if (comment.getImgs() != null && comment.getImgs().size() > 9) return MomiaHttpResponse.FAILED("上传的图片过多，1条评论最多上传9张图片");
 
         return MomiaHttpResponse.SUCCESS(courseService.comment(comment));
@@ -618,12 +623,11 @@ public class CourseController extends BaseController {
     }
 
     @RequestMapping(value = "/favorite", method = RequestMethod.GET)
-    public MomiaHttpResponse favorite(@RequestParam String utoken, @RequestParam int start, @RequestParam int count) {
+    public MomiaHttpResponse favorite(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
-        UserDto user = userServiceApi.get(utoken);
-        long totalCount = favoriteService.queryFavoriteCount(user.getId(), Favorite.Type.COURSE);
-        List<Favorite> favorites = favoriteService.queryFavorites(user.getId(), Favorite.Type.COURSE, start, count);
+        long totalCount = favoriteService.queryFavoriteCount(userId, Favorite.Type.COURSE);
+        List<Favorite> favorites = favoriteService.queryFavorites(userId, Favorite.Type.COURSE, start, count);
 
         PagedList<FavoriteDto> pagedFavoriteDtos = new PagedList<FavoriteDto>(totalCount, start, count);
         pagedFavoriteDtos.setList(buildFavoriteDtos(favorites));

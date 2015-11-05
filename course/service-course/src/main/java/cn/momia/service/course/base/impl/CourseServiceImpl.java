@@ -508,7 +508,7 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     }
 
     @Override
-    public boolean canComment(long userId, long courseId) {
+    public boolean finished(long userId, long courseId) {
         String sql = "SELECT COUNT(1) FROM SG_BookedCourse WHERE UserId=? AND CourseId=? AND Status=1 AND StartTime<=NOW()";
         return queryInt(sql, new Object[] { userId, courseId }) > 0;
     }

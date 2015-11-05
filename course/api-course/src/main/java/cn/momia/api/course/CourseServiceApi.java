@@ -120,6 +120,13 @@ public class CourseServiceApi extends ServiceApi {
         return CastUtil.toPagedList((JSON) executeRequest(request), BookedCourseDto.class);
     }
 
+    public boolean finished(long userId, long courseId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "finished"), builder.build());
+
+        return (Boolean) executeRequest(request);
+    }
+
     public boolean booking(String utoken, long packageId, long skuId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -183,9 +190,9 @@ public class CourseServiceApi extends ServiceApi {
         return (Boolean) executeRequest(request);
     }
 
-    public PagedList<FavoriteDto> listFavorites(String utoken, int start, int count) {
+    public PagedList<FavoriteDto> listFavorites(long userId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("utoken", utoken)
+                .add("uid", userId)
                 .add("start", start)
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course/favorite"), builder.build());
