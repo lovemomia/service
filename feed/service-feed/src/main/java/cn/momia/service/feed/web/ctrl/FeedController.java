@@ -172,4 +172,24 @@ public class FeedController extends BaseController {
         if (userId <= 0 || feedId <= 0) return MomiaHttpResponse.FAILED("无效的Feed");
         return MomiaHttpResponse.SUCCESS(feedService.delete(userId, feedId));
     }
+
+    @RequestMapping(value = "/live", method = RequestMethod.GET)
+    public MomiaHttpResponse live(@RequestParam(value = "suid") long subjectId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = feedService.queryLiveCountBySubject(subjectId);
+        List<Feed> feeds = feedService.queryLiveBySubject(subjectId, start, count);
+
+        return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(0, feeds, totalCount, start, count));
+    }
+
+    @RequestMapping(value = "/homework", method = RequestMethod.GET)
+    public MomiaHttpResponse homework(@RequestParam(value = "coid") long courseId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = feedService.queryHomeworkCountByCourse(courseId);
+        List<Feed> feeds = feedService.queryHomeworkByCourse(courseId, start, count);
+
+        return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(0, feeds, totalCount, start, count));
+    }
 }
