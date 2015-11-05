@@ -217,6 +217,7 @@ public class SubjectController extends BaseController {
             skuDto.setSubjectId(sku.getSubjectId());
             skuDto.setPrice(sku.getPrice());
             skuDto.setDesc(sku.getDesc());
+            skuDto.setLimit(sku.getLimit());
 
             skuDtos.add(skuDto);
         }

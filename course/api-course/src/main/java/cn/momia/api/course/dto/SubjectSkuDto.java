@@ -8,6 +8,7 @@ public class SubjectSkuDto {
     private BigDecimal price;
     private String desc;
     private int count;
+    private int limit;
 
     public long getId() {
         return id;
@@ -47,5 +48,13 @@ public class SubjectSkuDto {
 
     public void setCount(int count) {
         this.count = count;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
     }
 }
