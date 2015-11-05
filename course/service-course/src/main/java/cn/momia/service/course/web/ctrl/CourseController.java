@@ -76,11 +76,13 @@ public class CourseController extends BaseController {
     @Autowired private UserServiceApi userServiceApi;
 
     @RequestMapping(value = "/{coid}", method = RequestMethod.GET)
-    public MomiaHttpResponse get(@PathVariable(value = "coid") long courseId, @RequestParam String pos) {
+    public MomiaHttpResponse get(@PathVariable(value = "coid") long courseId,
+                                 @RequestParam String pos,
+                                 @RequestParam(required = false, defaultValue = "" + Course.Type.BASE) int type) {
         Course course = courseService.get(courseId);
         if (!course.exists()) return MomiaHttpResponse.FAILED("课程不存在");
 
-        return MomiaHttpResponse.SUCCESS(buildFullCourseDto(course, pos));
+        return MomiaHttpResponse.SUCCESS(type == Course.Type.FULL ? buildFullCourseDto(course, pos) : buildBaseCourseDto(course));
     }
 
     private CourseDto buildFullCourseDto(Course course, String pos) {
