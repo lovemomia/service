@@ -261,13 +261,13 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
 
     @Override
     public long queryCountBySubject(int subjectId) {
-        String sql = "SELECT COUNT(1) FROM SG_Course WHERE SubjectId=? AND Status=1";
+        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1";
         return queryLong(sql, new Object[] { subjectId });
     }
 
     @Override
     public List<Course> queryBySubject(int subjectId, int start, int count) {
-        String sql = "SELECT Id FROM SG_Course WHERE SubjectId=? AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
+        String sql = "SELECT A.Id FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1 GROUP BY A.Id ORDER BY MIN(B.StartTime) ASC LIMIT ?,?";
         List<Long> courseIds = queryLongList(sql, new Object[] { subjectId, start, count });
 
         return list(courseIds);
