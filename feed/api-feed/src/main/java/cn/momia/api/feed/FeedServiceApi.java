@@ -54,10 +54,11 @@ public class FeedServiceApi extends ServiceApi {
         return JSON.toJavaObject((JSON) executeRequest(request), FeedDto.class);
     }
 
-    public void delete(long userId, long feedId) {
+    public boolean delete(long userId, long feedId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
         HttpUriRequest request = MomiaHttpRequestBuilder.DELETE(url("feed", feedId), builder.build());
-        executeRequest(request);
+
+        return (Boolean) executeRequest(request);
     }
 
     public PagedList<FeedCommentDto> listComments(long feedId, int start, int count) {

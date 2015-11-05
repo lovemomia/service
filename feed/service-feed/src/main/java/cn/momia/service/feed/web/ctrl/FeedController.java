@@ -157,7 +157,6 @@ public class FeedController extends BaseController {
     @RequestMapping(value = "/{fid}", method = RequestMethod.DELETE)
     public MomiaHttpResponse delete(@RequestParam(value = "uid") long userId, @PathVariable(value = "fid") long feedId) {
         if (userId <= 0 || feedId <= 0) return MomiaHttpResponse.FAILED("无效的Feed");
-        if (!feedService.delete(userId, feedId)) return MomiaHttpResponse.FAILED("删除Feed失败");
-        return MomiaHttpResponse.SUCCESS;
+        return MomiaHttpResponse.SUCCESS(feedService.delete(userId, feedId));
     }
 }
