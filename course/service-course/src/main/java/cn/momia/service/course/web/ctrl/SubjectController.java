@@ -265,6 +265,7 @@ public class SubjectController extends BaseController {
         courseCommentDto.setChildren(formatChildren(user.getChildren()));
         courseCommentDto.setAddTime(comment.getAddTime());
         courseCommentDto.setStar(comment.getStar());
+        courseCommentDto.setContent(comment.getContent());
         courseCommentDto.setImgs(comment.getImgs());
 
         return courseCommentDto;
