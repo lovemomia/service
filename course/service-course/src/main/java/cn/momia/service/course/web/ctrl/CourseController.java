@@ -548,7 +548,11 @@ public class CourseController extends BaseController {
 
     @RequestMapping(value = "/comment", method = RequestMethod.POST, consumes = "application/json")
     public MomiaHttpResponse comment(@RequestBody CourseComment comment) {
+        if (comment.isInvalid()) return MomiaHttpResponse.BAD_REQUEST;
+        if (StringUtils.isBlank(comment.getContent())) return MomiaHttpResponse.FAILED("评论内容不能为空");
+
         if (!courseService.finished(comment.getUserId(), comment.getCourseId())) return MomiaHttpResponse.FAILED("你还没有上过这门课，无法评论");
+        if (courseService.isCommented(comment.getUserId(), comment.getCourseId())) return MomiaHttpResponse.FAILED("一堂课只能发表一次评论");
         if (comment.getImgs() != null && comment.getImgs().size() > 9) return MomiaHttpResponse.FAILED("上传的图片过多，1条评论最多上传9张图片");
 
         return MomiaHttpResponse.SUCCESS(courseService.comment(comment));

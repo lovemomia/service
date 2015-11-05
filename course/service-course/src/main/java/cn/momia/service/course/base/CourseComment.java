@@ -85,4 +85,8 @@ public class CourseComment {
     public void setAddTime(Date addTime) {
         this.addTime = addTime;
     }
+
+    public boolean isInvalid() {
+        return star < 0 || star > 5 || teacher < 0 || teacher > 5 || environment < 0 || environment > 5;
+    }
 }

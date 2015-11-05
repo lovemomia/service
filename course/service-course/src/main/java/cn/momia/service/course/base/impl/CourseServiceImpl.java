@@ -514,6 +514,12 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     }
 
     @Override
+    public boolean isCommented(long userId, long courseId) {
+        String sql = "SELECT COUNT(1) FROM SG_CourseComment WHERE UserId=? AND CourseId=?";
+        return queryInt(sql, new Object[] { userId, courseId }) > 0;
+    }
+
+    @Override
     public boolean comment(CourseComment comment) {
         long commentId = addComment(comment);
         if (commentId <= 0) return false;
