@@ -31,13 +31,13 @@ public class FeedServiceApi extends ServiceApi {
         return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedDto.class);
     }
 
-    public PagedList<FeedDto> list(long userId, long topicId, int start, int count) {
+    public PagedList<FeedDto> queryByCourse(long userId, long courseId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
-                .add("tid", topicId)
+                .add("coid", courseId)
                 .add("start", start)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("feed"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("feed/course"), builder.build());
 
         return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedDto.class);
     }

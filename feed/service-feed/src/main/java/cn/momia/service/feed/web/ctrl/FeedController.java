@@ -52,10 +52,10 @@ public class FeedController extends BaseController {
         long totalCount = userId > 0 ? feedService.queryFollowedCountByUser(userId) : feedService.queryOfficialFeedsCount();
         List<Feed> feeds = userId > 0 ? feedService.queryFollowedByUser(userId, start, count) : feedService.queryOfficialFeeds(start, count);
 
-        return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(userId, totalCount, feeds, start, count));
+        return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(userId, feeds, totalCount, start, count));
     }
 
-    private PagedList<FeedDto> buildPagedFeedDtos(long userId, long totalCount, List<Feed> feeds, int start, int count) {
+    private PagedList<FeedDto> buildPagedFeedDtos(long userId, List<Feed> feeds, long totalCount, int start, int count) {
         Set<Long> staredFeedIds = new HashSet<Long>();
         if (userId > 0) {
             Set<Long> feedIds = new HashSet<Long>();
@@ -122,6 +122,19 @@ public class FeedController extends BaseController {
         }
 
         return formatedChildren;
+    }
+
+    @RequestMapping(value = "/course", method = RequestMethod.GET)
+    public MomiaHttpResponse queryByCourse(@RequestParam(value = "uid") long userId,
+                                           @RequestParam(value = "coid") long courseId,
+                                           @RequestParam int start,
+                                           @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = feedService.queryCountByCourse(courseId);
+        List<Feed> feeds = feedService.queryByCourse(courseId, start, count);
+
+        return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(userId, feeds, totalCount, start, count));
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")

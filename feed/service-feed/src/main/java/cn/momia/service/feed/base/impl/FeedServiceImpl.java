@@ -185,6 +185,20 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
     }
 
     @Override
+    public long queryCountByCourse(long courseId) {
+        String sql = "SELECT COUNT(1) FROM SG_Feed WHERE CourseId=? AND Status=1";
+        return queryLong(sql, new Object[] { courseId });
+    }
+
+    @Override
+    public List<Feed> queryByCourse(long courseId, int start, int count) {
+        String sql = "SELECT Id FROM SG_Feed WHERE COurseId=? AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
+        List<Long> feedIds = queryLongList(sql, new Object[] { courseId, start, count });
+
+        return list(feedIds);
+    }
+
+    @Override
     public void increaseCommentCount(long feedId) {
         String sql = "UPDATE SG_Feed SET CommentCount=CommentCount+1 WHERE Id=?";
         update(sql, new Object[] { feedId });
