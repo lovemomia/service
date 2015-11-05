@@ -4,7 +4,7 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean class="cn.momia.api.feed.FeedServiceApi" init-method="init">
+    <bean class="cn.momia.api.feed.FeedServiceApi">
         <property name="service" value="${Service.Feed}" />
     </bean>
 </beans>

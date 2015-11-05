@@ -98,6 +98,7 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
 
     private List<Feed> list(Collection<Long> feedIds) {
         if (feedIds.isEmpty()) return new ArrayList<Feed>();
+
         String sql = "SELECT Id,`Type`, UserId, Content, CourseId, CourseTitle, Lng, Lat, CommentCount, StarCount, AddTime FROM SG_Feed WHERE Id IN (" + StringUtils.join(feedIds, ",") + ") AND Status=1";
         List<Feed> feeds = queryList(sql, Feed.class);
 
@@ -139,9 +140,14 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
     }
 
     @Override
-    public boolean delete(long userId, long id) {
+    public boolean delete(long userId, long feedId) {
         String sql = "UPDATE SG_Feed SET Status=0 WHERE Id=? AND UserId=?";
-        return update(sql, new Object[] { id, userId });
+        if (update(sql, new Object[] { feedId, userId })) {
+            sql = "UPDATE SG_FeedFollow SET Status=0 WHERE FeedId=?";
+            return update(sql, new Object[] { feedId });
+        }
+
+        return false;
     }
 
     @Override
@@ -172,7 +178,6 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
 
     @Override
     public List<Feed> queryOfficialFeeds(int start, int count) {
-        final List<Feed> feeds = new ArrayList<Feed>();
         String sql = "SELECT Id FROM SG_Feed WHERE Official=1 AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
         List<Long> feedIds = queryLongList(sql, new Object[] { start, count });
 
@@ -180,26 +185,26 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
     }
 
     @Override
-    public void increaseCommentCount(long id) {
+    public void increaseCommentCount(long feedId) {
         String sql = "UPDATE SG_Feed SET CommentCount=CommentCount+1 WHERE Id=?";
-        update(sql, new Object[] { id });
+        update(sql, new Object[] { feedId });
     }
 
     @Override
-    public void decreaseCommentCount(long id) {
+    public void decreaseCommentCount(long feedId) {
         String sql = "UPDATE SG_Feed SET CommentCount=CommentCount-1 WHERE Id=? AND CommentCount>=1";
-        update(sql, new Object[] { id });
+        update(sql, new Object[] { feedId });
     }
 
     @Override
-    public void increaseStarCount(long id) {
+    public void increaseStarCount(long feedId) {
         String sql = "UPDATE SG_Feed SET StarCount=StarCount+1 WHERE Id=?";
-        update(sql, new Object[] { id });
+        update(sql, new Object[] { feedId });
     }
 
     @Override
-    public void decreaseStarCount(long id) {
+    public void decreaseStarCount(long feedId) {
         String sql = "UPDATE SG_Feed SET StarCount=StarCount-1 WHERE Id=? AND CommentCount>=1";
-        update(sql, new Object[] { id });
+        update(sql, new Object[] { feedId });
     }
 }

@@ -11,5 +11,5 @@ public interface FeedStarService {
     boolean delete(long userId, long feedId);
 
     int queryUserCount(long feedId);
-    List<Long> queryUserIds(long id, int start, int count);
+    List<Long> queryUserIds(long feedId, int start, int count);
 }
