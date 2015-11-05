@@ -369,6 +369,7 @@ public class CourseController extends BaseController {
         for (CourseSku sku : skus) {
             CourseSkuDto courseSkuDto = new CourseSkuDto();
             courseSkuDto.setId(sku.getId());
+            courseSkuDto.setTime(sku.getStartTime());
             courseSkuDto.setPlace(buildCoursePlaceDto(sku.getPlace()));
             courseSkuDto.setStock(sku.getUnlockedStock());
 
