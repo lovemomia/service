@@ -139,6 +139,8 @@ public class FeedController extends BaseController {
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public MomiaHttpResponse add(@RequestBody Feed feed) {
+        if (feed.getImgs() != null && feed.getImgs().size() > 9) return MomiaHttpResponse.FAILED("上传的图片过多，1次最多上传9张图片");
+
         long feedId = feedService.add(feed);
         if (feedId <= 0) return MomiaHttpResponse.FAILED("发表Feed失败");
 
