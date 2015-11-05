@@ -107,6 +107,7 @@ public class CourseController extends BaseController {
 
     private void setFieldValue(CourseDto courseDto, Course course) {
         courseDto.setId(course.getId());
+        courseDto.setSubjectId(course.getSubjectId());
         courseDto.setTitle(course.getTitle());
         courseDto.setCover(course.getCover());
         courseDto.setAge(course.getAge());

@@ -10,6 +10,7 @@ public class Feed {
     private int type;
     private long userId;
     private String content = "";
+    private long subjectId;
     private long courseId;
     private String courseTitle;
     private double lng;
@@ -51,6 +52,14 @@ public class Feed {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public long getSubjectId() {
+        return subjectId;
+    }
+
+    public void setSubjectId(long subjectId) {
+        this.subjectId = subjectId;
     }
 
     public long getCourseId() {

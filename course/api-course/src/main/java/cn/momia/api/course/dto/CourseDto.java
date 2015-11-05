@@ -10,6 +10,7 @@ public class CourseDto {
     }
 
     private long id;
+    private long subjectId;
     private String title;
     private String cover;
     private String age;
@@ -36,6 +37,14 @@ public class CourseDto {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getSubjectId() {
+        return subjectId;
+    }
+
+    public void setSubjectId(long subjectId) {
+        this.subjectId = subjectId;
     }
 
     public String getTitle() {

@@ -45,15 +45,16 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO SG_Feed(`Type`, UserId, Content, CourseId, CourseTitle, Lng, Lat, AddTime) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO SG_Feed(`Type`, UserId, Content, SubjectId, CourseId, CourseTitle, Lng, Lat, AddTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setInt(1, feed.getType());
                 ps.setLong(2, feed.getUserId());
                 ps.setString(3, feed.getContent());
-                ps.setLong(4, feed.getCourseId());
-                ps.setString(5, feed.getCourseTitle());
-                ps.setDouble(6, feed.getLng());
-                ps.setDouble(7, feed.getLat());
+                ps.setLong(4, feed.getSubjectId());
+                ps.setLong(5, feed.getCourseId());
+                ps.setString(6, feed.getCourseTitle());
+                ps.setDouble(7, feed.getLng());
+                ps.setDouble(8, feed.getLat());
 
                 return ps;
             }
@@ -99,7 +100,7 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
     private List<Feed> list(Collection<Long> feedIds) {
         if (feedIds.isEmpty()) return new ArrayList<Feed>();
 
-        String sql = "SELECT Id,`Type`, UserId, Content, CourseId, CourseTitle, Lng, Lat, CommentCount, StarCount, AddTime FROM SG_Feed WHERE Id IN (" + StringUtils.join(feedIds, ",") + ") AND Status=1";
+        String sql = "SELECT Id,`Type`, UserId, Content, SubjectId, CourseId, CourseTitle, Lng, Lat, CommentCount, StarCount, AddTime FROM SG_Feed WHERE Id IN (" + StringUtils.join(feedIds, ",") + ") AND Status=1";
         List<Feed> feeds = queryList(sql, Feed.class);
 
         Map<Long, List<String>> imgs = queryImgs(feedIds);
