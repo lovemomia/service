@@ -524,7 +524,7 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         long commentId = addComment(comment);
         if (commentId <= 0) return false;
 
-        addCommentImgs(commentId, comment.getImgs());
+        if (comment.getImgs() != null && !comment.getImgs().isEmpty()) addCommentImgs(commentId, comment.getImgs());
 
         return true;
     }
