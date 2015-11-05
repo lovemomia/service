@@ -26,17 +26,17 @@ public class FeedStarController extends BaseController {
 
     @Autowired private UserServiceApi userServiceApi;
 
-    @RequestMapping(value = "/{id}/star/list", method = RequestMethod.GET)
-    public MomiaHttpResponse listStaredUsers(@PathVariable long id, @RequestParam int start, @RequestParam int count) {
+    @RequestMapping(value = "/{fid}/star/list", method = RequestMethod.GET)
+    public MomiaHttpResponse listStaredUsers(@PathVariable(value = "fid") long feedId, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
-        Feed feed = feedService.get(id);
+        Feed feed = feedService.get(feedId);
         if (!feed.exists()) return MomiaHttpResponse.FAILED("无效的Feed");
 
-        long totalCount = feedStarService.queryUserCount(id);
+        long totalCount = feedStarService.queryUserCount(feedId);
         if (totalCount <= 0) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
-        List<Long> userIds = feedStarService.queryUserIds(id, start, count);
+        List<Long> userIds = feedStarService.queryUserIds(feedId, start, count);
         List<UserDto> users = userServiceApi.list(userIds, UserDto.Type.MINI);
 
         PagedList<UserDto> pagedStaredUserDtos = new PagedList(totalCount, start, count);
@@ -49,22 +49,22 @@ public class FeedStarController extends BaseController {
         return MomiaHttpResponse.SUCCESS(pagedStaredUserDtos);
     }
 
-    @RequestMapping(value = "/{id}/star", method = RequestMethod.POST)
-    public MomiaHttpResponse star(@RequestParam(value = "uid") long userId, @PathVariable long id) {
-        Feed feed = feedService.get(id);
+    @RequestMapping(value = "/{fid}/star", method = RequestMethod.POST)
+    public MomiaHttpResponse star(@RequestParam(value = "uid") long userId, @PathVariable(value = "fid") long feedId) {
+        Feed feed = feedService.get(feedId);
         if (!feed.exists()) return MomiaHttpResponse.FAILED("无效的Feed");
 
-        if (userId <= 0 || !feedStarService.add(userId, id)) return MomiaHttpResponse.FAILED("赞失败");
+        if (userId <= 0 || !feedStarService.add(userId, feedId)) return MomiaHttpResponse.FAILED("赞失败");
 
-        feedService.increaseStarCount(id);
+        feedService.increaseStarCount(feedId);
         return MomiaHttpResponse.SUCCESS;
     }
 
-    @RequestMapping(value = "/{id}/unstar", method = RequestMethod.POST)
-    public MomiaHttpResponse unstar(@RequestParam(value = "uid") long userId, @PathVariable long id) {
-        if (userId <= 0 || id <= 0 || !feedStarService.delete(userId, id)) return MomiaHttpResponse.FAILED("取消赞失败");
+    @RequestMapping(value = "/{fid}/unstar", method = RequestMethod.POST)
+    public MomiaHttpResponse unstar(@RequestParam(value = "uid") long userId, @PathVariable(value = "fid") long feedId) {
+        if (userId <= 0 || feedId <= 0 || !feedStarService.delete(userId, feedId)) return MomiaHttpResponse.FAILED("取消赞失败");
 
-        feedService.decreaseStarCount(id);
+        feedService.decreaseStarCount(feedId);
         return MomiaHttpResponse.SUCCESS;
     }
 }
