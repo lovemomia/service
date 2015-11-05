@@ -18,7 +18,7 @@ public class CourseSkuDto {
         this.id = id;
     }
 
-    @JSONField(format = "yyyy-MM-dd HH:mm")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     public Date getTime() {
         return time;
     }
