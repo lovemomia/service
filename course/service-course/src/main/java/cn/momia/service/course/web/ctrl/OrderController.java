@@ -16,8 +16,6 @@ import cn.momia.service.course.subject.SubjectSku;
 import cn.momia.service.course.subject.order.Order;
 import cn.momia.service.course.subject.order.OrderService;
 import cn.momia.service.course.subject.order.OrderPackage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,8 +34,6 @@ import java.util.Set;
 @RestController
 @RequestMapping(value = "/subject/order")
 public class OrderController extends BaseController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
-
     @Autowired private CourseService courseService;
     @Autowired private SubjectService subjectService;
     @Autowired private OrderService orderService;
@@ -79,11 +75,18 @@ public class OrderController extends BaseController {
             SubjectSku sku = skusMap.get(orderPackage.getSkuId());
             if (sku == null) return  false;
 
+            if (sku.getLimit() > 0) checkLimit(order.getUserId(), sku.getId(), sku.getLimit());
+
             orderPackage.setPrice(sku.getPrice());
             orderPackage.setBookableCount(sku.getCourseCount());
         }
 
         return true;
+    }
+
+    private void checkLimit(long userId, long skuId, int limit) {
+        int boughtCount = orderService.getBoughtCount(userId, skuId);
+        if (boughtCount > limit) throw new MomiaFailedException("超出购买限额");
     }
 
     private OrderDto buildOrderDto(Order order) {
@@ -98,11 +101,19 @@ public class OrderController extends BaseController {
         return orderDto;
     }
 
+    @RequestMapping(method = RequestMethod.DELETE)
+    public MomiaHttpResponse delete(@RequestParam String utoken, @RequestParam(value = "oid") long orderId) {
+        UserDto user = userServiceApi.get(utoken);
+        return MomiaHttpResponse.SUCCESS(orderService.delete(user.getId(), orderId));
+    }
+
     @RequestMapping(value = "/bookable", method = RequestMethod.GET)
     public MomiaHttpResponse listBookableOrders(@RequestParam String utoken,
                                                 @RequestParam(value = "oid") long orderId,
                                                 @RequestParam int start,
                                                 @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
         UserDto user = userServiceApi.get(utoken);
 
         long totalCount = orderId > 0 ? orderService.queryBookableCountByUserAndOrder(user.getId(), orderId) : orderService.queryBookableCountByUser(user.getId());
@@ -175,6 +186,8 @@ public class OrderController extends BaseController {
                                         @RequestParam int status,
                                         @RequestParam int start,
                                         @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
         UserDto user = userServiceApi.get(utoken);
 
         long totalCount = orderService.queryCountByUser(user.getId(), status);

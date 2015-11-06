@@ -4,7 +4,13 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class CourseDto {
+    public static class Type {
+        public static final int BASE = 1;
+        public static final int FULL = 2;
+    }
+
     private long id;
+    private long subjectId;
     private String title;
     private String cover;
     private String age;
@@ -23,7 +29,7 @@ public class CourseDto {
 
     private CoursePlaceDto place;
 
-    private boolean favored;
+    private Boolean favored;
 
     public long getId() {
         return id;
@@ -31,6 +37,14 @@ public class CourseDto {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getSubjectId() {
+        return subjectId;
+    }
+
+    public void setSubjectId(long subjectId) {
+        this.subjectId = subjectId;
     }
 
     public String getTitle() {
@@ -153,11 +167,11 @@ public class CourseDto {
         this.place = place;
     }
 
-    public boolean isFavored() {
+    public Boolean isFavored() {
         return favored;
     }
 
-    public void setFavored(boolean favored) {
+    public void setFavored(Boolean favored) {
         this.favored = favored;
     }
 }

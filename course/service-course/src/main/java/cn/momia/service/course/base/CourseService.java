@@ -46,12 +46,17 @@ public interface CourseService {
     boolean cancel(long userId, long bookingId);
     void decreaseJoined(long courseId, int joinCount);
 
-    boolean isFavored(long userId, long courseId);
-    boolean favor(long userId, long courseId);
-    boolean unfavor(long userId, long courseId);
-
     CourseDetail getDetail(long courseId);
     Institution getInstitution(long courseId);
 
     boolean matched(long subjectId, long courseId);
+
+    boolean finished(long userId, long courseId);
+    boolean isCommented(long userId, long courseId);
+    boolean comment(CourseComment comment);
+
+    long queryCommentCountByCourse(long courseId);
+    List<CourseComment> queryCommentsByCourse(long courseId, int start, int count);
+    long queryCommentCountBySubject(long subjectId);
+    List<CourseComment> queryCommentsBySubject(long subjectId, int start, int count);
 }

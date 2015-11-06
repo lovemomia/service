@@ -7,6 +7,7 @@ import cn.momia.service.course.base.BookedCourse;
 import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseBook;
 import cn.momia.service.course.base.CourseBookImage;
+import cn.momia.service.course.base.CourseComment;
 import cn.momia.service.course.base.CourseDetail;
 import cn.momia.service.course.base.CourseImage;
 import cn.momia.service.course.base.CourseService;
@@ -260,13 +261,13 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
 
     @Override
     public long queryCountBySubject(int subjectId) {
-        String sql = "SELECT COUNT(1) FROM SG_Course WHERE SubjectId=? AND Status=1";
+        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1";
         return queryLong(sql, new Object[] { subjectId });
     }
 
     @Override
     public List<Course> queryBySubject(int subjectId, int start, int count) {
-        String sql = "SELECT Id FROM SG_Course WHERE SubjectId=? AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
+        String sql = "SELECT A.Id FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1 GROUP BY A.Id ORDER BY MIN(B.StartTime) ASC LIMIT ?,?";
         List<Long> courseIds = queryLongList(sql, new Object[] { subjectId, start, count });
 
         return list(courseIds);
@@ -489,36 +490,6 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     }
 
     @Override
-    public boolean isFavored(long userId, long courseId) {
-        String sql = "SELECT COUNT(1) FROM SG_Favorite WHERE UserId=? AND `Type`=1 AND RefId=? AND Status=1";
-        return queryInt(sql, new Object[] { userId, courseId }) > 0;
-    }
-
-    @Override
-    public boolean favor(long userId, long courseId) {
-        long favoretId = getFavoretId(userId, courseId);
-        if (favoretId > 0) {
-            String sql = "UPDATE SG_Favorite SET Status=1 WHERE Id=? AND UserId=? AND `Type`=1 AND RefId=?";
-            return jdbcTemplate.update(sql, new Object[] { favoretId, userId, courseId }) == 1;
-        } else {
-            String sql = "INSERT INTO SG_Favorite(UserId, `Type`, RefId, AddTime) VALUES (?, 1, ?, NOW())";
-            return jdbcTemplate.update(sql, new Object[] { userId, courseId }) == 1;
-        }
-    }
-
-
-    private long getFavoretId(long userId, long courseId) {
-        String sql = "SELECT Id FROM SG_Favorite WHERE UserId=? AND `Type`=1 AND RefId=?";
-        return queryLong(sql, new Object[] { userId, courseId });
-    }
-
-    @Override
-    public boolean unfavor(long userId, long courseId) {
-        String sql = "UPDATE SG_Favorite SET Status=0 WHERE UserId=? AND `Type`=1 AND RefId=?";
-        return jdbcTemplate.update(sql, new Object[] { userId, courseId }) > 0;
-    }
-
-    @Override
     public CourseDetail getDetail(long courseId) {
         String sql = "SELECT Id, CourseId, Abstracts, Detail FROM SG_CourseDetail WHERE CourseId=? AND Status=1";
         return queryObject(sql, new Object[] { courseId }, CourseDetail.class, CourseDetail.NOT_EXIST_COURSE_DETAIL);
@@ -534,5 +505,147 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     public boolean matched(long subjectId, long courseId) {
         String sql = "SELECT COUNT(1) FROM SG_Course WHERE Id=? AND SubjectId=? AND Status=1";
         return queryInt(sql, new Object[] { courseId, subjectId }) > 0;
+    }
+
+    @Override
+    public boolean finished(long userId, long courseId) {
+        String sql = "SELECT COUNT(1) FROM SG_BookedCourse WHERE UserId=? AND CourseId=? AND Status=1 AND StartTime<=NOW()";
+        return queryInt(sql, new Object[] { userId, courseId }) > 0;
+    }
+
+    @Override
+    public boolean isCommented(long userId, long courseId) {
+        String sql = "SELECT COUNT(1) FROM SG_CourseComment WHERE UserId=? AND CourseId=?";
+        return queryInt(sql, new Object[] { userId, courseId }) > 0;
+    }
+
+    @Override
+    public boolean comment(CourseComment comment) {
+        long commentId = addComment(comment);
+        if (commentId <= 0) return false;
+
+        if (comment.getImgs() != null && !comment.getImgs().isEmpty()) addCommentImgs(commentId, comment.getImgs());
+
+        return true;
+    }
+
+    private long addComment(final CourseComment comment) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                String sql = "INSERT INTO SG_CourseComment(UserId, CourseId, Star, Teacher, Environment, Content, AddTime) VALUES(?, ?, ?, ?, ?, ?, NOW())";
+                PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ps.setLong(1, comment.getUserId());
+                ps.setLong(2, comment.getCourseId());
+                ps.setInt(3, comment.getStar());
+                ps.setInt(4, comment.getTeacher());
+                ps.setInt(5, comment.getEnvironment());
+                ps.setString(6, comment.getContent());
+
+                return ps;
+            }
+        }, keyHolder);
+
+        return keyHolder.getKey().longValue();
+    }
+
+    private void addCommentImgs(long commentId, List<String> imgs) {
+        List<Object[]> params = new ArrayList<Object[]>();
+        for (String img : imgs) {
+            params.add(new Object[] { commentId, img });
+        }
+        String sql = "INSERT INTO SG_CourseCommentImg (CommentId, Url, AddTime) VALUES (?, ?, NOW())";
+        jdbcTemplate.batchUpdate(sql, params);
+    }
+
+    @Override
+    public long queryCommentCountByCourse(long courseId) {
+        Set<Long> courseIds = Sets.newHashSet(courseId);
+        return queryCommentCountByCourses(courseIds);
+    }
+
+    private long queryCommentCountByCourses(Collection<Long> courseIds) {
+        if (courseIds.isEmpty()) return 0;
+
+        String sql = "SELECT COUNT(1) FROM SG_CourseComment WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Status=1";
+        return queryInt(sql, null);
+    }
+
+    @Override
+    public List<CourseComment> queryCommentsByCourse(long courseId, int start, int count) {
+        String sql = "SELECT Id FROM SG_CourseComment WHERE CourseId=? AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
+        List<Long> commentIds = queryLongList(sql, new Object[] { courseId, start, count });
+
+        return listComments(commentIds);
+    }
+
+    private List<CourseComment> queryCommentsByCourses(Collection<Long> courseIds, int start, int count) {
+        if (courseIds.isEmpty()) return new ArrayList<CourseComment>();
+
+        String sql = "SELECT Id FROM SG_CourseComment WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
+        List<Long> commentIds = queryLongList(sql, new Object[] { start, count });
+
+        return listComments(commentIds);
+    }
+
+    private List<CourseComment> listComments(List<Long> commentIds) {
+        if (commentIds.isEmpty()) return new ArrayList<CourseComment>();
+
+        String sql = "SELECT Id, UserId, CourseId, Star, Teacher, Environment, Content, AddTime FROM SG_CourseComment WHERE Id IN (" + StringUtils.join(commentIds, ",") + ") AND Status=1";
+        List<CourseComment> comments = queryList(sql, CourseComment.class);
+
+        Map<Long, List<String>> imgsMap = queryCommentImgs(commentIds);
+
+        Map<Long, CourseComment> commentsMap = new HashMap<Long, CourseComment>();
+        for (CourseComment comment : comments) {
+            comment.setImgs(imgsMap.get(comment.getId()));
+            commentsMap.put(comment.getId(), comment);
+        }
+
+        List<CourseComment> result = new ArrayList<CourseComment>();
+        for (long commentId : commentIds) {
+            CourseComment comment = commentsMap.get(commentId);
+            if (comment != null) result.add(comment);
+        }
+
+        return result;
+    }
+
+    private Map<Long, List<String>> queryCommentImgs(List<Long> commentIds) {
+        if (commentIds.isEmpty()) return new HashMap<Long, List<String>>();
+
+        final Map<Long, List<String>> imgsMap = new HashMap<Long, List<String>>();
+        for (long commentId : commentIds) {
+            imgsMap.put(commentId, new ArrayList<String>());
+        }
+
+        String sql = "SELECT CommentId, Url FROM SG_CourseCommentImg WHERE CommentId IN (" + StringUtils.join(commentIds, ",") + ") AND Status=1";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                long commentId = rs.getLong("CommentId");
+                String url = rs.getString("Url");
+                imgsMap.get(commentId).add(url);
+            }
+        });
+
+        return imgsMap;
+    }
+
+    @Override
+    public long queryCommentCountBySubject(long subjectId) {
+        String sql = "SELECT Id FROM SG_Course WHERE SubjectId=? AND Status=1";
+        List<Long> courseIds = queryLongList(sql, new Object[] { subjectId });
+
+        return queryCommentCountByCourses(courseIds);
+    }
+
+    @Override
+    public List<CourseComment> queryCommentsBySubject(long subjectId, int start, int count) {
+        String sql = "SELECT Id FROM SG_Course WHERE SubjectId=? AND Status=1";
+        List<Long> courseIds = queryLongList(sql, new Object[] { subjectId });
+
+        return queryCommentsByCourses(courseIds, start, count);
     }
 }

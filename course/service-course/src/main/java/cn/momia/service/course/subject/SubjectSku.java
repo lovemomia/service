@@ -15,6 +15,7 @@ public class SubjectSku implements Cloneable {
     private int courseCount;
     private int time;
     private int timeUnit;
+    private int limit;
 
     public long getId() {
         return id;
@@ -94,6 +95,14 @@ public class SubjectSku implements Cloneable {
 
     public void setTimeUnit(int timeUnit) {
         this.timeUnit = timeUnit;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
     }
 
     public boolean exists() {

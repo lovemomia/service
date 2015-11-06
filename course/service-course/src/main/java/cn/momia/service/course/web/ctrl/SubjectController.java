@@ -2,20 +2,29 @@ package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.base.MetaUtil;
 import cn.momia.api.base.dto.RegionDto;
+import cn.momia.api.course.dto.CourseCommentDto;
+import cn.momia.api.course.dto.FavoriteDto;
 import cn.momia.api.course.dto.SubjectDto;
 import cn.momia.api.course.dto.SubjectSkuDto;
+import cn.momia.api.user.UserServiceApi;
+import cn.momia.api.user.dto.ChildDto;
+import cn.momia.api.user.dto.UserDto;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.Course;
+import cn.momia.service.course.base.CourseComment;
 import cn.momia.service.course.base.CourseService;
+import cn.momia.service.course.favorite.Favorite;
+import cn.momia.service.course.favorite.FavoriteService;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectImage;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.subject.SubjectSku;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +39,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,9 +54,14 @@ public class SubjectController extends BaseController {
 
     @Autowired private CourseService courseService;
     @Autowired private SubjectService subjectService;
+    @Autowired private FavoriteService favoriteService;
+
+    @Autowired private UserServiceApi userServiceApi;
 
     @RequestMapping(value = "/free", method = RequestMethod.GET)
     public MomiaHttpResponse listFree(@RequestParam(value = "city") long cityId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
         long totalCount = subjectService.queryFreeCount(cityId);
         List<Subject> subjects = subjectService.queryFree(cityId, start, count);
 
@@ -202,10 +217,124 @@ public class SubjectController extends BaseController {
             skuDto.setSubjectId(sku.getSubjectId());
             skuDto.setPrice(sku.getPrice());
             skuDto.setDesc(sku.getDesc());
+            skuDto.setLimit(sku.getLimit());
 
             skuDtos.add(skuDto);
         }
 
         return skuDtos;
+    }
+
+    @RequestMapping(value = "/{suid}/comment", method = RequestMethod.GET)
+    public MomiaHttpResponse listComments(@PathVariable(value = "suid") long subjectId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = courseService.queryCommentCountBySubject(subjectId);
+        List<CourseComment> comments = courseService.queryCommentsBySubject(subjectId, start, count);
+
+        Set<Long> userIds = new HashSet<Long>();
+        for (CourseComment comment : comments) {
+            userIds.add(comment.getUserId());
+        }
+
+        List<UserDto> users = userServiceApi.list(userIds, UserDto.Type.FULL);
+        Map<Long, UserDto> usersMap = new HashMap<Long, UserDto>();
+        for (UserDto user : users) {
+            usersMap.put(user.getId(), user);
+        }
+
+        List<CourseCommentDto> commentDtos = new ArrayList<CourseCommentDto>();
+        for (CourseComment comment : comments) {
+            UserDto user = usersMap.get(comment.getUserId());
+            if (user == null) continue;
+            commentDtos.add(buildCourseCommentDto(comment, user));
+        }
+
+        PagedList<CourseCommentDto> pagedCommentDtos = new PagedList<CourseCommentDto>(totalCount, start, count);
+        pagedCommentDtos.setList(commentDtos);
+
+        return MomiaHttpResponse.SUCCESS(pagedCommentDtos);
+    }
+
+    private CourseCommentDto buildCourseCommentDto(CourseComment comment, UserDto user) {
+        CourseCommentDto courseCommentDto = new CourseCommentDto();
+        courseCommentDto.setId(comment.getId());
+        courseCommentDto.setUserId(user.getId());
+        courseCommentDto.setNickName(user.getNickName());
+        courseCommentDto.setAvatar(user.getAvatar());
+        courseCommentDto.setChildren(formatChildren(user.getChildren()));
+        courseCommentDto.setAddTime(comment.getAddTime());
+        courseCommentDto.setStar(comment.getStar());
+        courseCommentDto.setContent(comment.getContent());
+        courseCommentDto.setImgs(comment.getImgs());
+
+        return courseCommentDto;
+    }
+
+    private List<String> formatChildren(List<ChildDto> children) {
+        List<String> formatedChildren = new ArrayList<String>();
+        for (int i = 0; i < Math.min(2, children.size()); i++) {
+            ChildDto child = children.get(i);
+            formatedChildren.add(child.getSex() + "孩" + TimeUtil.formatAge(child.getBirthday()));
+        }
+
+        return formatedChildren;
+    }
+
+    @RequestMapping(value = "/{suid}/favored", method = RequestMethod.GET)
+    public MomiaHttpResponse favored(@RequestParam(value = "uid") long userId, @PathVariable(value = "suid") long subjectId) {
+        return MomiaHttpResponse.SUCCESS(favoriteService.isFavored(userId, Favorite.Type.SUBJECT, subjectId));
+    }
+
+    @RequestMapping(value = "/{suid}/favor", method = RequestMethod.POST)
+    public MomiaHttpResponse favor(@RequestParam(value = "uid") long userId, @PathVariable(value = "suid") long subjectId) {
+        return MomiaHttpResponse.SUCCESS(favoriteService.favor(userId, Favorite.Type.SUBJECT, subjectId));
+    }
+
+    @RequestMapping(value = "/{suid}/unfavor", method = RequestMethod.POST)
+    public MomiaHttpResponse unfavor(@RequestParam(value = "uid") long userId, @PathVariable(value = "suid") long subjectId) {
+        return MomiaHttpResponse.SUCCESS(favoriteService.unfavor(userId, Favorite.Type.SUBJECT, subjectId));
+    }
+
+    @RequestMapping(value = "/favorite", method = RequestMethod.GET)
+    public MomiaHttpResponse favorite(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = favoriteService.queryFavoriteCount(userId, Favorite.Type.SUBJECT);
+        List<Favorite> favorites = favoriteService.queryFavorites(userId, Favorite.Type.SUBJECT, start, count);
+
+        PagedList<FavoriteDto> pagedFavoriteDtos = new PagedList<FavoriteDto>(totalCount, start, count);
+        pagedFavoriteDtos.setList(buildFavoriteDtos(favorites));
+
+        return MomiaHttpResponse.SUCCESS(pagedFavoriteDtos);
+    }
+
+    private List<FavoriteDto> buildFavoriteDtos(List<Favorite> favorites) {
+        Set<Long> subjectIds = new HashSet<Long>();
+        for (Favorite favorite: favorites) {
+            subjectIds.add(favorite.getRefId());
+        }
+
+        List<Subject> subjects = subjectService.list(subjectIds);
+        Map<Long, List<Course>> coursesMap = courseService.queryAllBySubjects(subjectIds);
+        Map<Long, SubjectDto> subjectDtosMap = new HashMap<Long, SubjectDto>();
+        for (Subject subject : subjects) {
+            subjectDtosMap.put(subject.getId(), buildBaseSubjectDto(subject, coursesMap.get(subject.getId())));
+        }
+
+        List<FavoriteDto> favoriteDtos = new ArrayList<FavoriteDto>();
+        for (Favorite favorite : favorites) {
+            SubjectDto subjectDto = subjectDtosMap.get(favorite.getRefId());
+            if (subjectDto == null) continue;
+
+            FavoriteDto favoriteDto = new FavoriteDto();
+            favoriteDto.setId(favorite.getId());
+            favoriteDto.setType(favorite.getType());
+            favoriteDto.setRef((JSONObject) JSON.toJSON(subjectDto));
+
+            favoriteDtos.add(favoriteDto);
+        }
+
+        return favoriteDtos;
     }
 }

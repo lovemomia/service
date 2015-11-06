@@ -87,6 +87,12 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
+    public boolean exists(long userId) {
+        String sql = "SELECT COUNT(1) FROM SG_User WHERE Id=? AND Status=1";
+        return queryInt(sql, new Object[] { userId }) > 0;
+    }
+
+    @Override
     public User get(long userId) {
         Set<Long> userIds = Sets.newHashSet(userId);
         List<User> users = list(userIds);

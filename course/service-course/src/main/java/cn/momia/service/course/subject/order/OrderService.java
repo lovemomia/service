@@ -7,6 +7,7 @@ public interface OrderService {
     long add(Order order);
     Order get(long orderId);
     List<Order> list(Collection<Long> orderIds);
+    boolean delete(long userId, long orderId);
 
     long queryCountByUser(long userId, int status);
     List<Order> queryByUser(long userId, int status, int start, int count);
@@ -23,4 +24,6 @@ public interface OrderService {
 
     boolean decreaseBookableCount(long packageId);
     boolean increaseBookableCount(long packageId);
+
+    int getBoughtCount(long userId, long skuId);
 }

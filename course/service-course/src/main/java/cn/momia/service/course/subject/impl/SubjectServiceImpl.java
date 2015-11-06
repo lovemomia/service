@@ -113,7 +113,7 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
     public List<SubjectSku> listSkus(Collection<Long> skuIds) {
         if (skuIds.isEmpty()) return new ArrayList<SubjectSku>();
 
-        String sql = "SELECT Id, SubjectId, `Desc`, Price, OriginalPrice, Adult, Child, CourseCount, Time, TimeUnit FROM SG_SubjectSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status=1";
+        String sql = "SELECT Id, SubjectId, `Desc`, Price, OriginalPrice, Adult, Child, CourseCount, Time, TimeUnit, `Limit` FROM SG_SubjectSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status=1";
         List<SubjectSku> skus = queryList(sql, SubjectSku.class);
 
         Map<Long, SubjectSku> skusMap = new HashMap<Long, SubjectSku>();

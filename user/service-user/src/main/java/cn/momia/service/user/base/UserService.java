@@ -7,6 +7,7 @@ import java.util.List;
 public interface UserService {
     long add(String nickName, String mobile, String password);
 
+    boolean exists(long userId);
     User get(long userId);
     List<User> list(Collection<Long> userIds);
     User getByToken(String token);

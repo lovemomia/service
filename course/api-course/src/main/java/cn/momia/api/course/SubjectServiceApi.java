@@ -1,5 +1,6 @@
 package cn.momia.api.course;
 
+import cn.momia.api.course.dto.FavoriteDto;
 import cn.momia.api.course.dto.OrderPackageDto;
 import cn.momia.api.course.dto.OrderDto;
 import cn.momia.api.course.dto.SubjectDto;
@@ -41,6 +42,15 @@ public class SubjectServiceApi extends ServiceApi {
         return CastUtil.toObject((JSON) executeRequest(request), OrderDto.class);
     }
 
+    public boolean deleteOrder(String utoken, long orderId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("oid", orderId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.DELETE(url("subject/order"), builder.build());
+
+        return (Boolean) executeRequest(request);
+    }
+
     public PagedList<OrderPackageDto> listBookableOrders(String utoken, long orderId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -61,5 +71,29 @@ public class SubjectServiceApi extends ServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/order/list"), builder.build());
 
         return CastUtil.toPagedList((JSON) executeRequest(request), OrderDto.class);
+    }
+
+    public boolean favor(long userId, long subjectId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("subject", subjectId, "favor"), builder.build());
+
+        return (Boolean) executeRequest(request);
+    }
+
+    public boolean unfavor(long userId, long subjectId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("subject", subjectId, "unfavor"), builder.build());
+
+        return (Boolean) executeRequest(request);
+    }
+
+    public PagedList<FavoriteDto> listFavorites(long userId, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("uid", userId)
+                .add("start", start)
+                .add("count", count);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/favorite"), builder.build());
+
+        return CastUtil.toPagedList((JSON) executeRequest(request), FavoriteDto.class);
     }
 }

@@ -159,6 +159,12 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
+    public boolean delete(long userId, long orderId) {
+        String sql = "UPDATE SG_SubjectOrder SET Status=0 WHERE UserId=? AND Id=? AND Status<?";
+        return update(sql, new Object[] { userId, orderId, Order.Status.PAYED });
+    }
+
+    @Override
     public long queryCountByUser(long userId, int status) {
         if (status == 1) {
             String sql = "SELECT COUNT(1) FROM SG_SubjectOrder WHERE UserId=? AND Status>0";
@@ -279,5 +285,11 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     public boolean increaseBookableCount(long packageId) {
         String sql = "UPDATE SG_SubjectOrderPackage SET BookableCount=BookableCount+1 WHERE Id=? AND Status=1 AND BookableCount<CourseCount";
         return update(sql, new Object[] { packageId });
+    }
+
+    @Override
+    public int getBoughtCount(long userId, long skuId) {
+        String sql = "SELECT COUNT(1) FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND B.SkuId=? AND A.Status>0 AND B.Status=1";
+        return queryInt(sql, new Object[] { userId, skuId });
     }
 }
