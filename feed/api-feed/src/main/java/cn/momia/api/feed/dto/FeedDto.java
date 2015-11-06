@@ -12,6 +12,8 @@ public class FeedDto {
     private String content;
     private List<String> imgs = new ArrayList<String>();
     private List<String> largeImgs = new ArrayList<String>();
+    private long tagId;
+    private String tagName;
     private long courseId;
     private String courseTitle = "";
     private Date addTime;
@@ -64,6 +66,22 @@ public class FeedDto {
 
     public void setLargeImgs(List<String> largeImgs) {
         this.largeImgs = largeImgs;
+    }
+
+    public long getTagId() {
+        return tagId;
+    }
+
+    public void setTagId(long tagId) {
+        this.tagId = tagId;
+    }
+
+    public String getTagName() {
+        return tagName;
+    }
+
+    public void setTagName(String tagName) {
+        this.tagName = tagName;
     }
 
     public long getCourseId() {

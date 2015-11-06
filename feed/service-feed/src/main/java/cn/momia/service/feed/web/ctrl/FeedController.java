@@ -97,6 +97,8 @@ public class FeedController extends BaseController {
         feedDto.setContent(feed.getContent());
         feedDto.setImgs(feed.getImgs());
 
+        feedDto.setTagId(feed.getTagId());
+        feedDto.setTagName(feed.getTagName());
         feedDto.setCourseId(feed.getCourseId());
         feedDto.setCourseTitle(feed.getCourseTitle());
 

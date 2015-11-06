@@ -10,6 +10,8 @@ public class Feed {
     private int type;
     private long userId;
     private String content = "";
+    private long tagId;
+    private String tagName;
     private long subjectId;
     private long courseId;
     private String courseTitle;
@@ -52,6 +54,22 @@ public class Feed {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public long getTagId() {
+        return tagId;
+    }
+
+    public void setTagId(long tagId) {
+        this.tagId = tagId;
+    }
+
+    public String getTagName() {
+        return tagName;
+    }
+
+    public void setTagName(String tagName) {
+        this.tagName = tagName;
     }
 
     public long getSubjectId() {

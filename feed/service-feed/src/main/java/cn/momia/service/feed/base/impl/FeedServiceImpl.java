@@ -20,6 +20,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,23 +46,27 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO SG_Feed(`Type`, UserId, Content, SubjectId, CourseId, CourseTitle, Lng, Lat, AddTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO SG_Feed(`Type`, UserId, Content, TagId, SubjectId, CourseId, CourseTitle, Lng, Lat, AddTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setInt(1, feed.getType());
                 ps.setLong(2, feed.getUserId());
                 ps.setString(3, feed.getContent());
-                ps.setLong(4, feed.getSubjectId());
-                ps.setLong(5, feed.getCourseId());
-                ps.setString(6, feed.getCourseTitle());
-                ps.setDouble(7, feed.getLng());
-                ps.setDouble(8, feed.getLat());
+                ps.setLong(4, feed.getTagId());
+                ps.setLong(5, feed.getSubjectId());
+                ps.setLong(6, feed.getCourseId());
+                ps.setString(7, feed.getCourseTitle());
+                ps.setDouble(8, feed.getLng());
+                ps.setDouble(9, feed.getLat());
 
                 return ps;
             }
         }, keyHolder);
 
         long feedId = keyHolder.getKey().longValue();
-        if (feedId > 0) addFeedImgs(feedId, feed.getImgs());
+        if (feedId > 0) {
+            addFeedImgs(feedId, feed.getImgs());
+            increaseTagRefCount(feed.getTagId());
+        }
 
         return feedId;
     }
@@ -76,6 +81,17 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
             jdbcTemplate.batchUpdate(sql, args);
         } catch (Exception e) {
             LOGGER.error("fail to add image for feed: {}", feedId, e);
+        }
+    }
+
+    private void increaseTagRefCount(long tagId) {
+        if (tagId <= 0) return;
+
+        try {
+            String sql = "UPDATE SG_FeedTag SET RefCount=RefCount+1 WHERE Id=? AND Status=1";
+            update(sql, new Object[] { tagId });
+        } catch (Exception e) {
+            LOGGER.error("fail to increase tag ref count of tag: {}", tagId, e);
         }
     }
 
@@ -100,20 +116,27 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
     private List<Feed> list(Collection<Long> feedIds) {
         if (feedIds.isEmpty()) return new ArrayList<Feed>();
 
-        String sql = "SELECT Id,`Type`, UserId, Content, SubjectId, CourseId, CourseTitle, Lng, Lat, CommentCount, StarCount, AddTime FROM SG_Feed WHERE Id IN (" + StringUtils.join(feedIds, ",") + ") AND Status=1";
+        String sql = "SELECT Id,`Type`, UserId, Content, TagId, SubjectId, CourseId, CourseTitle, Lng, Lat, CommentCount, StarCount, AddTime FROM SG_Feed WHERE Id IN (" + StringUtils.join(feedIds, ",") + ") AND Status=1";
         List<Feed> feeds = queryList(sql, Feed.class);
 
+        Set<Long> tagIds = new HashSet<Long>();
         Map<Long, List<String>> imgs = queryImgs(feedIds);
         Map<Long, Feed> feedsMap = new HashMap<Long, Feed>();
         for (Feed feed : feeds) {
+            tagIds.add(feed.getTagId());
             feed.setImgs(imgs.get(feed.getId()));
             feedsMap.put(feed.getId(), feed);
         }
+
+        Map<Long, String> tagNamesMap = queryTagNames(tagIds);
 
         List<Feed> result = new ArrayList<Feed>();
         for (long feedId : feedIds) {
             Feed feed = feedsMap.get(feedId);
             if (feed != null) result.add(feed);
+
+            String tagName = tagNamesMap.get(feed.getTagId());
+            feed.setTagName(tagName == null ? "" : tagName);
         }
 
         return result;
@@ -138,6 +161,23 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
         });
 
         return imgs;
+    }
+
+    private Map<Long, String> queryTagNames(Set<Long> tagIds) {
+        if (tagIds.isEmpty()) return new HashMap<Long, String>();
+
+        final Map<Long, String> tagNamesMap = new HashMap<Long, String>();
+        String sql = "SELECT Id, Name FROM SG_FeedTag WHERE id IN (" + StringUtils.join(tagIds, ",") + ") AND Status=1";
+        jdbcTemplate.query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                long id = rs.getLong("Id");
+                String name = rs.getString("Name");
+                tagNamesMap.put(id, name);
+            }
+        });
+
+        return tagNamesMap;
     }
 
     @Override
