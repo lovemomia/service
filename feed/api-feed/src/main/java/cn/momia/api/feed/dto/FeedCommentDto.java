@@ -7,7 +7,7 @@ import java.util.Date;
 public class FeedCommentDto {
     private long id;
     private String content;
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss") private Date addTime;
+    private Date addTime;
     private String avatar;
     private String nickName;
 
@@ -27,6 +27,7 @@ public class FeedCommentDto {
         this.content = content;
     }
 
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     public Date getAddTime() {
         return addTime;
     }

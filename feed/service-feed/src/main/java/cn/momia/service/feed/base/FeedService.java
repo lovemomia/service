@@ -20,11 +20,6 @@ public interface FeedService {
     long queryCountByCourse(long courseId);
     List<Feed> queryByCourse(long courseId, int start, int count);
 
-    long queryLiveCountBySubject(long subjectId);
-    List<Feed> queryLiveBySubject(long subjectId, int start, int count);
-    long queryHomeworkCountByCourse(long courseId);
-    List<Feed> queryHomeworkByCourse(long courseId, int start, int count);
-
     void increaseCommentCount(long feedId);
     void decreaseCommentCount(long feedId);
 

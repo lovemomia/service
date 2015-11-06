@@ -104,24 +104,4 @@ public class FeedServiceApi extends ServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("feed", feedId, "unstar"), builder.build());
         executeRequest(request);
     }
-
-    public PagedList<FeedDto> queryLiveFeedsBySubject(long subjectId, int start, int count) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("suid", subjectId)
-                .add("start", start)
-                .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("feed/live"), builder.build());
-
-        return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedDto.class);
-    }
-
-    public PagedList<FeedDto> queryHomeworkFeedsByCourse(long courseId, int start, int count) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("coid", courseId)
-                .add("start", start)
-                .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("feed/homework"), builder.build());
-
-        return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedDto.class);
-    }
 }

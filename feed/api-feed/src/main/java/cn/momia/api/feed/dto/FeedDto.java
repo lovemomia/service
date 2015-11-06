@@ -14,7 +14,7 @@ public class FeedDto {
     private List<String> largeImgs = new ArrayList<String>();
     private long courseId;
     private String courseTitle = "";
-    @JSONField(format = "yyyy-MM-dd") private Date addTime;
+    private Date addTime;
     private String poi = "";
     private int commentCount;
     private int starCount;
@@ -82,6 +82,7 @@ public class FeedDto {
         this.courseTitle = courseTitle;
     }
 
+    @JSONField(format = "yyyy-MM-dd")
     public Date getAddTime() {
         return addTime;
     }
