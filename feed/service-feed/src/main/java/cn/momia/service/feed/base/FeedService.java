@@ -25,4 +25,7 @@ public interface FeedService {
 
     void increaseStarCount(long feedId);
     void decreaseStarCount(long feedId);
+
+    List<FeedTag> listRecommendedTags(int count);
+    List<FeedTag> listHotTags(int count);
 }

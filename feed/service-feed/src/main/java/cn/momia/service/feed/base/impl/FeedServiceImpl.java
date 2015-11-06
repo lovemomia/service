@@ -3,6 +3,7 @@ package cn.momia.service.feed.base.impl;
 import cn.momia.common.service.DbAccessService;
 import cn.momia.service.feed.base.Feed;
 import cn.momia.service.feed.base.FeedService;
+import cn.momia.service.feed.base.FeedTag;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -261,5 +262,21 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
     public void decreaseStarCount(long feedId) {
         String sql = "UPDATE SG_Feed SET StarCount=StarCount-1 WHERE Id=? AND CommentCount>=1";
         update(sql, new Object[] { feedId });
+    }
+
+    @Override
+    public List<FeedTag> listRecommendedTags(int count) {
+        return listTags(1, count);
+    }
+
+    private List<FeedTag> listTags(int recommended, int count) {
+        String sql = "SELECT Id, Name FROM SG_FeedTag WHERE Recommended=? AND Status=1 ORDER BY RefCount DESC, AddTime DESC LIMIT ?";
+        return queryList(sql, new Object[] { recommended, count }, FeedTag.class);
+    }
+
+
+    @Override
+    public List<FeedTag> listHotTags(int count) {
+        return listTags(0, count);
     }
 }

@@ -3,6 +3,7 @@ package cn.momia.api.feed;
 import cn.momia.api.feed.dto.FeedCommentDto;
 import cn.momia.api.feed.dto.FeedDto;
 import cn.momia.api.feed.dto.FeedStarDto;
+import cn.momia.api.feed.dto.FeedTagsDto;
 import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
@@ -42,6 +43,13 @@ public class FeedServiceApi extends ServiceApi {
         return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedDto.class);
     }
 
+    public FeedTagsDto listTags(int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("count", count);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("feed/tag"), builder.build());
+
+        return CastUtil.toObject((JSON) executeRequest(request), FeedTagsDto.class);
+    }
+
     public void add(JSONObject feedJson) {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("feed"), feedJson.toString());
         executeRequest(request);
@@ -51,7 +59,7 @@ public class FeedServiceApi extends ServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("feed", feedId), builder.build());
 
-        return JSON.toJavaObject((JSON) executeRequest(request), FeedDto.class);
+        return CastUtil.toObject((JSON) executeRequest(request), FeedDto.class);
     }
 
     public boolean delete(long userId, long feedId) {
