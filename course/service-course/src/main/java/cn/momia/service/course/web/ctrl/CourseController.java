@@ -37,6 +37,7 @@ import cn.momia.service.course.subject.order.OrderService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -426,7 +427,7 @@ public class CourseController extends BaseController {
 
         long totalCount = courseService.queryNotFinishedCountByUser(userId);
         List<BookedCourse> bookedCourses = courseService.queryNotFinishedByUser(userId, start, count);
-        List<BookedCourseDto> bookedCourseDtos = buildBookedCourseDtos(bookedCourses);
+        List<BookedCourseDto> bookedCourseDtos = buildBookedCourseDtos(userId, bookedCourses);
 
         PagedList<BookedCourseDto> pagedCourseDtos = new PagedList<BookedCourseDto>(totalCount, start, count);
         pagedCourseDtos.setList(bookedCourseDtos);
@@ -434,12 +435,13 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
     }
 
-    private List<BookedCourseDto> buildBookedCourseDtos(List<BookedCourse> bookedCourses) {
+    private List<BookedCourseDto> buildBookedCourseDtos(long userId, List<BookedCourse> bookedCourses) {
         Set<Long> courseIds = new HashSet<Long>();
         for (BookedCourse bookedCourse : bookedCourses) {
             courseIds.add(bookedCourse.getCourseId());
         }
 
+        Set<Long> commentCourseIds = Sets.newHashSet(courseService.queryCommentedCourseIds(userId, courseIds));
         List<Course> courses = courseService.list(courseIds);
         Map<Long, Course> coursesMap = new HashMap<Long, Course>();
         for (Course course : courses) {
@@ -455,6 +457,7 @@ public class CourseController extends BaseController {
 
             BookedCourseDto bookedCourseDto = new BookedCourseDto();
             bookedCourseDto.setBookingId(bookedCourse.getId());
+            if (commentCourseIds.contains(course.getId())) bookedCourseDto.setCommented(true);
             setFieldValue(bookedCourseDto, course);
 
             CourseSkuPlace place = course.getPlace(bookedCourse.getCourseSkuId());
@@ -473,7 +476,7 @@ public class CourseController extends BaseController {
 
         long totalCount = courseService.queryFinishedCountByUser(userId);
         List<BookedCourse> bookedCourses = courseService.queryFinishedByUser(userId, start, count);
-        List<BookedCourseDto> bookedCourseDtos = buildBookedCourseDtos(bookedCourses);
+        List<BookedCourseDto> bookedCourseDtos = buildBookedCourseDtos(userId, bookedCourses);
 
         PagedList<BookedCourseDto> pagedBookedCourseDtos = new PagedList<BookedCourseDto>(totalCount, start, count);
         pagedBookedCourseDtos.setList(bookedCourseDtos);

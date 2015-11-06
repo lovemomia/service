@@ -648,4 +648,12 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
 
         return queryCommentsByCourses(courseIds, start, count);
     }
+
+    @Override
+    public List<Long> queryCommentedCourseIds(long userId, Collection<Long> courseIds) {
+        if (userId <= 0 || courseIds.isEmpty()) return new ArrayList<Long>();
+
+        String sql = "SELECT CourseId FROM SG_CourseComment WHERE UserId=? AND CourseId IN (" + StringUtils.join(courseIds, ",") + ")";
+        return queryLongList(sql, new Object[] { userId });
+    }
 }
