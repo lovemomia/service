@@ -1,5 +1,6 @@
 package cn.momia.service.feed.base.impl;
 
+import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.service.DbAccessService;
 import cn.momia.service.feed.base.Feed;
 import cn.momia.service.feed.base.FeedService;
@@ -267,17 +268,21 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
     @Override
     public long addTag(final long userId, final String tagName) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO SG_FeedTag (UserId, Name, AddTime) VALUES (?, ?, NOW())";
-                PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                ps.setLong(1, userId);
-                ps.setString(2, tagName);
+        try {
+            jdbcTemplate.update(new PreparedStatementCreator() {
+                @Override
+                public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                    String sql = "INSERT INTO SG_FeedTag (UserId, Name, AddTime) VALUES (?, ?, NOW())";
+                    PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                    ps.setLong(1, userId);
+                    ps.setString(2, tagName);
 
-                return ps;
-            }
-        }, keyHolder);
+                    return ps;
+                }
+            }, keyHolder);
+        } catch (Exception e) {
+            throw new MomiaFailedException("添加标签失败");
+        }
 
         return keyHolder.getKey().longValue();
     }
