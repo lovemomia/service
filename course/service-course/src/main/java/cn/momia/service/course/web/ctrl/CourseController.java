@@ -459,6 +459,7 @@ public class CourseController extends BaseController {
             bookedCourseDto.setBookingId(bookedCourse.getId());
             if (commentCourseIds.contains(course.getId())) bookedCourseDto.setCommented(true);
             setFieldValue(bookedCourseDto, course);
+            bookedCourseDto.setScheduler(course.getScheduler(bookedCourse.getCourseSkuId()));
 
             CourseSkuPlace place = course.getPlace(bookedCourse.getCourseSkuId());
             if (place == null) continue;
