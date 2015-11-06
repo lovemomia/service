@@ -157,14 +157,33 @@ public class FeedController extends BaseController {
     private List<FeedTagDto> buildFeedTagDtos(List<FeedTag> tags) {
         List<FeedTagDto> feedTagDtos = new ArrayList<FeedTagDto>();
         for (FeedTag tag : tags) {
-            FeedTagDto feedTagDto = new FeedTagDto();
-            feedTagDto.setId(tag.getId());
-            feedTagDto.setName(tag.getName());
-
-            feedTagDtos.add(feedTagDto);
+            feedTagDtos.add(buildFeedTagDto(tag));
         }
 
         return feedTagDtos;
+    }
+
+    private FeedTagDto buildFeedTagDto(FeedTag tag) {
+        FeedTagDto feedTagDto = new FeedTagDto();
+        feedTagDto.setId(tag.getId());
+        feedTagDto.setName(tag.getName());
+
+        return feedTagDto;
+    }
+
+    @RequestMapping(value = "/tag", method = RequestMethod.POST)
+    public MomiaHttpResponse addTag(@RequestParam(value = "uid") long userId, @RequestParam(value = "name") String tagName) {
+        FeedTag feedTag = feedService.query(tagName);
+        if (feedTag.exists()) return MomiaHttpResponse.SUCCESS(buildFeedTagDto(feedTag));
+
+        long tagId = feedService.addTag(userId, tagName);
+        if (tagId <= 0) return MomiaHttpResponse.FAILED("添加标签失败");
+
+        feedTag = new FeedTag();
+        feedTag.setId(tagId);
+        feedTag.setName(tagName);
+
+        return MomiaHttpResponse.SUCCESS(buildFeedTagDto(feedTag));
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")

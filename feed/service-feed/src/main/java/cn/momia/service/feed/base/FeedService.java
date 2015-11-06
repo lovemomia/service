@@ -26,6 +26,8 @@ public interface FeedService {
     void increaseStarCount(long feedId);
     void decreaseStarCount(long feedId);
 
+    long addTag(long userId, String tagName);
+    FeedTag query(String tagName);
     List<FeedTag> listRecommendedTags(int count);
     List<FeedTag> listHotTags(int count);
 }
