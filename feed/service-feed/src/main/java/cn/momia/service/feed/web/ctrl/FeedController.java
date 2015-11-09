@@ -1,6 +1,8 @@
 package cn.momia.service.feed.web.ctrl;
 
 import cn.momia.api.feed.dto.FeedDto;
+import cn.momia.api.feed.dto.FeedTagDto;
+import cn.momia.api.feed.dto.FeedTagsDto;
 import cn.momia.api.user.dto.ChildDto;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.TimeUtil;
@@ -10,6 +12,7 @@ import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.UserDto;
 import cn.momia.service.feed.base.Feed;
 import cn.momia.service.feed.base.FeedService;
+import cn.momia.service.feed.base.FeedTag;
 import cn.momia.service.feed.star.FeedStarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,6 +140,50 @@ public class FeedController extends BaseController {
         List<Feed> feeds = feedService.queryByCourse(courseId, start, count);
 
         return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(userId, feeds, totalCount, start, count));
+    }
+
+    @RequestMapping(value = "/tag", method = RequestMethod.GET)
+    public MomiaHttpResponse listTags(@RequestParam int count) {
+        List<FeedTag> recommendedTags = feedService.listRecommendedTags(count);
+        List<FeedTag> hotTags = feedService.listHotTags(count);
+
+        FeedTagsDto feedTagsDto = new FeedTagsDto();
+        feedTagsDto.setRecommendedTags(buildFeedTagDtos(recommendedTags));
+        feedTagsDto.setHotTags(buildFeedTagDtos(hotTags));
+
+        return MomiaHttpResponse.SUCCESS(feedTagsDto);
+    }
+
+    private List<FeedTagDto> buildFeedTagDtos(List<FeedTag> tags) {
+        List<FeedTagDto> feedTagDtos = new ArrayList<FeedTagDto>();
+        for (FeedTag tag : tags) {
+            feedTagDtos.add(buildFeedTagDto(tag));
+        }
+
+        return feedTagDtos;
+    }
+
+    private FeedTagDto buildFeedTagDto(FeedTag tag) {
+        FeedTagDto feedTagDto = new FeedTagDto();
+        feedTagDto.setId(tag.getId());
+        feedTagDto.setName(tag.getName());
+
+        return feedTagDto;
+    }
+
+    @RequestMapping(value = "/tag", method = RequestMethod.POST)
+    public MomiaHttpResponse addTag(@RequestParam(value = "uid") long userId, @RequestParam(value = "name") String tagName) {
+        FeedTag feedTag = feedService.query(tagName);
+        if (feedTag.exists()) return MomiaHttpResponse.SUCCESS(buildFeedTagDto(feedTag));
+
+        long tagId = feedService.addTag(userId, tagName);
+        if (tagId <= 0) return MomiaHttpResponse.FAILED("添加标签失败");
+
+        feedTag = new FeedTag();
+        feedTag.setId(tagId);
+        feedTag.setName(tagName);
+
+        return MomiaHttpResponse.SUCCESS(buildFeedTagDto(feedTag));
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")

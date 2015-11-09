@@ -23,6 +23,7 @@ public class Order {
     private List<OrderPackage> packages;
     private String contact;
     private String mobile;
+    private String inviteCode = "";
 
     private int status;
     private Date addTime;
@@ -73,6 +74,14 @@ public class Order {
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
+    }
+
+    public String getInviteCode() {
+        return inviteCode;
+    }
+
+    public void setInviteCode(String inviteCode) {
+        this.inviteCode = inviteCode;
     }
 
     public int getStatus() {

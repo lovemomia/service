@@ -8,6 +8,9 @@ import java.util.List;
 public class CourseCommentDto {
     private long id;
 
+    private long courseId;
+    private String courseTitle;
+
     private long userId;
     private String nickName;
     private String avatar;
@@ -25,6 +28,22 @@ public class CourseCommentDto {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(long courseId) {
+        this.courseId = courseId;
+    }
+
+    public String getCourseTitle() {
+        return courseTitle;
+    }
+
+    public void setCourseTitle(String courseTitle) {
+        this.courseTitle = courseTitle;
     }
 
     public long getUserId() {

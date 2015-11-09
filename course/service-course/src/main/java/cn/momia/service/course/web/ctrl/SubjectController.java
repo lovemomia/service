@@ -232,9 +232,17 @@ public class SubjectController extends BaseController {
         long totalCount = courseService.queryCommentCountBySubject(subjectId);
         List<CourseComment> comments = courseService.queryCommentsBySubject(subjectId, start, count);
 
+        Set<Long> courseIds = new HashSet<Long>();
         Set<Long> userIds = new HashSet<Long>();
         for (CourseComment comment : comments) {
+            courseIds.add(comment.getCourseId());
             userIds.add(comment.getUserId());
+        }
+
+        List<Course> courses = courseService.list(courseIds);
+        Map<Long, Course> coursesMap = new HashMap<Long, Course>();
+        for (Course course : courses) {
+            coursesMap.put(course.getId(), course);
         }
 
         List<UserDto> users = userServiceApi.list(userIds, UserDto.Type.FULL);
@@ -245,9 +253,12 @@ public class SubjectController extends BaseController {
 
         List<CourseCommentDto> commentDtos = new ArrayList<CourseCommentDto>();
         for (CourseComment comment : comments) {
+            Course course = coursesMap.get(comment.getCourseId());
+            if (course == null) continue;
             UserDto user = usersMap.get(comment.getUserId());
             if (user == null) continue;
-            commentDtos.add(buildCourseCommentDto(comment, user));
+
+            commentDtos.add(buildCourseCommentDto(comment, course, user));
         }
 
         PagedList<CourseCommentDto> pagedCommentDtos = new PagedList<CourseCommentDto>(totalCount, start, count);
@@ -256,9 +267,11 @@ public class SubjectController extends BaseController {
         return MomiaHttpResponse.SUCCESS(pagedCommentDtos);
     }
 
-    private CourseCommentDto buildCourseCommentDto(CourseComment comment, UserDto user) {
+    private CourseCommentDto buildCourseCommentDto(CourseComment comment, Course course, UserDto user) {
         CourseCommentDto courseCommentDto = new CourseCommentDto();
         courseCommentDto.setId(comment.getId());
+        courseCommentDto.setCourseId(course.getId());
+        courseCommentDto.setCourseTitle(course.getTitle());
         courseCommentDto.setUserId(user.getId());
         courseCommentDto.setNickName(user.getNickName());
         courseCommentDto.setAvatar(user.getAvatar());

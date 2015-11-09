@@ -1,8 +1,10 @@
 package cn.momia.service.feed.base.impl;
 
+import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.service.DbAccessService;
 import cn.momia.service.feed.base.Feed;
 import cn.momia.service.feed.base.FeedService;
+import cn.momia.service.feed.base.FeedTag;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -261,5 +263,49 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
     public void decreaseStarCount(long feedId) {
         String sql = "UPDATE SG_Feed SET StarCount=StarCount-1 WHERE Id=? AND CommentCount>=1";
         update(sql, new Object[] { feedId });
+    }
+
+    @Override
+    public long addTag(final long userId, final String tagName) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        try {
+            jdbcTemplate.update(new PreparedStatementCreator() {
+                @Override
+                public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                    String sql = "INSERT INTO SG_FeedTag (UserId, Name, AddTime) VALUES (?, ?, NOW())";
+                    PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                    ps.setLong(1, userId);
+                    ps.setString(2, tagName);
+
+                    return ps;
+                }
+            }, keyHolder);
+        } catch (Exception e) {
+            throw new MomiaFailedException("添加标签失败");
+        }
+
+        return keyHolder.getKey().longValue();
+    }
+
+    @Override
+    public FeedTag query(String tagName) {
+        String sql = "SELECT Id, Name FROM SG_FeedTag WHERE Name=? AND Status=1";
+        return queryObject(sql, new Object[] { tagName }, FeedTag.class, FeedTag.NOT_EXISTS_FEED_TAG);
+    }
+
+    @Override
+    public List<FeedTag> listRecommendedTags(int count) {
+        return listTags(1, count);
+    }
+
+    private List<FeedTag> listTags(int recommended, int count) {
+        String sql = "SELECT Id, Name FROM SG_FeedTag WHERE Recommended=? AND Status=1 ORDER BY RefCount DESC, AddTime DESC LIMIT ?";
+        return queryList(sql, new Object[] { recommended, count }, FeedTag.class);
+    }
+
+
+    @Override
+    public List<FeedTag> listHotTags(int count) {
+        return listTags(0, count);
     }
 }

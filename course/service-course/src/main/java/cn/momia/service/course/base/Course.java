@@ -262,6 +262,19 @@ public class Course implements Cloneable {
         }
     }
 
+    public String getScheduler(long skuId) {
+        List<Date> times = new ArrayList<Date>();
+        for (CourseSku sku : skus) {
+            if (sku.getId() == skuId) {
+                times.add(sku.getStartTime());
+                times.add(sku.getEndTime());
+            }
+        }
+        Collections.sort(times);
+
+        return format(times);
+    }
+
     public CourseSkuPlace getPlace(long skuId) {
         for (CourseSku sku : skus) {
             if (sku.getId() == skuId) return sku.getPlace();
