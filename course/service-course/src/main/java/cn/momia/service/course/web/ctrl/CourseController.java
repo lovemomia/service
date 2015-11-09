@@ -215,18 +215,8 @@ public class CourseController extends BaseController {
 
     private String format(List<Date> times) {
         if (times.isEmpty()) return "";
-        if (times.size() == 1) {
-            Date start = times.get(0);
-            return DATE_FORMAT.format(start) + " " + TimeUtil.getWeekDay(start);
-        } else {
-            Date start = times.get(0);
-            Date end = times.get(times.size() - 1);
-            if (TimeUtil.isSameDay(start, end)) {
-                return DATE_FORMAT.format(start) + " " + TimeUtil.getWeekDay(start);
-            } else {
-                return DATE_FORMAT.format(start) + "-" + DATE_FORMAT.format(end);
-            }
-        }
+        Date start = times.get(0);
+        return DATE_FORMAT.format(start) + " " + TimeUtil.getWeekDay(start);
     }
 
     @RequestMapping(value = "/query", method = RequestMethod.GET)
