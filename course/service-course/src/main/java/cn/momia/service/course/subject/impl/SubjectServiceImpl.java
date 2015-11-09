@@ -139,8 +139,20 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
     }
 
     @Override
-    public boolean isForNewUser(long subjectId) {
+    public boolean isTrial(long subjectId) {
         String sql = "SELECT Type FROM SG_Subject WHERE Id=?";
         return queryInt(sql, new Object[] { subjectId }) == Subject.Type.TRIAL;
+    }
+
+    @Override
+    public boolean increaseStock(long subjectId, int count) {
+        String sql = "UPDATE SG_Subject SET Stock=Stock+? WHERE Id=? AND Status=1";
+        return update(sql, new Object[] { count, subjectId });
+    }
+
+    @Override
+    public boolean decreaseStock(long subjectId, int count) {
+        String sql = "UPDATE SG_Subject SET Stock=Stock-? WHERE Id=? AND Stock>=? AND Status=1";
+        return update(sql, new Object[] { count, subjectId, count });
     }
 }

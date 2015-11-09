@@ -51,20 +51,26 @@ public class OrderController extends BaseController {
 
         if (!checkAndCompleteOrder(order, skus)) return MomiaHttpResponse.FAILED("无效的订单数据");
 
-        Subject subject = subjectService.get(order.getSubjectId());
+        boolean isTrial = subjectService.isTrial(order.getSubjectId());
+        if (isTrial && !subjectService.decreaseStock(order.getSubjectId(), order.getCount())) return MomiaHttpResponse.FAILED("下单失败，库存不足");
 
-        long orderId = orderService.add(order);
-        if (orderId < 0) return MomiaHttpResponse.FAILED("下单失败");
-
-        order.setId(orderId);
-        return MomiaHttpResponse.SUCCESS(buildOrderDto(order));
+        long orderId = 0;
+        try {
+            orderId = orderService.add(order);
+            order.setId(orderId);
+            return MomiaHttpResponse.SUCCESS(buildOrderDto(order));
+        } catch (Exception e) {
+            return MomiaHttpResponse.FAILED("下单失败");
+        } finally {
+            if (orderId <= 0 && isTrial) subjectService.increaseStock(order.getSubjectId(), order.getCount());
+        }
     }
 
     private boolean checkAndCompleteOrder(Order order, List<SubjectSku> skus) {
         if (order.isInvalid()) return false;
 
         UserDto user = userServiceApi.get(order.getUserId());
-        if (user.isPayed() && subjectService.isForNewUser(order.getSubjectId())) throw new MomiaFailedException("本课程包只供新用户专享");
+        if (user.isPayed() && subjectService.isTrial(order.getSubjectId())) throw new MomiaFailedException("本课程包只供新用户专享");
 
         Map<Long, SubjectSku> skusMap = new HashMap<Long, SubjectSku>();
         for (SubjectSku sku : skus) {
