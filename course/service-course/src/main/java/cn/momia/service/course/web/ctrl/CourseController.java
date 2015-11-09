@@ -67,7 +67,7 @@ import java.util.Set;
 public class CourseController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(CourseController.class);
 
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM月dd日");
     private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
     private static final Splitter POS_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
 
