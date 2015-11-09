@@ -239,12 +239,12 @@ public class CourseController extends BaseController {
         // TODO filter and sort
         long totalCount = courseService.queryCountBySubject(subjectId);
         List<Course> courses = courseService.queryBySubject(subjectId, start, count);
-        PagedList<CourseDto> pagedCourseDtos = buildPagedCourseDtos(totalCount, start, count, courses);
+        PagedList<CourseDto> pagedCourseDtos = buildPagedCourseDtos(courses, totalCount, start, count);
 
         return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
     }
 
-    private PagedList<CourseDto> buildPagedCourseDtos(long totalCount, int start, int count, List<Course> courses) {
+    private PagedList<CourseDto> buildPagedCourseDtos(List<Course> courses, long totalCount, int start, int count) {
         List<CourseDto> courseDtos = buildCourseDtos(courses);
         PagedList<CourseDto> pagedCourseDtos = new PagedList<CourseDto>(totalCount, start, count);
         pagedCourseDtos.setList(courseDtos);

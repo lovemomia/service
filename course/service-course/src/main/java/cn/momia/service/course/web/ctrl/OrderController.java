@@ -119,12 +119,12 @@ public class OrderController extends BaseController {
         long totalCount = orderId > 0 ? orderService.queryBookableCountByUserAndOrder(user.getId(), orderId) : orderService.queryBookableCountByUser(user.getId());
         List<OrderPackage> orderPackages = orderId > 0 ? orderService.queryBookableByUserAndOrder(user.getId(), orderId, start, count) : orderService.queryBookableByUser(user.getId(), start, count);
 
-        PagedList<OrderPackageDto> pagedOrderSkuDtos = buildPagedOrderSkuDtos(totalCount, start, count, orderPackages);
+        PagedList<OrderPackageDto> pagedOrderSkuDtos = buildPagedOrderSkuDtos(orderPackages, totalCount, start, count);
 
         return MomiaHttpResponse.SUCCESS(pagedOrderSkuDtos);
     }
 
-    private PagedList<OrderPackageDto> buildPagedOrderSkuDtos(long totalCount, int start, int count, List<OrderPackage> orderPackages) {
+    private PagedList<OrderPackageDto> buildPagedOrderSkuDtos(List<OrderPackage> orderPackages, long totalCount, int start, int count) {
         Set<Long> packageIds = new HashSet<Long>();
         Set<Long> orderIds = new HashSet<Long>();
         for (OrderPackage orderPackage : orderPackages) {
@@ -193,12 +193,12 @@ public class OrderController extends BaseController {
         long totalCount = orderService.queryCountByUser(user.getId(), status);
         List<Order> orders = orderService.queryByUser(user.getId(), status, start, count);
 
-        PagedList<OrderDto> pagedOrderDtos = buildPagedOrderDtos(totalCount, start, count, orders);
+        PagedList<OrderDto> pagedOrderDtos = buildPagedOrderDtos(orders, totalCount, start, count);
 
         return MomiaHttpResponse.SUCCESS(pagedOrderDtos);
     }
 
-    private PagedList<OrderDto> buildPagedOrderDtos(long totalCount, int start, int count, List<Order> orders) {
+    private PagedList<OrderDto> buildPagedOrderDtos(List<Order> orders, long totalCount, int start, int count) {
         Set<Long> orderIds = new HashSet<Long>();
         Set<Long> subjectIds = new HashSet<Long>();
         for (Order order : orders) {

@@ -45,12 +45,13 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO SG_SubjectOrder(UserId, SubjectId, Contact, Mobile, AddTime) VALUES(?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO SG_SubjectOrder(UserId, SubjectId, Contact, Mobile, InviteCode, AddTime) VALUES(?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setLong(1, order.getUserId());
                 ps.setLong(2, order.getSubjectId());
                 ps.setString(3, order.getContact());
                 ps.setString(4, order.getMobile());
+                ps.setString(5, order.getInviteCode());
 
                 return ps;
             }
