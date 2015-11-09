@@ -3,7 +3,6 @@ package cn.momia.api.feed;
 import cn.momia.api.feed.dto.FeedCommentDto;
 import cn.momia.api.feed.dto.FeedDto;
 import cn.momia.api.feed.dto.FeedStarDto;
-import cn.momia.api.feed.dto.FeedTagDto;
 import cn.momia.api.feed.dto.FeedTagsDto;
 import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.dto.PagedList;
@@ -49,15 +48,6 @@ public class FeedServiceApi extends ServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("feed/tag"), builder.build());
 
         return CastUtil.toObject((JSON) executeRequest(request), FeedTagsDto.class);
-    }
-
-    public FeedTagDto addTag(long userId, String tagName) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("uid", userId)
-                .add("name", tagName);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("feed/tag"), builder.build());
-
-        return CastUtil.toObject((JSON) executeRequest(request), FeedTagDto.class);
     }
 
     public void add(JSONObject feedJson) {

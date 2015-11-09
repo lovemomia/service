@@ -14,6 +14,7 @@ import cn.momia.service.feed.base.Feed;
 import cn.momia.service.feed.base.FeedService;
 import cn.momia.service.feed.base.FeedTag;
 import cn.momia.service.feed.star.FeedStarService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -171,24 +172,16 @@ public class FeedController extends BaseController {
         return feedTagDto;
     }
 
-    @RequestMapping(value = "/tag", method = RequestMethod.POST)
-    public MomiaHttpResponse addTag(@RequestParam(value = "uid") long userId, @RequestParam(value = "name") String tagName) {
-        FeedTag feedTag = feedService.query(tagName);
-        if (feedTag.exists()) return MomiaHttpResponse.SUCCESS(buildFeedTagDto(feedTag));
-
-        long tagId = feedService.addTag(userId, tagName);
-        if (tagId <= 0) return MomiaHttpResponse.FAILED("添加标签失败");
-
-        feedTag = new FeedTag();
-        feedTag.setId(tagId);
-        feedTag.setName(tagName);
-
-        return MomiaHttpResponse.SUCCESS(buildFeedTagDto(feedTag));
-    }
-
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public MomiaHttpResponse add(@RequestBody Feed feed) {
         if (feed.getImgs() != null && feed.getImgs().size() > 9) return MomiaHttpResponse.FAILED("上传的图片过多，1次最多上传9张图片");
+
+        long tagId = feed.getTagId();
+        String tagName = feed.getTagName();
+        if (tagId <= 0 && !StringUtils.isBlank(tagName)) {
+            tagId = addTag(feed.getUserId(), tagName);
+            feed.setTagId(tagId);
+        }
 
         long feedId = feedService.add(feed);
         if (feedId <= 0) return MomiaHttpResponse.FAILED("发表Feed失败");
@@ -203,6 +196,14 @@ public class FeedController extends BaseController {
         }
 
         return MomiaHttpResponse.SUCCESS;
+    }
+
+    private long addTag(long userId, String tagName) {
+        FeedTag feedTag = feedService.query(tagName);
+        if (feedTag.exists()) return feedTag.getId();
+
+        long tagId = feedService.addTag(userId, tagName);
+        return tagId > 0 ? tagId : 0;
     }
 
     @RequestMapping(value = "/{fid}", method = RequestMethod.GET)
