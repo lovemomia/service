@@ -89,13 +89,13 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
 
     @Override
     public long queryFreeCount(long cityId) {
-        String sql = "SELECT COUNT(1) FROM SG_Subject WHERE `Type`=? AND CityId=? AND Status=1";
+        String sql = "SELECT COUNT(1) FROM SG_Subject WHERE `Type`=? AND CityId=? AND Stock>0 AND Status=1";
         return queryLong(sql, new Object[] { Subject.Type.FREE, cityId });
     }
 
     @Override
     public List<Subject> queryFree(long cityId, int start, int count) {
-        String sql = "SELECT Id FROM SG_Subject WHERE `Type`=? AND CityId=? AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
+        String sql = "SELECT Id FROM SG_Subject WHERE `Type`=? AND CityId=? AND Stock>0 AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
         List<Long> subjectIds = queryLongList(sql, new Object[] { Subject.Type.FREE, cityId, start, count });
 
         return list(subjectIds);
