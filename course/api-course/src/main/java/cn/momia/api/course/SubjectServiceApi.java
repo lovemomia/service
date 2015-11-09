@@ -17,12 +17,12 @@ import org.apache.http.client.methods.HttpUriRequest;
 import java.util.List;
 
 public class SubjectServiceApi extends ServiceApi {
-    public PagedList<SubjectDto> listFree(int cityId, int start, int count) {
+    public PagedList<SubjectDto> listTrial(int cityId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
                 .add("start", start)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/free"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/trial"), builder.build());
 
         return CastUtil.toPagedList((JSON) executeRequest(request), SubjectDto.class);
     }

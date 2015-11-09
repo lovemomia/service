@@ -58,12 +58,12 @@ public class SubjectController extends BaseController {
 
     @Autowired private UserServiceApi userServiceApi;
 
-    @RequestMapping(value = "/free", method = RequestMethod.GET)
-    public MomiaHttpResponse listFree(@RequestParam(value = "city") long cityId, @RequestParam int start, @RequestParam int count) {
+    @RequestMapping(value = "/trial", method = RequestMethod.GET)
+    public MomiaHttpResponse listTrial(@RequestParam(value = "city") long cityId, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
-        long totalCount = subjectService.queryFreeCount(cityId);
-        List<Subject> subjects = subjectService.queryFree(cityId, start, count);
+        long totalCount = subjectService.queryTrialCount(cityId);
+        List<Subject> subjects = subjectService.queryTrial(cityId, start, count);
 
         Set<Long> subjectIds = new HashSet<Long>();
         for (Subject subject : subjects) {

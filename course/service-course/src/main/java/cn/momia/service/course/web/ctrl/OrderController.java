@@ -51,6 +51,8 @@ public class OrderController extends BaseController {
 
         if (!checkAndCompleteOrder(order, skus)) return MomiaHttpResponse.FAILED("无效的订单数据");
 
+        Subject subject = subjectService.get(order.getSubjectId());
+
         long orderId = orderService.add(order);
         if (orderId < 0) return MomiaHttpResponse.FAILED("下单失败");
 

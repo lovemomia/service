@@ -88,15 +88,15 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
     }
 
     @Override
-    public long queryFreeCount(long cityId) {
+    public long queryTrialCount(long cityId) {
         String sql = "SELECT COUNT(1) FROM SG_Subject WHERE `Type`=? AND CityId=? AND Stock>0 AND Status=1";
-        return queryLong(sql, new Object[] { Subject.Type.FREE, cityId });
+        return queryLong(sql, new Object[] { Subject.Type.TRIAL, cityId });
     }
 
     @Override
-    public List<Subject> queryFree(long cityId, int start, int count) {
+    public List<Subject> queryTrial(long cityId, int start, int count) {
         String sql = "SELECT Id FROM SG_Subject WHERE `Type`=? AND CityId=? AND Stock>0 AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
-        List<Long> subjectIds = queryLongList(sql, new Object[] { Subject.Type.FREE, cityId, start, count });
+        List<Long> subjectIds = queryLongList(sql, new Object[] { Subject.Type.TRIAL, cityId, start, count });
 
         return list(subjectIds);
     }
@@ -141,6 +141,6 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
     @Override
     public boolean isForNewUser(long subjectId) {
         String sql = "SELECT Type FROM SG_Subject WHERE Id=?";
-        return queryInt(sql, new Object[] { subjectId }) == Subject.Type.FREE;
+        return queryInt(sql, new Object[] { subjectId }) == Subject.Type.TRIAL;
     }
 }

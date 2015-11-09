@@ -5,7 +5,7 @@ import java.util.List;
 public class Subject {
     public static class Type {
         public static final int NORMAL = 1;
-        public static final int FREE = 2;
+        public static final int TRIAL = 2;
     }
 
     public static final Subject NOT_EXIST_SUBJECT = new Subject();
