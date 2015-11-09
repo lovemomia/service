@@ -68,6 +68,7 @@ public class CourseController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(CourseController.class);
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
     private static final Splitter POS_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
 
     @Autowired private CourseService courseService;
@@ -200,23 +201,32 @@ public class CourseController extends BaseController {
     }
 
     private String buildPlaceScheduler(List<CourseSku> skus) {
+        CourseSku earliestSku = null;
         Date now = new Date();
-        List<Date> times = new ArrayList<Date>();
         for (CourseSku sku : skus) {
             if (sku.isAvaliable(now)) {
-                times.add(sku.getStartTime());
-                times.add(sku.getEndTime());
+                if (earliestSku == null) {
+                    earliestSku = sku;
+                } else {
+                    if (sku.getStartTime().before(earliestSku.getStartTime())) earliestSku = sku;
+                }
             }
         }
-        Collections.sort(times);
 
-        return format(times);
+        return format(earliestSku);
     }
 
-    private String format(List<Date> times) {
-        if (times.isEmpty()) return "";
-        Date start = times.get(0);
-        return DATE_FORMAT.format(start) + " " + TimeUtil.getWeekDay(start);
+    private String format(CourseSku sku) {
+        if (sku == null) return "";
+
+        Date start = sku.getStartTime();
+        Date end = sku.getEndTime();
+
+        if (TimeUtil.isSameDay(start, end)) {
+            return DATE_FORMAT.format(start) + " " + TimeUtil.getWeekDay(start) +  " " + TIME_FORMAT.format(start) + "-" + TIME_FORMAT.format(end);
+        } else {
+            return DATE_FORMAT.format(start) + " " + TIME_FORMAT.format(start) + "-" + DATE_FORMAT.format(end) + " " + TIME_FORMAT.format(end);
+        }
     }
 
     @RequestMapping(value = "/query", method = RequestMethod.GET)
