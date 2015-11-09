@@ -70,7 +70,7 @@ public class OrderController extends BaseController {
         if (order.isInvalid()) return false;
 
         UserDto user = userServiceApi.get(order.getUserId());
-        if (user.isPayed() && subjectService.isTrial(order.getSubjectId())) throw new MomiaFailedException("本课程包只供新用户专享");
+        if (subjectService.isTrial(order.getSubjectId()) && (user.isPayed() || orderService.hasTrialOrder(user.getId()))) throw new MomiaFailedException("本课程包只供新用户专享");
 
         Map<Long, SubjectSku> skusMap = new HashMap<Long, SubjectSku>();
         for (SubjectSku sku : skus) {

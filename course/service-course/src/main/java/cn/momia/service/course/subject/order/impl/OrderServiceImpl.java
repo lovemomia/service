@@ -2,6 +2,7 @@ package cn.momia.service.course.subject.order.impl;
 
 import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.service.DbAccessService;
+import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.subject.SubjectSku;
 import cn.momia.service.course.subject.order.Order;
@@ -286,6 +287,12 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     public boolean increaseBookableCount(long packageId) {
         String sql = "UPDATE SG_SubjectOrderPackage SET BookableCount=BookableCount+1 WHERE Id=? AND Status=1 AND BookableCount<CourseCount";
         return update(sql, new Object[] { packageId });
+    }
+
+    @Override
+    public boolean hasTrialOrder(long userId) {
+        String sql = "SELECT COUNT(1) FROM SG_SubjectOrder A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.UserId=? AND A.Status>0 AND B.`Type`=?";
+        return queryInt(sql, new Object[] { userId, Subject.Type.TRIAL }) > 0;
     }
 
     @Override
