@@ -233,8 +233,8 @@ public class CourseController extends BaseController {
     @RequestMapping(value = "/query", method = RequestMethod.GET)
     public MomiaHttpResponse query(@RequestParam(value = "suid") long subjectId,
                                    @RequestParam(value = "pid", required = false, defaultValue = "0") long packageId,
-                                   @RequestParam(value = "min", required = false, defaultValue = "0") int minAge,
-                                   @RequestParam(value = "max", required = false, defaultValue = "0") int maxAge,
+                                   @RequestParam(value = "min", required = false, defaultValue = "1") int minAge,
+                                   @RequestParam(value = "max", required = false, defaultValue = "100") int maxAge,
                                    @RequestParam(value = "sort", required = false, defaultValue = "0") int sortTypeId,
                                    @RequestParam int start,
                                    @RequestParam int count) {
