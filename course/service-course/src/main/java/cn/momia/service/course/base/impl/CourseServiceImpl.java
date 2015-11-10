@@ -260,19 +260,19 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     }
 
     @Override
-    public long queryCountBySubject(long subjectId, Collection<Long> exclusions) {
+    public long queryCountBySubject(long subjectId, Collection<Long> exclusions, int minAge, int maxAge) {
         String sql = exclusions.isEmpty() ?
-                "SELECT COUNT(DISTINCT A.Id) FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1" :
-                "SELECT COUNT(DISTINCT A.Id) FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.Status=1 AND B.Deadline>NOW() AND A.Id NOT IN (" + StringUtils.join(exclusions, ",") + ") AND B.Status=1";
-        return queryLong(sql, new Object[] { subjectId });
+                "SELECT COUNT(DISTINCT A.Id) FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.MinAge>=? AND A.MaxAge<=? AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1" :
+                "SELECT COUNT(DISTINCT A.Id) FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.MinAge>=? AND A.MaxAge<=? AND A.Id NOT IN (" + StringUtils.join(exclusions, ",") + ") AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1";
+        return queryLong(sql, new Object[] { subjectId, minAge, maxAge });
     }
 
     @Override
-    public List<Course> queryBySubject(long subjectId, int start, int count, Collection<Long> exclusions) {
+    public List<Course> queryBySubject(long subjectId, int start, int count, Collection<Long> exclusions, int minAge, int maxAge) {
         String sql = exclusions.isEmpty() ?
-                "SELECT A.Id FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1 GROUP BY A.Id ORDER BY MIN(B.StartTime) ASC LIMIT ?,?" :
-                "SELECT A.Id FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.Status=1 AND B.Deadline>NOW() AND A.Id NOT IN (" + StringUtils.join(exclusions, ",") + ") AND B.Status=1 GROUP BY A.Id ORDER BY MIN(B.StartTime) ASC LIMIT ?,?";
-        List<Long> courseIds = queryLongList(sql, new Object[] { subjectId, start, count });
+                "SELECT A.Id FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.MinAge>=? AND A.MaxAge<=? AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1 GROUP BY A.Id ORDER BY MIN(B.StartTime) ASC LIMIT ?,?" :
+                "SELECT A.Id FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.MinAge>=? AND A.MaxAge<=? AND A.Id NOT IN (" + StringUtils.join(exclusions, ",") + ") AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1 GROUP BY A.Id ORDER BY MIN(B.StartTime) ASC LIMIT ?,?";
+        List<Long> courseIds = queryLongList(sql, new Object[] { subjectId, minAge, maxAge, start, count });
 
         return list(courseIds);
     }
