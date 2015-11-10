@@ -7,6 +7,8 @@ public interface FeedService {
     boolean isFollowed(long ownUserId, long otherUserId);
     boolean follow(long ownUserId, long otherUserId);
 
+    boolean isOfficialUser(long userId);
+
     long add(Feed feed);
     void push(long feedId, Collection<Long> followedIds);
     Feed get(long feedId);

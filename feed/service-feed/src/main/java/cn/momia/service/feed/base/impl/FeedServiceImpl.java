@@ -43,6 +43,12 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
     }
 
     @Override
+    public boolean isOfficialUser(long userId) {
+        String sql = "SELECT COUNT(1) FROM SG_FeedOfficialUser WHERE UserId=? AND Status=1";
+        return queryInt(sql, new Object[] { userId }) > 0;
+    }
+
+    @Override
     public long add(final Feed feed) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
