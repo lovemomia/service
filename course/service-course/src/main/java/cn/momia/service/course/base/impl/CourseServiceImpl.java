@@ -37,6 +37,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class CourseServiceImpl extends DbAccessService implements CourseService {
+    private static final int SORT_TYPE_JOINED = 1;
+    private static final int SORT_TYPE_ADDTIME = 2;
+
     private PoiServiceApi poiServiceApi;
 
     public void setPoiServiceApi(PoiServiceApi poiServiceApi) {
@@ -268,10 +271,17 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     }
 
     @Override
-    public List<Course> queryBySubject(long subjectId, int start, int count, Collection<Long> exclusions, int minAge, int maxAge) {
+    public List<Course> queryBySubject(long subjectId, int start, int count, Collection<Long> exclusions, int minAge, int maxAge, int sortTypeId) {
+        String sort = "MIN(B.StartTime) ASC";
+        if (sortTypeId == SORT_TYPE_JOINED) {
+            sort = "A.Joined DESC";
+        } else if (sortTypeId == SORT_TYPE_ADDTIME) {
+            sort = "A.AddTime DESC";
+        }
+
         String sql = exclusions.isEmpty() ?
-                "SELECT A.Id FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.MinAge>=? AND A.MaxAge<=? AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1 GROUP BY A.Id ORDER BY MIN(B.StartTime) ASC LIMIT ?,?" :
-                "SELECT A.Id FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.MinAge>=? AND A.MaxAge<=? AND A.Id NOT IN (" + StringUtils.join(exclusions, ",") + ") AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1 GROUP BY A.Id ORDER BY MIN(B.StartTime) ASC LIMIT ?,?";
+                "SELECT A.Id FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.MinAge>=? AND A.MaxAge<=? AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1 GROUP BY A.Id ORDER BY " + sort + " LIMIT ?,?" :
+                "SELECT A.Id FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.MinAge>=? AND A.MaxAge<=? AND A.Id NOT IN (" + StringUtils.join(exclusions, ",") + ") AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1 GROUP BY A.Id ORDER BY " + sort + " LIMIT ?,?";
         List<Long> courseIds = queryLongList(sql, new Object[] { subjectId, minAge, maxAge, start, count });
 
         return list(courseIds);

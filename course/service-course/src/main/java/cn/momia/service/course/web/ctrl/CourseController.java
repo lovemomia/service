@@ -238,9 +238,8 @@ public class CourseController extends BaseController {
                                    @RequestParam int start,
                                    @RequestParam int count) {
         List<Long> courseIds = courseService.queryBookedCourseIds(packageId);
-        // TODO filter and sort
         long totalCount = courseService.queryCountBySubject(subjectId, courseIds, minAge, maxAge);
-        List<Course> courses = courseService.queryBySubject(subjectId, start, count, courseIds, minAge, maxAge);
+        List<Course> courses = courseService.queryBySubject(subjectId, start, count, courseIds, minAge, maxAge, sortTypeId);
         PagedList<CourseDto> pagedCourseDtos = buildPagedCourseDtos(courses, totalCount, start, count);
 
         return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
