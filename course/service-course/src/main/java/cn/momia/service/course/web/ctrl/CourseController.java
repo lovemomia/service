@@ -437,12 +437,14 @@ public class CourseController extends BaseController {
     }
 
     private List<BookedCourseDto> buildBookedCourseDtos(long userId, List<BookedCourse> bookedCourses) {
+        Set<Long> bookingIds = new HashSet<Long>();
         Set<Long> courseIds = new HashSet<Long>();
         for (BookedCourse bookedCourse : bookedCourses) {
+            bookingIds.add(bookedCourse.getId());
             courseIds.add(bookedCourse.getCourseId());
         }
 
-        Set<Long> commentCourseIds = Sets.newHashSet(courseService.queryCommentedCourseIds(userId, courseIds));
+        Set<Long> commentBookingIds = Sets.newHashSet(courseService.queryCommentedBookingIds(userId, bookingIds));
         List<Course> courses = courseService.list(courseIds);
         Map<Long, Course> coursesMap = new HashMap<Long, Course>();
         for (Course course : courses) {
@@ -458,7 +460,7 @@ public class CourseController extends BaseController {
 
             BookedCourseDto bookedCourseDto = new BookedCourseDto();
             bookedCourseDto.setBookingId(bookedCourse.getId());
-            if (commentCourseIds.contains(course.getId())) bookedCourseDto.setCommented(true);
+            if (commentBookingIds.contains(bookedCourse.getId())) bookedCourseDto.setCommented(true);
             setFieldValue(bookedCourseDto, course);
             bookedCourseDto.setScheduler(course.getScheduler(bookedCourse.getCourseSkuId()));
 

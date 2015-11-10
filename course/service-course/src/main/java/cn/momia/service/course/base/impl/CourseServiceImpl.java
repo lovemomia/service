@@ -677,10 +677,10 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     }
 
     @Override
-    public List<Long> queryCommentedCourseIds(long userId, Collection<Long> courseIds) {
-        if (userId <= 0 || courseIds.isEmpty()) return new ArrayList<Long>();
+    public List<Long> queryCommentedBookingIds(long userId, Collection<Long> bookingIds) {
+        if (userId <= 0 || bookingIds.isEmpty()) return new ArrayList<Long>();
 
-        String sql = "SELECT CourseId FROM SG_CourseComment WHERE UserId=? AND CourseId IN (" + StringUtils.join(courseIds, ",") + ")";
+        String sql = "SELECT CourseId FROM SG_CourseComment WHERE UserId=? AND BookingId IN (" + StringUtils.join(bookingIds, ",") + ")";
         return queryLongList(sql, new Object[] { userId });
     }
 }
