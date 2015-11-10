@@ -167,6 +167,12 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     }
 
     @Override
+    public boolean refund(long userId, long orderId) {
+        String sql = "UPDATE SG_SubjectOrder SET Status=? WHERE UserId=? AND Id=? AND Status=?";
+        return update(sql, new Object[] { Order.Status.TO_REFUND, userId, orderId, Order.Status.PAYED });
+    }
+
+    @Override
     public long queryCountByUser(long userId, int status) {
         if (status == 1) {
             String sql = "SELECT COUNT(1) FROM SG_SubjectOrder WHERE UserId=? AND Status>0";

@@ -16,6 +16,7 @@ import cn.momia.service.course.subject.SubjectSku;
 import cn.momia.service.course.subject.order.Order;
 import cn.momia.service.course.subject.order.OrderService;
 import cn.momia.service.course.subject.order.OrderPackage;
+import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -113,6 +114,14 @@ public class OrderController extends BaseController {
     public MomiaHttpResponse delete(@RequestParam String utoken, @RequestParam(value = "oid") long orderId) {
         UserDto user = userServiceApi.get(utoken);
         return MomiaHttpResponse.SUCCESS(orderService.delete(user.getId(), orderId));
+    }
+
+    @RequestMapping(value = "/refund", method = RequestMethod.POST)
+    public MomiaHttpResponse refund(@RequestParam String utoken, @RequestParam(value = "oid") long orderId) {
+        if (courseService.queryBookedCourseCounts(Sets.newHashSet(orderId)).get(orderId) > 0) return MomiaHttpResponse.FAILED("已经选过课的订单不能申请退款");
+
+        UserDto user = userServiceApi.get(utoken);
+        return MomiaHttpResponse.SUCCESS(orderService.refund(user.getId(), orderId));
     }
 
     @RequestMapping(value = "/bookable", method = RequestMethod.GET)
