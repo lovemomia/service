@@ -121,9 +121,9 @@ public class CourseServiceApi extends ServiceApi {
         return CastUtil.toPagedList((JSON) executeRequest(request), BookedCourseDto.class);
     }
 
-    public boolean finished(long userId, long courseId) {
+    public boolean joined(long userId, long courseId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "finished"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "joined"), builder.build());
 
         return (Boolean) executeRequest(request);
     }

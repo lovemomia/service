@@ -528,15 +528,21 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     }
 
     @Override
-    public boolean finished(long userId, long courseId) {
+    public boolean joined(long userId, long courseId) {
         String sql = "SELECT COUNT(1) FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.CourseId=? AND A.Status=1 AND B.StartTime<=NOW() AND B.Status=1";
         return queryInt(sql, new Object[] { userId, courseId }) > 0;
     }
 
     @Override
-    public boolean isCommented(long userId, long courseId) {
-        String sql = "SELECT COUNT(1) FROM SG_CourseComment WHERE UserId=? AND CourseId=?";
-        return queryInt(sql, new Object[] { userId, courseId }) > 0;
+    public boolean finished(long userId, long bookingId) {
+        String sql = "SELECT COUNT(1) FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Id=? AND A.Status=1 AND B.StartTime<=NOW() AND B.Status=1";
+        return queryInt(sql, new Object[] { userId, bookingId }) > 0;
+    }
+
+    @Override
+    public boolean isCommented(long userId, long bookingId) {
+        String sql = "SELECT COUNT(1) FROM SG_CourseComment WHERE UserId=? AND BookingId=?";
+        return queryInt(sql, new Object[] { userId, bookingId }) > 0;
     }
 
     @Override
@@ -554,14 +560,15 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO SG_CourseComment(UserId, CourseId, Star, Teacher, Environment, Content, AddTime) VALUES(?, ?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO SG_CourseComment(UserId, BookingId, CourseId, Star, Teacher, Environment, Content, AddTime) VALUES(?, ?, ?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setLong(1, comment.getUserId());
-                ps.setLong(2, comment.getCourseId());
-                ps.setInt(3, comment.getStar());
-                ps.setInt(4, comment.getTeacher());
-                ps.setInt(5, comment.getEnvironment());
-                ps.setString(6, comment.getContent());
+                ps.setLong(2, comment.getBookingId());
+                ps.setLong(3, comment.getCourseId());
+                ps.setInt(4, comment.getStar());
+                ps.setInt(5, comment.getTeacher());
+                ps.setInt(6, comment.getEnvironment());
+                ps.setString(7, comment.getContent());
 
                 return ps;
             }
