@@ -55,7 +55,7 @@ public interface CourseService {
 
     boolean joined(long userId, long courseId);
 
-    boolean finished(long userId, long bookingId);
+    boolean finished(long userId, long bookingId, long courseId);
     boolean isCommented(long userId, long bookingId);
     boolean comment(CourseComment comment);
 

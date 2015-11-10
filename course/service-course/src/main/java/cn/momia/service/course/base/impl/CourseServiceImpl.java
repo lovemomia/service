@@ -534,9 +534,9 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     }
 
     @Override
-    public boolean finished(long userId, long bookingId) {
-        String sql = "SELECT COUNT(1) FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Id=? AND A.Status=1 AND B.StartTime<=NOW() AND B.Status=1";
-        return queryInt(sql, new Object[] { userId, bookingId }) > 0;
+    public boolean finished(long userId, long bookingId, long courseId) {
+        String sql = "SELECT COUNT(1) FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Id=? AND A.CourseId=? AND A.Status=1 AND B.StartTime<=NOW() AND B.Status=1";
+        return queryInt(sql, new Object[] { userId, bookingId, courseId }) > 0;
     }
 
     @Override
