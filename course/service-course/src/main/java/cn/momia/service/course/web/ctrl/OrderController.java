@@ -52,7 +52,7 @@ public class OrderController extends BaseController {
         if (!checkAndCompleteOrder(order, skus)) return MomiaHttpResponse.FAILED("无效的订单数据");
 
         boolean isTrial = subjectService.isTrial(order.getSubjectId());
-        if (isTrial && !subjectService.decreaseStock(order.getSubjectId(), order.getCount())) return MomiaHttpResponse.FAILED("下单失败，库存不足");
+        if (isTrial && !subjectService.decreaseStock(order.getSubjectId(), order.getCount())) return MomiaHttpResponse.FAILED("下单失败，库存不足或已售完");
 
         long orderId = 0;
         try {
