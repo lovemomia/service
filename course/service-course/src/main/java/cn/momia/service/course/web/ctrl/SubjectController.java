@@ -99,6 +99,8 @@ public class SubjectController extends BaseController {
             subjectDto.setScheduler(getScheduler(courses));
             subjectDto.setRegion(getRegion(courses));
 
+            subjectDto.setStock(subject.getStock());
+
             return subjectDto;
         } catch (Exception e) {
             LOGGER.error("invalid subject: {}", subject.getId(), e);

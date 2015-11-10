@@ -17,6 +17,7 @@ public class Subject {
     private String tags;
     private String intro;
     private String notice;
+    private int stock;
     private List<SubjectImage> imgs;
     private List<SubjectSku> skus;
 
@@ -74,6 +75,14 @@ public class Subject {
 
     public void setNotice(String notice) {
         this.notice = notice;
+    }
+
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
     }
 
     public List<SubjectImage> getImgs() {
