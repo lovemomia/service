@@ -260,14 +260,18 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
     }
 
     @Override
-    public long queryCountBySubject(int subjectId) {
-        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1";
+    public long queryCountBySubject(long subjectId, Collection<Long> exclusions) {
+        String sql = exclusions.isEmpty() ?
+                "SELECT COUNT(DISTINCT A.Id) FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1" :
+                "SELECT COUNT(DISTINCT A.Id) FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.Status=1 AND B.Deadline>NOW() AND A.Id NOT IN (" + StringUtils.join(exclusions, ",") + ") AND B.Status=1";
         return queryLong(sql, new Object[] { subjectId });
     }
 
     @Override
-    public List<Course> queryBySubject(int subjectId, int start, int count) {
-        String sql = "SELECT A.Id FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1 GROUP BY A.Id ORDER BY MIN(B.StartTime) ASC LIMIT ?,?";
+    public List<Course> queryBySubject(long subjectId, int start, int count, Collection<Long> exclusions) {
+        String sql = exclusions.isEmpty() ?
+                "SELECT A.Id FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1 GROUP BY A.Id ORDER BY MIN(B.StartTime) ASC LIMIT ?,?" :
+                "SELECT A.Id FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.Status=1 AND B.Deadline>NOW() AND A.Id NOT IN (" + StringUtils.join(exclusions, ",") + ") AND B.Status=1 GROUP BY A.Id ORDER BY MIN(B.StartTime) ASC LIMIT ?,?";
         List<Long> courseIds = queryLongList(sql, new Object[] { subjectId, start, count });
 
         return list(courseIds);
@@ -440,6 +444,14 @@ public class CourseServiceImpl extends DbAccessService implements CourseService 
         });
 
         return map;
+    }
+
+    @Override
+    public List<Long> queryBookedCourseIds(long packageId) {
+        if (packageId <= 0) return new ArrayList<Long>();
+
+        String sql = "SELECT CourseId FROM SG_BookedCourse WHERE PackageId=? AND Status=1";
+        return queryLongList(sql, new Object[] { packageId });
     }
 
     @Override

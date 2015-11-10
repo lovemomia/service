@@ -16,8 +16,8 @@ public interface CourseService {
     long queryTeacherCount(long courseId);
     List<Teacher> queryTeachers(long courseId, int start, int count);
 
-    long queryCountBySubject(int subjectId);
-    List<Course> queryBySubject(int subjectId, int start, int count);
+    long queryCountBySubject(long subjectId, Collection<Long> exclusions);
+    List<Course> queryBySubject(long subjectId, int start, int count, Collection<Long> exclusions);
 
     List<Course> queryAllBySubject(long subjectId);
     Map<Long, List<Course>> queryAllBySubjects(Collection<Long> subjectIds);
@@ -39,6 +39,8 @@ public interface CourseService {
 
     Map<Long, Integer> queryBookedCourseCounts(Set<Long> orderIds);
     Map<Long, Integer> queryFinishedCourseCounts(Set<Long> orderIds);
+
+    List<Long> queryBookedCourseIds(long packageId);
 
     boolean booked(long packageId, long courseId);
     long booking(long userId, long orderId, long packageId, CourseSku sku);

@@ -47,9 +47,10 @@ public class CourseServiceApi extends ServiceApi {
         return CastUtil.toPagedList((JSON) executeRequest(request), CourseDto.class);
     }
 
-    public PagedList<CourseDto> query(long subjectId, int minAge, int maxAge, int sortTypeId, int start, int count) {
+    public PagedList<CourseDto> query(long subjectId, long packageId, int minAge, int maxAge, int sortTypeId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("suid", subjectId)
+                .add("pid", packageId)
                 .add("min", minAge)
                 .add("max", maxAge)
                 .add("sort", sortTypeId)
