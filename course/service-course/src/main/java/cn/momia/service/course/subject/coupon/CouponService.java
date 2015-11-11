@@ -9,7 +9,10 @@ public interface CouponService {
     long queryCount(long userId, int status);
     List<UserCoupon> query(long userId, int status, int start, int count);
 
+    UserCoupon queryByOrder(long orderId);
+
     BigDecimal calcTotalFee(BigDecimal totalFee, UserCoupon userCoupon);
 
+    boolean preUseCoupon(long orderId, long userCouponId);
     boolean useCoupon(long orderId, long userCouponId);
 }

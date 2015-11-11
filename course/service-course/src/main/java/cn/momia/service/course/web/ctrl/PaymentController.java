@@ -19,6 +19,7 @@ import cn.momia.common.webapp.util.RequestUtil;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.subject.coupon.CouponService;
+import cn.momia.service.course.subject.coupon.UserCoupon;
 import cn.momia.service.course.subject.order.Order;
 import cn.momia.service.course.subject.order.OrderService;
 import cn.momia.service.course.subject.order.Payment;
@@ -64,7 +65,7 @@ public class PaymentController extends BaseController {
         PrepayResult prepayResult = gateway.prepay(prepayParam);
 
         if (!prepayResult.isSuccessful()) return MomiaHttpResponse.FAILED;
-        if (userCouponId > 0 && !couponService.useCoupon(order.getId(), userCouponId)) return MomiaHttpResponse.FAILED;
+        if (userCouponId > 0 && !couponService.preUseCoupon(order.getId(), userCouponId)) return MomiaHttpResponse.FAILED;
 
         return MomiaHttpResponse.SUCCESS(prepayResult);
     }
@@ -136,6 +137,17 @@ public class PaymentController extends BaseController {
         if (order.isPayed()) {
             // TODO 判断是否重复付款，是则退款
             return MomiaHttpResponse.SUCCESS("OK");
+        }
+
+        if (callbackParam.getTotalFee().compareTo(order.getTotalFee()) < 0) {
+            UserCoupon userCoupon = couponService.queryByOrder(order.getId());
+            if (!userCoupon.exists() ||
+                    callbackParam.getTotalFee().compareTo(couponService.calcTotalFee(order.getTotalFee(), userCoupon)) != 0 ||
+                    !couponService.useCoupon(order.getId(), userCoupon.getId())) {
+                // TODO 自动退款
+                LOGGER.error("红包/优惠券不匹配，订单: {}", order.getId());
+                return MomiaHttpResponse.SUCCESS("OK");
+            }
         }
 
         if (!finishPayment(order, createPayment(callbackParam))) return MomiaHttpResponse.SUCCESS("FAIL");

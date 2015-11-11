@@ -27,6 +27,26 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
         return userCoupons.isEmpty() ? UserCoupon.NOT_EXIST_USER_COUPON : userCoupons.get(0);
     }
 
+    private List<UserCoupon> list(Collection<Long> userCouponIds) {
+        if (userCouponIds.isEmpty()) return new ArrayList<UserCoupon>();
+
+        String sql = "SELECT A.Id, B.Type, A.UserId, A.CouponId, B.Title, B.Desc, B.Discount, B.Consumption, B.StartTime, B.EndTime, A.Status FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.Id IN (" + StringUtils.join(userCouponIds, ",") + ") AND A.Status<>0 AND B.Status=1";
+        List<UserCoupon> userCoupons = queryList(sql, UserCoupon.class);
+
+        Map<Long, UserCoupon> userCouponsMap = new HashMap<Long, UserCoupon>();
+        for (UserCoupon userCoupon : userCoupons) {
+            userCouponsMap.put(userCoupon.getId(), userCoupon);
+        }
+
+        List<UserCoupon> result = new ArrayList<UserCoupon>();
+        for (long userCouponId : userCouponIds) {
+            UserCoupon userCoupon = userCouponsMap.get(userCouponId);
+            if (userCoupon != null) result.add(userCoupon);
+        }
+
+        return result;
+    }
+
     @Override
     public long queryCount(long userId, int status) {
         String sql;
@@ -60,24 +80,13 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
         return list(userCouponIds);
     }
 
-    private List<UserCoupon> list(Collection<Long> userCouponIds) {
-        if (userCouponIds.isEmpty()) return new ArrayList<UserCoupon>();
+    @Override
+    public UserCoupon queryByOrder(long orderId) {
+        String sql = "SELECT UserCouponId FROM SG_SubjectOrderCoupon WHERE OrderId=? AND Status=1";
+        List<Long> userCouponIds = queryLongList(sql, new Object[] { orderId });
+        List<UserCoupon> userCoupons = list(userCouponIds);
 
-        String sql = "SELECT A.Id, B.Type, A.UserId, A.CouponId, B.Title, B.Desc, B.Discount, B.Consumption, B.StartTime, B.EndTime, A.Status FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.Id IN (" + StringUtils.join(userCouponIds, ",") + ") AND A.Status<>0 AND B.Status=1";
-        List<UserCoupon> userCoupons = queryList(sql, UserCoupon.class);
-
-        Map<Long, UserCoupon> userCouponsMap = new HashMap<Long, UserCoupon>();
-        for (UserCoupon userCoupon : userCoupons) {
-            userCouponsMap.put(userCoupon.getId(), userCoupon);
-        }
-
-        List<UserCoupon> result = new ArrayList<UserCoupon>();
-        for (long userCouponId : userCouponIds) {
-            UserCoupon userCoupon = userCouponsMap.get(userCouponId);
-            if (userCoupon != null) result.add(userCoupon);
-        }
-
-        return result;
+        return userCoupons.isEmpty() ? UserCoupon.NOT_EXIST_USER_COUPON : userCoupons.get(0);
     }
 
     @Override
@@ -86,7 +95,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     }
 
     @Override
-    public boolean useCoupon(long orderId, long userCouponId) {
+    public boolean preUseCoupon(long orderId, long userCouponId) {
         long orderCouponId = getOrderCouponId(orderId);
         if (orderCouponId <= 0) {
             String sql = "INSERT INTO SG_SubjectOrderCoupon (OrderId, UserCouponId, AddTime) VALUES (?, ?, NOW())";
@@ -100,5 +109,11 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     private long getOrderCouponId(long orderId) {
         String sql = "SELECT Id FROM SG_SubjectOrderCoupon WHERE OrderId=?";
         return queryLong(sql, new Object[] { orderId });
+    }
+
+    @Override
+    public boolean useCoupon(long orderId, long userCouponId) {
+        String sql = "UPDATE SG_UserCoupon SET OrderId=? WHERE Id=? AND (OrderId=0 OR OrderId=?)";
+        return update(sql, new Object[] { orderId, userCouponId, orderId });
     }
 }
