@@ -372,7 +372,7 @@ public class CourseController extends BaseController {
         for (CourseSku sku : skus) {
             CourseSkuDto courseSkuDto = new CourseSkuDto();
             courseSkuDto.setId(sku.getId());
-            courseSkuDto.setTime(sku.getStartTime());
+            courseSkuDto.setTime(formatSkuTime(sku));
             courseSkuDto.setPlace(buildCoursePlaceDto(sku.getPlace()));
             courseSkuDto.setStock(sku.getUnlockedStock());
 
@@ -380,6 +380,19 @@ public class CourseController extends BaseController {
         }
 
         return courseSkuDtos;
+    }
+
+    private String formatSkuTime(CourseSku sku) {
+        if (sku == null) return "";
+
+        Date start = sku.getStartTime();
+        Date end = sku.getEndTime();
+
+        if (TimeUtil.isSameDay(start, end)) {
+            return TimeUtil.getAmPm(start) + " " + TIME_FORMAT.format(start) + "-" + TimeUtil.getAmPm(end) + " " + TIME_FORMAT.format(end);
+        } else {
+            return MONTH_DATE_FORMAT.format(start) + " " + TimeUtil.getAmPm(start) + " " + TIME_FORMAT.format(start) + "-" + MONTH_DATE_FORMAT.format(end) + " " + TimeUtil.getAmPm(end) + " " + TIME_FORMAT.format(end);
+        }
     }
 
     private CoursePlaceDto buildCoursePlaceDto(CourseSkuPlace place) {
