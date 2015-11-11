@@ -84,4 +84,21 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     public BigDecimal calcTotalFee(BigDecimal totalFee, UserCoupon userCoupon) {
         return totalFee.compareTo(userCoupon.getDiscount()) > 0 ? totalFee.subtract(userCoupon.getDiscount()) : new BigDecimal(0);
     }
+
+    @Override
+    public boolean useCoupon(long orderId, long userCouponId) {
+        long orderCouponId = getOrderCouponId(orderId);
+        if (orderCouponId <= 0) {
+            String sql = "INSERT INTO SG_SubjectOrderCoupon (OrderId, UserCouponId, AddTime) VALUES (?, ?, NOW())";
+            return update(sql, new Object[] { orderId, userCouponId });
+        } else {
+            String sql = "UPDATE SG_SubjectOrderCoupon SET UserCouponId=?, Status=1 WHERE OrderId=?";
+            return update(sql, new Object[] { userCouponId, orderId });
+        }
+    }
+
+    private long getOrderCouponId(long orderId) {
+        String sql = "SELECT Id FROM SG_SubjectOrderCoupon WHERE OrderId=?";
+        return queryLong(sql, new Object[] { orderId });
+    }
 }

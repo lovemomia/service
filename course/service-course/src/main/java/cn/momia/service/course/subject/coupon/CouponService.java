@@ -10,4 +10,6 @@ public interface CouponService {
     List<UserCoupon> query(long userId, int status, int start, int count);
 
     BigDecimal calcTotalFee(BigDecimal totalFee, UserCoupon userCoupon);
+
+    boolean useCoupon(long orderId, long userCouponId);
 }

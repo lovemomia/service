@@ -18,6 +18,7 @@ import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.webapp.util.RequestUtil;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
+import cn.momia.service.course.subject.coupon.CouponService;
 import cn.momia.service.course.subject.order.Order;
 import cn.momia.service.course.subject.order.OrderService;
 import cn.momia.service.course.subject.order.Payment;
@@ -39,6 +40,7 @@ public class PaymentController extends BaseController {
 
     @Autowired private SubjectService subjectService;
     @Autowired private OrderService orderService;
+    @Autowired private CouponService couponService;
     @Autowired private UserServiceApi userServiceApi;
 
     @RequestMapping(value = "/prepay/alipay", method = RequestMethod.POST)
@@ -49,6 +51,7 @@ public class PaymentController extends BaseController {
     private MomiaHttpResponse prepay(HttpServletRequest request, int payType) {
         UserDto user = userServiceApi.get(request.getParameter("utoken"));
         long orderId = Long.valueOf(request.getParameter("oid"));
+        long userCouponId = Long.valueOf(request.getParameter("coupon"));
 
         Order order = orderService.get(orderId);
         Subject subject = subjectService.get(order.getSubjectId());
@@ -61,6 +64,8 @@ public class PaymentController extends BaseController {
         PrepayResult prepayResult = gateway.prepay(prepayParam);
 
         if (!prepayResult.isSuccessful()) return MomiaHttpResponse.FAILED;
+        if (userCouponId > 0 && !couponService.useCoupon(order.getId(), userCouponId)) return MomiaHttpResponse.FAILED;
+
         return MomiaHttpResponse.SUCCESS(prepayResult);
     }
 

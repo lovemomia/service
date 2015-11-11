@@ -12,21 +12,23 @@ import org.apache.http.client.methods.HttpUriRequest;
 import java.util.Map;
 
 public class PaymentServiceApi extends ServiceApi {
-    public Object prepayAlipay(String utoken, long orderId, String type) {
+    public Object prepayAlipay(String utoken, long orderId, String type, long userCouponId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("oid", orderId)
-                .add("type", type);
+                .add("type", type)
+                .add("coupon", userCouponId);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("payment/prepay/alipay"), builder.build());
 
         return executeRequest(request);
     }
 
-    public Object prepayWeixin(String utoken, long orderId, String type, String code) {
+    public Object prepayWeixin(String utoken, long orderId, String type, String code, long userCouponId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("oid", orderId)
-                .add("type", type);
+                .add("type", type)
+                .add("coupon", userCouponId);
         if (!StringUtils.isBlank(code)) builder.add("code", code);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("payment/prepay/weixin"), builder.build());
 
