@@ -115,6 +115,6 @@ public class UserCoupon {
     }
 
     public boolean isExpired() {
-        return endTime.before(new Date());
+        return status == 1 && endTime.before(new Date());
     }
 }

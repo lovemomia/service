@@ -62,11 +62,17 @@ public class PaymentController extends BaseController {
 
         PrepayParam prepayParam = extractPrepayParam(request, order, subject, payType);
         PaymentGateway gateway = PaymentGatewayFactory.create(payType);
+
+        if (userCouponId > 0) {
+            UserCoupon userCoupon = couponService.get(userCouponId);
+            if (!userCoupon.exists() || userCoupon.isExpired() || userCoupon.isUsed()) return MomiaHttpResponse.FAILED("无效的红包/优惠券");
+            if (!couponService.preUseCoupon(order.getId(), userCouponId)) return MomiaHttpResponse.FAILED;
+            prepayParam.setTotalFee(couponService.calcTotalFee(prepayParam.getTotalFee(), userCoupon));
+        }
+
         PrepayResult prepayResult = gateway.prepay(prepayParam);
 
         if (!prepayResult.isSuccessful()) return MomiaHttpResponse.FAILED;
-        if (userCouponId > 0 && !couponService.preUseCoupon(order.getId(), userCouponId)) return MomiaHttpResponse.FAILED;
-
         return MomiaHttpResponse.SUCCESS(prepayResult);
     }
 

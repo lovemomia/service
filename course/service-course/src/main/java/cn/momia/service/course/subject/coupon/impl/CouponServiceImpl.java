@@ -113,7 +113,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
 
     @Override
     public boolean useCoupon(long orderId, long userCouponId) {
-        String sql = "UPDATE SG_UserCoupon SET OrderId=? WHERE Id=? AND (OrderId=0 OR OrderId=?)";
+        String sql = "UPDATE SG_UserCoupon SET OrderId=?, Status=2 WHERE Id=? AND (OrderId=0 OR OrderId=?)";
         return update(sql, new Object[] { orderId, userCouponId, orderId });
     }
 }
