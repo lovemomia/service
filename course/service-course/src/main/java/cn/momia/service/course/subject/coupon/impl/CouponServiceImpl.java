@@ -53,7 +53,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     private List<UserCoupon> list(Collection<Long> userCouponIds) {
         if (userCouponIds.isEmpty()) return new ArrayList<UserCoupon>();
 
-        String sql = "SELECT A.Id, A.UserId, A.CouponId, B.Title, B.Desc, B.Discount, B.Consumption FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.Id IN (" + StringUtils.join(userCouponIds, ",") + ")";
+        String sql = "SELECT A.Id, B.Type, A.UserId, A.CouponId, B.Title, B.Desc, B.Discount, B.Consumption, B.StartTime, B.EndTime, A.Status FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.Id IN (" + StringUtils.join(userCouponIds, ",") + ")";
         List<UserCoupon> userCoupons = queryList(sql, UserCoupon.class);
 
         Map<Long, UserCoupon> userCouponsMap = new HashMap<Long, UserCoupon>();
