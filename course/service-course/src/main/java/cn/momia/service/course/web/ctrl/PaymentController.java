@@ -91,7 +91,7 @@ public class PaymentController extends BaseController {
                 prepayParam.setTotalFee(totalFee);
                 break;
             case PayType.WEIXIN:
-                prepayParam.setTotalFee(totalFee.multiply(new BigDecimal(100)));
+                prepayParam.setTotalFee(new BigDecimal(totalFee.multiply(new BigDecimal(100)).intValue()));
                 break;
             default: throw new MomiaFailedException("无效的支付类型: " + payType);
         }
