@@ -60,23 +60,23 @@ public class PaymentController extends BaseController {
 
         if (!orderService.prepay(orderId)) return MomiaHttpResponse.FAILED;
 
-        PrepayParam prepayParam = extractPrepayParam(request, order, subject, payType);
-        PaymentGateway gateway = PaymentGatewayFactory.create(payType);
-
+        BigDecimal totalFee = order.getTotalFee();
         if (userCouponId > 0) {
             UserCoupon userCoupon = couponService.get(userCouponId);
             if (!userCoupon.exists() || userCoupon.isExpired() || userCoupon.isUsed()) return MomiaHttpResponse.FAILED("无效的红包/优惠券");
             if (!couponService.preUseCoupon(order.getId(), userCouponId)) return MomiaHttpResponse.FAILED;
-            prepayParam.setTotalFee(couponService.calcTotalFee(prepayParam.getTotalFee(), userCoupon));
+            totalFee = couponService.calcTotalFee(totalFee, userCoupon);
         }
 
+        PrepayParam prepayParam = extractPrepayParam(request, order, totalFee, subject, payType);
+        PaymentGateway gateway = PaymentGatewayFactory.create(payType);
         PrepayResult prepayResult = gateway.prepay(prepayParam);
 
         if (!prepayResult.isSuccessful()) return MomiaHttpResponse.FAILED;
         return MomiaHttpResponse.SUCCESS(prepayResult);
     }
 
-    private PrepayParam extractPrepayParam(HttpServletRequest request, Order order, Subject subject, int payType) {
+    private PrepayParam extractPrepayParam(HttpServletRequest request, Order order, BigDecimal totalFee, Subject subject, int payType) {
         PrepayParam prepayParam = new PrepayParam();
 
         prepayParam.setClientType(extractClientType(request, payType));
@@ -88,10 +88,10 @@ public class PaymentController extends BaseController {
 
         switch (payType) {
             case PayType.ALIPAY:
-                prepayParam.setTotalFee(order.getTotalFee());
+                prepayParam.setTotalFee(totalFee);
                 break;
             case PayType.WEIXIN:
-                prepayParam.setTotalFee(new BigDecimal(order.getTotalFee().multiply(new BigDecimal(100)).intValue()));
+                prepayParam.setTotalFee(totalFee.multiply(new BigDecimal(100)));
                 break;
             default: throw new MomiaFailedException("无效的支付类型: " + payType);
         }
