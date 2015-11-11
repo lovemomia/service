@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class UserCoupon {
+    public static final UserCoupon NOT_EXIST_USER_COUPON = new UserCoupon();
+
     private long id;
     private int type;
     private long userId;
@@ -102,5 +104,17 @@ public class UserCoupon {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public boolean exists() {
+        return id > 0;
+    }
+
+    public boolean isUsed() {
+        return status != 1;
+    }
+
+    public boolean isExpired() {
+        return endTime.before(new Date());
     }
 }

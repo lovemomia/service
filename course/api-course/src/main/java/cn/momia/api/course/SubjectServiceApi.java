@@ -15,6 +15,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.http.client.methods.HttpUriRequest;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class SubjectServiceApi extends ServiceApi {
@@ -92,6 +93,16 @@ public class SubjectServiceApi extends ServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/coupon/list"), builder.build());
 
         return CastUtil.toPagedList((JSON) executeRequest(request), UserCouponDto.class);
+    }
+
+    public BigDecimal coupon(String utoken, long orderId, long userCouponId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("oid", orderId)
+                .add("coupon", userCouponId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/order/coupon"), builder.build());
+
+        return (BigDecimal) executeRequest(request);
     }
 
     public boolean favor(long userId, long subjectId) {

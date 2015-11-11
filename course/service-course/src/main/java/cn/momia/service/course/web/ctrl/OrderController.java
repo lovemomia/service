@@ -13,6 +13,8 @@ import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.subject.SubjectSku;
+import cn.momia.service.course.subject.coupon.CouponService;
+import cn.momia.service.course.subject.coupon.UserCoupon;
 import cn.momia.service.course.subject.order.Order;
 import cn.momia.service.course.subject.order.OrderService;
 import cn.momia.service.course.subject.order.OrderPackage;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -38,6 +41,7 @@ public class OrderController extends BaseController {
     @Autowired private CourseService courseService;
     @Autowired private SubjectService subjectService;
     @Autowired private OrderService orderService;
+    @Autowired private CouponService couponService;
     @Autowired private UserServiceApi userServiceApi;
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
@@ -260,5 +264,23 @@ public class OrderController extends BaseController {
         orderDto.setCover(subject.getCover());
 
         return orderDto;
+    }
+
+    @RequestMapping(value = "/coupon", method = RequestMethod.GET)
+    public MomiaHttpResponse coupon(@RequestParam String utoken,
+                                    @RequestParam(value = "oid") long orderId,
+                                    @RequestParam(value = "coupon") long userCouponId) {
+        UserDto user = userServiceApi.get(utoken);
+        UserCoupon userCoupon = couponService.get(userCouponId);
+        if (!userCoupon.exists() || userCoupon.getUserId() != user.getId() || userCoupon.isUsed()) return MomiaHttpResponse.FAILED("无效的红包/优惠券");
+        if (userCoupon.isExpired()) return MomiaHttpResponse.FAILED("红包/优惠券已经过期");
+
+        Order order = orderService.get(orderId);
+        if (!order.exists() || order.isPayed()) return MomiaHttpResponse.FAILED("无效的订单");
+
+        BigDecimal originalTotalFee = order.getTotalFee();
+        if (originalTotalFee.compareTo(userCoupon.getConsumption()) < 0) return MomiaHttpResponse.FAILED("使用条件不满足，无法使用");
+
+        return MomiaHttpResponse.SUCCESS(couponService.calcTotalFee(originalTotalFee, userCoupon));
     }
 }
