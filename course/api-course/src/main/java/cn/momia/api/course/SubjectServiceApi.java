@@ -5,6 +5,7 @@ import cn.momia.api.course.dto.OrderPackageDto;
 import cn.momia.api.course.dto.OrderDto;
 import cn.momia.api.course.dto.SubjectDto;
 import cn.momia.api.course.dto.SubjectSkuDto;
+import cn.momia.api.course.dto.UserCouponDto;
 import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
@@ -80,6 +81,17 @@ public class SubjectServiceApi extends ServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/order/list"), builder.build());
 
         return CastUtil.toPagedList((JSON) executeRequest(request), OrderDto.class);
+    }
+
+    public PagedList<UserCouponDto> listUserCoupons(String utoken, int status, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("status", status)
+                .add("start", start)
+                .add("count", count);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/coupon/list"), builder.build());
+
+        return CastUtil.toPagedList((JSON) executeRequest(request), UserCouponDto.class);
     }
 
     public boolean favor(long userId, long subjectId) {
