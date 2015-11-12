@@ -36,10 +36,13 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
-    public long add(final String nickName, final String mobile, final String password) {
-        if (exists("nickName", nickName)) throw new MomiaFailedException("昵称已存在，不能使用");
-        if (exists("mobile", mobile)) throw new MomiaFailedException("手机号已经注册过");
+    public boolean exists(String field, String value) {
+        String sql = "SELECT COUNT(1) FROM SG_User WHERE " + field + "=?";
+        return queryInt(sql, new Object[] { value }) > 0;
+    }
 
+    @Override
+    public long add(final String nickName, final String mobile, final String password) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
@@ -57,11 +60,6 @@ public class UserServiceImpl extends DbAccessService implements UserService {
         }, keyHolder);
 
         return keyHolder.getKey().longValue();
-    }
-
-    private boolean exists(String field, String value) {
-        String sql = "SELECT COUNT(1) FROM SG_User WHERE " + field + "=?";
-        return queryInt(sql, new Object[] { value }) > 0;
     }
 
     private String encryptPassword(String mobile, String password, String secretKey) {

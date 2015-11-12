@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface CouponService {
+    boolean hasRegisterCoupon(long userId);
+
     UserCoupon get(long userCouponId);
 
     long queryCount(long userId, int status);

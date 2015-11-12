@@ -15,9 +15,26 @@ import java.util.Map;
 import java.util.Set;
 
 public class CouponServiceImpl extends DbAccessService implements CouponService {
+    private static final int COUPON_SRC_REGISTER = 1;
+
     private static final int NOT_USED_STATUS = 1;
     private static final int USED_STATUS = 2;
     private static final int EXPIRED_STATUS = 3;
+
+    @Override
+    public boolean hasRegisterCoupon(long userId) {
+        return getCouponCount(COUPON_SRC_REGISTER) > 0 && getUserRegisterCouponCount(userId) <= 0;
+    }
+
+    private int getCouponCount(int src) {
+        String sql = "SELECT COUNT(1) FROM SG_Coupon WHERE Src=? AND OnlineTime<=NOW() AND OfflineTime>NOW() AND Status=1";
+        return queryInt(sql, new Object[] { src });
+    }
+
+    private int getUserRegisterCouponCount(long userId) {
+        String sql = "SELECT COUNT(1) FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.UserId=? AND B.Src=? AND A.Status<>0";
+        return queryInt(sql, new Object[] { userId, COUPON_SRC_REGISTER });
+    }
 
     @Override
     public UserCoupon get(long userCouponId) {

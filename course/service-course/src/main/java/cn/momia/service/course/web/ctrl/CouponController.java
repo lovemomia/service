@@ -8,6 +8,7 @@ import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.subject.coupon.CouponService;
 import cn.momia.service.course.subject.coupon.UserCoupon;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -62,5 +63,13 @@ public class CouponController extends BaseController {
         }
 
         return userCouponDtos;
+    }
+
+    @RequestMapping(value = "/register", method = RequestMethod.GET)
+    public MomiaHttpResponse registerCoupon(@RequestParam String utoken) {
+        if (StringUtils.isBlank(utoken)) return MomiaHttpResponse.TOKEN_EXPIRED;
+
+        UserDto user = userServiceApi.get(utoken);
+        return MomiaHttpResponse.SUCCESS(couponService.hasRegisterCoupon(user.getId()));
     }
 }

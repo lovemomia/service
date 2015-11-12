@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 public interface UserService {
+    boolean exists(String field, String value);
     long add(String nickName, String mobile, String password);
 
     boolean exists(long userId);
