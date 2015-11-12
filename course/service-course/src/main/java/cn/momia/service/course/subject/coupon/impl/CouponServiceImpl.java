@@ -30,7 +30,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     private List<UserCoupon> list(Collection<Long> userCouponIds) {
         if (userCouponIds.isEmpty()) return new ArrayList<UserCoupon>();
 
-        String sql = "SELECT A.Id, B.Type, A.UserId, A.CouponId, B.Title, B.Desc, B.Discount, B.Consumption, B.StartTime, B.EndTime, A.Status FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.Id IN (" + StringUtils.join(userCouponIds, ",") + ") AND A.Status<>0 AND B.Status=1";
+        String sql = "SELECT A.Id, B.Type, A.UserId, A.CouponId, B.Title, B.Desc, B.Discount, B.Consumption, A.StartTime, A.EndTime, A.Status FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.Id IN (" + StringUtils.join(userCouponIds, ",") + ") AND A.Status<>0 AND B.Status=1";
         List<UserCoupon> userCoupons = queryList(sql, UserCoupon.class);
 
         Map<Long, UserCoupon> userCouponsMap = new HashMap<Long, UserCoupon>();
@@ -51,13 +51,13 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     public long queryCount(long userId, int status) {
         String sql;
         if (status == NOT_USED_STATUS) {
-            sql = "SELECT COUNT(1) FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.UserId=? AND A.Status=1 AND B.EndTime>NOW() AND B.Status=1";
+            sql = "SELECT COUNT(1) FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.UserId=? AND A.Status=1 AND A.EndTime>NOW() AND B.Status=1";
         } else if (status == USED_STATUS) {
             sql = "SELECT COUNT(1) FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.UserId=? AND A.Status=2 AND B.Status=1";
         } else if (status == EXPIRED_STATUS) {
-            sql = "SELECT COUNT(1) FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.UserId=? AND A.Status=1 AND B.EndTime<=NOW() AND B.Status=1";
+            sql = "SELECT COUNT(1) FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.UserId=? AND A.Status=1 AND A.EndTime<=NOW() AND B.Status=1";
         } else {
-            sql = "SELECT COUNT(1) FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.UserId=? AND (A.Status=2 OR (A.Status=1 AND B.EndTime>NOW())) AND B.Status=1";
+            sql = "SELECT COUNT(1) FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.UserId=? AND (A.Status=2 OR (A.Status=1 AND A.EndTime>NOW())) AND B.Status=1";
         }
 
         return queryLong(sql, new Object[] { userId });
@@ -67,13 +67,13 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     public List<UserCoupon> query(long userId, int status, int start, int count) {
         String sql;
         if (status == NOT_USED_STATUS) {
-            sql = "SELECT A.Id FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.UserId=? AND A.Status=1 AND B.EndTime>NOW() AND B.Status=1 ORDER BY B.EndTime ASC, B.StartTime ASC LIMIT ?,?";
+            sql = "SELECT A.Id FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.UserId=? AND A.Status=1 AND A.EndTime>NOW() AND B.Status=1 ORDER BY A.EndTime ASC, A.StartTime ASC LIMIT ?,?";
         } else if (status == USED_STATUS) {
-            sql = "SELECT A.Id FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.UserId=? AND A.Status=2 AND B.Status=1 ORDER BY B.EndTime ASC, B.StartTime ASC LIMIT ?,?";
+            sql = "SELECT A.Id FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.UserId=? AND A.Status=2 AND B.Status=1 ORDER BY A.EndTime ASC, A.StartTime ASC LIMIT ?,?";
         } else if (status == EXPIRED_STATUS) {
-            sql = "SELECT A.Id FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.UserId=? AND A.Status=1 AND B.EndTime<=NOW() AND B.Status=1 ORDER BY B.EndTime ASC, B.StartTime ASC LIMIT ?,?";
+            sql = "SELECT A.Id FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.UserId=? AND A.Status=1 AND A.EndTime<=NOW() AND B.Status=1 ORDER BY A.EndTime ASC, A.StartTime ASC LIMIT ?,?";
         } else {
-            sql = "SELECT A.Id FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.UserId=? AND (A.Status=2 OR (A.Status=1 AND B.EndTime>NOW())) AND B.Status=1 ORDER BY B.EndTime ASC, B.StartTime ASC LIMIT ?,?";
+            sql = "SELECT A.Id FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.UserId=? AND (A.Status=2 OR (A.Status=1 AND A.EndTime>NOW())) AND B.Status=1 ORDER BY A.EndTime ASC, A.StartTime ASC LIMIT ?,?";
         }
         List<Long> userCouponIds = queryLongList(sql, new Object[] { userId, start, count });
 
