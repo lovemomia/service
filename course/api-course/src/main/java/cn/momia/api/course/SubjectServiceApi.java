@@ -105,16 +105,11 @@ public class SubjectServiceApi extends ServiceApi {
         return (BigDecimal) executeRequest(request);
     }
 
-    public boolean hasRegisterCoupon(String utoken) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/coupon/register"), builder.build());
-
-        return (Boolean) executeRequest(request);
-    }
-
-    public void getRegisterCoupon(String utoken) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("subject/coupon/register"), builder.build());
+    public void inviteCoupon(String mobile, String inviteCode) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("mobile", mobile)
+                .add("invite", inviteCode);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("subject/coupon/invite"), builder.build());
         executeRequest(request);
     }
 

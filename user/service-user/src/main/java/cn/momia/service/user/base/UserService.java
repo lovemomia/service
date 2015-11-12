@@ -9,6 +9,7 @@ public interface UserService {
     long add(String nickName, String mobile, String password);
 
     boolean exists(long userId);
+    boolean exists(String mobile);
     User get(long userId);
     List<User> list(Collection<Long> userIds);
     User getByToken(String token);

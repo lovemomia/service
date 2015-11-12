@@ -75,6 +75,13 @@ public class UserServiceApi extends ServiceApi {
         return (Boolean) executeRequest(request);
     }
 
+    public boolean exists(String mobile) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("mobile", mobile);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("user", "exists"), builder.build());
+
+        return (Boolean) executeRequest(request);
+    }
+
     public List<UserDto> list(Collection<Long> userIds, int type) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uids", StringUtils.join(userIds, ","))

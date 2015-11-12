@@ -4,9 +4,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface CouponService {
-    boolean hasRegisterCoupon(long userId);
-    void generateRegisterCoupon(long userId);
-
     UserCoupon get(long userCouponId);
 
     long queryCount(long userId, int status);
@@ -18,4 +15,7 @@ public interface CouponService {
 
     boolean preUseCoupon(long orderId, long userCouponId);
     boolean useCoupon(long orderId, long userCouponId);
+
+    boolean hasInviteCoupon(String mobile);
+    boolean addInviteCoupon(String mobile, String inviteCode);
 }

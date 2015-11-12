@@ -38,6 +38,11 @@ public class UserController extends UserRelatedController {
         return MomiaHttpResponse.SUCCESS(userService.exists(userId));
     }
 
+    @RequestMapping(value = "/exists", method = RequestMethod.GET)
+    public MomiaHttpResponse exist(@RequestParam String mobile) {
+        return MomiaHttpResponse.SUCCESS(userService.exists(mobile));
+    }
+
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public MomiaHttpResponse list(@RequestParam String uids, @RequestParam(defaultValue = "" + User.Type.BASE) int type) {
         List<Long> userIds = new ArrayList<Long>();
