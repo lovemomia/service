@@ -54,7 +54,7 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO SG_Feed(`Type`, UserId, Content, TagId, SubjectId, CourseId, CourseTitle, Lng, Lat, AddTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO SG_Feed(`Type`, UserId, Content, TagId, SubjectId, CourseId, CourseTitle, Lng, Lat, Official, AddTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setInt(1, feed.getType());
                 ps.setLong(2, feed.getUserId());
@@ -65,6 +65,7 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
                 ps.setString(7, feed.getCourseTitle());
                 ps.setDouble(8, feed.getLng());
                 ps.setDouble(9, feed.getLat());
+                ps.setInt(10, feed.getOfficial());
 
                 return ps;
             }
@@ -124,7 +125,7 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
     private List<Feed> list(Collection<Long> feedIds) {
         if (feedIds.isEmpty()) return new ArrayList<Feed>();
 
-        String sql = "SELECT Id,`Type`, UserId, Content, TagId, SubjectId, CourseId, CourseTitle, Lng, Lat, CommentCount, StarCount, AddTime FROM SG_Feed WHERE Id IN (" + StringUtils.join(feedIds, ",") + ") AND Status=1";
+        String sql = "SELECT Id,`Type`, UserId, Content, TagId, SubjectId, CourseId, CourseTitle, Lng, Lat, CommentCount, StarCount, Official, AddTime FROM SG_Feed WHERE Id IN (" + StringUtils.join(feedIds, ",") + ") AND Status=1";
         List<Feed> feeds = queryList(sql, Feed.class);
 
         Set<Long> tagIds = new HashSet<Long>();

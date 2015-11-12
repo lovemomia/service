@@ -85,7 +85,7 @@ public class FeedController extends BaseController {
             UserDto user = usersMap.get(feed.getUserId());
             if (user == null) continue;
 
-            feedDtos.add(buildFeedDto(feed, user, staredFeedIds.contains(feed.getId())));
+            feedDtos.add(buildFeedDto(userId, feed, user, staredFeedIds.contains(feed.getId())));
         }
 
         PagedList<FeedDto> pagedFeedDtos = new PagedList(totalCount, start, count);
@@ -94,7 +94,7 @@ public class FeedController extends BaseController {
         return pagedFeedDtos;
     }
 
-    private FeedDto buildFeedDto(Feed feed, UserDto user, boolean stared) {
+    private FeedDto buildFeedDto(long userId, Feed feed, UserDto user, boolean stared) {
         FeedDto feedDto = new FeedDto();
         feedDto.setId(feed.getId());
         feedDto.setType(feed.getType());
@@ -110,7 +110,7 @@ public class FeedController extends BaseController {
         feedDto.setPoi(feed.getLng() + ":" + feed.getLat());
         feedDto.setCommentCount(feed.getCommentCount());
         feedDto.setStarCount(feed.getStarCount());
-        feedDto.setOfficial(feed.getOfficial() > 0);
+        feedDto.setOfficial(feed.getOfficial() > 0 && (userId == 0 || feed.getUserId() != userId));
         feedDto.setUserId(user.getId());
         feedDto.setAvatar(user.getAvatar());
         feedDto.setNickName(user.getNickName());
@@ -183,14 +183,17 @@ public class FeedController extends BaseController {
             feed.setTagId(tagId);
         }
 
+        boolean isOfficialUser = feedService.isOfficialUser(feed.getUserId());
+        if (isOfficialUser) feed.setOfficial(1);
+
         long feedId = feedService.add(feed);
         if (feedId <= 0) return MomiaHttpResponse.FAILED("发表Feed失败");
 
         try {
             // TODO 异步推送
             List<Long> followedIds = feedService.getFollowedIds(feed.getUserId());
-            followedIds.add(feed.getUserId());
-            if (feedService.isOfficialUser(feed.getUserId())) followedIds.add(0L);
+            if (isOfficialUser) followedIds.add(0L);
+            else followedIds.add(feed.getUserId());
             feedService.push(feedId, followedIds);
         } catch (Exception e) {
             LOGGER.error("fail to push feed: {}", feed.getId());
@@ -217,7 +220,7 @@ public class FeedController extends BaseController {
 
         boolean stared = userId > 0 && feedStarService.isStared(userId, feedId);
 
-        return MomiaHttpResponse.SUCCESS(buildFeedDto(feed, feedUser, stared));
+        return MomiaHttpResponse.SUCCESS(buildFeedDto(userId, feed, feedUser, stared));
     }
 
     @RequestMapping(value = "/{fid}", method = RequestMethod.DELETE)
