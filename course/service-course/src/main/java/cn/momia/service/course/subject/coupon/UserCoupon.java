@@ -16,6 +16,7 @@ public class UserCoupon {
     private BigDecimal consumption;
     private Date startTime;
     private Date endTime;
+    private String inviteCode;
     private int status;
 
     public long getId() {
@@ -96,6 +97,14 @@ public class UserCoupon {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public String getInviteCode() {
+        return inviteCode;
+    }
+
+    public void setInviteCode(String inviteCode) {
+        this.inviteCode = inviteCode;
     }
 
     public int getStatus() {

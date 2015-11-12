@@ -4,6 +4,7 @@ import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.service.DbAccessService;
 import cn.momia.service.course.subject.coupon.Coupon;
 import cn.momia.service.course.subject.coupon.CouponService;
+import cn.momia.service.course.subject.coupon.InviteCoupon;
 import cn.momia.service.course.subject.coupon.UserCoupon;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
@@ -32,15 +33,15 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     @Override
     public UserCoupon get(long userCouponId) {
         Set<Long> userCouponIds = Sets.newHashSet(userCouponId);
-        List<UserCoupon> userCoupons = list(userCouponIds);
+        List<UserCoupon> userCoupons = listUserCoupons(userCouponIds);
 
         return userCoupons.isEmpty() ? UserCoupon.NOT_EXIST_USER_COUPON : userCoupons.get(0);
     }
 
-    private List<UserCoupon> list(Collection<Long> userCouponIds) {
+    private List<UserCoupon> listUserCoupons(Collection<Long> userCouponIds) {
         if (userCouponIds.isEmpty()) return new ArrayList<UserCoupon>();
 
-        String sql = "SELECT A.Id, B.Type, A.UserId, A.CouponId, B.Title, B.Desc, B.Discount, B.Consumption, A.StartTime, A.EndTime, A.Status FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.Id IN (" + StringUtils.join(userCouponIds, ",") + ") AND A.Status<>0 AND B.Status=1";
+        String sql = "SELECT A.Id, B.Type, A.UserId, A.CouponId, B.Title, B.Desc, B.Discount, B.Consumption, A.StartTime, A.EndTime, A.InviteCode, A.Status FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.Id IN (" + StringUtils.join(userCouponIds, ",") + ") AND A.Status<>0 AND B.Status=1";
         List<UserCoupon> userCoupons = queryList(sql, UserCoupon.class);
 
         Map<Long, UserCoupon> userCouponsMap = new HashMap<Long, UserCoupon>();
@@ -87,14 +88,14 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
         }
         List<Long> userCouponIds = queryLongList(sql, new Object[] { userId, start, count });
 
-        return list(userCouponIds);
+        return listUserCoupons(userCouponIds);
     }
 
     @Override
     public UserCoupon queryByOrder(long orderId) {
         String sql = "SELECT UserCouponId FROM SG_SubjectOrderCoupon WHERE OrderId=? AND Status=1";
         List<Long> userCouponIds = queryLongList(sql, new Object[] { orderId });
-        List<UserCoupon> userCoupons = list(userCouponIds);
+        List<UserCoupon> userCoupons = listUserCoupons(userCouponIds);
 
         return userCoupons.isEmpty() ? UserCoupon.NOT_EXIST_USER_COUPON : userCoupons.get(0);
     }
@@ -176,12 +177,12 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
 
     @Override
     public void addInviteUserCoupon(long userId, String mobile) {
-        int couponId = getInviteCouponId(mobile);
-        if (couponId <= 0) return;
+        InviteCoupon inviteCoupon = getInviteCoupon(mobile);
+        if (!inviteCoupon.exists()) return;
 
         if (!updateInviteCouponStatus(mobile)) return;
 
-        List<Coupon> coupons = listCoupons(Sets.newHashSet(couponId));
+        List<Coupon> coupons = listCoupons(Sets.newHashSet(inviteCoupon.getCouponId()));
         if (coupons.isEmpty()) return;
 
         List<Object[]> args = new ArrayList<Object[]>();
@@ -212,17 +213,19 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
                     endTime = coupon.getEndTime();
                 }
 
-                args.add(new Object[] { userId, coupon.getId(), startTime, endTime });
+                args.add(new Object[] { userId, coupon.getId(), startTime, endTime, inviteCoupon.getInviteCode() });
             }
         }
 
-        String sql = "INSERT INTO SG_UserCoupon (UserId, CouponId, StartTime, EndTime, AddTime) VALUES (?, ?, ?, ?, NOW())";
+        String sql = "INSERT INTO SG_UserCoupon (UserId, CouponId, StartTime, EndTime, InviteCode, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
         jdbcTemplate.batchUpdate(sql, args);
     }
 
-    private int getInviteCouponId(String mobile) {
-        String sql = "SELECT CouponId FROM SG_InviteCoupon WHERE Mobile=? AND Status=1";
-        return queryInt(sql, new Object[] { mobile });
+    private InviteCoupon getInviteCoupon(String mobile) {
+        String sql = "SELECT Id, Mobile, InviteCode, CouponId FROM SG_InviteCoupon WHERE Mobile=? AND Status=1";
+        List<InviteCoupon> inviteCoupons = queryList(sql, new Object[] { mobile }, InviteCoupon.class);
+
+        return inviteCoupons.isEmpty() ? InviteCoupon.NOT_EXIST_INVITE_COUPON : inviteCoupons.get(0);
     }
 
     private boolean updateInviteCouponStatus(String mobile) {
