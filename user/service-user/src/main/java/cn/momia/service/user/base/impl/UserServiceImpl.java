@@ -201,7 +201,7 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
     @Override
     public boolean updateRegisterCouponStatus(long userId) {
-        String sql = "UPDATE SG_User SET RegisterCoupon=1 WHERE RegisterCoupon=0";
+        String sql = "UPDATE SG_User SET RegisterCoupon=1 WHERE Id=? AND RegisterCoupon=0";
         return update(sql, new Object[] { userId });
     }
 }
