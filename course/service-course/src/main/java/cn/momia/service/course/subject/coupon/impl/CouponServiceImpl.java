@@ -179,6 +179,8 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
         int couponId = getInviteCouponId(mobile);
         if (couponId <= 0) return;
 
+        if (!updateInviteCouponStatus(mobile)) return;
+
         List<Coupon> coupons = listCoupons(Sets.newHashSet(couponId));
         if (coupons.isEmpty()) return;
 
@@ -221,5 +223,10 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     private int getInviteCouponId(String mobile) {
         String sql = "SELECT CouponId FROM SG_InviteCoupon WHERE Mobile=? AND Status=1";
         return queryInt(sql, new Object[] { mobile });
+    }
+
+    private boolean updateInviteCouponStatus(String mobile) {
+        String sql = "UPDATE SG_InviteCoupon SET Status=2 WHERE Mobile=? AND Status=1";
+        return update(sql, new Object[] { mobile });
     }
 }
