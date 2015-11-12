@@ -27,4 +27,5 @@ public interface UserService {
     boolean updatePassword(long userId, String mobile, String password);
 
     void payed(long userId);
+    boolean updateRegisterCouponStatus(long userId);
 }

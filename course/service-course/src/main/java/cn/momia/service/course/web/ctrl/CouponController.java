@@ -66,10 +66,22 @@ public class CouponController extends BaseController {
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.GET)
-    public MomiaHttpResponse registerCoupon(@RequestParam String utoken) {
+    public MomiaHttpResponse hasRegisterCoupon(@RequestParam String utoken) {
         if (StringUtils.isBlank(utoken)) return MomiaHttpResponse.TOKEN_EXPIRED;
 
         UserDto user = userServiceApi.get(utoken);
         return MomiaHttpResponse.SUCCESS(couponService.hasRegisterCoupon(user.getId()));
+    }
+
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public MomiaHttpResponse getRegisterCoupon(@RequestParam String utoken) {
+        if (StringUtils.isBlank(utoken)) return MomiaHttpResponse.TOKEN_EXPIRED;
+
+        UserDto user = userServiceApi.get(utoken);
+        if (!userServiceApi.updateRegisterCouponStatus(user.getId())) return MomiaHttpResponse.FAILED("您已经领取过注册红包");
+        
+        couponService.generateRegisterCoupon(user.getId());
+
+        return MomiaHttpResponse.SUCCESS;
     }
 }

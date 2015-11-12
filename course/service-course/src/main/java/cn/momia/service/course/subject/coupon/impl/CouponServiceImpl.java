@@ -1,6 +1,7 @@
 package cn.momia.service.course.subject.coupon.impl;
 
 import cn.momia.common.service.DbAccessService;
+import cn.momia.service.course.subject.coupon.Coupon;
 import cn.momia.service.course.subject.coupon.CouponService;
 import cn.momia.service.course.subject.coupon.UserCoupon;
 import com.google.common.collect.Sets;
@@ -8,7 +9,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +37,74 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     private int getUserRegisterCouponCount(long userId) {
         String sql = "SELECT COUNT(1) FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.UserId=? AND B.Src=? AND A.Status<>0";
         return queryInt(sql, new Object[] { userId, COUPON_SRC_REGISTER });
+    }
+
+    @Override
+    public void generateRegisterCoupon(long userId) {
+        String sql = "SELECT Id FROM SG_Coupon WHERE Src=? AND OnlineTime<=NOW() AND OfflineTime>NOW() AND Status=1";
+        List<Integer> couponIds = queryIntList(sql, new Object[] { userId });
+
+        List<Coupon> coupons = listCoupons(couponIds);
+        addRegisterCoupons(userId, coupons);
+    }
+
+    private List<Coupon> listCoupons(Collection<Integer> couponIds) {
+        if (couponIds.isEmpty()) return new ArrayList<Coupon>();
+
+        String sql = "SELECT Id, Count, TimeType, Time, TimeUnit, StartTime, EndTime FROM SG_Coupon WHERE Id IN(" + StringUtils.join(couponIds, ",") + ") AND Status=1";
+        List<Coupon> coupons = queryList(sql, Coupon.class);
+
+        Map<Integer, Coupon> couponsMap = new HashMap<Integer, Coupon>();
+        for (Coupon coupon : coupons) {
+            couponsMap.put(coupon.getId(), coupon);
+        }
+
+        List<Coupon> result = new ArrayList<Coupon>();
+        for (int couponId : couponIds) {
+            Coupon coupon = couponsMap.get(couponId);
+            if (coupon != null) result.add(coupon);
+        }
+
+        return result;
+    }
+
+    private void addRegisterCoupons(long userId, List<Coupon> coupons) {
+        if (coupons.isEmpty()) return;
+
+        List<Object[]> args = new ArrayList<Object[]>();
+        for (Coupon coupon : coupons) {
+            for (int i = 0; i < coupon.getCount(); i++) {
+                int timeType = coupon.getTimeType();
+                Date startTime;
+                Date endTime;
+                if (timeType == 1) {
+                    startTime = new Date();
+                    int time = coupon.getTime();
+                    int timeUnit = coupon.getTimeUnit();
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(startTime);
+                    switch (timeUnit) {
+                        case Coupon.TimeUnit.YEAR:
+                            calendar.add(Calendar.YEAR, time);
+                            break;
+                        case Coupon.TimeUnit.QUATER:
+                            calendar.add(Calendar.MONTH, time * 3);
+                            break;
+                        default:
+                            calendar.add(Calendar.MONTH, time);
+                    }
+                    endTime = calendar.getTime();
+                } else {
+                    startTime = coupon.getStartTime();
+                    endTime = coupon.getEndTime();
+                }
+
+                args.add(new Object[] { userId, coupon.getId(), startTime, endTime });
+            }
+        }
+
+        String sql = "INSERT INTO SG_UserCoupon (UserId, CouponId, StartTime, EndTime, AddTime) VALUES (?, ?, ?, ?, NOW())";
+        jdbcTemplate.batchUpdate(sql, args);
     }
 
     @Override

@@ -5,6 +5,7 @@ import java.util.List;
 
 public interface CouponService {
     boolean hasRegisterCoupon(long userId);
+    void generateRegisterCoupon(long userId);
 
     UserCoupon get(long userCouponId);
 

@@ -180,4 +180,9 @@ public class UserController extends UserRelatedController {
         userService.payed(userId);
         return MomiaHttpResponse.SUCCESS;
     }
+
+    @RequestMapping(value = "/{uid}/coupon/register", method = RequestMethod.POST)
+    public MomiaHttpResponse updateRegisterCouponStatus(@PathVariable(value = "uid") long userId) {
+        return MomiaHttpResponse.SUCCESS(userService.updateRegisterCouponStatus(userId));
+    }
 }

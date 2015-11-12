@@ -167,4 +167,9 @@ public class UserServiceApi extends ServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("user", userId, "payed"));
         executeRequest(request);
     }
+
+    public boolean updateRegisterCouponStatus(long userId) {
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("user", userId, "coupon/register"));
+        return (Boolean) executeRequest(request);
+    }
 }
