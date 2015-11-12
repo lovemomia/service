@@ -138,6 +138,15 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
+    public User getByInviteCode(String inviteCode) {
+        String sql = "SELECT Id FROM SG_User WHERE InviteCode=? AND Status=1";
+        List<Long> userIds = queryLongList(sql, new Object[] { inviteCode });
+        List<User> users = list(userIds);
+
+        return userIds.isEmpty() ? User.NOT_EXIST_USER : users.get(0);
+    }
+
+    @Override
     public boolean updateNickName(long userId, String nickName) {
         if (exists("nickName", nickName)) throw new MomiaFailedException("昵称已存在，不能使用");
 
@@ -200,9 +209,9 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
-    public void payed(long userId) {
-        String sql = "UPDATE SG_User SET Payed=1 WHERE Id=?";
-        update(sql, new Object[] { userId });
+    public boolean payed(long userId) {
+        String sql = "UPDATE SG_User SET Payed=1 WHERE Id=? AND Payed=0";
+        return update(sql, new Object[] { userId });
     }
 
     @Override

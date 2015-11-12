@@ -154,6 +154,17 @@ public class PaymentController extends BaseController {
                 LOGGER.error("红包/优惠券不匹配，订单: {}", order.getId());
                 return MomiaHttpResponse.SUCCESS("OK");
             }
+
+            try {
+                if (!userServiceApi.payed(order.getUserId())) {
+                    UserDto inviteUser = userServiceApi.getByInviteCode(userCoupon.getInviteCode());
+                    if (inviteUser.exists() && inviteUser.getId() != order.getUserId()) {
+                        couponService.addInviteUserCoupon(inviteUser.getId(), userCoupon.getCouponId());
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.error("返红包失败，订单: {}", order.getId(), e);
+            }
         }
 
         if (!finishPayment(order, createPayment(callbackParam))) return MomiaHttpResponse.SUCCESS("FAIL");

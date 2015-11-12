@@ -19,4 +19,5 @@ public interface CouponService {
     boolean hasInviteCoupon(String mobile);
     boolean addInviteCoupon(String mobile, String inviteCode);
     void addInviteUserCoupon(long userId, String mobile);
+    void addInviteUserCoupon(long userId, int couponId);
 }

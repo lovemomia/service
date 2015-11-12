@@ -33,6 +33,12 @@ public class UserController extends UserRelatedController {
         return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL, false));
     }
 
+    @RequestMapping(value = "/invite", method = RequestMethod.GET)
+    public MomiaHttpResponse getByInviteCode(@RequestParam(value = "invite") String inviteCode) {
+        User user = userService.getByInviteCode(inviteCode);
+        return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL, false));
+    }
+
     @RequestMapping(value = "/{uid}/exists", method = RequestMethod.GET)
     public MomiaHttpResponse exist(@PathVariable(value = "uid") long userId) {
         return MomiaHttpResponse.SUCCESS(userService.exists(userId));
@@ -182,8 +188,7 @@ public class UserController extends UserRelatedController {
 
     @RequestMapping(value = "/{uid}/payed", method = RequestMethod.POST)
     public MomiaHttpResponse payed(@PathVariable(value = "uid") long userId) {
-        userService.payed(userId);
-        return MomiaHttpResponse.SUCCESS;
+        return MomiaHttpResponse.SUCCESS(userService.payed(userId));
     }
 
     @RequestMapping(value = "/{uid}/coupon/register", method = RequestMethod.POST)

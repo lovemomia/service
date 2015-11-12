@@ -70,6 +70,13 @@ public class UserServiceApi extends ServiceApi {
         return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
     }
 
+    public UserDto getByInviteCode(String inviteCode) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("invite", inviteCode);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("user/invite"), builder.build());
+
+        return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
+    }
+
     public boolean exists(long userId) {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("user", userId, "exists"));
         return (Boolean) executeRequest(request);
@@ -170,13 +177,8 @@ public class UserServiceApi extends ServiceApi {
         return CastUtil.toObject((JSON) executeRequest(request), ContactDto.class);
     }
 
-    public void payed(long userId) {
+    public boolean payed(long userId) {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("user", userId, "payed"));
-        executeRequest(request);
-    }
-
-    public boolean updateRegisterCouponStatus(long userId) {
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("user", userId, "coupon/register"));
         return (Boolean) executeRequest(request);
     }
 }

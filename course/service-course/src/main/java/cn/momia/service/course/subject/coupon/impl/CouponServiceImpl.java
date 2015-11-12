@@ -185,6 +185,10 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
         List<Coupon> coupons = listCoupons(Sets.newHashSet(inviteCoupon.getCouponId()));
         if (coupons.isEmpty()) return;
 
+        addUserCoupons(userId, inviteCoupon.getInviteCode(), coupons);
+    }
+
+    private void addUserCoupons(long userId, String inviteCode, List<Coupon> coupons) {
         List<Object[]> args = new ArrayList<Object[]>();
         for (Coupon coupon : coupons) {
             for (int i = 0; i < coupon.getCount(); i++) {
@@ -213,7 +217,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
                     endTime = coupon.getEndTime();
                 }
 
-                args.add(new Object[] { userId, coupon.getId(), startTime, endTime, inviteCoupon.getInviteCode() });
+                args.add(new Object[] { userId, coupon.getId(), startTime, endTime, inviteCode });
             }
         }
 
@@ -231,5 +235,13 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
     private boolean updateInviteCouponStatus(String mobile) {
         String sql = "UPDATE SG_InviteCoupon SET Status=2 WHERE Mobile=? AND Status=1";
         return update(sql, new Object[] { mobile });
+    }
+
+    @Override
+    public void addInviteUserCoupon(long userId, int couponId) {
+        List<Coupon> coupons = listCoupons(Sets.newHashSet(couponId));
+        if (coupons.isEmpty()) return;
+
+        addUserCoupons(userId, "", coupons);
     }
 }

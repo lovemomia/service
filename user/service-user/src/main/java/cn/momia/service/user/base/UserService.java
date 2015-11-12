@@ -14,6 +14,7 @@ public interface UserService {
     List<User> list(Collection<Long> userIds);
     User getByToken(String token);
     User getByMobile(String mobile);
+    User getByInviteCode(String inviteCode);
 
     boolean updateNickName(long userId, String nickName);
     boolean updateAvatar(long userId, String avatar);
@@ -27,6 +28,6 @@ public interface UserService {
     boolean validatePassword(String mobile, String password);
     boolean updatePassword(long userId, String mobile, String password);
 
-    void payed(long userId);
+    boolean payed(long userId);
     boolean updateRegisterCouponStatus(long userId);
 }
