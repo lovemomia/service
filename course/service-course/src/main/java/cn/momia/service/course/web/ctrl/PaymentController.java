@@ -156,7 +156,7 @@ public class PaymentController extends BaseController {
             }
 
             try {
-                if (!userServiceApi.payed(order.getUserId())) {
+                if (userServiceApi.payed(order.getUserId())) {
                     UserDto inviteUser = userServiceApi.getByInviteCode(userCoupon.getInviteCode());
                     if (inviteUser.exists() && inviteUser.getId() != order.getUserId()) {
                         couponService.addInviteUserCoupon(inviteUser.getId(), userCoupon.getCouponId());
