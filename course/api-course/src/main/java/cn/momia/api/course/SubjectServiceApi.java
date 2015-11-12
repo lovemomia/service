@@ -113,6 +113,14 @@ public class SubjectServiceApi extends ServiceApi {
         executeRequest(request);
     }
 
+    public void addInviteUserCoupon(long userId, String mobile) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("uid", userId)
+                .add("mobile", mobile);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("subject/coupon/invite/add"), builder.build());
+        executeRequest(request);
+    }
+
     public boolean favor(long userId, long subjectId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("subject", subjectId, "favor"), builder.build());

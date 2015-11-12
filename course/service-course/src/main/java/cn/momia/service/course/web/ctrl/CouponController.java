@@ -70,4 +70,10 @@ public class CouponController extends BaseController {
         if (!couponService.addInviteCoupon(mobile, inviteCode)) return MomiaHttpResponse.FAILED("领取失败，可能是该手机号已经领取过了");
         return MomiaHttpResponse.SUCCESS;
     }
+
+    @RequestMapping(value = "/invite/add", method = RequestMethod.POST)
+    public MomiaHttpResponse inviteUserCoupon(@RequestParam(value = "uid") long userId, @RequestParam String mobile) {
+        couponService.addInviteUserCoupon(userId, mobile);
+        return MomiaHttpResponse.SUCCESS;
+    }
 }

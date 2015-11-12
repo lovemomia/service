@@ -12,7 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,7 +129,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
 
     @Override
     public boolean hasInviteCoupon(String mobile) {
-        String sql = "SELECT COUNT(1) FROM SG_InviteCoupon WHERE Mobile=?";
+        String sql = "SELECT COUNT(1) FROM SG_InviteCoupon WHERE Mobile=? AND Status<>0";
         return queryInt(sql, new Object[] { mobile }) > 0;
     }
 
@@ -170,5 +172,54 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
             LOGGER.error("fail to add invite coupon for mobile: {}", mobile, e);
             return false;
         }
+    }
+
+    @Override
+    public void addInviteUserCoupon(long userId, String mobile) {
+        int couponId = getInviteCouponId(mobile);
+        if (couponId <= 0) return;
+
+        List<Coupon> coupons = listCoupons(Sets.newHashSet(couponId));
+        if (coupons.isEmpty()) return;
+
+        List<Object[]> args = new ArrayList<Object[]>();
+        for (Coupon coupon : coupons) {
+            for (int i = 0; i < coupon.getCount(); i++) {
+                int timeType = coupon.getTimeType();
+                Date startTime;
+                Date endTime;
+                if (timeType == 1) {
+                    startTime = new Date();
+                    int time = coupon.getTime();
+                    int timeUnit = coupon.getTimeUnit();
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(startTime);
+                    switch (timeUnit) {
+                        case Coupon.TimeUnit.YEAR:
+                            calendar.add(Calendar.YEAR, time);
+                            break;
+                        case Coupon.TimeUnit.QUATER:
+                            calendar.add(Calendar.MONTH, time * 3);
+                            break;
+                        default:
+                            calendar.add(Calendar.MONTH, time);
+                    }
+                    endTime = calendar.getTime();
+                } else {
+                    startTime = coupon.getStartTime();
+                    endTime = coupon.getEndTime();
+                }
+
+                args.add(new Object[] { userId, coupon.getId(), startTime, endTime });
+            }
+        }
+
+        String sql = "INSERT INTO SG_UserCoupon (UserId, CouponId, StartTime, EndTime, AddTime) VALUES (?, ?, ?, ?, NOW())";
+        jdbcTemplate.batchUpdate(sql, args);
+    }
+
+    private int getInviteCouponId(String mobile) {
+        String sql = "SELECT CouponId FROM SG_InviteCoupon WHERE Mobile=? AND Status=1";
+        return queryInt(sql, new Object[] { mobile });
     }
 }
