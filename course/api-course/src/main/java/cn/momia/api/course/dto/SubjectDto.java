@@ -18,7 +18,7 @@ public class SubjectDto {
     private String region;
     private String intro;
     private JSONArray notice;
-    private int stock;
+    private int status;
     private List<String> imgs;
 
     public long getId() {
@@ -117,12 +117,12 @@ public class SubjectDto {
         this.notice = notice;
     }
 
-    public int getStock() {
-        return stock;
+    public int getStatus() {
+        return status;
     }
 
-    public void setStock(int stock) {
-        this.stock = stock;
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public List<String> getImgs() {

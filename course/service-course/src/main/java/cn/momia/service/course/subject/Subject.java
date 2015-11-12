@@ -8,6 +8,11 @@ public class Subject {
         public static final int TRIAL = 2;
     }
 
+    public static class Status {
+        public static final int OK = 1;
+        public static final int SOLD_OUT = 2;
+    }
+
     public static final Subject NOT_EXIST_SUBJECT = new Subject();
 
     private long id;

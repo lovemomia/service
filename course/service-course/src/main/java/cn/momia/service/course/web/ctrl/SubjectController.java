@@ -99,7 +99,9 @@ public class SubjectController extends BaseController {
             subjectDto.setScheduler(getScheduler(courses));
             subjectDto.setRegion(getRegion(courses));
 
-            subjectDto.setStock(subject.getStock());
+            int stock = subject.getStock();
+            int status = (stock == -1 || stock > 0) ? Subject.Status.OK : Subject.Status.SOLD_OUT;
+            subjectDto.setStatus(status);
 
             return subjectDto;
         } catch (Exception e) {
