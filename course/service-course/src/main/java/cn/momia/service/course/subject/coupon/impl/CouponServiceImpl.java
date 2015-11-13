@@ -2,6 +2,7 @@ package cn.momia.service.course.subject.coupon.impl;
 
 import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.service.DbAccessService;
+import cn.momia.common.util.TimeUtil;
 import cn.momia.service.course.subject.coupon.Coupon;
 import cn.momia.service.course.subject.coupon.CouponService;
 import cn.momia.service.course.subject.coupon.InviteCoupon;
@@ -13,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -197,21 +197,7 @@ public class CouponServiceImpl extends DbAccessService implements CouponService 
                 Date endTime;
                 if (timeType == 1) {
                     startTime = new Date();
-                    int time = coupon.getTime();
-                    int timeUnit = coupon.getTimeUnit();
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(startTime);
-                    switch (timeUnit) {
-                        case Coupon.TimeUnit.YEAR:
-                            calendar.add(Calendar.YEAR, time);
-                            break;
-                        case Coupon.TimeUnit.QUATER:
-                            calendar.add(Calendar.MONTH, time * 3);
-                            break;
-                        default:
-                            calendar.add(Calendar.MONTH, time);
-                    }
-                    endTime = calendar.getTime();
+                    endTime = TimeUtil.add(startTime, coupon.getTime(), coupon.getTimeUnit());
                 } else {
                     startTime = coupon.getStartTime();
                     endTime = coupon.getEndTime();
