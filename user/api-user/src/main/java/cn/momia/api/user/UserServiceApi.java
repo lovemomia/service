@@ -6,19 +6,16 @@ import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
 import cn.momia.common.api.util.CastUtil;
+import cn.momia.common.util.TimeUtil;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 public class UserServiceApi extends ServiceApi {
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
     public UserDto register(String nickName, String mobile, String password, String code) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("nickname", nickName)
@@ -70,23 +67,18 @@ public class UserServiceApi extends ServiceApi {
         return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
     }
 
+    public UserDto getByMobile(String mobile) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("mobile", mobile);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/user/mobile"), builder.build());
+
+        return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
+    }
+
     public UserDto getByInviteCode(String inviteCode) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("invite", inviteCode);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/user/invite"), builder.build());
 
         return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
-    }
-
-    public boolean exists(long userId) {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/user/%d/exists", userId));
-        return (Boolean) executeRequest(request);
-    }
-
-    public boolean exists(String mobile) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("mobile", mobile);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/user/exists"), builder.build());
-
-        return (Boolean) executeRequest(request);
     }
 
     public List<UserDto> list(Collection<Long> userIds, int type) {
@@ -137,7 +129,7 @@ public class UserServiceApi extends ServiceApi {
     public UserDto updateBirthday(String utoken, Date birthday) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
-                .add("birthday", DATE_FORMAT.format(birthday));
+                .add("birthday", TimeUtil.DATE_FORMAT.format(birthday));
         HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/user/birthday"), builder.build());
 
         return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
@@ -177,7 +169,7 @@ public class UserServiceApi extends ServiceApi {
         return CastUtil.toObject((JSON) executeRequest(request), ContactDto.class);
     }
 
-    public boolean payed(long userId) {
+    public boolean setPayed(long userId) {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/user/%d/payed", userId));
         return (Boolean) executeRequest(request);
     }

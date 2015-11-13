@@ -8,13 +8,11 @@ public interface UserService {
     boolean exists(String field, String value);
     long add(String nickName, String mobile, String password);
 
-    boolean exists(long userId);
-    boolean exists(String mobile);
     User get(long userId);
-    List<User> list(Collection<Long> userIds);
     User getByToken(String token);
     User getByMobile(String mobile);
     User getByInviteCode(String inviteCode);
+    List<User> list(Collection<Long> userIds);
 
     boolean updateNickName(long userId, String nickName);
     boolean updateAvatar(long userId, String avatar);
@@ -28,6 +26,5 @@ public interface UserService {
     boolean validatePassword(String mobile, String password);
     boolean updatePassword(long userId, String mobile, String password);
 
-    boolean payed(long userId);
-    boolean updateRegisterCouponStatus(long userId);
+    boolean setPayed(long userId);
 }

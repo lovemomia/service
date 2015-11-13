@@ -83,38 +83,11 @@ public class UserServiceImpl extends AbstractService implements UserService {
     }
 
     @Override
-    public boolean exists(long userId) {
-        String sql = "SELECT COUNT(1) FROM SG_User WHERE Id=? AND Status=1";
-        return queryInt(sql, new Object[] { userId }) > 0;
-    }
-
-    @Override
-    public boolean exists(String mobile) {
-        String sql = "SELECT COUNT(1) FROM SG_User WHERE Mobile=?";
-        return queryInt(sql, new Object[] { mobile }) > 0;
-    }
-
-    @Override
     public User get(long userId) {
         Set<Long> userIds = Sets.newHashSet(userId);
         List<User> users = list(userIds);
 
         return users.isEmpty() ? User.NOT_EXIST_USER : users.get(0);
-    }
-
-    @Override
-    public List<User> list(Collection<Long> userIds) {
-        if (userIds.isEmpty()) return new ArrayList<User>();
-
-        String sql = "SELECT Id, NickName, Avatar, Mobile, Name, Sex, Birthday, CityId, RegionId, Address, Payed, Token FROM SG_User WHERE Id IN (" + StringUtils.join(userIds, ",") + ") AND Status=1";
-        List<User> users = queryObjectList(sql, User.class);
-
-        Map<Long, List<Child>> childrenMap = childService.queryByUsers(userIds);
-        for (User user : users) {
-            user.setChildren(childrenMap.get(user.getId()));
-        }
-
-        return users;
     }
 
     @Override
@@ -142,6 +115,21 @@ public class UserServiceImpl extends AbstractService implements UserService {
         List<User> users = list(userIds);
 
         return userIds.isEmpty() ? User.NOT_EXIST_USER : users.get(0);
+    }
+
+    @Override
+    public List<User> list(Collection<Long> userIds) {
+        if (userIds.isEmpty()) return new ArrayList<User>();
+
+        String sql = "SELECT Id, NickName, Avatar, Mobile, Name, Sex, Birthday, CityId, RegionId, Address, Payed, Token FROM SG_User WHERE Id IN (" + StringUtils.join(userIds, ",") + ") AND Status=1";
+        List<User> users = queryObjectList(sql, User.class);
+
+        Map<Long, List<Child>> childrenMap = childService.queryByUsers(userIds);
+        for (User user : users) {
+            user.setChildren(childrenMap.get(user.getId()));
+        }
+
+        return users;
     }
 
     @Override
@@ -207,14 +195,8 @@ public class UserServiceImpl extends AbstractService implements UserService {
     }
 
     @Override
-    public boolean payed(long userId) {
+    public boolean setPayed(long userId) {
         String sql = "UPDATE SG_User SET Payed=1 WHERE Id=? AND Payed=0";
-        return update(sql, new Object[] { userId });
-    }
-
-    @Override
-    public boolean updateRegisterCouponStatus(long userId) {
-        String sql = "UPDATE SG_User SET RegisterCoupon=1 WHERE Id=? AND RegisterCoupon=0";
         return update(sql, new Object[] { userId });
     }
 }

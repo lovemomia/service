@@ -33,20 +33,16 @@ public class UserController extends UserRelatedController {
         return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL, false));
     }
 
+    @RequestMapping(value = "/mobile", method = RequestMethod.GET)
+    public MomiaHttpResponse getByMobile(@RequestParam String mobile) {
+        User user = userService.getByMobile(mobile);
+        return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL, false));
+    }
+
     @RequestMapping(value = "/invite", method = RequestMethod.GET)
     public MomiaHttpResponse getByInviteCode(@RequestParam(value = "invite") String inviteCode) {
         User user = userService.getByInviteCode(inviteCode);
         return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL, false));
-    }
-
-    @RequestMapping(value = "/{uid}/exists", method = RequestMethod.GET)
-    public MomiaHttpResponse exist(@PathVariable(value = "uid") long userId) {
-        return MomiaHttpResponse.SUCCESS(userService.exists(userId));
-    }
-
-    @RequestMapping(value = "/exists", method = RequestMethod.GET)
-    public MomiaHttpResponse exist(@RequestParam String mobile) {
-        return MomiaHttpResponse.SUCCESS(userService.exists(mobile));
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
@@ -187,12 +183,7 @@ public class UserController extends UserRelatedController {
     }
 
     @RequestMapping(value = "/{uid}/payed", method = RequestMethod.POST)
-    public MomiaHttpResponse payed(@PathVariable(value = "uid") long userId) {
-        return MomiaHttpResponse.SUCCESS(userService.payed(userId));
-    }
-
-    @RequestMapping(value = "/{uid}/coupon/register", method = RequestMethod.POST)
-    public MomiaHttpResponse updateRegisterCouponStatus(@PathVariable(value = "uid") long userId) {
-        return MomiaHttpResponse.SUCCESS(userService.updateRegisterCouponStatus(userId));
+    public MomiaHttpResponse setPayed(@PathVariable(value = "uid") long userId) {
+        return MomiaHttpResponse.SUCCESS(userService.setPayed(userId));
     }
 }

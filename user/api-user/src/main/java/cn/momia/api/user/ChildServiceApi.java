@@ -6,17 +6,14 @@ import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
 import cn.momia.common.api.util.CastUtil;
+import cn.momia.common.util.TimeUtil;
 import com.alibaba.fastjson.JSON;
 import org.apache.http.client.methods.HttpUriRequest;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 public class ChildServiceApi extends ServiceApi {
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
     public UserDto add(List<ChildDto> children) {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/user/child"), JSON.toJSONString(children));
         return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
@@ -66,7 +63,7 @@ public class ChildServiceApi extends ServiceApi {
     public UserDto updateBirthday(String utoken, long childId, Date birthday) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
-                .add("birthday", DATE_FORMAT.format(birthday));
+                .add("birthday", TimeUtil.DATE_FORMAT.format(birthday));
         HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/user/child/%d/birthday", childId), builder.build());
 
         return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);

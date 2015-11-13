@@ -156,7 +156,7 @@ public class PaymentController extends BaseController {
             }
 
             try {
-                if (userServiceApi.payed(order.getUserId())) {
+                if (userServiceApi.setPayed(order.getUserId())) {
                     UserDto inviteUser = userServiceApi.getByInviteCode(userCoupon.getInviteCode());
                     if (inviteUser.exists() && inviteUser.getId() != order.getUserId()) {
                         couponService.addInviteUserCoupon(inviteUser.getId(), userCoupon.getCouponId());
@@ -188,7 +188,7 @@ public class PaymentController extends BaseController {
         // TODO 后续的一些操作
         if (orderService.pay(payment)) {
             try {
-                userServiceApi.payed(order.getUserId());
+                userServiceApi.setPayed(order.getUserId());
             } catch (Exception e) {
                 LOGGER.error("fail to set payed of user: {}", order.getUserId(), e);
             }
