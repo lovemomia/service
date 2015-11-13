@@ -1,14 +1,14 @@
-package cn.momia.service.course.subject.order.impl;
+package cn.momia.service.course.order.impl;
 
 import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.subject.SubjectSku;
-import cn.momia.service.course.subject.order.Order;
-import cn.momia.service.course.subject.order.OrderService;
-import cn.momia.service.course.subject.order.OrderPackage;
-import cn.momia.service.course.subject.order.Payment;
+import cn.momia.service.course.order.Order;
+import cn.momia.service.course.order.OrderService;
+import cn.momia.service.course.order.OrderPackage;
+import cn.momia.service.course.order.Payment;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

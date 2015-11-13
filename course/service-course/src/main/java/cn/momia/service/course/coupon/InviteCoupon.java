@@ -1,4 +1,4 @@
-package cn.momia.service.course.subject.coupon;
+package cn.momia.service.course.coupon;
 
 public class InviteCoupon {
     public static final InviteCoupon NOT_EXIST_INVITE_COUPON = new InviteCoupon();

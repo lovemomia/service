@@ -1,12 +1,12 @@
-package cn.momia.service.course.subject.coupon.impl;
+package cn.momia.service.course.coupon.impl;
 
 import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.common.util.TimeUtil;
-import cn.momia.service.course.subject.coupon.Coupon;
-import cn.momia.service.course.subject.coupon.CouponService;
-import cn.momia.service.course.subject.coupon.InviteCoupon;
-import cn.momia.service.course.subject.coupon.UserCoupon;
+import cn.momia.service.course.coupon.Coupon;
+import cn.momia.service.course.coupon.CouponService;
+import cn.momia.service.course.coupon.InviteCoupon;
+import cn.momia.service.course.coupon.UserCoupon;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -59,6 +59,11 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
     }
 
     @Override
+    public BigDecimal calcTotalFee(BigDecimal totalFee, UserCoupon userCoupon) {
+        return totalFee.compareTo(userCoupon.getDiscount()) > 0 ? totalFee.subtract(userCoupon.getDiscount()) : new BigDecimal(0);
+    }
+
+    @Override
     public long queryCount(long userId, int status) {
         String sql;
         if (status == NOT_USED_STATUS) {
@@ -98,11 +103,6 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
         List<UserCoupon> userCoupons = listUserCoupons(userCouponIds);
 
         return userCoupons.isEmpty() ? UserCoupon.NOT_EXIST_USER_COUPON : userCoupons.get(0);
-    }
-
-    @Override
-    public BigDecimal calcTotalFee(BigDecimal totalFee, UserCoupon userCoupon) {
-        return totalFee.compareTo(userCoupon.getDiscount()) > 0 ? totalFee.subtract(userCoupon.getDiscount()) : new BigDecimal(0);
     }
 
     @Override
@@ -176,16 +176,25 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
     }
 
     @Override
-    public void addInviteUserCoupon(long userId, String mobile) {
-        InviteCoupon inviteCoupon = getInviteCoupon(mobile);
-        if (!inviteCoupon.exists()) return;
+    public InviteCoupon getInviteCoupon(String mobile) {
+        String sql = "SELECT Id, Mobile, InviteCode, CouponId FROM SG_InviteCoupon WHERE Mobile=? AND Status=1";
+        List<InviteCoupon> inviteCoupons = queryObjectList(sql, new Object[] { mobile }, InviteCoupon.class);
 
-        if (!updateInviteCouponStatus(mobile)) return;
+        return inviteCoupons.isEmpty() ? InviteCoupon.NOT_EXIST_INVITE_COUPON : inviteCoupons.get(0);
+    }
 
-        List<Coupon> coupons = listCoupons(Sets.newHashSet(inviteCoupon.getCouponId()));
+    @Override
+    public boolean updateInviteCouponStatus(String mobile) {
+        String sql = "UPDATE SG_InviteCoupon SET Status=2 WHERE Mobile=? AND Status=1";
+        return update(sql, new Object[] { mobile });
+    }
+
+    @Override
+    public void distributeInviteUserCoupon(long userId, int couponId) {
+        List<Coupon> coupons = listCoupons(Sets.newHashSet(couponId));
         if (coupons.isEmpty()) return;
 
-        addUserCoupons(userId, inviteCoupon.getInviteCode(), coupons);
+        addUserCoupons(userId, "", coupons);
     }
 
     private void addUserCoupons(long userId, String inviteCode, List<Coupon> coupons) {
@@ -209,25 +218,5 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
 
         String sql = "INSERT INTO SG_UserCoupon (UserId, CouponId, StartTime, EndTime, InviteCode, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
         batchUpdate(sql, args);
-    }
-
-    private InviteCoupon getInviteCoupon(String mobile) {
-        String sql = "SELECT Id, Mobile, InviteCode, CouponId FROM SG_InviteCoupon WHERE Mobile=? AND Status=1";
-        List<InviteCoupon> inviteCoupons = queryObjectList(sql, new Object[] { mobile }, InviteCoupon.class);
-
-        return inviteCoupons.isEmpty() ? InviteCoupon.NOT_EXIST_INVITE_COUPON : inviteCoupons.get(0);
-    }
-
-    private boolean updateInviteCouponStatus(String mobile) {
-        String sql = "UPDATE SG_InviteCoupon SET Status=2 WHERE Mobile=? AND Status=1";
-        return update(sql, new Object[] { mobile });
-    }
-
-    @Override
-    public void addInviteUserCoupon(long userId, int couponId) {
-        List<Coupon> coupons = listCoupons(Sets.newHashSet(couponId));
-        if (coupons.isEmpty()) return;
-
-        addUserCoupons(userId, "", coupons);
     }
 }

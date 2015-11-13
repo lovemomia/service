@@ -1,4 +1,4 @@
-package cn.momia.service.course.subject.order;
+package cn.momia.service.course.order;
 
 import java.math.BigDecimal;
 

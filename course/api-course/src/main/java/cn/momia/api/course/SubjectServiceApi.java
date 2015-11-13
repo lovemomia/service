@@ -1,21 +1,17 @@
 package cn.momia.api.course;
 
+import cn.momia.api.course.dto.CourseCommentDto;
 import cn.momia.api.course.dto.FavoriteDto;
-import cn.momia.api.course.dto.OrderPackageDto;
-import cn.momia.api.course.dto.OrderDto;
 import cn.momia.api.course.dto.SubjectDto;
 import cn.momia.api.course.dto.SubjectSkuDto;
-import cn.momia.api.course.dto.UserCouponDto;
 import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
 import cn.momia.common.api.util.CastUtil;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.http.client.methods.HttpUriRequest;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public class SubjectServiceApi extends ServiceApi {
@@ -39,86 +35,13 @@ public class SubjectServiceApi extends ServiceApi {
         return CastUtil.toList((JSON) executeRequest(request), SubjectSkuDto.class);
     }
 
-    public OrderDto placeOrder(JSONObject orderJson) {
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/subject/order"), orderJson.toString());
-        return CastUtil.toObject((JSON) executeRequest(request), OrderDto.class);
-    }
-
-    public boolean deleteOrder(String utoken, long orderId) {
+    public PagedList<CourseCommentDto> queryCommentsBySubject(long subjectId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("utoken", utoken)
-                .add("oid", orderId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.DELETE(url("/subject/order"), builder.build());
-
-        return (Boolean) executeRequest(request);
-    }
-
-    public boolean refundOrder(String utoken, long orderId) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("utoken", utoken)
-                .add("oid", orderId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/subject/order/refund"), builder.build());
-
-        return (Boolean) executeRequest(request);
-    }
-
-    public PagedList<OrderPackageDto> listBookableOrders(String utoken, long orderId, int start, int count) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("utoken", utoken)
-                .add("oid", orderId)
                 .add("start", start)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/order/bookable"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/%d/comment", subjectId), builder.build());
 
-        return CastUtil.toPagedList((JSON) executeRequest(request), OrderPackageDto.class);
-    }
-
-    public PagedList<OrderDto> listOrders(String utoken, int status, int start, int count) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("utoken", utoken)
-                .add("status", status)
-                .add("start", start)
-                .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/order/list"), builder.build());
-
-        return CastUtil.toPagedList((JSON) executeRequest(request), OrderDto.class);
-    }
-
-    public PagedList<UserCouponDto> listUserCoupons(String utoken, int status, int start, int count) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("utoken", utoken)
-                .add("status", status)
-                .add("start", start)
-                .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/coupon/list"), builder.build());
-
-        return CastUtil.toPagedList((JSON) executeRequest(request), UserCouponDto.class);
-    }
-
-    public BigDecimal coupon(String utoken, long orderId, long userCouponId) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("utoken", utoken)
-                .add("oid", orderId)
-                .add("coupon", userCouponId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/order/coupon"), builder.build());
-
-        return (BigDecimal) executeRequest(request);
-    }
-
-    public void inviteCoupon(String mobile, String inviteCode) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("mobile", mobile)
-                .add("invite", inviteCode);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/subject/coupon/invite"), builder.build());
-        executeRequest(request);
-    }
-
-    public void addInviteUserCoupon(long userId, String mobile) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("uid", userId)
-                .add("mobile", mobile);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/subject/coupon/invite/add"), builder.build());
-        executeRequest(request);
+        return CastUtil.toPagedList((JSON) executeRequest(request), CourseCommentDto.class);
     }
 
     public boolean favor(long userId, long subjectId) {

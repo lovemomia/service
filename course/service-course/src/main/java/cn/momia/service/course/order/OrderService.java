@@ -1,4 +1,4 @@
-package cn.momia.service.course.subject.order;
+package cn.momia.service.course.order;
 
 import java.util.Collection;
 import java.util.List;

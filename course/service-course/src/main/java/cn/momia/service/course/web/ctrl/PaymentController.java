@@ -18,11 +18,11 @@ import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.webapp.util.RequestUtil;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
-import cn.momia.service.course.subject.coupon.CouponService;
-import cn.momia.service.course.subject.coupon.UserCoupon;
-import cn.momia.service.course.subject.order.Order;
-import cn.momia.service.course.subject.order.OrderService;
-import cn.momia.service.course.subject.order.Payment;
+import cn.momia.service.course.coupon.CouponService;
+import cn.momia.service.course.coupon.UserCoupon;
+import cn.momia.service.course.order.Order;
+import cn.momia.service.course.order.OrderService;
+import cn.momia.service.course.order.Payment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -159,7 +159,7 @@ public class PaymentController extends BaseController {
                 if (userServiceApi.setPayed(order.getUserId())) {
                     UserDto inviteUser = userServiceApi.getByInviteCode(userCoupon.getInviteCode());
                     if (inviteUser.exists() && inviteUser.getId() != order.getUserId()) {
-                        couponService.addInviteUserCoupon(inviteUser.getId(), userCoupon.getCouponId());
+                        couponService.distributeInviteUserCoupon(inviteUser.getId(), userCoupon.getCouponId());
                     }
                 }
             } catch (Exception e) {

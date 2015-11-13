@@ -129,6 +129,7 @@ public class FeedController extends BaseController {
 
         return formatedChildren;
     }
+    
     @RequestMapping(value = "/user", method = RequestMethod.GET)
     public MomiaHttpResponse listFeedsOfUser(@RequestParam(value = "uid") long userId,
                                              @RequestParam int start,

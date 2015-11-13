@@ -1,23 +1,24 @@
-package cn.momia.service.course.subject.coupon;
+package cn.momia.service.course.coupon;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public interface CouponService {
     UserCoupon get(long userCouponId);
+    BigDecimal calcTotalFee(BigDecimal totalFee, UserCoupon userCoupon);
 
     long queryCount(long userId, int status);
     List<UserCoupon> query(long userId, int status, int start, int count);
 
     UserCoupon queryByOrder(long orderId);
 
-    BigDecimal calcTotalFee(BigDecimal totalFee, UserCoupon userCoupon);
-
     boolean preUseCoupon(long orderId, long userCouponId);
     boolean useCoupon(long orderId, long userCouponId);
 
     boolean hasInviteCoupon(String mobile);
     boolean addInviteCoupon(String mobile, String inviteCode);
-    void addInviteUserCoupon(long userId, String mobile);
-    void addInviteUserCoupon(long userId, int couponId);
+
+    InviteCoupon getInviteCoupon(String mobile);
+    boolean updateInviteCouponStatus(String mobile);
+    void distributeInviteUserCoupon(long userId, int couponId);
 }

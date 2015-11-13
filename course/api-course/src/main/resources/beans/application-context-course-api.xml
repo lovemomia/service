@@ -9,5 +9,7 @@
     </bean>
     <bean class="cn.momia.api.course.CourseServiceApi" parent="abstractCourseApi" />
     <bean class="cn.momia.api.course.SubjectServiceApi" parent="abstractCourseApi" />
+    <bean class="cn.momia.api.course.CouponServiceApi" parent="abstractCourseApi" />
+    <bean class="cn.momia.api.course.OrderServiceApi" parent="abstractCourseApi" />
     <bean class="cn.momia.api.course.PaymentServiceApi" parent="abstractCourseApi" />
 </beans>

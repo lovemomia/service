@@ -75,7 +75,7 @@ public class CourseServiceApi extends ServiceApi {
         return CastUtil.toPagedList((JSON) executeRequest(request), String.class);
     }
 
-    public PagedList<TeacherDto> queryTeachers(long courseId, int start, int count) {
+    public PagedList<TeacherDto> teacher(long courseId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
                 .add("count", count);
@@ -157,15 +157,6 @@ public class CourseServiceApi extends ServiceApi {
                 .add("start", start)
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/comment", courseId), builder.build());
-
-        return CastUtil.toPagedList((JSON) executeRequest(request), CourseCommentDto.class);
-    }
-
-    public PagedList<CourseCommentDto> queryCommentsBySubject(long subjectId, int start, int count) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("start", start)
-                .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/%d/comment", subjectId), builder.build());
 
         return CastUtil.toPagedList((JSON) executeRequest(request), CourseCommentDto.class);
     }

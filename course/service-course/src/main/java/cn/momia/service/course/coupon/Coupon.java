@@ -1,14 +1,8 @@
-package cn.momia.service.course.subject.coupon;
+package cn.momia.service.course.coupon;
 
 import java.util.Date;
 
 public class Coupon {
-    public static class TimeUnit {
-        public static final int MONTH = 1;
-        public static final int QUATER = 2;
-        public static final int YEAR = 3;
-    }
-
     private int Id;
     private int count;
     private int timeType;
