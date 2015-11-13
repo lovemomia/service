@@ -32,7 +32,7 @@ public class CourseServiceApi extends ServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("pos", pos)
                 .add("type", type);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d", courseId), builder.build());
 
         return CastUtil.toObject((JSON) executeRequest(request), CourseDto.class);
     }
@@ -42,7 +42,7 @@ public class CourseServiceApi extends ServiceApi {
                 .add("suid", subjectId)
                 .add("start", start)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course/query"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/query"), builder.build());
 
         return CastUtil.toPagedList((JSON) executeRequest(request), CourseDto.class);
     }
@@ -56,13 +56,13 @@ public class CourseServiceApi extends ServiceApi {
                 .add("sort", sortTypeId)
                 .add("start", start)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course/query"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/query"), builder.build());
 
         return CastUtil.toPagedList((JSON) executeRequest(request), CourseDto.class);
     }
 
     public CourseDetailDto detail(long courseId) {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "detail"));
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/detail", courseId));
         return CastUtil.toObject((JSON) executeRequest(request), CourseDetailDto.class);
     }
 
@@ -70,7 +70,7 @@ public class CourseServiceApi extends ServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "book"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/book", courseId), builder.build());
 
         return CastUtil.toPagedList((JSON) executeRequest(request), String.class);
     }
@@ -79,24 +79,24 @@ public class CourseServiceApi extends ServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "teacher"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/teacher", courseId), builder.build());
 
         return CastUtil.toPagedList((JSON) executeRequest(request), TeacherDto.class);
     }
 
     public InstitutionDto institution(long courseId) {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "institution"));
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/institution", courseId));
         return CastUtil.toObject((JSON) executeRequest(request), InstitutionDto.class);
     }
 
     public List<DatedCourseSkusDto> listWeekSkus(long courseId) {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "sku/week"));
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/sku/week", courseId));
         return CastUtil.toList((JSON) executeRequest(request), DatedCourseSkusDto.class);
     }
 
     public List<DatedCourseSkusDto> listMonthSkus(long courseId, int month) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("month", month);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "sku/month"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/sku/month", courseId), builder.build());
 
         return CastUtil.toList((JSON) executeRequest(request), DatedCourseSkusDto.class);
     }
@@ -106,7 +106,7 @@ public class CourseServiceApi extends ServiceApi {
                 .add("uid", userId)
                 .add("start", start)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course/notfinished"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/notfinished"), builder.build());
 
         return CastUtil.toPagedList((JSON) executeRequest(request), BookedCourseDto.class);
     }
@@ -116,14 +116,14 @@ public class CourseServiceApi extends ServiceApi {
                 .add("uid", userId)
                 .add("start", start)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course/finished"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/finished"), builder.build());
 
         return CastUtil.toPagedList((JSON) executeRequest(request), BookedCourseDto.class);
     }
 
     public boolean joined(long userId, long courseId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "joined"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/joined", courseId), builder.build());
 
         return (Boolean) executeRequest(request);
     }
@@ -133,7 +133,7 @@ public class CourseServiceApi extends ServiceApi {
                 .add("utoken", utoken)
                 .add("pid", packageId)
                 .add("sid", skuId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("course/booking"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/course/booking"), builder.build());
 
         return (Boolean) executeRequest(request);
     }
@@ -142,13 +142,13 @@ public class CourseServiceApi extends ServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("bid", bookingId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("course/cancel"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/course/cancel"), builder.build());
 
         return (Boolean) executeRequest(request);
     }
 
     public boolean comment(JSONObject commentJson) {
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("course/comment"), commentJson.toString());
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/course/comment"), commentJson.toString());
         return (Boolean) executeRequest(request);
     }
 
@@ -156,7 +156,7 @@ public class CourseServiceApi extends ServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "comment"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/comment", courseId), builder.build());
 
         return CastUtil.toPagedList((JSON) executeRequest(request), CourseCommentDto.class);
     }
@@ -165,28 +165,28 @@ public class CourseServiceApi extends ServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject", subjectId, "comment"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/%d/comment", subjectId), builder.build());
 
         return CastUtil.toPagedList((JSON) executeRequest(request), CourseCommentDto.class);
     }
 
     public boolean isFavored(long userId, long courseId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course", courseId, "favored"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/favored", courseId), builder.build());
 
         return (Boolean) executeRequest(request);
     }
 
     public boolean favor(long userId, long courseId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("course", courseId, "favor"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/course/%d/favor", courseId), builder.build());
 
         return (Boolean) executeRequest(request);
     }
 
     public boolean unfavor(long userId, long courseId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("course", courseId, "unfavor"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/course/%d/unfavor", courseId), builder.build());
 
         return (Boolean) executeRequest(request);
     }
@@ -196,7 +196,7 @@ public class CourseServiceApi extends ServiceApi {
                 .add("uid", userId)
                 .add("start", start)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("course/favorite"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/favorite"), builder.build());
 
         return CastUtil.toPagedList((JSON) executeRequest(request), FavoriteDto.class);
     }

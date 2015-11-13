@@ -18,7 +18,7 @@ public class PaymentServiceApi extends ServiceApi {
                 .add("oid", orderId)
                 .add("type", type)
                 .add("coupon", userCouponId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("payment/prepay/alipay"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/payment/prepay/alipay"), builder.build());
 
         return executeRequest(request);
     }
@@ -30,18 +30,18 @@ public class PaymentServiceApi extends ServiceApi {
                 .add("type", type)
                 .add("coupon", userCouponId);
         if (!StringUtils.isBlank(code)) builder.add("code", code);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("payment/prepay/weixin"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/payment/prepay/weixin"), builder.build());
 
         return executeRequest(request);
     }
 
     public boolean callbackAlipay(Map<String, String> params) {
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("payment/callback/alipay"), params);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/payment/callback/alipay"), params);
         return "OK".equalsIgnoreCase((String) executeRequest(request));
     }
 
     public boolean callbackWeixin(Map<String, String> params) {
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("payment/callback/weixin"), params);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/payment/callback/weixin"), params);
         return "OK".equalsIgnoreCase((String) executeRequest(request));
     }
 
@@ -49,7 +49,7 @@ public class PaymentServiceApi extends ServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("oid", orderId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("payment/check"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/payment/check"), builder.build());
 
         return CastUtil.toObject((JSON) executeRequest(request), PaymentDto.class);
     }

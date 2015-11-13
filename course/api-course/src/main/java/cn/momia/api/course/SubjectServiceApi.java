@@ -24,23 +24,23 @@ public class SubjectServiceApi extends ServiceApi {
                 .add("city", cityId)
                 .add("start", start)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/trial"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/trial"), builder.build());
 
         return CastUtil.toPagedList((JSON) executeRequest(request), SubjectDto.class);
     }
 
     public SubjectDto get(long subjectId) {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject", subjectId));
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/%d", subjectId));
         return CastUtil.toObject((JSON) executeRequest(request), SubjectDto.class);
     }
 
     public List<SubjectSkuDto> querySkus(long subjectId) {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject", subjectId, "sku"));
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/%d/sku", subjectId));
         return CastUtil.toList((JSON) executeRequest(request), SubjectSkuDto.class);
     }
 
     public OrderDto placeOrder(JSONObject orderJson) {
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("subject/order"), orderJson.toString());
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/subject/order"), orderJson.toString());
         return CastUtil.toObject((JSON) executeRequest(request), OrderDto.class);
     }
 
@@ -48,7 +48,7 @@ public class SubjectServiceApi extends ServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("oid", orderId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.DELETE(url("subject/order"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.DELETE(url("/subject/order"), builder.build());
 
         return (Boolean) executeRequest(request);
     }
@@ -57,7 +57,7 @@ public class SubjectServiceApi extends ServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("oid", orderId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("subject/order/refund"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/subject/order/refund"), builder.build());
 
         return (Boolean) executeRequest(request);
     }
@@ -68,7 +68,7 @@ public class SubjectServiceApi extends ServiceApi {
                 .add("oid", orderId)
                 .add("start", start)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/order/bookable"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/order/bookable"), builder.build());
 
         return CastUtil.toPagedList((JSON) executeRequest(request), OrderPackageDto.class);
     }
@@ -79,7 +79,7 @@ public class SubjectServiceApi extends ServiceApi {
                 .add("status", status)
                 .add("start", start)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/order/list"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/order/list"), builder.build());
 
         return CastUtil.toPagedList((JSON) executeRequest(request), OrderDto.class);
     }
@@ -90,7 +90,7 @@ public class SubjectServiceApi extends ServiceApi {
                 .add("status", status)
                 .add("start", start)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/coupon/list"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/coupon/list"), builder.build());
 
         return CastUtil.toPagedList((JSON) executeRequest(request), UserCouponDto.class);
     }
@@ -100,7 +100,7 @@ public class SubjectServiceApi extends ServiceApi {
                 .add("utoken", utoken)
                 .add("oid", orderId)
                 .add("coupon", userCouponId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/order/coupon"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/order/coupon"), builder.build());
 
         return (BigDecimal) executeRequest(request);
     }
@@ -109,7 +109,7 @@ public class SubjectServiceApi extends ServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("mobile", mobile)
                 .add("invite", inviteCode);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("subject/coupon/invite"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/subject/coupon/invite"), builder.build());
         executeRequest(request);
     }
 
@@ -117,20 +117,20 @@ public class SubjectServiceApi extends ServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
                 .add("mobile", mobile);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("subject/coupon/invite/add"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/subject/coupon/invite/add"), builder.build());
         executeRequest(request);
     }
 
     public boolean favor(long userId, long subjectId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("subject", subjectId, "favor"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/subject/%d/favor", subjectId), builder.build());
 
         return (Boolean) executeRequest(request);
     }
 
     public boolean unfavor(long userId, long subjectId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("subject", subjectId, "unfavor"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/subject/%d/unfavor", subjectId), builder.build());
 
         return (Boolean) executeRequest(request);
     }
@@ -140,7 +140,7 @@ public class SubjectServiceApi extends ServiceApi {
                 .add("uid", userId)
                 .add("start", start)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("subject/favorite"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/favorite"), builder.build());
 
         return CastUtil.toPagedList((JSON) executeRequest(request), FavoriteDto.class);
     }

@@ -11,7 +11,7 @@ import java.util.List;
 
 public class RegionServiceApi extends ServiceApi {
     public List<RegionDto> listAll() {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("region"));
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/region"));
         return CastUtil.toList((JSON) executeRequest(request), RegionDto.class);
     }
 }

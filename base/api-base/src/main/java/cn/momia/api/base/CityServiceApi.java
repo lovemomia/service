@@ -11,7 +11,7 @@ import java.util.List;
 
 public class CityServiceApi extends ServiceApi {
     public List<CityDto> listAll() {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("city"));
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/city"));
         return CastUtil.toList((JSON) executeRequest(request), CityDto.class);
     }
 }

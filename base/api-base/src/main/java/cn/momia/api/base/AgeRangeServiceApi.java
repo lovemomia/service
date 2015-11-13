@@ -11,7 +11,7 @@ import java.util.List;
 
 public class AgeRangeServiceApi extends ServiceApi {
     public List<AgeRangeDto> listAll() {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("agerange"));
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/agerange"));
         return CastUtil.toList((JSON) executeRequest(request), AgeRangeDto.class);
     }
 }

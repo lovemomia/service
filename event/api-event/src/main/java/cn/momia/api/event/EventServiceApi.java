@@ -17,7 +17,7 @@ public class EventServiceApi extends ServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("event/banner"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/event/banner"), builder.build());
 
         return CastUtil.toList((JSON) executeRequest(request), BannerDto.class);
     }
@@ -26,7 +26,7 @@ public class EventServiceApi extends ServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("event/icon"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/event/icon"), builder.build());
 
         return CastUtil.toList((JSON) executeRequest(request), IconDto.class);
     }
@@ -35,7 +35,7 @@ public class EventServiceApi extends ServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("event/event"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/event/event"), builder.build());
 
         return CastUtil.toList((JSON) executeRequest(request), EventDto.class);
     }
