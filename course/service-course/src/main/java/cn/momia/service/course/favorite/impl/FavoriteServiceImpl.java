@@ -1,12 +1,12 @@
 package cn.momia.service.course.favorite.impl;
 
-import cn.momia.common.service.DbAccessService;
+import cn.momia.common.service.AbstractService;
 import cn.momia.service.course.favorite.Favorite;
 import cn.momia.service.course.favorite.FavoriteService;
 
 import java.util.List;
 
-public class FavoriteServiceImpl extends DbAccessService implements FavoriteService {
+public class FavoriteServiceImpl extends AbstractService implements FavoriteService {
     @Override
     public boolean isFavored(long userId, int type, long refId) {
         String sql = "SELECT COUNT(1) FROM SG_Favorite WHERE UserId=? AND `Type`=? AND RefId=? AND Status=1";

@@ -1,13 +1,13 @@
 package cn.momia.service.base.sort.impl;
 
-import cn.momia.common.service.DbAccessService;
+import cn.momia.common.service.AbstractService;
 import cn.momia.service.base.sort.SortType;
 import cn.momia.service.base.sort.SortTypeService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SortTypeServiceImpl extends DbAccessService implements SortTypeService {
+public class SortTypeServiceImpl extends AbstractService implements SortTypeService {
     private List<SortType> sortTypesCache = new ArrayList<SortType>();
 
     @Override

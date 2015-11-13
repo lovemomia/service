@@ -1,13 +1,13 @@
 package cn.momia.service.base.age.impl;
 
-import cn.momia.common.service.DbAccessService;
+import cn.momia.common.service.AbstractService;
 import cn.momia.service.base.age.AgeRange;
 import cn.momia.service.base.age.AgeRangeService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AgeRangeServiceImpl extends DbAccessService implements AgeRangeService {
+public class AgeRangeServiceImpl extends AbstractService implements AgeRangeService {
     private List<AgeRange> ageRangesCache = new ArrayList<AgeRange>();
 
     @Override

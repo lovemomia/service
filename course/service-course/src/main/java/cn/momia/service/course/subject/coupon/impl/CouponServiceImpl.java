@@ -1,7 +1,7 @@
 package cn.momia.service.course.subject.coupon.impl;
 
 import cn.momia.common.api.exception.MomiaFailedException;
-import cn.momia.common.service.DbAccessService;
+import cn.momia.common.service.AbstractService;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.service.course.subject.coupon.Coupon;
 import cn.momia.service.course.subject.coupon.CouponService;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class CouponServiceImpl extends DbAccessService implements CouponService {
+public class CouponServiceImpl extends AbstractService implements CouponService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CouponServiceImpl.class);
 
     private static final int COUPON_SRC_INVITE = 1;

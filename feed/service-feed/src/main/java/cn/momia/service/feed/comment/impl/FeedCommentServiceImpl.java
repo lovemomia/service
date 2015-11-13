@@ -1,12 +1,12 @@
 package cn.momia.service.feed.comment.impl;
 
-import cn.momia.common.service.DbAccessService;
+import cn.momia.common.service.AbstractService;
 import cn.momia.service.feed.comment.FeedComment;
 import cn.momia.service.feed.comment.FeedCommentService;
 
 import java.util.List;
 
-public class FeedCommentServiceImpl extends DbAccessService implements FeedCommentService {
+public class FeedCommentServiceImpl extends AbstractService implements FeedCommentService {
     @Override
     public boolean add(long userId, long feedId, String content) {
         String sql = "INSERT INTO SG_FeedComment(UserId, FeedId, Content, AddTime) VALUES (?, ?, ?, NOW())";

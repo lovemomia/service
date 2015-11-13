@@ -1,7 +1,7 @@
 package cn.momia.service.feed.base.impl;
 
 import cn.momia.common.api.exception.MomiaFailedException;
-import cn.momia.common.service.DbAccessService;
+import cn.momia.common.service.AbstractService;
 import cn.momia.service.feed.base.Feed;
 import cn.momia.service.feed.base.FeedService;
 import cn.momia.service.feed.base.FeedTag;
@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class FeedServiceImpl extends DbAccessService implements FeedService {
+public class FeedServiceImpl extends AbstractService implements FeedService {
     private static final Logger LOGGER = LoggerFactory.getLogger(FeedServiceImpl.class);
 
     @Override

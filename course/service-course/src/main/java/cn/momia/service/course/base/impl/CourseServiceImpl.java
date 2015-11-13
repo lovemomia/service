@@ -2,7 +2,7 @@ package cn.momia.service.course.base.impl;
 
 import cn.momia.api.poi.PoiServiceApi;
 import cn.momia.api.poi.dto.PlaceDto;
-import cn.momia.common.service.DbAccessService;
+import cn.momia.common.service.AbstractService;
 import cn.momia.service.course.base.BookedCourse;
 import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseBook;
@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class CourseServiceImpl extends DbAccessService implements CourseService {
+public class CourseServiceImpl extends AbstractService implements CourseService {
     private static final int SORT_TYPE_JOINED = 1;
     private static final int SORT_TYPE_ADDTIME = 2;
 

@@ -1,7 +1,7 @@
 package cn.momia.service.base.sms.impl;
 
 import cn.momia.common.api.exception.MomiaFailedException;
-import cn.momia.common.service.DbAccessService;
+import cn.momia.common.service.AbstractService;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.base.sms.SmsSender;
 import cn.momia.service.base.sms.SmsService;
@@ -13,7 +13,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class SmsServiceImpl extends DbAccessService implements SmsService {
+public class SmsServiceImpl extends AbstractService implements SmsService {
     private ExecutorService executorService;
 
     private SmsSender sender;

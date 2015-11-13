@@ -1,7 +1,7 @@
 package cn.momia.service.user.base.impl;
 
 import cn.momia.common.api.exception.MomiaFailedException;
-import cn.momia.common.service.DbAccessService;
+import cn.momia.common.service.AbstractService;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.user.base.User;
@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class UserServiceImpl extends DbAccessService implements UserService {
+public class UserServiceImpl extends AbstractService implements UserService {
     private ChildService childService;
 
     public void setChildService(ChildService childService) {

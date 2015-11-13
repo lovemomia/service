@@ -1,6 +1,6 @@
 package cn.momia.service.poi.impl;
 
-import cn.momia.common.service.DbAccessService;
+import cn.momia.common.service.AbstractService;
 import cn.momia.service.poi.Place;
 import cn.momia.service.poi.PlaceImage;
 import cn.momia.service.poi.PlaceService;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class PlaceServiceImpl extends DbAccessService implements PlaceService {
+public class PlaceServiceImpl extends AbstractService implements PlaceService {
     @Override
     public Place get(int placeId) {
         Set<Integer> placeIds = Sets.newHashSet(placeId);

@@ -1,6 +1,6 @@
 package cn.momia.service.course.subject.impl;
 
-import cn.momia.common.service.DbAccessService;
+import cn.momia.common.service.AbstractService;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectImage;
 import cn.momia.service.course.subject.SubjectService;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class SubjectServiceImpl extends DbAccessService implements SubjectService {
+public class SubjectServiceImpl extends AbstractService implements SubjectService {
     @Override
     public Subject get(long subjectId) {
         Set<Long> subjectIds = Sets.newHashSet(subjectId);

@@ -1,6 +1,6 @@
 package cn.momia.service.user.base.child.impl;
 
-import cn.momia.common.service.DbAccessService;
+import cn.momia.common.service.AbstractService;
 import cn.momia.service.user.base.child.Child;
 import cn.momia.service.user.base.child.ChildService;
 import com.google.common.collect.Sets;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ChildServiceImpl extends DbAccessService implements ChildService {
+public class ChildServiceImpl extends AbstractService implements ChildService {
     @Override
     public long add(final Child child) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
