@@ -28,6 +28,6 @@ public class FeedCommentServiceImpl extends AbstractService implements FeedComme
     @Override
     public List<FeedComment> query(long feedId, int start, int count) {
         String sql = "SELECT Id, FeedId, UserId, Content, AddTime FROM SG_FeedComment WHERE FeedId=? AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
-        return queryList(sql, new Object[] { feedId, start, count }, FeedComment.class);
+        return queryObjectList(sql, new Object[] { feedId, start, count }, FeedComment.class);
     }
 }

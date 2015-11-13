@@ -10,6 +10,6 @@ public class IconServiceImpl extends AbstractService implements IconService {
     @Override
     public List<Icon> list(int cityId, int count) {
         String sql = "SELECT Title, Img, Action FROM SG_Icon WHERE (CityId=? OR CityId=0) AND Status=1 ORDER BY Weight DESC, AddTime DESC LIMIT ?";
-        return queryList(sql, new Object[] { cityId, count }, Icon.class);
+        return queryObjectList(sql, new Object[] { cityId, count }, Icon.class);
     }
 }

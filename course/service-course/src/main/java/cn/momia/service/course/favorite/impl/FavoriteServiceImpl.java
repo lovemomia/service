@@ -20,10 +20,10 @@ public class FavoriteServiceImpl extends AbstractService implements FavoriteServ
         long favoretId = getFavoretId(userId, type, refId);
         if (favoretId > 0) {
             String sql = "UPDATE SG_Favorite SET Status=1 WHERE Id=? AND UserId=? AND `Type`=? AND RefId=?";
-            return jdbcTemplate.update(sql, new Object[] { favoretId, userId, type, refId }) == 1;
+            return update(sql, new Object[] { favoretId, userId, type, refId });
         } else {
             String sql = "INSERT INTO SG_Favorite(UserId, `Type`, RefId, AddTime) VALUES (?, ?, ?, NOW())";
-            return jdbcTemplate.update(sql, new Object[] { userId, type, refId }) == 1;
+            return update(sql, new Object[] { userId, type, refId });
         }
     }
 
@@ -46,7 +46,7 @@ public class FavoriteServiceImpl extends AbstractService implements FavoriteServ
     @Override
     public boolean unfavor(long userId, int type, long refId) {
         String sql = "UPDATE SG_Favorite SET Status=0 WHERE UserId=? AND `Type`=? AND RefId=?";
-        return jdbcTemplate.update(sql, new Object[] { userId, type, refId }) > 0;
+        return update(sql, new Object[] { userId, type, refId });
     }
 
     @Override
@@ -58,6 +58,6 @@ public class FavoriteServiceImpl extends AbstractService implements FavoriteServ
     @Override
     public List<Favorite> queryFavorites(long userId, int type, int start, int count) {
         String sql = "SELECT Id, `Type`, UserId, RefId FROM SG_Favorite WHERE UserId=? AND `Type`=? AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
-        return queryList(sql, new Object[] { userId, type, start, count }, Favorite.class);
+        return queryObjectList(sql, new Object[] { userId, type, start, count }, Favorite.class);
     }
 }

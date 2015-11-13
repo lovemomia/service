@@ -13,7 +13,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import java.security.MessageDigest;
@@ -43,8 +42,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
 
     @Override
     public long add(final String nickName, final String mobile, final String password) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(new PreparedStatementCreator() {
+        KeyHolder keyHolder = insert(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 String sql = "INSERT INTO SG_User(NickName, Mobile, Password, Token, InviteCode, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
@@ -57,7 +55,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
 
                 return ps;
             }
-        }, keyHolder);
+        });
 
         return keyHolder.getKey().longValue();
     }
@@ -109,7 +107,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
         if (userIds.isEmpty()) return new ArrayList<User>();
 
         String sql = "SELECT Id, NickName, Avatar, Mobile, Name, Sex, Birthday, CityId, RegionId, Address, Payed, Token FROM SG_User WHERE Id IN (" + StringUtils.join(userIds, ",") + ") AND Status=1";
-        List<User> users = queryList(sql, User.class);
+        List<User> users = queryObjectList(sql, User.class);
 
         Map<Long, List<Child>> childrenMap = childService.queryByUsers(userIds);
         for (User user : users) {

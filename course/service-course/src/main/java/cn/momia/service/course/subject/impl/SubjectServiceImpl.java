@@ -29,7 +29,7 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
         if (subjectIds.isEmpty()) return new ArrayList<Subject>();
 
         String sql = "SELECT Id, CityId, Title, Cover, Tags, Intro, Notice, Stock FROM SG_Subject WHERE Id IN (" + StringUtils.join(subjectIds, ",") + ") AND Status=1";
-        List<Subject> subjects = queryList(sql, Subject.class);
+        List<Subject> subjects = queryObjectList(sql, Subject.class);
 
         Map<Long, List<SubjectImage>> imgs = queryImgs(subjectIds);
         Map<Long, List<SubjectSku>> skus = querySkus(subjectIds);
@@ -56,7 +56,7 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
         if (subjectIds.isEmpty()) return new HashMap<Long, List<SubjectImage>>();
 
         String sql = "SELECT Id, SubjectId, Url, Width, Height FROM SG_SubjectImg WHERE SubjectId IN (" + StringUtils.join(subjectIds, ",") + ") AND Status=1";
-        List<SubjectImage> imgs = queryList(sql, SubjectImage.class);
+        List<SubjectImage> imgs = queryObjectList(sql, SubjectImage.class);
 
         final Map<Long, List<SubjectImage>> imgsMap = new HashMap<Long, List<SubjectImage>>();
         for (long subjectId : subjectIds) {
@@ -114,7 +114,7 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
         if (skuIds.isEmpty()) return new ArrayList<SubjectSku>();
 
         String sql = "SELECT Id, SubjectId, `Desc`, Price, OriginalPrice, Adult, Child, CourseCount, Time, TimeUnit, `Limit` FROM SG_SubjectSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status=1";
-        List<SubjectSku> skus = queryList(sql, SubjectSku.class);
+        List<SubjectSku> skus = queryObjectList(sql, SubjectSku.class);
 
         Map<Long, SubjectSku> skusMap = new HashMap<Long, SubjectSku>();
         for (SubjectSku sku : skus) {

@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import java.sql.Connection;
@@ -50,8 +49,7 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
 
     @Override
     public long add(final Feed feed) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(new PreparedStatementCreator() {
+        KeyHolder keyHolder = insert(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 String sql = "INSERT INTO SG_Feed(`Type`, UserId, Content, TagId, SubjectId, CourseId, CourseTitle, Lng, Lat, Official, AddTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
@@ -69,7 +67,7 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
 
                 return ps;
             }
-        }, keyHolder);
+        });
 
         long feedId = keyHolder.getKey().longValue();
         if (feedId > 0) {
@@ -87,7 +85,7 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
             for (String img : imgs) {
                 args.add(new Object[] { feedId, img });
             }
-            jdbcTemplate.batchUpdate(sql, args);
+            batchUpdate(sql, args);
         } catch (Exception e) {
             LOGGER.error("fail to add image for feed: {}", feedId, e);
         }
@@ -111,7 +109,7 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
         for (long followedId : followedIds) {
             args.add(new Object[] { followedId, feedId });
         }
-        jdbcTemplate.batchUpdate(sql, args);
+        batchUpdate(sql, args);
     }
 
     @Override
@@ -126,7 +124,7 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
         if (feedIds.isEmpty()) return new ArrayList<Feed>();
 
         String sql = "SELECT Id,`Type`, UserId, Content, TagId, SubjectId, CourseId, CourseTitle, Lng, Lat, CommentCount, StarCount, Official, AddTime FROM SG_Feed WHERE Id IN (" + StringUtils.join(feedIds, ",") + ") AND Status=1";
-        List<Feed> feeds = queryList(sql, Feed.class);
+        List<Feed> feeds = queryObjectList(sql, Feed.class);
 
         Set<Long> tagIds = new HashSet<Long>();
         Map<Long, List<String>> imgs = queryImgs(feedIds);
@@ -160,7 +158,7 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
         }
 
         String sql = "SELECT FeedId, Url FROM SG_FeedImg WHERE FeedId IN (" + StringUtils.join(feedIds, ",") + ") AND Status=1";
-        jdbcTemplate.query(sql, new RowCallbackHandler() {
+        query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 long feedId = rs.getLong("FeedId");
@@ -177,7 +175,7 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
 
         final Map<Long, String> tagNamesMap = new HashMap<Long, String>();
         String sql = "SELECT Id, Name FROM SG_FeedTag WHERE id IN (" + StringUtils.join(tagIds, ",") + ") AND Status=1";
-        jdbcTemplate.query(sql, new RowCallbackHandler() {
+        query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 long id = rs.getLong("Id");
@@ -288,9 +286,8 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
 
     @Override
     public long addTag(final long userId, final String tagName) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
         try {
-            jdbcTemplate.update(new PreparedStatementCreator() {
+            KeyHolder keyHolder = insert(new PreparedStatementCreator() {
                 @Override
                 public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                     String sql = "INSERT INTO SG_FeedTag (UserId, Name, AddTime) VALUES (?, ?, NOW())";
@@ -300,12 +297,12 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
 
                     return ps;
                 }
-            }, keyHolder);
+            });
+
+            return keyHolder.getKey().longValue();
         } catch (Exception e) {
             throw new MomiaFailedException("添加标签失败");
         }
-
-        return keyHolder.getKey().longValue();
     }
 
     @Override
@@ -321,7 +318,7 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
 
     private List<FeedTag> listTags(int recommended, int count) {
         String sql = "SELECT Id, Name FROM SG_FeedTag WHERE Recommended=? AND Status=1 ORDER BY RefCount DESC, AddTime DESC LIMIT ?";
-        return queryList(sql, new Object[] { recommended, count }, FeedTag.class);
+        return queryObjectList(sql, new Object[] { recommended, count }, FeedTag.class);
     }
 
 

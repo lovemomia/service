@@ -28,7 +28,7 @@ public class PlaceServiceImpl extends AbstractService implements PlaceService {
         if (placeIds.isEmpty()) return new ArrayList<Place>();
 
         String sql = "SELECT Id, CityId, RegionId, Name, Address, `Desc`, Cover, Lng, Lat FROM SG_Place WHERE Id IN (" + StringUtils.join(placeIds, ",") + ") AND Status=1";
-        List<Place> places = queryList(sql, Place.class);
+        List<Place> places = queryObjectList(sql, Place.class);
 
         Map<Integer, List<PlaceImage>> placeImgsMap = queryImgs(placeIds);
         for (Place place : places) {
@@ -42,7 +42,7 @@ public class PlaceServiceImpl extends AbstractService implements PlaceService {
         if (placeIds.isEmpty()) return new HashMap<Integer, List<PlaceImage>>();
 
         String sql = "SELECT Id, PlaceId, Url, Width, Height FROM SG_PlaceImg WHERE PlaceId IN (" + StringUtils.join(placeIds, ",") + ") AND Status=1 ORDER BY AddTime DESC";
-        List<PlaceImage> imgs = queryList(sql, PlaceImage.class);
+        List<PlaceImage> imgs = queryObjectList(sql, PlaceImage.class);
 
         Map<Integer, List<PlaceImage>> imgsMap = new HashMap<Integer, List<PlaceImage>>();
         for (int placeId : placeIds) {

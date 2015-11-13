@@ -59,7 +59,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         if (courseIds.isEmpty()) return new ArrayList<Course>();
 
         String sql = "SELECT Id, SubjectId, Title, Cover, MinAge, MaxAge, Insurance, Joined, Price, Goal, Flow, Tips, InstitutionId FROM SG_Course WHERE Id IN (" + StringUtils.join(courseIds, ",") + ") AND Status=1";
-        List<Course> courses = queryList(sql, Course.class);
+        List<Course> courses = queryObjectList(sql, Course.class);
 
         Set<Integer> institutionIds = new HashSet<Integer>();
         for (Course course : courses) {
@@ -96,7 +96,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         if (institutionIds.isEmpty()) return new HashMap<Integer, Institution>();
 
         String sql = "SELECT Id, Name, Cover, Intro FROM SG_Institution WHERE Id IN (" + StringUtils.join(institutionIds, ",") + ") AND Status=1";
-        List<Institution> institutions = queryList(sql, Institution.class);
+        List<Institution> institutions = queryObjectList(sql, Institution.class);
 
         Map<Integer, Institution> institutionsMap = new HashMap<Integer, Institution>();
         for (Institution institution : institutions) {
@@ -110,7 +110,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         if (courseIds.isEmpty()) return new HashMap<Long, List<CourseImage>>();
 
         String sql = "SELECT Id, CourseId, Url, Width, Height FROM SG_CourseImg WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Status=1";
-        List<CourseImage> imgs = queryList(sql, CourseImage.class);
+        List<CourseImage> imgs = queryObjectList(sql, CourseImage.class);
 
         final Map<Long, List<CourseImage>> imgsMap = new HashMap<Long, List<CourseImage>>();
         for (long courseId : courseIds) {
@@ -127,7 +127,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         if (courseIds.isEmpty()) return new HashMap<Long, CourseBook>();
 
         String sql = "SELECT Id, CourseId, Img, `Order` FROM SG_CourseBook WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Status=1 ORDER BY `Order` ASC";
-        List<CourseBookImage> imgs = queryList(sql, CourseBookImage.class);
+        List<CourseBookImage> imgs = queryObjectList(sql, CourseBookImage.class);
 
         final Map<Long, List<CourseBookImage>> imgsMap = new HashMap<Long, List<CourseBookImage>>();
         for (long courseId : courseIds) {
@@ -176,7 +176,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         if (skuIds.isEmpty()) return new ArrayList<CourseSku>();
 
         String sql = "SELECT Id, CourseId, StartTime, EndTime, Deadline, Stock, UnlockedStock, LockedStock, PlaceId, Adult, Child FROM SG_CourseSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status=1";
-        List<CourseSku> skus = queryList(sql, CourseSku.class);
+        List<CourseSku> skus = queryObjectList(sql, CourseSku.class);
 
         Map<Long, CourseSku> skusMap = new HashMap<Long, CourseSku>();
         for (CourseSku sku : skus) {
@@ -259,7 +259,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         if (teacherIds.isEmpty()) return new ArrayList<Teacher>();
 
         String sql = "SELECT Id, Name, Avatar, Education, Experience FROM SG_Teacher WHERE Id IN (" + StringUtils.join(teacherIds, ",") + ") AND Status=1";
-        return queryList(sql, Teacher.class);
+        return queryObjectList(sql, Teacher.class);
     }
 
     @Override
@@ -348,7 +348,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
         final Map<Long, Date> startTimesMap = new HashMap<Long, Date>();
         String sql = "SELECT A.PackageId, MIN(B.StartTime) AS StartTime FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.PackageId IN (" + StringUtils.join(packageIds, ",") + ") AND A.Status=1 AND B.Status=1 GROUP BY A.PackageId";
-        jdbcTemplate.query(sql, new RowCallbackHandler() {
+        query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 startTimesMap.put(rs.getLong("PackageId"), rs.getTimestamp("StartTime"));
@@ -370,7 +370,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         if (bookingIds.isEmpty()) return new ArrayList<BookedCourse>();
 
         String sql = "SELECT A.Id, A.UserId, A.OrderId, A.PackageId, A.CourseId, A.CourseSkuId, B.StartTime, B.EndTime FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.Id IN (" + StringUtils.join(bookingIds, ",") + ") AND A.Status=1 AND B.Status=1";
-        List<BookedCourse> bookedCourses = queryList(sql, BookedCourse.class);
+        List<BookedCourse> bookedCourses = queryObjectList(sql, BookedCourse.class);
 
         Map<Long, BookedCourse> bookedCoursesMap = new HashMap<Long, BookedCourse>();
         for (BookedCourse bookedCourse : bookedCourses) {
@@ -423,7 +423,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
             map.put(orderId, 0);
         }
         String sql = "SELECT OrderId, COUNT(1) AS Count FROM SG_BookedCourse WHERE OrderId IN (" + StringUtils.join(orderIds, ",") + ") AND Status=1 GROUP BY OrderId";
-        jdbcTemplate.query(sql, new RowCallbackHandler() {
+        query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 long orderId = rs.getLong("OrderId");
@@ -444,7 +444,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
             map.put(orderId, 0);
         }
         String sql = "SELECT A.OrderId, COUNT(1) AS Count FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.OrderId IN (" + StringUtils.join(orderIds, ",") + ") AND A.Status=1 AND B.EndTime<=NOW() AND B.Status=1 GROUP BY A.OrderId";
-        jdbcTemplate.query(sql, new RowCallbackHandler() {
+        query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 long orderId = rs.getLong("OrderId");
@@ -472,8 +472,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public long booking(final long userId, final long orderId, final long packageId, final CourseSku sku) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(new PreparedStatementCreator() {
+        KeyHolder keyHolder = insert(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 String sql = "INSERT INTO SG_BookedCourse(UserId, OrderId, PackageId, CourseId, CourseSkuId, AddTime) VALUES(?, ?, ?, ?, ?, NOW())";
@@ -486,7 +485,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
                 return ps;
             }
-        }, keyHolder);
+        });
 
         return keyHolder.getKey().longValue();
     }
@@ -556,8 +555,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     private long addComment(final CourseComment comment) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(new PreparedStatementCreator() {
+        KeyHolder keyHolder = insert(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 String sql = "INSERT INTO SG_CourseComment(UserId, BookingId, CourseId, Star, Teacher, Environment, Content, AddTime) VALUES(?, ?, ?, ?, ?, ?, ?, NOW())";
@@ -572,7 +570,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
                 return ps;
             }
-        }, keyHolder);
+        });
 
         return keyHolder.getKey().longValue();
     }
@@ -583,7 +581,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
             params.add(new Object[] { commentId, img });
         }
         String sql = "INSERT INTO SG_CourseCommentImg (CommentId, Url, AddTime) VALUES (?, ?, NOW())";
-        jdbcTemplate.batchUpdate(sql, params);
+        batchUpdate(sql, params);
     }
 
     @Override
@@ -620,7 +618,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         if (commentIds.isEmpty()) return new ArrayList<CourseComment>();
 
         String sql = "SELECT Id, UserId, CourseId, Star, Teacher, Environment, Content, AddTime FROM SG_CourseComment WHERE Id IN (" + StringUtils.join(commentIds, ",") + ") AND Status=1";
-        List<CourseComment> comments = queryList(sql, CourseComment.class);
+        List<CourseComment> comments = queryObjectList(sql, CourseComment.class);
 
         Map<Long, List<String>> imgsMap = queryCommentImgs(commentIds);
 
@@ -648,7 +646,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         }
 
         String sql = "SELECT CommentId, Url FROM SG_CourseCommentImg WHERE CommentId IN (" + StringUtils.join(commentIds, ",") + ") AND Status=1";
-        jdbcTemplate.query(sql, new RowCallbackHandler() {
+        query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 long commentId = rs.getLong("CommentId");

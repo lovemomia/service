@@ -42,7 +42,7 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
         if (userCouponIds.isEmpty()) return new ArrayList<UserCoupon>();
 
         String sql = "SELECT A.Id, B.Type, A.UserId, A.CouponId, B.Title, B.Desc, B.Discount, B.Consumption, A.StartTime, A.EndTime, A.InviteCode, A.Status FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.Id IN (" + StringUtils.join(userCouponIds, ",") + ") AND A.Status<>0 AND B.Status=1";
-        List<UserCoupon> userCoupons = queryList(sql, UserCoupon.class);
+        List<UserCoupon> userCoupons = queryObjectList(sql, UserCoupon.class);
 
         Map<Long, UserCoupon> userCouponsMap = new HashMap<Long, UserCoupon>();
         for (UserCoupon userCoupon : userCoupons) {
@@ -149,7 +149,7 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
         if (couponIds.isEmpty()) return new ArrayList<Coupon>();
 
         String sql = "SELECT Id, Count, TimeType, Time, TimeUnit, StartTime, EndTime FROM SG_Coupon WHERE Id IN(" + StringUtils.join(couponIds, ",") + ") AND Status=1";
-        List<Coupon> coupons = queryList(sql, Coupon.class);
+        List<Coupon> coupons = queryObjectList(sql, Coupon.class);
 
         Map<Integer, Coupon> couponsMap = new HashMap<Integer, Coupon>();
         for (Coupon coupon : coupons) {
@@ -208,12 +208,12 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
         }
 
         String sql = "INSERT INTO SG_UserCoupon (UserId, CouponId, StartTime, EndTime, InviteCode, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
-        jdbcTemplate.batchUpdate(sql, args);
+        batchUpdate(sql, args);
     }
 
     private InviteCoupon getInviteCoupon(String mobile) {
         String sql = "SELECT Id, Mobile, InviteCode, CouponId FROM SG_InviteCoupon WHERE Mobile=? AND Status=1";
-        List<InviteCoupon> inviteCoupons = queryList(sql, new Object[] { mobile }, InviteCoupon.class);
+        List<InviteCoupon> inviteCoupons = queryObjectList(sql, new Object[] { mobile }, InviteCoupon.class);
 
         return inviteCoupons.isEmpty() ? InviteCoupon.NOT_EXIST_INVITE_COUPON : inviteCoupons.get(0);
     }
