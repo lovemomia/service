@@ -110,10 +110,10 @@ public class FeedController extends BaseController {
         feedDto.setPoi(feed.getLng() + ":" + feed.getLat());
         feedDto.setCommentCount(feed.getCommentCount());
         feedDto.setStarCount(feed.getStarCount());
-        feedDto.setOfficial(feed.getOfficial() > 0 && (userId == 0 || feed.getUserId() != userId));
+        feedDto.setOfficial(feed.getOfficial() > 0);
         feedDto.setUserId(user.getId());
         feedDto.setAvatar(user.getAvatar());
-        feedDto.setNickName(user.getNickName());
+        feedDto.setNickName(feed.getOfficial() > 0 ? "官方帐号" : user.getNickName());
         feedDto.setChildren(formatChildren(user.getChildren()));
         feedDto.setStared(stared);
 
