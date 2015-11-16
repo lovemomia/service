@@ -205,6 +205,7 @@ public class FeedController extends BaseController {
         try {
             // TODO 异步推送
             List<Long> followedIds = isOfficialUser ? Lists.newArrayList(0L) : feedService.getFollowedIds(feed.getUserId());
+            if (!isOfficialUser) followedIds.add(feed.getUserId());
             feedService.push(feedId, followedIds);
         } catch (Exception e) {
             LOGGER.error("fail to push feed: {}", feed.getId());
