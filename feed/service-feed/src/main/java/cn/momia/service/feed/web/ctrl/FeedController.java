@@ -14,6 +14,7 @@ import cn.momia.service.feed.base.Feed;
 import cn.momia.service.feed.base.FeedService;
 import cn.momia.service.feed.base.FeedTag;
 import cn.momia.service.feed.star.FeedStarService;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -203,9 +204,7 @@ public class FeedController extends BaseController {
 
         try {
             // TODO 异步推送
-            List<Long> followedIds = feedService.getFollowedIds(feed.getUserId());
-            if (isOfficialUser) followedIds.add(0L);
-            else followedIds.add(feed.getUserId());
+            List<Long> followedIds = isOfficialUser ? Lists.newArrayList(0L) : feedService.getFollowedIds(feed.getUserId());
             feedService.push(feedId, followedIds);
         } catch (Exception e) {
             LOGGER.error("fail to push feed: {}", feed.getId());
