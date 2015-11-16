@@ -108,6 +108,15 @@ public class UserServiceApi extends ServiceApi {
         return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
     }
 
+    public UserDto updateCover(String utoken, String cover) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("cover", cover);
+        HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/user/cover"), builder.build());
+
+        return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
+    }
+
     public UserDto updateName(String utoken, String name) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)

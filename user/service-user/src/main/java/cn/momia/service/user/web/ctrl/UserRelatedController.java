@@ -34,6 +34,7 @@ public abstract class UserRelatedController extends BaseController {
                 userDto.setChildren(buildChildDtos(user.getChildren()));
             case User.Type.BASE:
                 userDto.setMobile(MobileUtil.encrypt(user.getMobile()));
+                userDto.setCover(user.getCover());
                 userDto.setName(user.getName());
                 userDto.setSex(user.getSex());
                 userDto.setBirthday(user.getBirthday());

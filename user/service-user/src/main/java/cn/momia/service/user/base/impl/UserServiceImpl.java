@@ -121,7 +121,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
     public List<User> list(Collection<Long> userIds) {
         if (userIds.isEmpty()) return new ArrayList<User>();
 
-        String sql = "SELECT Id, NickName, Avatar, Mobile, Name, Sex, Birthday, CityId, RegionId, Address, Payed, Token FROM SG_User WHERE Id IN (" + StringUtils.join(userIds, ",") + ") AND Status=1";
+        String sql = "SELECT Id, NickName, Avatar, Mobile, Cover, Name, Sex, Birthday, CityId, RegionId, Address, Payed, Token FROM SG_User WHERE Id IN (" + StringUtils.join(userIds, ",") + ") AND Status=1";
         List<User> users = queryObjectList(sql, User.class);
 
         Map<Long, List<Child>> childrenMap = childService.queryByUsers(userIds);
@@ -144,6 +144,12 @@ public class UserServiceImpl extends AbstractService implements UserService {
     public boolean updateAvatar(long userId, String avatar) {
         String sql = "UPDATE SG_User SET Avatar=? WHERE Id=?";
         return update(sql, new Object[] { avatar, userId });
+    }
+
+    @Override
+    public boolean updateCover(long userId, String cover) {
+        String sql = "UPDATE SG_User SET Cover=? WHERE Id=?";
+        return update(sql, new Object[] { cover, userId });
     }
 
     @Override

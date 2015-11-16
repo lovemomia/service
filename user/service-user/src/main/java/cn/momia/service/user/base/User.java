@@ -19,6 +19,7 @@ public class User {
     private String avatar;
 
     private String mobile;
+    private String cover;
     private String name;
     private String sex;
     private Date birthday;
@@ -61,6 +62,14 @@ public class User {
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
     }
 
     public String getName() {

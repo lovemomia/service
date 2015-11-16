@@ -102,6 +102,18 @@ public class UserController extends UserRelatedController {
         return MomiaHttpResponse.SUCCESS(buildUserDto(user));
     }
 
+    @RequestMapping(value = "/cover", method = RequestMethod.PUT)
+    public MomiaHttpResponse updateCover(@RequestParam String utoken, @RequestParam String cover) {
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
+
+        boolean successful = userService.updateCover(user.getId(), cover);
+        if (!successful) return MomiaHttpResponse.FAILED("更新用户封面图失败");
+
+        user.setCover(cover);
+        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
+    }
+
     @RequestMapping(value = "/name", method = RequestMethod.PUT)
     public MomiaHttpResponse updateName(@RequestParam String utoken, @RequestParam String name) {
         User user = userService.getByToken(utoken);

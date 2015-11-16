@@ -16,6 +16,7 @@ public interface UserService {
 
     boolean updateNickName(long userId, String nickName);
     boolean updateAvatar(long userId, String avatar);
+    boolean updateCover(long userId, String cover);
     boolean updateName(long userId, String name);
     boolean updateSex(long userId, String sex);
     boolean updateBirthday(long userId, Date birthday);
