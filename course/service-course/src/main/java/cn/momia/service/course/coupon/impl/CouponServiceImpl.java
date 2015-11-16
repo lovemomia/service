@@ -148,7 +148,7 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
     private List<Coupon> listCoupons(Collection<Integer> couponIds) {
         if (couponIds.isEmpty()) return new ArrayList<Coupon>();
 
-        String sql = "SELECT Id, Count, TimeType, Time, TimeUnit, StartTime, EndTime FROM SG_Coupon WHERE Id IN(" + StringUtils.join(couponIds, ",") + ") AND Status=1";
+        String sql = "SELECT Id, Count, TimeType, Time, TimeUnit, StartTime, EndTime FROM SG_Coupon WHERE Id IN(" + StringUtils.join(couponIds, ",") + ") AND OnlineTime<=NOW() AND OfflineTime>NOW() AND Status=1";
         List<Coupon> coupons = queryObjectList(sql, Coupon.class);
 
         Map<Integer, Coupon> couponsMap = new HashMap<Integer, Coupon>();
