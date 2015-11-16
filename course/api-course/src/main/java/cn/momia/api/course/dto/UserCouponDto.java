@@ -64,7 +64,7 @@ public class UserCouponDto {
         this.consumption = consumption;
     }
 
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @JSONField(format = "yyyy-MM-dd")
     public Date getStartTime() {
         return startTime;
     }
@@ -73,7 +73,7 @@ public class UserCouponDto {
         this.startTime = startTime;
     }
 
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @JSONField(format = "yyyy-MM-dd")
     public Date getEndTime() {
         return endTime;
     }
