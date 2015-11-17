@@ -37,15 +37,6 @@ public class CourseServiceApi extends ServiceApi {
         return CastUtil.toObject((JSON) executeRequest(request), CourseDto.class);
     }
 
-    public PagedList<CourseDto> list(int start, int count) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("start", start)
-                .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/list"), builder.build());
-
-        return CastUtil.toPagedList((JSON) executeRequest(request), CourseDto.class);
-    }
-
     public PagedList<CourseDto> query(long subjectId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("suid", subjectId)
@@ -108,6 +99,15 @@ public class CourseServiceApi extends ServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/sku/month", courseId), builder.build());
 
         return CastUtil.toList((JSON) executeRequest(request), DatedCourseSkusDto.class);
+    }
+
+    public PagedList<CourseDto> listFinished(int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("start", start)
+                .add("count", count);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/finished/list"), builder.build());
+
+        return CastUtil.toPagedList((JSON) executeRequest(request), CourseDto.class);
     }
 
     public PagedList<BookedCourseDto> queryNotFinishedByUser(long userId, int start, int count) {

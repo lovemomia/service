@@ -387,15 +387,17 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
-    public long queryCount() {
+    public long queryFinishedCount() {
         String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.ParentId=0 AND A.Status=1 AND B.StartTime<=NOW() AND B.Status=1";
         return queryLong(sql);
     }
 
     @Override
-    public List<Course> query(int start, int count) {
+    public List<Course> queryFinished(int start, int count) {
         String sql = "SELECT A.Id FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.ParentId=0 AND A.Status=1 AND B.StartTime<=NOW() AND B.Status=1 GROUP BY A.Id ORDER BY MAX(B.StartTime) DESC LIMIT ?,?";
-        return queryObjectList(sql, new Object[] { start, count }, Course.class);
+        List<Long> courseIds =  queryLongList(sql, new Object[] { start, count });
+
+        return list(courseIds);
     }
 
     @Override

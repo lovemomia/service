@@ -32,8 +32,8 @@ public interface CourseService {
 
     BookedCourse getBookedCourse(long bookingId);
 
-    long queryCount();
-    List<Course> query(int start, int count);
+    long queryFinishedCount();
+    List<Course> queryFinished(int start, int count);
     long queryNotFinishedCountByUser(long userId);
     List<BookedCourse> queryNotFinishedByUser(long userId, int start, int count);
     long queryFinishedCountByUser(long userId);
