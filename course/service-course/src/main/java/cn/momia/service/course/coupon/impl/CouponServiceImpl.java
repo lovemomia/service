@@ -190,11 +190,11 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
     }
 
     @Override
-    public void distributeInviteUserCoupon(long userId, int couponId) {
+    public void distributeInviteUserCoupon(long userId, int couponId, String inviteCode) {
         List<Coupon> coupons = listCoupons(Sets.newHashSet(couponId));
         if (coupons.isEmpty()) return;
 
-        addUserCoupons(userId, "", coupons);
+        addUserCoupons(userId, StringUtils.isBlank(inviteCode) ? "" : inviteCode, coupons);
     }
 
     private void addUserCoupons(long userId, String inviteCode, List<Coupon> coupons) {

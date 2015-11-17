@@ -159,7 +159,7 @@ public class PaymentController extends BaseController {
                 if (userServiceApi.setPayed(order.getUserId())) {
                     UserDto inviteUser = userServiceApi.getByInviteCode(userCoupon.getInviteCode());
                     if (inviteUser.exists() && inviteUser.getId() != order.getUserId()) {
-                        couponService.distributeInviteUserCoupon(inviteUser.getId(), userCoupon.getCouponId());
+                        couponService.distributeInviteUserCoupon(inviteUser.getId(), userCoupon.getCouponId(), null);
                     }
                 }
             } catch (Exception e) {

@@ -57,7 +57,7 @@ public class CouponController extends BaseController {
     @RequestMapping(value = "/invite/distribute", method = RequestMethod.POST)
     public MomiaHttpResponse inviteUserCoupon(@RequestParam(value = "uid") long userId, @RequestParam String mobile) {
         InviteCoupon inviteCoupon = couponService.getInviteCoupon(mobile);
-        if (inviteCoupon.exists() && couponService.updateInviteCouponStatus(mobile)) couponService.distributeInviteUserCoupon(userId, inviteCoupon.getCouponId());
+        if (inviteCoupon.exists() && couponService.updateInviteCouponStatus(mobile)) couponService.distributeInviteUserCoupon(userId, inviteCoupon.getCouponId(), inviteCoupon.getInviteCode());
         return MomiaHttpResponse.SUCCESS;
     }
 
