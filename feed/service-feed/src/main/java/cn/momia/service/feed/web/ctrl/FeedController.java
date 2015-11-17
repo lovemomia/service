@@ -156,6 +156,11 @@ public class FeedController extends BaseController {
         return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(userId, feeds, totalCount, start, count));
     }
 
+    @RequestMapping(value = "/official", method = RequestMethod.GET)
+    public MomiaHttpResponse isOfficialUser(@RequestParam(value = "uid") long userId) {
+        return MomiaHttpResponse.SUCCESS(feedService.isOfficialUser(userId));
+    }
+
     @RequestMapping(value = "/tag", method = RequestMethod.GET)
     public MomiaHttpResponse listTags(@RequestParam int count) {
         List<FeedTag> recommendedTags = feedService.listRecommendedTags(count);

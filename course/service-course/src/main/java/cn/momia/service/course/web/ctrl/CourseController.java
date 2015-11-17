@@ -230,6 +230,17 @@ public class CourseController extends BaseController {
         }
     }
 
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public MomiaHttpResponse list(@RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = courseService.queryCount();
+        List<Course> courses = courseService.query(start, count);
+        PagedList<CourseDto> pagedCourseDtos = buildPagedCourseDtos(courses, totalCount, start, count);
+
+        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
+    }
+
     @RequestMapping(value = "/query", method = RequestMethod.GET)
     public MomiaHttpResponse query(@RequestParam(value = "suid") long subjectId,
                                    @RequestParam(value = "pid", required = false, defaultValue = "0") long packageId,

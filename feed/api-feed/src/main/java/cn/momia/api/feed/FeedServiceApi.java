@@ -53,6 +53,13 @@ public class FeedServiceApi extends ServiceApi {
         return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedDto.class);
     }
 
+    public boolean isOfficialUser(long userId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/feed/official"), builder.build());
+
+        return (Boolean) executeRequest(request);
+    }
+
     public FeedTagsDto listTags(int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/feed/tag"), builder.build());
