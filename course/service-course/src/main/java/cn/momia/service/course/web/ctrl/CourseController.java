@@ -231,27 +231,11 @@ public class CourseController extends BaseController {
     }
 
     @RequestMapping(value = "/finished/list", method = RequestMethod.GET)
-    public MomiaHttpResponse listFinished(@RequestParam int start, @RequestParam int count) {
+    public MomiaHttpResponse listFinished(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
-        long totalCount = courseService.queryFinishedCount();
-        List<Course> courses = courseService.queryFinished(start, count);
-        PagedList<CourseDto> pagedCourseDtos = buildPagedCourseDtos(courses, totalCount, start, count);
-
-        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
-    }
-
-    @RequestMapping(value = "/query", method = RequestMethod.GET)
-    public MomiaHttpResponse query(@RequestParam(value = "suid") long subjectId,
-                                   @RequestParam(value = "pid", required = false, defaultValue = "0") long packageId,
-                                   @RequestParam(value = "min", required = false, defaultValue = "1") int minAge,
-                                   @RequestParam(value = "max", required = false, defaultValue = "100") int maxAge,
-                                   @RequestParam(value = "sort", required = false, defaultValue = "0") int sortTypeId,
-                                   @RequestParam int start,
-                                   @RequestParam int count) {
-        List<Long> courseIds = courseService.queryBookedCourseIds(packageId);
-        long totalCount = courseService.queryCountBySubject(subjectId, courseIds, minAge, maxAge);
-        List<Course> courses = courseService.queryBySubject(subjectId, start, count, courseIds, minAge, maxAge, sortTypeId);
+        long totalCount = userId <= 0 ? courseService.listFinishedCount() : courseService.listFinishedCount(userId);
+        List<Course> courses = userId <= 0 ? courseService.listFinished(start, count) : courseService.listFinished(userId, start, count);
         PagedList<CourseDto> pagedCourseDtos = buildPagedCourseDtos(courses, totalCount, start, count);
 
         return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
@@ -272,6 +256,22 @@ public class CourseController extends BaseController {
         }
 
         return courseDtos;
+    }
+
+    @RequestMapping(value = "/query", method = RequestMethod.GET)
+    public MomiaHttpResponse query(@RequestParam(value = "suid") long subjectId,
+                                   @RequestParam(value = "pid", required = false, defaultValue = "0") long packageId,
+                                   @RequestParam(value = "min", required = false, defaultValue = "1") int minAge,
+                                   @RequestParam(value = "max", required = false, defaultValue = "100") int maxAge,
+                                   @RequestParam(value = "sort", required = false, defaultValue = "0") int sortTypeId,
+                                   @RequestParam int start,
+                                   @RequestParam int count) {
+        List<Long> courseIds = courseService.queryBookedCourseIds(packageId);
+        long totalCount = courseService.queryCountBySubject(subjectId, courseIds, minAge, maxAge);
+        List<Course> courses = courseService.queryBySubject(subjectId, start, count, courseIds, minAge, maxAge, sortTypeId);
+        PagedList<CourseDto> pagedCourseDtos = buildPagedCourseDtos(courses, totalCount, start, count);
+
+        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
     }
 
     @RequestMapping(value = "/{coid}/detail", method = RequestMethod.GET)
