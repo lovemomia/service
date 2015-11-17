@@ -42,6 +42,7 @@ public abstract class UserRelatedController extends BaseController {
                 userDto.setRegionId(user.getRegionId());
                 userDto.setAddress(user.getAddress());
                 userDto.setPayed(user.getPayed() == 1);
+                userDto.setInviteCode(user.getInviteCode());
                 if (showToken) userDto.setToken(user.getToken());
             case User.Type.MINI:
                 userDto.setId(user.getId());

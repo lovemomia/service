@@ -27,6 +27,7 @@ public class UserDto {
     private Integer regionId;
     private String address;
     private Boolean payed;
+    private String inviteCode;
 
     private String token;
 
@@ -127,6 +128,14 @@ public class UserDto {
 
     public void setPayed(Boolean payed) {
         this.payed = payed;
+    }
+
+    public String getInviteCode() {
+        return inviteCode;
+    }
+
+    public void setInviteCode(String inviteCode) {
+        this.inviteCode = inviteCode;
     }
 
     public String getToken() {

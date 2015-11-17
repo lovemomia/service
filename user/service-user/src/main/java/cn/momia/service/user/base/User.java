@@ -27,6 +27,7 @@ public class User {
     private int regionId;
     private String address;
     private int payed;
+    private String inviteCode;
 
     private String token;
 
@@ -126,6 +127,14 @@ public class User {
 
     public void setPayed(int payed) {
         this.payed = payed;
+    }
+
+    public String getInviteCode() {
+        return inviteCode;
+    }
+
+    public void setInviteCode(String inviteCode) {
+        this.inviteCode = inviteCode;
     }
 
     public String getToken() {
