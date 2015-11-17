@@ -280,7 +280,7 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
 
     @Override
     public void decreaseStarCount(long feedId) {
-        String sql = "UPDATE SG_Feed SET StarCount=StarCount-1 WHERE Id=? AND CommentCount>=1";
+        String sql = "UPDATE SG_Feed SET StarCount=StarCount-1 WHERE Id=? AND StarCount>=1";
         update(sql, new Object[] { feedId });
     }
 
