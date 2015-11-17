@@ -49,7 +49,7 @@ public class CouponController extends BaseController {
 
     @RequestMapping(value = "/invite", method = RequestMethod.POST)
     public MomiaHttpResponse inviteCoupon(@RequestParam String mobile, @RequestParam(value = "invite") String inviteCode) {
-        if (couponService.hasInviteCoupon(mobile)) return MomiaHttpResponse.FAILED("一个手机号只能领取一次");
+        if (couponService.hasInviteCoupon(mobile)) return MomiaHttpResponse.FAILED("您已经领取过红包了，不能在领了");
         if (!couponService.addInviteCoupon(mobile, inviteCode)) return MomiaHttpResponse.FAILED("领取失败，可能是该手机号已经领取过了");
         return MomiaHttpResponse.SUCCESS;
     }
