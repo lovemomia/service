@@ -89,7 +89,7 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
         } else if (status == EXPIRED_STATUS) {
             sql = "SELECT A.Id FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.UserId=? AND A.Status=1 AND A.EndTime<=NOW() AND B.Status=1 ORDER BY A.EndTime ASC, A.StartTime ASC LIMIT ?,?";
         } else {
-            sql = "SELECT A.Id FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.UserId=? AND (A.Status=2 OR (A.Status=1 AND A.EndTime>NOW())) AND B.Status=1 ORDER BY A.EndTime ASC, A.StartTime ASC LIMIT ?,?";
+            sql = "SELECT A.Id FROM SG_UserCoupon A INNER JOIN SG_Coupon B ON A.CouponId=B.Id WHERE A.UserId=? AND (A.Status=2 OR (A.Status=1 AND A.EndTime>NOW())) AND B.Status=1 ORDER BY A.Status ASC, A.EndTime ASC, A.StartTime ASC LIMIT ?,?";
         }
         List<Long> userCouponIds = queryLongList(sql, new Object[] { userId, start, count });
 
