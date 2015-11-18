@@ -143,7 +143,10 @@ public class CourseController extends BaseController {
         List<CourseSkuPlace> places = new ArrayList<CourseSkuPlace>();
         Map<Integer, CourseSkuPlace> placesMap = new HashMap<Integer, CourseSkuPlace>();
         Map<Integer, List<CourseSku>> skusGroupedByPlace = new HashMap<Integer, List<CourseSku>>();
+        Date now = new Date();
         for (CourseSku sku : skus) {
+            if (!sku.isAvaliable(now)) continue;
+
             CourseSkuPlace place = sku.getPlace();
             if (place == null) continue;
 
