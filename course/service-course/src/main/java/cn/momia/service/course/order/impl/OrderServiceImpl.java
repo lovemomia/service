@@ -1,19 +1,19 @@
-package cn.momia.service.course.subject.order.impl;
+package cn.momia.service.course.order.impl;
 
 import cn.momia.common.api.exception.MomiaFailedException;
-import cn.momia.common.service.DbAccessService;
+import cn.momia.common.service.AbstractService;
+import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.subject.SubjectSku;
-import cn.momia.service.course.subject.order.Order;
-import cn.momia.service.course.subject.order.OrderService;
-import cn.momia.service.course.subject.order.OrderPackage;
-import cn.momia.service.course.subject.order.Payment;
+import cn.momia.service.course.order.Order;
+import cn.momia.service.course.order.OrderService;
+import cn.momia.service.course.order.OrderPackage;
+import cn.momia.service.course.order.Payment;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class OrderServiceImpl extends DbAccessService implements OrderService {
+public class OrderServiceImpl extends AbstractService implements OrderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     private SubjectService subjectService;
@@ -41,8 +41,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     @Override
     public long add(final Order order) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(new PreparedStatementCreator() {
+        KeyHolder keyHolder = insert(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 String sql = "INSERT INTO SG_SubjectOrder(UserId, SubjectId, Contact, Mobile, InviteCode, AddTime) VALUES(?, ?, ?, ?, ?, NOW())";
@@ -55,7 +54,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
                 return ps;
             }
-        }, keyHolder);
+        });
 
         long orderId = keyHolder.getKey().longValue();
         if (orderId < 0) throw new MomiaFailedException("下单失败");
@@ -71,7 +70,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         for (OrderPackage orderPackage : order.getPackages()) {
             args.add(new Object[] { orderId, orderPackage.getSkuId(), orderPackage.getPrice(), orderPackage.getBookableCount(), orderPackage.getBookableCount() });
         }
-        jdbcTemplate.batchUpdate(sql, args);
+        batchUpdate(sql, args);
     }
 
     @Override
@@ -87,7 +86,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         if (orderIds.isEmpty()) return new ArrayList<Order>();
 
         String sql = "SELECT Id, UserId, SubjectId, Contact, Mobile, Status, AddTime FROM SG_SubjectOrder WHERE Id IN (" + StringUtils.join(orderIds, ",") + ") AND Status>0";
-        List<Order> orders = queryList(sql, Order.class);
+        List<Order> orders = queryObjectList(sql, Order.class);
 
         Map<Long, List<OrderPackage>> packagesMap = queryOrderPackages(orderIds);
         Set<Long> skuIds = new HashSet<Long>();
@@ -143,7 +142,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
         if (packageIds.isEmpty()) return new ArrayList<OrderPackage>();
 
         String sql = "SELECT Id, OrderId, SkuId, Price, CourseCount, BookableCount FROM SG_SubjectOrderPackage WHERE Id IN (" + StringUtils.join(packageIds, ",") + ") AND Status=1";
-        List<OrderPackage> packages = queryList(sql, OrderPackage.class);
+        List<OrderPackage> packages = queryObjectList(sql, OrderPackage.class);
 
         Map<Long, OrderPackage> packagesMap = new HashMap<Long, OrderPackage>();
         for (OrderPackage orderPackage : packages) {
@@ -163,6 +162,12 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     public boolean delete(long userId, long orderId) {
         String sql = "UPDATE SG_SubjectOrder SET Status=0 WHERE UserId=? AND Id=? AND Status<?";
         return update(sql, new Object[] { userId, orderId, Order.Status.PAYED });
+    }
+
+    @Override
+    public boolean refund(long userId, long orderId) {
+        String sql = "UPDATE SG_SubjectOrder SET Status=? WHERE UserId=? AND Id=? AND Status=?";
+        return update(sql, new Object[] { Order.Status.TO_REFUND, userId, orderId, Order.Status.PAYED });
     }
 
     @Override
@@ -237,7 +242,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     @Override
     public boolean prepay(long orderId) {
         String sql = "UPDATE SG_SubjectOrder SET Status=? WHERE Id=? AND (Status=? OR Status=?)";
-        int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PRE_PAYED, orderId, Order.Status.NOT_PAYED, Order.Status.PRE_PAYED });
+        int updateCount = singleUpdate(sql, new Object[] { Order.Status.PRE_PAYED, orderId, Order.Status.NOT_PAYED, Order.Status.PRE_PAYED });
 
         return updateCount == 1;
     }
@@ -245,7 +250,7 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     @Override
     public boolean pay(final Payment payment) {
         try {
-            transactionTemplate.execute(new TransactionCallback() {
+            execute(new TransactionCallback() {
                 @Override
                 public Object doInTransaction(TransactionStatus status) {
                     payOrder(payment.getOrderId());
@@ -264,14 +269,14 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
 
     private void payOrder(long orderId) {
         String sql = "UPDATE SG_SubjectOrder SET Status=? WHERE Id=? AND Status=?";
-        int updateCount = jdbcTemplate.update(sql, new Object[] { Order.Status.PAYED, orderId, Order.Status.PRE_PAYED });
+        int updateCount = singleUpdate(sql, new Object[] { Order.Status.PAYED, orderId, Order.Status.PRE_PAYED });
 
         if (updateCount != 1) throw new RuntimeException("fail to pay order: {}" + orderId);
     }
 
     private void logPayment(final Payment payment) {
         String sql = "INSERT INTO SG_SubjectPayment(OrderId, Payer, FinishTime, PayType, TradeNo, Fee, AddTime) VALUES(?, ?, ?, ?, ?, ?, NOW())";
-        int updateCount = jdbcTemplate.update(sql, new Object[] { payment.getOrderId(), payment.getPayer(), payment.getFinishTime(), payment.getPayType(), payment.getTradeNo(), payment.getFee() });
+        int updateCount = singleUpdate(sql, new Object[] { payment.getOrderId(), payment.getPayer(), payment.getFinishTime(), payment.getPayType(), payment.getTradeNo(), payment.getFee() });
 
         if (updateCount != 1) throw new RuntimeException("fail to log payment for order: " + payment.getOrderId());
     }
@@ -286,6 +291,12 @@ public class OrderServiceImpl extends DbAccessService implements OrderService {
     public boolean increaseBookableCount(long packageId) {
         String sql = "UPDATE SG_SubjectOrderPackage SET BookableCount=BookableCount+1 WHERE Id=? AND Status=1 AND BookableCount<CourseCount";
         return update(sql, new Object[] { packageId });
+    }
+
+    @Override
+    public boolean hasTrialOrder(long userId) {
+        String sql = "SELECT COUNT(1) FROM SG_SubjectOrder A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.UserId=? AND A.Status>0 AND B.`Type`=?";
+        return queryInt(sql, new Object[] { userId, Subject.Type.TRIAL }) > 0;
     }
 
     @Override

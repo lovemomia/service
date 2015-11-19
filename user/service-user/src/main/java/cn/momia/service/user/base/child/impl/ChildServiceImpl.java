@@ -1,12 +1,11 @@
 package cn.momia.service.user.base.child.impl;
 
-import cn.momia.common.service.DbAccessService;
+import cn.momia.common.service.AbstractService;
 import cn.momia.service.user.base.child.Child;
 import cn.momia.service.user.base.child.ChildService;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import java.sql.Connection;
@@ -21,11 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ChildServiceImpl extends DbAccessService implements ChildService {
+public class ChildServiceImpl extends AbstractService implements ChildService {
     @Override
     public long add(final Child child) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(new PreparedStatementCreator() {
+        KeyHolder keyHolder = insert(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 String sql = "INSERT INTO SG_Child (UserId, Avatar, Name, Sex, Birthday, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
@@ -38,7 +36,7 @@ public class ChildServiceImpl extends DbAccessService implements ChildService {
 
                 return ps;
             }
-        }, keyHolder);
+        });
 
         return keyHolder.getKey().longValue();
     }
@@ -56,7 +54,7 @@ public class ChildServiceImpl extends DbAccessService implements ChildService {
         if (childIds.isEmpty()) return new ArrayList<Child>();
 
         String sql = "SELECT Id, UserId, Avatar, Name, Sex, Birthday FROM SG_Child WHERE Id IN (" + StringUtils.join(childIds, ",") + ") AND Status=1";
-        return queryList(sql, Child.class);
+        return queryObjectList(sql, Child.class);
     }
 
     @Override

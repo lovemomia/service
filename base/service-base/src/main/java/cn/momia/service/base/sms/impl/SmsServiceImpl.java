@@ -1,7 +1,7 @@
 package cn.momia.service.base.sms.impl;
 
 import cn.momia.common.api.exception.MomiaFailedException;
-import cn.momia.common.service.DbAccessService;
+import cn.momia.common.service.AbstractService;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.base.sms.SmsSender;
 import cn.momia.service.base.sms.SmsService;
@@ -13,7 +13,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class SmsServiceImpl extends DbAccessService implements SmsService {
+public class SmsServiceImpl extends AbstractService implements SmsService {
     private ExecutorService executorService;
 
     private SmsSender sender;
@@ -66,10 +66,10 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
     private void updateCode(String mobile, String code) {
         if (exists(mobile)) {
             String sql = "UPDATE SG_Verify SET Mobile=?, Code=?, GenerateTime=NOW(), SendTime=NULL, Status=1 WHERE Mobile=?";
-            jdbcTemplate.update(sql, new Object[] { mobile, code, mobile });
+            update(sql, new Object[] { mobile, code, mobile });
         } else {
             String sql = "INSERT INTO SG_Verify(Mobile, Code, GenerateTime) VALUES (?, ?, NOW())";
-            jdbcTemplate.update(sql, new Object[] { mobile, code });
+            update(sql, new Object[] { mobile, code });
         }
     }
 
@@ -106,7 +106,7 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
 
     private boolean updateSendTime(String mobile) {
         String sql = "UPDATE SG_Verify SET SendTime=NOW() WHERE Mobile=?";
-        return jdbcTemplate.update(sql, new Object[] { mobile }) == 1;
+        return update(sql, new Object[] { mobile });
     }
 
     @Override
@@ -121,7 +121,7 @@ public class SmsServiceImpl extends DbAccessService implements SmsService {
 
     private void disable(String mobile, String code) {
         String sql = "UPDATE SG_Verify SET Status=0 WHERE Mobile=? AND Code=?";
-        jdbcTemplate.update(sql, new Object[] { mobile, code });
+        update(sql, new Object[] { mobile, code });
     }
 
     @Override

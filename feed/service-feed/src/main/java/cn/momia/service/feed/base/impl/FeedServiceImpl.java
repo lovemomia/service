@@ -1,7 +1,7 @@
 package cn.momia.service.feed.base.impl;
 
 import cn.momia.common.api.exception.MomiaFailedException;
-import cn.momia.common.service.DbAccessService;
+import cn.momia.common.service.AbstractService;
 import cn.momia.service.feed.base.Feed;
 import cn.momia.service.feed.base.FeedService;
 import cn.momia.service.feed.base.FeedTag;
@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import java.sql.Connection;
@@ -27,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class FeedServiceImpl extends DbAccessService implements FeedService {
+public class FeedServiceImpl extends AbstractService implements FeedService {
     private static final Logger LOGGER = LoggerFactory.getLogger(FeedServiceImpl.class);
 
     @Override
@@ -43,12 +42,17 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
     }
 
     @Override
+    public boolean isOfficialUser(long userId) {
+        String sql = "SELECT COUNT(1) FROM SG_FeedOfficialUser WHERE UserId=? AND Status=1";
+        return queryInt(sql, new Object[] { userId }) > 0;
+    }
+
+    @Override
     public long add(final Feed feed) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(new PreparedStatementCreator() {
+        KeyHolder keyHolder = insert(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO SG_Feed(`Type`, UserId, Content, TagId, SubjectId, CourseId, CourseTitle, Lng, Lat, AddTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO SG_Feed(`Type`, UserId, Content, TagId, SubjectId, CourseId, CourseTitle, Lng, Lat, Official, AddTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setInt(1, feed.getType());
                 ps.setLong(2, feed.getUserId());
@@ -59,10 +63,11 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
                 ps.setString(7, feed.getCourseTitle());
                 ps.setDouble(8, feed.getLng());
                 ps.setDouble(9, feed.getLat());
+                ps.setInt(10, feed.getOfficial());
 
                 return ps;
             }
-        }, keyHolder);
+        });
 
         long feedId = keyHolder.getKey().longValue();
         if (feedId > 0) {
@@ -80,7 +85,7 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
             for (String img : imgs) {
                 args.add(new Object[] { feedId, img });
             }
-            jdbcTemplate.batchUpdate(sql, args);
+            batchUpdate(sql, args);
         } catch (Exception e) {
             LOGGER.error("fail to add image for feed: {}", feedId, e);
         }
@@ -104,7 +109,7 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
         for (long followedId : followedIds) {
             args.add(new Object[] { followedId, feedId });
         }
-        jdbcTemplate.batchUpdate(sql, args);
+        batchUpdate(sql, args);
     }
 
     @Override
@@ -118,8 +123,8 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
     private List<Feed> list(Collection<Long> feedIds) {
         if (feedIds.isEmpty()) return new ArrayList<Feed>();
 
-        String sql = "SELECT Id,`Type`, UserId, Content, TagId, SubjectId, CourseId, CourseTitle, Lng, Lat, CommentCount, StarCount, AddTime FROM SG_Feed WHERE Id IN (" + StringUtils.join(feedIds, ",") + ") AND Status=1";
-        List<Feed> feeds = queryList(sql, Feed.class);
+        String sql = "SELECT Id,`Type`, UserId, Content, TagId, SubjectId, CourseId, CourseTitle, Lng, Lat, CommentCount, StarCount, Official, AddTime FROM SG_Feed WHERE Id IN (" + StringUtils.join(feedIds, ",") + ") AND Status=1";
+        List<Feed> feeds = queryObjectList(sql, Feed.class);
 
         Set<Long> tagIds = new HashSet<Long>();
         Map<Long, List<String>> imgs = queryImgs(feedIds);
@@ -153,7 +158,7 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
         }
 
         String sql = "SELECT FeedId, Url FROM SG_FeedImg WHERE FeedId IN (" + StringUtils.join(feedIds, ",") + ") AND Status=1";
-        jdbcTemplate.query(sql, new RowCallbackHandler() {
+        query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 long feedId = rs.getLong("FeedId");
@@ -170,7 +175,7 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
 
         final Map<Long, String> tagNamesMap = new HashMap<Long, String>();
         String sql = "SELECT Id, Name FROM SG_FeedTag WHERE id IN (" + StringUtils.join(tagIds, ",") + ") AND Status=1";
-        jdbcTemplate.query(sql, new RowCallbackHandler() {
+        query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 long id = rs.getLong("Id");
@@ -201,13 +206,13 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
 
     @Override
     public long queryFollowedCountByUser(long userId) {
-        String sql = "SELECT COUNT(1) FROM SG_FeedFollow WHERE UserId=? AND Status=1";
+        String sql = "SELECT COUNT(1) FROM SG_FeedFollow WHERE (UserId=? OR UserId=0) AND Status=1";
         return queryLong(sql, new Object[] { userId });
     }
 
     @Override
     public List<Feed> queryFollowedByUser(long userId, int start, int count) {
-        String sql = "SELECT FeedId FROM SG_FeedFollow WHERE UserId=? AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
+        String sql = "SELECT FeedId FROM SG_FeedFollow WHERE (UserId=? OR UserId=0) AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
         List<Long> feedIds = queryLongList(sql, new Object[] { userId, start, count });
 
         return list(feedIds);
@@ -223,6 +228,20 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
     public List<Feed> queryOfficialFeeds(int start, int count) {
         String sql = "SELECT Id FROM SG_Feed WHERE Official=1 AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
         List<Long> feedIds = queryLongList(sql, new Object[] { start, count });
+
+        return list(feedIds);
+    }
+
+    @Override
+    public long queryCountByUser(long userId) {
+        String sql = "SELECT COUNT(1) FROM SG_Feed WHERE UserId=? AND Status=1";
+        return queryLong(sql, new Object[] { userId });
+    }
+
+    @Override
+    public List<Feed> queryByUser(long userId, int start, int count) {
+        String sql = "SELECT Id FROM SG_Feed WHERE UserId=? AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
+        List<Long> feedIds = queryLongList(sql, new Object[] { userId, start, count });
 
         return list(feedIds);
     }
@@ -261,15 +280,14 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
 
     @Override
     public void decreaseStarCount(long feedId) {
-        String sql = "UPDATE SG_Feed SET StarCount=StarCount-1 WHERE Id=? AND CommentCount>=1";
+        String sql = "UPDATE SG_Feed SET StarCount=StarCount-1 WHERE Id=? AND StarCount>=1";
         update(sql, new Object[] { feedId });
     }
 
     @Override
     public long addTag(final long userId, final String tagName) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
         try {
-            jdbcTemplate.update(new PreparedStatementCreator() {
+            KeyHolder keyHolder = insert(new PreparedStatementCreator() {
                 @Override
                 public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                     String sql = "INSERT INTO SG_FeedTag (UserId, Name, AddTime) VALUES (?, ?, NOW())";
@@ -279,12 +297,12 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
 
                     return ps;
                 }
-            }, keyHolder);
+            });
+
+            return keyHolder.getKey().longValue();
         } catch (Exception e) {
             throw new MomiaFailedException("添加标签失败");
         }
-
-        return keyHolder.getKey().longValue();
     }
 
     @Override
@@ -300,7 +318,7 @@ public class FeedServiceImpl extends DbAccessService implements FeedService {
 
     private List<FeedTag> listTags(int recommended, int count) {
         String sql = "SELECT Id, Name FROM SG_FeedTag WHERE Recommended=? AND Status=1 ORDER BY RefCount DESC, AddTime DESC LIMIT ?";
-        return queryList(sql, new Object[] { recommended, count }, FeedTag.class);
+        return queryObjectList(sql, new Object[] { recommended, count }, FeedTag.class);
     }
 
 

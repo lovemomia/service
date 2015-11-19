@@ -7,6 +7,8 @@ public interface FeedService {
     boolean isFollowed(long ownUserId, long otherUserId);
     boolean follow(long ownUserId, long otherUserId);
 
+    boolean isOfficialUser(long userId);
+
     long add(Feed feed);
     void push(long feedId, Collection<Long> followedIds);
     Feed get(long feedId);
@@ -17,6 +19,8 @@ public interface FeedService {
     List<Feed> queryFollowedByUser(long userId, int start, int count);
     long queryOfficialFeedsCount();
     List<Feed> queryOfficialFeeds(int start, int count);
+    long queryCountByUser(long userId);
+    List<Feed> queryByUser(long userId, int start, int count);
     long queryCountByCourse(long courseId);
     List<Feed> queryByCourse(long courseId, int start, int count);
 

@@ -1,6 +1,6 @@
 package cn.momia.service.feed.star.impl;
 
-import cn.momia.common.service.DbAccessService;
+import cn.momia.common.service.AbstractService;
 import cn.momia.service.feed.star.FeedStarService;
 import org.apache.commons.lang3.StringUtils;
 
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class FeedStarServiceImpl extends DbAccessService implements FeedStarService {
+public class FeedStarServiceImpl extends AbstractService implements FeedStarService {
     @Override
     public boolean isStared(long userId, long feedId) {
         String sql = "SELECT COUNT(1) FROM SG_FeedStar WHERE UserId=? AND FeedId=? AND Status=1";

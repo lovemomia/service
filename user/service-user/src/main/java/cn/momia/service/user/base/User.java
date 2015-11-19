@@ -19,6 +19,7 @@ public class User {
     private String avatar;
 
     private String mobile;
+    private String cover;
     private String name;
     private String sex;
     private Date birthday;
@@ -26,6 +27,7 @@ public class User {
     private int regionId;
     private String address;
     private int payed;
+    private String inviteCode;
 
     private String token;
 
@@ -61,6 +63,14 @@ public class User {
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
     }
 
     public String getName() {
@@ -117,6 +127,14 @@ public class User {
 
     public void setPayed(int payed) {
         this.payed = payed;
+    }
+
+    public String getInviteCode() {
+        return inviteCode;
+    }
+
+    public void setInviteCode(String inviteCode) {
+        this.inviteCode = inviteCode;
     }
 
     public String getToken() {

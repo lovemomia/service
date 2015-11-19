@@ -13,9 +13,12 @@ import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.subject.SubjectSku;
-import cn.momia.service.course.subject.order.Order;
-import cn.momia.service.course.subject.order.OrderService;
-import cn.momia.service.course.subject.order.OrderPackage;
+import cn.momia.service.course.coupon.CouponService;
+import cn.momia.service.course.coupon.UserCoupon;
+import cn.momia.service.course.order.Order;
+import cn.momia.service.course.order.OrderService;
+import cn.momia.service.course.order.OrderPackage;
+import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,11 +36,12 @@ import java.util.Map;
 import java.util.Set;
 
 @RestController
-@RequestMapping(value = "/subject/order")
+@RequestMapping(value = "/order")
 public class OrderController extends BaseController {
     @Autowired private CourseService courseService;
     @Autowired private SubjectService subjectService;
     @Autowired private OrderService orderService;
+    @Autowired private CouponService couponService;
     @Autowired private UserServiceApi userServiceApi;
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
@@ -51,18 +56,26 @@ public class OrderController extends BaseController {
 
         if (!checkAndCompleteOrder(order, skus)) return MomiaHttpResponse.FAILED("无效的订单数据");
 
-        long orderId = orderService.add(order);
-        if (orderId < 0) return MomiaHttpResponse.FAILED("下单失败");
+        boolean isTrial = subjectService.isTrial(order.getSubjectId());
+        if (isTrial && !subjectService.decreaseStock(order.getSubjectId(), order.getCount())) return MomiaHttpResponse.FAILED("下单失败，库存不足或已售完");
 
-        order.setId(orderId);
-        return MomiaHttpResponse.SUCCESS(buildOrderDto(order));
+        long orderId = 0;
+        try {
+            orderId = orderService.add(order);
+            order.setId(orderId);
+            return MomiaHttpResponse.SUCCESS(buildOrderDto(order));
+        } catch (Exception e) {
+            return MomiaHttpResponse.FAILED("下单失败");
+        } finally {
+            if (orderId <= 0 && isTrial) subjectService.increaseStock(order.getSubjectId(), order.getCount());
+        }
     }
 
     private boolean checkAndCompleteOrder(Order order, List<SubjectSku> skus) {
         if (order.isInvalid()) return false;
 
         UserDto user = userServiceApi.get(order.getUserId());
-        if (user.isPayed() && subjectService.isForNewUser(order.getSubjectId())) throw new MomiaFailedException("本课程包只供新用户专享");
+        if (subjectService.isTrial(order.getSubjectId()) && (user.isPayed() || orderService.hasTrialOrder(user.getId()))) throw new MomiaFailedException("本课程包只供新用户专享");
 
         Map<Long, SubjectSku> skusMap = new HashMap<Long, SubjectSku>();
         for (SubjectSku sku : skus) {
@@ -105,6 +118,14 @@ public class OrderController extends BaseController {
     public MomiaHttpResponse delete(@RequestParam String utoken, @RequestParam(value = "oid") long orderId) {
         UserDto user = userServiceApi.get(utoken);
         return MomiaHttpResponse.SUCCESS(orderService.delete(user.getId(), orderId));
+    }
+
+    @RequestMapping(value = "/refund", method = RequestMethod.POST)
+    public MomiaHttpResponse refund(@RequestParam String utoken, @RequestParam(value = "oid") long orderId) {
+        if (courseService.queryBookedCourseCounts(Sets.newHashSet(orderId)).get(orderId) > 0) return MomiaHttpResponse.FAILED("已经选过课的订单不能申请退款");
+
+        UserDto user = userServiceApi.get(utoken);
+        return MomiaHttpResponse.SUCCESS(orderService.refund(user.getId(), orderId));
     }
 
     @RequestMapping(value = "/bookable", method = RequestMethod.GET)

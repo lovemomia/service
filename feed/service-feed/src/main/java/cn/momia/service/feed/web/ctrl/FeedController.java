@@ -14,6 +14,8 @@ import cn.momia.service.feed.base.Feed;
 import cn.momia.service.feed.base.FeedService;
 import cn.momia.service.feed.base.FeedTag;
 import cn.momia.service.feed.star.FeedStarService;
+import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +86,7 @@ public class FeedController extends BaseController {
             UserDto user = usersMap.get(feed.getUserId());
             if (user == null) continue;
 
-            feedDtos.add(buildFeedDto(feed, user, staredFeedIds.contains(feed.getId())));
+            feedDtos.add(buildFeedDto(userId, feed, user, staredFeedIds.contains(feed.getId())));
         }
 
         PagedList<FeedDto> pagedFeedDtos = new PagedList(totalCount, start, count);
@@ -93,7 +95,7 @@ public class FeedController extends BaseController {
         return pagedFeedDtos;
     }
 
-    private FeedDto buildFeedDto(Feed feed, UserDto user, boolean stared) {
+    private FeedDto buildFeedDto(long userId, Feed feed, UserDto user, boolean stared) {
         FeedDto feedDto = new FeedDto();
         feedDto.setId(feed.getId());
         feedDto.setType(feed.getType());
@@ -112,7 +114,7 @@ public class FeedController extends BaseController {
         feedDto.setOfficial(feed.getOfficial() > 0);
         feedDto.setUserId(user.getId());
         feedDto.setAvatar(user.getAvatar());
-        feedDto.setNickName(user.getNickName());
+        feedDto.setNickName(feed.getOfficial() > 0 ? "官方帐号" : user.getNickName());
         feedDto.setChildren(formatChildren(user.getChildren()));
         feedDto.setStared(stared);
 
@@ -128,6 +130,18 @@ public class FeedController extends BaseController {
 
         return formatedChildren;
     }
+    
+    @RequestMapping(value = "/user", method = RequestMethod.GET)
+    public MomiaHttpResponse listFeedsOfUser(@RequestParam(value = "uid") long userId,
+                                             @RequestParam int start,
+                                             @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount =feedService.queryCountByUser(userId);
+        List<Feed> feeds = feedService.queryByUser(userId, start, count);
+
+        return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(userId, feeds, totalCount, start, count));
+    }
 
     @RequestMapping(value = "/course", method = RequestMethod.GET)
     public MomiaHttpResponse queryByCourse(@RequestParam(value = "uid") long userId,
@@ -140,6 +154,11 @@ public class FeedController extends BaseController {
         List<Feed> feeds = feedService.queryByCourse(courseId, start, count);
 
         return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(userId, feeds, totalCount, start, count));
+    }
+
+    @RequestMapping(value = "/official", method = RequestMethod.GET)
+    public MomiaHttpResponse isOfficialUser(@RequestParam(value = "uid") long userId) {
+        return MomiaHttpResponse.SUCCESS(feedService.isOfficialUser(userId));
     }
 
     @RequestMapping(value = "/tag", method = RequestMethod.GET)
@@ -171,38 +190,41 @@ public class FeedController extends BaseController {
         return feedTagDto;
     }
 
-    @RequestMapping(value = "/tag", method = RequestMethod.POST)
-    public MomiaHttpResponse addTag(@RequestParam(value = "uid") long userId, @RequestParam(value = "name") String tagName) {
-        FeedTag feedTag = feedService.query(tagName);
-        if (feedTag.exists()) return MomiaHttpResponse.SUCCESS(buildFeedTagDto(feedTag));
-
-        long tagId = feedService.addTag(userId, tagName);
-        if (tagId <= 0) return MomiaHttpResponse.FAILED("添加标签失败");
-
-        feedTag = new FeedTag();
-        feedTag.setId(tagId);
-        feedTag.setName(tagName);
-
-        return MomiaHttpResponse.SUCCESS(buildFeedTagDto(feedTag));
-    }
-
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     public MomiaHttpResponse add(@RequestBody Feed feed) {
         if (feed.getImgs() != null && feed.getImgs().size() > 9) return MomiaHttpResponse.FAILED("上传的图片过多，1次最多上传9张图片");
+
+        long tagId = feed.getTagId();
+        String tagName = feed.getTagName();
+        if (tagId <= 0 && !StringUtils.isBlank(tagName)) {
+            tagId = addTag(feed.getUserId(), tagName);
+            feed.setTagId(tagId);
+        }
+
+        boolean isOfficialUser = feedService.isOfficialUser(feed.getUserId());
+        if (isOfficialUser) feed.setOfficial(1);
 
         long feedId = feedService.add(feed);
         if (feedId <= 0) return MomiaHttpResponse.FAILED("发表Feed失败");
 
         try {
             // TODO 异步推送
-            List<Long> followedIds = feedService.getFollowedIds(feed.getUserId());
-            followedIds.add(feed.getUserId());
+            List<Long> followedIds = isOfficialUser ? Lists.newArrayList(0L) : feedService.getFollowedIds(feed.getUserId());
+            if (!isOfficialUser) followedIds.add(feed.getUserId());
             feedService.push(feedId, followedIds);
         } catch (Exception e) {
             LOGGER.error("fail to push feed: {}", feed.getId());
         }
 
         return MomiaHttpResponse.SUCCESS;
+    }
+
+    private long addTag(long userId, String tagName) {
+        FeedTag feedTag = feedService.query(tagName);
+        if (feedTag.exists()) return feedTag.getId();
+
+        long tagId = feedService.addTag(userId, tagName);
+        return tagId > 0 ? tagId : 0;
     }
 
     @RequestMapping(value = "/{fid}", method = RequestMethod.GET)
@@ -215,7 +237,7 @@ public class FeedController extends BaseController {
 
         boolean stared = userId > 0 && feedStarService.isStared(userId, feedId);
 
-        return MomiaHttpResponse.SUCCESS(buildFeedDto(feed, feedUser, stared));
+        return MomiaHttpResponse.SUCCESS(buildFeedDto(userId, feed, feedUser, stared));
     }
 
     @RequestMapping(value = "/{fid}", method = RequestMethod.DELETE)

@@ -5,7 +5,12 @@ import java.util.List;
 public class Subject {
     public static class Type {
         public static final int NORMAL = 1;
-        public static final int FREE = 2;
+        public static final int TRIAL = 2;
+    }
+
+    public static class Status {
+        public static final int OK = 1;
+        public static final int SOLD_OUT = 2;
     }
 
     public static final Subject NOT_EXIST_SUBJECT = new Subject();
@@ -17,6 +22,7 @@ public class Subject {
     private String tags;
     private String intro;
     private String notice;
+    private int stock;
     private List<SubjectImage> imgs;
     private List<SubjectSku> skus;
 
@@ -74,6 +80,14 @@ public class Subject {
 
     public void setNotice(String notice) {
         this.notice = notice;
+    }
+
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
     }
 
     public List<SubjectImage> getImgs() {

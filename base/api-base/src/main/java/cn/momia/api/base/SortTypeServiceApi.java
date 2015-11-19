@@ -11,7 +11,7 @@ import java.util.List;
 
 public class SortTypeServiceApi extends ServiceApi {
     public List<SortTypeDto> listAll() {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("sorttype"));
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/sorttype"));
         return CastUtil.toList((JSON) executeRequest(request), SortTypeDto.class);
     }
 }

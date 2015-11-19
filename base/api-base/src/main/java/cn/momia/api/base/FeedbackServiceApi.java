@@ -10,7 +10,7 @@ public class FeedbackServiceApi extends ServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("content", content)
                 .add("contact", contact);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("feedback"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/feedback"), builder.build());
 
         return (Boolean) executeRequest(request);
     }

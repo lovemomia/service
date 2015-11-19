@@ -33,9 +33,16 @@ public class UserController extends UserRelatedController {
         return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL, false));
     }
 
-    @RequestMapping(value = "/{uid}/exists", method = RequestMethod.GET)
-    public MomiaHttpResponse exist(@PathVariable(value = "uid") long userId) {
-        return MomiaHttpResponse.SUCCESS(userService.exists(userId));
+    @RequestMapping(value = "/mobile", method = RequestMethod.GET)
+    public MomiaHttpResponse getByMobile(@RequestParam String mobile) {
+        User user = userService.getByMobile(mobile);
+        return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL, false));
+    }
+
+    @RequestMapping(value = "/invite", method = RequestMethod.GET)
+    public MomiaHttpResponse getByInviteCode(@RequestParam(value = "invite") String inviteCode) {
+        User user = userService.getByInviteCode(inviteCode);
+        return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL, false));
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
@@ -92,6 +99,18 @@ public class UserController extends UserRelatedController {
         if (!successful) return MomiaHttpResponse.FAILED("更新用户头像失败");
 
         user.setAvatar(avatar);
+        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
+    }
+
+    @RequestMapping(value = "/cover", method = RequestMethod.PUT)
+    public MomiaHttpResponse updateCover(@RequestParam String utoken, @RequestParam String cover) {
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
+
+        boolean successful = userService.updateCover(user.getId(), cover);
+        if (!successful) return MomiaHttpResponse.FAILED("更新用户封面图失败");
+
+        user.setCover(cover);
         return MomiaHttpResponse.SUCCESS(buildUserDto(user));
     }
 
@@ -176,8 +195,7 @@ public class UserController extends UserRelatedController {
     }
 
     @RequestMapping(value = "/{uid}/payed", method = RequestMethod.POST)
-    public MomiaHttpResponse payed(@PathVariable(value = "uid") long userId) {
-        userService.payed(userId);
-        return MomiaHttpResponse.SUCCESS;
+    public MomiaHttpResponse setPayed(@PathVariable(value = "uid") long userId) {
+        return MomiaHttpResponse.SUCCESS(userService.setPayed(userId));
     }
 }

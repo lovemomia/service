@@ -18,6 +18,7 @@ public class SubjectDto {
     private String region;
     private String intro;
     private JSONArray notice;
+    private int status;
     private List<String> imgs;
 
     public long getId() {
@@ -114,6 +115,14 @@ public class SubjectDto {
 
     public void setNotice(JSONArray notice) {
         this.notice = notice;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public List<String> getImgs() {

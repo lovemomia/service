@@ -1,6 +1,6 @@
 package cn.momia.service.course.subject.impl;
 
-import cn.momia.common.service.DbAccessService;
+import cn.momia.common.service.AbstractService;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectImage;
 import cn.momia.service.course.subject.SubjectService;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class SubjectServiceImpl extends DbAccessService implements SubjectService {
+public class SubjectServiceImpl extends AbstractService implements SubjectService {
     @Override
     public Subject get(long subjectId) {
         Set<Long> subjectIds = Sets.newHashSet(subjectId);
@@ -28,8 +28,8 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
     public List<Subject> list(Collection<Long> subjectIds) {
         if (subjectIds.isEmpty()) return new ArrayList<Subject>();
 
-        String sql = "SELECT Id, CityId, Title, Cover, Tags, Intro, Notice FROM SG_Subject WHERE Id IN (" + StringUtils.join(subjectIds, ",") + ") AND Status=1";
-        List<Subject> subjects = queryList(sql, Subject.class);
+        String sql = "SELECT Id, CityId, Title, Cover, Tags, Intro, Notice, Stock FROM SG_Subject WHERE Id IN (" + StringUtils.join(subjectIds, ",") + ") AND Status=1";
+        List<Subject> subjects = queryObjectList(sql, Subject.class);
 
         Map<Long, List<SubjectImage>> imgs = queryImgs(subjectIds);
         Map<Long, List<SubjectSku>> skus = querySkus(subjectIds);
@@ -56,7 +56,7 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
         if (subjectIds.isEmpty()) return new HashMap<Long, List<SubjectImage>>();
 
         String sql = "SELECT Id, SubjectId, Url, Width, Height FROM SG_SubjectImg WHERE SubjectId IN (" + StringUtils.join(subjectIds, ",") + ") AND Status=1";
-        List<SubjectImage> imgs = queryList(sql, SubjectImage.class);
+        List<SubjectImage> imgs = queryObjectList(sql, SubjectImage.class);
 
         final Map<Long, List<SubjectImage>> imgsMap = new HashMap<Long, List<SubjectImage>>();
         for (long subjectId : subjectIds) {
@@ -88,15 +88,15 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
     }
 
     @Override
-    public long queryFreeCount(long cityId) {
-        String sql = "SELECT COUNT(1) FROM SG_Subject WHERE `Type`=? AND CityId=? AND Status=1";
-        return queryLong(sql, new Object[] { Subject.Type.FREE, cityId });
+    public long queryTrialCount(long cityId) {
+        String sql = "SELECT COUNT(1) FROM SG_Subject WHERE `Type`=? AND CityId=? AND Stock>0 AND Status=1";
+        return queryLong(sql, new Object[] { Subject.Type.TRIAL, cityId });
     }
 
     @Override
-    public List<Subject> queryFree(long cityId, int start, int count) {
-        String sql = "SELECT Id FROM SG_Subject WHERE `Type`=? AND CityId=? AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
-        List<Long> subjectIds = queryLongList(sql, new Object[] { Subject.Type.FREE, cityId, start, count });
+    public List<Subject> queryTrial(long cityId, int start, int count) {
+        String sql = "SELECT Id FROM SG_Subject WHERE `Type`=? AND CityId=? AND Stock>0 AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
+        List<Long> subjectIds = queryLongList(sql, new Object[] { Subject.Type.TRIAL, cityId, start, count });
 
         return list(subjectIds);
     }
@@ -114,7 +114,7 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
         if (skuIds.isEmpty()) return new ArrayList<SubjectSku>();
 
         String sql = "SELECT Id, SubjectId, `Desc`, Price, OriginalPrice, Adult, Child, CourseCount, Time, TimeUnit, `Limit` FROM SG_SubjectSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status=1";
-        List<SubjectSku> skus = queryList(sql, SubjectSku.class);
+        List<SubjectSku> skus = queryObjectList(sql, SubjectSku.class);
 
         Map<Long, SubjectSku> skusMap = new HashMap<Long, SubjectSku>();
         for (SubjectSku sku : skus) {
@@ -139,8 +139,20 @@ public class SubjectServiceImpl extends DbAccessService implements SubjectServic
     }
 
     @Override
-    public boolean isForNewUser(long subjectId) {
+    public boolean isTrial(long subjectId) {
         String sql = "SELECT Type FROM SG_Subject WHERE Id=?";
-        return queryInt(sql, new Object[] { subjectId }) == Subject.Type.FREE;
+        return queryInt(sql, new Object[] { subjectId }) == Subject.Type.TRIAL;
+    }
+
+    @Override
+    public boolean increaseStock(long subjectId, int count) {
+        String sql = "UPDATE SG_Subject SET Stock=Stock+? WHERE Id=? AND Status=1";
+        return update(sql, new Object[] { count, subjectId });
+    }
+
+    @Override
+    public boolean decreaseStock(long subjectId, int count) {
+        String sql = "UPDATE SG_Subject SET Stock=Stock-? WHERE Id=? AND Stock>=? AND Status=1";
+        return update(sql, new Object[] { count, subjectId, count });
     }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 public class CourseComment {
     private long id;
     private long userId;
+    private long bookingId;
     private long courseId;
     private int star;
     private int teacher;
@@ -28,6 +29,14 @@ public class CourseComment {
 
     public void setUserId(long userId) {
         this.userId = userId;
+    }
+
+    public long getBookingId() {
+        return bookingId;
+    }
+
+    public void setBookingId(long bookingId) {
+        this.bookingId = bookingId;
     }
 
     public long getCourseId() {

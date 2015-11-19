@@ -31,9 +31,9 @@ import cn.momia.service.course.base.Institution;
 import cn.momia.service.course.base.Teacher;
 import cn.momia.service.course.favorite.Favorite;
 import cn.momia.service.course.favorite.FavoriteService;
-import cn.momia.service.course.subject.order.Order;
-import cn.momia.service.course.subject.order.OrderPackage;
-import cn.momia.service.course.subject.order.OrderService;
+import cn.momia.service.course.order.Order;
+import cn.momia.service.course.order.OrderPackage;
+import cn.momia.service.course.order.OrderService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Splitter;
@@ -68,6 +68,8 @@ public class CourseController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(CourseController.class);
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final DateFormat MONTH_DATE_FORMAT = new SimpleDateFormat("MM月dd日");
+    private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
     private static final Splitter POS_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
 
     @Autowired private CourseService courseService;
@@ -141,7 +143,10 @@ public class CourseController extends BaseController {
         List<CourseSkuPlace> places = new ArrayList<CourseSkuPlace>();
         Map<Integer, CourseSkuPlace> placesMap = new HashMap<Integer, CourseSkuPlace>();
         Map<Integer, List<CourseSku>> skusGroupedByPlace = new HashMap<Integer, List<CourseSku>>();
+        Date now = new Date();
         for (CourseSku sku : skus) {
+            if (!sku.isAvaliable(now)) continue;
+
             CourseSkuPlace place = sku.getPlace();
             if (place == null) continue;
 
@@ -200,35 +205,40 @@ public class CourseController extends BaseController {
     }
 
     private String buildPlaceScheduler(List<CourseSku> skus) {
+        CourseSku earliestSku = null;
         Date now = new Date();
-        List<Date> times = new ArrayList<Date>();
         for (CourseSku sku : skus) {
             if (sku.isAvaliable(now)) {
-                times.add(sku.getStartTime());
-                times.add(sku.getEndTime());
+                if (earliestSku == null) {
+                    earliestSku = sku;
+                } else {
+                    if (sku.getStartTime().before(earliestSku.getStartTime())) earliestSku = sku;
+                }
             }
         }
-        Collections.sort(times);
 
-        return format(times);
+        return format(earliestSku);
     }
 
-    private String format(List<Date> times) {
-        if (times.isEmpty()) return "";
-        Date start = times.get(0);
-        return DATE_FORMAT.format(start) + " " + TimeUtil.getWeekDay(start);
+    private String format(CourseSku sku) {
+        if (sku == null) return "";
+
+        Date start = sku.getStartTime();
+        Date end = sku.getEndTime();
+
+        if (TimeUtil.isSameDay(start, end)) {
+            return MONTH_DATE_FORMAT.format(start) + " " + TimeUtil.getWeekDay(start) +  " " + TIME_FORMAT.format(start) + "-" + TIME_FORMAT.format(end);
+        } else {
+            return MONTH_DATE_FORMAT.format(start) + " " + TIME_FORMAT.format(start) + "-" + MONTH_DATE_FORMAT.format(end) + " " + TIME_FORMAT.format(end);
+        }
     }
 
-    @RequestMapping(value = "/query", method = RequestMethod.GET)
-    public MomiaHttpResponse query(@RequestParam(value = "suid") int subjectId,
-                                   @RequestParam(value = "min", required = false, defaultValue = "0") int minAge,
-                                   @RequestParam(value = "max", required = false, defaultValue = "0") int maxAge,
-                                   @RequestParam(value = "sort", required = false, defaultValue = "0") int sortTypeId,
-                                   @RequestParam int start,
-                                   @RequestParam int count) {
-        // TODO filter and sort
-        long totalCount = courseService.queryCountBySubject(subjectId);
-        List<Course> courses = courseService.queryBySubject(subjectId, start, count);
+    @RequestMapping(value = "/finished/list", method = RequestMethod.GET)
+    public MomiaHttpResponse listFinished(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = userId <= 0 ? courseService.listFinishedCount() : courseService.listFinishedCount(userId);
+        List<Course> courses = userId <= 0 ? courseService.listFinished(start, count) : courseService.listFinished(userId, start, count);
         PagedList<CourseDto> pagedCourseDtos = buildPagedCourseDtos(courses, totalCount, start, count);
 
         return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
@@ -249,6 +259,22 @@ public class CourseController extends BaseController {
         }
 
         return courseDtos;
+    }
+
+    @RequestMapping(value = "/query", method = RequestMethod.GET)
+    public MomiaHttpResponse query(@RequestParam(value = "suid") long subjectId,
+                                   @RequestParam(value = "pid", required = false, defaultValue = "0") long packageId,
+                                   @RequestParam(value = "min", required = false, defaultValue = "1") int minAge,
+                                   @RequestParam(value = "max", required = false, defaultValue = "100") int maxAge,
+                                   @RequestParam(value = "sort", required = false, defaultValue = "0") int sortTypeId,
+                                   @RequestParam int start,
+                                   @RequestParam int count) {
+        List<Long> courseIds = courseService.queryBookedCourseIds(packageId);
+        long totalCount = courseService.queryCountBySubject(subjectId, courseIds, minAge, maxAge);
+        List<Course> courses = courseService.queryBySubject(subjectId, start, count, courseIds, minAge, maxAge, sortTypeId);
+        PagedList<CourseDto> pagedCourseDtos = buildPagedCourseDtos(courses, totalCount, start, count);
+
+        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
     }
 
     @RequestMapping(value = "/{coid}/detail", method = RequestMethod.GET)
@@ -360,7 +386,7 @@ public class CourseController extends BaseController {
         for (CourseSku sku : skus) {
             CourseSkuDto courseSkuDto = new CourseSkuDto();
             courseSkuDto.setId(sku.getId());
-            courseSkuDto.setTime(sku.getStartTime());
+            courseSkuDto.setTime(formatSkuTime(sku));
             courseSkuDto.setPlace(buildCoursePlaceDto(sku.getPlace()));
             courseSkuDto.setStock(sku.getUnlockedStock());
 
@@ -368,6 +394,19 @@ public class CourseController extends BaseController {
         }
 
         return courseSkuDtos;
+    }
+
+    private String formatSkuTime(CourseSku sku) {
+        if (sku == null) return "";
+
+        Date start = sku.getStartTime();
+        Date end = sku.getEndTime();
+
+        if (TimeUtil.isSameDay(start, end)) {
+            return TimeUtil.getAmPm(start) + " " + TIME_FORMAT.format(start) + "-" + TimeUtil.getAmPm(end) + " " + TIME_FORMAT.format(end);
+        } else {
+            return MONTH_DATE_FORMAT.format(start) + " " + TimeUtil.getAmPm(start) + " " + TIME_FORMAT.format(start) + "-" + MONTH_DATE_FORMAT.format(end) + " " + TimeUtil.getAmPm(end) + " " + TIME_FORMAT.format(end);
+        }
     }
 
     private CoursePlaceDto buildCoursePlaceDto(CourseSkuPlace place) {
@@ -426,12 +465,14 @@ public class CourseController extends BaseController {
     }
 
     private List<BookedCourseDto> buildBookedCourseDtos(long userId, List<BookedCourse> bookedCourses) {
+        Set<Long> bookingIds = new HashSet<Long>();
         Set<Long> courseIds = new HashSet<Long>();
         for (BookedCourse bookedCourse : bookedCourses) {
+            bookingIds.add(bookedCourse.getId());
             courseIds.add(bookedCourse.getCourseId());
         }
 
-        Set<Long> commentCourseIds = Sets.newHashSet(courseService.queryCommentedCourseIds(userId, courseIds));
+        Set<Long> commentBookingIds = Sets.newHashSet(courseService.queryCommentedBookingIds(userId, bookingIds));
         List<Course> courses = courseService.list(courseIds);
         Map<Long, Course> coursesMap = new HashMap<Long, Course>();
         for (Course course : courses) {
@@ -447,7 +488,7 @@ public class CourseController extends BaseController {
 
             BookedCourseDto bookedCourseDto = new BookedCourseDto();
             bookedCourseDto.setBookingId(bookedCourse.getId());
-            if (commentCourseIds.contains(course.getId())) bookedCourseDto.setCommented(true);
+            if (commentBookingIds.contains(bookedCourse.getId())) bookedCourseDto.setCommented(true);
             setFieldValue(bookedCourseDto, course);
             bookedCourseDto.setScheduler(course.getScheduler(bookedCourse.getCourseSkuId()));
 
@@ -475,9 +516,9 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(pagedBookedCourseDtos);
     }
 
-    @RequestMapping(value = "/{coid}/finished", method = RequestMethod.GET)
+    @RequestMapping(value = "/{coid}/joined", method = RequestMethod.GET)
     public MomiaHttpResponse finished(@RequestParam(value = "uid") long userId, @PathVariable(value = "coid") long courseId) {
-        return MomiaHttpResponse.SUCCESS(courseService.finished(userId, courseId));
+        return MomiaHttpResponse.SUCCESS(courseService.joined(userId, courseId));
     }
 
     @RequestMapping(value = "/booking", method = RequestMethod.POST)
@@ -545,8 +586,8 @@ public class CourseController extends BaseController {
         if (comment.isInvalid()) return MomiaHttpResponse.BAD_REQUEST;
         if (StringUtils.isBlank(comment.getContent())) return MomiaHttpResponse.FAILED("评论内容不能为空");
 
-        if (!courseService.finished(comment.getUserId(), comment.getCourseId())) return MomiaHttpResponse.FAILED("你还没有上过这门课，无法评论");
-        if (courseService.isCommented(comment.getUserId(), comment.getCourseId())) return MomiaHttpResponse.FAILED("一堂课只能发表一次评论");
+        if (!courseService.finished(comment.getUserId(), comment.getBookingId(), comment.getCourseId())) return MomiaHttpResponse.FAILED("你还没有上过这门课，无法评论");
+        if (courseService.isCommented(comment.getUserId(), comment.getBookingId())) return MomiaHttpResponse.FAILED("一堂课只能发表一次评论");
         if (comment.getImgs() != null && comment.getImgs().size() > 9) return MomiaHttpResponse.FAILED("上传的图片过多，1条评论最多上传9张图片");
 
         return MomiaHttpResponse.SUCCESS(courseService.comment(comment));

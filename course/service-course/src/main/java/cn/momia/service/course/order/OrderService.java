@@ -1,4 +1,4 @@
-package cn.momia.service.course.subject.order;
+package cn.momia.service.course.order;
 
 import java.util.Collection;
 import java.util.List;
@@ -8,6 +8,7 @@ public interface OrderService {
     Order get(long orderId);
     List<Order> list(Collection<Long> orderIds);
     boolean delete(long userId, long orderId);
+    boolean refund(long userId, long orderId);
 
     long queryCountByUser(long userId, int status);
     List<Order> queryByUser(long userId, int status, int start, int count);
@@ -25,5 +26,6 @@ public interface OrderService {
     boolean decreaseBookableCount(long packageId);
     boolean increaseBookableCount(long packageId);
 
+    boolean hasTrialOrder(long userId);
     int getBoughtCount(long userId, long skuId);
 }

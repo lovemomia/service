@@ -26,12 +26,15 @@ public abstract class UserRelatedController extends BaseController {
     }
 
     protected UserDto buildUserDto(User user, int type, boolean showToken) {
+        if (!user.exists()) return UserDto.NOT_EXIST_USER;
+
         UserDto userDto = new UserDto();
         switch (type) {
             case User.Type.FULL:
-                userDto.setChildren(buildUserDtos(user.getChildren()));
+                userDto.setChildren(buildChildDtos(user.getChildren()));
             case User.Type.BASE:
                 userDto.setMobile(MobileUtil.encrypt(user.getMobile()));
+                userDto.setCover(user.getCover());
                 userDto.setName(user.getName());
                 userDto.setSex(user.getSex());
                 userDto.setBirthday(user.getBirthday());
@@ -39,6 +42,7 @@ public abstract class UserRelatedController extends BaseController {
                 userDto.setRegionId(user.getRegionId());
                 userDto.setAddress(user.getAddress());
                 userDto.setPayed(user.getPayed() == 1);
+                userDto.setInviteCode(user.getInviteCode());
                 if (showToken) userDto.setToken(user.getToken());
             case User.Type.MINI:
                 userDto.setId(user.getId());
@@ -50,7 +54,7 @@ public abstract class UserRelatedController extends BaseController {
         return userDto;
     }
 
-    protected List<ChildDto> buildUserDtos(List<Child> children) {
+    protected List<ChildDto> buildChildDtos(List<Child> children) {
         List<ChildDto> childDtos = new ArrayList<ChildDto>();
         for (Child child : children) {
             childDtos.add(buildChildDto(child));

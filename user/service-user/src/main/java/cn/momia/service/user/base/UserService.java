@@ -5,16 +5,18 @@ import java.util.Date;
 import java.util.List;
 
 public interface UserService {
+    boolean exists(String field, String value);
     long add(String nickName, String mobile, String password);
 
-    boolean exists(long userId);
     User get(long userId);
-    List<User> list(Collection<Long> userIds);
     User getByToken(String token);
     User getByMobile(String mobile);
+    User getByInviteCode(String inviteCode);
+    List<User> list(Collection<Long> userIds);
 
     boolean updateNickName(long userId, String nickName);
     boolean updateAvatar(long userId, String avatar);
+    boolean updateCover(long userId, String cover);
     boolean updateName(long userId, String name);
     boolean updateSex(long userId, String sex);
     boolean updateBirthday(long userId, Date birthday);
@@ -25,5 +27,5 @@ public interface UserService {
     boolean validatePassword(String mobile, String password);
     boolean updatePassword(long userId, String mobile, String password);
 
-    void payed(long userId);
+    boolean setPayed(long userId);
 }

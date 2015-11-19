@@ -30,7 +30,7 @@
         <property name="propagationBehaviorName" value="PROPAGATION_REQUIRED"/>
     </bean>
 
-    <bean id="dbAccessService" class="cn.momia.common.service.DbAccessService" abstract="true">
+    <bean id="dbAccessService" class="cn.momia.common.service.AbstractService" abstract="true">
         <property name="jdbcTemplate" ref="jdbcTemplate" />
         <property name="transactionTemplate" ref="transactionTemplate" />
     </bean>

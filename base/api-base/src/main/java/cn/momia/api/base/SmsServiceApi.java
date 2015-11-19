@@ -8,7 +8,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 public class SmsServiceApi extends ServiceApi {
     public boolean send(String mobile) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("mobile", mobile);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("sms/send"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/sms/send"), builder.build());
 
         return (Boolean) executeRequest(request);
     }
@@ -17,7 +17,7 @@ public class SmsServiceApi extends ServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("mobile", mobile)
                 .add("code", code);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("sms/verify"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/sms/verify"), builder.build());
 
         return (Boolean) executeRequest(request);
     }
@@ -26,7 +26,7 @@ public class SmsServiceApi extends ServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("mobile", mobile)
                 .add("msg", msg);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("sms/notify"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/sms/notify"), builder.build());
 
         return (Boolean) executeRequest(request);
     }

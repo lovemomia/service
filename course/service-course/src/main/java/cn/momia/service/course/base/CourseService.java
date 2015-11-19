@@ -16,8 +16,8 @@ public interface CourseService {
     long queryTeacherCount(long courseId);
     List<Teacher> queryTeachers(long courseId, int start, int count);
 
-    long queryCountBySubject(int subjectId);
-    List<Course> queryBySubject(int subjectId, int start, int count);
+    long queryCountBySubject(long subjectId, Collection<Long> exclusions, int minAge, int maxAge);
+    List<Course> queryBySubject(long subjectId, int start, int count, Collection<Long> exclusions, int minAge, int maxAge, int sortTypeId);
 
     List<Course> queryAllBySubject(long subjectId);
     Map<Long, List<Course>> queryAllBySubjects(Collection<Long> subjectIds);
@@ -32,6 +32,11 @@ public interface CourseService {
 
     BookedCourse getBookedCourse(long bookingId);
 
+    long listFinishedCount();
+    List<Course> listFinished(int start, int count);
+    long listFinishedCount(long userId);
+    List<Course> listFinished(long userId, int start, int count);
+
     long queryNotFinishedCountByUser(long userId);
     List<BookedCourse> queryNotFinishedByUser(long userId, int start, int count);
     long queryFinishedCountByUser(long userId);
@@ -39,6 +44,8 @@ public interface CourseService {
 
     Map<Long, Integer> queryBookedCourseCounts(Set<Long> orderIds);
     Map<Long, Integer> queryFinishedCourseCounts(Set<Long> orderIds);
+
+    List<Long> queryBookedCourseIds(long packageId);
 
     boolean booked(long packageId, long courseId);
     long booking(long userId, long orderId, long packageId, CourseSku sku);
@@ -51,8 +58,10 @@ public interface CourseService {
 
     boolean matched(long subjectId, long courseId);
 
-    boolean finished(long userId, long courseId);
-    boolean isCommented(long userId, long courseId);
+    boolean joined(long userId, long courseId);
+
+    boolean finished(long userId, long bookingId, long courseId);
+    boolean isCommented(long userId, long bookingId);
     boolean comment(CourseComment comment);
 
     long queryCommentCountByCourse(long courseId);
@@ -60,5 +69,5 @@ public interface CourseService {
     long queryCommentCountBySubject(long subjectId);
     List<CourseComment> queryCommentsBySubject(long subjectId, int start, int count);
 
-    List<Long> queryCommentedCourseIds(long userId, Collection<Long> courseIds);
+    List<Long> queryCommentedBookingIds(long userId, Collection<Long> courseIds);
 }

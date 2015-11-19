@@ -109,6 +109,6 @@ public class ChildController extends UserRelatedController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
-        return MomiaHttpResponse.SUCCESS(buildUserDtos(user.getChildren()));
+        return MomiaHttpResponse.SUCCESS(buildChildDtos(user.getChildren()));
     }
 }

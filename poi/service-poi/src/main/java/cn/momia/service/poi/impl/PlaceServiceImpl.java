@@ -1,6 +1,6 @@
 package cn.momia.service.poi.impl;
 
-import cn.momia.common.service.DbAccessService;
+import cn.momia.common.service.AbstractService;
 import cn.momia.service.poi.Place;
 import cn.momia.service.poi.PlaceImage;
 import cn.momia.service.poi.PlaceService;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class PlaceServiceImpl extends DbAccessService implements PlaceService {
+public class PlaceServiceImpl extends AbstractService implements PlaceService {
     @Override
     public Place get(int placeId) {
         Set<Integer> placeIds = Sets.newHashSet(placeId);
@@ -28,7 +28,7 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
         if (placeIds.isEmpty()) return new ArrayList<Place>();
 
         String sql = "SELECT Id, CityId, RegionId, Name, Address, `Desc`, Cover, Lng, Lat FROM SG_Place WHERE Id IN (" + StringUtils.join(placeIds, ",") + ") AND Status=1";
-        List<Place> places = queryList(sql, Place.class);
+        List<Place> places = queryObjectList(sql, Place.class);
 
         Map<Integer, List<PlaceImage>> placeImgsMap = queryImgs(placeIds);
         for (Place place : places) {
@@ -42,7 +42,7 @@ public class PlaceServiceImpl extends DbAccessService implements PlaceService {
         if (placeIds.isEmpty()) return new HashMap<Integer, List<PlaceImage>>();
 
         String sql = "SELECT Id, PlaceId, Url, Width, Height FROM SG_PlaceImg WHERE PlaceId IN (" + StringUtils.join(placeIds, ",") + ") AND Status=1 ORDER BY AddTime DESC";
-        List<PlaceImage> imgs = queryList(sql, PlaceImage.class);
+        List<PlaceImage> imgs = queryObjectList(sql, PlaceImage.class);
 
         Map<Integer, List<PlaceImage>> imgsMap = new HashMap<Integer, List<PlaceImage>>();
         for (int placeId : placeIds) {

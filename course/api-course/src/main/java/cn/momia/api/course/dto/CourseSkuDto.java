@@ -1,12 +1,8 @@
 package cn.momia.api.course.dto;
 
-import com.alibaba.fastjson.annotation.JSONField;
-
-import java.util.Date;
-
 public class CourseSkuDto {
     private long id;
-    private Date time;
+    private String time;
     private CoursePlaceDto place;
     private int stock;
 
@@ -18,12 +14,11 @@ public class CourseSkuDto {
         this.id = id;
     }
 
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    public Date getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(String time) {
         this.time = time;
     }
 

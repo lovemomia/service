@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 
 public class UserDto {
+    public static final UserDto NOT_EXIST_USER = new UserDto();
+
     public static class Type {
         public static final int MINI = 1;
         public static final int BASE = 2;
@@ -17,6 +19,7 @@ public class UserDto {
     private String avatar;
 
     private String mobile;
+    private String cover;
     private String name;
     private String sex;
     private Date birthday;
@@ -24,6 +27,7 @@ public class UserDto {
     private Integer regionId;
     private String address;
     private Boolean payed;
+    private String inviteCode;
 
     private String token;
 
@@ -59,6 +63,14 @@ public class UserDto {
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
     }
 
     public String getName() {
@@ -116,6 +128,14 @@ public class UserDto {
 
     public void setPayed(Boolean payed) {
         this.payed = payed;
+    }
+
+    public String getInviteCode() {
+        return inviteCode;
+    }
+
+    public void setInviteCode(String inviteCode) {
+        this.inviteCode = inviteCode;
     }
 
     public String getToken() {

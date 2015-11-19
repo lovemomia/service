@@ -1,7 +1,7 @@
 package cn.momia.service.user.base.impl;
 
 import cn.momia.common.api.exception.MomiaFailedException;
-import cn.momia.common.service.DbAccessService;
+import cn.momia.common.service.AbstractService;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.user.base.User;
@@ -13,7 +13,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import java.security.MessageDigest;
@@ -28,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class UserServiceImpl extends DbAccessService implements UserService {
+public class UserServiceImpl extends AbstractService implements UserService {
     private ChildService childService;
 
     public void setChildService(ChildService childService) {
@@ -36,12 +35,14 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
-    public long add(final String nickName, final String mobile, final String password) {
-        if (exists("nickName", nickName)) throw new MomiaFailedException("昵称已存在，不能使用");
-        if (exists("mobile", mobile)) throw new MomiaFailedException("手机号已经注册过");
+    public boolean exists(String field, String value) {
+        String sql = "SELECT COUNT(1) FROM SG_User WHERE " + field + "=?";
+        return queryInt(sql, new Object[] { value }) > 0;
+    }
 
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(new PreparedStatementCreator() {
+    @Override
+    public long add(final String nickName, final String mobile, final String password) {
+        KeyHolder keyHolder = insert(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 String sql = "INSERT INTO SG_User(NickName, Mobile, Password, Token, InviteCode, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
@@ -54,14 +55,9 @@ public class UserServiceImpl extends DbAccessService implements UserService {
 
                 return ps;
             }
-        }, keyHolder);
+        });
 
         return keyHolder.getKey().longValue();
-    }
-
-    private boolean exists(String field, String value) {
-        String sql = "SELECT COUNT(1) FROM SG_User WHERE " + field + "=?";
-        return queryInt(sql, new Object[] { value }) > 0;
     }
 
     private String encryptPassword(String mobile, String password, String secretKey) {
@@ -87,32 +83,11 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
-    public boolean exists(long userId) {
-        String sql = "SELECT COUNT(1) FROM SG_User WHERE Id=? AND Status=1";
-        return queryInt(sql, new Object[] { userId }) > 0;
-    }
-
-    @Override
     public User get(long userId) {
         Set<Long> userIds = Sets.newHashSet(userId);
         List<User> users = list(userIds);
 
         return users.isEmpty() ? User.NOT_EXIST_USER : users.get(0);
-    }
-
-    @Override
-    public List<User> list(Collection<Long> userIds) {
-        if (userIds.isEmpty()) return new ArrayList<User>();
-
-        String sql = "SELECT Id, NickName, Avatar, Mobile, Name, Sex, Birthday, CityId, RegionId, Address, Payed, Token FROM SG_User WHERE Id IN (" + StringUtils.join(userIds, ",") + ") AND Status=1";
-        List<User> users = queryList(sql, User.class);
-
-        Map<Long, List<Child>> childrenMap = childService.queryByUsers(userIds);
-        for (User user : users) {
-            user.setChildren(childrenMap.get(user.getId()));
-        }
-
-        return users;
     }
 
     @Override
@@ -134,6 +109,30 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
+    public User getByInviteCode(String inviteCode) {
+        String sql = "SELECT Id FROM SG_User WHERE InviteCode=? AND Status=1";
+        List<Long> userIds = queryLongList(sql, new Object[] { inviteCode });
+        List<User> users = list(userIds);
+
+        return userIds.isEmpty() ? User.NOT_EXIST_USER : users.get(0);
+    }
+
+    @Override
+    public List<User> list(Collection<Long> userIds) {
+        if (userIds.isEmpty()) return new ArrayList<User>();
+
+        String sql = "SELECT Id, NickName, Avatar, Mobile, Cover, Name, Sex, Birthday, CityId, RegionId, Address, Payed, InviteCode, Token FROM SG_User WHERE Id IN (" + StringUtils.join(userIds, ",") + ") AND Status=1";
+        List<User> users = queryObjectList(sql, User.class);
+
+        Map<Long, List<Child>> childrenMap = childService.queryByUsers(userIds);
+        for (User user : users) {
+            user.setChildren(childrenMap.get(user.getId()));
+        }
+
+        return users;
+    }
+
+    @Override
     public boolean updateNickName(long userId, String nickName) {
         if (exists("nickName", nickName)) throw new MomiaFailedException("昵称已存在，不能使用");
 
@@ -145,6 +144,12 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     public boolean updateAvatar(long userId, String avatar) {
         String sql = "UPDATE SG_User SET Avatar=? WHERE Id=?";
         return update(sql, new Object[] { avatar, userId });
+    }
+
+    @Override
+    public boolean updateCover(long userId, String cover) {
+        String sql = "UPDATE SG_User SET Cover=? WHERE Id=?";
+        return update(sql, new Object[] { cover, userId });
     }
 
     @Override
@@ -196,8 +201,8 @@ public class UserServiceImpl extends DbAccessService implements UserService {
     }
 
     @Override
-    public void payed(long userId) {
-        String sql = "UPDATE SG_User SET Payed=1 WHERE Id=?";
-        update(sql, new Object[] { userId });
+    public boolean setPayed(long userId) {
+        String sql = "UPDATE SG_User SET Payed=1 WHERE Id=? AND Payed=0";
+        return update(sql, new Object[] { userId });
     }
 }
