@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.Set;
 
 public interface CourseService {
+    long queryRecommendCount(long cityId);
+    List<Course> queryRecomend(long cityId, int start, int count);
+
     Course get(long courseId);
     List<Course> list(Collection<Long> courseIds);
 

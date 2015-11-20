@@ -29,6 +29,7 @@ public class CourseDto {
 
     private CoursePlaceDto place;
 
+    private String subject;
     private Boolean favored;
 
     public long getId() {
@@ -165,6 +166,14 @@ public class CourseDto {
 
     public void setPlace(CoursePlaceDto place) {
         this.place = place;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 
     public Boolean isFavored() {

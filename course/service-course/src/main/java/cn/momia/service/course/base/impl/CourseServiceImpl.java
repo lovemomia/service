@@ -19,7 +19,6 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import java.sql.Connection;
@@ -47,6 +46,20 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
+    public long queryRecommendCount(long cityId) {
+        String sql = "SELECT COUNT(DISTINCT A.CourseId) FROM SG_CourseRecommend A INNER JOIN SG_Course B ON A.CourseId=B.Id INNER JOIN SG_Subject C ON B.SubjectId=C.Id WHERE A.Status=1 AND A.Status=1 AND C.Status=1 AND C.CityId=?";
+        return queryLong(sql, new Object[] { cityId });
+    }
+
+    @Override
+    public List<Course> queryRecomend(long cityId, int start, int count) {
+        String sql = "SELECT DISTINCT A.CourseId FROM SG_CourseRecommend A INNER JOIN SG_Course B ON A.CourseId=B.Id INNER JOIN SG_Subject C ON B.SubjectId=C.Id WHERE A.Status=1 AND A.Status=1 AND C.Status=1 AND C.CityId=? ORDER BY A.Weight DESC, A.AddTime DESC LIMIT ?,?";
+        List<Long> courseIds = queryLongList(sql, new Object[] { cityId, start, count });
+
+        return list(courseIds);
+    }
+
+    @Override
     public Course get(long courseId) {
         Collection<Long> courseIds = Sets.newHashSet(courseId);
         List<Course> courses = list(courseIds);
@@ -58,7 +71,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     public List<Course> list(Collection<Long> courseIds) {
         if (courseIds.isEmpty()) return new ArrayList<Course>();
 
-        String sql = "SELECT Id, SubjectId, Title, Cover, MinAge, MaxAge, Insurance, Joined, Price, Goal, Flow, Tips, InstitutionId FROM SG_Course WHERE Id IN (" + StringUtils.join(courseIds, ",") + ") AND Status=1";
+        String sql = "SELECT A.Id, A.SubjectId, A.Title, A.Cover, A.MinAge, A.MaxAge, A.Insurance, A.Joined, A.Price, A.Goal, A.Flow, A.Tips, A.InstitutionId, B.Title AS Subject FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Id IN (" + StringUtils.join(courseIds, ",") + ") AND A.Status=1 AND B.Status=1";
         List<Course> courses = queryObjectList(sql, Course.class);
 
         Set<Integer> institutionIds = new HashSet<Integer>();

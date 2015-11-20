@@ -41,6 +41,8 @@ public class Course implements Cloneable {
     private CourseBook book;
     private List<CourseSku> skus = new ArrayList<CourseSku>();
 
+    private String subject;
+
     public long getId() {
         return id;
     }
@@ -175,6 +177,14 @@ public class Course implements Cloneable {
 
     public void setSkus(List<CourseSku> skus) {
         this.skus = skus;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 
     @Override

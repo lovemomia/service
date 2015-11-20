@@ -20,6 +20,16 @@ import org.apache.http.client.methods.HttpUriRequest;
 import java.util.List;
 
 public class CourseServiceApi extends ServiceApi {
+    public PagedList<CourseDto> listRecommend(int cityId, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("city", cityId)
+                .add("start", start)
+                .add("count", count);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/recommend"), builder.build());
+
+        return CastUtil.toPagedList((JSON) executeRequest(request), CourseDto.class);
+    }
+
     public CourseDto get(long courseId, int type) {
         return get(courseId, "", type);
     }

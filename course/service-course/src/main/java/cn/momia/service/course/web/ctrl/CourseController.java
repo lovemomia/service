@@ -77,6 +77,44 @@ public class CourseController extends BaseController {
     @Autowired private FavoriteService favoriteService;
 
     @Autowired private UserServiceApi userServiceApi;
+    @RequestMapping(value = "/recommend", method = RequestMethod.GET)
+    public MomiaHttpResponse listRecommend(@RequestParam(value = "city") long cityId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = courseService.queryRecommendCount(cityId);
+        List<Course> courses = courseService.queryRecomend(cityId, start, count);
+
+        List<CourseDto> courseDtos = new ArrayList<CourseDto>();
+        for (Course course : courses) {
+            courseDtos.add(buildBaseCourseDto(course));
+        }
+
+        PagedList<CourseDto> pagedCourseDtos = new PagedList<CourseDto>(totalCount, start, count);
+        pagedCourseDtos.setList(courseDtos);
+
+        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
+    }
+
+    private CourseDto buildBaseCourseDto(Course course) {
+        CourseDto courseDto = new CourseDto();
+        setFieldValue(courseDto, course);
+
+        return courseDto;
+    }
+
+    private void setFieldValue(CourseDto courseDto, Course course) {
+        courseDto.setId(course.getId());
+        courseDto.setSubjectId(course.getSubjectId());
+        courseDto.setTitle(course.getTitle());
+        courseDto.setCover(course.getCover());
+        courseDto.setAge(course.getAge());
+        courseDto.setInsurance(course.getInsurance() > 0);
+        courseDto.setJoined(course.getJoined());
+        courseDto.setPrice(course.getPrice());
+        courseDto.setScheduler(course.getScheduler());
+        courseDto.setRegion(MetaUtil.getRegionName(course.getRegionId()));
+        courseDto.setSubject(course.getSubject());
+    }
 
     @RequestMapping(value = "/{coid}", method = RequestMethod.GET)
     public MomiaHttpResponse get(@PathVariable(value = "coid") long courseId,
@@ -99,26 +137,6 @@ public class CourseController extends BaseController {
         courseDto.setPlace(buildCoursePlaceDto(course.getSkus(), pos));
 
         return courseDto;
-    }
-
-    private CourseDto buildBaseCourseDto(Course course) {
-        CourseDto courseDto = new CourseDto();
-        setFieldValue(courseDto, course);
-
-        return courseDto;
-    }
-
-    private void setFieldValue(CourseDto courseDto, Course course) {
-        courseDto.setId(course.getId());
-        courseDto.setSubjectId(course.getSubjectId());
-        courseDto.setTitle(course.getTitle());
-        courseDto.setCover(course.getCover());
-        courseDto.setAge(course.getAge());
-        courseDto.setInsurance(course.getInsurance() > 0);
-        courseDto.setJoined(course.getJoined());
-        courseDto.setPrice(course.getPrice());
-        courseDto.setScheduler(course.getScheduler());
-        courseDto.setRegion(MetaUtil.getRegionName(course.getRegionId()));
     }
 
     private List<String> extractImgUrls(List<CourseImage> imgs) {
