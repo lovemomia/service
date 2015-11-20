@@ -16,7 +16,7 @@ public class FeedDto {
     private String tagName;
     private long courseId;
     private String courseTitle = "";
-    private Date addTime;
+    private String addTime;
     private String poi = "";
     private int commentCount;
     private int starCount;
@@ -100,12 +100,11 @@ public class FeedDto {
         this.courseTitle = courseTitle;
     }
 
-    @JSONField(format = "yyyy-MM-dd")
-    public Date getAddTime() {
+    public String getAddTime() {
         return addTime;
     }
 
-    public void setAddTime(Date addTime) {
+    public void setAddTime(String addTime) {
         this.addTime = addTime;
     }
 
