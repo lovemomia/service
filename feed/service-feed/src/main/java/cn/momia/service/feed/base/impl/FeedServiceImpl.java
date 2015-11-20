@@ -247,6 +247,20 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
     }
 
     @Override
+    public long queryCountBySubject(long subjectId) {
+        String sql = "SELECT COUNT(1) FROM SG_Feed WHERE SubjectId=? AND Status=1";
+        return queryLong(sql, new Object[] { subjectId });
+    }
+
+    @Override
+    public List<Feed> queryBySubject(long subjectId, int start, int count) {
+        String sql = "SELECT Id FROM SG_Feed WHERE SubjectId=? AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
+        List<Long> feedIds = queryLongList(sql, new Object[] { subjectId, start, count });
+
+        return list(feedIds);
+    }
+
+    @Override
     public long queryCountByCourse(long courseId) {
         String sql = "SELECT COUNT(1) FROM SG_Feed WHERE CourseId=? AND Status=1";
         return queryLong(sql, new Object[] { courseId });

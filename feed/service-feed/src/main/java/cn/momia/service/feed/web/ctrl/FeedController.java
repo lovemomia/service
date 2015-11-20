@@ -167,6 +167,19 @@ public class FeedController extends BaseController {
         return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(userId, feeds, totalCount, start, count));
     }
 
+    @RequestMapping(value = "/subject", method = RequestMethod.GET)
+    public MomiaHttpResponse queryBySubject(@RequestParam(value = "uid") long userId,
+                                            @RequestParam(value = "suid") long subjectId,
+                                            @RequestParam int start,
+                                            @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = feedService.queryCountBySubject(subjectId);
+        List<Feed> feeds = feedService.queryBySubject(subjectId, start, count);
+
+        return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(userId, feeds, totalCount, start, count));
+    }
+
     @RequestMapping(value = "/course", method = RequestMethod.GET)
     public MomiaHttpResponse queryByCourse(@RequestParam(value = "uid") long userId,
                                            @RequestParam(value = "coid") long courseId,
