@@ -23,6 +23,7 @@ public class CourseDto {
     private String goal;
     private String flow;
     private String tips;
+    private String notice;
     private String institution;
     private List<String> imgs;
     private CourseBookDto book;
@@ -134,6 +135,14 @@ public class CourseDto {
 
     public void setTips(String tips) {
         this.tips = tips;
+    }
+
+    public String getNotice() {
+        return notice;
+    }
+
+    public void setNotice(String notice) {
+        this.notice = notice;
     }
 
     public String getInstitution() {

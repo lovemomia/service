@@ -71,7 +71,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     public List<Course> list(Collection<Long> courseIds) {
         if (courseIds.isEmpty()) return new ArrayList<Course>();
 
-        String sql = "SELECT A.Id, A.SubjectId, A.Title, A.Cover, A.MinAge, A.MaxAge, A.Insurance, A.Joined, A.Price, A.Goal, A.Flow, A.Tips, A.InstitutionId, B.Title AS Subject FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Id IN (" + StringUtils.join(courseIds, ",") + ") AND A.Status=1 AND B.Status=1";
+        String sql = "SELECT A.Id, A.SubjectId, A.Title, A.Cover, A.MinAge, A.MaxAge, A.Insurance, A.Joined, A.Price, A.Goal, A.Flow, A.Tips, A.Notice, A.InstitutionId, B.Title AS Subject FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Id IN (" + StringUtils.join(courseIds, ",") + ") AND A.Status=1 AND B.Status=1";
         List<Course> courses = queryObjectList(sql, Course.class);
 
         Set<Integer> institutionIds = new HashSet<Integer>();

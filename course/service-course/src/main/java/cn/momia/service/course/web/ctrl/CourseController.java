@@ -131,6 +131,7 @@ public class CourseController extends BaseController {
         courseDto.setGoal(course.getGoal());
         courseDto.setFlow(course.getFlow());
         courseDto.setTips(course.getTips());
+        courseDto.setNotice(course.getNotice());
         courseDto.setInstitution(course.getInstitution());
         courseDto.setImgs(extractImgUrls(course.getImgs()));
         courseDto.setBook(buildCourseBookDto(course.getBook()));

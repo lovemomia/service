@@ -30,6 +30,10 @@ public class CourseServiceApi extends ServiceApi {
         return CastUtil.toPagedList((JSON) executeRequest(request), CourseDto.class);
     }
 
+    public CourseDto get(long courseId) {
+        return get(courseId, CourseDto.Type.FULL);
+    }
+
     public CourseDto get(long courseId, int type) {
         return get(courseId, "", type);
     }
