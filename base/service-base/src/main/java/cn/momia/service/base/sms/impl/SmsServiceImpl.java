@@ -54,7 +54,7 @@ public class SmsServiceImpl extends AbstractService implements SmsService {
     }
 
     private String getGeneratedCode(String mobile) {
-        String sql = "SELECT Code FROM SG_Verify WHERE Mobile=? AND GenerateTime>? AND Status=1";
+        String sql = "SELECT Code FROM SG_Verify WHERE Mobile=? AND GenerateTime>? AND Status<>0";
         return queryString(sql, new Object[] { mobile, new Date(new Date().getTime() - 30 * 60 * 1000) }, null);
     }
 
@@ -111,7 +111,7 @@ public class SmsServiceImpl extends AbstractService implements SmsService {
 
     @Override
     public boolean verifyCode(String mobile, String code) {
-        String sql = "SELECT COUNT(1) FROM SG_Verify WHERE Mobile=? AND Code=? AND GenerateTime>? AND Status=1";
+        String sql = "SELECT COUNT(1) FROM SG_Verify WHERE Mobile=? AND Code=? AND GenerateTime>? AND Status<>0";
         boolean successful = queryInt(sql, new Object[] { mobile, code, new Date(new Date().getTime() - 30 * 60 * 1000) }) > 0;
 
         if (successful) disable(mobile, code);

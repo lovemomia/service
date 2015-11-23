@@ -11,7 +11,7 @@ import java.util.List;
 public class FeedStarServiceImpl extends AbstractService implements FeedStarService {
     @Override
     public boolean isStared(long userId, long feedId) {
-        String sql = "SELECT COUNT(1) FROM SG_FeedStar WHERE UserId=? AND FeedId=? AND Status=1";
+        String sql = "SELECT COUNT(1) FROM SG_FeedStar WHERE UserId=? AND FeedId=? AND Status<>0";
         return queryInt(sql, new Object[] { userId, feedId }) > 0;
     }
 
@@ -19,7 +19,7 @@ public class FeedStarServiceImpl extends AbstractService implements FeedStarServ
     public List<Long> queryStaredFeeds(long userId, Collection<Long> feedIds) {
         if (feedIds.isEmpty()) return new ArrayList<Long>();
 
-        String sql = "SELECT feedId FROM SG_FeedStar WHERE UserId=? AND FeedId IN(" + StringUtils.join(feedIds, ",") + ") AND Status=1";
+        String sql = "SELECT feedId FROM SG_FeedStar WHERE UserId=? AND FeedId IN(" + StringUtils.join(feedIds, ",") + ") AND Status<>0";
         return queryLongList(sql, new Object[] { userId });
     }
 
@@ -42,19 +42,19 @@ public class FeedStarServiceImpl extends AbstractService implements FeedStarServ
 
     @Override
     public boolean delete(long userId, long feedId) {
-        String sql = "UPDATE SG_FeedStar SET Status=0 WHERE UserId=? AND FeedId=? AND Status=1";
+        String sql = "UPDATE SG_FeedStar SET Status=0 WHERE UserId=? AND FeedId=? AND Status<>0";
         return update(sql, new Object[] { userId, feedId });
     }
 
     @Override
     public int queryUserCount(long feedId) {
-        String sql = "SELECT COUNT(DISTINCT UserId) FROM SG_FeedStar WHERE FeedId=? AND Status=1";
+        String sql = "SELECT COUNT(DISTINCT UserId) FROM SG_FeedStar WHERE FeedId=? AND Status<>0";
         return queryInt(sql, new Object[] { feedId });
     }
 
     @Override
     public List<Long> queryUserIds(long feedId, int start, int count) {
-        String sql = "SELECT UserId FROM SG_FeedStar WHERE FeedId=? AND Status=1 LIMIT ?,?";
+        String sql = "SELECT UserId FROM SG_FeedStar WHERE FeedId=? AND Status<>0 LIMIT ?,?";
         return queryLongList(sql, new Object[] { feedId, start, count });
     }
 }

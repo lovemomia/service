@@ -15,19 +15,19 @@ public class FeedCommentServiceImpl extends AbstractService implements FeedComme
 
     @Override
     public boolean delete(long userId, long feedId, long commentId) {
-        String sql = "UPDATE SG_FeedComment SET Status=0 WHERE Id=? AND UserId=? AND FeedId=? AND Status=1";
+        String sql = "UPDATE SG_FeedComment SET Status=0 WHERE Id=? AND UserId=? AND FeedId=? AND Status<>0";
         return update(sql, new Object[] { commentId, userId, feedId });
     }
 
     @Override
     public int queryCount(long feedId) {
-        String sql = "SELECT COUNT(1) FROM SG_FeedComment WHERE FeedId=? AND Status=1";
+        String sql = "SELECT COUNT(1) FROM SG_FeedComment WHERE FeedId=? AND Status<>0";
         return queryInt(sql, new Object[] { feedId });
     }
 
     @Override
     public List<FeedComment> query(long feedId, int start, int count) {
-        String sql = "SELECT Id, FeedId, UserId, Content, AddTime FROM SG_FeedComment WHERE FeedId=? AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
+        String sql = "SELECT Id, FeedId, UserId, Content, AddTime FROM SG_FeedComment WHERE FeedId=? AND Status<>0 ORDER BY AddTime DESC LIMIT ?,?";
         return queryObjectList(sql, new Object[] { feedId, start, count }, FeedComment.class);
     }
 }

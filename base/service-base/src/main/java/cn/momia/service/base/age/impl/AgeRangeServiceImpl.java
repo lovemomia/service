@@ -12,7 +12,7 @@ public class AgeRangeServiceImpl extends AbstractService implements AgeRangeServ
 
     @Override
     protected void doReload() {
-        String sql = "SELECT Id, `Min`, `Max` FROM SG_AgeRange WHERE Status=1";
+        String sql = "SELECT Id, `Min`, `Max` FROM SG_AgeRange WHERE Status<>0";
         ageRangesCache = queryObjectList(sql, AgeRange.class);
     }
 

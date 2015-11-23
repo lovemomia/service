@@ -11,6 +11,7 @@ public interface CouponService {
     List<UserCoupon> query(long userId, int status, int start, int count);
 
     UserCoupon queryByOrder(long orderId);
+    UserCoupon queryUsedByOrder(long orderId);
 
     boolean preUseCoupon(long orderId, long userCouponId);
     boolean useCoupon(long orderId, long userCouponId);

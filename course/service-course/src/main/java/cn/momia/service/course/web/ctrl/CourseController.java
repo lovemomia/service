@@ -121,7 +121,7 @@ public class CourseController extends BaseController {
                                  @RequestParam String pos,
                                  @RequestParam(required = false, defaultValue = "" + Course.Type.BASE) int type) {
         Course course = courseService.get(courseId);
-        if (!course.exists()) return MomiaHttpResponse.FAILED("课程不存在");
+        if (!course.exists() || course.getStatus() != 1) return MomiaHttpResponse.FAILED("课程不存在");
 
         return MomiaHttpResponse.SUCCESS(type == Course.Type.FULL ? buildFullCourseDto(course, pos) : buildBaseCourseDto(course));
     }

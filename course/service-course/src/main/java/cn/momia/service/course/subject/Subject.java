@@ -26,6 +26,8 @@ public class Subject {
     private List<SubjectImage> imgs;
     private List<SubjectSku> skus;
 
+    private int status;
+
     public long getId() {
         return id;
     }
@@ -104,6 +106,14 @@ public class Subject {
 
     public void setSkus(List<SubjectSku> skus) {
         this.skus = skus;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public boolean exists() {

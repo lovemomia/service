@@ -92,7 +92,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
 
     @Override
     public User getByToken(String token) {
-        String sql = "SELECT Id FROM SG_User WHERE Token=? AND Status=1";
+        String sql = "SELECT Id FROM SG_User WHERE Token=? AND Status<>0";
         List<Long> userIds = queryLongList(sql, new Object[] { token });
         List<User> users = list(userIds);
 
@@ -101,7 +101,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
 
     @Override
     public User getByMobile(String mobile) {
-        String sql = "SELECT Id FROM SG_User WHERE Mobile=? AND Status=1";
+        String sql = "SELECT Id FROM SG_User WHERE Mobile=? AND Status<>0";
         List<Long> userIds = queryLongList(sql, new Object[] { mobile });
         List<User> users = list(userIds);
 
@@ -110,7 +110,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
 
     @Override
     public User getByInviteCode(String inviteCode) {
-        String sql = "SELECT Id FROM SG_User WHERE InviteCode=? AND Status=1";
+        String sql = "SELECT Id FROM SG_User WHERE InviteCode=? AND Status<>0";
         List<Long> userIds = queryLongList(sql, new Object[] { inviteCode });
         List<User> users = list(userIds);
 
@@ -121,7 +121,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
     public List<User> list(Collection<Long> userIds) {
         if (userIds.isEmpty()) return new ArrayList<User>();
 
-        String sql = "SELECT Id, NickName, Avatar, Mobile, Cover, Name, Sex, Birthday, CityId, RegionId, Address, Payed, InviteCode, Token FROM SG_User WHERE Id IN (" + StringUtils.join(userIds, ",") + ") AND Status=1";
+        String sql = "SELECT Id, NickName, Avatar, Mobile, Cover, Name, Sex, Birthday, CityId, RegionId, Address, Payed, InviteCode, Token FROM SG_User WHERE Id IN (" + StringUtils.join(userIds, ",") + ") AND Status<>0";
         List<User> users = queryObjectList(sql, User.class);
 
         Map<Long, List<Child>> childrenMap = childService.queryByUsers(userIds);

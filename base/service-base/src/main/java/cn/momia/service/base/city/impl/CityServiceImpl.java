@@ -12,7 +12,7 @@ public class CityServiceImpl extends AbstractService implements CityService {
 
     @Override
     protected void doReload() {
-        String sql = "SELECT Id, Name FROM SG_City WHERE Status=1";
+        String sql = "SELECT Id, Name FROM SG_City WHERE Status<>0";
         citiesCache = queryObjectList(sql, City.class);
     }
 

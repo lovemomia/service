@@ -151,7 +151,7 @@ public class OrderController extends BaseController {
         OrderDto orderDetailDto = buildOrderDetailDto(order, title, cover, finishedCourceCounts.get(orderId));
 
         if (order.isPayed()) {
-            UserCoupon userCoupon = couponService.queryByOrder(orderId);
+            UserCoupon userCoupon = couponService.queryUsedByOrder(orderId);
             if (userCoupon.exists()) {
                 orderDetailDto.setUserCouponId(userCoupon.getId());
                 orderDetailDto.setCouponId(userCoupon.getCouponId());

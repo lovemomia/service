@@ -12,7 +12,7 @@ public class RegionServiceImpl extends AbstractService implements RegionService 
 
     @Override
     protected void doReload() {
-        String sql = "SELECT Id, CityId, Name, ParentId FROM SG_Region WHERE Status=1";
+        String sql = "SELECT Id, CityId, Name, ParentId FROM SG_Region WHERE Status<>0";
         regionsCache = queryObjectList(sql, Region.class);
     }
 

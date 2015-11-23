@@ -28,7 +28,7 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
     public List<Subject> list(Collection<Long> subjectIds) {
         if (subjectIds.isEmpty()) return new ArrayList<Subject>();
 
-        String sql = "SELECT Id, CityId, Title, Cover, Tags, Intro, Notice, Stock FROM SG_Subject WHERE Id IN (" + StringUtils.join(subjectIds, ",") + ") AND Status=1";
+        String sql = "SELECT Id, CityId, Title, Cover, Tags, Intro, Notice, Stock, Status FROM SG_Subject WHERE Id IN (" + StringUtils.join(subjectIds, ",") + ") AND Status<>0";
         List<Subject> subjects = queryObjectList(sql, Subject.class);
 
         Map<Long, List<SubjectImage>> imgs = queryImgs(subjectIds);
@@ -55,7 +55,7 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
     private Map<Long, List<SubjectImage>> queryImgs(Collection<Long> subjectIds) {
         if (subjectIds.isEmpty()) return new HashMap<Long, List<SubjectImage>>();
 
-        String sql = "SELECT Id, SubjectId, Url, Width, Height FROM SG_SubjectImg WHERE SubjectId IN (" + StringUtils.join(subjectIds, ",") + ") AND Status=1";
+        String sql = "SELECT Id, SubjectId, Url, Width, Height FROM SG_SubjectImg WHERE SubjectId IN (" + StringUtils.join(subjectIds, ",") + ") AND Status<>0";
         List<SubjectImage> imgs = queryObjectList(sql, SubjectImage.class);
 
         final Map<Long, List<SubjectImage>> imgsMap = new HashMap<Long, List<SubjectImage>>();
@@ -113,7 +113,7 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
     public List<SubjectSku> listSkus(Collection<Long> skuIds) {
         if (skuIds.isEmpty()) return new ArrayList<SubjectSku>();
 
-        String sql = "SELECT Id, SubjectId, `Desc`, Price, OriginalPrice, Adult, Child, CourseCount, Time, TimeUnit, `Limit`, CourseId FROM SG_SubjectSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status=1";
+        String sql = "SELECT Id, SubjectId, `Desc`, Price, OriginalPrice, Adult, Child, CourseCount, Time, TimeUnit, `Limit`, CourseId FROM SG_SubjectSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status<>0";
         List<SubjectSku> skus = queryObjectList(sql, SubjectSku.class);
 
         Map<Long, SubjectSku> skusMap = new HashMap<Long, SubjectSku>();
