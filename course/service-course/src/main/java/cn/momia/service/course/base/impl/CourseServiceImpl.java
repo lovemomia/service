@@ -46,6 +46,12 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
+    public boolean isRecommended(long courseId) {
+        String sql = "SELECT COUNT(1) FROM SG_CourseRecommend WHERE CourseId=? AND Status=1";
+        return queryInt(sql, new Object[] { courseId }) > 0;
+    }
+
+    @Override
     public long queryRecommendCount(long cityId) {
         String sql = "SELECT COUNT(DISTINCT A.CourseId) FROM SG_CourseRecommend A INNER JOIN SG_Course B ON A.CourseId=B.Id INNER JOIN SG_Subject C ON B.SubjectId=C.Id WHERE A.Status=1 AND A.Status=1 AND C.Status=1 AND C.CityId=?";
         return queryLong(sql, new Object[] { cityId });
