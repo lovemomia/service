@@ -10,6 +10,8 @@ public class SubjectSkuDto {
     private int count;
     private int limit;
 
+    private long courseId;
+
     public long getId() {
         return id;
     }
@@ -56,5 +58,13 @@ public class SubjectSkuDto {
 
     public void setLimit(int limit) {
         this.limit = limit;
+    }
+
+    public long getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(long courseId) {
+        this.courseId = courseId;
     }
 }
