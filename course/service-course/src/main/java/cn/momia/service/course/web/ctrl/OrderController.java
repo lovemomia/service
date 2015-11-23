@@ -9,6 +9,7 @@ import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
+import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
@@ -146,12 +147,19 @@ public class OrderController extends BaseController {
     private PagedList<OrderPackageDto> buildPagedOrderSkuDtos(List<OrderPackage> orderPackages, long totalCount, int start, int count) {
         Set<Long> packageIds = new HashSet<Long>();
         Set<Long> orderIds = new HashSet<Long>();
+        Set<Long> courseIds = new HashSet<Long>();
         for (OrderPackage orderPackage : orderPackages) {
             packageIds.add(orderPackage.getId());
             orderIds.add(orderPackage.getOrderId());
+            if (orderPackage.getCourseId() > 0) courseIds.add(orderPackage.getCourseId());
         }
 
         Map<Long, Date> startTimes = courseService.queryStartTimesByPackages(packageIds);
+        List<Course> courses = courseService.list(courseIds);
+        Map<Long, Course> coursesMap = new HashMap<Long, Course>();
+        for (Course course : courses) {
+            coursesMap.put(course.getId(), course);
+        }
 
         List<Order> orders = orderService.list(orderIds);
         Set<Long> subjectIds = new HashSet<Long>();
@@ -192,6 +200,8 @@ public class OrderController extends BaseController {
             }
 
             orderPackageDto.setCourseId(orderPackage.getCourseId());
+            Course course = coursesMap.get(orderPackage.getCourseId());
+            if (course != null) orderPackageDto.setTitle(course.getTitle());
 
             orderPackageDtos.add(orderPackageDto);
         }
