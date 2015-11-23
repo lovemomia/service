@@ -555,6 +555,8 @@ public class CourseController extends BaseController {
         CourseSku sku = courseService.getSku(skuId);
         if (!sku.exists() || !sku.isAvaliable(new Date())) return MomiaHttpResponse.FAILED("预约失败，无效的课程地点");
 
+        if (orderPackage.getCourseId() > 0 && orderPackage.getCourseId() != sku.getCourseId()) return MomiaHttpResponse.FAILED("预约失败，课程与购买的包不匹配");
+
         Order order = orderService.get(orderPackage.getOrderId());
         UserDto user = userServiceApi.get(utoken);
         if (!order.exists() || !order.isPayed() || order.getUserId() != user.getId()) return MomiaHttpResponse.FAILED("预约失败，无效的订单");
