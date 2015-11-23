@@ -35,6 +35,13 @@ public class OrderServiceApi extends ServiceApi {
         return (Boolean) executeRequest(request);
     }
 
+    public OrderDto get(String utoken, long orderId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/order/%d", orderId), builder.build());
+
+        return CastUtil.toObject((JSON) executeRequest(request), OrderDto.class);
+    }
+
     public PagedList<OrderPackageDto> listBookable(String utoken, long orderId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)

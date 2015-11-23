@@ -1,6 +1,7 @@
 package cn.momia.service.course.order;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -141,5 +142,15 @@ public class Order {
 
     public boolean isPayed() {
         return status >= Status.PAYED;
+    }
+
+    public List<Long> getCourseIds() {
+        List<Long> courseIds = new ArrayList<Long>();
+        for (OrderPackage orderPackage : packages) {
+            if (orderPackage.getCourseId() == 0) continue;
+            courseIds.add(orderPackage.getCourseId());
+        }
+
+        return courseIds;
     }
 }

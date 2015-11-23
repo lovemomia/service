@@ -4,7 +4,6 @@ import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
-import cn.momia.service.course.subject.SubjectSku;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderService;
 import cn.momia.service.course.order.OrderPackage;
@@ -94,11 +93,6 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
             for (OrderPackage orderPackage : packages) {
                 skuIds.add(orderPackage.getSkuId());
             }
-        }
-        List<SubjectSku> skus = subjectService.listSkus(skuIds);
-        Map<Long, SubjectSku> skusMap = new HashMap<Long, SubjectSku>();
-        for (SubjectSku sku : skus) {
-            skusMap.put(sku.getId(), sku);
         }
 
         for (Order order : orders) {
