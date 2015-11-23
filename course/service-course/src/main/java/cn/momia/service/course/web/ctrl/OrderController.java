@@ -149,6 +149,7 @@ public class OrderController extends BaseController {
         }
         Map<Long, Integer> finishedCourceCounts = courseService.queryFinishedCourseCounts(Sets.newHashSet(orderId));
         OrderDto orderDetailDto = buildOrderDetailDto(order, title, cover, finishedCourceCounts.get(orderId));
+        if (courseIds.size() >= 1) orderDetailDto.setCourseId(courseIds.get(0));
 
         if (order.isPayed()) {
             UserCoupon userCoupon = couponService.queryUsedByOrder(orderId);
@@ -315,7 +316,9 @@ public class OrderController extends BaseController {
                 cover = course.getCover();
             }
 
-            orderDtos.add(buildOrderDetailDto(order, title, cover, finishedCourceCounts.get(order.getId())));
+            OrderDto orderDto = buildOrderDetailDto(order, title, cover, finishedCourceCounts.get(order.getId()));
+            if (courseId != null) orderDto.setCourseId(courseId);
+            orderDtos.add(orderDto);
         }
 
         PagedList<OrderDto> pagedOrderDtos = new PagedList<OrderDto>(totalCount, start, count);

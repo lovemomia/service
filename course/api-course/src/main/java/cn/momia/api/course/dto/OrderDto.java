@@ -7,7 +7,6 @@ import java.util.Date;
 
 public class OrderDto {
     private long id;
-    private long subjectId;
     private int count;
     private BigDecimal totalFee;
 
@@ -17,6 +16,8 @@ public class OrderDto {
     private Integer bookingStatus;
 
     // 课程体系的内容
+    private long subjectId;
+    private long courseId;
     private String title;
     private String cover;
 
@@ -33,14 +34,6 @@ public class OrderDto {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public long getSubjectId() {
-        return subjectId;
-    }
-
-    public void setSubjectId(long subjectId) {
-        this.subjectId = subjectId;
     }
 
     public int getCount() {
@@ -82,6 +75,22 @@ public class OrderDto {
 
     public void setBookingStatus(Integer bookingStatus) {
         this.bookingStatus = bookingStatus;
+    }
+
+    public long getSubjectId() {
+        return subjectId;
+    }
+
+    public void setSubjectId(long subjectId) {
+        this.subjectId = subjectId;
+    }
+
+    public long getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(long courseId) {
+        this.courseId = courseId;
     }
 
     public String getTitle() {
