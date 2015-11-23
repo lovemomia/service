@@ -107,7 +107,7 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
 
     @Override
     public UserCoupon queryUsedByOrder(long orderId) {
-        String sql = "SELECT UserCouponId FROM SG_UserCoupon WHERE OrderId=? AND Status=2";
+        String sql = "SELECT Id FROM SG_UserCoupon WHERE OrderId=? AND Status=2";
         List<Long> userCouponIds = queryLongList(sql, new Object[] { orderId });
         List<UserCoupon> userCoupons = listUserCoupons(userCouponIds);
 
