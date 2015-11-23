@@ -8,6 +8,8 @@ public class OrderPackageDto {
     private int bookableCourseCount;
     private String expireTime;
 
+    private long courseId;
+
     public long getPackageId() {
         return packageId;
     }
@@ -54,5 +56,13 @@ public class OrderPackageDto {
 
     public void setExpireTime(String expireTime) {
         this.expireTime = expireTime;
+    }
+
+    public long getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(long courseId) {
+        this.courseId = courseId;
     }
 }
