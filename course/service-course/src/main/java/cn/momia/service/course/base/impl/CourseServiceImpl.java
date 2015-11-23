@@ -268,7 +268,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public List<Teacher> queryTeachers(long courseId, int start, int count) {
-        String sql = "SELECT TeacherId FROM SG_CourseTeacher WHERE CourseId=? AND Status=<>0 LIMIT ?,?";
+        String sql = "SELECT TeacherId FROM SG_CourseTeacher WHERE CourseId=? AND Status<>0 LIMIT ?,?";
         List<Integer> teacherIds = queryIntList(sql, new Object[] { courseId, start, count });
 
         return listTeachers(teacherIds);
