@@ -14,7 +14,6 @@ import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.subject.SubjectSku;
 import cn.momia.service.course.coupon.CouponService;
-import cn.momia.service.course.coupon.UserCoupon;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderService;
 import cn.momia.service.course.order.OrderPackage;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -192,6 +190,8 @@ public class OrderController extends BaseController {
                 Date endTime = TimeUtil.add(startTime, sku.getTime(), sku.getTimeUnit());
                 orderPackageDto.setExpireTime("有效期至: " + TimeUtil.DATE_FORMAT.format(endTime));
             }
+
+            orderPackageDto.setCourseId(orderPackage.getCourseId());
 
             orderPackageDtos.add(orderPackageDto);
         }

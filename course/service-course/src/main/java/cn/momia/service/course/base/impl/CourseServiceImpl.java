@@ -366,7 +366,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         if (packageIds.isEmpty()) return new HashMap<Long, Date>();
 
         final Map<Long, Date> startTimesMap = new HashMap<Long, Date>();
-        String sql = "SELECT A.PackageId, MIN(B.StartTime) AS StartTime FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.PackageId IN (" + StringUtils.join(packageIds, ",") + ") AND A.Status=1 AND B.Status=1 GROUP BY A.PackageId";
+        String sql = "SELECT A.PackageId, MIN(B.StartTime) AS StartTime FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.PackageId IN (" + StringUtils.join(packageIds, ",") + ") AND A.Status=1 AND B.Status<>0 GROUP BY A.PackageId";
         query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -388,7 +388,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     private List<BookedCourse> listBookedCourses(Collection<Long> bookingIds) {
         if (bookingIds.isEmpty()) return new ArrayList<BookedCourse>();
 
-        String sql = "SELECT A.Id, A.UserId, A.OrderId, A.PackageId, A.CourseId, A.CourseSkuId, B.StartTime, B.EndTime FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.Id IN (" + StringUtils.join(bookingIds, ",") + ") AND A.Status=1 AND B.Status=1";
+        String sql = "SELECT A.Id, A.UserId, A.OrderId, A.PackageId, A.CourseId, A.CourseSkuId, B.StartTime, B.EndTime FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.Id IN (" + StringUtils.join(bookingIds, ",") + ") AND A.Status=1 AND B.Status<>0";
         List<BookedCourse> bookedCourses = queryObjectList(sql, BookedCourse.class);
 
         Map<Long, BookedCourse> bookedCoursesMap = new HashMap<Long, BookedCourse>();
@@ -407,13 +407,13 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public long listFinishedCount() {
-        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.ParentId=0 AND A.Status=1 AND B.StartTime<=NOW() AND B.Status=1";
+        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.ParentId=0 AND A.Status=1 AND B.StartTime<=NOW() AND B.Status<>0";
         return queryLong(sql);
     }
 
     @Override
     public List<Course> listFinished(int start, int count) {
-        String sql = "SELECT A.Id FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.ParentId=0 AND A.Status=1 AND B.StartTime<=NOW() AND B.Status=1 GROUP BY A.Id ORDER BY MAX(B.StartTime) DESC LIMIT ?,?";
+        String sql = "SELECT A.Id FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.ParentId=0 AND A.Status=1 AND B.StartTime<=NOW() AND B.Status<>0 GROUP BY A.Id ORDER BY MAX(B.StartTime) DESC LIMIT ?,?";
         List<Long> courseIds =  queryLongList(sql, new Object[] { start, count });
 
         return list(courseIds);
@@ -421,13 +421,13 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public long listFinishedCount(long userId) {
-        String sql = "SELECT COUNT(DISTINCT A.CourseId) FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status=1 AND B.StartTime<=NOW() AND B.Status=1";
+        String sql = "SELECT COUNT(DISTINCT A.CourseId) FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status=1 AND B.StartTime<=NOW() AND B.Status<>0";
         return queryLong(sql, new Object[] { userId });
     }
 
     @Override
     public List<Course> listFinished(long userId, int start, int count) {
-        String sql = "SELECT A.CourseId FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status=1 AND B.StartTime<=NOW() AND B.Status=1 GROUP BY A.CourseId ORDER BY MAX(B.StartTime) DESC LIMIT ?,?";
+        String sql = "SELECT A.CourseId FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status=1 AND B.StartTime<=NOW() AND B.Status<>0 GROUP BY A.CourseId ORDER BY MAX(B.StartTime) DESC LIMIT ?,?";
         List<Long> courseIds =  queryLongList(sql, new Object[] { userId, start, count });
 
         return list(courseIds);
@@ -435,13 +435,13 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public long queryNotFinishedCountByUser(long userId) {
-        String sql = "SELECT COUNT(1) FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status=1 AND B.StartTime>NOW() AND B.Status=1";
+        String sql = "SELECT COUNT(1) FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status=1 AND B.StartTime>NOW() AND B.Status<>0";
         return queryLong(sql, new Object[] { userId });
     }
 
     @Override
     public List<BookedCourse> queryNotFinishedByUser(long userId, int start, int count) {
-        String sql = "SELECT A.Id FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status=1 AND B.StartTime>NOW() AND B.Status=1 ORDER BY B.StartTime ASC LIMIT ?,?";
+        String sql = "SELECT A.Id FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status=1 AND B.StartTime>NOW() AND B.Status<>0 ORDER BY B.StartTime ASC LIMIT ?,?";
         List<Long> bookingIds = queryLongList(sql, new Object[] { userId, start, count });
 
         return listBookedCourses(bookingIds);
@@ -449,13 +449,13 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public long queryFinishedCountByUser(long userId) {
-        String sql = "SELECT COUNT(1) FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status=1 AND B.StartTime<=NOW() AND B.Status=1";
+        String sql = "SELECT COUNT(1) FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status=1 AND B.StartTime<=NOW() AND B.Status<>0";
         return queryLong(sql, new Object[] { userId });
     }
 
     @Override
     public List<BookedCourse> queryFinishedByUser(long userId, int start, int count) {
-        String sql = "SELECT A.Id FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status=1 AND B.StartTime<=NOW() AND B.Status=1 ORDER BY B.StartTime ASC LIMIT ?,?";
+        String sql = "SELECT A.Id FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status=1 AND B.StartTime<=NOW() AND B.Status<>0 ORDER BY B.StartTime ASC LIMIT ?,?";
         List<Long> bookingIds = queryLongList(sql, new Object[] { userId, start, count });
 
         return listBookedCourses(bookingIds);
@@ -490,7 +490,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         for (long orderId : orderIds) {
             map.put(orderId, 0);
         }
-        String sql = "SELECT A.OrderId, COUNT(1) AS Count FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.OrderId IN (" + StringUtils.join(orderIds, ",") + ") AND A.Status=1 AND B.EndTime<=NOW() AND B.Status=1 GROUP BY A.OrderId";
+        String sql = "SELECT A.OrderId, COUNT(1) AS Count FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.OrderId IN (" + StringUtils.join(orderIds, ",") + ") AND A.Status=1 AND B.EndTime<=NOW() AND B.Status<>0 GROUP BY A.OrderId";
         query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -575,13 +575,13 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public boolean joined(long userId, long courseId) {
-        String sql = "SELECT COUNT(1) FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.CourseId=? AND A.Status=1 AND B.StartTime<=NOW() AND B.Status=1";
+        String sql = "SELECT COUNT(1) FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.CourseId=? AND A.Status=1 AND B.StartTime<=NOW() AND B.Status<>0";
         return queryInt(sql, new Object[] { userId, courseId }) > 0;
     }
 
     @Override
     public boolean finished(long userId, long bookingId, long courseId) {
-        String sql = "SELECT COUNT(1) FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Id=? AND A.CourseId=? AND A.Status=1 AND B.StartTime<=NOW() AND B.Status=1";
+        String sql = "SELECT COUNT(1) FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Id=? AND A.CourseId=? AND A.Status=1 AND B.StartTime<=NOW() AND B.Status<>0";
         return queryInt(sql, new Object[] { userId, bookingId, courseId }) > 0;
     }
 

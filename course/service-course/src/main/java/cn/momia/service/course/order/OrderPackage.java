@@ -12,6 +12,8 @@ public class OrderPackage {
     private int courseCount;
     private int bookableCount;
 
+    private long courseId;
+
     public long getId() {
         return id;
     }
@@ -58,6 +60,14 @@ public class OrderPackage {
 
     public void setBookableCount(int bookableCount) {
         this.bookableCount = bookableCount;
+    }
+
+    public long getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(long courseId) {
+        this.courseId = courseId;
     }
 
     public boolean exists() {
