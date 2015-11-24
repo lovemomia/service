@@ -33,6 +33,8 @@ public class CourseDto {
     private String subject;
     private Boolean favored;
 
+    private Boolean buyable;
+
     public long getId() {
         return id;
     }
@@ -191,5 +193,13 @@ public class CourseDto {
 
     public void setFavored(Boolean favored) {
         this.favored = favored;
+    }
+
+    public Boolean isBuyable() {
+        return buyable;
+    }
+
+    public void setBuyable(Boolean buyable) {
+        this.buyable = buyable;
     }
 }

@@ -88,6 +88,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         Map<Long, List<CourseImage>> imgsMap = queryImgs(courseIds);
         Map<Long, CourseBook> booksMap = queryBooks(courseIds);
         Map<Long, List<CourseSku>> skusMap = querySkus(courseIds);
+        Map<Long, Boolean> buyablesMap = queryBuyables(courseIds);
 
         for (Course course : courses) {
             Institution institution = institutionsMap.get(course.getInstitutionId());
@@ -95,6 +96,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
             course.setImgs(imgsMap.get(course.getId()));
             course.setBook(booksMap.get(course.getId()));
             course.setSkus(skusMap.get(course.getId()));
+            course.setBuyable(buyablesMap.get(course.getId()));
         }
 
         Map<Long, Course> coursesMap = new HashMap<Long, Course>();
@@ -246,6 +248,23 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         courseSkuPlace.setLat(place.getLat());
 
         return courseSkuPlace;
+    }
+
+    private Map<Long, Boolean> queryBuyables(Collection<Long> courseIds) {
+        if (courseIds.isEmpty()) return new HashMap<Long, Boolean>();
+
+        Map<Long, Boolean> buyablesMap = new HashMap<Long, Boolean>();
+        for (long courseId : courseIds) {
+            buyablesMap.put(courseId, false);
+        }
+
+        String sql = "SELECT CourseId FROM SG_SubjectSku WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND CourseId>0 AND Status=1";
+        List<Long> buyableCourseIds = queryLongList(sql);
+        for (long courseId : buyableCourseIds) {
+            buyablesMap.put(courseId, true);
+        }
+
+        return buyablesMap;
     }
 
     @Override
