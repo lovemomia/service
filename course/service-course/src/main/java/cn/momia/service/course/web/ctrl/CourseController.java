@@ -114,6 +114,7 @@ public class CourseController extends BaseController {
         courseDto.setScheduler(course.getScheduler());
         courseDto.setRegion(MetaUtil.getRegionName(course.getRegionId()));
         courseDto.setSubject(course.getSubject());
+        courseDto.setBuyable(course.isBuyable());
     }
 
     @RequestMapping(value = "/{coid}", method = RequestMethod.GET)
