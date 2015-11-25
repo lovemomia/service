@@ -89,7 +89,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         Map<Long, List<CourseImage>> imgsMap = queryImgs(courseIds);
         Map<Long, CourseBook> booksMap = queryBooks(courseIds);
         Map<Long, List<CourseSku>> skusMap = querySkus(courseIds);
-        Map<Long, Boolean> buyablesMap = queryBuyables(courseIds);
+        Map<Long, BigDecimal> buyablesMap = queryBuyables(courseIds);
 
         for (Course course : courses) {
             Institution institution = institutionsMap.get(course.getInstitutionId());
@@ -97,7 +97,12 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
             course.setImgs(imgsMap.get(course.getId()));
             course.setBook(booksMap.get(course.getId()));
             course.setSkus(skusMap.get(course.getId()));
-            course.setBuyable(buyablesMap.get(course.getId()));
+
+            BigDecimal price = buyablesMap.get(course.getId());
+            if (price.compareTo(new BigDecimal(0)) > 0) {
+                course.setPrice(price);
+                course.setBuyable(true);
+            }
         }
 
         Map<Long, Course> coursesMap = new HashMap<Long, Course>();
@@ -251,19 +256,23 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         return courseSkuPlace;
     }
 
-    private Map<Long, Boolean> queryBuyables(Collection<Long> courseIds) {
-        if (courseIds.isEmpty()) return new HashMap<Long, Boolean>();
+    private Map<Long, BigDecimal> queryBuyables(Collection<Long> courseIds) {
+        if (courseIds.isEmpty()) return new HashMap<Long, BigDecimal>();
 
-        Map<Long, Boolean> buyablesMap = new HashMap<Long, Boolean>();
+        final Map<Long, BigDecimal> buyablesMap = new HashMap<Long, BigDecimal>();
         for (long courseId : courseIds) {
-            buyablesMap.put(courseId, false);
+            buyablesMap.put(courseId, new BigDecimal(0));
         }
 
-        String sql = "SELECT CourseId FROM SG_SubjectSku WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND CourseId>0 AND Status=1";
-        List<Long> buyableCourseIds = queryLongList(sql);
-        for (long courseId : buyableCourseIds) {
-            buyablesMap.put(courseId, true);
-        }
+        String sql = "SELECT CourseId, Price FROM SG_SubjectSku WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND CourseId>0 AND Status=1";
+        query(sql, null, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                long courseId = rs.getLong("CourseId");
+                BigDecimal price = rs.getBigDecimal("Price");
+                buyablesMap.put(courseId, price);
+            }
+        });
 
         return buyablesMap;
     }
@@ -747,11 +756,5 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
         String sql = "SELECT BookingId FROM SG_CourseComment WHERE UserId=? AND BookingId IN (" + StringUtils.join(bookingIds, ",") + ")";
         return queryLongList(sql, new Object[] { userId });
-    }
-
-    @Override
-    public BigDecimal getSoldPrice(long courseId) {
-        String sql = "SELECT MIN(Price) FROM SG_SubjectSku WHERE CourseId=? AND Status=1";
-        return queryObject(sql, new Object[] { courseId }, BigDecimal.class, new BigDecimal(0));
     }
 }
