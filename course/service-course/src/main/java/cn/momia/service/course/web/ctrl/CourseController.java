@@ -49,6 +49,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -137,6 +138,11 @@ public class CourseController extends BaseController {
         courseDto.setImgs(extractImgUrls(course.getImgs()));
         courseDto.setBook(buildCourseBookDto(course.getBook()));
         courseDto.setPlace(buildCoursePlaceDto(course.getSkus(), pos));
+
+        if (course.isBuyable()) {
+            BigDecimal soldPrice = courseService.getSoldPrice(course.getId());
+            if (soldPrice.compareTo(new BigDecimal(0)) > 0) courseDto.setPrice(soldPrice);
+        }
 
         return courseDto;
     }

@@ -1,5 +1,6 @@
 package cn.momia.service.course.base;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -74,4 +75,6 @@ public interface CourseService {
     List<CourseComment> queryCommentsBySubject(long subjectId, int start, int count);
 
     List<Long> queryCommentedBookingIds(long userId, Collection<Long> courseIds);
+
+    BigDecimal getSoldPrice(long courseId);
 }

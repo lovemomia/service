@@ -21,6 +21,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.support.KeyHolder;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -746,5 +747,11 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
         String sql = "SELECT BookingId FROM SG_CourseComment WHERE UserId=? AND BookingId IN (" + StringUtils.join(bookingIds, ",") + ")";
         return queryLongList(sql, new Object[] { userId });
+    }
+
+    @Override
+    public BigDecimal getSoldPrice(long courseId) {
+        String sql = "SELECT MIN(Price) FROM SG_SubjectSku WHERE CourseId=? AND Status=1";
+        return queryObject(sql, new Object[] { courseId }, BigDecimal.class, new BigDecimal(0));
     }
 }
