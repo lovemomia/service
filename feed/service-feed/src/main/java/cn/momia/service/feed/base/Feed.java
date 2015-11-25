@@ -14,7 +14,7 @@ public class Feed {
     private String tagName;
     private long subjectId;
     private long courseId;
-    private String courseTitle;
+    private String courseTitle = "";
     private double lng;
     private double lat;
     private int commentCount;
