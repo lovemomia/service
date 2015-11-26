@@ -67,6 +67,20 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
+    public long queryTrialCount(long cityId) {
+        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Status=1 AND B.Status=1 AND B.CityId=? AND B.Type=2";
+        return queryLong(sql, new Object[] { cityId });
+    }
+
+    @Override
+    public List<Course> queryTrial(long cityId, int start, int count) {
+        String sql = "SELECT DISTINCT A.Id FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Status=1 AND B.Status=1 AND B.CityId=? AND B.Type=2 ORDER BY A.Joined DESC, A.AddTime DESC LIMIT ?,?";
+        List<Long> courseIds = queryLongList(sql, new Object[] { cityId, start, count });
+
+        return list(courseIds);
+    }
+
+    @Override
     public Course get(long courseId) {
         Collection<Long> courseIds = Sets.newHashSet(courseId);
         List<Course> courses = list(courseIds);

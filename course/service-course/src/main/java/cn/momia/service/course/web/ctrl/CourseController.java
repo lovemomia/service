@@ -121,6 +121,24 @@ public class CourseController extends BaseController {
         courseDto.setBuyable(course.isBuyable());
     }
 
+    @RequestMapping(value = "/trial", method = RequestMethod.GET)
+    public MomiaHttpResponse listTrialCourses(@RequestParam(value = "city") long cityId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = courseService.queryTrialCount(cityId);
+        List<Course> courses = courseService.queryTrial(cityId, start, count);
+
+        List<CourseDto> courseDtos = new ArrayList<CourseDto>();
+        for (Course course : courses) {
+            courseDtos.add(buildBaseCourseDto(course));
+        }
+
+        PagedList<CourseDto> pagedCourseDtos = new PagedList<CourseDto>(totalCount, start, count);
+        pagedCourseDtos.setList(courseDtos);
+
+        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
+    }
+
     @RequestMapping(value = "/{coid}", method = RequestMethod.GET)
     public MomiaHttpResponse get(@PathVariable(value = "coid") long courseId,
                                  @RequestParam String pos,

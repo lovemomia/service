@@ -11,6 +11,9 @@ public interface CourseService {
     long queryRecommendCount(long cityId);
     List<Course> queryRecomend(long cityId, int start, int count);
 
+    long queryTrialCount(long cityId);
+    List<Course> queryTrial(long cityId, int start, int count);
+
     Course get(long courseId);
     List<Course> list(Collection<Long> courseIds);
 
