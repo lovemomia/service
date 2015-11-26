@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class Banner implements Serializable {
     private String cover;
     private String action;
+    private int platform;
 
     public String getCover() {
         return cover;
@@ -20,5 +21,13 @@ public class Banner implements Serializable {
 
     public void setAction(String action) {
         this.action = action;
+    }
+
+    public int getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(int platform) {
+        this.platform = platform;
     }
 }

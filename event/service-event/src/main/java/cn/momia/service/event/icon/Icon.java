@@ -4,6 +4,7 @@ public class Icon {
     private String title;
     private String img;
     private String action;
+    private int platform;
 
     public String getTitle() {
         return title;
@@ -27,5 +28,13 @@ public class Icon {
 
     public void setAction(String action) {
         this.action = action;
+    }
+
+    public int getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(int platform) {
+        this.platform = platform;
     }
 }
