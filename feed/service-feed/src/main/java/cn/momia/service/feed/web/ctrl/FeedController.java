@@ -122,7 +122,7 @@ public class FeedController extends BaseController {
         feedDto.setOfficial(feed.getOfficial() > 0);
         feedDto.setUserId(user.getId());
         feedDto.setAvatar(user.getAvatar());
-        feedDto.setNickName(feed.getOfficial() > 0 ? "官方帐号" : user.getNickName());
+        feedDto.setNickName(user.getNickName());
         feedDto.setChildren(formatChildren(user.getChildren()));
         feedDto.setStared(stared);
 
