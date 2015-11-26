@@ -177,12 +177,12 @@ public class OrderController extends BaseController {
         long totalCount = orderId > 0 ? orderService.queryBookableCountByUserAndOrder(user.getId(), orderId) : orderService.queryBookableCountByUser(user.getId());
         List<OrderPackage> orderPackages = orderId > 0 ? orderService.queryBookableByUserAndOrder(user.getId(), orderId, start, count) : orderService.queryBookableByUser(user.getId(), start, count);
 
-        PagedList<OrderPackageDto> pagedOrderSkuDtos = buildPagedOrderSkuDtos(orderPackages, totalCount, start, count);
+        PagedList<OrderPackageDto> pagedOrderPackageDtos = buildPagedOrderPackageDtos(orderPackages, totalCount, start, count);
 
-        return MomiaHttpResponse.SUCCESS(pagedOrderSkuDtos);
+        return MomiaHttpResponse.SUCCESS(pagedOrderPackageDtos);
     }
 
-    private PagedList<OrderPackageDto> buildPagedOrderSkuDtos(List<OrderPackage> orderPackages, long totalCount, int start, int count) {
+    private PagedList<OrderPackageDto> buildPagedOrderPackageDtos(List<OrderPackage> orderPackages, long totalCount, int start, int count) {
         Set<Long> packageIds = new HashSet<Long>();
         Set<Long> orderIds = new HashSet<Long>();
         Set<Long> courseIds = new HashSet<Long>();
@@ -239,7 +239,10 @@ public class OrderController extends BaseController {
 
             orderPackageDto.setCourseId(orderPackage.getCourseId());
             Course course = coursesMap.get(orderPackage.getCourseId());
-            if (course != null) orderPackageDto.setTitle(course.getTitle());
+            if (course != null) {
+                orderPackageDto.setCover(course.getCover());
+                orderPackageDto.setTitle(course.getTitle());
+            }
 
             orderPackageDtos.add(orderPackageDto);
         }
