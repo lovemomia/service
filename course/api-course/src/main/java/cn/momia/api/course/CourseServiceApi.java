@@ -61,11 +61,6 @@ public class CourseServiceApi extends ServiceApi {
         return CastUtil.toObject((JSON) executeRequest(request), CourseDto.class);
     }
 
-    public boolean isBuyable(long courseId) {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/buyable", courseId));
-        return (Boolean) executeRequest(request);
-    }
-
     public PagedList<CourseDto> listFinished(long userId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)

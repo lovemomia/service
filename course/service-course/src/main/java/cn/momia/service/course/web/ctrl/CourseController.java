@@ -275,11 +275,6 @@ public class CourseController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/{coid}/buyable", method = RequestMethod.GET)
-    public MomiaHttpResponse buyable(@PathVariable(value = "coid") long courseId) {
-        return MomiaHttpResponse.SUCCESS(courseService.isRecommended(courseId));
-    }
-
     @RequestMapping(value = "/finished/list", method = RequestMethod.GET)
     public MomiaHttpResponse listFinished(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
