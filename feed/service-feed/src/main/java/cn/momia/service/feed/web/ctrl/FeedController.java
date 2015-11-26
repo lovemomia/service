@@ -26,7 +26,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,6 +41,10 @@ import java.util.Set;
 @RequestMapping("/feed")
 public class FeedController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(FeedController.class);
+
+    public static final DateFormat YEAR_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM-dd");
+    public static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
 
     @Autowired private FeedService feedService;
     @Autowired private FeedStarService feedStarService;
@@ -86,7 +94,7 @@ public class FeedController extends BaseController {
             UserDto user = usersMap.get(feed.getUserId());
             if (user == null) continue;
 
-            feedDtos.add(buildFeedDto(userId, feed, user, staredFeedIds.contains(feed.getId())));
+            feedDtos.add(buildFeedDto(feed, user, staredFeedIds.contains(feed.getId())));
         }
 
         PagedList<FeedDto> pagedFeedDtos = new PagedList(totalCount, start, count);
@@ -95,7 +103,7 @@ public class FeedController extends BaseController {
         return pagedFeedDtos;
     }
 
-    private FeedDto buildFeedDto(long userId, Feed feed, UserDto user, boolean stared) {
+    private FeedDto buildFeedDto(Feed feed, UserDto user, boolean stared) {
         FeedDto feedDto = new FeedDto();
         feedDto.setId(feed.getId());
         feedDto.setType(feed.getType());
@@ -107,7 +115,7 @@ public class FeedController extends BaseController {
         feedDto.setCourseId(feed.getCourseId());
         feedDto.setCourseTitle(feed.getCourseTitle());
 
-        feedDto.setAddTime(feed.getAddTime());
+        feedDto.setAddTime(formatAddTime(feed.getAddTime()));
         feedDto.setPoi(feed.getLng() + ":" + feed.getLat());
         feedDto.setCommentCount(feed.getCommentCount());
         feedDto.setStarCount(feed.getStarCount());
@@ -119,6 +127,22 @@ public class FeedController extends BaseController {
         feedDto.setStared(stared);
 
         return feedDto;
+    }
+
+    private String formatAddTime(Date addTime) {
+        Calendar calendar = Calendar.getInstance();
+        int curYear = calendar.get(Calendar.YEAR);
+        int curMonth = calendar.get(Calendar.MONTH);
+        int curDay = calendar.get(Calendar.DATE);
+
+        calendar.setTime(addTime);
+        int addYear = calendar.get(Calendar.YEAR);
+        int addMonth = calendar.get(Calendar.MONTH);
+        int addDay = calendar.get(Calendar.DATE);
+
+        if (addYear != curYear) return YEAR_DATE_FORMAT.format(addTime);
+        if (addMonth != curMonth || addDay != curDay) return DATE_FORMAT.format(addTime);
+        return TIME_FORMAT.format(addTime);
     }
 
     private List<String> formatChildren(List<ChildDto> children) {
@@ -139,6 +163,19 @@ public class FeedController extends BaseController {
 
         long totalCount =feedService.queryCountByUser(userId);
         List<Feed> feeds = feedService.queryByUser(userId, start, count);
+
+        return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(userId, feeds, totalCount, start, count));
+    }
+
+    @RequestMapping(value = "/subject", method = RequestMethod.GET)
+    public MomiaHttpResponse queryBySubject(@RequestParam(value = "uid") long userId,
+                                            @RequestParam(value = "suid") long subjectId,
+                                            @RequestParam int start,
+                                            @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = feedService.queryCountBySubject(subjectId);
+        List<Feed> feeds = feedService.queryBySubject(subjectId, start, count);
 
         return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(userId, feeds, totalCount, start, count));
     }
@@ -237,7 +274,7 @@ public class FeedController extends BaseController {
 
         boolean stared = userId > 0 && feedStarService.isStared(userId, feedId);
 
-        return MomiaHttpResponse.SUCCESS(buildFeedDto(userId, feed, feedUser, stared));
+        return MomiaHttpResponse.SUCCESS(buildFeedDto(feed, feedUser, stared));
     }
 
     @RequestMapping(value = "/{fid}", method = RequestMethod.DELETE)

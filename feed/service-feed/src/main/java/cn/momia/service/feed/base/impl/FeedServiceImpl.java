@@ -31,7 +31,7 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
 
     @Override
     public boolean isFollowed(long ownUserId, long otherUserId) {
-        String sql = "SELECT COUNT(1) FROM SG_UserFollow WHERE UserId=? AND FollowedId=? AND Status=1";
+        String sql = "SELECT COUNT(1) FROM SG_UserFollow WHERE UserId=? AND FollowedId=? AND Status<>0";
         return queryInt(sql, new Object[] { ownUserId, otherUserId }) > 0;
     }
 
@@ -43,7 +43,7 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
 
     @Override
     public boolean isOfficialUser(long userId) {
-        String sql = "SELECT COUNT(1) FROM SG_FeedOfficialUser WHERE UserId=? AND Status=1";
+        String sql = "SELECT COUNT(1) FROM SG_FeedOfficialUser WHERE UserId=? AND Status<>0";
         return queryInt(sql, new Object[] { userId }) > 0;
     }
 
@@ -95,7 +95,7 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
         if (tagId <= 0) return;
 
         try {
-            String sql = "UPDATE SG_FeedTag SET RefCount=RefCount+1 WHERE Id=? AND Status=1";
+            String sql = "UPDATE SG_FeedTag SET RefCount=RefCount+1 WHERE Id=? AND Status<>0";
             update(sql, new Object[] { tagId });
         } catch (Exception e) {
             LOGGER.error("fail to increase tag ref count of tag: {}", tagId, e);
@@ -123,7 +123,7 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
     private List<Feed> list(Collection<Long> feedIds) {
         if (feedIds.isEmpty()) return new ArrayList<Feed>();
 
-        String sql = "SELECT Id,`Type`, UserId, Content, TagId, SubjectId, CourseId, CourseTitle, Lng, Lat, CommentCount, StarCount, Official, AddTime FROM SG_Feed WHERE Id IN (" + StringUtils.join(feedIds, ",") + ") AND Status=1";
+        String sql = "SELECT Id, `Type`, UserId, Content, TagId, SubjectId, CourseId, CourseTitle, Lng, Lat, CommentCount, StarCount, Official, AddTime FROM SG_Feed WHERE Id IN (" + StringUtils.join(feedIds, ",") + ") AND Status<>0";
         List<Feed> feeds = queryObjectList(sql, Feed.class);
 
         Set<Long> tagIds = new HashSet<Long>();
@@ -157,7 +157,7 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
             imgs.put(feedId, new ArrayList<String>());
         }
 
-        String sql = "SELECT FeedId, Url FROM SG_FeedImg WHERE FeedId IN (" + StringUtils.join(feedIds, ",") + ") AND Status=1";
+        String sql = "SELECT FeedId, Url FROM SG_FeedImg WHERE FeedId IN (" + StringUtils.join(feedIds, ",") + ") AND Status<>0";
         query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -174,7 +174,7 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
         if (tagIds.isEmpty()) return new HashMap<Long, String>();
 
         final Map<Long, String> tagNamesMap = new HashMap<Long, String>();
-        String sql = "SELECT Id, Name FROM SG_FeedTag WHERE id IN (" + StringUtils.join(tagIds, ",") + ") AND Status=1";
+        String sql = "SELECT Id, Name FROM SG_FeedTag WHERE id IN (" + StringUtils.join(tagIds, ",") + ") AND Status<>0";
         query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -200,19 +200,19 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
 
     @Override
     public List<Long> getFollowedIds(long userId) {
-        String sql = "SELECT FollowedId FROM SG_UserFollow WHERE UserId=? AND Status=1";
+        String sql = "SELECT FollowedId FROM SG_UserFollow WHERE UserId=? AND Status<>0";
         return queryLongList(sql, new Object[] { userId });
     }
 
     @Override
     public long queryFollowedCountByUser(long userId) {
-        String sql = "SELECT COUNT(1) FROM SG_FeedFollow WHERE (UserId=? OR UserId=0) AND Status=1";
+        String sql = "SELECT COUNT(1) FROM SG_FeedFollow WHERE (UserId=? OR UserId=0) AND Status<>0";
         return queryLong(sql, new Object[] { userId });
     }
 
     @Override
     public List<Feed> queryFollowedByUser(long userId, int start, int count) {
-        String sql = "SELECT FeedId FROM SG_FeedFollow WHERE (UserId=? OR UserId=0) AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
+        String sql = "SELECT FeedId FROM SG_FeedFollow WHERE (UserId=? OR UserId=0) AND Status<>0 ORDER BY AddTime DESC LIMIT ?,?";
         List<Long> feedIds = queryLongList(sql, new Object[] { userId, start, count });
 
         return list(feedIds);
@@ -220,13 +220,13 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
 
     @Override
     public long queryOfficialFeedsCount() {
-        String sql = "SELECT COUNT(1) FROM SG_Feed WHERE Official=1 AND Status=1";
+        String sql = "SELECT COUNT(1) FROM SG_Feed WHERE Official=1 AND Status<>0";
         return queryLong(sql, null);
     }
 
     @Override
     public List<Feed> queryOfficialFeeds(int start, int count) {
-        String sql = "SELECT Id FROM SG_Feed WHERE Official=1 AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
+        String sql = "SELECT Id FROM SG_Feed WHERE Official=1 AND Status<>0 ORDER BY AddTime DESC LIMIT ?,?";
         List<Long> feedIds = queryLongList(sql, new Object[] { start, count });
 
         return list(feedIds);
@@ -234,27 +234,41 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
 
     @Override
     public long queryCountByUser(long userId) {
-        String sql = "SELECT COUNT(1) FROM SG_Feed WHERE UserId=? AND Status=1";
+        String sql = "SELECT COUNT(1) FROM SG_Feed WHERE UserId=? AND Status<>0";
         return queryLong(sql, new Object[] { userId });
     }
 
     @Override
     public List<Feed> queryByUser(long userId, int start, int count) {
-        String sql = "SELECT Id FROM SG_Feed WHERE UserId=? AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
+        String sql = "SELECT Id FROM SG_Feed WHERE UserId=? AND Status<>0 ORDER BY AddTime DESC LIMIT ?,?";
         List<Long> feedIds = queryLongList(sql, new Object[] { userId, start, count });
 
         return list(feedIds);
     }
 
     @Override
+    public long queryCountBySubject(long subjectId) {
+        String sql = "SELECT COUNT(1) FROM SG_Feed WHERE SubjectId=? AND Status<>0";
+        return queryLong(sql, new Object[] { subjectId });
+    }
+
+    @Override
+    public List<Feed> queryBySubject(long subjectId, int start, int count) {
+        String sql = "SELECT Id FROM SG_Feed WHERE SubjectId=? AND Status<>0 ORDER BY AddTime DESC LIMIT ?,?";
+        List<Long> feedIds = queryLongList(sql, new Object[] { subjectId, start, count });
+
+        return list(feedIds);
+    }
+
+    @Override
     public long queryCountByCourse(long courseId) {
-        String sql = "SELECT COUNT(1) FROM SG_Feed WHERE CourseId=? AND Status=1";
+        String sql = "SELECT COUNT(1) FROM SG_Feed WHERE CourseId=? AND Status<>0";
         return queryLong(sql, new Object[] { courseId });
     }
 
     @Override
     public List<Feed> queryByCourse(long courseId, int start, int count) {
-        String sql = "SELECT Id FROM SG_Feed WHERE CourseId=? AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
+        String sql = "SELECT Id FROM SG_Feed WHERE CourseId=? AND Status<>0 ORDER BY AddTime DESC LIMIT ?,?";
         List<Long> feedIds = queryLongList(sql, new Object[] { courseId, start, count });
 
         return list(feedIds);
@@ -307,7 +321,7 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
 
     @Override
     public FeedTag query(String tagName) {
-        String sql = "SELECT Id, Name FROM SG_FeedTag WHERE Name=? AND Status=1";
+        String sql = "SELECT Id, Name FROM SG_FeedTag WHERE Name=? AND Status<>0";
         return queryObject(sql, new Object[] { tagName }, FeedTag.class, FeedTag.NOT_EXISTS_FEED_TAG);
     }
 
@@ -317,7 +331,7 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
     }
 
     private List<FeedTag> listTags(int recommended, int count) {
-        String sql = "SELECT Id, Name FROM SG_FeedTag WHERE Recommended=? AND Status=1 ORDER BY RefCount DESC, AddTime DESC LIMIT ?";
+        String sql = "SELECT Id, Name FROM SG_FeedTag WHERE Recommended=? AND Status<>0 ORDER BY RefCount DESC, AddTime DESC LIMIT ?";
         return queryObjectList(sql, new Object[] { recommended, count }, FeedTag.class);
     }
 

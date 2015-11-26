@@ -42,6 +42,17 @@ public class FeedServiceApi extends ServiceApi {
         return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedDto.class);
     }
 
+    public PagedList<FeedDto> queryBySubject(long userId, long subjectId, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("uid", userId)
+                .add("suid", subjectId)
+                .add("start", start)
+                .add("count", count);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/feed/subject"), builder.build());
+
+        return CastUtil.toPagedList((JSONObject) executeRequest(request), FeedDto.class);
+    }
+
     public PagedList<FeedDto> queryByCourse(long userId, long courseId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)

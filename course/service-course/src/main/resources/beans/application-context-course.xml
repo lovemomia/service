@@ -8,9 +8,7 @@
         <property name="poiServiceApi" ref="poiServiceApi" />
     </bean>
     <bean id="subjectService" class="cn.momia.service.course.subject.impl.SubjectServiceImpl" parent="dbAccessService" />
-    <bean class="cn.momia.service.course.order.impl.OrderServiceImpl" parent="dbAccessService">
-        <property name="subjectService" ref="subjectService" />
-    </bean>
+    <bean class="cn.momia.service.course.order.impl.OrderServiceImpl" parent="dbAccessService" />
     <bean class="cn.momia.service.course.coupon.impl.CouponServiceImpl" parent="dbAccessService" />
     <bean class="cn.momia.service.course.favorite.impl.FavoriteServiceImpl" parent="dbAccessService" />
 </beans>

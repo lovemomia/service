@@ -34,6 +34,8 @@ import cn.momia.service.course.favorite.FavoriteService;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderPackage;
 import cn.momia.service.course.order.OrderService;
+import cn.momia.service.course.subject.SubjectService;
+import cn.momia.service.course.subject.SubjectSku;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Splitter;
@@ -72,33 +74,29 @@ public class CourseController extends BaseController {
     private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
     private static final Splitter POS_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
 
+    @Autowired private SubjectService subjectService;
     @Autowired private CourseService courseService;
     @Autowired private OrderService orderService;
     @Autowired private FavoriteService favoriteService;
 
     @Autowired private UserServiceApi userServiceApi;
 
-    @RequestMapping(value = "/{coid}", method = RequestMethod.GET)
-    public MomiaHttpResponse get(@PathVariable(value = "coid") long courseId,
-                                 @RequestParam String pos,
-                                 @RequestParam(required = false, defaultValue = "" + Course.Type.BASE) int type) {
-        Course course = courseService.get(courseId);
-        if (!course.exists()) return MomiaHttpResponse.FAILED("课程不存在");
+    @RequestMapping(value = "/recommend", method = RequestMethod.GET)
+    public MomiaHttpResponse listRecommend(@RequestParam(value = "city") long cityId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
-        return MomiaHttpResponse.SUCCESS(type == Course.Type.FULL ? buildFullCourseDto(course, pos) : buildBaseCourseDto(course));
-    }
+        long totalCount = courseService.queryRecommendCount(cityId);
+        List<Course> courses = courseService.queryRecomend(cityId, start, count);
 
-    private CourseDto buildFullCourseDto(Course course, String pos) {
-        CourseDto courseDto = buildBaseCourseDto(course);
-        courseDto.setGoal(course.getGoal());
-        courseDto.setFlow(course.getFlow());
-        courseDto.setTips(course.getTips());
-        courseDto.setInstitution(course.getInstitution());
-        courseDto.setImgs(extractImgUrls(course.getImgs()));
-        courseDto.setBook(buildCourseBookDto(course.getBook()));
-        courseDto.setPlace(buildCoursePlaceDto(course.getSkus(), pos));
+        List<CourseDto> courseDtos = new ArrayList<CourseDto>();
+        for (Course course : courses) {
+            courseDtos.add(buildBaseCourseDto(course));
+        }
 
-        return courseDto;
+        PagedList<CourseDto> pagedCourseDtos = new PagedList<CourseDto>(totalCount, start, count);
+        pagedCourseDtos.setList(courseDtos);
+
+        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
     }
 
     private CourseDto buildBaseCourseDto(Course course) {
@@ -119,6 +117,50 @@ public class CourseController extends BaseController {
         courseDto.setPrice(course.getPrice());
         courseDto.setScheduler(course.getScheduler());
         courseDto.setRegion(MetaUtil.getRegionName(course.getRegionId()));
+        courseDto.setSubject(course.getSubject());
+        courseDto.setBuyable(course.isBuyable());
+    }
+
+    @RequestMapping(value = "/trial", method = RequestMethod.GET)
+    public MomiaHttpResponse listTrialCourses(@RequestParam(value = "city") long cityId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = courseService.queryTrialCount(cityId);
+        List<Course> courses = courseService.queryTrial(cityId, start, count);
+
+        List<CourseDto> courseDtos = new ArrayList<CourseDto>();
+        for (Course course : courses) {
+            courseDtos.add(buildBaseCourseDto(course));
+        }
+
+        PagedList<CourseDto> pagedCourseDtos = new PagedList<CourseDto>(totalCount, start, count);
+        pagedCourseDtos.setList(courseDtos);
+
+        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
+    }
+
+    @RequestMapping(value = "/{coid}", method = RequestMethod.GET)
+    public MomiaHttpResponse get(@PathVariable(value = "coid") long courseId,
+                                 @RequestParam String pos,
+                                 @RequestParam(required = false, defaultValue = "" + Course.Type.BASE) int type) {
+        Course course = courseService.get(courseId);
+        if (!course.exists() || course.getStatus() != 1) return MomiaHttpResponse.FAILED("课程不存在");
+
+        return MomiaHttpResponse.SUCCESS(type == Course.Type.FULL ? buildFullCourseDto(course, pos) : buildBaseCourseDto(course));
+    }
+
+    private CourseDto buildFullCourseDto(Course course, String pos) {
+        CourseDto courseDto = buildBaseCourseDto(course);
+        courseDto.setGoal(course.getGoal());
+        courseDto.setFlow(course.getFlow());
+        courseDto.setTips(course.getTips());
+        courseDto.setNotice(course.getNotice());
+        courseDto.setInstitution(course.getInstitution());
+        courseDto.setImgs(extractImgUrls(course.getImgs()));
+        courseDto.setBook(buildCourseBookDto(course.getBook()));
+        courseDto.setPlace(buildCoursePlaceDto(course.getSkus(), pos));
+
+        return courseDto;
     }
 
     private List<String> extractImgUrls(List<CourseImage> imgs) {
@@ -528,8 +570,19 @@ public class CourseController extends BaseController {
         OrderPackage orderPackage = orderService.getOrderPackage(packageId);
         if (!orderPackage.exists()) return MomiaHttpResponse.FAILED("预约失败，无效的课程包");
 
+        SubjectSku subjectSku = subjectService.getSku(orderPackage.getSkuId());
+        if (!subjectSku.exists()) return MomiaHttpResponse.FAILED("预约失败，无效的课程包");
+
         CourseSku sku = courseService.getSku(skuId);
         if (!sku.exists() || !sku.isAvaliable(new Date())) return MomiaHttpResponse.FAILED("预约失败，无效的课程地点");
+        if (orderPackage.getCourseId() > 0 && orderPackage.getCourseId() != sku.getCourseId()) return MomiaHttpResponse.FAILED("预约失败，课程与购买的包不匹配");
+
+        Map<Long, Date> startTimes = courseService.queryStartTimesByPackages(Sets.newHashSet(packageId));
+        Date startTime = startTimes.get(packageId);
+        if (startTime != null) {
+            Date endTime = TimeUtil.add(startTime, subjectSku.getTime(), subjectSku.getTimeUnit());
+            if (endTime.before(sku.getStartTime())) return MomiaHttpResponse.FAILED("预约失败，该课程的时间超出了课程包的有效期");
+        }
 
         Order order = orderService.get(orderPackage.getOrderId());
         UserDto user = userServiceApi.get(utoken);

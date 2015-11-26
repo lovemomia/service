@@ -12,7 +12,7 @@ public class SortTypeServiceImpl extends AbstractService implements SortTypeServ
 
     @Override
     protected void doReload() {
-        String sql = "SELECT Id, Text FROM SG_SortType WHERE Status=1";
+        String sql = "SELECT Id, Text FROM SG_SortType WHERE Status<>0";
         sortTypesCache = queryObjectList(sql, SortType.class);
     }
 

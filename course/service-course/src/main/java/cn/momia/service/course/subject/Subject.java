@@ -26,6 +26,8 @@ public class Subject {
     private List<SubjectImage> imgs;
     private List<SubjectSku> skus;
 
+    private int status;
+
     public long getId() {
         return id;
     }
@@ -106,6 +108,14 @@ public class Subject {
         this.skus = skus;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     public boolean exists() {
         return id > 0;
     }
@@ -113,6 +123,8 @@ public class Subject {
     public SubjectSku getMinPriceSku() {
         SubjectSku minPriceSubjectSku = SubjectSku.NOT_EXIST_SUBJECT_SKU;
         for (SubjectSku sku : skus) {
+            if (sku.getCourseId() > 0) continue;
+
             if (!minPriceSubjectSku.exists()) {
                 minPriceSubjectSku = sku;
             } else {

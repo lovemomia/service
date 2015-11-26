@@ -34,12 +34,18 @@ public class Course implements Cloneable {
     private String goal;
     private String flow;
     private String tips;
+    private String notice;
     private int institutionId;
     private String institution;
+
+    private int status;
 
     private List<CourseImage> imgs;
     private CourseBook book;
     private List<CourseSku> skus = new ArrayList<CourseSku>();
+
+    private String subject;
+    private boolean buyable;
 
     public long getId() {
         return id;
@@ -137,6 +143,14 @@ public class Course implements Cloneable {
         this.tips = tips;
     }
 
+    public String getNotice() {
+        return notice;
+    }
+
+    public void setNotice(String notice) {
+        this.notice = notice;
+    }
+
     public int getInstitutionId() {
         return institutionId;
     }
@@ -151,6 +165,14 @@ public class Course implements Cloneable {
 
     public void setInstitution(String institution) {
         this.institution = institution;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public List<CourseImage> getImgs() {
@@ -175,6 +197,22 @@ public class Course implements Cloneable {
 
     public void setSkus(List<CourseSku> skus) {
         this.skus = skus;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public boolean isBuyable() {
+        return buyable;
+    }
+
+    public void setBuyable(boolean buyable) {
+        this.buyable = buyable;
     }
 
     @Override

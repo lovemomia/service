@@ -9,24 +9,25 @@ import cn.momia.common.api.exception.MomiaFailedException;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
+import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseService;
+import cn.momia.service.course.coupon.UserCoupon;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.subject.SubjectSku;
 import cn.momia.service.course.coupon.CouponService;
-import cn.momia.service.course.coupon.UserCoupon;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderService;
 import cn.momia.service.course.order.OrderPackage;
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -128,6 +129,42 @@ public class OrderController extends BaseController {
         return MomiaHttpResponse.SUCCESS(orderService.refund(user.getId(), orderId));
     }
 
+    @RequestMapping(value = "/{oid}", method = RequestMethod.GET)
+    public MomiaHttpResponse get(@RequestParam String utoken, @PathVariable(value = "oid") long orderId) {
+        UserDto user = userServiceApi.get(utoken);
+        Order order = orderService.get(orderId);
+        if (!user.exists() || !order.exists() || order.getUserId() != user.getId()) return MomiaHttpResponse.FAILED("无效的订单");
+
+        String title;
+        String cover;
+        List<Long> courseIds = order.getCourseIds();
+        if (courseIds.size() >= 1) {
+            Course course = courseService.get(courseIds.get(0));
+            title = course.getTitle();
+            cover = course.getCover();
+        } else {
+            Subject subject = subjectService.get(order.getSubjectId());
+            title = subject.getTitle();
+            cover = subject.getCover();
+        }
+        Map<Long, Integer> finishedCourceCounts = courseService.queryFinishedCourseCounts(Sets.newHashSet(orderId));
+        OrderDto orderDetailDto = buildOrderDetailDto(order, title, cover, finishedCourceCounts.get(orderId));
+        if (courseIds.size() >= 1) orderDetailDto.setCourseId(courseIds.get(0));
+
+        if (order.isPayed()) {
+            UserCoupon userCoupon = couponService.queryUsedByOrder(orderId);
+            if (userCoupon.exists()) {
+                orderDetailDto.setUserCouponId(userCoupon.getId());
+                orderDetailDto.setCouponId(userCoupon.getCouponId());
+                orderDetailDto.setCouponType(userCoupon.getType());
+                orderDetailDto.setDiscount(userCoupon.getDiscount());
+                orderDetailDto.setCouponDesc(userCoupon.getDiscount() + "元红包"); // TODO 更多类型
+            }
+        }
+
+        return MomiaHttpResponse.SUCCESS(orderDetailDto);
+    }
+
     @RequestMapping(value = "/bookable", method = RequestMethod.GET)
     public MomiaHttpResponse listBookableOrders(@RequestParam String utoken,
                                                 @RequestParam(value = "oid") long orderId,
@@ -140,20 +177,27 @@ public class OrderController extends BaseController {
         long totalCount = orderId > 0 ? orderService.queryBookableCountByUserAndOrder(user.getId(), orderId) : orderService.queryBookableCountByUser(user.getId());
         List<OrderPackage> orderPackages = orderId > 0 ? orderService.queryBookableByUserAndOrder(user.getId(), orderId, start, count) : orderService.queryBookableByUser(user.getId(), start, count);
 
-        PagedList<OrderPackageDto> pagedOrderSkuDtos = buildPagedOrderSkuDtos(orderPackages, totalCount, start, count);
+        PagedList<OrderPackageDto> pagedOrderPackageDtos = buildPagedOrderPackageDtos(orderPackages, totalCount, start, count);
 
-        return MomiaHttpResponse.SUCCESS(pagedOrderSkuDtos);
+        return MomiaHttpResponse.SUCCESS(pagedOrderPackageDtos);
     }
 
-    private PagedList<OrderPackageDto> buildPagedOrderSkuDtos(List<OrderPackage> orderPackages, long totalCount, int start, int count) {
+    private PagedList<OrderPackageDto> buildPagedOrderPackageDtos(List<OrderPackage> orderPackages, long totalCount, int start, int count) {
         Set<Long> packageIds = new HashSet<Long>();
         Set<Long> orderIds = new HashSet<Long>();
+        Set<Long> courseIds = new HashSet<Long>();
         for (OrderPackage orderPackage : orderPackages) {
             packageIds.add(orderPackage.getId());
             orderIds.add(orderPackage.getOrderId());
+            if (orderPackage.getCourseId() > 0) courseIds.add(orderPackage.getCourseId());
         }
 
         Map<Long, Date> startTimes = courseService.queryStartTimesByPackages(packageIds);
+        List<Course> courses = courseService.list(courseIds);
+        Map<Long, Course> coursesMap = new HashMap<Long, Course>();
+        for (Course course : courses) {
+            coursesMap.put(course.getId(), course);
+        }
 
         List<Order> orders = orderService.list(orderIds);
         Set<Long> subjectIds = new HashSet<Long>();
@@ -193,6 +237,13 @@ public class OrderController extends BaseController {
                 orderPackageDto.setExpireTime("有效期至: " + TimeUtil.DATE_FORMAT.format(endTime));
             }
 
+            orderPackageDto.setCourseId(orderPackage.getCourseId());
+            Course course = coursesMap.get(orderPackage.getCourseId());
+            if (course != null) {
+                orderPackageDto.setCover(course.getCover());
+                orderPackageDto.setTitle(course.getTitle());
+            }
+
             orderPackageDtos.add(orderPackageDto);
         }
 
@@ -222,9 +273,17 @@ public class OrderController extends BaseController {
     private PagedList<OrderDto> buildPagedOrderDtos(List<Order> orders, long totalCount, int start, int count) {
         Set<Long> orderIds = new HashSet<Long>();
         Set<Long> subjectIds = new HashSet<Long>();
+        Map<Long, Long> orderCourse = new HashMap<Long, Long>();
+        Set<Long> courseIds = new HashSet<Long>();
         for (Order order : orders) {
             orderIds.add(order.getId());
             subjectIds.add(order.getSubjectId());
+            List<Long> orderCourseIds = order.getCourseIds();
+            if (orderCourseIds.size() >= 1) {
+                long courseId = orderCourseIds.get(0);
+                orderCourse.put(order.getId(), courseId);
+                courseIds.add(courseId);
+            }
         }
 
         Map<Long, Integer> finishedCourceCounts = courseService.queryFinishedCourseCounts(orderIds);
@@ -235,12 +294,34 @@ public class OrderController extends BaseController {
             subjectsMap.put(subject.getId(), subject);
         }
 
+        List<Course> courses = courseService.list(courseIds);
+        Map<Long, Course> coursesMap = new HashMap<Long, Course>();
+        for (Course course : courses) {
+            coursesMap.put(course.getId(), course);
+        }
+
         List<OrderDto> orderDtos = new ArrayList<OrderDto>();
         for (Order order : orders) {
-            Subject subject = subjectsMap.get(order.getSubjectId());
-            if (subject == null) continue;
+            String title;
+            String cover;
+            Long courseId = orderCourse.get(order.getId());
+            if (courseId == null) {
+                Subject subject = subjectsMap.get(order.getSubjectId());
+                if (subject == null) continue;
 
-            orderDtos.add(buildOrderDetailDto(order, subject, finishedCourceCounts));
+                title = subject.getTitle();
+                cover = subject.getCover();
+            } else {
+                Course course = coursesMap.get(courseId);
+                if (course == null) continue;
+
+                title = course.getTitle();
+                cover = course.getCover();
+            }
+
+            OrderDto orderDto = buildOrderDetailDto(order, title, cover, finishedCourceCounts.get(order.getId()));
+            if (courseId != null) orderDto.setCourseId(courseId);
+            orderDtos.add(orderDto);
         }
 
         PagedList<OrderDto> pagedOrderDtos = new PagedList<OrderDto>(totalCount, start, count);
@@ -249,19 +330,18 @@ public class OrderController extends BaseController {
         return pagedOrderDtos;
     }
 
-    private OrderDto buildOrderDetailDto(Order order, Subject subject, Map<Long, Integer> finishedCourceCounts) {
+    private OrderDto buildOrderDetailDto(Order order, String title, String cover, int finishedCourseCount) {
         OrderDto orderDto = buildOrderDto(order);
         int bookableCourseCount = order.getBookableCourseCount();
         if (bookableCourseCount > 0) {
             orderDto.setBookingStatus(1);
         } else {
             int totalCourseCount = order.getTotalCourseCount();
-            int finishedCourseCount = finishedCourceCounts.get(order.getId());
             if (finishedCourseCount < totalCourseCount) orderDto.setBookingStatus(2);
             else orderDto.setBookingStatus(3);
         }
-        orderDto.setTitle(subject.getTitle());
-        orderDto.setCover(subject.getCover());
+        orderDto.setTitle(title);
+        orderDto.setCover(cover);
 
         return orderDto;
     }

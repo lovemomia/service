@@ -23,13 +23,17 @@ public class CourseDto {
     private String goal;
     private String flow;
     private String tips;
+    private String notice;
     private String institution;
     private List<String> imgs;
     private CourseBookDto book;
 
     private CoursePlaceDto place;
 
+    private String subject;
     private Boolean favored;
+
+    private Boolean buyable;
 
     public long getId() {
         return id;
@@ -135,6 +139,14 @@ public class CourseDto {
         this.tips = tips;
     }
 
+    public String getNotice() {
+        return notice;
+    }
+
+    public void setNotice(String notice) {
+        this.notice = notice;
+    }
+
     public String getInstitution() {
         return institution;
     }
@@ -167,11 +179,27 @@ public class CourseDto {
         this.place = place;
     }
 
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
     public Boolean isFavored() {
         return favored;
     }
 
     public void setFavored(Boolean favored) {
         this.favored = favored;
+    }
+
+    public Boolean isBuyable() {
+        return buyable;
+    }
+
+    public void setBuyable(Boolean buyable) {
+        this.buyable = buyable;
     }
 }
