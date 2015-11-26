@@ -34,6 +34,8 @@ import cn.momia.service.course.favorite.FavoriteService;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderPackage;
 import cn.momia.service.course.order.OrderService;
+import cn.momia.service.course.subject.SubjectService;
+import cn.momia.service.course.subject.SubjectSku;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Splitter;
@@ -72,11 +74,13 @@ public class CourseController extends BaseController {
     private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
     private static final Splitter POS_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
 
+    @Autowired private SubjectService subjectService;
     @Autowired private CourseService courseService;
     @Autowired private OrderService orderService;
     @Autowired private FavoriteService favoriteService;
 
     @Autowired private UserServiceApi userServiceApi;
+
     @RequestMapping(value = "/recommend", method = RequestMethod.GET)
     public MomiaHttpResponse listRecommend(@RequestParam(value = "city") long cityId, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
@@ -553,10 +557,19 @@ public class CourseController extends BaseController {
         OrderPackage orderPackage = orderService.getOrderPackage(packageId);
         if (!orderPackage.exists()) return MomiaHttpResponse.FAILED("预约失败，无效的课程包");
 
+        SubjectSku subjectSku = subjectService.getSku(orderPackage.getSkuId());
+        if (!subjectSku.exists()) return MomiaHttpResponse.FAILED("预约失败，无效的课程包");
+
         CourseSku sku = courseService.getSku(skuId);
         if (!sku.exists() || !sku.isAvaliable(new Date())) return MomiaHttpResponse.FAILED("预约失败，无效的课程地点");
-
         if (orderPackage.getCourseId() > 0 && orderPackage.getCourseId() != sku.getCourseId()) return MomiaHttpResponse.FAILED("预约失败，课程与购买的包不匹配");
+
+        Map<Long, Date> startTimes = courseService.queryStartTimesByPackages(Sets.newHashSet(packageId));
+        Date startTime = startTimes.get(packageId);
+        if (startTime != null) {
+            Date endTime = TimeUtil.add(startTime, subjectSku.getTime(), subjectSku.getTimeUnit());
+            if (endTime.before(sku.getStartTime())) return MomiaHttpResponse.FAILED("预约失败，该课程的时间超出了课程包的有效期");
+        }
 
         Order order = orderService.get(orderPackage.getOrderId());
         UserDto user = userServiceApi.get(utoken);
