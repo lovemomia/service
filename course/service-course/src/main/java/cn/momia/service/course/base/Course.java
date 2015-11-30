@@ -23,6 +23,7 @@ public class Course implements Cloneable {
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("M月d日");
 
     private long id;
+    private int type;
     private long subjectId;
     private String title;
     private String cover;
@@ -53,6 +54,14 @@ public class Course implements Cloneable {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public long getSubjectId() {
