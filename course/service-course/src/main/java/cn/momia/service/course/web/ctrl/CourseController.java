@@ -446,9 +446,17 @@ public class CourseController extends BaseController {
         Date end = sku.getEndTime();
 
         if (TimeUtil.isSameDay(start, end)) {
-            return TimeUtil.getAmPm(start) + " " + TIME_FORMAT.format(start) + "-" + TimeUtil.getAmPm(end) + " " + TIME_FORMAT.format(end);
+            return TIME_FORMAT.format(start) + "-" + TIME_FORMAT.format(end);
         } else {
-            return MONTH_DATE_FORMAT.format(start) + " " + TimeUtil.getAmPm(start) + " " + TIME_FORMAT.format(start) + "-" + MONTH_DATE_FORMAT.format(end) + " " + TimeUtil.getAmPm(end) + " " + TIME_FORMAT.format(end);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(start);
+            calendar.add(Calendar.DATE, 1);
+            Date nextDay = calendar.getTime();
+            if (TimeUtil.isSameDay(nextDay, end)) {
+                return TIME_FORMAT.format(start) + "-次日" + TIME_FORMAT.format(end);
+            } else {
+                return TIME_FORMAT.format(start) + "-" + MONTH_DATE_FORMAT.format(end) + " " + TIME_FORMAT.format(end);
+            }
         }
     }
 
