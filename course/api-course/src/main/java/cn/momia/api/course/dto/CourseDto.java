@@ -32,6 +32,7 @@ public class CourseDto {
     private CoursePlaceDto place;
 
     private String subject;
+    private int status;
     private Boolean favored;
 
     private Boolean buyable;
@@ -194,6 +195,14 @@ public class CourseDto {
 
     public void setSubject(String subject) {
         this.subject = subject;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public Boolean isFavored() {

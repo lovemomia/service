@@ -68,13 +68,13 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public long queryTrialCount(long cityId) {
-        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Status=1 AND B.Status=1 AND B.CityId=? AND B.Type=2";
+        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Status=1 AND B.Stock>=0 AND B.Status=1 AND B.CityId=? AND B.Type=2";
         return queryLong(sql, new Object[] { cityId });
     }
 
     @Override
     public List<Course> queryTrial(long cityId, int start, int count) {
-        String sql = "SELECT DISTINCT A.Id FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Status=1 AND B.Status=1 AND B.CityId=? AND B.Type=2 ORDER BY A.Joined DESC, A.AddTime DESC LIMIT ?,?";
+        String sql = "SELECT DISTINCT A.Id FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Status=1 AND B.Stock>=0 AND B.Status=1 AND B.CityId=? AND B.Type=2 ORDER BY B.Stock DESC, A.Joined DESC, A.AddTime DESC LIMIT ?,?";
         List<Long> courseIds = queryLongList(sql, new Object[] { cityId, start, count });
 
         return list(courseIds);
@@ -92,7 +92,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     public List<Course> list(Collection<Long> courseIds) {
         if (courseIds.isEmpty()) return new ArrayList<Course>();
 
-        String sql = "SELECT A.Id, A.Type, A.SubjectId, A.Title, A.Cover, A.MinAge, A.MaxAge, A.Insurance, A.Joined, A.Price, A.Goal, A.Flow, A.Tips, A.Notice, A.InstitutionId, A.Status, B.Title AS Subject FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Id IN (" + StringUtils.join(courseIds, ",") + ") AND A.Status<>0 AND B.Status<>0";
+        String sql = "SELECT A.Id, A.Type, A.SubjectId, A.Title, A.Cover, A.MinAge, A.MaxAge, A.Insurance, A.Joined, A.Price, A.Goal, A.Flow, A.Tips, A.Notice, A.InstitutionId, A.Status, B.Title AS Subject, B.Stock FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Id IN (" + StringUtils.join(courseIds, ",") + ") AND A.Status<>0 AND B.Status<>0";
         List<Course> courses = queryObjectList(sql, Course.class);
 
         Set<Integer> institutionIds = new HashSet<Integer>();

@@ -119,6 +119,11 @@ public class CourseController extends BaseController {
         courseDto.setScheduler(course.getScheduler());
         courseDto.setRegion(MetaUtil.getRegionName(course.getRegionId()));
         courseDto.setSubject(course.getSubject());
+
+        int stock = course.getStock();
+        int status = (stock == -1 || stock > 0) ? Course.Status.OK : Course.Status.SOLD_OUT;
+        courseDto.setStatus(status);
+
         courseDto.setBuyable(course.isBuyable());
     }
 
@@ -143,11 +148,11 @@ public class CourseController extends BaseController {
     @RequestMapping(value = "/{coid}", method = RequestMethod.GET)
     public MomiaHttpResponse get(@PathVariable(value = "coid") long courseId,
                                  @RequestParam String pos,
-                                 @RequestParam(required = false, defaultValue = "" + Course.Type.BASE) int type) {
+                                 @RequestParam(required = false, defaultValue = "" + Course.ShowType.BASE) int type) {
         Course course = courseService.get(courseId);
         if (!course.exists() || course.getStatus() != 1) return MomiaHttpResponse.FAILED("课程不存在");
 
-        return MomiaHttpResponse.SUCCESS(type == Course.Type.FULL ? buildFullCourseDto(course, pos) : buildBaseCourseDto(course));
+        return MomiaHttpResponse.SUCCESS(type == Course.ShowType.FULL ? buildFullCourseDto(course, pos) : buildBaseCourseDto(course));
     }
 
     private CourseDto buildFullCourseDto(Course course, String pos) {

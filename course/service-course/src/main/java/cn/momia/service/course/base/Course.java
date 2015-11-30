@@ -15,9 +15,14 @@ import java.util.List;
 public class Course implements Cloneable {
     public static final Course NOT_EXIST_COURSE = new Course();
 
-    public static class Type {
+    public static class ShowType {
         public static final int BASE = 1;
         public static final int FULL = 2;
+    }
+
+    public static class Status {
+        public static final int OK = 1;
+        public static final int SOLD_OUT = 2;
     }
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("M月d日");
@@ -46,6 +51,7 @@ public class Course implements Cloneable {
     private List<CourseSku> skus = new ArrayList<CourseSku>();
 
     private String subject;
+    private int stock;
     private boolean buyable;
 
     public long getId() {
@@ -214,6 +220,14 @@ public class Course implements Cloneable {
 
     public void setSubject(String subject) {
         this.subject = subject;
+    }
+
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
     }
 
     public boolean isBuyable() {
