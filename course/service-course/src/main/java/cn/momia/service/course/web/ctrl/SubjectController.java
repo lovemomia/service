@@ -73,8 +73,12 @@ public class SubjectController extends BaseController {
 
         List<SubjectDto> subjectDtos = new ArrayList<SubjectDto>();
         for (Subject subject : subjects) {
-            SubjectDto subjectDto = buildBaseSubjectDto(subject, coursesMap.get(subject.getId()));
-            if (subjectDto != null) subjectDtos.add(subjectDto);
+            List<Course> courses = coursesMap.get(subject.getId());
+            SubjectDto subjectDto = buildBaseSubjectDto(subject, courses);
+            if (subjectDto != null) {
+                if (courses != null && courses.size() > 0) subjectDto.setCover(courses.get(0).getCover());
+                subjectDtos.add(subjectDto);
+            }
         }
         PagedList<SubjectDto> pagedSubjectDtos = new PagedList<SubjectDto>(totalCount, start, count);
         pagedSubjectDtos.setList(subjectDtos);

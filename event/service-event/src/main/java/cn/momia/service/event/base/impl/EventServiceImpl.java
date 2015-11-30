@@ -9,7 +9,7 @@ import java.util.List;
 public class EventServiceImpl extends AbstractService implements EventService {
     @Override
     public List<Event> list(int cityId, int count) {
-        String sql = "SELECT Title, Img, `Desc`, Action FROM SG_Event WHERE Status<>0 AND (CityId=? OR CityId=0) ORDER BY Weight DESC, AddTime DESC LIMIT ?";
+        String sql = "SELECT Title, Img, `Desc`, Action, Platform FROM SG_Event WHERE Status<>0 AND (CityId=? OR CityId=0) ORDER BY Weight DESC, AddTime DESC LIMIT ?";
         return queryObjectList(sql, new Object[] { cityId, count }, Event.class);
     }
 }

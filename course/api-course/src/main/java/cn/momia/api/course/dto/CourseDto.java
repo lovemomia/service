@@ -10,6 +10,7 @@ public class CourseDto {
     }
 
     private long id;
+    private int type;
     private long subjectId;
     private String title;
     private String cover;
@@ -31,6 +32,7 @@ public class CourseDto {
     private CoursePlaceDto place;
 
     private String subject;
+    private int status;
     private Boolean favored;
 
     private Boolean buyable;
@@ -41,6 +43,14 @@ public class CourseDto {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public long getSubjectId() {
@@ -185,6 +195,14 @@ public class CourseDto {
 
     public void setSubject(String subject) {
         this.subject = subject;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public Boolean isFavored() {

@@ -108,6 +108,7 @@ public class CourseController extends BaseController {
 
     private void setFieldValue(CourseDto courseDto, Course course) {
         courseDto.setId(course.getId());
+        courseDto.setType(course.getType());
         courseDto.setSubjectId(course.getSubjectId());
         courseDto.setTitle(course.getTitle());
         courseDto.setCover(course.getCover());
@@ -118,6 +119,11 @@ public class CourseController extends BaseController {
         courseDto.setScheduler(course.getScheduler());
         courseDto.setRegion(MetaUtil.getRegionName(course.getRegionId()));
         courseDto.setSubject(course.getSubject());
+
+        int stock = course.getStock();
+        int status = (stock == -1 || stock > 0) ? Course.Status.OK : Course.Status.SOLD_OUT;
+        courseDto.setStatus(status);
+
         courseDto.setBuyable(course.isBuyable());
     }
 
@@ -142,11 +148,11 @@ public class CourseController extends BaseController {
     @RequestMapping(value = "/{coid}", method = RequestMethod.GET)
     public MomiaHttpResponse get(@PathVariable(value = "coid") long courseId,
                                  @RequestParam String pos,
-                                 @RequestParam(required = false, defaultValue = "" + Course.Type.BASE) int type) {
+                                 @RequestParam(required = false, defaultValue = "" + Course.ShowType.BASE) int type) {
         Course course = courseService.get(courseId);
         if (!course.exists() || course.getStatus() != 1) return MomiaHttpResponse.FAILED("课程不存在");
 
-        return MomiaHttpResponse.SUCCESS(type == Course.Type.FULL ? buildFullCourseDto(course, pos) : buildBaseCourseDto(course));
+        return MomiaHttpResponse.SUCCESS(type == Course.ShowType.FULL ? buildFullCourseDto(course, pos) : buildBaseCourseDto(course));
     }
 
     private CourseDto buildFullCourseDto(Course course, String pos) {
@@ -445,9 +451,17 @@ public class CourseController extends BaseController {
         Date end = sku.getEndTime();
 
         if (TimeUtil.isSameDay(start, end)) {
-            return TimeUtil.getAmPm(start) + " " + TIME_FORMAT.format(start) + "-" + TimeUtil.getAmPm(end) + " " + TIME_FORMAT.format(end);
+            return TIME_FORMAT.format(start) + "-" + TIME_FORMAT.format(end);
         } else {
-            return MONTH_DATE_FORMAT.format(start) + " " + TimeUtil.getAmPm(start) + " " + TIME_FORMAT.format(start) + "-" + MONTH_DATE_FORMAT.format(end) + " " + TimeUtil.getAmPm(end) + " " + TIME_FORMAT.format(end);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(start);
+            calendar.add(Calendar.DATE, 1);
+            Date nextDay = calendar.getTime();
+            if (TimeUtil.isSameDay(nextDay, end)) {
+                return TIME_FORMAT.format(start) + "-次日" + TIME_FORMAT.format(end);
+            } else {
+                return TIME_FORMAT.format(start) + "-" + MONTH_DATE_FORMAT.format(end) + " " + TIME_FORMAT.format(end);
+            }
         }
     }
 
