@@ -290,7 +290,7 @@ public class SubjectController extends BaseController {
         courseCommentDto.setNickName(user.getNickName());
         courseCommentDto.setAvatar(user.getAvatar());
         courseCommentDto.setChildren(formatChildren(user.getChildren()));
-        courseCommentDto.setAddTime(comment.getAddTime());
+        courseCommentDto.setAddTime(TimeUtil.formatAddTime(comment.getAddTime()));
         courseCommentDto.setStar(comment.getStar());
         courseCommentDto.setContent(comment.getContent());
         courseCommentDto.setImgs(comment.getImgs());

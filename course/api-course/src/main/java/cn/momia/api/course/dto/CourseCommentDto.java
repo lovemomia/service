@@ -1,8 +1,5 @@
 package cn.momia.api.course.dto;
 
-import com.alibaba.fastjson.annotation.JSONField;
-
-import java.util.Date;
 import java.util.List;
 
 public class CourseCommentDto {
@@ -16,7 +13,7 @@ public class CourseCommentDto {
     private String avatar;
     private List<String> children;
 
-    private Date addTime;
+    private String addTime;
     private int star;
     private String content;
     private List<String> imgs;
@@ -78,12 +75,11 @@ public class CourseCommentDto {
         this.children = children;
     }
 
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    public Date getAddTime() {
+    public String getAddTime() {
         return addTime;
     }
 
-    public void setAddTime(Date addTime) {
+    public void setAddTime(String addTime) {
         this.addTime = addTime;
     }
 

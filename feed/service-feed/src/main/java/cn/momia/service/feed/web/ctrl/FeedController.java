@@ -26,11 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -41,10 +37,6 @@ import java.util.Set;
 @RequestMapping("/feed")
 public class FeedController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(FeedController.class);
-
-    public static final DateFormat YEAR_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM-dd");
-    public static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
 
     @Autowired private FeedService feedService;
     @Autowired private FeedStarService feedStarService;
@@ -115,7 +107,7 @@ public class FeedController extends BaseController {
         feedDto.setCourseId(feed.getCourseId());
         feedDto.setCourseTitle(feed.getCourseTitle());
 
-        feedDto.setAddTime(formatAddTime(feed.getAddTime()));
+        feedDto.setAddTime(TimeUtil.formatAddTime(feed.getAddTime()));
         feedDto.setPoi(feed.getLng() + ":" + feed.getLat());
         feedDto.setCommentCount(feed.getCommentCount());
         feedDto.setStarCount(feed.getStarCount());
@@ -127,22 +119,6 @@ public class FeedController extends BaseController {
         feedDto.setStared(stared);
 
         return feedDto;
-    }
-
-    private String formatAddTime(Date addTime) {
-        Calendar calendar = Calendar.getInstance();
-        int curYear = calendar.get(Calendar.YEAR);
-        int curMonth = calendar.get(Calendar.MONTH);
-        int curDay = calendar.get(Calendar.DATE);
-
-        calendar.setTime(addTime);
-        int addYear = calendar.get(Calendar.YEAR);
-        int addMonth = calendar.get(Calendar.MONTH);
-        int addDay = calendar.get(Calendar.DATE);
-
-        if (addYear != curYear) return YEAR_DATE_FORMAT.format(addTime);
-        if (addMonth != curMonth || addDay != curDay) return DATE_FORMAT.format(addTime);
-        return TIME_FORMAT.format(addTime);
     }
 
     private List<String> formatChildren(List<ChildDto> children) {

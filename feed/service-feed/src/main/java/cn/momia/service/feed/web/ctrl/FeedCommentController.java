@@ -5,6 +5,7 @@ import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.UserDto;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.feed.base.Feed;
 import cn.momia.service.feed.base.FeedService;
@@ -66,7 +67,7 @@ public class FeedCommentController extends BaseController {
         FeedCommentDto feedCommentDto = new FeedCommentDto();
         feedCommentDto.setId(comment.getId());
         feedCommentDto.setContent(comment.getContent());
-        feedCommentDto.setAddTime(comment.getAddTime());
+        feedCommentDto.setAddTime(TimeUtil.formatAddTime(comment.getAddTime()));
         feedCommentDto.setNickName(user.getNickName());
         feedCommentDto.setAvatar(user.getAvatar());
 
