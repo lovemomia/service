@@ -72,7 +72,7 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
     private Map<Long, List<SubjectSku>> querySkus(Collection<Long> subjectIds) {
         if (subjectIds.isEmpty()) return new HashMap<Long, List<SubjectSku>>();
 
-        String sql = "SELECT Id FROM SG_SubjectSku WHERE SubjectId IN (" + StringUtils.join(subjectIds, ",") + ") AND Status=1";
+        String sql = "SELECT Id FROM SG_SubjectSku WHERE SubjectId IN (" + StringUtils.join(subjectIds, ",") + ") AND Status<>0";
         List<Long> skuIds = queryLongList(sql);
         List<SubjectSku> skus = listSkus(skuIds);
 
@@ -113,7 +113,7 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
     public List<SubjectSku> listSkus(Collection<Long> skuIds) {
         if (skuIds.isEmpty()) return new ArrayList<SubjectSku>();
 
-        String sql = "SELECT Id, SubjectId, `Desc`, Price, OriginalPrice, Adult, Child, CourseCount, Time, TimeUnit, `Limit`, CourseId FROM SG_SubjectSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status<>0";
+        String sql = "SELECT Id, SubjectId, `Desc`, Price, OriginalPrice, Adult, Child, CourseCount, Time, TimeUnit, `Limit`, Status, CourseId FROM SG_SubjectSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status<>0";
         List<SubjectSku> skus = queryObjectList(sql, SubjectSku.class);
 
         Map<Long, SubjectSku> skusMap = new HashMap<Long, SubjectSku>();

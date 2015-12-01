@@ -16,6 +16,7 @@ public class SubjectSku implements Cloneable {
     private int time;
     private int timeUnit;
     private int limit;
+    private int status;
 
     private long courseId;
 
@@ -107,6 +108,10 @@ public class SubjectSku implements Cloneable {
         this.limit = limit;
     }
 
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     public long getCourseId() {
         return courseId;
     }
@@ -121,6 +126,10 @@ public class SubjectSku implements Cloneable {
 
     public int getJoinCount() {
         return adult + child;
+    }
+
+    public boolean isAvaliable() {
+        return status == 1;
     }
 
     @Override

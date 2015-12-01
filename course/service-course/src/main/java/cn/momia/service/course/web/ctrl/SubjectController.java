@@ -214,7 +214,12 @@ public class SubjectController extends BaseController {
 
     @RequestMapping(value = "/{suid}/sku", method = RequestMethod.GET)
     public MomiaHttpResponse listSkus(@PathVariable(value = "suid") long subjectId) {
-        return MomiaHttpResponse.SUCCESS(buildSubjectSkuDtos(subjectService.querySkus(subjectId)));
+        List<SubjectSku> skus = subjectService.querySkus(subjectId);
+        List<SubjectSku> avaliableSkus = new ArrayList<SubjectSku>();
+        for (SubjectSku sku : skus) {
+            if (sku.isAvaliable()) avaliableSkus.add(sku);
+        }
+        return MomiaHttpResponse.SUCCESS(buildSubjectSkuDtos(avaliableSkus));
     }
 
     private List<SubjectSkuDto> buildSubjectSkuDtos(List<SubjectSku> skus) {
