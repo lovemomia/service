@@ -16,6 +16,7 @@ import cn.momia.common.deal.gateway.factory.PaymentGatewayFactory;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.webapp.util.RequestUtil;
+import cn.momia.service.course.order.OrderPackage;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.coupon.CouponService;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.util.Set;
 
 @RestController
 @RequestMapping(value = "/payment")
@@ -145,6 +147,9 @@ public class PaymentController extends BaseController {
             return MomiaHttpResponse.SUCCESS("OK");
         }
 
+        boolean isFirstPay = setPayed(order.getUserId());
+        Set<Integer> packageTypes = orderService.getOrderPackageTypes(order.getId());
+
         if (callbackParam.getTotalFee().compareTo(order.getTotalFee()) < 0) {
             UserCoupon userCoupon = couponService.queryByOrder(order.getId());
             if (!userCoupon.exists() ||
@@ -155,21 +160,42 @@ public class PaymentController extends BaseController {
                 return MomiaHttpResponse.SUCCESS("OK");
             }
 
-            try {
-                if (userServiceApi.setPayed(order.getUserId())) {
-                    UserDto inviteUser = userServiceApi.getByInviteCode(userCoupon.getInviteCode());
-                    if (inviteUser.exists() && inviteUser.getId() != order.getUserId()) {
-                        couponService.distributeInviteUserCoupon(inviteUser.getId(), userCoupon.getCouponId(), null);
-                    }
-                }
-            } catch (Exception e) {
-                LOGGER.error("返红包失败，订单: {}", order.getId(), e);
-            }
+            if (isFirstPay && packageTypes.contains(OrderPackage.Type.PACKAGE)) inviteUserCoupon(order, userCoupon);
         }
+
+        if (isFirstPay && packageTypes.contains(OrderPackage.Type.PACKAGE)) firstPayUserCoupon(order);
 
         if (!finishPayment(order, createPayment(callbackParam))) return MomiaHttpResponse.SUCCESS("FAIL");
 
         return MomiaHttpResponse.SUCCESS("OK");
+    }
+
+    private boolean setPayed(long userId) {
+        try {
+            return userServiceApi.setPayed(userId);
+        } catch (Exception e) {
+            LOGGER.error("fail to set payed for user: {}", userId, e);
+            return false;
+        }
+    }
+
+    private void inviteUserCoupon(Order order, UserCoupon userCoupon) {
+        try {
+            UserDto inviteUser = userServiceApi.getByInviteCode(userCoupon.getInviteCode());
+            if (inviteUser.exists() && inviteUser.getId() != order.getUserId()) {
+                couponService.distributeInviteUserCoupon(inviteUser.getId(), userCoupon.getCouponId(), null);
+            }
+        } catch (Exception e) {
+            LOGGER.error("返邀请红包失败，订单: {}", order.getId(), e);
+        }
+    }
+
+    private void firstPayUserCoupon(Order order) {
+        try {
+            couponService.distributeFirstPayUserCoupon(order.getUserId());
+        } catch (Exception e) {
+            LOGGER.error("返首次购买红包失败，订单: {}", order.getId(), e);
+        }
     }
 
     private Payment createPayment(CallbackParam callbackParam) {

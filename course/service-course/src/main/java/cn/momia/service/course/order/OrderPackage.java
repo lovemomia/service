@@ -3,6 +3,12 @@ package cn.momia.service.course.order;
 import java.math.BigDecimal;
 
 public class OrderPackage {
+    public static class Type {
+        public static final int PACKAGE = 1;
+        public static final int SINGLE_COURSE = 2;
+        public static final int TRIAL = 3;
+    }
+
     public static final OrderPackage NOT_EXIST_ORDER_PACKAGE = new OrderPackage();
 
     private long id;

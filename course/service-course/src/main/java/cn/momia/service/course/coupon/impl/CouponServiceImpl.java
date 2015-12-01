@@ -25,6 +25,7 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
     private static final Logger LOGGER = LoggerFactory.getLogger(CouponServiceImpl.class);
 
     private static final int COUPON_SRC_INVITE = 1;
+    private static final int COUPON_SRC_FIRST_PAY = 2;
 
     private static final int NOT_USED_STATUS = 1;
     private static final int USED_STATUS = 2;
@@ -227,5 +228,20 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
 
         String sql = "INSERT INTO SG_UserCoupon (UserId, CouponId, StartTime, EndTime, InviteCode, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
         batchUpdate(sql, args);
+    }
+
+    @Override
+    public void distributeFirstPayUserCoupon(long userId) {
+        List<Coupon> coupons = listFirstPayCoupons();
+        if (coupons.isEmpty()) return;
+
+        addUserCoupons(userId, "", coupons);
+    }
+
+    private List<Coupon> listFirstPayCoupons() {
+        String sql = "SELECT Id FROM SG_Coupon WHERE Src=? AND OnlineTime<=NOW() AND OfflineTime>NOW() AND Status<>0 ORDER BY AddTime DESC LIMIT 1";
+        List<Integer> couponIds = queryIntList(sql, new Object[] { COUPON_SRC_FIRST_PAY });
+
+        return listCoupons(couponIds);
     }
 }

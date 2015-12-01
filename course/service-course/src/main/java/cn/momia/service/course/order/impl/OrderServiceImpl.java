@@ -12,12 +12,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -224,6 +226,28 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
         List<OrderPackage> packages = listOrderPackages(packageIds);
 
         return packages.isEmpty() ? OrderPackage.NOT_EXIST_ORDER_PACKAGE : packages.get(0);
+    }
+
+    @Override
+    public Set<Integer> getOrderPackageTypes(long orderId) {
+        final Set<Integer> packageTypes = new HashSet<Integer>();
+        String sql = "SELECT B.CourseId, C.Type FROM SG_SubjectOrderPackage A INNER JOIN SG_SubjectSku B ON A.SkuId=B.Id INNER JOIN SG_Subject C ON B.SubjectId=C.Id WHERE A.OrderId=? AND A.Status=1 AND B.Status<>0 AND C.Status<>0";
+        query(sql, new Object[] { orderId }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                long courseId = rs.getLong("CourseId");
+                int type = rs.getInt("Type");
+                if (type == Subject.Type.TRIAL) {
+                    packageTypes.add(OrderPackage.Type.TRIAL);
+                } else if (courseId > 0) {
+                    packageTypes.add(OrderPackage.Type.SINGLE_COURSE);
+                } else {
+                    packageTypes.add(OrderPackage.Type.PACKAGE);
+                }
+            }
+        });
+
+        return packageTypes;
     }
 
     @Override

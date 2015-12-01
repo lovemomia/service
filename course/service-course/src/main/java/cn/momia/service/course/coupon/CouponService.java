@@ -22,4 +22,6 @@ public interface CouponService {
     InviteCoupon getInviteCoupon(String mobile);
     boolean updateInviteCouponStatus(String mobile);
     void distributeInviteUserCoupon(long userId, int couponId, String inviteCode);
+
+    void distributeFirstPayUserCoupon(long userId);
 }
