@@ -1,8 +1,9 @@
-package cn.momia.service.event.icon;
+package cn.momia.api.event.dto;
 
-public class Icon {
+public class Event {
     private String title;
     private String img;
+    private String desc;
     private String action;
     private int platform;
 
@@ -20,6 +21,14 @@ public class Icon {
 
     public void setImg(String img) {
         this.img = img;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 
     public String getAction() {

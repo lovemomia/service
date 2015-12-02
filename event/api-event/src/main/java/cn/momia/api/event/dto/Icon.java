@@ -1,18 +1,25 @@
-package cn.momia.service.event.banner;
+package cn.momia.api.event.dto;
 
-import java.io.Serializable;
-
-public class Banner implements Serializable {
-    private String cover;
+public class Icon {
+    private String title;
+    private String img;
     private String action;
     private int platform;
 
-    public String getCover() {
-        return cover;
+    public String getTitle() {
+        return title;
     }
 
-    public void setCover(String cover) {
-        this.cover = cover;
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
     }
 
     public String getAction() {

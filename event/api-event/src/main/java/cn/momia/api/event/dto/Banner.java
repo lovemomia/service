@@ -1,25 +1,16 @@
 package cn.momia.api.event.dto;
 
-public class IconDto {
-    private String title;
-    private String img;
+public class Banner {
+    private String cover;
     private String action;
     private int platform;
 
-    public String getTitle() {
-        return title;
+    public String getCover() {
+        return cover;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getImg() {
-        return img;
-    }
-
-    public void setImg(String img) {
-        this.img = img;
+    public void setCover(String cover) {
+        this.cover = cover;
     }
 
     public String getAction() {

@@ -1,7 +1,7 @@
 package cn.momia.service.event.base.impl;
 
+import cn.momia.api.event.dto.Event;
 import cn.momia.common.service.AbstractService;
-import cn.momia.service.event.base.Event;
 import cn.momia.service.event.base.EventService;
 
 import java.util.List;
