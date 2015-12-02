@@ -96,7 +96,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
         List<Long> userIds = queryLongList(sql, new Object[] { token });
         List<User> users = list(userIds);
 
-        return userIds.isEmpty() ? User.NOT_EXIST_USER : users.get(0);
+        return users.isEmpty() ? User.NOT_EXIST_USER : users.get(0);
     }
 
     @Override
@@ -105,7 +105,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
         List<Long> userIds = queryLongList(sql, new Object[] { mobile });
         List<User> users = list(userIds);
 
-        return userIds.isEmpty() ? User.NOT_EXIST_USER : users.get(0);
+        return users.isEmpty() ? User.NOT_EXIST_USER : users.get(0);
     }
 
     @Override
@@ -114,7 +114,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
         List<Long> userIds = queryLongList(sql, new Object[] { inviteCode });
         List<User> users = list(userIds);
 
-        return userIds.isEmpty() ? User.NOT_EXIST_USER : users.get(0);
+        return users.isEmpty() ? User.NOT_EXIST_USER : users.get(0);
     }
 
     @Override

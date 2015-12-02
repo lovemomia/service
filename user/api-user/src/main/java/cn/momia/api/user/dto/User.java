@@ -24,10 +24,10 @@ public class User {
     private String name;
     private String sex;
     private Date birthday;
-    private int cityId;
-    private int regionId;
+    private Integer cityId;
+    private Integer regionId;
     private String address;
-    private int payed;
+    private Integer payed;
     private String inviteCode;
 
     private String token;
@@ -90,6 +90,7 @@ public class User {
         this.sex = sex;
     }
 
+    @JSONField(format = "yyyy-MM-dd")
     public Date getBirthday() {
         return birthday;
     }
@@ -98,19 +99,19 @@ public class User {
         this.birthday = birthday;
     }
 
-    public int getCityId() {
+    public Integer getCityId() {
         return cityId;
     }
 
-    public void setCityId(int cityId) {
+    public void setCityId(Integer cityId) {
         this.cityId = cityId;
     }
 
-    public int getRegionId() {
+    public Integer getRegionId() {
         return regionId;
     }
 
-    public void setRegionId(int regionId) {
+    public void setRegionId(Integer regionId) {
         this.regionId = regionId;
     }
 
@@ -122,11 +123,11 @@ public class User {
         this.address = address;
     }
 
-    public int getPayed() {
+    public Integer getPayed() {
         return payed;
     }
 
-    public void setPayed(int payed) {
+    public void setPayed(Integer payed) {
         this.payed = payed;
     }
 
@@ -158,94 +159,49 @@ public class User {
         return id > 0;
     }
 
-    public static class Mini {
-        protected User user;
+    @JSONField(serialize = false)
+    public boolean isPayed() {
+        if (payed == null) return true; // 默认按true处理
+        return payed == 1;
+    }
 
+    public static class Mini extends User {
         public Mini(User user) {
-            this.user = user;
-        }
-
-        public long getId() {
-            return user.getId();
-        }
-
-        public String getNickName() {
-            return user.getNickName();
-        }
-
-        public String getAvatar() {
-            return user.getAvatar();
+            setId(user.getId());
+            setNickName(user.getNickName());
+            setAvatar(user.getAvatar());
         }
     }
 
     public static class Base extends Mini {
-        private boolean showToken = true;
-
         public Base(User user) {
-            super(user);
+            this(user, true);
         }
 
         public Base(User user, boolean showToken) {
-            this(user);
-            this.showToken = showToken;
-        }
-        public String getMobile() {
-            return MobileUtil.encrypt(user.getMobile());
-        }
-
-        public String getCover() {
-            return user.getCover();
-        }
-
-        public String getName() {
-            return user.getName();
-        }
-
-        public String getSex() {
-            return user.getSex();
-        }
-
-        @JSONField(format = "yyyy-MM-dd")
-        public Date getBirthday() {
-            return user.getBirthday();
-        }
-
-        public int getCityId() {
-            return user.getCityId();
-        }
-
-        public int getRegionId() {
-            return user.getRegionId();
-        }
-
-        public String getAddress() {
-            return user.getAddress();
-        }
-
-        public boolean isPayed() {
-            return user.getPayed() == 1;
-        }
-
-        public String getInviteCode() {
-            return user.getInviteCode();
-        }
-
-        public String getToken() {
-            return showToken ? user.getToken() : "";
+            super(user);
+            setMobile(MobileUtil.encrypt(user.getMobile()));
+            setCover(user.getCover());
+            setName(user.getName());
+            setSex(user.getSex());
+            setBirthday(user.getBirthday());
+            setCityId(user.getCityId());
+            setRegionId(user.getRegionId());
+            setAddress(user.getAddress());
+            setPayed(user.getPayed());
+            setInviteCode(user.getInviteCode());
+            setToken(showToken ? user.getToken() : "");
         }
     }
 
     public static class Full extends Base {
         public Full(User user) {
-            super(user);
+            this(user, true);
         }
 
         public Full(User user, boolean showToken) {
             super(user, showToken);
-        }
-
-        public List<Child> getChildren() {
-            return user.getChildren();
+            setChildren(user.getChildren());
         }
     }
 }

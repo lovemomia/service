@@ -69,6 +69,7 @@ public class Child {
         return id > 0;
     }
 
+    @JSONField(serialize = false)
     public boolean isInvalid() {
         return userId <= 0 || StringUtils.isBlank(name) || SexUtil.isInvalid(sex) || birthday == null;
     }
