@@ -1,7 +1,7 @@
 package cn.momia.api.base.dto;
 
-public class AgeRangeDto {
-    public static final AgeRangeDto DEFAULT = new AgeRangeDto();
+public class AgeRange {
+    public static final AgeRange DEFAULT = new AgeRange();
     static {
         DEFAULT.setId(0);
         DEFAULT.setMin(1);

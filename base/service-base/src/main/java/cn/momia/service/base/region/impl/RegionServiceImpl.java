@@ -1,7 +1,7 @@
 package cn.momia.service.base.region.impl;
 
+import cn.momia.api.base.dto.Region;
 import cn.momia.common.service.AbstractService;
-import cn.momia.service.base.region.Region;
 import cn.momia.service.base.region.RegionService;
 
 import java.util.ArrayList;

@@ -1,6 +1,8 @@
-package cn.momia.service.base.region;
+package cn.momia.api.base.dto;
 
 public class Region {
+    public static final int MULTI_REGION_ID = -1;
+
     private int id;
     private int cityId;
     private String name;
@@ -39,6 +41,6 @@ public class Region {
     }
 
     public boolean exists() {
-        return id > 0;
+        return id == MULTI_REGION_ID || id > 0;
     }
 }

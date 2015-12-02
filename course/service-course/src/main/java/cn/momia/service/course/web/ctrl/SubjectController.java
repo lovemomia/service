@@ -1,7 +1,7 @@
 package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.base.MetaUtil;
-import cn.momia.api.base.dto.RegionDto;
+import cn.momia.api.base.dto.Region;
 import cn.momia.api.course.dto.CourseCommentDto;
 import cn.momia.api.course.dto.FavoriteDto;
 import cn.momia.api.course.dto.SubjectDto;
@@ -181,7 +181,7 @@ public class SubjectController extends BaseController {
             if (!regionIds.contains(regionId)) regionIds.add(regionId);
         }
 
-        return MetaUtil.getRegionName(regionIds.size() > 1 ? RegionDto.MULTI_REGION_ID : regionIds.get(0));
+        return MetaUtil.getRegionName(regionIds.size() > 1 ? Region.MULTI_REGION_ID : regionIds.get(0));
     }
 
     @RequestMapping(value = "/{suid}", method = RequestMethod.GET)

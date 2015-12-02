@@ -1,7 +1,7 @@
 package cn.momia.service.base.sort.impl;
 
+import cn.momia.api.base.dto.SortType;
 import cn.momia.common.service.AbstractService;
-import cn.momia.service.base.sort.SortType;
 import cn.momia.service.base.sort.SortTypeService;
 
 import java.util.ArrayList;

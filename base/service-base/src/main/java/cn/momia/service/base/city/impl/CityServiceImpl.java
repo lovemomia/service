@@ -1,7 +1,7 @@
 package cn.momia.service.base.city.impl;
 
+import cn.momia.api.base.dto.City;
 import cn.momia.common.service.AbstractService;
-import cn.momia.service.base.city.City;
 import cn.momia.service.base.city.CityService;
 
 import java.util.ArrayList;

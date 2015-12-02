@@ -1,6 +1,6 @@
 package cn.momia.service.course.base;
 
-import cn.momia.api.base.dto.RegionDto;
+import cn.momia.api.base.dto.Region;
 import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.util.TimeUtil;
 
@@ -282,7 +282,7 @@ public class Course implements Cloneable {
         }
 
         if (regionIds.isEmpty()) return 0;
-        return regionIds.size() > 1 ? RegionDto.MULTI_REGION_ID : regionIds.get(0);
+        return regionIds.size() > 1 ? Region.MULTI_REGION_ID : regionIds.get(0);
     }
 
     public String getAge() {

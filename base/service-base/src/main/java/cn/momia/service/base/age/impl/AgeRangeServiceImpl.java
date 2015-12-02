@@ -1,7 +1,7 @@
 package cn.momia.service.base.age.impl;
 
+import cn.momia.api.base.dto.AgeRange;
 import cn.momia.common.service.AbstractService;
-import cn.momia.service.base.age.AgeRange;
 import cn.momia.service.base.age.AgeRangeService;
 
 import java.util.ArrayList;
