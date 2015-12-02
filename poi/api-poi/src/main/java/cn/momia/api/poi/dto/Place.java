@@ -1,4 +1,4 @@
-package cn.momia.service.poi;
+package cn.momia.api.poi.dto;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public class Place {
     private double lng;
     private double lat;
 
-    private List<PlaceImage> imgs;
+    private List<String> imgs;
 
     public int getId() {
         return id;
@@ -89,11 +89,11 @@ public class Place {
         this.lat = lat;
     }
 
-    public List<PlaceImage> getImgs() {
+    public List<String> getImgs() {
         return imgs;
     }
 
-    public void setImgs(List<PlaceImage> imgs) {
+    public void setImgs(List<String> imgs) {
         this.imgs = imgs;
     }
 

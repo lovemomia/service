@@ -1,7 +1,7 @@
 package cn.momia.service.course.base.impl;
 
 import cn.momia.api.poi.PoiServiceApi;
-import cn.momia.api.poi.dto.PlaceDto;
+import cn.momia.api.poi.dto.Place;
 import cn.momia.common.service.AbstractService;
 import cn.momia.service.course.base.BookedCourse;
 import cn.momia.service.course.base.Course;
@@ -239,15 +239,15 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
             placeIds.add(sku.getPlaceId());
         }
 
-        List<PlaceDto> places = poiServiceApi.list(placeIds);
-        Map<Integer, PlaceDto> placesMap = new HashMap<Integer, PlaceDto>();
-        for (PlaceDto place : places) {
+        List<Place> places = poiServiceApi.list(placeIds);
+        Map<Integer, Place> placesMap = new HashMap<Integer, Place>();
+        for (Place place : places) {
             placesMap.put(place.getId(), place);
         }
 
         List<CourseSku> completedSkus = new ArrayList<CourseSku>();
         for (CourseSku sku : skus) {
-            PlaceDto place = placesMap.get(sku.getPlaceId());
+            Place place = placesMap.get(sku.getPlaceId());
             if (place == null) continue;
 
             sku.setPlace(buildCourseSkuPlace(place));
@@ -257,7 +257,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         return completedSkus;
     }
 
-    private CourseSkuPlace buildCourseSkuPlace(PlaceDto place) {
+    private CourseSkuPlace buildCourseSkuPlace(Place place) {
         CourseSkuPlace courseSkuPlace = new CourseSkuPlace();
         courseSkuPlace.setId(place.getId());
         courseSkuPlace.setCityId(place.getCityId());
