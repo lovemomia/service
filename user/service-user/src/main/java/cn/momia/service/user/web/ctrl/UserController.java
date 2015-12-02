@@ -1,10 +1,12 @@
 package cn.momia.service.user.web.ctrl;
 
-import cn.momia.api.user.dto.UserDto;
+import cn.momia.api.user.dto.Contact;
+import cn.momia.api.user.dto.User;
 import cn.momia.common.api.http.MomiaHttpResponse;
-import cn.momia.service.user.base.User;
+import cn.momia.service.user.base.UserService;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,31 +20,33 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/user")
-public class UserController extends UserRelatedController {
+public class UserController {
+    @Autowired private UserService userService;
+
     @RequestMapping(method = RequestMethod.GET)
     public MomiaHttpResponse get(@RequestParam String utoken) {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
+        return MomiaHttpResponse.SUCCESS(new User.Full(user));
     }
 
     @RequestMapping(value = "/{uid}", method = RequestMethod.GET)
     public MomiaHttpResponse get(@PathVariable(value = "uid") long userId) {
         User user = userService.get(userId);
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL, false));
+        return MomiaHttpResponse.SUCCESS(new User.Full(user, false));
     }
 
     @RequestMapping(value = "/mobile", method = RequestMethod.GET)
     public MomiaHttpResponse getByMobile(@RequestParam String mobile) {
         User user = userService.getByMobile(mobile);
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL, false));
+        return MomiaHttpResponse.SUCCESS(new User.Full(user, false));
     }
 
     @RequestMapping(value = "/invite", method = RequestMethod.GET)
     public MomiaHttpResponse getByInviteCode(@RequestParam(value = "invite") String inviteCode) {
         User user = userService.getByInviteCode(inviteCode);
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user, User.Type.FULL, false));
+        return MomiaHttpResponse.SUCCESS(new User.Full(user, false));
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
@@ -53,26 +57,26 @@ public class UserController extends UserRelatedController {
         }
 
         List<User> users = userService.list(userIds);
-        List<UserDto> userDtos = new ArrayList<UserDto>();
-
         switch (type) {
             case User.Type.MINI:
+                List<User.Mini> miniUsers = new ArrayList<User.Mini>();
                 for (User user : users) {
-                    userDtos.add(buildUserDto(user, User.Type.MINI));
+                    miniUsers.add(new User.Mini(user));
                 }
-                break;
+                return MomiaHttpResponse.SUCCESS(miniUsers);
             case User.Type.FULL:
+                List<User.Full> fullUsers = new ArrayList<User.Full>();
                 for (User user : users) {
-                    userDtos.add(buildUserDto(user, User.Type.FULL, false));
+                    fullUsers.add(new User.Full(user, false));
                 }
-                break;
+                return MomiaHttpResponse.SUCCESS(fullUsers);
             default:
+                List<User.Base> baseUsers = new ArrayList<User.Base>();
                 for (User user : users) {
-                    userDtos.add(buildUserDto(user, User.Type.BASE, false));
+                    baseUsers.add(new User.Base(user, false));
                 }
+                return MomiaHttpResponse.SUCCESS(baseUsers);
         }
-
-        return MomiaHttpResponse.SUCCESS(userDtos);
     }
 
     @RequestMapping(value = "/nickname", method = RequestMethod.PUT)
@@ -87,7 +91,7 @@ public class UserController extends UserRelatedController {
         }
 
         user.setNickName(nickName);
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
+        return MomiaHttpResponse.SUCCESS(new User.Full(user));
     }
 
     @RequestMapping(value = "/avatar", method = RequestMethod.PUT)
@@ -99,7 +103,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return MomiaHttpResponse.FAILED("更新用户头像失败");
 
         user.setAvatar(avatar);
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
+        return MomiaHttpResponse.SUCCESS(new User.Full(user));
     }
 
     @RequestMapping(value = "/cover", method = RequestMethod.PUT)
@@ -111,7 +115,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return MomiaHttpResponse.FAILED("更新用户封面图失败");
 
         user.setCover(cover);
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
+        return MomiaHttpResponse.SUCCESS(new User.Full(user));
     }
 
     @RequestMapping(value = "/name", method = RequestMethod.PUT)
@@ -123,7 +127,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return MomiaHttpResponse.FAILED("更新用户名字失败");
 
         user.setName(name);
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
+        return MomiaHttpResponse.SUCCESS(new User.Full(user));
     }
 
     @RequestMapping(value = "/sex", method = RequestMethod.PUT)
@@ -135,7 +139,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return MomiaHttpResponse.FAILED("更新用户性别失败");
 
         user.setSex(sex);
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
+        return MomiaHttpResponse.SUCCESS(new User.Full(user));
     }
 
     @RequestMapping(value = "/birthday", method = RequestMethod.PUT)
@@ -147,7 +151,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return MomiaHttpResponse.FAILED("更新用户生日失败");
 
         user.setBirthday(birthday);
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
+        return MomiaHttpResponse.SUCCESS(new User.Full(user));
     }
 
     @RequestMapping(value = "/city", method = RequestMethod.PUT)
@@ -159,7 +163,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return MomiaHttpResponse.FAILED("更新用户城市失败");
 
         user.setCityId(cityId);
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
+        return MomiaHttpResponse.SUCCESS(new User.Full(user));
     }
 
     @RequestMapping(value = "/region", method = RequestMethod.PUT)
@@ -171,7 +175,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return MomiaHttpResponse.FAILED("更新用户所在区域失败");
 
         user.setRegionId(regionId);
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
+        return MomiaHttpResponse.SUCCESS(new User.Full(user));
     }
 
     @RequestMapping(value = "/address", method = RequestMethod.PUT)
@@ -183,7 +187,7 @@ public class UserController extends UserRelatedController {
         if (!successful) return MomiaHttpResponse.FAILED("更新用户地址失败");
 
         user.setAddress(address);
-        return MomiaHttpResponse.SUCCESS(buildUserDto(user));
+        return MomiaHttpResponse.SUCCESS(new User.Full(user));
     }
 
     @RequestMapping(value = "/contact", method = RequestMethod.GET)
@@ -191,7 +195,7 @@ public class UserController extends UserRelatedController {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
-        return MomiaHttpResponse.SUCCESS(buildContactDto(user));
+        return MomiaHttpResponse.SUCCESS(new Contact(user));
     }
 
     @RequestMapping(value = "/{uid}/payed", method = RequestMethod.POST)

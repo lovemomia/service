@@ -3,13 +3,13 @@ package cn.momia.service.feed.web.ctrl;
 import cn.momia.api.feed.dto.FeedDto;
 import cn.momia.api.feed.dto.FeedTagDto;
 import cn.momia.api.feed.dto.FeedTagsDto;
-import cn.momia.api.user.dto.ChildDto;
+import cn.momia.api.user.dto.Child;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.api.user.UserServiceApi;
-import cn.momia.api.user.dto.UserDto;
+import cn.momia.api.user.dto.User;
 import cn.momia.service.feed.base.Feed;
 import cn.momia.service.feed.base.FeedService;
 import cn.momia.service.feed.base.FeedTag;
@@ -75,15 +75,15 @@ public class FeedController extends BaseController {
             userIds.add(feed.getUserId());
         }
 
-        List<UserDto> users = userServiceApi.list(userIds, UserDto.Type.FULL);
-        Map<Long, UserDto> usersMap = new HashMap<Long, UserDto>();
-        for (UserDto user : users) {
+        List<User> users = userServiceApi.list(userIds, User.Type.FULL);
+        Map<Long, User> usersMap = new HashMap<Long, User>();
+        for (User user : users) {
             usersMap.put(user.getId(), user);
         }
 
         List<FeedDto> feedDtos = new ArrayList<FeedDto>();
         for (Feed feed : feeds) {
-            UserDto user = usersMap.get(feed.getUserId());
+            User user = usersMap.get(feed.getUserId());
             if (user == null) continue;
 
             feedDtos.add(buildFeedDto(feed, user, staredFeedIds.contains(feed.getId())));
@@ -95,7 +95,7 @@ public class FeedController extends BaseController {
         return pagedFeedDtos;
     }
 
-    private FeedDto buildFeedDto(Feed feed, UserDto user, boolean stared) {
+    private FeedDto buildFeedDto(Feed feed, User user, boolean stared) {
         FeedDto feedDto = new FeedDto();
         feedDto.setId(feed.getId());
         feedDto.setType(feed.getType());
@@ -121,10 +121,10 @@ public class FeedController extends BaseController {
         return feedDto;
     }
 
-    private List<String> formatChildren(List<ChildDto> children) {
+    private List<String> formatChildren(List<Child> children) {
         List<String> formatedChildren = new ArrayList<String>();
         for (int i = 0; i < Math.min(2, children.size()); i++) {
-            ChildDto child = children.get(i);
+            Child child = children.get(i);
             formatedChildren.add(child.getSex() + "孩" + TimeUtil.formatAge(child.getBirthday()));
         }
 
@@ -245,7 +245,7 @@ public class FeedController extends BaseController {
         Feed feed = feedService.get(feedId);
         if (!feed.exists()) return MomiaHttpResponse.FAILED("无效的Feed");
 
-        UserDto feedUser = userServiceApi.get(feed.getUserId());
+        User feedUser = userServiceApi.get(feed.getUserId());
         if (!feedUser.exists()) return MomiaHttpResponse.FAILED("无效的Feed");
 
         boolean stared = userId > 0 && feedStarService.isStared(userId, feedId);

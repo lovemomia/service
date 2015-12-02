@@ -2,7 +2,7 @@ package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.course.dto.PaymentDto;
 import cn.momia.api.user.UserServiceApi;
-import cn.momia.api.user.dto.UserDto;
+import cn.momia.api.user.dto.User;
 import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.client.ClientType;
@@ -54,7 +54,7 @@ public class PaymentController extends BaseController {
     }
 
     private MomiaHttpResponse prepay(HttpServletRequest request, int payType) {
-        UserDto user = userServiceApi.get(request.getParameter("utoken"));
+        User user = userServiceApi.get(request.getParameter("utoken"));
         long orderId = Long.valueOf(request.getParameter("oid"));
         long userCouponId = Long.valueOf(request.getParameter("coupon"));
 
@@ -195,7 +195,7 @@ public class PaymentController extends BaseController {
 
     private void inviteUserCoupon(Order order, UserCoupon userCoupon) {
         try {
-            UserDto inviteUser = userServiceApi.getByInviteCode(userCoupon.getInviteCode());
+            User inviteUser = userServiceApi.getByInviteCode(userCoupon.getInviteCode());
             if (inviteUser.exists() && inviteUser.getId() != order.getUserId()) {
                 couponService.distributeInviteUserCoupon(inviteUser.getId(), userCoupon.getCouponId(), null);
             }
@@ -246,7 +246,7 @@ public class PaymentController extends BaseController {
 
     @RequestMapping(value = "/check", method = RequestMethod.POST)
     public MomiaHttpResponse check(@RequestParam String utoken, @RequestParam(value = "oid") long orderId) {
-        UserDto user = userServiceApi.get(utoken);
+        User user = userServiceApi.get(utoken);
         Order order = orderService.get(orderId);
 
         PaymentDto paymentDto = new PaymentDto();

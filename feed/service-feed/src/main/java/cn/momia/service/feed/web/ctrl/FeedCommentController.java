@@ -2,7 +2,7 @@ package cn.momia.service.feed.web.ctrl;
 
 import cn.momia.api.feed.dto.FeedCommentDto;
 import cn.momia.api.user.UserServiceApi;
-import cn.momia.api.user.dto.UserDto;
+import cn.momia.api.user.dto.User;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.TimeUtil;
@@ -46,14 +46,14 @@ public class FeedCommentController extends BaseController {
 
         List<Long> userIds = new ArrayList<Long>();
         for (FeedComment comment : comments) userIds.add(comment.getUserId());
-        List<UserDto> users = userServiceApi.list(userIds, UserDto.Type.MINI);
-        Map<Long, UserDto> usersMap = new HashMap<Long, UserDto>();
-        for (UserDto user : users) usersMap.put(user.getId(), user);
+        List<User> users = userServiceApi.list(userIds, User.Type.MINI);
+        Map<Long, User> usersMap = new HashMap<Long, User>();
+        for (User user : users) usersMap.put(user.getId(), user);
 
         PagedList<FeedCommentDto> pagedFeedCommentDtos = new PagedList(totalCount, start, count);
         List<FeedCommentDto> feedCommentDtos = new ArrayList<FeedCommentDto>();
         for (FeedComment comment : comments) {
-            UserDto user = usersMap.get(comment.getUserId());
+            User user = usersMap.get(comment.getUserId());
             if (user == null) continue;
 
             feedCommentDtos.add(buildFeedCommentDto(comment, user));
@@ -63,7 +63,7 @@ public class FeedCommentController extends BaseController {
         return MomiaHttpResponse.SUCCESS(pagedFeedCommentDtos);
     }
 
-    private FeedCommentDto buildFeedCommentDto(FeedComment comment, UserDto user) {
+    private FeedCommentDto buildFeedCommentDto(FeedComment comment, User user) {
         FeedCommentDto feedCommentDto = new FeedCommentDto();
         feedCommentDto.setId(comment.getId());
         feedCommentDto.setContent(comment.getContent());

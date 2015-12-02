@@ -1,8 +1,8 @@
-package cn.momia.service.user.base.child.impl;
+package cn.momia.service.user.child.impl;
 
+import cn.momia.api.user.dto.Child;
 import cn.momia.common.service.AbstractService;
-import cn.momia.service.user.base.child.Child;
-import cn.momia.service.user.base.child.ChildService;
+import cn.momia.service.user.child.ChildService;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -54,21 +54,35 @@ public class ChildServiceImpl extends AbstractService implements ChildService {
         if (childIds.isEmpty()) return new ArrayList<Child>();
 
         String sql = "SELECT Id, UserId, Avatar, Name, Sex, Birthday FROM SG_Child WHERE Id IN (" + StringUtils.join(childIds, ",") + ") AND Status<>0";
-        return queryObjectList(sql, Child.class);
+        List<Child> children = queryObjectList(sql, Child.class);
+
+        Map<Long, Child> childrenMap = new HashMap<Long, Child>();
+        for (Child child : children) {
+            childrenMap.put(child.getId(), child);
+        }
+
+        List<Child> result = new ArrayList<Child>();
+        for (long childId : childIds) {
+            Child child = childrenMap.get(childId);
+            if (child != null) result.add(child);
+        }
+
+        return result;
     }
 
     @Override
     public Map<Long, List<Child>> queryByUsers(Collection<Long> userIds) {
         if (userIds.isEmpty()) return new HashMap<Long, List<Child>>();
 
-        String sql = "SELECT Id FROM SG_Child WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND Status<>0";
-        List<Long> childIds = queryLongList(sql);
-        List<Child> children = list(childIds);
-
         Map<Long, List<Child>> childrenMap = new HashMap<Long, List<Child>>();
         for (long userId : userIds) {
             childrenMap.put(userId, new ArrayList<Child>());
         }
+
+        String sql = "SELECT Id FROM SG_Child WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND Status<>0";
+        List<Long> childIds = queryLongList(sql);
+        List<Child> children = list(childIds);
+
         for (Child child : children) {
             childrenMap.get(child.getUserId()).add(child);
         }

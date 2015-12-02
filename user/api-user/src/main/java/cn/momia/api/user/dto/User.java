@@ -1,18 +1,19 @@
-package cn.momia.service.user.base;
+package cn.momia.api.user.dto;
 
-import cn.momia.service.user.base.child.Child;
+import cn.momia.common.util.MobileUtil;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
 import java.util.List;
 
 public class User {
+    public static final User NOT_EXIST_USER = new User();
+
     public static class Type {
         public static final int MINI = 1;
         public static final int BASE = 2;
         public static final int FULL = 3;
     }
-
-    public static final User NOT_EXIST_USER = new User();
 
     private long id;
     private String nickName;
@@ -155,5 +156,96 @@ public class User {
 
     public boolean exists() {
         return id > 0;
+    }
+
+    public static class Mini {
+        protected User user;
+
+        public Mini(User user) {
+            this.user = user;
+        }
+
+        public long getId() {
+            return user.getId();
+        }
+
+        public String getNickName() {
+            return user.getNickName();
+        }
+
+        public String getAvatar() {
+            return user.getAvatar();
+        }
+    }
+
+    public static class Base extends Mini {
+        private boolean showToken = true;
+
+        public Base(User user) {
+            super(user);
+        }
+
+        public Base(User user, boolean showToken) {
+            this(user);
+            this.showToken = showToken;
+        }
+        public String getMobile() {
+            return MobileUtil.encrypt(user.getMobile());
+        }
+
+        public String getCover() {
+            return user.getCover();
+        }
+
+        public String getName() {
+            return user.getName();
+        }
+
+        public String getSex() {
+            return user.getSex();
+        }
+
+        @JSONField(format = "yyyy-MM-dd")
+        public Date getBirthday() {
+            return user.getBirthday();
+        }
+
+        public int getCityId() {
+            return user.getCityId();
+        }
+
+        public int getRegionId() {
+            return user.getRegionId();
+        }
+
+        public String getAddress() {
+            return user.getAddress();
+        }
+
+        public boolean isPayed() {
+            return user.getPayed() == 1;
+        }
+
+        public String getInviteCode() {
+            return user.getInviteCode();
+        }
+
+        public String getToken() {
+            return showToken ? user.getToken() : "";
+        }
+    }
+
+    public static class Full extends Base {
+        public Full(User user) {
+            super(user);
+        }
+
+        public Full(User user, boolean showToken) {
+            super(user, showToken);
+        }
+
+        public List<Child> getChildren() {
+            return user.getChildren();
+        }
     }
 }

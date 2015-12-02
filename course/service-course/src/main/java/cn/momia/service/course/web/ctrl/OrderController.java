@@ -3,7 +3,7 @@ package cn.momia.service.course.web.ctrl;
 import cn.momia.api.course.dto.OrderDto;
 import cn.momia.api.course.dto.OrderPackageDto;
 import cn.momia.api.user.UserServiceApi;
-import cn.momia.api.user.dto.UserDto;
+import cn.momia.api.user.dto.User;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.api.http.MomiaHttpResponse;
@@ -75,7 +75,7 @@ public class OrderController extends BaseController {
     private boolean checkAndCompleteOrder(Order order, List<SubjectSku> skus) {
         if (order.isInvalid()) return false;
 
-        UserDto user = userServiceApi.get(order.getUserId());
+        User user = userServiceApi.get(order.getUserId());
         if (subjectService.isTrial(order.getSubjectId()) && (user.isPayed() || orderService.hasTrialOrder(user.getId()))) throw new MomiaErrorException("本课程包只供新用户专享");
 
         Map<Long, SubjectSku> skusMap = new HashMap<Long, SubjectSku>();
@@ -117,7 +117,7 @@ public class OrderController extends BaseController {
 
     @RequestMapping(method = RequestMethod.DELETE)
     public MomiaHttpResponse delete(@RequestParam String utoken, @RequestParam(value = "oid") long orderId) {
-        UserDto user = userServiceApi.get(utoken);
+        User user = userServiceApi.get(utoken);
         return MomiaHttpResponse.SUCCESS(orderService.delete(user.getId(), orderId));
     }
 
@@ -125,13 +125,13 @@ public class OrderController extends BaseController {
     public MomiaHttpResponse refund(@RequestParam String utoken, @RequestParam(value = "oid") long orderId) {
         if (courseService.queryBookedCourseCounts(Sets.newHashSet(orderId)).get(orderId) > 0) return MomiaHttpResponse.FAILED("已经选过课的订单不能申请退款");
 
-        UserDto user = userServiceApi.get(utoken);
+        User user = userServiceApi.get(utoken);
         return MomiaHttpResponse.SUCCESS(orderService.refund(user.getId(), orderId));
     }
 
     @RequestMapping(value = "/{oid}", method = RequestMethod.GET)
     public MomiaHttpResponse get(@RequestParam String utoken, @PathVariable(value = "oid") long orderId) {
-        UserDto user = userServiceApi.get(utoken);
+        User user = userServiceApi.get(utoken);
         Order order = orderService.get(orderId);
         if (!user.exists() || !order.exists() || order.getUserId() != user.getId()) return MomiaHttpResponse.FAILED("无效的订单");
 
@@ -172,7 +172,7 @@ public class OrderController extends BaseController {
                                                 @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
-        UserDto user = userServiceApi.get(utoken);
+        User user = userServiceApi.get(utoken);
 
         long totalCount = orderId > 0 ? orderService.queryBookableCountByUserAndOrder(user.getId(), orderId) : orderService.queryBookableCountByUser(user.getId());
         List<OrderPackage> orderPackages = orderId > 0 ? orderService.queryBookableByUserAndOrder(user.getId(), orderId, start, count) : orderService.queryBookableByUser(user.getId(), start, count);
@@ -260,7 +260,7 @@ public class OrderController extends BaseController {
                                         @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
-        UserDto user = userServiceApi.get(utoken);
+        User user = userServiceApi.get(utoken);
 
         long totalCount = orderService.queryCountByUser(user.getId(), status);
         List<Order> orders = orderService.queryByUser(user.getId(), status, start, count);

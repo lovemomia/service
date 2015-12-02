@@ -1,4 +1,6 @@
-package cn.momia.service.user.base.child;
+package cn.momia.service.user.child;
+
+import cn.momia.api.user.dto.Child;
 
 import java.util.Collection;
 import java.util.Date;

@@ -7,8 +7,8 @@ import cn.momia.api.course.dto.FavoriteDto;
 import cn.momia.api.course.dto.SubjectDto;
 import cn.momia.api.course.dto.SubjectSkuDto;
 import cn.momia.api.user.UserServiceApi;
-import cn.momia.api.user.dto.ChildDto;
-import cn.momia.api.user.dto.UserDto;
+import cn.momia.api.user.dto.Child;
+import cn.momia.api.user.dto.User;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.api.http.MomiaHttpResponse;
@@ -259,9 +259,9 @@ public class SubjectController extends BaseController {
             coursesMap.put(course.getId(), course);
         }
 
-        List<UserDto> users = userServiceApi.list(userIds, UserDto.Type.FULL);
-        Map<Long, UserDto> usersMap = new HashMap<Long, UserDto>();
-        for (UserDto user : users) {
+        List<User> users = userServiceApi.list(userIds, User.Type.FULL);
+        Map<Long, User> usersMap = new HashMap<Long, User>();
+        for (User user : users) {
             usersMap.put(user.getId(), user);
         }
 
@@ -269,7 +269,7 @@ public class SubjectController extends BaseController {
         for (CourseComment comment : comments) {
             Course course = coursesMap.get(comment.getCourseId());
             if (course == null) continue;
-            UserDto user = usersMap.get(comment.getUserId());
+            User user = usersMap.get(comment.getUserId());
             if (user == null) continue;
 
             commentDtos.add(buildCourseCommentDto(comment, course, user));
@@ -281,7 +281,7 @@ public class SubjectController extends BaseController {
         return MomiaHttpResponse.SUCCESS(pagedCommentDtos);
     }
 
-    private CourseCommentDto buildCourseCommentDto(CourseComment comment, Course course, UserDto user) {
+    private CourseCommentDto buildCourseCommentDto(CourseComment comment, Course course, User user) {
         CourseCommentDto courseCommentDto = new CourseCommentDto();
         courseCommentDto.setId(comment.getId());
         courseCommentDto.setCourseId(course.getId());
@@ -298,10 +298,10 @@ public class SubjectController extends BaseController {
         return courseCommentDto;
     }
 
-    private List<String> formatChildren(List<ChildDto> children) {
+    private List<String> formatChildren(List<Child> children) {
         List<String> formatedChildren = new ArrayList<String>();
         for (int i = 0; i < Math.min(2, children.size()); i++) {
-            ChildDto child = children.get(i);
+            Child child = children.get(i);
             formatedChildren.add(child.getSex() + "孩" + TimeUtil.formatAge(child.getBirthday()));
         }
 

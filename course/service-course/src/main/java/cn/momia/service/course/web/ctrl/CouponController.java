@@ -2,7 +2,7 @@ package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.course.dto.UserCouponDto;
 import cn.momia.api.user.UserServiceApi;
-import cn.momia.api.user.dto.UserDto;
+import cn.momia.api.user.dto.User;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
@@ -33,7 +33,7 @@ public class CouponController extends BaseController {
     public MomiaHttpResponse coupon(@RequestParam String utoken,
                                     @RequestParam(value = "oid") long orderId,
                                     @RequestParam(value = "coupon") long userCouponId) {
-        UserDto user = userServiceApi.get(utoken);
+        User user = userServiceApi.get(utoken);
         UserCoupon userCoupon = couponService.get(userCouponId);
         if (!userCoupon.exists() || userCoupon.getUserId() != user.getId() || userCoupon.isUsed()) return MomiaHttpResponse.FAILED("无效的红包/优惠券");
         if (userCoupon.isExpired()) return MomiaHttpResponse.FAILED("红包/优惠券已经过期");
@@ -68,7 +68,7 @@ public class CouponController extends BaseController {
                                          @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
-        UserDto user = userServiceApi.get(utoken);
+        User user = userServiceApi.get(utoken);
         long totalCount = couponService.queryCount(user.getId(), status);
         List<UserCoupon> userCoupons = couponService.query(user.getId(), status, start, count);
 

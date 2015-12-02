@@ -11,8 +11,8 @@ import cn.momia.api.course.dto.CourseSkuDto;
 import cn.momia.api.course.dto.DatedCourseSkusDto;
 import cn.momia.api.course.dto.FavoriteDto;
 import cn.momia.api.user.UserServiceApi;
-import cn.momia.api.user.dto.ChildDto;
-import cn.momia.api.user.dto.UserDto;
+import cn.momia.api.user.dto.Child;
+import cn.momia.api.user.dto.User;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.PoiUtil;
@@ -599,7 +599,7 @@ public class CourseController extends BaseController {
         }
 
         Order order = orderService.get(orderPackage.getOrderId());
-        UserDto user = userServiceApi.get(utoken);
+        User user = userServiceApi.get(utoken);
         if (!order.exists() || !order.isPayed() || order.getUserId() != user.getId()) return MomiaHttpResponse.FAILED("预约失败，无效的订单");
 
         if (courseService.booked(packageId, sku.getCourseId())) return MomiaHttpResponse.FAILED("一门课程在一个课程包内只能约一次");
@@ -630,7 +630,7 @@ public class CourseController extends BaseController {
 
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     public MomiaHttpResponse cancel(@RequestParam String utoken, @RequestParam(value = "bid") long bookingId) {
-        UserDto user = userServiceApi.get(utoken);
+        User user = userServiceApi.get(utoken);
         BookedCourse bookedCourse = courseService.getBookedCourse(bookingId);
         if (!bookedCourse.exists()) return MomiaHttpResponse.FAILED("取消预约的课程不存在");
         if (!bookedCourse.canCancel()) return MomiaHttpResponse.FAILED("课程开始前2天内无法取消课程");
@@ -672,15 +672,15 @@ public class CourseController extends BaseController {
             userIds.add(comment.getUserId());
         }
 
-        List<UserDto> users = userServiceApi.list(userIds, UserDto.Type.FULL);
-        Map<Long, UserDto> usersMap = new HashMap<Long, UserDto>();
-        for (UserDto user : users) {
+        List<User> users = userServiceApi.list(userIds, User.Type.FULL);
+        Map<Long, User> usersMap = new HashMap<Long, User>();
+        for (User user : users) {
             usersMap.put(user.getId(), user);
         }
 
         List<CourseCommentDto> commentDtos = new ArrayList<CourseCommentDto>();
         for (CourseComment comment : comments) {
-            UserDto user = usersMap.get(comment.getUserId());
+            User user = usersMap.get(comment.getUserId());
             if (user == null) continue;
             commentDtos.add(buildCourseCommentDto(comment, user));
         }
@@ -691,7 +691,7 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(pagedCommentDtos);
     }
 
-    private CourseCommentDto buildCourseCommentDto(CourseComment comment, UserDto user) {
+    private CourseCommentDto buildCourseCommentDto(CourseComment comment, User user) {
         CourseCommentDto courseCommentDto = new CourseCommentDto();
         courseCommentDto.setId(comment.getId());
         courseCommentDto.setUserId(user.getId());
@@ -706,10 +706,10 @@ public class CourseController extends BaseController {
         return courseCommentDto;
     }
 
-    private List<String> formatChildren(List<ChildDto> children) {
+    private List<String> formatChildren(List<Child> children) {
         List<String> formatedChildren = new ArrayList<String>();
         for (int i = 0; i < Math.min(2, children.size()); i++) {
-            ChildDto child = children.get(i);
+            Child child = children.get(i);
             formatedChildren.add(child.getSex() + "孩" + TimeUtil.formatAge(child.getBirthday()));
         }
 

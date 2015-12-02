@@ -1,5 +1,7 @@
 package cn.momia.service.user.base;
 
+import cn.momia.api.user.dto.User;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;

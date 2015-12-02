@@ -1,7 +1,7 @@
 package cn.momia.service.feed.web.ctrl;
 
 import cn.momia.api.user.UserServiceApi;
-import cn.momia.api.user.dto.UserDto;
+import cn.momia.api.user.dto.User;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
@@ -37,11 +37,11 @@ public class FeedStarController extends BaseController {
         if (totalCount <= 0) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
         List<Long> userIds = feedStarService.queryUserIds(feedId, start, count);
-        List<UserDto> users = userServiceApi.list(userIds, UserDto.Type.MINI);
+        List<User> users = userServiceApi.list(userIds, User.Type.MINI);
 
-        PagedList<UserDto> pagedStaredUserDtos = new PagedList(totalCount, start, count);
-        List<UserDto> staredUserDtos = new ArrayList<UserDto>();
-        for (UserDto user : users) {
+        PagedList<User> pagedStaredUserDtos = new PagedList(totalCount, start, count);
+        List<User> staredUserDtos = new ArrayList<User>();
+        for (User user : users) {
             staredUserDtos.add(user);
         }
         pagedStaredUserDtos.setList(staredUserDtos);
