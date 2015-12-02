@@ -1,10 +1,10 @@
 package cn.momia.service.feed.base.impl;
 
+import cn.momia.api.feed.dto.FeedTag;
 import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.service.feed.base.Feed;
 import cn.momia.service.feed.base.FeedService;
-import cn.momia.service.feed.base.FeedTag;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -334,7 +334,6 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
         String sql = "SELECT Id, Name FROM SG_FeedTag WHERE Recommended=? AND Status<>0 ORDER BY RefCount DESC, AddTime DESC LIMIT ?";
         return queryObjectList(sql, new Object[] { recommended, count }, FeedTag.class);
     }
-
 
     @Override
     public List<FeedTag> listHotTags(int count) {

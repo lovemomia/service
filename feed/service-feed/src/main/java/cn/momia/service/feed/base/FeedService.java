@@ -1,5 +1,7 @@
 package cn.momia.service.feed.base;
 
+import cn.momia.api.feed.dto.FeedTag;
+
 import java.util.Collection;
 import java.util.List;
 

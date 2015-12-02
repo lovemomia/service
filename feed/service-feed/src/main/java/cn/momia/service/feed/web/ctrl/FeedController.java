@@ -1,8 +1,7 @@
 package cn.momia.service.feed.web.ctrl;
 
 import cn.momia.api.feed.dto.FeedDto;
-import cn.momia.api.feed.dto.FeedTagDto;
-import cn.momia.api.feed.dto.FeedTagsDto;
+import cn.momia.api.feed.dto.FeedTag;
 import cn.momia.api.user.dto.Child;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.TimeUtil;
@@ -12,7 +11,6 @@ import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
 import cn.momia.service.feed.base.Feed;
 import cn.momia.service.feed.base.FeedService;
-import cn.momia.service.feed.base.FeedTag;
 import cn.momia.service.feed.star.FeedStarService;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
@@ -174,33 +172,14 @@ public class FeedController extends BaseController {
         return MomiaHttpResponse.SUCCESS(feedService.isOfficialUser(userId));
     }
 
-    @RequestMapping(value = "/tag", method = RequestMethod.GET)
-    public MomiaHttpResponse listTags(@RequestParam int count) {
-        List<FeedTag> recommendedTags = feedService.listRecommendedTags(count);
-        List<FeedTag> hotTags = feedService.listHotTags(count);
-
-        FeedTagsDto feedTagsDto = new FeedTagsDto();
-        feedTagsDto.setRecommendedTags(buildFeedTagDtos(recommendedTags));
-        feedTagsDto.setHotTags(buildFeedTagDtos(hotTags));
-
-        return MomiaHttpResponse.SUCCESS(feedTagsDto);
+    @RequestMapping(value = "/tag/recommend", method = RequestMethod.GET)
+    public MomiaHttpResponse listRecommendedTags(@RequestParam int count) {
+        return MomiaHttpResponse.SUCCESS(feedService.listRecommendedTags(count));
     }
 
-    private List<FeedTagDto> buildFeedTagDtos(List<FeedTag> tags) {
-        List<FeedTagDto> feedTagDtos = new ArrayList<FeedTagDto>();
-        for (FeedTag tag : tags) {
-            feedTagDtos.add(buildFeedTagDto(tag));
-        }
-
-        return feedTagDtos;
-    }
-
-    private FeedTagDto buildFeedTagDto(FeedTag tag) {
-        FeedTagDto feedTagDto = new FeedTagDto();
-        feedTagDto.setId(tag.getId());
-        feedTagDto.setName(tag.getName());
-
-        return feedTagDto;
+    @RequestMapping(value = "/tag/hot", method = RequestMethod.GET)
+    public MomiaHttpResponse listHotTags(@RequestParam int count) {
+        return MomiaHttpResponse.SUCCESS(feedService.listHotTags(count));
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")

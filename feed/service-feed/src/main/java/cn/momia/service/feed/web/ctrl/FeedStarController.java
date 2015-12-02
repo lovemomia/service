@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -40,11 +39,7 @@ public class FeedStarController extends BaseController {
         List<User> users = userServiceApi.list(userIds, User.Type.MINI);
 
         PagedList<User> pagedStaredUserDtos = new PagedList(totalCount, start, count);
-        List<User> staredUserDtos = new ArrayList<User>();
-        for (User user : users) {
-            staredUserDtos.add(user);
-        }
-        pagedStaredUserDtos.setList(staredUserDtos);
+        pagedStaredUserDtos.setList(users);
 
         return MomiaHttpResponse.SUCCESS(pagedStaredUserDtos);
     }
