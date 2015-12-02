@@ -7,6 +7,7 @@ import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.client.ClientType;
 import cn.momia.common.deal.gateway.CallbackParam;
+import cn.momia.common.deal.gateway.CallbackResult;
 import cn.momia.common.deal.gateway.PayType;
 import cn.momia.common.deal.gateway.PaymentGateway;
 import cn.momia.common.deal.gateway.PrepayParam;
@@ -24,6 +25,7 @@ import cn.momia.service.course.coupon.UserCoupon;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderService;
 import cn.momia.service.course.order.Payment;
+import com.google.common.base.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +72,7 @@ public class PaymentController extends BaseController {
             totalFee = couponService.calcTotalFee(totalFee, userCoupon);
         }
 
-        PrepayParam prepayParam = extractPrepayParam(request, order, totalFee, subject, payType);
+        PrepayParam prepayParam = buildPrepayParam(request, order, totalFee, subject, payType);
         PaymentGateway gateway = PaymentGatewayFactory.create(payType);
         PrepayResult prepayResult = gateway.prepay(prepayParam);
 
@@ -78,7 +80,7 @@ public class PaymentController extends BaseController {
         return MomiaHttpResponse.SUCCESS(prepayResult);
     }
 
-    private PrepayParam extractPrepayParam(HttpServletRequest request, Order order, BigDecimal totalFee, Subject subject, int payType) {
+    private PrepayParam buildPrepayParam(HttpServletRequest request, Order order, BigDecimal totalFee, Subject subject, int payType) {
         PrepayParam prepayParam = new PrepayParam();
 
         prepayParam.setClientType(extractClientType(request, payType));
@@ -132,19 +134,31 @@ public class PaymentController extends BaseController {
 
     private MomiaHttpResponse callback(HttpServletRequest request, int payType) {
         CallbackParam callbackParam = CallbackParamFactory.create(extractParams(request), payType);
+        PaymentGateway gateway = PaymentGatewayFactory.create(payType);
+        CallbackResult callbackResult = gateway.callback(callbackParam, new Function<CallbackParam, Boolean>() {
+            @Override
+            public Boolean apply(CallbackParam callbackParam) {
+                return doCallback(callbackParam);
+            }
+        });
 
-        if (!callbackParam.isPayedSuccessfully()) return MomiaHttpResponse.SUCCESS("OK");
+        if (callbackResult.isSuccessful()) return MomiaHttpResponse.SUCCESS("OK");
+        return MomiaHttpResponse.SUCCESS("FAIL");
+    }
+
+    private boolean doCallback(CallbackParam callbackParam) {
+        if (!callbackParam.isPayedSuccessfully()) return true;
 
         long orderId = callbackParam.getOrderId();
         Order order = orderService.get(orderId);
         if (!order.exists()) {
             // TODO 自动退款
-            return MomiaHttpResponse.SUCCESS("OK");
+            return true;
         }
 
         if (order.isPayed()) {
             // TODO 判断是否重复付款，是则退款
-            return MomiaHttpResponse.SUCCESS("OK");
+            return true;
         }
 
         boolean isFirstPay = setPayed(order.getUserId());
@@ -157,7 +171,7 @@ public class PaymentController extends BaseController {
                     !couponService.useCoupon(order.getId(), userCoupon.getId())) {
                 // TODO 自动退款
                 LOGGER.error("红包/优惠券不匹配，订单: {}", order.getId());
-                return MomiaHttpResponse.SUCCESS("OK");
+                return true;
             }
 
             if (isFirstPay && packageTypes.contains(OrderPackage.Type.PACKAGE)) inviteUserCoupon(order, userCoupon);
@@ -165,9 +179,9 @@ public class PaymentController extends BaseController {
 
         if (isFirstPay && packageTypes.contains(OrderPackage.Type.PACKAGE)) firstPayUserCoupon(order);
 
-        if (!finishPayment(order, createPayment(callbackParam))) return MomiaHttpResponse.SUCCESS("FAIL");
+        if (!finishPayment(order, createPayment(callbackParam))) return false;
 
-        return MomiaHttpResponse.SUCCESS("OK");
+        return true;
     }
 
     private boolean setPayed(long userId) {
