@@ -4,8 +4,6 @@ import cn.momia.api.course.dto.PaymentDto;
 import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
-import cn.momia.common.api.util.CastUtil;
-import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
 
@@ -20,7 +18,7 @@ public class PaymentServiceApi extends ServiceApi {
                 .add("coupon", userCouponId);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/payment/prepay/alipay"), builder.build());
 
-        return executeRequest(request);
+        return execute(request);
     }
 
     public Object prepayWeixin(String utoken, long orderId, String type, String code, long userCouponId) {
@@ -32,17 +30,17 @@ public class PaymentServiceApi extends ServiceApi {
         if (!StringUtils.isBlank(code)) builder.add("code", code);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/payment/prepay/weixin"), builder.build());
 
-        return executeRequest(request);
+        return execute(request);
     }
 
     public boolean callbackAlipay(Map<String, String> params) {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/payment/callback/alipay"), params);
-        return "OK".equalsIgnoreCase((String) executeRequest(request));
+        return "OK".equalsIgnoreCase(executeReturnObject(request, String.class));
     }
 
     public boolean callbackWeixin(Map<String, String> params) {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/payment/callback/weixin"), params);
-        return "OK".equalsIgnoreCase((String) executeRequest(request));
+        return "OK".equalsIgnoreCase(executeReturnObject(request, String.class));
     }
 
     public PaymentDto checkPayment(String utoken, long orderId) {
@@ -51,6 +49,6 @@ public class PaymentServiceApi extends ServiceApi {
                 .add("oid", orderId);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/payment/check"), builder.build());
 
-        return CastUtil.toObject((JSON) executeRequest(request), PaymentDto.class);
+        return executeReturnObject(request, PaymentDto.class);
     }
 }

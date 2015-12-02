@@ -5,9 +5,7 @@ import cn.momia.api.user.dto.UserDto;
 import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
-import cn.momia.common.api.util.CastUtil;
 import cn.momia.common.util.TimeUtil;
-import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
 
@@ -24,7 +22,7 @@ public class UserServiceApi extends ServiceApi {
                 .add("code", code);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/auth/register"), builder.build());
 
-        return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
+        return executeReturnObject(request, UserDto.class);
     }
 
     public UserDto login(String mobile, String password) {
@@ -33,7 +31,7 @@ public class UserServiceApi extends ServiceApi {
                 .add("password", password);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/auth/login"), builder.build());
 
-        return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
+        return executeReturnObject(request, UserDto.class);
     }
 
     public UserDto loginByCode(String mobile, String code) {
@@ -42,7 +40,7 @@ public class UserServiceApi extends ServiceApi {
                 .add("code", code);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/auth/login/code"), builder.build());
 
-        return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
+        return executeReturnObject(request, UserDto.class);
     }
 
     public UserDto updatePassword(String mobile, String password, String code) {
@@ -52,33 +50,33 @@ public class UserServiceApi extends ServiceApi {
                 .add("code", code);
         HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/auth/password"), builder.build());
 
-        return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
+        return executeReturnObject(request, UserDto.class);
     }
 
     public UserDto get(String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/user"), builder.build());
 
-        return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
+        return executeReturnObject(request, UserDto.class);
     }
 
     public UserDto get(long userId) {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/user/%d", userId));
-        return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
+        return executeReturnObject(request, UserDto.class);
     }
 
     public UserDto getByMobile(String mobile) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("mobile", mobile);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/user/mobile"), builder.build());
 
-        return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
+        return executeReturnObject(request, UserDto.class);
     }
 
     public UserDto getByInviteCode(String inviteCode) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("invite", inviteCode);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/user/invite"), builder.build());
 
-        return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
+        return executeReturnObject(request, UserDto.class);
     }
 
     public List<UserDto> list(Collection<Long> userIds, int type) {
@@ -87,7 +85,7 @@ public class UserServiceApi extends ServiceApi {
                 .add("type", type);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/user/list"), builder.build());
 
-        return CastUtil.toList((JSON) executeRequest(request), UserDto.class);
+        return executeReturnList(request, UserDto.class);
     }
 
     public UserDto updateNickName(String utoken, String nickName) {
@@ -96,7 +94,7 @@ public class UserServiceApi extends ServiceApi {
                 .add("nickname", nickName);
         HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/user/nickname"), builder.build());
 
-        return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
+        return executeReturnObject(request, UserDto.class);
     }
 
     public UserDto updateAvatar(String utoken, String avatar) {
@@ -105,7 +103,7 @@ public class UserServiceApi extends ServiceApi {
                 .add("avatar", avatar);
         HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/user/avatar"), builder.build());
 
-        return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
+        return executeReturnObject(request, UserDto.class);
     }
 
     public UserDto updateCover(String utoken, String cover) {
@@ -114,7 +112,7 @@ public class UserServiceApi extends ServiceApi {
                 .add("cover", cover);
         HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/user/cover"), builder.build());
 
-        return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
+        return executeReturnObject(request, UserDto.class);
     }
 
     public UserDto updateName(String utoken, String name) {
@@ -123,7 +121,7 @@ public class UserServiceApi extends ServiceApi {
                 .add("name", name);
         HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/user/name"), builder.build());
 
-        return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
+        return executeReturnObject(request, UserDto.class);
     }
 
     public UserDto updateSex(String utoken, String sex) {
@@ -132,7 +130,7 @@ public class UserServiceApi extends ServiceApi {
                 .add("sex", sex);
         HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/user/sex"), builder.build());
 
-        return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
+        return executeReturnObject(request, UserDto.class);
     }
 
     public UserDto updateBirthday(String utoken, Date birthday) {
@@ -141,7 +139,7 @@ public class UserServiceApi extends ServiceApi {
                 .add("birthday", TimeUtil.DATE_FORMAT.format(birthday));
         HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/user/birthday"), builder.build());
 
-        return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
+        return executeReturnObject(request, UserDto.class);
     }
 
     public UserDto updateCity(String utoken, int cityId) {
@@ -150,7 +148,7 @@ public class UserServiceApi extends ServiceApi {
                 .add("city", cityId);
         HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/user/city"), builder.build());
 
-        return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
+        return executeReturnObject(request, UserDto.class);
     }
 
     public UserDto updateRegion(String utoken, int regionId) {
@@ -159,7 +157,7 @@ public class UserServiceApi extends ServiceApi {
                 .add("region", regionId);
         HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/user/region"), builder.build());
 
-        return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
+        return executeReturnObject(request, UserDto.class);
     }
 
     public UserDto updateAddress(String utoken, String address) {
@@ -168,18 +166,18 @@ public class UserServiceApi extends ServiceApi {
                 .add("address", address);
         HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/user/address"), builder.build());
 
-        return CastUtil.toObject((JSON) executeRequest(request), UserDto.class);
+        return executeReturnObject(request, UserDto.class);
     }
 
     public ContactDto getContact(String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/user/contact"), builder.build());
 
-        return CastUtil.toObject((JSON) executeRequest(request), ContactDto.class);
+        return executeReturnObject(request, ContactDto.class);
     }
 
     public boolean setPayed(long userId) {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/user/%d/payed", userId));
-        return (Boolean) executeRequest(request);
+        return executeReturnObject(request, Boolean.class);
     }
 }

@@ -5,8 +5,6 @@ import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
-import cn.momia.common.api.util.CastUtil;
-import com.alibaba.fastjson.JSON;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.math.BigDecimal;
@@ -19,7 +17,7 @@ public class CouponServiceApi extends ServiceApi {
                 .add("coupon", userCouponId);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/coupon"), builder.build());
 
-        return (BigDecimal) executeRequest(request);
+        return executeReturnObject(request, BigDecimal.class);
     }
 
     public void invite(String mobile, String inviteCode) {
@@ -27,7 +25,7 @@ public class CouponServiceApi extends ServiceApi {
                 .add("mobile", mobile)
                 .add("invite", inviteCode);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/coupon/invite"), builder.build());
-        executeRequest(request);
+        execute(request);
     }
 
     public void distributeInviteCoupon(long userId, String mobile) {
@@ -35,7 +33,7 @@ public class CouponServiceApi extends ServiceApi {
                 .add("uid", userId)
                 .add("mobile", mobile);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/coupon/invite/distribute"), builder.build());
-        executeRequest(request);
+        execute(request);
     }
 
     public PagedList<UserCouponDto> listUserCoupons(String utoken, int status, int start, int count) {
@@ -46,6 +44,6 @@ public class CouponServiceApi extends ServiceApi {
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/coupon/list"), builder.build());
 
-        return CastUtil.toPagedList((JSON) executeRequest(request), UserCouponDto.class);
+        return executeReturnPagedList(request, UserCouponDto.class);
     }
 }
