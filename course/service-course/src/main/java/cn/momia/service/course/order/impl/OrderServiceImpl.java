@@ -1,6 +1,6 @@
 package cn.momia.service.course.order.impl;
 
-import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.order.Order;
@@ -51,7 +51,7 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
         });
 
         long orderId = keyHolder.getKey().longValue();
-        if (orderId < 0) throw new MomiaFailedException("下单失败");
+        if (orderId < 0) throw new MomiaErrorException("下单失败");
 
         addOrderSkus(orderId, order);
 

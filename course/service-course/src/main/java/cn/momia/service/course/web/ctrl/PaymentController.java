@@ -3,7 +3,7 @@ package cn.momia.service.course.web.ctrl;
 import cn.momia.api.course.dto.PaymentDto;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.UserDto;
-import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.client.ClientType;
 import cn.momia.common.deal.gateway.CallbackParam;
@@ -95,7 +95,7 @@ public class PaymentController extends BaseController {
             case PayType.WEIXIN:
                 prepayParam.setTotalFee(new BigDecimal(totalFee.multiply(new BigDecimal(100)).intValue()));
                 break;
-            default: throw new MomiaFailedException("无效的支付类型: " + payType);
+            default: throw new MomiaErrorException("无效的支付类型: " + payType);
         }
 
         prepayParam.addAll(extractParams(request));
@@ -110,12 +110,12 @@ public class PaymentController extends BaseController {
                 String type = request.getParameter("type");
                 if ("app".equalsIgnoreCase(type)) return ClientType.APP;
                 else if ("wap".equalsIgnoreCase(type)) return ClientType.WAP;
-                else throw new MomiaFailedException("not supported type: " + type);
+                else throw new MomiaErrorException("not supported type: " + type);
             case PayType.WEIXIN:
                 String tradeType = request.getParameter("type");
                 if ("APP".equalsIgnoreCase(tradeType)) return ClientType.APP;
                 else if ("JSAPI".equalsIgnoreCase(tradeType)) return ClientType.WAP;
-                else throw new MomiaFailedException("not supported trade type: " + tradeType);
+                else throw new MomiaErrorException("not supported trade type: " + tradeType);
             default: return 0;
         }
     }

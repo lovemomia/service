@@ -1,6 +1,6 @@
 package cn.momia.service.course.coupon.impl;
 
-import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.service.course.coupon.Coupon;
@@ -152,7 +152,7 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
         List<Coupon> coupons = listCoupons(couponIds);
         if (!coupons.isEmpty()) return addInviteCoupon(mobile, inviteCode, coupons.get(0));
 
-        throw new MomiaFailedException("不能再领取了，活动已经结束了哦");
+        throw new MomiaErrorException("不能再领取了，活动已经结束了哦");
     }
 
     private List<Coupon> listCoupons(Collection<Integer> couponIds) {

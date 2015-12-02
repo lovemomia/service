@@ -1,7 +1,7 @@
 package cn.momia.service.course.base;
 
 import cn.momia.api.base.dto.RegionDto;
-import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.util.TimeUtil;
 
 import java.math.BigDecimal;
@@ -286,7 +286,7 @@ public class Course implements Cloneable {
     }
 
     public String getAge() {
-        if (minAge <= 0 && maxAge <= 0) throw new MomiaFailedException("invalid age of course: " + id);
+        if (minAge <= 0 && maxAge <= 0) throw new MomiaErrorException("invalid age of course: " + id);
         if (minAge <= 0) return maxAge + "岁";
         if (maxAge <= 0) return minAge + "岁";
         if (minAge == maxAge) return minAge + "岁";

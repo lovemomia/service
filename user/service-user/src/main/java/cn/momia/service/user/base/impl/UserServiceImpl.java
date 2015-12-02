@@ -1,6 +1,6 @@
 package cn.momia.service.user.base.impl;
 
-import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.config.Configuration;
@@ -70,7 +70,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
 
             return new String(encryptedBase64);
         } catch (Exception e) {
-            throw new MomiaFailedException("fail to excrypt password of user: " + mobile, e);
+            throw new MomiaErrorException("fail to excrypt password of user: " + mobile, e);
         }
     }
 
@@ -134,7 +134,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
 
     @Override
     public boolean updateNickName(long userId, String nickName) {
-        if (exists("nickName", nickName)) throw new MomiaFailedException("昵称已存在，不能使用");
+        if (exists("nickName", nickName)) throw new MomiaErrorException("昵称已存在，不能使用");
 
         String sql = "UPDATE SG_User SET NickName=? WHERE Id=?";
         return update(sql, new Object[] { nickName, userId });

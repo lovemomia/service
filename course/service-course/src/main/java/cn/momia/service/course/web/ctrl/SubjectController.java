@@ -10,7 +10,7 @@ import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.ChildDto;
 import cn.momia.api.user.dto.UserDto;
 import cn.momia.common.api.dto.PagedList;
-import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
@@ -125,7 +125,7 @@ public class SubjectController extends BaseController {
             maxAge = Math.max(maxAge, course.getMaxAge());
         }
 
-        if (minAge <= 0 && maxAge <= 0) throw new MomiaFailedException("invalid age of subject sku");
+        if (minAge <= 0 && maxAge <= 0) throw new MomiaErrorException("invalid age of subject sku");
         if (minAge <= 0) return maxAge + "岁";
         if (maxAge <= 0) return minAge + "岁";
         if (minAge == maxAge) return minAge + "岁";

@@ -1,6 +1,6 @@
 package cn.momia.service.feed.base.impl;
 
-import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.service.feed.base.Feed;
 import cn.momia.service.feed.base.FeedService;
@@ -315,7 +315,7 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
 
             return keyHolder.getKey().longValue();
         } catch (Exception e) {
-            throw new MomiaFailedException("添加标签失败");
+            throw new MomiaErrorException("添加标签失败");
         }
     }
 

@@ -5,7 +5,7 @@ import cn.momia.api.course.dto.OrderPackageDto;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.UserDto;
 import cn.momia.common.api.dto.PagedList;
-import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
@@ -76,7 +76,7 @@ public class OrderController extends BaseController {
         if (order.isInvalid()) return false;
 
         UserDto user = userServiceApi.get(order.getUserId());
-        if (subjectService.isTrial(order.getSubjectId()) && (user.isPayed() || orderService.hasTrialOrder(user.getId()))) throw new MomiaFailedException("本课程包只供新用户专享");
+        if (subjectService.isTrial(order.getSubjectId()) && (user.isPayed() || orderService.hasTrialOrder(user.getId()))) throw new MomiaErrorException("本课程包只供新用户专享");
 
         Map<Long, SubjectSku> skusMap = new HashMap<Long, SubjectSku>();
         for (SubjectSku sku : skus) {
@@ -100,7 +100,7 @@ public class OrderController extends BaseController {
 
     private void checkLimit(long userId, long skuId, int limit) {
         int boughtCount = orderService.getBoughtCount(userId, skuId);
-        if (boughtCount > limit) throw new MomiaFailedException("超出购买限额");
+        if (boughtCount > limit) throw new MomiaErrorException("超出购买限额");
     }
 
     private OrderDto buildOrderDto(Order order) {
