@@ -231,10 +231,10 @@ public class OrderController extends BaseController {
 
             Date startTime = startTimes.get(orderPackage.getId());
             if (startTime == null) {
-                orderPackageDto.setExpireTime("购买日期: " + TimeUtil.DATE_FORMAT.format(order.getAddTime()));
+                orderPackageDto.setExpireTime("购买日期: " + TimeUtil.SHORT_DATE_FORMAT.format(order.getAddTime()));
             } else {
                 Date endTime = TimeUtil.add(startTime, sku.getTime(), sku.getTimeUnit());
-                orderPackageDto.setExpireTime("有效期至: " + TimeUtil.DATE_FORMAT.format(endTime));
+                orderPackageDto.setExpireTime("有效期至: " + TimeUtil.SHORT_DATE_FORMAT.format(endTime));
             }
 
             orderPackageDto.setCourseId(orderPackage.getCourseId());

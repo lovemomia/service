@@ -79,7 +79,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
     }
 
     private String generateInviteCode(String nickName, String mobile) {
-        return DigestUtils.md5Hex(StringUtils.join(new String[] { nickName, mobile, TimeUtil.STANDARD_FORMAT.format(new Date()), Configuration.getString("SecretKey.UToken") }, "|"));
+        return DigestUtils.md5Hex(StringUtils.join(new String[] { nickName, mobile, TimeUtil.STANDARD_DATE_FORMAT.format(new Date()), Configuration.getString("SecretKey.UToken") }, "|"));
     }
 
     @Override

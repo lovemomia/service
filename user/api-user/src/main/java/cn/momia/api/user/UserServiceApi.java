@@ -136,7 +136,7 @@ public class UserServiceApi extends ServiceApi {
     public UserDto updateBirthday(String utoken, Date birthday) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
-                .add("birthday", TimeUtil.DATE_FORMAT.format(birthday));
+                .add("birthday", TimeUtil.SHORT_DATE_FORMAT.format(birthday));
         HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/user/birthday"), builder.build());
 
         return executeReturnObject(request, UserDto.class);
