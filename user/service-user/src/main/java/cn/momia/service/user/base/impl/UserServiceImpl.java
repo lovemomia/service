@@ -121,7 +121,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
     public List<User> list(Collection<Long> userIds) {
         if (userIds.isEmpty()) return new ArrayList<User>();
 
-        String sql = "SELECT Id, NickName, Avatar, Mobile, Cover, Name, Sex, Birthday, CityId, RegionId, Address, Payed, InviteCode, Token FROM SG_User WHERE Id IN (" + StringUtils.join(userIds, ",") + ") AND Status<>0";
+        String sql = "SELECT Id, NickName, Avatar, Mobile, Cover, Name, Sex, Birthday, CityId, RegionId, Address, Payed, InviteCode, Token, ImToken FROM SG_User WHERE Id IN (" + StringUtils.join(userIds, ",") + ") AND Status<>0";
         List<User> users = queryObjectList(sql, User.class);
 
         Map<Long, List<Child>> childrenMap = childService.queryByUsers(userIds);

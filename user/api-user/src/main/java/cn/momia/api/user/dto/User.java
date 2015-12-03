@@ -31,6 +31,7 @@ public class User {
     private String inviteCode;
 
     private String token;
+    private String imToken;
 
     private List<Child> children;
 
@@ -147,6 +148,14 @@ public class User {
         this.token = token;
     }
 
+    public String getImToken() {
+        return imToken;
+    }
+
+    public void setImToken(String imToken) {
+        this.imToken = imToken;
+    }
+
     public List<Child> getChildren() {
         return children;
     }
@@ -190,7 +199,10 @@ public class User {
             setAddress(user.getAddress());
             setPayed(user.getPayed());
             setInviteCode(user.getInviteCode());
-            setToken(showToken ? user.getToken() : "");
+            if (showToken) {
+                setToken(user.getToken());
+                setImToken(user.getImToken());
+            }
         }
     }
 
