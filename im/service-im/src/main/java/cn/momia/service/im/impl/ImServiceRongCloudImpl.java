@@ -22,4 +22,19 @@ public class ImServiceRongCloudImpl extends AbstractImService {
     protected boolean doLeaveGroup(long groupId, long userId) {
         return false;
     }
+
+    @Override
+    public String generateImToken(long userId, String nickName, String avatar) {
+        return null;
+    }
+
+    @Override
+    public void updateNickName(long userId, String nickName) {
+
+    }
+
+    @Override
+    public void updateAvatar(long userId, String avatar) {
+
+    }
 }

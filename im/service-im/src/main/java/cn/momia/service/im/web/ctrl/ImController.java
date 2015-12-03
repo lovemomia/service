@@ -29,11 +29,36 @@ public class ImController extends BaseController {
     @Autowired private ImService imService;
     @Autowired private UserServiceApi userServiceApi;
 
+    @RequestMapping(value = "/token", method = RequestMethod.POST)
+    public MomiaHttpResponse generateImToken(@RequestParam String utoken, @RequestParam(value = "nickname") String nickName, @RequestParam String avatar) {
+        User user = userServiceApi.get(utoken);
+        String imToken = imService.generateImToken(user.getId(), nickName, avatar);
+        if (!StringUtils.isBlank(imToken)) userServiceApi.updateImToken(utoken, imToken);
+
+        return MomiaHttpResponse.SUCCESS;
+    }
+
     @RequestMapping(value = "/token", method = RequestMethod.GET)
     public MomiaHttpResponse getImToken(@RequestParam String utoken) {
         User user = userServiceApi.get(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
         return MomiaHttpResponse.SUCCESS(user.getImToken());
+    }
+
+    @RequestMapping(value = "/user/nickname", method = RequestMethod.PUT)
+    public MomiaHttpResponse updateNickName(@RequestParam String utoken, @RequestParam(value = "nickname") String nickName) {
+        User user = userServiceApi.get(utoken);
+        imService.updateNickName(user.getId(), nickName);
+
+        return MomiaHttpResponse.SUCCESS;
+    }
+
+    @RequestMapping(value = "/user/avatar", method = RequestMethod.PUT)
+    public MomiaHttpResponse updateAvatar(@RequestParam String utoken, @RequestParam String avatar) {
+        User user = userServiceApi.get(utoken);
+        imService.updateAvatar(user.getId(), avatar);
+
+        return MomiaHttpResponse.SUCCESS;
     }
 
     @RequestMapping(value = "/user/{uid}", method = RequestMethod.GET)
@@ -77,8 +102,6 @@ public class ImController extends BaseController {
     @RequestMapping(value = "/group/{id}/member", method = RequestMethod.GET)
     public MomiaHttpResponse listGroupMembers(@RequestParam String utoken, @PathVariable(value = "id") long groupId) {
         User user = userServiceApi.get(utoken);
-        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
-
         if (!imService.isInGroup(user.getId(), groupId)) return MomiaHttpResponse.FAILED("您不在该群组中，无权查看群组成员");
 
         List<Member> members = imService.listMembers(groupId);

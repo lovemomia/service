@@ -10,11 +10,36 @@ import org.apache.http.client.methods.HttpUriRequest;
 import java.util.List;
 
 public class ImServiceApi extends ServiceApi {
+    public void generateImToken(String utoken, String nickName, String avatar) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("nickname", nickName)
+                .add("avatar", avatar);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/im/token"), builder.build());
+        execute(request);
+    }
+
     public String getImToken(String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/im/token"), builder.build());
 
         return executeReturnObject(request, String.class);
+    }
+
+    public void updateImNickName(String utoken, String nickName) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("nickname", nickName);
+        HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/im/user/nickname"), builder.build());
+        execute(request);
+    }
+
+    public void updateImAvatar(String utoken, String avatar) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("avatar", avatar);
+        HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/im/user/avatar"), builder.build());
+        execute(request);
     }
 
     public ImUser getImUser(long userId) {

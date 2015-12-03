@@ -130,6 +130,15 @@ public class UserServiceApi extends ServiceApi {
         return executeReturnObject(request, User.class);
     }
 
+    public User updateImToken(String utoken, String imToken) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("imtoken", imToken);
+        HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/user/imtoken"), builder.build());
+
+        return executeReturnObject(request, User.class);
+    }
+
     public Contact getContact(String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/user/contact"), builder.build());

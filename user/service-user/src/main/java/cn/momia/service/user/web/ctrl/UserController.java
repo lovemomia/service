@@ -190,6 +190,18 @@ public class UserController {
         return MomiaHttpResponse.SUCCESS(new User.Full(user));
     }
 
+    @RequestMapping(value = "/imtoken", method = RequestMethod.PUT)
+    public MomiaHttpResponse updateImToken(@RequestParam String utoken, @RequestParam String imToken) {
+        User user = userService.getByToken(utoken);
+        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
+
+        boolean successful = userService.updateImToken(user.getId(), imToken);
+        if (!successful) return MomiaHttpResponse.FAILED("更新Im Token失败");
+
+        user.setImToken(imToken);
+        return MomiaHttpResponse.SUCCESS(new User.Full(user));
+    }
+
     @RequestMapping(value = "/contact", method = RequestMethod.GET)
     public MomiaHttpResponse getContact(@RequestParam String utoken) {
         User user = userService.getByToken(utoken);

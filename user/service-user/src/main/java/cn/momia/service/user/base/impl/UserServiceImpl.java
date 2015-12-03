@@ -189,6 +189,12 @@ public class UserServiceImpl extends AbstractService implements UserService {
     }
 
     @Override
+    public boolean updateImToken(long userId, String imToken) {
+        String sql = "UPDATE SG_User SET ImToken=? WHERE Id=?";
+        return update(sql, new Object[] { imToken, userId });
+    }
+
+    @Override
     public boolean validatePassword(String mobile, String password) {
         String sql = "SELECT COUNT(1) FROM SG_User WHERE Mobile=? AND Password=?";
         return queryInt(sql, new Object[] { mobile, encryptPassword(mobile, password, Configuration.getString("SecretKey.Password")) }) == 1;
