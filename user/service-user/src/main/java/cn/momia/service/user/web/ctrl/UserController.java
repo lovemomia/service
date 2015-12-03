@@ -198,7 +198,7 @@ public class UserController {
         return MomiaHttpResponse.SUCCESS(new Contact(user));
     }
 
-    @RequestMapping(value = "/{uid}/teacher", method = RequestMethod.POST)
+    @RequestMapping(value = "/{uid}/teacher", method = RequestMethod.GET)
     public MomiaHttpResponse isTeacher(@PathVariable(value = "uid") long userId) {
         return MomiaHttpResponse.SUCCESS(userService.isTeacher(userId));
     }

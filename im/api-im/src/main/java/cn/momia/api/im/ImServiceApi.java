@@ -18,7 +18,7 @@ public class ImServiceApi extends ServiceApi {
     }
 
     public ImUser getImUser(long userId) {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/im/user/{uid}", userId));
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/im/user/%d", userId));
         return executeReturnObject(request, ImUser.class);
     }
 
