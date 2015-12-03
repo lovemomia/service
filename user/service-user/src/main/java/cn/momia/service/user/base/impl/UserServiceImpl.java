@@ -201,6 +201,12 @@ public class UserServiceImpl extends AbstractService implements UserService {
     }
 
     @Override
+    public boolean isTeacher(long userId) {
+        String sql = "SELECT COUNT(1) FROM SG_Teacher WHERE UserId=? AND Status<>0";
+        return queryInt(sql, new Object[] { userId }) > 0;
+    }
+
+    @Override
     public boolean setPayed(long userId) {
         String sql = "UPDATE SG_User SET Payed=1 WHERE Id=? AND Payed=0";
         return update(sql, new Object[] { userId });

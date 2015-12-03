@@ -198,6 +198,11 @@ public class UserController {
         return MomiaHttpResponse.SUCCESS(new Contact(user));
     }
 
+    @RequestMapping(value = "/{uid}/teacher", method = RequestMethod.POST)
+    public MomiaHttpResponse isTeacher(@PathVariable(value = "uid") long userId) {
+        return MomiaHttpResponse.SUCCESS(userService.isTeacher(userId));
+    }
+
     @RequestMapping(value = "/{uid}/payed", method = RequestMethod.POST)
     public MomiaHttpResponse setPayed(@PathVariable(value = "uid") long userId) {
         return MomiaHttpResponse.SUCCESS(userService.setPayed(userId));
