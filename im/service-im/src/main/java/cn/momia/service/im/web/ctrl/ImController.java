@@ -61,8 +61,9 @@ public class ImController extends BaseController {
         for (String teacher : Splitter.on(",").trimResults().omitEmptyStrings().split(teachers)) {
             teacherUserIds.add(Long.valueOf(teacher));
         }
+        if (teacherUserIds.isEmpty()) return MomiaHttpResponse.FAILED("创建群组失败，至少要有一个群成员");
 
-        return MomiaHttpResponse.SUCCESS(imService.createGroup(courseId, courseSkuId, teacherUserIds, groupName) > 0);
+        return MomiaHttpResponse.SUCCESS(imService.createGroup(courseId, courseSkuId, teacherUserIds, groupName));
     }
 
     @RequestMapping(value = "/group", method = RequestMethod.PUT)
@@ -107,5 +108,21 @@ public class ImController extends BaseController {
         }
 
         return MomiaHttpResponse.SUCCESS(imUsers);
+    }
+
+    @RequestMapping(value = "/group/join", method = RequestMethod.POST)
+    public MomiaHttpResponse joinGroup(@RequestParam(value = "coid") long courseId,
+                                       @RequestParam(value = "sid") long courseSkuId,
+                                       @RequestParam(value = "uid") long userId) {
+        if (courseId <= 0 || courseSkuId <= 0 || userId <= 0) return MomiaHttpResponse.BAD_REQUEST;
+        return MomiaHttpResponse.SUCCESS(imService.joinGroup(courseId, courseSkuId, userId, userServiceApi.isTeacher(userId)));
+    }
+
+    @RequestMapping(value = "/group/leave", method = RequestMethod.POST)
+    public MomiaHttpResponse leaveGroup(@RequestParam(value = "coid") long courseId,
+                                       @RequestParam(value = "sid") long courseSkuId,
+                                       @RequestParam(value = "uid") long userId) {
+        if (courseId <= 0 || courseSkuId <= 0 || userId <= 0) return MomiaHttpResponse.BAD_REQUEST;
+        return MomiaHttpResponse.SUCCESS(imService.leaveGroup(courseId, courseSkuId, userId));
     }
 }
