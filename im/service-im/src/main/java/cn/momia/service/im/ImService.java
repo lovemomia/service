@@ -9,6 +9,7 @@ import java.util.List;
 public interface ImService {
     boolean createGroup(long courseId, long courseSkuId, Collection<Long> teacherUserIds, String groupName);
     boolean updateGroupName(long courseId, long courseSkuId, String groupName);
+    Group getGroup(long groupId);
     List<Group> listGroups(Collection<Long> groupIds);
 
     boolean isInGroup(long userId, long groupId);

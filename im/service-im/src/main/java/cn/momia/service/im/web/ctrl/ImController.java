@@ -1,5 +1,6 @@
 package cn.momia.service.im.web.ctrl;
 
+import cn.momia.api.im.dto.Group;
 import cn.momia.api.im.dto.ImUser;
 import cn.momia.api.im.dto.Member;
 import cn.momia.api.user.UserServiceApi;
@@ -95,6 +96,13 @@ public class ImController extends BaseController {
         if (teacherUserIds.isEmpty()) return MomiaHttpResponse.FAILED("创建群组失败，至少要有一个群成员");
 
         return MomiaHttpResponse.SUCCESS(imService.createGroup(courseId, courseSkuId, teacherUserIds, groupName));
+    }
+
+    @RequestMapping(value = "/group/{gid}", method = RequestMethod.GET)
+    public MomiaHttpResponse getGroup(@PathVariable(value = "gid") long groupId) {
+        Group group = imService.getGroup(groupId);
+        if (!group.exists()) return MomiaHttpResponse.FAILED("群组不存在");
+        return MomiaHttpResponse.SUCCESS(group);
     }
 
     @RequestMapping(value = "/group", method = RequestMethod.PUT)

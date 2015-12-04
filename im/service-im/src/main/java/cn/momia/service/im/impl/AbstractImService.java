@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class AbstractImService extends AbstractService implements ImService {
     @Override
@@ -58,6 +59,14 @@ public abstract class AbstractImService extends AbstractService implements ImSer
     private boolean updateGroupNameLog(long groupId, String groupName, long courseId, long courseSkuId) {
         String sql = "UPDATE SG_ImGroup SET GroupName=? WHERE GroupId=? AND CourseId=? AND CourseSkuId=? AND Status<>0";
         return update(sql, new Object[] { groupName, groupId, courseId, courseSkuId });
+    }
+
+    @Override
+    public Group getGroup(long groupId) {
+        Set<Long> groupIds = Sets.newHashSet(groupId);
+        List<Group> groups = listGroups(groupIds);
+
+        return groups.isEmpty() ? Group.NOT_EXIST_GROUP : groups.get(0);
     }
 
     @Override

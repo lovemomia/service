@@ -78,6 +78,11 @@ public class ImServiceApi extends ServiceApi {
         return executeReturnObject(request, Boolean.class);
     }
 
+    public Group getGroup(long groupId) {
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/im/group/%d", groupId));
+        return executeReturnObject(request, Group.class);
+    }
+
     public List<Group> listGroups(Set<Long> groupIds) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("gids", StringUtils.join(groupIds, ","));
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/im/group/list"), builder.build());
