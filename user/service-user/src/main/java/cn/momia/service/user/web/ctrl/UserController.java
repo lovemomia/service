@@ -191,7 +191,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/imtoken", method = RequestMethod.PUT)
-    public MomiaHttpResponse updateImToken(@RequestParam String utoken, @RequestParam String imToken) {
+    public MomiaHttpResponse updateImToken(@RequestParam String utoken, @RequestParam(value = "imtoken") String imToken) {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
