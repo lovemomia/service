@@ -98,21 +98,21 @@ public class ImServiceApi extends ServiceApi {
         return executeReturnList(request, ImUser.class);
     }
 
-    public boolean joinGroup(long courseId, long courseSkuId, String userId) {
+    public boolean joinGroup(String utoken, long courseId, long courseSkuId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
                 .add("coid", courseId)
-                .add("sid", courseSkuId)
-                .add("uid", userId);
+                .add("sid", courseSkuId);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/im/group/join"), builder.build());
 
         return executeReturnObject(request, Boolean.class);
     }
 
-    public boolean leaveGroup(long courseId, long courseSkuId, String userId) {
+    public boolean leaveGroup(String utoken, long courseId, long courseSkuId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
                 .add("coid", courseId)
-                .add("sid", courseSkuId)
-                .add("uid", userId);
+                .add("sid", courseSkuId);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/im/group/leave"), builder.build());
 
         return executeReturnObject(request, Boolean.class);

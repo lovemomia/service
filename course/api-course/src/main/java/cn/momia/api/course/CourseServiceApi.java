@@ -175,23 +175,23 @@ public class CourseServiceApi extends ServiceApi {
         return executeReturnObject(request, Boolean.class);
     }
 
-    public boolean booking(String utoken, long packageId, long skuId) {
+    public BookedCourseDto booking(String utoken, long packageId, long skuId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("pid", packageId)
                 .add("sid", skuId);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/course/booking"), builder.build());
 
-        return executeReturnObject(request, Boolean.class);
+        return executeReturnObject(request, BookedCourseDto.class);
     }
 
-    public boolean cancel(String utoken, long bookingId) {
+    public BookedCourseDto cancel(String utoken, long bookingId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("bid", bookingId);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/course/cancel"), builder.build());
 
-        return executeReturnObject(request, Boolean.class);
+        return executeReturnObject(request, BookedCourseDto.class);
     }
 
     public boolean comment(JSONObject commentJson) {

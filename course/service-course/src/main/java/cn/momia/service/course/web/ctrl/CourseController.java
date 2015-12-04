@@ -39,6 +39,7 @@ import cn.momia.service.course.subject.SubjectSku;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -567,6 +568,7 @@ public class CourseController extends BaseController {
 
             BookedCourseDto bookedCourseDto = new BookedCourseDto();
             bookedCourseDto.setBookingId(bookedCourse.getId());
+            bookedCourseDto.setCourseSkuId(bookedCourse.getCourseSkuId());
             if (commentBookingIds.contains(bookedCourse.getId())) bookedCourseDto.setCommented(true);
             setFieldValue(bookedCourseDto, course);
             bookedCourseDto.setScheduler(course.getScheduler(bookedCourse.getCourseSkuId()));
@@ -648,7 +650,13 @@ public class CourseController extends BaseController {
             if (bookingId <= 0 && !courseService.unlockSku(skuId)) LOGGER.error("fail to unlock course sku, skuId: {}", skuId);
         }
 
-        return MomiaHttpResponse.SUCCESS(bookingId > 0);
+        if (bookingId <= 0) return MomiaHttpResponse.FAILED("选课失败");
+
+        BookedCourse bookedCourse = courseService.getBookedCourse(bookingId);
+        List<BookedCourseDto> bookedCourseDtos = buildBookedCourseDtos(user.getId(), Lists.newArrayList(bookedCourse));
+        if (bookedCourseDtos.isEmpty()) return MomiaHttpResponse.FAILED("选课失败");
+
+        return MomiaHttpResponse.SUCCESS(bookedCourseDtos.get(0));
     }
 
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
@@ -668,7 +676,10 @@ public class CourseController extends BaseController {
             LOGGER.error("error when cancel booked course, {}", bookingId, e);
         }
 
-        return MomiaHttpResponse.SUCCESS(true);
+        List<BookedCourseDto> bookedCourseDtos = buildBookedCourseDtos(user.getId(), Lists.newArrayList(bookedCourse));
+        if (bookedCourseDtos.isEmpty()) return MomiaHttpResponse.FAILED("取消选课失败");
+
+        return MomiaHttpResponse.SUCCESS(bookedCourseDtos.get(0));
     }
 
     @RequestMapping(value = "/comment", method = RequestMethod.POST, consumes = "application/json")

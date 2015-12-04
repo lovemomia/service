@@ -158,18 +158,20 @@ public class ImController extends BaseController {
     }
 
     @RequestMapping(value = "/group/join", method = RequestMethod.POST)
-    public MomiaHttpResponse joinGroup(@RequestParam(value = "coid") long courseId,
-                                       @RequestParam(value = "sid") long courseSkuId,
-                                       @RequestParam(value = "uid") long userId) {
-        if (courseId <= 0 || courseSkuId <= 0 || userId <= 0) return MomiaHttpResponse.BAD_REQUEST;
-        return MomiaHttpResponse.SUCCESS(imService.joinGroup(courseId, courseSkuId, userId, userServiceApi.isTeacher(userId)));
+    public MomiaHttpResponse joinGroup(@RequestParam String utoken,
+                                       @RequestParam(value = "coid") long courseId,
+                                       @RequestParam(value = "sid") long courseSkuId) {
+        if (courseId <= 0 || courseSkuId <= 0) return MomiaHttpResponse.BAD_REQUEST;
+        User user = userServiceApi.get(utoken);
+        return MomiaHttpResponse.SUCCESS(imService.joinGroup(courseId, courseSkuId, user.getId(), userServiceApi.isTeacher(user.getId())));
     }
 
     @RequestMapping(value = "/group/leave", method = RequestMethod.POST)
-    public MomiaHttpResponse leaveGroup(@RequestParam(value = "coid") long courseId,
-                                       @RequestParam(value = "sid") long courseSkuId,
-                                       @RequestParam(value = "uid") long userId) {
-        if (courseId <= 0 || courseSkuId <= 0 || userId <= 0) return MomiaHttpResponse.BAD_REQUEST;
-        return MomiaHttpResponse.SUCCESS(imService.leaveGroup(courseId, courseSkuId, userId));
+    public MomiaHttpResponse leaveGroup(@RequestParam String utoken,
+                                        @RequestParam(value = "coid") long courseId,
+                                       @RequestParam(value = "sid") long courseSkuId) {
+        if (courseId <= 0 || courseSkuId <= 0) return MomiaHttpResponse.BAD_REQUEST;
+        User user = userServiceApi.get(utoken);
+        return MomiaHttpResponse.SUCCESS(imService.leaveGroup(courseId, courseSkuId, user.getId()));
     }
 }
