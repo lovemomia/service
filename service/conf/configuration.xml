@@ -89,9 +89,11 @@
         <RongCloud>
             <Service>
                 <GetToken>https://api.cn.ronghub.com/user/getToken.json</GetToken>
+                <UpdateUser>https://api.cn.ronghub.com/user/refresh.json</UpdateUser>
                 <CreateGroup>https://api.cn.ronghub.com/group/create.json</CreateGroup>
+                <UpdateGroup>https://api.cn.ronghub.com/group/refresh.json</UpdateGroup>
                 <JoinGroup>https://api.cn.ronghub.com/group/join.json</JoinGroup>
-                <DeleteGroup>https://api.cn.ronghub.com/group/dismiss.json</DeleteGroup>
+                <LeaveGroup>https://api.cn.ronghub.com/group/quit.json</LeaveGroup>
             </Service>
             <AppKey>0vnjpoadnwp2z</AppKey>
             <AppSecret>X44MIhxlhq</AppSecret>
