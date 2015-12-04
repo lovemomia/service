@@ -6,6 +6,8 @@ import cn.momia.common.service.AbstractService;
 import cn.momia.service.im.ImService;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,6 +17,8 @@ import java.util.Map;
 import java.util.Set;
 
 public abstract class AbstractImService extends AbstractService implements ImService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractImService.class);
+
     @Override
     public boolean createGroup(long courseId, long courseSkuId, Collection<Long> teacherUserIds, String groupName) {
         long groupId = courseSkuId;
@@ -31,8 +35,12 @@ public abstract class AbstractImService extends AbstractService implements ImSer
     protected abstract boolean doCreateGroup(long groupId, String groupName, Collection<Long> userIds);
 
     private void logGroup(long groupId, String groupName, long courseId, long courseSkuId) {
-        String sql = "INSERT INTO SG_ImGroup (GroupId, GroupName, CourseId, CourseSkuId, AddTime) VALUES (?, ?, ?, ?, NOW())";
-        update(sql, new Object[] { groupId, groupName, courseId, courseSkuId });
+        try {
+            String sql = "INSERT INTO SG_ImGroup (GroupId, GroupName, CourseId, CourseSkuId, AddTime) VALUES (?, ?, ?, ?, NOW())";
+            update(sql, new Object[] { groupId, groupName, courseId, courseSkuId });
+        } catch (Exception e) {
+            LOGGER.error("fail to log group info for group: {}", groupId, e);
+        }
     }
 
     private void logGroupMembers(long groupId, Collection<Long> userIds, boolean teacher) {
