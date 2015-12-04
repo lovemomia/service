@@ -375,6 +375,16 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(pagedTeachers);
     }
 
+    @RequestMapping(value = "/tips", method = RequestMethod.GET)
+    public MomiaHttpResponse queryTips(@RequestParam String coids) {
+        Set<Long> courseIds = new HashSet<Long>();
+        for (String courseId : Splitter.on(",").omitEmptyStrings().trimResults().split(coids)) {
+            courseIds.add(Long.valueOf(courseId));
+        }
+
+        return MomiaHttpResponse.SUCCESS(courseService.queryTips(courseIds));
+    }
+
     @RequestMapping(value = "/{coid}/sku/week", method = RequestMethod.GET)
     public MomiaHttpResponse listWeekSkus(@PathVariable(value = "coid") long courseId) {
         Date now = new Date();

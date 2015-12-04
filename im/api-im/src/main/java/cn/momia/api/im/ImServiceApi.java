@@ -1,6 +1,8 @@
 package cn.momia.api.im;
 
+import cn.momia.api.im.dto.Group;
 import cn.momia.api.im.dto.ImUser;
+import cn.momia.api.im.dto.Member;
 import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
@@ -8,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.List;
+import java.util.Set;
 
 public class ImServiceApi extends ServiceApi {
     public void generateImToken(String utoken, String nickName, String avatar) {
@@ -47,6 +50,13 @@ public class ImServiceApi extends ServiceApi {
         return executeReturnObject(request, ImUser.class);
     }
 
+    public List<Member> queryMembersByUser(String utoken) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/im/user/member"), builder.build());
+
+        return executeReturnList(request, Member.class);
+    }
+
     public boolean createGroup(long courseId, long courseSkuId, List<Long> teacherUserIds, String groupName) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("coid", courseId)
@@ -66,6 +76,13 @@ public class ImServiceApi extends ServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/im/group"), builder.build());
 
         return executeReturnObject(request, Boolean.class);
+    }
+
+    public List<Group> listGroups(Set<Long> groupIds) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("gids", StringUtils.join(groupIds, ","));
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/im/group/list"), builder.build());
+
+        return executeReturnList(request, Group.class);
     }
 
     public List<ImUser> listGroupMembers(String utoken, long groupId) {

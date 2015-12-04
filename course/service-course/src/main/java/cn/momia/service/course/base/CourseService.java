@@ -63,6 +63,8 @@ public interface CourseService {
     CourseDetail getDetail(long courseId);
     Institution getInstitution(long courseId);
 
+    Map<Long, String> queryTips(Collection<Long> courseIds);
+
     boolean matched(long subjectId, long courseId);
 
     boolean joined(long userId, long courseId);

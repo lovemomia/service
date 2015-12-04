@@ -611,6 +611,27 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
+    public Map<Long, String> queryTips(Collection<Long> courseIds) {
+        if (courseIds.isEmpty()) return new HashMap<Long, String>();
+
+        final Map<Long, String> tipsMap = new HashMap<Long, String>();
+        for (long courseId : courseIds) {
+            tipsMap.put(courseId, "");
+        }
+        String sql = "SELECT Id, Tips FROM SG_Course WHERE Id IN (" + StringUtils.join(courseIds, ",") + ") AND Status<>0";
+        query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                long courseId = rs.getLong("Id");
+                String tips = rs.getString("tips");
+                tipsMap.put(courseId, tips);
+            }
+        });
+
+        return tipsMap;
+    }
+
+    @Override
     public boolean matched(long subjectId, long courseId) {
         String sql = "SELECT COUNT(1) FROM SG_Course WHERE Id=? AND SubjectId=? AND Status<>0";
         return queryInt(sql, new Object[] { courseId, subjectId }) > 0;

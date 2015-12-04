@@ -1,10 +1,13 @@
 package cn.momia.api.im.dto;
 
+import java.util.Date;
+
 public class Member {
     private long id;
     private long groupId;
     private long userId;
     private int teacher;
+    private Date addTime;
 
     public long getId() {
         return id;
@@ -36,5 +39,13 @@ public class Member {
 
     public void setTeacher(int teacher) {
         this.teacher = teacher;
+    }
+
+    public Date getAddTime() {
+        return addTime;
+    }
+
+    public void setAddTime(Date addTime) {
+        this.addTime = addTime;
     }
 }

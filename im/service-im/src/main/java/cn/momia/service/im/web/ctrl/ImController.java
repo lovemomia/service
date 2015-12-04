@@ -75,6 +75,12 @@ public class ImController extends BaseController {
         return MomiaHttpResponse.SUCCESS(imUser);
     }
 
+    @RequestMapping(value = "/user/member", method = RequestMethod.GET)
+    public MomiaHttpResponse queryMembersByUser(@RequestParam String utoken) {
+        User user = userServiceApi.get(utoken);
+        return MomiaHttpResponse.SUCCESS(imService.queryMembersByUser(user.getId()));
+    }
+
     @RequestMapping(value = "/group", method = RequestMethod.POST)
     public MomiaHttpResponse createGroup(@RequestParam(value = "coid") long courseId,
                                          @RequestParam(value = "sid") long courseSkuId,
@@ -99,12 +105,22 @@ public class ImController extends BaseController {
         return MomiaHttpResponse.SUCCESS(imService.updateGroupName(courseId, courseSkuId, groupName));
     }
 
+    @RequestMapping(value = "/group/list", method = RequestMethod.GET)
+    public MomiaHttpResponse listGroups(@RequestParam String gids) {
+        Set<Long> groupIds = new HashSet<Long>();
+        for (String groupId : Splitter.on(",").trimResults().omitEmptyStrings().split(gids)) {
+            groupIds.add(Long.valueOf(groupId));
+        }
+
+        return MomiaHttpResponse.SUCCESS(imService.listGroups(groupIds));
+    }
+
     @RequestMapping(value = "/group/{id}/member", method = RequestMethod.GET)
     public MomiaHttpResponse listGroupMembers(@RequestParam String utoken, @PathVariable(value = "id") long groupId) {
         User user = userServiceApi.get(utoken);
         if (!imService.isInGroup(user.getId(), groupId)) return MomiaHttpResponse.FAILED("您不在该群组中，无权查看群组成员");
 
-        List<Member> members = imService.listMembers(groupId);
+        List<Member> members = imService.queryMembersByGroup(groupId);
         Set<Long> userIds = new HashSet<Long>();
         for (Member member : members) {
             userIds.add(member.getUserId());

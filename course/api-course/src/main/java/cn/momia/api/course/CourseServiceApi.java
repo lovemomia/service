@@ -13,9 +13,12 @@ import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class CourseServiceApi extends ServiceApi {
     public PagedList<CourseDto> listRecommend(int cityId, int start, int count) {
@@ -119,6 +122,12 @@ public class CourseServiceApi extends ServiceApi {
     public InstitutionDto institution(long courseId) {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/institution", courseId));
         return executeReturnObject(request, InstitutionDto.class);
+    }
+
+    public Map<Long, String> queryTips(Set<Long> courseIds) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("coids", StringUtils.join(courseIds, ","));
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/tips"), builder.build());
+        return executeReturnObject(request, Map.class);
     }
 
     public List<DatedCourseSkusDto> listWeekSkus(long courseId) {
