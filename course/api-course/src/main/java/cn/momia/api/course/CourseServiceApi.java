@@ -4,6 +4,7 @@ import cn.momia.api.course.dto.BookedCourseDto;
 import cn.momia.api.course.dto.CourseCommentDto;
 import cn.momia.api.course.dto.CourseDetailDto;
 import cn.momia.api.course.dto.CourseDto;
+import cn.momia.api.course.dto.CourseSkuDto;
 import cn.momia.api.course.dto.DatedCourseSkusDto;
 import cn.momia.api.course.dto.FavoriteDto;
 import cn.momia.api.course.dto.InstitutionDto;
@@ -128,6 +129,11 @@ public class CourseServiceApi extends ServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("coids", StringUtils.join(courseIds, ","));
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/tips"), builder.build());
         return executeReturnObject(request, Map.class);
+    }
+
+    public CourseSkuDto getSku(long courseId, long skuId) {
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/sku/%d", courseId, skuId));
+        return executeReturnObject(request, CourseSkuDto.class);
     }
 
     public List<DatedCourseSkusDto> listWeekSkus(long courseId) {

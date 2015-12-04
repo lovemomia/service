@@ -385,6 +385,55 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(courseService.queryTips(courseIds));
     }
 
+    @RequestMapping(value = "/{coid}/sku/{sid}", method = RequestMethod.GET)
+    public MomiaHttpResponse getSku(@PathVariable(value = "coid") long courseId, @PathVariable(value = "sid") long skuId) {
+        CourseSku sku = courseService.getSku(skuId);
+        if (!sku.exists() || sku.getCourseId() != courseId) return MomiaHttpResponse.FAILED("无效的场次");
+        return MomiaHttpResponse.SUCCESS(buildCourseSkuDto(sku));
+    }
+
+    private CourseSkuDto buildCourseSkuDto(CourseSku sku) {
+        CourseSkuDto courseSkuDto = new CourseSkuDto();
+        courseSkuDto.setId(sku.getId());
+        courseSkuDto.setTime(formatSkuTime(sku));
+        courseSkuDto.setPlace(buildCoursePlaceDto(sku.getPlace()));
+        courseSkuDto.setStock(sku.getUnlockedStock());
+
+        return courseSkuDto;
+    }
+
+    private String formatSkuTime(CourseSku sku) {
+        if (sku == null) return "";
+
+        Date start = sku.getStartTime();
+        Date end = sku.getEndTime();
+
+        if (TimeUtil.isSameDay(start, end)) {
+            return TIME_FORMAT.format(start) + "-" + TIME_FORMAT.format(end);
+        } else {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(start);
+            calendar.add(Calendar.DATE, 1);
+            Date nextDay = calendar.getTime();
+            if (TimeUtil.isSameDay(nextDay, end)) {
+                return TIME_FORMAT.format(start) + "-次日" + TIME_FORMAT.format(end);
+            } else {
+                return TIME_FORMAT.format(start) + "-" + MONTH_DATE_FORMAT.format(end) + " " + TIME_FORMAT.format(end);
+            }
+        }
+    }
+
+    private CoursePlaceDto buildCoursePlaceDto(CourseSkuPlace place) {
+        CoursePlaceDto coursePlaceDto = new CoursePlaceDto();
+        coursePlaceDto.setId(place.getId());
+        coursePlaceDto.setName(place.getName());
+        coursePlaceDto.setAddress(place.getAddress());
+        coursePlaceDto.setLng(place.getLng());
+        coursePlaceDto.setLat(place.getLat());
+
+        return coursePlaceDto;
+    }
+
     @RequestMapping(value = "/{coid}/sku/week", method = RequestMethod.GET)
     public MomiaHttpResponse listWeekSkus(@PathVariable(value = "coid") long courseId) {
         Date now = new Date();
@@ -442,48 +491,12 @@ public class CourseController extends BaseController {
     private List<CourseSkuDto> buildCourseSkuDtos(List<CourseSku> skus) {
         List<CourseSkuDto> courseSkuDtos = new ArrayList<CourseSkuDto>();
         for (CourseSku sku : skus) {
-            CourseSkuDto courseSkuDto = new CourseSkuDto();
-            courseSkuDto.setId(sku.getId());
-            courseSkuDto.setTime(formatSkuTime(sku));
-            courseSkuDto.setPlace(buildCoursePlaceDto(sku.getPlace()));
-            courseSkuDto.setStock(sku.getUnlockedStock());
+            CourseSkuDto courseSkuDto = buildCourseSkuDto(sku);
 
             courseSkuDtos.add(courseSkuDto);
         }
 
         return courseSkuDtos;
-    }
-
-    private String formatSkuTime(CourseSku sku) {
-        if (sku == null) return "";
-
-        Date start = sku.getStartTime();
-        Date end = sku.getEndTime();
-
-        if (TimeUtil.isSameDay(start, end)) {
-            return TIME_FORMAT.format(start) + "-" + TIME_FORMAT.format(end);
-        } else {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(start);
-            calendar.add(Calendar.DATE, 1);
-            Date nextDay = calendar.getTime();
-            if (TimeUtil.isSameDay(nextDay, end)) {
-                return TIME_FORMAT.format(start) + "-次日" + TIME_FORMAT.format(end);
-            } else {
-                return TIME_FORMAT.format(start) + "-" + MONTH_DATE_FORMAT.format(end) + " " + TIME_FORMAT.format(end);
-            }
-        }
-    }
-
-    private CoursePlaceDto buildCoursePlaceDto(CourseSkuPlace place) {
-        CoursePlaceDto coursePlaceDto = new CoursePlaceDto();
-        coursePlaceDto.setId(place.getId());
-        coursePlaceDto.setName(place.getName());
-        coursePlaceDto.setAddress(place.getAddress());
-        coursePlaceDto.setLng(place.getLng());
-        coursePlaceDto.setLat(place.getLat());
-
-        return coursePlaceDto;
     }
 
     @RequestMapping(value = "/{coid}/sku/month", method = RequestMethod.GET)
