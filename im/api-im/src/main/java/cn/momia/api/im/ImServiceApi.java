@@ -13,13 +13,14 @@ import java.util.List;
 import java.util.Set;
 
 public class ImServiceApi extends ServiceApi {
-    public void generateImToken(String utoken, String nickName, String avatar) {
+    public String generateImToken(String utoken, String nickName, String avatar) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("nickname", nickName)
                 .add("avatar", avatar);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/im/token"), builder.build());
-        execute(request);
+
+        return executeReturnObject(request, String.class);
     }
 
     public String getImToken(String utoken) {

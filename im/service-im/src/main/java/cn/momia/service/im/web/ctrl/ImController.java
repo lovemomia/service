@@ -36,7 +36,7 @@ public class ImController extends BaseController {
         String imToken = imService.generateImToken(user.getId(), nickName, avatar);
         if (!StringUtils.isBlank(imToken)) userServiceApi.updateImToken(utoken, imToken);
 
-        return MomiaHttpResponse.SUCCESS;
+        return MomiaHttpResponse.SUCCESS(imToken);
     }
 
     @RequestMapping(value = "/token", method = RequestMethod.GET)

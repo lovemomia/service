@@ -93,8 +93,8 @@
                 <JoinGroup>https://api.cn.ronghub.com/group/join.json</JoinGroup>
                 <DeleteGroup>https://api.cn.ronghub.com/group/dismiss.json</DeleteGroup>
             </Service>
-            <AppKey>lmxuhwagxybkd</AppKey>
-            <AppSecret>ZFpOktg33dzF</AppSecret>
+            <AppKey>0vnjpoadnwp2z</AppKey>
+            <AppSecret>X44MIhxlhq</AppSecret>
         </RongCloud>
     </Im>
 </Configuration>
