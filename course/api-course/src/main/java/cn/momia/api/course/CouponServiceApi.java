@@ -1,6 +1,6 @@
 package cn.momia.api.course;
 
-import cn.momia.api.course.dto.UserCouponDto;
+import cn.momia.api.course.dto.UserCoupon;
 import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
@@ -36,7 +36,7 @@ public class CouponServiceApi extends ServiceApi {
         execute(request);
     }
 
-    public PagedList<UserCouponDto> listUserCoupons(String utoken, int status, int start, int count) {
+    public PagedList<UserCoupon> listUserCoupons(String utoken, int status, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("status", status)
@@ -44,6 +44,6 @@ public class CouponServiceApi extends ServiceApi {
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/coupon/list"), builder.build());
 
-        return executeReturnPagedList(request, UserCouponDto.class);
+        return executeReturnPagedList(request, UserCoupon.class);
     }
 }

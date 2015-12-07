@@ -1,5 +1,7 @@
 package cn.momia.service.course.coupon;
 
+import cn.momia.api.course.dto.UserCoupon;
+
 import java.math.BigDecimal;
 import java.util.List;
 

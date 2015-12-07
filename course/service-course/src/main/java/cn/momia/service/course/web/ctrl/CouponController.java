@@ -1,6 +1,5 @@
 package cn.momia.service.course.web.ctrl;
 
-import cn.momia.api.course.dto.UserCouponDto;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.api.dto.PagedList;
@@ -8,7 +7,7 @@ import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.coupon.CouponService;
 import cn.momia.service.course.coupon.InviteCoupon;
-import cn.momia.service.course.coupon.UserCoupon;
+import cn.momia.api.course.dto.UserCoupon;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -72,32 +69,9 @@ public class CouponController extends BaseController {
         long totalCount = couponService.queryCount(user.getId(), status);
         List<UserCoupon> userCoupons = couponService.query(user.getId(), status, start, count);
 
-        PagedList<UserCouponDto> pagedUserCoupons = new PagedList<UserCouponDto>(totalCount, start, count);
-        pagedUserCoupons.setList(buildUserCouponDtos(userCoupons));
+        PagedList<UserCoupon> pagedUserCoupons = new PagedList<UserCoupon>(totalCount, start, count);
+        pagedUserCoupons.setList(userCoupons);
 
         return MomiaHttpResponse.SUCCESS(pagedUserCoupons);
-    }
-
-    private List<UserCouponDto> buildUserCouponDtos(List<UserCoupon> userCoupons) {
-        Date now = new Date();
-        List<UserCouponDto> userCouponDtos = new ArrayList<UserCouponDto>();
-        for (UserCoupon userCoupon : userCoupons) {
-            UserCouponDto userCouponDto = new UserCouponDto();
-            userCouponDto.setId(userCoupon.getId());
-            userCouponDto.setType(userCoupon.getType());
-            userCouponDto.setTitle(userCoupon.getTitle());
-            userCouponDto.setDesc(userCoupon.getDesc());
-            userCouponDto.setDiscount(userCoupon.getDiscount());
-            userCouponDto.setConsumption(userCoupon.getConsumption());
-            userCouponDto.setStartTime(userCoupon.getStartTime());
-            userCouponDto.setEndTime(userCoupon.getEndTime());
-            int status = userCoupon.getStatus();
-            if (status == 1 && userCoupon.getEndTime().before(now)) status = 3;
-            userCouponDto.setStatus(status);
-
-            userCouponDtos.add(userCouponDto);
-        }
-
-        return userCouponDtos;
     }
 }

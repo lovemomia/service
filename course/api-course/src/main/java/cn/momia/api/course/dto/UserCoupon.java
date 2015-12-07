@@ -1,9 +1,17 @@
-package cn.momia.service.course.coupon;
+package cn.momia.api.course.dto;
+
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
 public class UserCoupon {
+    public static class Status {
+        public static final int NOT_USED = 1;
+        public static final int USED = 2;
+        public static final int EXPIRED = 3;
+    }
+
     public static final UserCoupon NOT_EXIST_USER_COUPON = new UserCoupon();
 
     private long id;
@@ -35,6 +43,7 @@ public class UserCoupon {
         this.type = type;
     }
 
+    @JSONField(serialize = false)
     public long getUserId() {
         return userId;
     }
@@ -43,6 +52,7 @@ public class UserCoupon {
         this.userId = userId;
     }
 
+    @JSONField(serialize = false)
     public int getCouponId() {
         return couponId;
     }
@@ -83,6 +93,7 @@ public class UserCoupon {
         this.consumption = consumption;
     }
 
+    @JSONField(format = "yyyy-MM-dd")
     public Date getStartTime() {
         return startTime;
     }
@@ -91,6 +102,7 @@ public class UserCoupon {
         this.startTime = startTime;
     }
 
+    @JSONField(format = "yyyy-MM-dd")
     public Date getEndTime() {
         return endTime;
     }
@@ -99,6 +111,7 @@ public class UserCoupon {
         this.endTime = endTime;
     }
 
+    @JSONField(serialize = false)
     public String getInviteCode() {
         return inviteCode;
     }
@@ -119,11 +132,13 @@ public class UserCoupon {
         return id > 0;
     }
 
+    @JSONField(serialize = false)
     public boolean isUsed() {
-        return status != 1;
+        return status == Status.USED;
     }
 
+    @JSONField(serialize = false)
     public boolean isExpired() {
-        return status == 1 && endTime.before(new Date());
+        return (status == Status.NOT_USED && endTime.before(new Date())) || status == Status.EXPIRED;
     }
 }

@@ -21,7 +21,7 @@ import cn.momia.service.course.order.OrderPackage;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.coupon.CouponService;
-import cn.momia.service.course.coupon.UserCoupon;
+import cn.momia.api.course.dto.UserCoupon;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderService;
 import cn.momia.service.course.order.Payment;

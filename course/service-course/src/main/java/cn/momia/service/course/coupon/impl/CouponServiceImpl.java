@@ -6,7 +6,7 @@ import cn.momia.common.util.TimeUtil;
 import cn.momia.service.course.coupon.Coupon;
 import cn.momia.service.course.coupon.CouponService;
 import cn.momia.service.course.coupon.InviteCoupon;
-import cn.momia.service.course.coupon.UserCoupon;
+import cn.momia.api.course.dto.UserCoupon;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -50,10 +50,15 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
             userCouponsMap.put(userCoupon.getId(), userCoupon);
         }
 
+        Date now = new Date();
         List<UserCoupon> result = new ArrayList<UserCoupon>();
         for (long userCouponId : userCouponIds) {
             UserCoupon userCoupon = userCouponsMap.get(userCouponId);
-            if (userCoupon != null) result.add(userCoupon);
+            if (userCoupon != null) {
+                int status = userCoupon.getStatus();
+                if (status == UserCoupon.Status.USED && userCoupon.getEndTime().before(now)) userCoupon.setStatus(UserCoupon.Status.EXPIRED);
+                result.add(userCoupon);
+            }
         }
 
         return result;
