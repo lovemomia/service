@@ -29,6 +29,7 @@ public class Course implements Cloneable {
 
     private long id;
     private int type;
+    private long parentId;
     private long subjectId;
     private String title;
     private String cover;
@@ -68,6 +69,14 @@ public class Course implements Cloneable {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(long parentId) {
+        this.parentId = parentId;
     }
 
     public long getSubjectId() {

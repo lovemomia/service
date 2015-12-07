@@ -92,24 +92,32 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     public List<Course> list(Collection<Long> courseIds) {
         if (courseIds.isEmpty()) return new ArrayList<Course>();
 
-        String sql = "SELECT A.Id, A.Type, A.SubjectId, A.Title, A.Cover, A.MinAge, A.MaxAge, A.Insurance, A.Joined, A.Price, A.Goal, A.Flow, A.Tips, A.Notice, A.InstitutionId, A.Status, B.Title AS Subject, B.Stock FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Id IN (" + StringUtils.join(courseIds, ",") + ") AND A.Status<>0 AND B.Status<>0";
+        String sql = "SELECT A.Id, A.Type, A.ParentId, A.SubjectId, A.Title, A.Cover, A.MinAge, A.MaxAge, A.Insurance, A.Joined, A.Price, A.Goal, A.Flow, A.Tips, A.Notice, A.InstitutionId, A.Status, B.Title AS Subject, B.Stock FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Id IN (" + StringUtils.join(courseIds, ",") + ") AND A.Status<>0 AND B.Status<>0";
         List<Course> courses = queryObjectList(sql, Course.class);
 
         Set<Integer> institutionIds = new HashSet<Integer>();
+        Set<Long> courseAndParentIds = Sets.newHashSet(courseIds);
         for (Course course : courses) {
             institutionIds.add(course.getInstitutionId());
+            if (course.getParentId() > 0) courseAndParentIds.add(course.getParentId());
         }
         Map<Integer, Institution> institutionsMap = queryInstitutions(institutionIds);
-        Map<Long, List<CourseImage>> imgsMap = queryImgs(courseIds);
-        Map<Long, CourseBook> booksMap = queryBooks(courseIds);
+        Map<Long, List<CourseImage>> imgsMap = queryImgs(courseAndParentIds);
+        Map<Long, CourseBook> booksMap = queryBooks(courseAndParentIds);
         Map<Long, List<CourseSku>> skusMap = querySkus(courseIds);
         Map<Long, BigDecimal> buyablesMap = queryBuyables(courseIds);
 
         for (Course course : courses) {
             Institution institution = institutionsMap.get(course.getInstitutionId());
             if (institution != null) course.setInstitution(institution.getIntro());
+
             course.setImgs(imgsMap.get(course.getId()));
             course.setBook(booksMap.get(course.getId()));
+            if (course.getParentId() > 0) {
+                course.getImgs().addAll(imgsMap.get(course.getParentId()));
+                course.getBook().getImgs().addAll(booksMap.get(course.getParentId()).getImgs());
+            }
+
             course.setSkus(skusMap.get(course.getId()));
 
             BigDecimal price = buyablesMap.get(course.getId());
@@ -293,26 +301,47 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public long queryBookImgCount(long courseId) {
-        String sql = "SELECT COUNT(1) FROM SG_CourseBook WHERE CourseId=? AND Status<>0";
+        Set<Long> courseIds = Sets.newHashSet(courseId);
+        long parentId = getParentId(courseId);
+        if (parentId > 0) courseIds.add(parentId);
+
+        String sql = "SELECT COUNT(1) FROM SG_CourseBook WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Status<>0";
+        return queryLong(sql);
+    }
+
+    public long getParentId(long courseId) {
+        String sql = "SELECT ParentId FROM SG_Course WHERE Id=? AND Status<>0";
         return queryLong(sql, new Object[] { courseId });
     }
 
     @Override
     public List<String> queryBookImgs(long courseId, int start, int count) {
-        String sql = "SELECT Img FROM SG_CourseBook WHERE CourseId=? AND Status<>0 ORDER BY `Order` ASC LIMIT ?,?";
-        return queryStringList(sql, new Object[] { courseId, start, count });
+        Set<Long> courseIds = Sets.newHashSet(courseId);
+        long parentId = getParentId(courseId);
+        if (parentId > 0) courseIds.add(parentId);
+
+        String sql = "SELECT Img FROM SG_CourseBook WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Status<>0 ORDER BY `Order` ASC LIMIT ?,?";
+        return queryStringList(sql, new Object[] { start, count });
     }
 
     @Override
     public long queryTeacherCount(long courseId) {
-        String sql = "SELECT COUNT(1) FROM SG_CourseTeacher WHERE CourseId=? AND Status<>0";
-        return queryLong(sql, new Object[] { courseId });
+        Set<Long> courseIds = Sets.newHashSet(courseId);
+        long parentId = getParentId(courseId);
+        if (parentId > 0) courseIds.add(parentId);
+
+        String sql = "SELECT COUNT(1) FROM SG_CourseTeacher WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Status<>0";
+        return queryLong(sql);
     }
 
     @Override
     public List<Teacher> queryTeachers(long courseId, int start, int count) {
-        String sql = "SELECT TeacherId FROM SG_CourseTeacher WHERE CourseId=? AND Status<>0 LIMIT ?,?";
-        List<Integer> teacherIds = queryIntList(sql, new Object[] { courseId, start, count });
+        Set<Long> courseIds = Sets.newHashSet(courseId);
+        long parentId = getParentId(courseId);
+        if (parentId > 0) courseIds.add(parentId);
+
+        String sql = "SELECT TeacherId FROM SG_CourseTeacher WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Status<>0 LIMIT ?,?";
+        List<Integer> teacherIds = queryIntList(sql, new Object[] { start, count });
 
         return listTeachers(teacherIds);
     }
