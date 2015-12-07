@@ -28,7 +28,7 @@ import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.base.CourseSku;
 import cn.momia.service.course.base.CourseSkuPlace;
 import cn.momia.service.course.base.Institution;
-import cn.momia.service.course.base.Teacher;
+import cn.momia.api.course.dto.Teacher;
 import cn.momia.service.course.favorite.Favorite;
 import cn.momia.service.course.favorite.FavoriteService;
 import cn.momia.service.course.order.Order;

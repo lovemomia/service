@@ -1,5 +1,7 @@
 package cn.momia.service.course.base;
 
+import cn.momia.api.course.dto.Teacher;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
