@@ -1,7 +1,7 @@
 package cn.momia.api.feed;
 
-import cn.momia.api.feed.dto.FeedCommentDto;
-import cn.momia.api.feed.dto.FeedDto;
+import cn.momia.api.feed.dto.UserComment;
+import cn.momia.api.feed.dto.UserFeed;
 import cn.momia.api.feed.dto.FeedTag;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.api.ServiceApi;
@@ -22,27 +22,27 @@ public class FeedServiceApi extends ServiceApi {
         execute(request);
     }
 
-    public PagedList<FeedDto> list(long userId, int start, int count) {
+    public PagedList<UserFeed> list(long userId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
                 .add("start", start)
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/feed"), builder.build());
 
-        return executeReturnPagedList(request, FeedDto.class);
+        return executeReturnPagedList(request, UserFeed.class);
     }
 
-    public PagedList<FeedDto> listFeedsOfUser(long userId, int start, int count) {
+    public PagedList<UserFeed> listFeedsOfUser(long userId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
                 .add("start", start)
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/feed/user"), builder.build());
 
-        return executeReturnPagedList(request, FeedDto.class);
+        return executeReturnPagedList(request, UserFeed.class);
     }
 
-    public PagedList<FeedDto> queryBySubject(long userId, long subjectId, int start, int count) {
+    public PagedList<UserFeed> queryBySubject(long userId, long subjectId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
                 .add("suid", subjectId)
@@ -50,10 +50,10 @@ public class FeedServiceApi extends ServiceApi {
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/feed/subject"), builder.build());
 
-        return executeReturnPagedList(request, FeedDto.class);
+        return executeReturnPagedList(request, UserFeed.class);
     }
 
-    public PagedList<FeedDto> queryByCourse(long userId, long courseId, int start, int count) {
+    public PagedList<UserFeed> queryByCourse(long userId, long courseId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
                 .add("coid", courseId)
@@ -61,7 +61,7 @@ public class FeedServiceApi extends ServiceApi {
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/feed/course"), builder.build());
 
-        return executeReturnPagedList(request, FeedDto.class);
+        return executeReturnPagedList(request, UserFeed.class);
     }
 
     public boolean isOfficialUser(long userId) {
@@ -90,11 +90,11 @@ public class FeedServiceApi extends ServiceApi {
         execute(request);
     }
 
-    public FeedDto get(long userId, long feedId) {
+    public UserFeed get(long userId, long feedId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/feed/%d", feedId), builder.build());
 
-        return executeReturnObject(request, FeedDto.class);
+        return executeReturnObject(request, UserFeed.class);
     }
 
     public boolean delete(long userId, long feedId) {
@@ -104,13 +104,13 @@ public class FeedServiceApi extends ServiceApi {
         return executeReturnObject(request, Boolean.class);
     }
 
-    public PagedList<FeedCommentDto> listComments(long feedId, int start, int count) {
+    public PagedList<UserComment> listComments(long feedId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/feed/%d/comment/list", feedId), builder.build());
 
-        return executeReturnPagedList(request, FeedCommentDto.class);
+        return executeReturnPagedList(request, UserComment.class);
     }
 
     public void addComment(long userId, long feedId, String content) {

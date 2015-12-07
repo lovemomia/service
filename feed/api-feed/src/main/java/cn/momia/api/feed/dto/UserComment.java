@@ -1,6 +1,6 @@
 package cn.momia.api.feed.dto;
 
-public class FeedCommentDto {
+public class UserComment {
     private long id;
     private String content;
     private String addTime;

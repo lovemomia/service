@@ -1,6 +1,6 @@
 package cn.momia.service.feed.web.ctrl;
 
-import cn.momia.api.feed.dto.FeedCommentDto;
+import cn.momia.api.feed.dto.UserComment;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.api.dto.PagedList;
@@ -45,33 +45,37 @@ public class FeedCommentController extends BaseController {
         List<FeedComment> comments = feedCommentService.query(feedId, start, count);
 
         List<Long> userIds = new ArrayList<Long>();
-        for (FeedComment comment : comments) userIds.add(comment.getUserId());
+        for (FeedComment comment : comments) {
+            userIds.add(comment.getUserId());
+        }
         List<User> users = userServiceApi.list(userIds, User.Type.MINI);
         Map<Long, User> usersMap = new HashMap<Long, User>();
-        for (User user : users) usersMap.put(user.getId(), user);
+        for (User user : users) {
+            usersMap.put(user.getId(), user);
+        }
 
-        PagedList<FeedCommentDto> pagedFeedCommentDtos = new PagedList(totalCount, start, count);
-        List<FeedCommentDto> feedCommentDtos = new ArrayList<FeedCommentDto>();
+        PagedList<UserComment> pagedUserComments = new PagedList(totalCount, start, count);
+        List<UserComment> userComments = new ArrayList<UserComment>();
         for (FeedComment comment : comments) {
             User user = usersMap.get(comment.getUserId());
             if (user == null) continue;
 
-            feedCommentDtos.add(buildFeedCommentDto(comment, user));
+            userComments.add(buildUserComment(comment, user));
         }
-        pagedFeedCommentDtos.setList(feedCommentDtos);
+        pagedUserComments.setList(userComments);
 
-        return MomiaHttpResponse.SUCCESS(pagedFeedCommentDtos);
+        return MomiaHttpResponse.SUCCESS(pagedUserComments);
     }
 
-    private FeedCommentDto buildFeedCommentDto(FeedComment comment, User user) {
-        FeedCommentDto feedCommentDto = new FeedCommentDto();
-        feedCommentDto.setId(comment.getId());
-        feedCommentDto.setContent(comment.getContent());
-        feedCommentDto.setAddTime(TimeUtil.formatAddTime(comment.getAddTime()));
-        feedCommentDto.setNickName(user.getNickName());
-        feedCommentDto.setAvatar(user.getAvatar());
+    private UserComment buildUserComment(FeedComment comment, User user) {
+        UserComment userComment = new UserComment();
+        userComment.setId(comment.getId());
+        userComment.setContent(comment.getContent());
+        userComment.setAddTime(TimeUtil.formatAddTime(comment.getAddTime()));
+        userComment.setNickName(user.getNickName());
+        userComment.setAvatar(user.getAvatar());
 
-        return feedCommentDto;
+        return userComment;
     }
 
     @RequestMapping(value = "/{fid}/comment", method = RequestMethod.POST)

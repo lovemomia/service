@@ -1,12 +1,10 @@
 package cn.momia.api.feed.dto;
 
-import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-public class FeedDto {
+public class UserFeed {
     private long id;
     private int type;
     private String content;

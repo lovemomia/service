@@ -1,6 +1,6 @@
 package cn.momia.service.feed.web.ctrl;
 
-import cn.momia.api.feed.dto.FeedDto;
+import cn.momia.api.feed.dto.UserFeed;
 import cn.momia.api.feed.dto.FeedTag;
 import cn.momia.api.user.dto.Child;
 import cn.momia.common.api.http.MomiaHttpResponse;
@@ -55,10 +55,10 @@ public class FeedController extends BaseController {
         long totalCount = userId > 0 ? feedService.queryFollowedCountByUser(userId) : feedService.queryOfficialFeedsCount();
         List<Feed> feeds = userId > 0 ? feedService.queryFollowedByUser(userId, start, count) : feedService.queryOfficialFeeds(start, count);
 
-        return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(userId, feeds, totalCount, start, count));
+        return MomiaHttpResponse.SUCCESS(buildPagedUserFeeds(userId, feeds, totalCount, start, count));
     }
 
-    private PagedList<FeedDto> buildPagedFeedDtos(long userId, List<Feed> feeds, long totalCount, int start, int count) {
+    private PagedList<UserFeed> buildPagedUserFeeds(long userId, List<Feed> feeds, long totalCount, int start, int count) {
         Set<Long> staredFeedIds = new HashSet<Long>();
         if (userId > 0) {
             Set<Long> feedIds = new HashSet<Long>();
@@ -79,44 +79,44 @@ public class FeedController extends BaseController {
             usersMap.put(user.getId(), user);
         }
 
-        List<FeedDto> feedDtos = new ArrayList<FeedDto>();
+        List<UserFeed> userFeeds = new ArrayList<UserFeed>();
         for (Feed feed : feeds) {
             User user = usersMap.get(feed.getUserId());
             if (user == null) continue;
 
-            feedDtos.add(buildFeedDto(feed, user, staredFeedIds.contains(feed.getId())));
+            userFeeds.add(buildUserFeed(feed, user, staredFeedIds.contains(feed.getId())));
         }
 
-        PagedList<FeedDto> pagedFeedDtos = new PagedList(totalCount, start, count);
-        pagedFeedDtos.setList(feedDtos);
+        PagedList<UserFeed> pagedFeedDtos = new PagedList(totalCount, start, count);
+        pagedFeedDtos.setList(userFeeds);
 
         return pagedFeedDtos;
     }
 
-    private FeedDto buildFeedDto(Feed feed, User user, boolean stared) {
-        FeedDto feedDto = new FeedDto();
-        feedDto.setId(feed.getId());
-        feedDto.setType(feed.getType());
-        feedDto.setContent(feed.getContent());
-        feedDto.setImgs(feed.getImgs());
+    private UserFeed buildUserFeed(Feed feed, User user, boolean stared) {
+        UserFeed userFeed = new UserFeed();
+        userFeed.setId(feed.getId());
+        userFeed.setType(feed.getType());
+        userFeed.setContent(feed.getContent());
+        userFeed.setImgs(feed.getImgs());
 
-        feedDto.setTagId(feed.getTagId());
-        feedDto.setTagName(feed.getTagName());
-        feedDto.setCourseId(feed.getCourseId());
-        feedDto.setCourseTitle(feed.getCourseTitle());
+        userFeed.setTagId(feed.getTagId());
+        userFeed.setTagName(feed.getTagName());
+        userFeed.setCourseId(feed.getCourseId());
+        userFeed.setCourseTitle(feed.getCourseTitle());
 
-        feedDto.setAddTime(TimeUtil.formatAddTime(feed.getAddTime()));
-        feedDto.setPoi(feed.getLng() + ":" + feed.getLat());
-        feedDto.setCommentCount(feed.getCommentCount());
-        feedDto.setStarCount(feed.getStarCount());
-        feedDto.setOfficial(feed.getOfficial() > 0);
-        feedDto.setUserId(user.getId());
-        feedDto.setAvatar(user.getAvatar());
-        feedDto.setNickName(user.getNickName());
-        feedDto.setChildren(formatChildren(user.getChildren()));
-        feedDto.setStared(stared);
+        userFeed.setAddTime(TimeUtil.formatAddTime(feed.getAddTime()));
+        userFeed.setPoi(feed.getLng() + ":" + feed.getLat());
+        userFeed.setCommentCount(feed.getCommentCount());
+        userFeed.setStarCount(feed.getStarCount());
+        userFeed.setOfficial(feed.getOfficial() > 0);
+        userFeed.setUserId(user.getId());
+        userFeed.setAvatar(user.getAvatar());
+        userFeed.setNickName(user.getNickName());
+        userFeed.setChildren(formatChildren(user.getChildren()));
+        userFeed.setStared(stared);
 
-        return feedDto;
+        return userFeed;
     }
 
     private List<String> formatChildren(List<Child> children) {
@@ -138,7 +138,7 @@ public class FeedController extends BaseController {
         long totalCount =feedService.queryCountByUser(userId);
         List<Feed> feeds = feedService.queryByUser(userId, start, count);
 
-        return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(userId, feeds, totalCount, start, count));
+        return MomiaHttpResponse.SUCCESS(buildPagedUserFeeds(userId, feeds, totalCount, start, count));
     }
 
     @RequestMapping(value = "/subject", method = RequestMethod.GET)
@@ -151,7 +151,7 @@ public class FeedController extends BaseController {
         long totalCount = feedService.queryCountBySubject(subjectId);
         List<Feed> feeds = feedService.queryBySubject(subjectId, start, count);
 
-        return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(userId, feeds, totalCount, start, count));
+        return MomiaHttpResponse.SUCCESS(buildPagedUserFeeds(userId, feeds, totalCount, start, count));
     }
 
     @RequestMapping(value = "/course", method = RequestMethod.GET)
@@ -164,7 +164,7 @@ public class FeedController extends BaseController {
         long totalCount = feedService.queryCountByCourse(courseId);
         List<Feed> feeds = feedService.queryByCourse(courseId, start, count);
 
-        return MomiaHttpResponse.SUCCESS(buildPagedFeedDtos(userId, feeds, totalCount, start, count));
+        return MomiaHttpResponse.SUCCESS(buildPagedUserFeeds(userId, feeds, totalCount, start, count));
     }
 
     @RequestMapping(value = "/official", method = RequestMethod.GET)
@@ -229,7 +229,7 @@ public class FeedController extends BaseController {
 
         boolean stared = userId > 0 && feedStarService.isStared(userId, feedId);
 
-        return MomiaHttpResponse.SUCCESS(buildFeedDto(feed, feedUser, stared));
+        return MomiaHttpResponse.SUCCESS(buildUserFeed(feed, feedUser, stared));
     }
 
     @RequestMapping(value = "/{fid}", method = RequestMethod.DELETE)
