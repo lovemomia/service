@@ -7,7 +7,7 @@ import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.CourseSkuDto;
 import cn.momia.api.course.dto.DatedCourseSkusDto;
 import cn.momia.api.course.dto.FavoriteDto;
-import cn.momia.api.course.dto.InstitutionDto;
+import cn.momia.api.course.dto.Institution;
 import cn.momia.api.course.dto.Teacher;
 import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.dto.PagedList;
@@ -120,9 +120,9 @@ public class CourseServiceApi extends ServiceApi {
         return executeReturnPagedList(request, Teacher.class);
     }
 
-    public InstitutionDto institution(long courseId) {
+    public Institution institution(long courseId) {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/institution", courseId));
-        return executeReturnObject(request, InstitutionDto.class);
+        return executeReturnObject(request, Institution.class);
     }
 
     public Map<Long, String> queryTips(Set<Long> courseIds) {

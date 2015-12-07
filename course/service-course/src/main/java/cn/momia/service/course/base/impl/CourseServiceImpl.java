@@ -13,7 +13,7 @@ import cn.momia.service.course.base.CourseImage;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.base.CourseSku;
 import cn.momia.service.course.base.CourseSkuPlace;
-import cn.momia.service.course.base.Institution;
+import cn.momia.api.course.dto.Institution;
 import cn.momia.api.course.dto.Teacher;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
