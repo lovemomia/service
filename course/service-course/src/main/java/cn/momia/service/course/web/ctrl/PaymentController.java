@@ -1,6 +1,6 @@
 package cn.momia.service.course.web.ctrl;
 
-import cn.momia.api.course.dto.PaymentDto;
+import cn.momia.api.course.dto.PaymentResult;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.api.exception.MomiaErrorException;
@@ -249,14 +249,14 @@ public class PaymentController extends BaseController {
         User user = userServiceApi.get(utoken);
         Order order = orderService.get(orderId);
 
-        PaymentDto paymentDto = new PaymentDto();
+        PaymentResult paymentResult = new PaymentResult();
         if (order.exists() && order.getUserId() == user.getId() && order.isPayed()) {
-            paymentDto.setPayed(true);
-            paymentDto.setSubjectId(order.getSubjectId());
+            paymentResult.setPayed(true);
+            paymentResult.setSubjectId(order.getSubjectId());
         } else {
-            paymentDto.setPayed(false);
+            paymentResult.setPayed(false);
         }
 
-        return MomiaHttpResponse.SUCCESS(paymentDto);
+        return MomiaHttpResponse.SUCCESS(paymentResult);
     }
 }

@@ -1,6 +1,6 @@
 package cn.momia.api.course.dto;
 
-public class PaymentDto {
+public class PaymentResult {
     private boolean payed;
     private Long subjectId;
 

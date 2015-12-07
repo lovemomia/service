@@ -1,6 +1,6 @@
 package cn.momia.api.course;
 
-import cn.momia.api.course.dto.PaymentDto;
+import cn.momia.api.course.dto.PaymentResult;
 import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
@@ -43,12 +43,12 @@ public class PaymentServiceApi extends ServiceApi {
         return "OK".equalsIgnoreCase(executeReturnObject(request, String.class));
     }
 
-    public PaymentDto checkPayment(String utoken, long orderId) {
+    public PaymentResult checkPayment(String utoken, long orderId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("oid", orderId);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/payment/check"), builder.build());
 
-        return executeReturnObject(request, PaymentDto.class);
+        return executeReturnObject(request, PaymentResult.class);
     }
 }
