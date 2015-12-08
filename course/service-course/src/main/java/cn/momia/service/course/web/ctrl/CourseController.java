@@ -33,7 +33,7 @@ import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderPackage;
 import cn.momia.service.course.order.OrderService;
 import cn.momia.service.course.subject.SubjectService;
-import cn.momia.service.course.subject.SubjectSku;
+import cn.momia.api.course.dto.SubjectSku;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Splitter;

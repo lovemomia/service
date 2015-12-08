@@ -5,7 +5,6 @@ import cn.momia.api.base.dto.Region;
 import cn.momia.api.course.dto.UserCourseComment;
 import cn.momia.api.course.dto.Favorite;
 import cn.momia.api.course.dto.SubjectDto;
-import cn.momia.api.course.dto.SubjectSkuDto;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.Child;
 import cn.momia.api.user.dto.User;
@@ -19,9 +18,8 @@ import cn.momia.service.course.base.CourseComment;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.favorite.FavoriteService;
 import cn.momia.service.course.subject.Subject;
-import cn.momia.service.course.subject.SubjectImage;
 import cn.momia.service.course.subject.SubjectService;
-import cn.momia.service.course.subject.SubjectSku;
+import cn.momia.api.course.dto.SubjectSku;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
@@ -197,18 +195,9 @@ public class SubjectController extends BaseController {
         SubjectDto subjectDto = buildBaseSubjectDto(subject, courses);
         subjectDto.setIntro(subject.getIntro());
         subjectDto.setNotice(JSON.parseArray(subject.getNotice()));
-        subjectDto.setImgs(extractImgUrls(subject.getImgs()));
+        subjectDto.setImgs(subject.getImgs());
 
         return subjectDto;
-    }
-
-    private List<String> extractImgUrls(List<SubjectImage> imgs) {
-        List<String> urls = new ArrayList<String>();
-        for (SubjectImage img : imgs) {
-            urls.add(img.getUrl());
-        }
-
-        return urls;
     }
 
     @RequestMapping(value = "/{suid}/sku", method = RequestMethod.GET)
@@ -221,10 +210,10 @@ public class SubjectController extends BaseController {
         return MomiaHttpResponse.SUCCESS(buildSubjectSkuDtos(avaliableSkus));
     }
 
-    private List<SubjectSkuDto> buildSubjectSkuDtos(List<SubjectSku> skus) {
-        List<SubjectSkuDto> skuDtos = new ArrayList<SubjectSkuDto>();
+    private List<SubjectSku> buildSubjectSkuDtos(List<SubjectSku> skus) {
+        List<SubjectSku> skuDtos = new ArrayList<SubjectSku>();
         for (SubjectSku sku : skus) {
-            SubjectSkuDto skuDto = new SubjectSkuDto();
+            SubjectSku skuDto = new SubjectSku();
             skuDto.setId(sku.getId());
             skuDto.setSubjectId(sku.getSubjectId());
             skuDto.setPrice(sku.getPrice());

@@ -14,7 +14,7 @@ import cn.momia.service.course.base.CourseService;
 import cn.momia.api.course.dto.UserCoupon;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
-import cn.momia.service.course.subject.SubjectSku;
+import cn.momia.api.course.dto.SubjectSku;
 import cn.momia.service.course.coupon.CouponService;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderService;

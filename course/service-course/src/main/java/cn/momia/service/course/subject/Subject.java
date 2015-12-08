@@ -1,5 +1,7 @@
 package cn.momia.service.course.subject;
 
+import cn.momia.api.course.dto.SubjectSku;
+
 import java.util.List;
 
 public class Subject {
@@ -23,7 +25,7 @@ public class Subject {
     private String intro;
     private String notice;
     private int stock;
-    private List<SubjectImage> imgs;
+    private List<String> imgs;
     private List<SubjectSku> skus;
 
     private int status;
@@ -92,11 +94,11 @@ public class Subject {
         this.stock = stock;
     }
 
-    public List<SubjectImage> getImgs() {
+    public List<String> getImgs() {
         return imgs;
     }
 
-    public void setImgs(List<SubjectImage> imgs) {
+    public void setImgs(List<String> imgs) {
         this.imgs = imgs;
     }
 

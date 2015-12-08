@@ -1,9 +1,9 @@
 package cn.momia.api.course;
 
+import cn.momia.api.course.dto.SubjectSku;
 import cn.momia.api.course.dto.UserCourseComment;
 import cn.momia.api.course.dto.Favorite;
 import cn.momia.api.course.dto.SubjectDto;
-import cn.momia.api.course.dto.SubjectSkuDto;
 import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
@@ -28,9 +28,9 @@ public class SubjectServiceApi extends ServiceApi {
         return executeReturnObject(request, SubjectDto.class);
     }
 
-    public List<SubjectSkuDto> querySkus(long subjectId) {
+    public List<SubjectSku> querySkus(long subjectId) {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/%d/sku", subjectId));
-        return executeReturnList(request, SubjectSkuDto.class);
+        return executeReturnList(request, SubjectSku.class);
     }
 
     public PagedList<UserCourseComment> queryCommentsBySubject(long subjectId, int start, int count) {

@@ -1,4 +1,6 @@
-package cn.momia.service.course.subject;
+package cn.momia.api.course.dto;
+
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.math.BigDecimal;
 
@@ -18,6 +20,7 @@ public class SubjectSku implements Cloneable {
     private int limit;
     private int status;
 
+    private int count;
     private long courseId;
 
     public long getId() {
@@ -52,6 +55,7 @@ public class SubjectSku implements Cloneable {
         this.price = price;
     }
 
+    @JSONField(serialize = false)
     public BigDecimal getOriginalPrice() {
         return originalPrice;
     }
@@ -60,6 +64,7 @@ public class SubjectSku implements Cloneable {
         this.originalPrice = originalPrice;
     }
 
+    @JSONField(serialize = false)
     public int getAdult() {
         return adult;
     }
@@ -68,6 +73,7 @@ public class SubjectSku implements Cloneable {
         this.adult = adult;
     }
 
+    @JSONField(serialize = false)
     public int getChild() {
         return child;
     }
@@ -76,6 +82,7 @@ public class SubjectSku implements Cloneable {
         this.child = child;
     }
 
+    @JSONField(serialize = false)
     public int getCourseCount() {
         return courseCount;
     }
@@ -84,6 +91,7 @@ public class SubjectSku implements Cloneable {
         this.courseCount = courseCount;
     }
 
+    @JSONField(serialize = false)
     public int getTime() {
         return time;
     }
@@ -92,6 +100,7 @@ public class SubjectSku implements Cloneable {
         this.time = time;
     }
 
+    @JSONField(serialize = false)
     public int getTimeUnit() {
         return timeUnit;
     }
@@ -112,6 +121,15 @@ public class SubjectSku implements Cloneable {
         this.status = status;
     }
 
+    @JSONField(serialize = false)
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
     public long getCourseId() {
         return courseId;
     }
@@ -124,10 +142,12 @@ public class SubjectSku implements Cloneable {
         return id > 0;
     }
 
+    @JSONField(serialize = false)
     public int getJoinCount() {
         return adult + child;
     }
 
+    @JSONField(serialize = false)
     public boolean isAvaliable() {
         return status == 1;
     }

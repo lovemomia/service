@@ -2,9 +2,8 @@ package cn.momia.service.course.subject.impl;
 
 import cn.momia.common.service.AbstractService;
 import cn.momia.service.course.subject.Subject;
-import cn.momia.service.course.subject.SubjectImage;
 import cn.momia.service.course.subject.SubjectService;
-import cn.momia.service.course.subject.SubjectSku;
+import cn.momia.api.course.dto.SubjectSku;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 
@@ -31,7 +30,7 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
         String sql = "SELECT Id, CityId, Title, Cover, Tags, Intro, Notice, Stock, Status FROM SG_Subject WHERE Id IN (" + StringUtils.join(subjectIds, ",") + ") AND Status<>0";
         List<Subject> subjects = queryObjectList(sql, Subject.class);
 
-        Map<Long, List<SubjectImage>> imgs = queryImgs(subjectIds);
+        Map<Long, List<String>> imgs = queryImgs(subjectIds);
         Map<Long, List<SubjectSku>> skus = querySkus(subjectIds);
         for (Subject subject : subjects) {
             subject.setImgs(imgs.get(subject.getId()));
@@ -52,18 +51,14 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
         return result;
     }
 
-    private Map<Long, List<SubjectImage>> queryImgs(Collection<Long> subjectIds) {
-        if (subjectIds.isEmpty()) return new HashMap<Long, List<SubjectImage>>();
+    private Map<Long, List<String>> queryImgs(Collection<Long> subjectIds) {
+        if (subjectIds.isEmpty()) return new HashMap<Long, List<String>>();
 
-        String sql = "SELECT Id, SubjectId, Url, Width, Height FROM SG_SubjectImg WHERE SubjectId IN (" + StringUtils.join(subjectIds, ",") + ") AND Status<>0";
-        List<SubjectImage> imgs = queryObjectList(sql, SubjectImage.class);
+        String sql = "SELECT SubjectId, Url FROM SG_SubjectImg WHERE SubjectId IN (" + StringUtils.join(subjectIds, ",") + ") AND Status<>0";
+        Map<Long, List<String>> imgsMap = queryListMap(sql, Long.class, String.class);
 
-        final Map<Long, List<SubjectImage>> imgsMap = new HashMap<Long, List<SubjectImage>>();
         for (long subjectId : subjectIds) {
-            imgsMap.put(subjectId, new ArrayList<SubjectImage>());
-        }
-        for (SubjectImage img : imgs) {
-            imgsMap.get(img.getSubjectId()).add(img);
+            if (!imgsMap.containsKey(subjectId)) imgsMap.put(subjectId, new ArrayList<String>());
         }
 
         return imgsMap;
