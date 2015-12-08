@@ -1,5 +1,7 @@
 package cn.momia.api.course.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -45,6 +47,7 @@ public class Subject {
         this.id = id;
     }
 
+    @JSONField(serialize = false)
     public int getType() {
         return type;
     }
@@ -53,6 +56,7 @@ public class Subject {
         this.type = type;
     }
 
+    @JSONField(serialize = false)
     public int getCityId() {
         return cityId;
     }
@@ -101,6 +105,7 @@ public class Subject {
         this.notice = notice;
     }
 
+    @JSONField(serialize = false)
     public int getStock() {
         return stock;
     }
@@ -196,6 +201,17 @@ public class Subject {
     public static class Base extends Subject {
         public Base(Subject subject) {
             super();
+            setId(subject.getId());
+            setTitle(subject.getTitle());
+            setCover(subject.getCover());
+            setTags(subject.getTags());
+            setPrice(subject.getPrice());
+            setOriginalPrice(subject.getOriginalPrice());
+            setAge(subject.getAge());
+            setJoined(subject.getJoined());
+            setScheduler(subject.getScheduler());
+            setRegion(subject.getRegion());
+            setStatus(subject.getStatus());
         }
     }
 }
