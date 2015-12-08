@@ -14,8 +14,9 @@ import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.Course;
-import cn.momia.service.course.base.CourseComment;
+import cn.momia.service.course.comment.CourseComment;
 import cn.momia.service.course.base.CourseService;
+import cn.momia.service.course.comment.CourseCommentService;
 import cn.momia.service.course.favorite.FavoriteService;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
@@ -50,6 +51,7 @@ public class SubjectController extends BaseController {
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("M月d日");
 
     @Autowired private CourseService courseService;
+    @Autowired private CourseCommentService courseCommentService;
     @Autowired private SubjectService subjectService;
     @Autowired private FavoriteService favoriteService;
 
@@ -231,8 +233,8 @@ public class SubjectController extends BaseController {
     public MomiaHttpResponse listComments(@PathVariable(value = "suid") long subjectId, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
-        long totalCount = courseService.queryCommentCountBySubject(subjectId);
-        List<CourseComment> comments = courseService.queryCommentsBySubject(subjectId, start, count);
+        long totalCount = courseCommentService.queryCommentCountBySubject(subjectId);
+        List<CourseComment> comments = courseCommentService.queryCommentsBySubject(subjectId, start, count);
 
         Set<Long> courseIds = new HashSet<Long>();
         Set<Long> userIds = new HashSet<Long>();

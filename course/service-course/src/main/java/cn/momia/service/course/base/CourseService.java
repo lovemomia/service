@@ -74,13 +74,4 @@ public interface CourseService {
     boolean joined(long userId, long courseId);
 
     boolean finished(long userId, long bookingId, long courseId);
-    boolean isCommented(long userId, long bookingId);
-    boolean comment(CourseComment comment);
-
-    long queryCommentCountByCourse(long courseId);
-    List<CourseComment> queryCommentsByCourse(long courseId, int start, int count);
-    long queryCommentCountBySubject(long subjectId);
-    List<CourseComment> queryCommentsBySubject(long subjectId, int start, int count);
-
-    List<Long> queryCommentedBookingIds(long userId, Collection<Long> courseIds);
 }

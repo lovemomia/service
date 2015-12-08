@@ -1,4 +1,4 @@
-package cn.momia.service.course.base;
+package cn.momia.service.course.comment;
 
 import java.util.Date;
 import java.util.List;

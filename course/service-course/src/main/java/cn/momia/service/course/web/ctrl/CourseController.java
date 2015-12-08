@@ -21,12 +21,13 @@ import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.BookedCourse;
 import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseBook;
-import cn.momia.service.course.base.CourseComment;
+import cn.momia.service.course.comment.CourseComment;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.base.CourseSku;
 import cn.momia.service.course.base.CourseSkuPlace;
 import cn.momia.api.course.dto.Institution;
 import cn.momia.api.course.dto.Teacher;
+import cn.momia.service.course.comment.CourseCommentService;
 import cn.momia.service.course.favorite.FavoriteService;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderPackage;
@@ -72,8 +73,9 @@ public class CourseController extends BaseController {
     private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
     private static final Splitter POS_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
 
-    @Autowired private SubjectService subjectService;
     @Autowired private CourseService courseService;
+    @Autowired private CourseCommentService courseCommentService;
+    @Autowired private SubjectService subjectService;
     @Autowired private OrderService orderService;
     @Autowired private FavoriteService favoriteService;
 
@@ -530,7 +532,7 @@ public class CourseController extends BaseController {
             courseIds.add(bookedCourse.getCourseId());
         }
 
-        Set<Long> commentBookingIds = Sets.newHashSet(courseService.queryCommentedBookingIds(userId, bookingIds));
+        Set<Long> commentBookingIds = Sets.newHashSet(courseCommentService.queryCommentedBookingIds(userId, bookingIds));
         List<Course> courses = courseService.list(courseIds);
         Map<Long, Course> coursesMap = new HashMap<Long, Course>();
         for (Course course : courses) {
@@ -666,18 +668,18 @@ public class CourseController extends BaseController {
         if (StringUtils.isBlank(comment.getContent())) return MomiaHttpResponse.FAILED("评论内容不能为空");
 
         if (!courseService.finished(comment.getUserId(), comment.getBookingId(), comment.getCourseId())) return MomiaHttpResponse.FAILED("你还没有上过这门课，无法评论");
-        if (courseService.isCommented(comment.getUserId(), comment.getBookingId())) return MomiaHttpResponse.FAILED("一堂课只能发表一次评论");
+        if (courseCommentService.isCommented(comment.getUserId(), comment.getBookingId())) return MomiaHttpResponse.FAILED("一堂课只能发表一次评论");
         if (comment.getImgs() != null && comment.getImgs().size() > 9) return MomiaHttpResponse.FAILED("上传的图片过多，1条评论最多上传9张图片");
 
-        return MomiaHttpResponse.SUCCESS(courseService.comment(comment));
+        return MomiaHttpResponse.SUCCESS(courseCommentService.comment(comment));
     }
 
     @RequestMapping(value = "/{coid}/comment", method = RequestMethod.GET)
     public MomiaHttpResponse listComment(@PathVariable(value = "coid") long courseId, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
-        long totalCount = courseService.queryCommentCountByCourse(courseId);
-        List<CourseComment> comments = courseService.queryCommentsByCourse(courseId, start, count);
+        long totalCount = courseCommentService.queryCommentCountByCourse(courseId);
+        List<CourseComment> comments = courseCommentService.queryCommentsByCourse(courseId, start, count);
 
         Set<Long> userIds = new HashSet<Long>();
         for (CourseComment comment : comments) {
