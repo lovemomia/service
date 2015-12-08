@@ -215,17 +215,10 @@ public class CourseController extends BaseController {
         if (places.isEmpty()) return null;
 
         CourseSkuPlace place = places.get(0);
-
-        CourseSkuPlace courseSkuPlace = new CourseSkuPlace();
-        courseSkuPlace.setId(place.getId());
-        courseSkuPlace.setName(place.getName());
-        courseSkuPlace.setAddress(place.getAddress());
-        courseSkuPlace.setLng(place.getLng());
-        courseSkuPlace.setLat(place.getLat());
         List<CourseSku> skusOfPlace = skusGroupedByPlace.get(place.getId());
-        courseSkuPlace.setScheduler(buildPlaceScheduler(skusOfPlace));
+        place.setScheduler(buildPlaceScheduler(skusOfPlace));
 
-        return courseSkuPlace;
+        return place;
     }
 
     private String buildPlaceScheduler(List<CourseSku> skus) {
@@ -241,7 +234,7 @@ public class CourseController extends BaseController {
             }
         }
 
-        return earliestSku.getTime();
+        return earliestSku == null ? "" : earliestSku.getTime();
     }
 
     @RequestMapping(value = "/finished/list", method = RequestMethod.GET)
@@ -345,17 +338,6 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(sku);
     }
 
-    private CourseSkuPlace buildCoursePlaceDto(CourseSkuPlace place) {
-        CourseSkuPlace courseSkuPlace = new CourseSkuPlace();
-        courseSkuPlace.setId(place.getId());
-        courseSkuPlace.setName(place.getName());
-        courseSkuPlace.setAddress(place.getAddress());
-        courseSkuPlace.setLng(place.getLng());
-        courseSkuPlace.setLat(place.getLat());
-
-        return courseSkuPlace;
-    }
-
     @RequestMapping(value = "/{coid}/sku/week", method = RequestMethod.GET)
     public MomiaHttpResponse listWeekSkus(@PathVariable(value = "coid") long courseId) {
         Date now = new Date();
@@ -363,7 +345,7 @@ public class CourseController extends BaseController {
         String end = DATE_FORMAT.format(new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000));
         List<CourseSku> skus = courseService.querySkus(courseId, start, end);
 
-        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkusDtos(filterUnavaliableSkus(skus)));
+        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkus(filterUnavaliableSkus(skus)));
     }
 
     private List<CourseSku> filterUnavaliableSkus(List<CourseSku> skus) {
@@ -376,7 +358,7 @@ public class CourseController extends BaseController {
         return avaliableSkus;
     }
 
-    private List<DatedCourseSkus> buildDatedCourseSkusDtos(List<CourseSku> skus) {
+    private List<DatedCourseSkus> buildDatedCourseSkus(List<CourseSku> skus) {
         Map<String, List<CourseSku>> skusMap = new HashMap<String, List<CourseSku>>();
         for (CourseSku sku : skus) {
             String date = DATE_FORMAT.format(sku.getStartTime());
@@ -416,7 +398,7 @@ public class CourseController extends BaseController {
         String end = formatNextMonth(month);
         List<CourseSku> skus = courseService.querySkus(courseId, start, end);
 
-        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkusDtos(filterUnavaliableSkus(skus)));
+        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkus(filterUnavaliableSkus(skus)));
     }
 
     private String formatCurrentMonth(int month) {
@@ -485,7 +467,7 @@ public class CourseController extends BaseController {
 
             CourseSkuPlace place = course.getPlace(bookedCourse.getCourseSkuId());
             if (place == null) continue;
-            bookedCourseDto.setPlace(buildCoursePlaceDto(place));
+            bookedCourseDto.setPlace(place);
 
             bookedCourseDtos.add(bookedCourseDto);
         }

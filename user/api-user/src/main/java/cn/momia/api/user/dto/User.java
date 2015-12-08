@@ -23,7 +23,7 @@ public class User {
     private String cover;
     private String name;
     private String sex;
-    private Date birthday;
+    @JSONField(format = "yyyy-MM-dd") private Date birthday;
     private Integer cityId;
     private Integer regionId;
     private String address;
@@ -91,7 +91,6 @@ public class User {
         this.sex = sex;
     }
 
-    @JSONField(format = "yyyy-MM-dd")
     public Date getBirthday() {
         return birthday;
     }

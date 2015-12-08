@@ -16,15 +16,15 @@ public class UserCoupon {
 
     private long id;
     private int type;
-    private long userId;
-    private int couponId;
+    @JSONField(serialize = false) private long userId;
+    @JSONField(serialize = false) private int couponId;
     private String title;
     private String desc;
     private BigDecimal discount;
     private BigDecimal consumption;
-    private Date startTime;
-    private Date endTime;
-    private String inviteCode;
+    @JSONField(format = "yyyy-MM-dd") private Date startTime;
+    @JSONField(format = "yyyy-MM-dd") private Date endTime;
+    @JSONField(serialize = false) private String inviteCode;
     private int status;
 
     public long getId() {
@@ -43,7 +43,6 @@ public class UserCoupon {
         this.type = type;
     }
 
-    @JSONField(serialize = false)
     public long getUserId() {
         return userId;
     }
@@ -52,7 +51,6 @@ public class UserCoupon {
         this.userId = userId;
     }
 
-    @JSONField(serialize = false)
     public int getCouponId() {
         return couponId;
     }
@@ -93,7 +91,6 @@ public class UserCoupon {
         this.consumption = consumption;
     }
 
-    @JSONField(format = "yyyy-MM-dd")
     public Date getStartTime() {
         return startTime;
     }
@@ -102,7 +99,6 @@ public class UserCoupon {
         this.startTime = startTime;
     }
 
-    @JSONField(format = "yyyy-MM-dd")
     public Date getEndTime() {
         return endTime;
     }
@@ -111,7 +107,6 @@ public class UserCoupon {
         this.endTime = endTime;
     }
 
-    @JSONField(serialize = false)
     public String getInviteCode() {
         return inviteCode;
     }

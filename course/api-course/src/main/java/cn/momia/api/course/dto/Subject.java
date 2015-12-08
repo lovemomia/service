@@ -19,16 +19,16 @@ public class Subject {
     public static final Subject NOT_EXIST_SUBJECT = new Subject();
 
     private long id;
-    private int type;
-    private int cityId;
+    @JSONField(serialize = false) private int type;
+    @JSONField(serialize = false) private int cityId;
     private String title;
     private String cover;
     private String tags;
     private String intro;
     private String notice;
-    private int stock;
+    @JSONField(serialize = false) private int stock;
     private List<String> imgs;
-    private List<SubjectSku> skus;
+    @JSONField(serialize = false) private List<SubjectSku> skus;
 
     private int status;
 

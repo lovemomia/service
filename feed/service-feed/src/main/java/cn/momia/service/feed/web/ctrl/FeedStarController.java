@@ -38,10 +38,10 @@ public class FeedStarController extends BaseController {
         List<Long> userIds = feedStarService.queryUserIds(feedId, start, count);
         List<User> users = userServiceApi.list(userIds, User.Type.MINI);
 
-        PagedList<User> pagedStaredUserDtos = new PagedList(totalCount, start, count);
-        pagedStaredUserDtos.setList(users);
+        PagedList<User> pagedStaredUsers = new PagedList(totalCount, start, count);
+        pagedStaredUsers.setList(users);
 
-        return MomiaHttpResponse.SUCCESS(pagedStaredUserDtos);
+        return MomiaHttpResponse.SUCCESS(pagedStaredUsers);
     }
 
     @RequestMapping(value = "/{fid}/star", method = RequestMethod.POST)

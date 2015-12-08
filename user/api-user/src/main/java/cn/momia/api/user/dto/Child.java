@@ -14,7 +14,7 @@ public class Child {
     private String avatar;
     private String name;
     private String sex;
-    private Date birthday;
+    @JSONField(format = "yyyy-MM-dd") private Date birthday;
 
     public long getId() {
         return id;
@@ -56,7 +56,6 @@ public class Child {
         this.sex = sex;
     }
 
-    @JSONField(format = "yyyy-MM-dd")
     public Date getBirthday() {
         return birthday;
     }

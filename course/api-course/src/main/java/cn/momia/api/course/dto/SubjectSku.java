@@ -11,16 +11,16 @@ public class SubjectSku implements Cloneable {
     private long subjectId;
     private String desc;
     private BigDecimal price = new BigDecimal(0);
-    private BigDecimal originalPrice = new BigDecimal(0);
-    private int adult;
-    private int child;
-    private int courseCount;
-    private int time;
-    private int timeUnit;
+    @JSONField(serialize = false) private BigDecimal originalPrice = new BigDecimal(0);
+    @JSONField(serialize = false) private int adult;
+    @JSONField(serialize = false) private int child;
+    @JSONField(serialize = false) private int courseCount;
+    @JSONField(serialize = false) private int time;
+    @JSONField(serialize = false) private int timeUnit;
     private int limit;
     private int status;
 
-    private int count;
+    @JSONField(serialize = false) private int count;
     private long courseId;
 
     public long getId() {
@@ -55,7 +55,6 @@ public class SubjectSku implements Cloneable {
         this.price = price;
     }
 
-    @JSONField(serialize = false)
     public BigDecimal getOriginalPrice() {
         return originalPrice;
     }
@@ -64,7 +63,6 @@ public class SubjectSku implements Cloneable {
         this.originalPrice = originalPrice;
     }
 
-    @JSONField(serialize = false)
     public int getAdult() {
         return adult;
     }
@@ -73,7 +71,6 @@ public class SubjectSku implements Cloneable {
         this.adult = adult;
     }
 
-    @JSONField(serialize = false)
     public int getChild() {
         return child;
     }
@@ -82,7 +79,6 @@ public class SubjectSku implements Cloneable {
         this.child = child;
     }
 
-    @JSONField(serialize = false)
     public int getCourseCount() {
         return courseCount;
     }
@@ -91,7 +87,6 @@ public class SubjectSku implements Cloneable {
         this.courseCount = courseCount;
     }
 
-    @JSONField(serialize = false)
     public int getTime() {
         return time;
     }
@@ -100,7 +95,6 @@ public class SubjectSku implements Cloneable {
         this.time = time;
     }
 
-    @JSONField(serialize = false)
     public int getTimeUnit() {
         return timeUnit;
     }
@@ -121,7 +115,6 @@ public class SubjectSku implements Cloneable {
         this.status = status;
     }
 
-    @JSONField(serialize = false)
     public int getCount() {
         return count;
     }

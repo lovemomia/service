@@ -87,10 +87,10 @@ public class FeedController extends BaseController {
             userFeeds.add(buildUserFeed(feed, user, staredFeedIds.contains(feed.getId())));
         }
 
-        PagedList<UserFeed> pagedFeedDtos = new PagedList(totalCount, start, count);
-        pagedFeedDtos.setList(userFeeds);
+        PagedList<UserFeed> pagedUserFeeds = new PagedList(totalCount, start, count);
+        pagedUserFeeds.setList(userFeeds);
 
-        return pagedFeedDtos;
+        return pagedUserFeeds;
     }
 
     private UserFeed buildUserFeed(Feed feed, User user, boolean stared) {

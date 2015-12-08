@@ -12,7 +12,7 @@ public class SubjectOrder {
     private BigDecimal totalFee;
 
     private int status;
-    private Date addTime;
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss") private Date addTime;
 
     // BASE
     private Integer bookingStatus;
@@ -63,7 +63,6 @@ public class SubjectOrder {
         this.status = status;
     }
 
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     public Date getAddTime() {
         return addTime;
     }

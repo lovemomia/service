@@ -11,8 +11,8 @@ public class Favorite {
 
     private long id;
     private int type;
-    private long userId;
-    private long refId;
+    @JSONField(serialize = false) private long userId;
+    @JSONField(serialize = false) private long refId;
     private JSONObject ref;
 
     public long getId() {
@@ -31,7 +31,6 @@ public class Favorite {
         this.type = type;
     }
 
-    @JSONField(serialize = false)
     public long getUserId() {
         return userId;
     }
@@ -40,7 +39,6 @@ public class Favorite {
         this.userId = userId;
     }
 
-    @JSONField(serialize = false)
     public long getRefId() {
         return refId;
     }

@@ -16,13 +16,13 @@ public class CourseSku {
 
     private long id;
     private long courseId;
-    private Date startTime;
-    private Date endTime;
-    private Date deadline;
-    private int unlockedStock;
-    private int placeId;
-    private int adult;
-    private int child;
+    @JSONField(serialize = false) private Date startTime;
+    @JSONField(serialize = false) private Date endTime;
+    @JSONField(serialize = false) private Date deadline;
+    @JSONField(serialize = false) private int unlockedStock;
+    @JSONField(serialize = false) private int placeId;
+    @JSONField(serialize = false) private int adult;
+    @JSONField(serialize = false) private int child;
 
     private CourseSkuPlace place;
 

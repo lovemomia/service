@@ -148,9 +148,9 @@ public class OrderController extends BaseController {
             cover = subject.getCover();
         }
         Map<Long, Integer> finishedCourceCounts = courseService.queryFinishedCourseCounts(Sets.newHashSet(orderId));
-        SubjectOrder orderDetailDto = buildFullSubjectOrder(order, title, cover, finishedCourceCounts.get(orderId), courseIds);
+        SubjectOrder detailOrder = buildFullSubjectOrder(order, title, cover, finishedCourceCounts.get(orderId), courseIds);
 
-        return MomiaHttpResponse.SUCCESS(orderDetailDto);
+        return MomiaHttpResponse.SUCCESS(detailOrder);
     }
 
     private SubjectOrder buildFullSubjectOrder(Order order, String title, String cover, int finishedCourseCount, List<Long> courseIds) {
@@ -199,12 +199,12 @@ public class OrderController extends BaseController {
         long totalCount = orderId > 0 ? orderService.queryBookableCountByUserAndOrder(user.getId(), orderId) : orderService.queryBookableCountByUser(user.getId());
         List<OrderPackage> orderPackages = orderId > 0 ? orderService.queryBookableByUserAndOrder(user.getId(), orderId, start, count) : orderService.queryBookableByUser(user.getId(), start, count);
 
-        PagedList<SubjectPackage> pagedOrderPackageDtos = buildPagedOrderPackageDtos(orderPackages, totalCount, start, count);
+        PagedList<SubjectPackage> pagedSubjectPackages = buildPagedSubjectPackages(orderPackages, totalCount, start, count);
 
-        return MomiaHttpResponse.SUCCESS(pagedOrderPackageDtos);
+        return MomiaHttpResponse.SUCCESS(pagedSubjectPackages);
     }
 
-    private PagedList<SubjectPackage> buildPagedOrderPackageDtos(List<OrderPackage> orderPackages, long totalCount, int start, int count) {
+    private PagedList<SubjectPackage> buildPagedSubjectPackages(List<OrderPackage> orderPackages, long totalCount, int start, int count) {
         Set<Long> packageIds = new HashSet<Long>();
         Set<Long> orderIds = new HashSet<Long>();
         Set<Long> courseIds = new HashSet<Long>();
@@ -269,10 +269,10 @@ public class OrderController extends BaseController {
             subjectPackages.add(subjectPackage);
         }
 
-        PagedList<SubjectPackage> pagedOrderSkuDtos = new PagedList<SubjectPackage>(totalCount, start, count);
-        pagedOrderSkuDtos.setList(subjectPackages);
+        PagedList<SubjectPackage> pagedSubjectPackages = new PagedList<SubjectPackage>(totalCount, start, count);
+        pagedSubjectPackages.setList(subjectPackages);
 
-        return pagedOrderSkuDtos;
+        return pagedSubjectPackages;
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
