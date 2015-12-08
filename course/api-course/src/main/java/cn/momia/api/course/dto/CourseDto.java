@@ -1,5 +1,7 @@
 package cn.momia.api.course.dto;
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -27,7 +29,7 @@ public class CourseDto {
     private String notice;
     private String institution;
     private List<String> imgs;
-    private CourseBookDto book;
+    private JSONObject book;
 
     private CoursePlaceDto place;
 
@@ -173,11 +175,11 @@ public class CourseDto {
         this.imgs = imgs;
     }
 
-    public CourseBookDto getBook() {
+    public JSONObject getBook() {
         return book;
     }
 
-    public void setBook(CourseBookDto book) {
+    public void setBook(JSONObject book) {
         this.book = book;
     }
 

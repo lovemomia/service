@@ -2,7 +2,6 @@ package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.base.MetaUtil;
 import cn.momia.api.course.dto.BookedCourseDto;
-import cn.momia.api.course.dto.CourseBookDto;
 import cn.momia.api.course.dto.UserCourseComment;
 import cn.momia.api.course.dto.CourseDetail;
 import cn.momia.api.course.dto.CourseDto;
@@ -20,7 +19,6 @@ import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.BookedCourse;
 import cn.momia.service.course.base.Course;
-import cn.momia.service.course.base.CourseBook;
 import cn.momia.service.course.comment.CourseComment;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.base.CourseSku;
@@ -163,19 +161,10 @@ public class CourseController extends BaseController {
         courseDto.setNotice(course.getNotice());
         courseDto.setInstitution(course.getInstitution());
         courseDto.setImgs(course.getImgs());
-        courseDto.setBook(buildCourseBookDto(course.getBook()));
+        courseDto.setBook(course.getBook());
         courseDto.setPlace(buildCoursePlaceDto(course.getSkus(), pos));
 
         return courseDto;
-    }
-
-    private CourseBookDto buildCourseBookDto(CourseBook book) {
-        if (book == null || book.getImgs().isEmpty()) return null;
-
-        CourseBookDto courseBookDto = new CourseBookDto();
-        courseBookDto.setImgs(book.getImgs().subList(0, Math.min(10, book.getImgs().size())));
-
-        return courseBookDto;
     }
 
     private CoursePlaceDto buildCoursePlaceDto(List<CourseSku> skus, String pos) {

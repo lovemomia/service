@@ -6,13 +6,12 @@ import cn.momia.api.poi.dto.Place;
 import cn.momia.common.service.AbstractService;
 import cn.momia.service.course.base.BookedCourse;
 import cn.momia.service.course.base.Course;
-import cn.momia.service.course.base.CourseBook;
-import cn.momia.service.course.base.CourseBookImage;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.base.CourseSku;
 import cn.momia.service.course.base.CourseSkuPlace;
 import cn.momia.api.course.dto.Institution;
 import cn.momia.api.course.dto.Teacher;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -101,7 +100,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         }
         Map<Integer, Institution> institutionsMap = queryInstitutions(institutionIds);
         Map<Long, List<String>> imgsMap = queryImgs(courseAndParentIds);
-        Map<Long, CourseBook> booksMap = queryBooks(courseAndParentIds);
+        Map<Long, List<String>> bookImgsMap = queryBookImgs(courseAndParentIds);
         Map<Long, List<CourseSku>> skusMap = querySkus(courseIds);
         Map<Long, BigDecimal> buyablesMap = queryBuyables(courseIds);
 
@@ -110,11 +109,16 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
             if (institution != null) course.setInstitution(institution.getIntro());
 
             course.setImgs(imgsMap.get(course.getId()));
-            course.setBook(booksMap.get(course.getId()));
+            List<String> bookImgs = bookImgsMap.get(course.getId());
+
             if (course.getParentId() > 0) {
                 course.getImgs().addAll(imgsMap.get(course.getParentId()));
-                course.getBook().getImgs().addAll(booksMap.get(course.getParentId()).getImgs());
+                bookImgs.addAll(bookImgsMap.get(course.getParentId()));
             }
+
+            JSONObject book = new JSONObject();
+            book.put("imgs", bookImgs);
+            course.setBook(book);
 
             course.setSkus(skusMap.get(course.getId()));
 
@@ -166,35 +170,17 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         return imgsMap;
     }
 
-    private Map<Long, CourseBook> queryBooks(Collection<Long> courseIds) {
-        if (courseIds.isEmpty()) return new HashMap<Long, CourseBook>();
+    private Map<Long, List<String>> queryBookImgs(Collection<Long> courseIds) {
+        if (courseIds.isEmpty()) return new HashMap<Long, List<String>>();
 
-        String sql = "SELECT Id, CourseId, Img, `Order` FROM SG_CourseBook WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Status<>0 ORDER BY `Order` ASC";
-        List<CourseBookImage> imgs = queryObjectList(sql, CourseBookImage.class);
+        String sql = "SELECT CourseId, Img FROM SG_CourseBook WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Status<>0 ORDER BY `Order` ASC";
+        Map<Long, List<String>> imgsMap = queryListMap(sql, Long.class, String.class);
 
-        final Map<Long, List<CourseBookImage>> imgsMap = new HashMap<Long, List<CourseBookImage>>();
         for (long courseId : courseIds) {
-            imgsMap.put(courseId, new ArrayList<CourseBookImage>());
-        }
-        for (CourseBookImage img : imgs) {
-            imgsMap.get(img.getCourseId()).add(img);
+            if (!imgsMap.containsKey(courseId)) imgsMap.put(courseId, new ArrayList<String>());
         }
 
-        Map<Long, CourseBook> booksMap = new HashMap<Long, CourseBook>();
-        for (long courseId : courseIds) {
-            List<CourseBookImage> bookImgs = imgsMap.get(courseId);
-            List<String> urls = new ArrayList<String>();
-            for (CourseBookImage bookImg : bookImgs) {
-                urls.add(bookImg.getImg());
-            }
-
-            CourseBook book = new CourseBook();
-            book.setImgs(urls);
-
-            booksMap.put(courseId, book);
-        }
-
-        return booksMap;
+        return imgsMap;
     }
 
     private Map<Long, List<CourseSku>> querySkus(Collection<Long> courseIds) {

@@ -3,6 +3,7 @@ package cn.momia.service.course.base;
 import cn.momia.api.base.dto.Region;
 import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.util.TimeUtil;
+import com.alibaba.fastjson.JSONObject;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -48,7 +49,7 @@ public class Course implements Cloneable {
     private int status;
 
     private List<String> imgs;
-    private CourseBook book;
+    private JSONObject book;
     private List<CourseSku> skus = new ArrayList<CourseSku>();
 
     private String subject;
@@ -207,11 +208,11 @@ public class Course implements Cloneable {
         this.imgs = imgs;
     }
 
-    public CourseBook getBook() {
+    public JSONObject getBook() {
         return book;
     }
 
-    public void setBook(CourseBook book) {
+    public void setBook(JSONObject book) {
         this.book = book;
     }
 
