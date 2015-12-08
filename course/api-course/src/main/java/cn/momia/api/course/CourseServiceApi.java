@@ -2,7 +2,7 @@ package cn.momia.api.course;
 
 import cn.momia.api.course.dto.BookedCourseDto;
 import cn.momia.api.course.dto.CourseCommentDto;
-import cn.momia.api.course.dto.CourseDetailDto;
+import cn.momia.api.course.dto.CourseDetail;
 import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.CourseSkuDto;
 import cn.momia.api.course.dto.DatedCourseSkusDto;
@@ -97,9 +97,9 @@ public class CourseServiceApi extends ServiceApi {
         return executeReturnPagedList(request, CourseDto.class);
     }
 
-    public CourseDetailDto detail(long courseId) {
+    public CourseDetail detail(long courseId) {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/detail", courseId));
-        return executeReturnObject(request, CourseDetailDto.class);
+        return executeReturnObject(request, CourseDetail.class);
     }
 
     public PagedList<String> book(long courseId, int start, int count) {

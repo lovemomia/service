@@ -3,10 +3,7 @@ package cn.momia.service.course.base;
 import cn.momia.common.util.TimeUtil;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.logging.SimpleFormatter;
 
 public class BookedCourse {
     public static final BookedCourse NOT_EXIST_BOOKED_COURSE = new BookedCourse();

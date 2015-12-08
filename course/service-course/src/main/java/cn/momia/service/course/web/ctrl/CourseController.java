@@ -4,7 +4,7 @@ import cn.momia.api.base.MetaUtil;
 import cn.momia.api.course.dto.BookedCourseDto;
 import cn.momia.api.course.dto.CourseBookDto;
 import cn.momia.api.course.dto.CourseCommentDto;
-import cn.momia.api.course.dto.CourseDetailDto;
+import cn.momia.api.course.dto.CourseDetail;
 import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.CoursePlaceDto;
 import cn.momia.api.course.dto.CourseSkuDto;
@@ -22,7 +22,6 @@ import cn.momia.service.course.base.BookedCourse;
 import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseBook;
 import cn.momia.service.course.base.CourseComment;
-import cn.momia.service.course.base.CourseDetail;
 import cn.momia.service.course.base.CourseImage;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.base.CourseSku;
@@ -330,17 +329,7 @@ public class CourseController extends BaseController {
         CourseDetail courseDetail = courseService.getDetail(courseId);
         if (!courseDetail.exists()) return MomiaHttpResponse.FAILED("课程详情不存在");
 
-        return MomiaHttpResponse.SUCCESS(buildCourseDetailDto(courseDetail));
-    }
-
-    private CourseDetailDto buildCourseDetailDto(CourseDetail detail) {
-        CourseDetailDto courseDetailDto = new CourseDetailDto();
-        courseDetailDto.setId(detail.getId());
-        courseDetailDto.setCourseId(detail.getCourseId());
-        courseDetailDto.setAbstracts(detail.getAbstracts());
-        courseDetailDto.setDetail(detail.getDetail());
-
-        return courseDetailDto;
+        return MomiaHttpResponse.SUCCESS(courseDetail);
     }
 
     @RequestMapping(value = "/{coid}/institution", method = RequestMethod.GET)

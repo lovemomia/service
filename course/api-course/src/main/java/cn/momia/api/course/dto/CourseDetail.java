@@ -1,6 +1,8 @@
 package cn.momia.api.course.dto;
 
-public class CourseDetailDto {
+public class CourseDetail {
+    public static final CourseDetail NOT_EXIST_COURSE_DETAIL = new CourseDetail();
+
     private long id;
     private long courseId;
     private String abstracts;
@@ -36,5 +38,9 @@ public class CourseDetailDto {
 
     public void setDetail(String detail) {
         this.detail = detail;
+    }
+
+    public boolean exists() {
+        return id > 0;
     }
 }

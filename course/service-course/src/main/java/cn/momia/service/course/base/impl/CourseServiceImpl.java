@@ -1,5 +1,6 @@
 package cn.momia.service.course.base.impl;
 
+import cn.momia.api.course.dto.CourseDetail;
 import cn.momia.api.poi.PoiServiceApi;
 import cn.momia.api.poi.dto.Place;
 import cn.momia.common.service.AbstractService;
@@ -8,7 +9,6 @@ import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseBook;
 import cn.momia.service.course.base.CourseBookImage;
 import cn.momia.service.course.base.CourseComment;
-import cn.momia.service.course.base.CourseDetail;
 import cn.momia.service.course.base.CourseImage;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.base.CourseSku;
