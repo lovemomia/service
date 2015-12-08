@@ -1,5 +1,7 @@
 package cn.momia.api.course.dto;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.math.BigDecimal;
@@ -97,8 +99,8 @@ public class Subject {
         this.intro = intro;
     }
 
-    public String getNotice() {
-        return notice;
+    public JSONArray getNotice() {
+        return JSON.parseArray(notice);
     }
 
     public void setNotice(String notice) {
