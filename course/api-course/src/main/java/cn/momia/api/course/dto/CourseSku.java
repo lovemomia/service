@@ -1,22 +1,30 @@
-package cn.momia.service.course.base;
+package cn.momia.api.course.dto;
 
+import cn.momia.common.util.TimeUtil;
+import com.alibaba.fastjson.annotation.JSONField;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class CourseSku {
     public static final CourseSku NOT_EXIST_COURSE_SKU = new CourseSku();
+
+    private static final DateFormat MONTH_DATE_FORMAT = new SimpleDateFormat("MM月dd日");
+    private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
 
     private long id;
     private long courseId;
     private Date startTime;
     private Date endTime;
     private Date deadline;
-    private int stock;
     private int unlockedStock;
-    private int lockedStock;
     private int placeId;
-    private CourseSkuPlace place;
     private int adult;
     private int child;
+
+    private CourseSkuPlace place;
 
     public long getId() {
         return id;
@@ -58,14 +66,6 @@ public class CourseSku {
         this.deadline = deadline;
     }
 
-    public int getStock() {
-        return stock;
-    }
-
-    public void setStock(int stock) {
-        this.stock = stock;
-    }
-
     public int getUnlockedStock() {
         return unlockedStock;
     }
@@ -74,28 +74,12 @@ public class CourseSku {
         this.unlockedStock = unlockedStock;
     }
 
-    public int getLockedStock() {
-        return lockedStock;
-    }
-
-    public void setLockedStock(int lockedStock) {
-        this.lockedStock = lockedStock;
-    }
-
     public int getPlaceId() {
         return placeId;
     }
 
     public void setPlaceId(int placeId) {
         this.placeId = placeId;
-    }
-
-    public CourseSkuPlace getPlace() {
-        return place;
-    }
-
-    public void setPlace(CourseSkuPlace place) {
-        this.place = place;
     }
 
     public int getAdult() {
@@ -114,15 +98,46 @@ public class CourseSku {
         this.child = child;
     }
 
+    public CourseSkuPlace getPlace() {
+        return place;
+    }
+
+    public void setPlace(CourseSkuPlace place) {
+        this.place = place;
+    }
+
     public boolean exists() {
         return id > 0;
     }
 
+    @JSONField(serialize = false)
     public int getJoinCount() {
         return adult + child;
     }
 
+    @JSONField(serialize = false)
     public boolean isAvaliable(Date now) {
         return deadline.after(now);
+    }
+
+    public String getTime() {
+        if (TimeUtil.isSameDay(startTime, endTime)) {
+            return TIME_FORMAT.format(startTime) + "-" + TIME_FORMAT.format(endTime);
+        } else {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(startTime);
+            calendar.add(Calendar.DATE, 1);
+            Date nextDay = calendar.getTime();
+            if (TimeUtil.isSameDay(nextDay, endTime)) {
+                return TIME_FORMAT.format(startTime) + "-次日" + TIME_FORMAT.format(endTime);
+            } else {
+                return TIME_FORMAT.format(startTime) + "-" + MONTH_DATE_FORMAT.format(endTime) + " " + TIME_FORMAT.format(endTime);
+            }
+        }
+
+    }
+
+    public int getStock() {
+        return unlockedStock;
     }
 }

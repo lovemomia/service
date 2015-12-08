@@ -1,14 +1,14 @@
 package cn.momia.service.course.base.impl;
 
 import cn.momia.api.course.dto.CourseDetail;
+import cn.momia.api.course.dto.CourseSkuPlace;
 import cn.momia.api.poi.PoiServiceApi;
 import cn.momia.api.poi.dto.Place;
 import cn.momia.common.service.AbstractService;
 import cn.momia.service.course.base.BookedCourse;
 import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseService;
-import cn.momia.service.course.base.CourseSku;
-import cn.momia.service.course.base.CourseSkuPlace;
+import cn.momia.api.course.dto.CourseSku;
 import cn.momia.api.course.dto.Institution;
 import cn.momia.api.course.dto.Teacher;
 import com.alibaba.fastjson.JSONObject;

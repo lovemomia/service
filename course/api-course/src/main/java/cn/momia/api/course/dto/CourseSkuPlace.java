@@ -1,4 +1,4 @@
-package cn.momia.service.course.base;
+package cn.momia.api.course.dto;
 
 public class CourseSkuPlace {
     private int id;
@@ -8,6 +8,7 @@ public class CourseSkuPlace {
     private String address;
     private double lng;
     private double lat;
+    private String scheduler;
 
     public int getId() {
         return id;
@@ -63,6 +64,14 @@ public class CourseSkuPlace {
 
     public void setLat(double lat) {
         this.lat = lat;
+    }
+
+    public String getScheduler() {
+        return scheduler;
+    }
+
+    public void setScheduler(String scheduler) {
+        this.scheduler = scheduler;
     }
 
     public boolean hasNoPosition() {

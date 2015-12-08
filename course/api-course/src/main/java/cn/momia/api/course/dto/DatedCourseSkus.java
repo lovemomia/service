@@ -2,9 +2,9 @@ package cn.momia.api.course.dto;
 
 import java.util.List;
 
-public class DatedCourseSkusDto {
+public class DatedCourseSkus {
     private String date;
-    private List<CourseSkuDto> skus;
+    private List<CourseSku> skus;
 
     public String getDate() {
         return date;
@@ -14,11 +14,11 @@ public class DatedCourseSkusDto {
         this.date = date;
     }
 
-    public List<CourseSkuDto> getSkus() {
+    public List<CourseSku> getSkus() {
         return skus;
     }
 
-    public void setSkus(List<CourseSkuDto> skus) {
+    public void setSkus(List<CourseSku> skus) {
         this.skus = skus;
     }
 }

@@ -5,9 +5,8 @@ import cn.momia.api.course.dto.BookedCourseDto;
 import cn.momia.api.course.dto.UserCourseComment;
 import cn.momia.api.course.dto.CourseDetail;
 import cn.momia.api.course.dto.CourseDto;
-import cn.momia.api.course.dto.CoursePlaceDto;
-import cn.momia.api.course.dto.CourseSkuDto;
-import cn.momia.api.course.dto.DatedCourseSkusDto;
+import cn.momia.api.course.dto.CourseSkuPlace;
+import cn.momia.api.course.dto.DatedCourseSkus;
 import cn.momia.api.course.dto.Favorite;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.Child;
@@ -21,8 +20,7 @@ import cn.momia.service.course.base.BookedCourse;
 import cn.momia.service.course.base.Course;
 import cn.momia.service.course.comment.CourseComment;
 import cn.momia.service.course.base.CourseService;
-import cn.momia.service.course.base.CourseSku;
-import cn.momia.service.course.base.CourseSkuPlace;
+import cn.momia.api.course.dto.CourseSku;
 import cn.momia.api.course.dto.Institution;
 import cn.momia.api.course.dto.Teacher;
 import cn.momia.service.course.comment.CourseCommentService;
@@ -67,8 +65,6 @@ public class CourseController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(CourseController.class);
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-    private static final DateFormat MONTH_DATE_FORMAT = new SimpleDateFormat("MM月dd日");
-    private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
     private static final Splitter POS_SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
 
     @Autowired private CourseService courseService;
@@ -167,7 +163,7 @@ public class CourseController extends BaseController {
         return courseDto;
     }
 
-    private CoursePlaceDto buildCoursePlaceDto(List<CourseSku> skus, String pos) {
+    private CourseSkuPlace buildCoursePlaceDto(List<CourseSku> skus, String pos) {
         List<CourseSkuPlace> places = new ArrayList<CourseSkuPlace>();
         Map<Integer, CourseSkuPlace> placesMap = new HashMap<Integer, CourseSkuPlace>();
         Map<Integer, List<CourseSku>> skusGroupedByPlace = new HashMap<Integer, List<CourseSku>>();
@@ -220,16 +216,16 @@ public class CourseController extends BaseController {
 
         CourseSkuPlace place = places.get(0);
 
-        CoursePlaceDto coursePlaceDto = new CoursePlaceDto();
-        coursePlaceDto.setId(place.getId());
-        coursePlaceDto.setName(place.getName());
-        coursePlaceDto.setAddress(place.getAddress());
-        coursePlaceDto.setLng(place.getLng());
-        coursePlaceDto.setLat(place.getLat());
+        CourseSkuPlace courseSkuPlace = new CourseSkuPlace();
+        courseSkuPlace.setId(place.getId());
+        courseSkuPlace.setName(place.getName());
+        courseSkuPlace.setAddress(place.getAddress());
+        courseSkuPlace.setLng(place.getLng());
+        courseSkuPlace.setLat(place.getLat());
         List<CourseSku> skusOfPlace = skusGroupedByPlace.get(place.getId());
-        coursePlaceDto.setScheduler(buildPlaceScheduler(skusOfPlace));
+        courseSkuPlace.setScheduler(buildPlaceScheduler(skusOfPlace));
 
-        return coursePlaceDto;
+        return courseSkuPlace;
     }
 
     private String buildPlaceScheduler(List<CourseSku> skus) {
@@ -245,20 +241,7 @@ public class CourseController extends BaseController {
             }
         }
 
-        return format(earliestSku);
-    }
-
-    private String format(CourseSku sku) {
-        if (sku == null) return "";
-
-        Date start = sku.getStartTime();
-        Date end = sku.getEndTime();
-
-        if (TimeUtil.isSameDay(start, end)) {
-            return MONTH_DATE_FORMAT.format(start) + " " + TimeUtil.getWeekDay(start) +  " " + TIME_FORMAT.format(start) + "-" + TIME_FORMAT.format(end);
-        } else {
-            return MONTH_DATE_FORMAT.format(start) + " " + TIME_FORMAT.format(start) + "-" + MONTH_DATE_FORMAT.format(end) + " " + TIME_FORMAT.format(end);
-        }
+        return earliestSku.getTime();
     }
 
     @RequestMapping(value = "/finished/list", method = RequestMethod.GET)
@@ -359,49 +342,18 @@ public class CourseController extends BaseController {
     public MomiaHttpResponse getSku(@PathVariable(value = "coid") long courseId, @PathVariable(value = "sid") long skuId) {
         CourseSku sku = courseService.getSku(skuId);
         if (!sku.exists() || sku.getCourseId() != courseId) return MomiaHttpResponse.FAILED("无效的场次");
-        return MomiaHttpResponse.SUCCESS(buildCourseSkuDto(sku));
+        return MomiaHttpResponse.SUCCESS(sku);
     }
 
-    private CourseSkuDto buildCourseSkuDto(CourseSku sku) {
-        CourseSkuDto courseSkuDto = new CourseSkuDto();
-        courseSkuDto.setId(sku.getId());
-        courseSkuDto.setTime(formatSkuTime(sku));
-        courseSkuDto.setPlace(buildCoursePlaceDto(sku.getPlace()));
-        courseSkuDto.setStock(sku.getUnlockedStock());
+    private CourseSkuPlace buildCoursePlaceDto(CourseSkuPlace place) {
+        CourseSkuPlace courseSkuPlace = new CourseSkuPlace();
+        courseSkuPlace.setId(place.getId());
+        courseSkuPlace.setName(place.getName());
+        courseSkuPlace.setAddress(place.getAddress());
+        courseSkuPlace.setLng(place.getLng());
+        courseSkuPlace.setLat(place.getLat());
 
-        return courseSkuDto;
-    }
-
-    private String formatSkuTime(CourseSku sku) {
-        if (sku == null) return "";
-
-        Date start = sku.getStartTime();
-        Date end = sku.getEndTime();
-
-        if (TimeUtil.isSameDay(start, end)) {
-            return TIME_FORMAT.format(start) + "-" + TIME_FORMAT.format(end);
-        } else {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(start);
-            calendar.add(Calendar.DATE, 1);
-            Date nextDay = calendar.getTime();
-            if (TimeUtil.isSameDay(nextDay, end)) {
-                return TIME_FORMAT.format(start) + "-次日" + TIME_FORMAT.format(end);
-            } else {
-                return TIME_FORMAT.format(start) + "-" + MONTH_DATE_FORMAT.format(end) + " " + TIME_FORMAT.format(end);
-            }
-        }
-    }
-
-    private CoursePlaceDto buildCoursePlaceDto(CourseSkuPlace place) {
-        CoursePlaceDto coursePlaceDto = new CoursePlaceDto();
-        coursePlaceDto.setId(place.getId());
-        coursePlaceDto.setName(place.getName());
-        coursePlaceDto.setAddress(place.getAddress());
-        coursePlaceDto.setLng(place.getLng());
-        coursePlaceDto.setLat(place.getLat());
-
-        return coursePlaceDto;
+        return courseSkuPlace;
     }
 
     @RequestMapping(value = "/{coid}/sku/week", method = RequestMethod.GET)
@@ -424,7 +376,7 @@ public class CourseController extends BaseController {
         return avaliableSkus;
     }
 
-    private List<DatedCourseSkusDto> buildDatedCourseSkusDtos(List<CourseSku> skus) {
+    private List<DatedCourseSkus> buildDatedCourseSkusDtos(List<CourseSku> skus) {
         Map<String, List<CourseSku>> skusMap = new HashMap<String, List<CourseSku>>();
         for (CourseSku sku : skus) {
             String date = DATE_FORMAT.format(sku.getStartTime());
@@ -436,37 +388,26 @@ public class CourseController extends BaseController {
             skusOfDay.add(sku);
         }
 
-        List<DatedCourseSkusDto> datedCourseSkusDtos = new ArrayList<DatedCourseSkusDto>();
+        List<DatedCourseSkus> datedCourseSkuses = new ArrayList<DatedCourseSkus>();
         for (Map.Entry<String, List<CourseSku>> entry : skusMap.entrySet()) {
             String date = entry.getKey();
             List<CourseSku> skusOfDay = entry.getValue();
 
-            DatedCourseSkusDto datedCourseSkusDto = new DatedCourseSkusDto();
-            datedCourseSkusDto.setDate(date);
-            datedCourseSkusDto.setSkus(buildCourseSkuDtos(skusOfDay));
+            DatedCourseSkus datedCourseSkus = new DatedCourseSkus();
+            datedCourseSkus.setDate(date);
+            datedCourseSkus.setSkus(skusOfDay);
 
-            datedCourseSkusDtos.add(datedCourseSkusDto);
+            datedCourseSkuses.add(datedCourseSkus);
         }
 
-        Collections.sort(datedCourseSkusDtos, new Comparator<DatedCourseSkusDto>() {
+        Collections.sort(datedCourseSkuses, new Comparator<DatedCourseSkus>() {
             @Override
-            public int compare(DatedCourseSkusDto o1, DatedCourseSkusDto o2) {
+            public int compare(DatedCourseSkus o1, DatedCourseSkus o2) {
                 return o1.getDate().compareTo(o2.getDate());
             }
         });
 
-        return datedCourseSkusDtos;
-    }
-
-    private List<CourseSkuDto> buildCourseSkuDtos(List<CourseSku> skus) {
-        List<CourseSkuDto> courseSkuDtos = new ArrayList<CourseSkuDto>();
-        for (CourseSku sku : skus) {
-            CourseSkuDto courseSkuDto = buildCourseSkuDto(sku);
-
-            courseSkuDtos.add(courseSkuDto);
-        }
-
-        return courseSkuDtos;
+        return datedCourseSkuses;
     }
 
     @RequestMapping(value = "/{coid}/sku/month", method = RequestMethod.GET)

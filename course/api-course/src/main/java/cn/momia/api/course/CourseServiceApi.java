@@ -1,11 +1,11 @@
 package cn.momia.api.course;
 
 import cn.momia.api.course.dto.BookedCourseDto;
+import cn.momia.api.course.dto.CourseSku;
 import cn.momia.api.course.dto.UserCourseComment;
 import cn.momia.api.course.dto.CourseDetail;
 import cn.momia.api.course.dto.CourseDto;
-import cn.momia.api.course.dto.CourseSkuDto;
-import cn.momia.api.course.dto.DatedCourseSkusDto;
+import cn.momia.api.course.dto.DatedCourseSkus;
 import cn.momia.api.course.dto.Favorite;
 import cn.momia.api.course.dto.Institution;
 import cn.momia.api.course.dto.Teacher;
@@ -131,21 +131,21 @@ public class CourseServiceApi extends ServiceApi {
         return executeReturnObject(request, Map.class);
     }
 
-    public CourseSkuDto getSku(long courseId, long skuId) {
+    public CourseSku getSku(long courseId, long skuId) {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/sku/%d", courseId, skuId));
-        return executeReturnObject(request, CourseSkuDto.class);
+        return executeReturnObject(request, CourseSku.class);
     }
 
-    public List<DatedCourseSkusDto> listWeekSkus(long courseId) {
+    public List<DatedCourseSkus> listWeekSkus(long courseId) {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/sku/week", courseId));
-        return executeReturnList(request, DatedCourseSkusDto.class);
+        return executeReturnList(request, DatedCourseSkus.class);
     }
 
-    public List<DatedCourseSkusDto> listMonthSkus(long courseId, int month) {
+    public List<DatedCourseSkus> listMonthSkus(long courseId, int month) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("month", month);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/sku/month", courseId), builder.build());
 
-        return executeReturnList(request, DatedCourseSkusDto.class);
+        return executeReturnList(request, DatedCourseSkus.class);
     }
 
     public PagedList<BookedCourseDto> queryNotFinishedByUser(long userId, int start, int count) {

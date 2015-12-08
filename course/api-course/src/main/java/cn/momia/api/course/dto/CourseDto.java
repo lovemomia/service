@@ -31,7 +31,7 @@ public class CourseDto {
     private List<String> imgs;
     private JSONObject book;
 
-    private CoursePlaceDto place;
+    private CourseSkuPlace place;
 
     private String subject;
     private int status;
@@ -183,11 +183,11 @@ public class CourseDto {
         this.book = book;
     }
 
-    public CoursePlaceDto getPlace() {
+    public CourseSkuPlace getPlace() {
         return place;
     }
 
-    public void setPlace(CoursePlaceDto place) {
+    public void setPlace(CourseSkuPlace place) {
         this.place = place;
     }
 
