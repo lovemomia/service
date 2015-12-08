@@ -1,6 +1,6 @@
 package cn.momia.service.feed.web.ctrl;
 
-import cn.momia.api.feed.dto.UserComment;
+import cn.momia.api.feed.dto.UserFeedComment;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.api.dto.PagedList;
@@ -54,28 +54,28 @@ public class FeedCommentController extends BaseController {
             usersMap.put(user.getId(), user);
         }
 
-        PagedList<UserComment> pagedUserComments = new PagedList(totalCount, start, count);
-        List<UserComment> userComments = new ArrayList<UserComment>();
+        PagedList<UserFeedComment> pagedUserComments = new PagedList(totalCount, start, count);
+        List<UserFeedComment> userFeedComments = new ArrayList<UserFeedComment>();
         for (FeedComment comment : comments) {
             User user = usersMap.get(comment.getUserId());
             if (user == null) continue;
 
-            userComments.add(buildUserComment(comment, user));
+            userFeedComments.add(buildUserComment(comment, user));
         }
-        pagedUserComments.setList(userComments);
+        pagedUserComments.setList(userFeedComments);
 
         return MomiaHttpResponse.SUCCESS(pagedUserComments);
     }
 
-    private UserComment buildUserComment(FeedComment comment, User user) {
-        UserComment userComment = new UserComment();
-        userComment.setId(comment.getId());
-        userComment.setContent(comment.getContent());
-        userComment.setAddTime(TimeUtil.formatAddTime(comment.getAddTime()));
-        userComment.setNickName(user.getNickName());
-        userComment.setAvatar(user.getAvatar());
+    private UserFeedComment buildUserComment(FeedComment comment, User user) {
+        UserFeedComment userFeedComment = new UserFeedComment();
+        userFeedComment.setId(comment.getId());
+        userFeedComment.setContent(comment.getContent());
+        userFeedComment.setAddTime(TimeUtil.formatAddTime(comment.getAddTime()));
+        userFeedComment.setNickName(user.getNickName());
+        userFeedComment.setAvatar(user.getAvatar());
 
-        return userComment;
+        return userFeedComment;
     }
 
     @RequestMapping(value = "/{fid}/comment", method = RequestMethod.POST)

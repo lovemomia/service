@@ -2,7 +2,7 @@ package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.base.MetaUtil;
 import cn.momia.api.base.dto.Region;
-import cn.momia.api.course.dto.CourseCommentDto;
+import cn.momia.api.course.dto.UserCourseComment;
 import cn.momia.api.course.dto.Favorite;
 import cn.momia.api.course.dto.SubjectDto;
 import cn.momia.api.course.dto.SubjectSkuDto;
@@ -264,37 +264,37 @@ public class SubjectController extends BaseController {
             usersMap.put(user.getId(), user);
         }
 
-        List<CourseCommentDto> commentDtos = new ArrayList<CourseCommentDto>();
+        List<UserCourseComment> userCourseComments = new ArrayList<UserCourseComment>();
         for (CourseComment comment : comments) {
             Course course = coursesMap.get(comment.getCourseId());
             if (course == null) continue;
             User user = usersMap.get(comment.getUserId());
             if (user == null) continue;
 
-            commentDtos.add(buildCourseCommentDto(comment, course, user));
+            userCourseComments.add(buildUserCourseComment(comment, course, user));
         }
 
-        PagedList<CourseCommentDto> pagedCommentDtos = new PagedList<CourseCommentDto>(totalCount, start, count);
-        pagedCommentDtos.setList(commentDtos);
+        PagedList<UserCourseComment> pagedUserCourseComments = new PagedList<UserCourseComment>(totalCount, start, count);
+        pagedUserCourseComments.setList(userCourseComments);
 
-        return MomiaHttpResponse.SUCCESS(pagedCommentDtos);
+        return MomiaHttpResponse.SUCCESS(pagedUserCourseComments);
     }
 
-    private CourseCommentDto buildCourseCommentDto(CourseComment comment, Course course, User user) {
-        CourseCommentDto courseCommentDto = new CourseCommentDto();
-        courseCommentDto.setId(comment.getId());
-        courseCommentDto.setCourseId(course.getId());
-        courseCommentDto.setCourseTitle(course.getTitle());
-        courseCommentDto.setUserId(user.getId());
-        courseCommentDto.setNickName(user.getNickName());
-        courseCommentDto.setAvatar(user.getAvatar());
-        courseCommentDto.setChildren(formatChildren(user.getChildren()));
-        courseCommentDto.setAddTime(TimeUtil.formatAddTime(comment.getAddTime()));
-        courseCommentDto.setStar(comment.getStar());
-        courseCommentDto.setContent(comment.getContent());
-        courseCommentDto.setImgs(comment.getImgs());
+    private UserCourseComment buildUserCourseComment(CourseComment comment, Course course, User user) {
+        UserCourseComment userCourseComment = new UserCourseComment();
+        userCourseComment.setId(comment.getId());
+        userCourseComment.setCourseId(course.getId());
+        userCourseComment.setCourseTitle(course.getTitle());
+        userCourseComment.setUserId(user.getId());
+        userCourseComment.setNickName(user.getNickName());
+        userCourseComment.setAvatar(user.getAvatar());
+        userCourseComment.setChildren(formatChildren(user.getChildren()));
+        userCourseComment.setAddTime(TimeUtil.formatAddTime(comment.getAddTime()));
+        userCourseComment.setStar(comment.getStar());
+        userCourseComment.setContent(comment.getContent());
+        userCourseComment.setImgs(comment.getImgs());
 
-        return courseCommentDto;
+        return userCourseComment;
     }
 
     private List<String> formatChildren(List<Child> children) {

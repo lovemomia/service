@@ -3,7 +3,7 @@ package cn.momia.service.course.web.ctrl;
 import cn.momia.api.base.MetaUtil;
 import cn.momia.api.course.dto.BookedCourseDto;
 import cn.momia.api.course.dto.CourseBookDto;
-import cn.momia.api.course.dto.CourseCommentDto;
+import cn.momia.api.course.dto.UserCourseComment;
 import cn.momia.api.course.dto.CourseDetail;
 import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.CoursePlaceDto;
@@ -700,32 +700,32 @@ public class CourseController extends BaseController {
             usersMap.put(user.getId(), user);
         }
 
-        List<CourseCommentDto> commentDtos = new ArrayList<CourseCommentDto>();
+        List<UserCourseComment> userCourseComments = new ArrayList<UserCourseComment>();
         for (CourseComment comment : comments) {
             User user = usersMap.get(comment.getUserId());
             if (user == null) continue;
-            commentDtos.add(buildCourseCommentDto(comment, user));
+            userCourseComments.add(buildUserCourseComment(comment, user));
         }
 
-        PagedList<CourseCommentDto> pagedCommentDtos = new PagedList<CourseCommentDto>(totalCount, start, count);
-        pagedCommentDtos.setList(commentDtos);
+        PagedList<UserCourseComment> pagedUserCourseComments = new PagedList<UserCourseComment>(totalCount, start, count);
+        pagedUserCourseComments.setList(userCourseComments);
 
-        return MomiaHttpResponse.SUCCESS(pagedCommentDtos);
+        return MomiaHttpResponse.SUCCESS(pagedUserCourseComments);
     }
 
-    private CourseCommentDto buildCourseCommentDto(CourseComment comment, User user) {
-        CourseCommentDto courseCommentDto = new CourseCommentDto();
-        courseCommentDto.setId(comment.getId());
-        courseCommentDto.setUserId(user.getId());
-        courseCommentDto.setNickName(user.getNickName());
-        courseCommentDto.setAvatar(user.getAvatar());
-        courseCommentDto.setChildren(formatChildren(user.getChildren()));
-        courseCommentDto.setAddTime(TimeUtil.formatAddTime(comment.getAddTime()));
-        courseCommentDto.setStar(comment.getStar());
-        courseCommentDto.setContent(comment.getContent());
-        courseCommentDto.setImgs(comment.getImgs());
+    private UserCourseComment buildUserCourseComment(CourseComment comment, User user) {
+        UserCourseComment userCourseComment = new UserCourseComment();
+        userCourseComment.setId(comment.getId());
+        userCourseComment.setUserId(user.getId());
+        userCourseComment.setNickName(user.getNickName());
+        userCourseComment.setAvatar(user.getAvatar());
+        userCourseComment.setChildren(formatChildren(user.getChildren()));
+        userCourseComment.setAddTime(TimeUtil.formatAddTime(comment.getAddTime()));
+        userCourseComment.setStar(comment.getStar());
+        userCourseComment.setContent(comment.getContent());
+        userCourseComment.setImgs(comment.getImgs());
 
-        return courseCommentDto;
+        return userCourseComment;
     }
 
     private List<String> formatChildren(List<Child> children) {

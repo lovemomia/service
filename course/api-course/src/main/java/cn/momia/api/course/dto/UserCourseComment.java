@@ -2,7 +2,7 @@ package cn.momia.api.course.dto;
 
 import java.util.List;
 
-public class CourseCommentDto {
+public class UserCourseComment {
     private long id;
 
     private long courseId;

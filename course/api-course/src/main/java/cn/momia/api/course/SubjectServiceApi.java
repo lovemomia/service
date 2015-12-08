@@ -1,6 +1,6 @@
 package cn.momia.api.course;
 
-import cn.momia.api.course.dto.CourseCommentDto;
+import cn.momia.api.course.dto.UserCourseComment;
 import cn.momia.api.course.dto.Favorite;
 import cn.momia.api.course.dto.SubjectDto;
 import cn.momia.api.course.dto.SubjectSkuDto;
@@ -33,13 +33,13 @@ public class SubjectServiceApi extends ServiceApi {
         return executeReturnList(request, SubjectSkuDto.class);
     }
 
-    public PagedList<CourseCommentDto> queryCommentsBySubject(long subjectId, int start, int count) {
+    public PagedList<UserCourseComment> queryCommentsBySubject(long subjectId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/%d/comment", subjectId), builder.build());
 
-        return executeReturnPagedList(request, CourseCommentDto.class);
+        return executeReturnPagedList(request, UserCourseComment.class);
     }
 
     public boolean favor(long userId, long subjectId) {

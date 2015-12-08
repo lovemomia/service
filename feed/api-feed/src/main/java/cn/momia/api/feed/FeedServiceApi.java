@@ -1,6 +1,6 @@
 package cn.momia.api.feed;
 
-import cn.momia.api.feed.dto.UserComment;
+import cn.momia.api.feed.dto.UserFeedComment;
 import cn.momia.api.feed.dto.UserFeed;
 import cn.momia.api.feed.dto.FeedTag;
 import cn.momia.api.user.dto.User;
@@ -104,13 +104,13 @@ public class FeedServiceApi extends ServiceApi {
         return executeReturnObject(request, Boolean.class);
     }
 
-    public PagedList<UserComment> listComments(long feedId, int start, int count) {
+    public PagedList<UserFeedComment> listComments(long feedId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/feed/%d/comment/list", feedId), builder.build());
 
-        return executeReturnPagedList(request, UserComment.class);
+        return executeReturnPagedList(request, UserFeedComment.class);
     }
 
     public void addComment(long userId, long feedId, String content) {
