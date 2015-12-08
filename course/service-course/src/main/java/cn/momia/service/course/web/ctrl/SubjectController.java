@@ -1,16 +1,10 @@
 package cn.momia.service.course.web.ctrl;
 
-import cn.momia.api.course.dto.UserCourseComment;
 import cn.momia.api.course.dto.Favorite;
 import cn.momia.api.user.UserServiceApi;
-import cn.momia.api.user.dto.Child;
-import cn.momia.api.user.dto.User;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
-import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.service.course.base.Course;
-import cn.momia.service.course.comment.CourseComment;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.comment.CourseCommentService;
 import cn.momia.service.course.favorite.FavoriteService;
@@ -76,75 +70,6 @@ public class SubjectController extends BaseController {
         }
 
         return MomiaHttpResponse.SUCCESS(avaliableSkus);
-    }
-
-    @RequestMapping(value = "/{suid}/comment", method = RequestMethod.GET)
-    public MomiaHttpResponse listComments(@PathVariable(value = "suid") long subjectId, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
-
-        long totalCount = courseCommentService.queryCommentCountBySubject(subjectId);
-        List<CourseComment> comments = courseCommentService.queryCommentsBySubject(subjectId, start, count);
-
-        Set<Long> courseIds = new HashSet<Long>();
-        Set<Long> userIds = new HashSet<Long>();
-        for (CourseComment comment : comments) {
-            courseIds.add(comment.getCourseId());
-            userIds.add(comment.getUserId());
-        }
-
-        List<Course> courses = courseService.list(courseIds);
-        Map<Long, Course> coursesMap = new HashMap<Long, Course>();
-        for (Course course : courses) {
-            coursesMap.put(course.getId(), course);
-        }
-
-        List<User> users = userServiceApi.list(userIds, User.Type.FULL);
-        Map<Long, User> usersMap = new HashMap<Long, User>();
-        for (User user : users) {
-            usersMap.put(user.getId(), user);
-        }
-
-        List<UserCourseComment> userCourseComments = new ArrayList<UserCourseComment>();
-        for (CourseComment comment : comments) {
-            Course course = coursesMap.get(comment.getCourseId());
-            if (course == null) continue;
-            User user = usersMap.get(comment.getUserId());
-            if (user == null) continue;
-
-            userCourseComments.add(buildUserCourseComment(comment, course, user));
-        }
-
-        PagedList<UserCourseComment> pagedUserCourseComments = new PagedList<UserCourseComment>(totalCount, start, count);
-        pagedUserCourseComments.setList(userCourseComments);
-
-        return MomiaHttpResponse.SUCCESS(pagedUserCourseComments);
-    }
-
-    private UserCourseComment buildUserCourseComment(CourseComment comment, Course course, User user) {
-        UserCourseComment userCourseComment = new UserCourseComment();
-        userCourseComment.setId(comment.getId());
-        userCourseComment.setCourseId(course.getId());
-        userCourseComment.setCourseTitle(course.getTitle());
-        userCourseComment.setUserId(user.getId());
-        userCourseComment.setNickName(user.getNickName());
-        userCourseComment.setAvatar(user.getAvatar());
-        userCourseComment.setChildren(formatChildren(user.getChildren()));
-        userCourseComment.setAddTime(TimeUtil.formatAddTime(comment.getAddTime()));
-        userCourseComment.setStar(comment.getStar());
-        userCourseComment.setContent(comment.getContent());
-        userCourseComment.setImgs(comment.getImgs());
-
-        return userCourseComment;
-    }
-
-    private List<String> formatChildren(List<Child> children) {
-        List<String> formatedChildren = new ArrayList<String>();
-        for (int i = 0; i < Math.min(2, children.size()); i++) {
-            Child child = children.get(i);
-            formatedChildren.add(child.getSex() + "孩" + TimeUtil.formatAge(child.getBirthday()));
-        }
-
-        return formatedChildren;
     }
 
     @RequestMapping(value = "/{suid}/favored", method = RequestMethod.GET)

@@ -2,14 +2,12 @@ package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.base.MetaUtil;
 import cn.momia.api.course.dto.BookedCourseDto;
-import cn.momia.api.course.dto.UserCourseComment;
 import cn.momia.api.course.dto.CourseDetail;
 import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.CourseSkuPlace;
 import cn.momia.api.course.dto.DatedCourseSkus;
 import cn.momia.api.course.dto.Favorite;
 import cn.momia.api.user.UserServiceApi;
-import cn.momia.api.user.dto.Child;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
@@ -18,7 +16,6 @@ import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.BookedCourse;
 import cn.momia.service.course.base.Course;
-import cn.momia.service.course.comment.CourseComment;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.api.course.dto.CourseSku;
 import cn.momia.api.course.dto.Institution;
@@ -40,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -572,74 +568,6 @@ public class CourseController extends BaseController {
         if (bookedCourseDtos.isEmpty()) return MomiaHttpResponse.FAILED("取消选课失败");
 
         return MomiaHttpResponse.SUCCESS(bookedCourseDtos.get(0));
-    }
-
-    @RequestMapping(value = "/comment", method = RequestMethod.POST, consumes = "application/json")
-    public MomiaHttpResponse comment(@RequestBody CourseComment comment) {
-        if (comment.isInvalid()) return MomiaHttpResponse.BAD_REQUEST;
-        if (StringUtils.isBlank(comment.getContent())) return MomiaHttpResponse.FAILED("评论内容不能为空");
-
-        if (!courseService.finished(comment.getUserId(), comment.getBookingId(), comment.getCourseId())) return MomiaHttpResponse.FAILED("你还没有上过这门课，无法评论");
-        if (courseCommentService.isCommented(comment.getUserId(), comment.getBookingId())) return MomiaHttpResponse.FAILED("一堂课只能发表一次评论");
-        if (comment.getImgs() != null && comment.getImgs().size() > 9) return MomiaHttpResponse.FAILED("上传的图片过多，1条评论最多上传9张图片");
-
-        return MomiaHttpResponse.SUCCESS(courseCommentService.comment(comment));
-    }
-
-    @RequestMapping(value = "/{coid}/comment", method = RequestMethod.GET)
-    public MomiaHttpResponse listComment(@PathVariable(value = "coid") long courseId, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
-
-        long totalCount = courseCommentService.queryCommentCountByCourse(courseId);
-        List<CourseComment> comments = courseCommentService.queryCommentsByCourse(courseId, start, count);
-
-        Set<Long> userIds = new HashSet<Long>();
-        for (CourseComment comment : comments) {
-            userIds.add(comment.getUserId());
-        }
-
-        List<User> users = userServiceApi.list(userIds, User.Type.FULL);
-        Map<Long, User> usersMap = new HashMap<Long, User>();
-        for (User user : users) {
-            usersMap.put(user.getId(), user);
-        }
-
-        List<UserCourseComment> userCourseComments = new ArrayList<UserCourseComment>();
-        for (CourseComment comment : comments) {
-            User user = usersMap.get(comment.getUserId());
-            if (user == null) continue;
-            userCourseComments.add(buildUserCourseComment(comment, user));
-        }
-
-        PagedList<UserCourseComment> pagedUserCourseComments = new PagedList<UserCourseComment>(totalCount, start, count);
-        pagedUserCourseComments.setList(userCourseComments);
-
-        return MomiaHttpResponse.SUCCESS(pagedUserCourseComments);
-    }
-
-    private UserCourseComment buildUserCourseComment(CourseComment comment, User user) {
-        UserCourseComment userCourseComment = new UserCourseComment();
-        userCourseComment.setId(comment.getId());
-        userCourseComment.setUserId(user.getId());
-        userCourseComment.setNickName(user.getNickName());
-        userCourseComment.setAvatar(user.getAvatar());
-        userCourseComment.setChildren(formatChildren(user.getChildren()));
-        userCourseComment.setAddTime(TimeUtil.formatAddTime(comment.getAddTime()));
-        userCourseComment.setStar(comment.getStar());
-        userCourseComment.setContent(comment.getContent());
-        userCourseComment.setImgs(comment.getImgs());
-
-        return userCourseComment;
-    }
-
-    private List<String> formatChildren(List<Child> children) {
-        List<String> formatedChildren = new ArrayList<String>();
-        for (int i = 0; i < Math.min(2, children.size()); i++) {
-            Child child = children.get(i);
-            formatedChildren.add(child.getSex() + "孩" + TimeUtil.formatAge(child.getBirthday()));
-        }
-
-        return formatedChildren;
     }
 
     @RequestMapping(value = "/{coid}/favored", method = RequestMethod.GET)
