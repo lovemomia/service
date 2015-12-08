@@ -22,7 +22,6 @@ import cn.momia.service.course.base.BookedCourse;
 import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseBook;
 import cn.momia.service.course.base.CourseComment;
-import cn.momia.service.course.base.CourseImage;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.base.CourseSku;
 import cn.momia.service.course.base.CourseSkuPlace;
@@ -161,20 +160,11 @@ public class CourseController extends BaseController {
         courseDto.setTips(course.getTips());
         courseDto.setNotice(course.getNotice());
         courseDto.setInstitution(course.getInstitution());
-        courseDto.setImgs(extractImgUrls(course.getImgs()));
+        courseDto.setImgs(course.getImgs());
         courseDto.setBook(buildCourseBookDto(course.getBook()));
         courseDto.setPlace(buildCoursePlaceDto(course.getSkus(), pos));
 
         return courseDto;
-    }
-
-    private List<String> extractImgUrls(List<CourseImage> imgs) {
-        List<String> urls = new ArrayList<String>();
-        for (CourseImage img : imgs) {
-            urls.add(img.getUrl());
-        }
-
-        return urls;
     }
 
     private CourseBookDto buildCourseBookDto(CourseBook book) {

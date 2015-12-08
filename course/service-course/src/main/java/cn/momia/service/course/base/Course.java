@@ -47,7 +47,7 @@ public class Course implements Cloneable {
 
     private int status;
 
-    private List<CourseImage> imgs;
+    private List<String> imgs;
     private CourseBook book;
     private List<CourseSku> skus = new ArrayList<CourseSku>();
 
@@ -199,11 +199,11 @@ public class Course implements Cloneable {
         this.status = status;
     }
 
-    public List<CourseImage> getImgs() {
+    public List<String> getImgs() {
         return imgs;
     }
 
-    public void setImgs(List<CourseImage> imgs) {
+    public void setImgs(List<String> imgs) {
         this.imgs = imgs;
     }
 

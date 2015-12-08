@@ -9,7 +9,6 @@ import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseBook;
 import cn.momia.service.course.base.CourseBookImage;
 import cn.momia.service.course.base.CourseComment;
-import cn.momia.service.course.base.CourseImage;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.base.CourseSku;
 import cn.momia.service.course.base.CourseSkuPlace;
@@ -102,7 +101,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
             if (course.getParentId() > 0) courseAndParentIds.add(course.getParentId());
         }
         Map<Integer, Institution> institutionsMap = queryInstitutions(institutionIds);
-        Map<Long, List<CourseImage>> imgsMap = queryImgs(courseAndParentIds);
+        Map<Long, List<String>> imgsMap = queryImgs(courseAndParentIds);
         Map<Long, CourseBook> booksMap = queryBooks(courseAndParentIds);
         Map<Long, List<CourseSku>> skusMap = querySkus(courseIds);
         Map<Long, BigDecimal> buyablesMap = queryBuyables(courseIds);
@@ -155,18 +154,14 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         return institutionsMap;
     }
 
-    private Map<Long, List<CourseImage>> queryImgs(Collection<Long> courseIds) {
-        if (courseIds.isEmpty()) return new HashMap<Long, List<CourseImage>>();
+    private Map<Long, List<String>> queryImgs(Collection<Long> courseIds) {
+        if (courseIds.isEmpty()) return new HashMap<Long, List<String>>();
 
-        String sql = "SELECT Id, CourseId, Url, Width, Height FROM SG_CourseImg WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Status<>0";
-        List<CourseImage> imgs = queryObjectList(sql, CourseImage.class);
+        String sql = "SELECT CourseId, Url FROM SG_CourseImg WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Status<>0";
+        Map<Long, List<String>> imgsMap = queryListMap(sql, Long.class, String.class);
 
-        final Map<Long, List<CourseImage>> imgsMap = new HashMap<Long, List<CourseImage>>();
         for (long courseId : courseIds) {
-            imgsMap.put(courseId, new ArrayList<CourseImage>());
-        }
-        for (CourseImage img : imgs) {
-            imgsMap.get(img.getCourseId()).add(img);
+            if (!imgsMap.containsKey(courseId)) imgsMap.put(courseId, new ArrayList<String>());
         }
 
         return imgsMap;
