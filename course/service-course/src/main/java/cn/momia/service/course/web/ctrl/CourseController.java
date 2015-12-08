@@ -9,7 +9,7 @@ import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.CoursePlaceDto;
 import cn.momia.api.course.dto.CourseSkuDto;
 import cn.momia.api.course.dto.DatedCourseSkusDto;
-import cn.momia.api.course.dto.FavoriteDto;
+import cn.momia.api.course.dto.Favorite;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.Child;
 import cn.momia.api.user.dto.User;
@@ -29,7 +29,6 @@ import cn.momia.service.course.base.CourseSku;
 import cn.momia.service.course.base.CourseSkuPlace;
 import cn.momia.api.course.dto.Institution;
 import cn.momia.api.course.dto.Teacher;
-import cn.momia.service.course.favorite.Favorite;
 import cn.momia.service.course.favorite.FavoriteService;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderPackage;
@@ -772,37 +771,33 @@ public class CourseController extends BaseController {
         long totalCount = favoriteService.queryFavoriteCount(userId, Favorite.Type.COURSE);
         List<Favorite> favorites = favoriteService.queryFavorites(userId, Favorite.Type.COURSE, start, count);
 
-        PagedList<FavoriteDto> pagedFavoriteDtos = new PagedList<FavoriteDto>(totalCount, start, count);
-        pagedFavoriteDtos.setList(buildFavoriteDtos(favorites));
+        PagedList<Favorite> pagedFavorites = new PagedList<Favorite>(totalCount, start, count);
+        pagedFavorites.setList(completeFavorites(favorites));
 
-        return MomiaHttpResponse.SUCCESS(pagedFavoriteDtos);
+        return MomiaHttpResponse.SUCCESS(pagedFavorites);
     }
 
-    private List<FavoriteDto> buildFavoriteDtos(List<Favorite> favorites) {
+    private List<Favorite> completeFavorites(List<Favorite> favorites) {
         Set<Long> courseIds = new HashSet<Long>();
         for (Favorite favorite: favorites) {
             courseIds.add(favorite.getRefId());
         }
 
         List<Course> courses = courseService.list(courseIds);
-        Map<Long, CourseDto> courseDtosMap = new HashMap<Long, CourseDto>();
+        Map<Long, CourseDto> coursesMap = new HashMap<Long, CourseDto>();
         for (Course course : courses) {
-            courseDtosMap.put(course.getId(), buildBaseCourseDto(course));
+            coursesMap.put(course.getId(), buildBaseCourseDto(course));
         }
 
-        List<FavoriteDto> favoriteDtos = new ArrayList<FavoriteDto>();
+        List<Favorite> results = new ArrayList<Favorite>();
         for (Favorite favorite : favorites) {
-            CourseDto courseDto = courseDtosMap.get(favorite.getRefId());
-            if (courseDto == null) continue;
+            CourseDto course = coursesMap.get(favorite.getRefId());
+            if (course == null) continue;
 
-            FavoriteDto favoriteDto = new FavoriteDto();
-            favoriteDto.setId(favorite.getId());
-            favoriteDto.setType(favorite.getType());
-            favoriteDto.setRef((JSONObject) JSON.toJSON(courseDto));
-
-            favoriteDtos.add(favoriteDto);
+            favorite.setRef((JSONObject) JSON.toJSON(course));
+            results.add(favorite);
         }
 
-        return favoriteDtos;
+        return results;
     }
 }

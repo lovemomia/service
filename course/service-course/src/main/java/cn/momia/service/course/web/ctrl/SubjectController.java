@@ -3,7 +3,7 @@ package cn.momia.service.course.web.ctrl;
 import cn.momia.api.base.MetaUtil;
 import cn.momia.api.base.dto.Region;
 import cn.momia.api.course.dto.CourseCommentDto;
-import cn.momia.api.course.dto.FavoriteDto;
+import cn.momia.api.course.dto.Favorite;
 import cn.momia.api.course.dto.SubjectDto;
 import cn.momia.api.course.dto.SubjectSkuDto;
 import cn.momia.api.user.UserServiceApi;
@@ -17,7 +17,6 @@ import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseComment;
 import cn.momia.service.course.base.CourseService;
-import cn.momia.service.course.favorite.Favorite;
 import cn.momia.service.course.favorite.FavoriteService;
 import cn.momia.service.course.subject.Subject;
 import cn.momia.service.course.subject.SubjectImage;
@@ -330,13 +329,13 @@ public class SubjectController extends BaseController {
         long totalCount = favoriteService.queryFavoriteCount(userId, Favorite.Type.SUBJECT);
         List<Favorite> favorites = favoriteService.queryFavorites(userId, Favorite.Type.SUBJECT, start, count);
 
-        PagedList<FavoriteDto> pagedFavoriteDtos = new PagedList<FavoriteDto>(totalCount, start, count);
-        pagedFavoriteDtos.setList(buildFavoriteDtos(favorites));
+        PagedList<Favorite> pagedFavorites = new PagedList<Favorite>(totalCount, start, count);
+        pagedFavorites.setList(completeFavorites(favorites));
 
-        return MomiaHttpResponse.SUCCESS(pagedFavoriteDtos);
+        return MomiaHttpResponse.SUCCESS(pagedFavorites);
     }
 
-    private List<FavoriteDto> buildFavoriteDtos(List<Favorite> favorites) {
+    private List<Favorite> completeFavorites(List<Favorite> favorites) {
         Set<Long> subjectIds = new HashSet<Long>();
         for (Favorite favorite: favorites) {
             subjectIds.add(favorite.getRefId());
@@ -344,24 +343,20 @@ public class SubjectController extends BaseController {
 
         List<Subject> subjects = subjectService.list(subjectIds);
         Map<Long, List<Course>> coursesMap = courseService.queryAllBySubjects(subjectIds);
-        Map<Long, SubjectDto> subjectDtosMap = new HashMap<Long, SubjectDto>();
+        Map<Long, SubjectDto> subjectsMap = new HashMap<Long, SubjectDto>();
         for (Subject subject : subjects) {
-            subjectDtosMap.put(subject.getId(), buildBaseSubjectDto(subject, coursesMap.get(subject.getId())));
+            subjectsMap.put(subject.getId(), buildBaseSubjectDto(subject, coursesMap.get(subject.getId())));
         }
 
-        List<FavoriteDto> favoriteDtos = new ArrayList<FavoriteDto>();
+        List<Favorite> results = new ArrayList<Favorite>();
         for (Favorite favorite : favorites) {
-            SubjectDto subjectDto = subjectDtosMap.get(favorite.getRefId());
+            SubjectDto subjectDto = subjectsMap.get(favorite.getRefId());
             if (subjectDto == null) continue;
 
-            FavoriteDto favoriteDto = new FavoriteDto();
-            favoriteDto.setId(favorite.getId());
-            favoriteDto.setType(favorite.getType());
-            favoriteDto.setRef((JSONObject) JSON.toJSON(subjectDto));
-
-            favoriteDtos.add(favoriteDto);
+            favorite.setRef((JSONObject) JSON.toJSON(subjectDto));
+            results.add(favorite);
         }
 
-        return favoriteDtos;
+        return results;
     }
 }

@@ -1,5 +1,7 @@
 package cn.momia.service.course.favorite;
 
+import cn.momia.api.course.dto.Favorite;
+
 import java.util.List;
 
 public interface FavoriteService {

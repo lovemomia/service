@@ -1,4 +1,7 @@
-package cn.momia.service.course.favorite;
+package cn.momia.api.course.dto;
+
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 
 public class Favorite {
     public static class Type {
@@ -10,6 +13,7 @@ public class Favorite {
     private int type;
     private long userId;
     private long refId;
+    private JSONObject ref;
 
     public long getId() {
         return id;
@@ -27,6 +31,7 @@ public class Favorite {
         this.type = type;
     }
 
+    @JSONField(serialize = false)
     public long getUserId() {
         return userId;
     }
@@ -35,11 +40,20 @@ public class Favorite {
         this.userId = userId;
     }
 
+    @JSONField(serialize = false)
     public long getRefId() {
         return refId;
     }
 
     public void setRefId(long refId) {
         this.refId = refId;
+    }
+
+    public JSONObject getRef() {
+        return ref;
+    }
+
+    public void setRef(JSONObject ref) {
+        this.ref = ref;
     }
 }
