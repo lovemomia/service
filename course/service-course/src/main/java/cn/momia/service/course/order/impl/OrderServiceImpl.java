@@ -2,7 +2,7 @@ package cn.momia.service.course.order.impl;
 
 import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
-import cn.momia.service.course.subject.Subject;
+import cn.momia.api.course.dto.Subject;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderService;
 import cn.momia.service.course.order.OrderPackage;

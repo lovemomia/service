@@ -18,7 +18,7 @@ import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.webapp.util.RequestUtil;
 import cn.momia.service.course.order.OrderPackage;
-import cn.momia.service.course.subject.Subject;
+import cn.momia.api.course.dto.Subject;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.coupon.CouponService;
 import cn.momia.api.course.dto.UserCoupon;

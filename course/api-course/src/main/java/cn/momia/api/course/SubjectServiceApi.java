@@ -1,9 +1,9 @@
 package cn.momia.api.course;
 
+import cn.momia.api.course.dto.Subject;
 import cn.momia.api.course.dto.SubjectSku;
 import cn.momia.api.course.dto.UserCourseComment;
 import cn.momia.api.course.dto.Favorite;
-import cn.momia.api.course.dto.SubjectDto;
 import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
@@ -13,19 +13,19 @@ import org.apache.http.client.methods.HttpUriRequest;
 import java.util.List;
 
 public class SubjectServiceApi extends ServiceApi {
-    public PagedList<SubjectDto> listTrial(int cityId, int start, int count) {
+    public PagedList<Subject> listTrial(int cityId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
                 .add("start", start)
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/trial"), builder.build());
 
-        return executeReturnPagedList(request, SubjectDto.class);
+        return executeReturnPagedList(request, Subject.class);
     }
 
-    public SubjectDto get(long subjectId) {
+    public Subject get(long subjectId) {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/%d", subjectId));
-        return executeReturnObject(request, SubjectDto.class);
+        return executeReturnObject(request, Subject.class);
     }
 
     public List<SubjectSku> querySkus(long subjectId) {

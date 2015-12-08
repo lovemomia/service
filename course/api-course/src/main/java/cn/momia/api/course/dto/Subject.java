@@ -1,7 +1,6 @@
-package cn.momia.service.course.subject;
+package cn.momia.api.course.dto;
 
-import cn.momia.api.course.dto.SubjectSku;
-
+import java.math.BigDecimal;
 import java.util.List;
 
 public class Subject {
@@ -18,6 +17,7 @@ public class Subject {
     public static final Subject NOT_EXIST_SUBJECT = new Subject();
 
     private long id;
+    private int type;
     private int cityId;
     private String title;
     private String cover;
@@ -30,12 +30,27 @@ public class Subject {
 
     private int status;
 
+    private BigDecimal price;
+    private BigDecimal originalPrice;
+    private String age;
+    private int joined;
+    private String scheduler;
+    private String region;
+
     public long getId() {
         return id;
     }
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public int getCityId() {
@@ -118,23 +133,56 @@ public class Subject {
         this.status = status;
     }
 
-    public boolean exists() {
-        return id > 0;
+    public BigDecimal getPrice() {
+        return price;
     }
 
-    public SubjectSku getMinPriceSku() {
-        SubjectSku minPriceSubjectSku = SubjectSku.NOT_EXIST_SUBJECT_SKU;
-        for (SubjectSku sku : skus) {
-            if (sku.getCourseId() > 0) continue;
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
 
-            if (!minPriceSubjectSku.exists()) {
-                minPriceSubjectSku = sku;
-            } else {
-                if (minPriceSubjectSku.getPrice().compareTo(sku.getPrice()) > 0) minPriceSubjectSku = sku;
-            }
-        }
+    public BigDecimal getOriginalPrice() {
+        return originalPrice;
+    }
 
-        return minPriceSubjectSku;
+    public void setOriginalPrice(BigDecimal originalPrice) {
+        this.originalPrice = originalPrice;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
+    }
+
+    public int getJoined() {
+        return joined;
+    }
+
+    public void setJoined(int joined) {
+        this.joined = joined;
+    }
+
+    public String getScheduler() {
+        return scheduler;
+    }
+
+    public void setScheduler(String scheduler) {
+        this.scheduler = scheduler;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
+    public boolean exists() {
+        return id > 0;
     }
 
     public SubjectSku getSku(long skuId) {
@@ -143,5 +191,11 @@ public class Subject {
         }
 
         return SubjectSku.NOT_EXIST_SUBJECT_SKU;
+    }
+
+    public static class Base extends Subject {
+        public Base(Subject subject) {
+            super();
+        }
     }
 }

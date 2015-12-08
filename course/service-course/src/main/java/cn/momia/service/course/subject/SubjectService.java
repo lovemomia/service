@@ -1,5 +1,6 @@
 package cn.momia.service.course.subject;
 
+import cn.momia.api.course.dto.Subject;
 import cn.momia.api.course.dto.SubjectSku;
 
 import java.util.Collection;
