@@ -6,7 +6,6 @@ import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
 import cn.momia.common.util.TimeUtil;
-import com.alibaba.fastjson.JSON;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.Date;

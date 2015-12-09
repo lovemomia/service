@@ -1,6 +1,5 @@
 package cn.momia.api.feed.dto;
 
-
 import java.util.ArrayList;
 import java.util.List;
 

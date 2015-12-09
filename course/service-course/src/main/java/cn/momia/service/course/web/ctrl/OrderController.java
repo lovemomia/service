@@ -1,5 +1,6 @@
 package cn.momia.service.course.web.ctrl;
 
+import cn.momia.api.course.dto.Course;
 import cn.momia.api.course.dto.SubjectOrder;
 import cn.momia.api.course.dto.SubjectPackage;
 import cn.momia.api.user.UserServiceApi;
@@ -9,7 +10,6 @@ import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.api.course.dto.UserCoupon;
 import cn.momia.api.course.dto.Subject;
