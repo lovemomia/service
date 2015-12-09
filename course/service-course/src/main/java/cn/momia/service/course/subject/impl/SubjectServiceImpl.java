@@ -203,20 +203,6 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
     }
 
     @Override
-    public long queryTrialCount(long cityId) {
-        String sql = "SELECT COUNT(1) FROM SG_Subject WHERE `Type`=? AND CityId=? AND Stock>=0 AND Status=1";
-        return queryLong(sql, new Object[] { Subject.Type.TRIAL, cityId });
-    }
-
-    @Override
-    public List<Subject> queryTrial(long cityId, int start, int count) {
-        String sql = "SELECT Id FROM SG_Subject WHERE `Type`=? AND CityId=? AND Stock>=0 AND Status=1 ORDER BY Stock DESC, AddTime DESC LIMIT ?,?";
-        List<Long> subjectIds = queryLongList(sql, new Object[] { Subject.Type.TRIAL, cityId, start, count });
-
-        return list(subjectIds);
-    }
-
-    @Override
     public SubjectSku getSku(long skuId) {
         Set<Long> skuIds = Sets.newHashSet(skuId);
         List<SubjectSku> skus = listSkus(skuIds);
@@ -257,6 +243,20 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
     public boolean isTrial(long subjectId) {
         String sql = "SELECT Type FROM SG_Subject WHERE Id=?";
         return queryInt(sql, new Object[] { subjectId }) == Subject.Type.TRIAL;
+    }
+
+    @Override
+    public long queryTrialCount(long cityId) {
+        String sql = "SELECT COUNT(1) FROM SG_Subject WHERE `Type`=? AND CityId=? AND Stock>=0 AND Status=1";
+        return queryLong(sql, new Object[] { Subject.Type.TRIAL, cityId });
+    }
+
+    @Override
+    public List<Subject> queryTrial(long cityId, int start, int count) {
+        String sql = "SELECT Id FROM SG_Subject WHERE `Type`=? AND CityId=? AND Stock>=0 AND Status=1 ORDER BY Stock DESC, AddTime DESC LIMIT ?,?";
+        List<Long> subjectIds = queryLongList(sql, new Object[] { Subject.Type.TRIAL, cityId, start, count });
+
+        return list(subjectIds);
     }
 
     @Override

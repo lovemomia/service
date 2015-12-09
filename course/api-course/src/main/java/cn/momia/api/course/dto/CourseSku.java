@@ -140,4 +140,8 @@ public class CourseSku {
     public int getStock() {
         return unlockedStock;
     }
+
+    public void setStock(int stock) {
+        this.unlockedStock = stock;
+    }
 }

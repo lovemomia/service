@@ -18,16 +18,16 @@ public class SubjectOrder {
     private Integer bookingStatus;
 
     // 课程体系的内容
-    private long subjectId;
-    private long courseId;
+    private Long subjectId;
+    private Long courseId;
     private String title;
     private String cover;
 
     // FULL
     // 使用的红包/优惠券
-    private long userCouponId;
-    private int couponId;
-    private int couponType;
+    private Long userCouponId;
+    private Integer couponId;
+    private Integer couponType;
     private BigDecimal discount;
     private String couponDesc;
 
@@ -79,19 +79,19 @@ public class SubjectOrder {
         this.bookingStatus = bookingStatus;
     }
 
-    public long getSubjectId() {
+    public Long getSubjectId() {
         return subjectId;
     }
 
-    public void setSubjectId(long subjectId) {
+    public void setSubjectId(Long subjectId) {
         this.subjectId = subjectId;
     }
 
-    public long getCourseId() {
+    public Long getCourseId() {
         return courseId;
     }
 
-    public void setCourseId(long courseId) {
+    public void setCourseId(Long courseId) {
         this.courseId = courseId;
     }
 
@@ -111,27 +111,27 @@ public class SubjectOrder {
         this.cover = cover;
     }
 
-    public long getUserCouponId() {
+    public Long getUserCouponId() {
         return userCouponId;
     }
 
-    public void setUserCouponId(long userCouponId) {
+    public void setUserCouponId(Long userCouponId) {
         this.userCouponId = userCouponId;
     }
 
-    public int getCouponId() {
+    public Integer getCouponId() {
         return couponId;
     }
 
-    public void setCouponId(int couponId) {
+    public void setCouponId(Integer couponId) {
         this.couponId = couponId;
     }
 
-    public int getCouponType() {
+    public Integer getCouponType() {
         return couponType;
     }
 
-    public void setCouponType(int couponType) {
+    public void setCouponType(Integer couponType) {
         this.couponType = couponType;
     }
 
