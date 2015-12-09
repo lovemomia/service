@@ -1,12 +1,9 @@
 package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.course.dto.Favorite;
-import cn.momia.api.user.UserServiceApi;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.service.course.base.CourseService;
-import cn.momia.service.course.comment.CourseCommentService;
 import cn.momia.service.course.favorite.FavoriteService;
 import cn.momia.api.course.dto.Subject;
 import cn.momia.service.course.subject.SubjectService;
@@ -30,12 +27,8 @@ import java.util.Set;
 @RestController
 @RequestMapping("/subject")
 public class SubjectController extends BaseController {
-    @Autowired private CourseService courseService;
-    @Autowired private CourseCommentService courseCommentService;
     @Autowired private SubjectService subjectService;
     @Autowired private FavoriteService favoriteService;
-
-    @Autowired private UserServiceApi userServiceApi;
 
     @RequestMapping(value = "/trial", method = RequestMethod.GET)
     public MomiaHttpResponse listTrial(@RequestParam(value = "city") long cityId, @RequestParam int start, @RequestParam int count) {
