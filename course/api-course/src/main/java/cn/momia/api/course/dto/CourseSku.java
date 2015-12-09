@@ -23,6 +23,7 @@ public class CourseSku {
     @JSONField(serialize = false) private int placeId;
     @JSONField(serialize = false) private int adult;
     @JSONField(serialize = false) private int child;
+    @JSONField(serialize = false) private int status;
 
     private CourseSkuPlace place;
 
@@ -98,6 +99,14 @@ public class CourseSku {
         this.child = child;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     public CourseSkuPlace getPlace() {
         return place;
     }
@@ -117,7 +126,7 @@ public class CourseSku {
 
     @JSONField(serialize = false)
     public boolean isAvaliable(Date now) {
-        return deadline.after(now);
+        return status == 1 && deadline.after(now);
     }
 
     public String getTime() {
