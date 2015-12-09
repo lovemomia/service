@@ -125,7 +125,7 @@ public class CourseCommentServiceImpl extends AbstractService implements CourseC
         if (commentIds.isEmpty()) return new HashMap<Long, List<String>>();
 
         String sql = "SELECT CommentId, Url FROM SG_CourseCommentImg WHERE CommentId IN (" + StringUtils.join(commentIds, ",") + ") AND Status<>0";
-        Map<Long, List<String>> imgsMap = queryListMap(sql, long.class, String.class);
+        Map<Long, List<String>> imgsMap = queryListMap(sql, Long.class, String.class);
         for (long commentId : commentIds) {
             if (!imgsMap.containsKey(commentId)) imgsMap.put(commentId, new ArrayList<String>());
         }
