@@ -204,7 +204,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     private List<CourseSku> listSkus(Collection<Long> skuIds) {
         if (skuIds.isEmpty()) return new ArrayList<CourseSku>();
 
-        String sql = "SELECT Id, CourseId, StartTime, EndTime, Deadline, Stock, UnlockedStock, LockedStock, PlaceId, Adult, Child FROM SG_CourseSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status<>0";
+        String sql = "SELECT Id, CourseId, StartTime, EndTime, Deadline, UnlockedStock, PlaceId, Adult, Child FROM SG_CourseSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status<>0";
         List<CourseSku> skus = queryObjectList(sql, CourseSku.class);
 
         Map<Long, CourseSku> skusMap = new HashMap<Long, CourseSku>();
