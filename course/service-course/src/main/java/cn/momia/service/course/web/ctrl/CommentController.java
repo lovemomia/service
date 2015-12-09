@@ -1,5 +1,6 @@
 package cn.momia.service.course.web.ctrl;
 
+import cn.momia.api.course.dto.Course;
 import cn.momia.api.course.dto.UserCourseComment;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.Child;
@@ -8,7 +9,6 @@ import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.comment.CourseComment;
 import cn.momia.service.course.comment.CourseCommentService;

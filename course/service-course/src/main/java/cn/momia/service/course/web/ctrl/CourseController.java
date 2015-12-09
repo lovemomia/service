@@ -1,12 +1,9 @@
 package cn.momia.service.course.web.ctrl;
 
-import cn.momia.api.base.MetaUtil;
-import cn.momia.api.course.dto.BookedCourseDto;
+import cn.momia.api.course.dto.Course;
 import cn.momia.api.course.dto.CourseDetail;
-import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.CourseSkuPlace;
 import cn.momia.api.course.dto.DatedCourseSkus;
-import cn.momia.api.course.dto.Favorite;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.api.dto.PagedList;
@@ -14,21 +11,17 @@ import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.PoiUtil;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.service.course.base.BookedCourse;
-import cn.momia.service.course.base.Course;
+import cn.momia.api.course.dto.BookedCourse;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.api.course.dto.CourseSku;
 import cn.momia.api.course.dto.Institution;
 import cn.momia.api.course.dto.Teacher;
 import cn.momia.service.course.comment.CourseCommentService;
-import cn.momia.service.course.favorite.FavoriteService;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderPackage;
 import cn.momia.service.course.order.OrderService;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.api.course.dto.SubjectSku;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -67,7 +60,6 @@ public class CourseController extends BaseController {
     @Autowired private CourseCommentService courseCommentService;
     @Autowired private SubjectService subjectService;
     @Autowired private OrderService orderService;
-    @Autowired private FavoriteService favoriteService;
 
     @Autowired private UserServiceApi userServiceApi;
 
@@ -78,43 +70,19 @@ public class CourseController extends BaseController {
         long totalCount = courseService.queryRecommendCount(cityId);
         List<Course> courses = courseService.queryRecomend(cityId, start, count);
 
-        List<CourseDto> courseDtos = new ArrayList<CourseDto>();
+        return MomiaHttpResponse.SUCCESS(buildPagedCourses(courses, totalCount, start, count));
+    }
+
+    private PagedList<Course> buildPagedCourses(List<Course> courses, long totalCount, int start, int count) {
+        List<Course> baseCourses = new ArrayList<Course>();
         for (Course course : courses) {
-            courseDtos.add(buildBaseCourseDto(course));
+            baseCourses.add(new Course.Base(course));
         }
 
-        PagedList<CourseDto> pagedCourseDtos = new PagedList<CourseDto>(totalCount, start, count);
-        pagedCourseDtos.setList(courseDtos);
+        PagedList<Course> pagedCourses = new PagedList<Course>(totalCount, start, count);
+        pagedCourses.setList(baseCourses);
 
-        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
-    }
-
-    private CourseDto buildBaseCourseDto(Course course) {
-        CourseDto courseDto = new CourseDto();
-        setFieldValue(courseDto, course);
-
-        return courseDto;
-    }
-
-    private void setFieldValue(CourseDto courseDto, Course course) {
-        courseDto.setId(course.getId());
-        courseDto.setType(course.getType());
-        courseDto.setSubjectId(course.getSubjectId());
-        courseDto.setTitle(course.getTitle());
-        courseDto.setCover(course.getCover());
-        courseDto.setAge(course.getAge());
-        courseDto.setInsurance(course.getInsurance() > 0);
-        courseDto.setJoined(course.getJoined());
-        courseDto.setPrice(course.getPrice());
-        courseDto.setScheduler(course.getScheduler());
-        courseDto.setRegion(MetaUtil.getRegionName(course.getRegionId()));
-        courseDto.setSubject(course.getSubject());
-
-        int stock = course.getStock();
-        int status = (stock == -1 || stock > 0) ? Course.Status.OK : Course.Status.SOLD_OUT;
-        courseDto.setStatus(status);
-
-        courseDto.setBuyable(course.isBuyable());
+        return pagedCourses;
     }
 
     @RequestMapping(value = "/trial", method = RequestMethod.GET)
@@ -124,15 +92,7 @@ public class CourseController extends BaseController {
         long totalCount = courseService.queryTrialCount(cityId);
         List<Course> courses = courseService.queryTrial(cityId, start, count);
 
-        List<CourseDto> courseDtos = new ArrayList<CourseDto>();
-        for (Course course : courses) {
-            courseDtos.add(buildBaseCourseDto(course));
-        }
-
-        PagedList<CourseDto> pagedCourseDtos = new PagedList<CourseDto>(totalCount, start, count);
-        pagedCourseDtos.setList(courseDtos);
-
-        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
+        return MomiaHttpResponse.SUCCESS(buildPagedCourses(courses, totalCount, start, count));
     }
 
     @RequestMapping(value = "/{coid}", method = RequestMethod.GET)
@@ -142,31 +102,19 @@ public class CourseController extends BaseController {
         Course course = courseService.get(courseId);
         if (!course.exists()) return MomiaHttpResponse.FAILED("课程不存在");
 
-        return MomiaHttpResponse.SUCCESS(type == Course.ShowType.FULL ? buildFullCourseDto(course, pos) : buildBaseCourseDto(course));
+        if (type == Course.ShowType.FULL) {
+            course.setPlace(buildCourseSkuPlace(filterUnavaliableSkus(course.getSkus()), pos));
+            return MomiaHttpResponse.SUCCESS(course);
+        } else {
+            return MomiaHttpResponse.SUCCESS(new Course.Base(course));
+        }
     }
 
-    private CourseDto buildFullCourseDto(Course course, String pos) {
-        CourseDto courseDto = buildBaseCourseDto(course);
-        courseDto.setGoal(course.getGoal());
-        courseDto.setFlow(course.getFlow());
-        courseDto.setTips(course.getTips());
-        courseDto.setNotice(course.getNotice());
-        courseDto.setInstitution(course.getInstitution());
-        courseDto.setImgs(course.getImgs());
-        courseDto.setBook(course.getBook());
-        courseDto.setPlace(buildCoursePlaceDto(course.getSkus(), pos));
-
-        return courseDto;
-    }
-
-    private CourseSkuPlace buildCoursePlaceDto(List<CourseSku> skus, String pos) {
+    private CourseSkuPlace buildCourseSkuPlace(List<CourseSku> skus, String pos) {
         List<CourseSkuPlace> places = new ArrayList<CourseSkuPlace>();
         Map<Integer, CourseSkuPlace> placesMap = new HashMap<Integer, CourseSkuPlace>();
         Map<Integer, List<CourseSku>> skusGroupedByPlace = new HashMap<Integer, List<CourseSku>>();
-        Date now = new Date();
         for (CourseSku sku : skus) {
-            if (!sku.isAvaliable(now)) continue;
-
             CourseSkuPlace place = sku.getPlace();
             if (place == null) continue;
 
@@ -239,26 +187,8 @@ public class CourseController extends BaseController {
 
         long totalCount = userId <= 0 ? courseService.listFinishedCount() : courseService.listFinishedCount(userId);
         List<Course> courses = userId <= 0 ? courseService.listFinished(start, count) : courseService.listFinished(userId, start, count);
-        PagedList<CourseDto> pagedCourseDtos = buildPagedCourseDtos(courses, totalCount, start, count);
 
-        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
-    }
-
-    private PagedList<CourseDto> buildPagedCourseDtos(List<Course> courses, long totalCount, int start, int count) {
-        List<CourseDto> courseDtos = buildCourseDtos(courses);
-        PagedList<CourseDto> pagedCourseDtos = new PagedList<CourseDto>(totalCount, start, count);
-        pagedCourseDtos.setList(courseDtos);
-
-        return pagedCourseDtos;
-    }
-
-    private List<CourseDto> buildCourseDtos(List<Course> courses) {
-        List<CourseDto> courseDtos = new ArrayList<CourseDto>();
-        for (Course course : courses) {
-            courseDtos.add(buildBaseCourseDto(course));
-        }
-
-        return courseDtos;
+        return MomiaHttpResponse.SUCCESS(buildPagedCourses(courses, totalCount, start, count));
     }
 
     @RequestMapping(value = "/query", method = RequestMethod.GET)
@@ -272,9 +202,8 @@ public class CourseController extends BaseController {
         List<Long> courseIds = courseService.queryBookedCourseIds(packageId);
         long totalCount = courseService.queryCountBySubject(subjectId, courseIds, minAge, maxAge);
         List<Course> courses = courseService.queryBySubject(subjectId, start, count, courseIds, minAge, maxAge, sortTypeId);
-        PagedList<CourseDto> pagedCourseDtos = buildPagedCourseDtos(courses, totalCount, start, count);
 
-        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
+        return MomiaHttpResponse.SUCCESS(buildPagedCourses(courses, totalCount, start, count));
     }
 
     @RequestMapping(value = "/{coid}/detail", method = RequestMethod.GET)
@@ -424,19 +353,18 @@ public class CourseController extends BaseController {
 
         long totalCount = courseService.queryNotFinishedCountByUser(userId);
         List<BookedCourse> bookedCourses = courseService.queryNotFinishedByUser(userId, start, count);
-        List<BookedCourseDto> bookedCourseDtos = buildBookedCourseDtos(userId, bookedCourses);
 
-        PagedList<BookedCourseDto> pagedCourseDtos = new PagedList<BookedCourseDto>(totalCount, start, count);
-        pagedCourseDtos.setList(bookedCourseDtos);
+        PagedList<BookedCourse> pagedBookedCourses = new PagedList<BookedCourse>(totalCount, start, count);
+        pagedBookedCourses.setList(completeBookedCourses(userId, bookedCourses));
 
-        return MomiaHttpResponse.SUCCESS(pagedCourseDtos);
+        return MomiaHttpResponse.SUCCESS(pagedBookedCourses);
     }
 
-    private List<BookedCourseDto> buildBookedCourseDtos(long userId, List<BookedCourse> bookedCourses) {
+    private List<BookedCourse> completeBookedCourses(long userId, List<BookedCourse> bookedCourses) {
         Set<Long> bookingIds = new HashSet<Long>();
         Set<Long> courseIds = new HashSet<Long>();
         for (BookedCourse bookedCourse : bookedCourses) {
-            bookingIds.add(bookedCourse.getId());
+            bookingIds.add(bookedCourse.getBookingId());
             courseIds.add(bookedCourse.getCourseId());
         }
 
@@ -447,28 +375,26 @@ public class CourseController extends BaseController {
             coursesMap.put(course.getId(), course);
         }
 
-        List<BookedCourseDto> bookedCourseDtos = new ArrayList<BookedCourseDto>();
+        List<BookedCourse> completedBookedCourses = new ArrayList<BookedCourse>();
         for (BookedCourse bookedCourse : bookedCourses) {
             Course course = coursesMap.get(bookedCourse.getCourseId());
             if (course == null) continue;
             List<CourseSku> skus = course.getSkus();
             if (skus.isEmpty()) continue;
-
-            BookedCourseDto bookedCourseDto = new BookedCourseDto();
-            bookedCourseDto.setBookingId(bookedCourse.getId());
-            bookedCourseDto.setCourseSkuId(bookedCourse.getCourseSkuId());
-            if (commentBookingIds.contains(bookedCourse.getId())) bookedCourseDto.setCommented(true);
-            setFieldValue(bookedCourseDto, course);
-            bookedCourseDto.setScheduler(course.getScheduler(bookedCourse.getCourseSkuId()));
-
             CourseSkuPlace place = course.getPlace(bookedCourse.getCourseSkuId());
             if (place == null) continue;
-            bookedCourseDto.setPlace(place);
 
-            bookedCourseDtos.add(bookedCourseDto);
+            BookedCourse completedBookedCourse = new BookedCourse(course);
+            completedBookedCourse.setBookingId(bookedCourse.getBookingId());
+            completedBookedCourse.setCourseSkuId(bookedCourse.getCourseSkuId());
+            if (commentBookingIds.contains(bookedCourse.getBookingId())) completedBookedCourse.setCommented(true);
+            completedBookedCourse.setScheduler(course.getScheduler(bookedCourse.getCourseSkuId()));
+            completedBookedCourse.setPlace(place);
+
+            completedBookedCourses.add(completedBookedCourse);
         }
 
-        return bookedCourseDtos;
+        return completedBookedCourses;
     }
 
     @RequestMapping(value = "/finished", method = RequestMethod.GET)
@@ -477,12 +403,11 @@ public class CourseController extends BaseController {
 
         long totalCount = courseService.queryFinishedCountByUser(userId);
         List<BookedCourse> bookedCourses = courseService.queryFinishedByUser(userId, start, count);
-        List<BookedCourseDto> bookedCourseDtos = buildBookedCourseDtos(userId, bookedCourses);
 
-        PagedList<BookedCourseDto> pagedBookedCourseDtos = new PagedList<BookedCourseDto>(totalCount, start, count);
-        pagedBookedCourseDtos.setList(bookedCourseDtos);
+        PagedList<BookedCourse> pagedBookedCourses = new PagedList<BookedCourse>(totalCount, start, count);
+        pagedBookedCourses.setList(completeBookedCourses(userId, bookedCourses));
 
-        return MomiaHttpResponse.SUCCESS(pagedBookedCourseDtos);
+        return MomiaHttpResponse.SUCCESS(pagedBookedCourses);
     }
 
     @RequestMapping(value = "/{coid}/joined", method = RequestMethod.GET)
@@ -541,10 +466,10 @@ public class CourseController extends BaseController {
         if (bookingId <= 0) return MomiaHttpResponse.FAILED("选课失败");
 
         BookedCourse bookedCourse = courseService.getBookedCourse(bookingId);
-        List<BookedCourseDto> bookedCourseDtos = buildBookedCourseDtos(user.getId(), Lists.newArrayList(bookedCourse));
-        if (bookedCourseDtos.isEmpty()) return MomiaHttpResponse.FAILED("选课失败");
+        List<BookedCourse> completedBookedCourses = completeBookedCourses(user.getId(), Lists.newArrayList(bookedCourse));
+        if (completedBookedCourses.isEmpty()) return MomiaHttpResponse.FAILED("选课失败");
 
-        return MomiaHttpResponse.SUCCESS(bookedCourseDtos.get(0));
+        return MomiaHttpResponse.SUCCESS(completedBookedCourses.get(0));
     }
 
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
@@ -564,61 +489,9 @@ public class CourseController extends BaseController {
             LOGGER.error("error when cancel booked course, {}", bookingId, e);
         }
 
-        List<BookedCourseDto> bookedCourseDtos = buildBookedCourseDtos(user.getId(), Lists.newArrayList(bookedCourse));
-        if (bookedCourseDtos.isEmpty()) return MomiaHttpResponse.FAILED("取消选课失败");
+        List<BookedCourse> completedBookedCourses = completeBookedCourses(user.getId(), Lists.newArrayList(bookedCourse));
+        if (completedBookedCourses.isEmpty()) return MomiaHttpResponse.FAILED("取消选课失败");
 
-        return MomiaHttpResponse.SUCCESS(bookedCourseDtos.get(0));
-    }
-
-    @RequestMapping(value = "/{coid}/favored", method = RequestMethod.GET)
-    public MomiaHttpResponse favored(@RequestParam(value = "uid") long userId, @PathVariable(value = "coid") long courseId) {
-        return MomiaHttpResponse.SUCCESS(favoriteService.isFavored(userId, Favorite.Type.COURSE, courseId));
-    }
-
-    @RequestMapping(value = "/{coid}/favor", method = RequestMethod.POST)
-    public MomiaHttpResponse favor(@RequestParam(value = "uid") long userId, @PathVariable(value = "coid") long courseId) {
-        return MomiaHttpResponse.SUCCESS(favoriteService.favor(userId, Favorite.Type.COURSE, courseId));
-    }
-
-    @RequestMapping(value = "/{coid}/unfavor", method = RequestMethod.POST)
-    public MomiaHttpResponse unfavor(@RequestParam(value = "uid") long userId, @PathVariable(value = "coid") long courseId) {
-        return MomiaHttpResponse.SUCCESS(favoriteService.unfavor(userId, Favorite.Type.COURSE, courseId));
-    }
-
-    @RequestMapping(value = "/favorite", method = RequestMethod.GET)
-    public MomiaHttpResponse favorite(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
-
-        long totalCount = favoriteService.queryFavoriteCount(userId, Favorite.Type.COURSE);
-        List<Favorite> favorites = favoriteService.queryFavorites(userId, Favorite.Type.COURSE, start, count);
-
-        PagedList<Favorite> pagedFavorites = new PagedList<Favorite>(totalCount, start, count);
-        pagedFavorites.setList(completeFavorites(favorites));
-
-        return MomiaHttpResponse.SUCCESS(pagedFavorites);
-    }
-
-    private List<Favorite> completeFavorites(List<Favorite> favorites) {
-        Set<Long> courseIds = new HashSet<Long>();
-        for (Favorite favorite: favorites) {
-            courseIds.add(favorite.getRefId());
-        }
-
-        List<Course> courses = courseService.list(courseIds);
-        Map<Long, CourseDto> coursesMap = new HashMap<Long, CourseDto>();
-        for (Course course : courses) {
-            coursesMap.put(course.getId(), buildBaseCourseDto(course));
-        }
-
-        List<Favorite> results = new ArrayList<Favorite>();
-        for (Favorite favorite : favorites) {
-            CourseDto course = coursesMap.get(favorite.getRefId());
-            if (course == null) continue;
-
-            favorite.setRef((JSONObject) JSON.toJSON(course));
-            results.add(favorite);
-        }
-
-        return results;
+        return MomiaHttpResponse.SUCCESS(completedBookedCourses.get(0));
     }
 }

@@ -1,5 +1,7 @@
 package cn.momia.service.course.base;
 
+import cn.momia.api.course.dto.BookedCourse;
+import cn.momia.api.course.dto.Course;
 import cn.momia.api.course.dto.CourseDetail;
 import cn.momia.api.course.dto.CourseSku;
 import cn.momia.api.course.dto.Institution;

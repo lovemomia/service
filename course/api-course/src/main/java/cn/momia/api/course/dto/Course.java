@@ -1,14 +1,9 @@
-package cn.momia.service.course.base;
+package cn.momia.api.course.dto;
 
-import cn.momia.api.course.dto.CourseSku;
-import cn.momia.api.course.dto.CourseSkuPlace;
-import cn.momia.common.api.exception.MomiaErrorException;
-import cn.momia.common.util.TimeUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -27,35 +22,40 @@ public class Course implements Cloneable {
         public static final int SOLD_OUT = 2;
     }
 
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("M月d日");
-
     private long id;
     private int type;
-    private long parentId;
+    @JSONField(serialize = false) private long parentId;
     private long subjectId;
+    private String subject;
     private String title;
     private String cover;
-    private int minAge;
-    private int maxAge;
+    @JSONField(serialize = false) private int minAge;
+    @JSONField(serialize = false) private int maxAge;
     private int insurance;
     private int joined;
     private BigDecimal price;
+    @JSONField(serialize = false) private int stock;
+    private int status;
+    private boolean buyable;
+
+    @JSONField(serialize = false) private List<CourseSku> skus = new ArrayList<CourseSku>();
+
+    // 非数据库字段
+    private String age;
+    private String scheduler;
+    @JSONField(serialize = false) private int regionId;
+    private String region;
+
     private String goal;
     private String flow;
     private String tips;
     private String notice;
-    private int institutionId;
+    @JSONField(serialize = false) private int institutionId;
     private String institution;
-
-    private int status;
 
     private List<String> imgs;
     private JSONObject book;
-    private List<CourseSku> skus = new ArrayList<CourseSku>();
-
-    private String subject;
-    private int stock;
-    private boolean buyable;
+    private CourseSkuPlace place;
 
     public long getId() {
         return id;
@@ -87,6 +87,14 @@ public class Course implements Cloneable {
 
     public void setSubjectId(long subjectId) {
         this.subjectId = subjectId;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 
     public String getTitle() {
@@ -121,12 +129,22 @@ public class Course implements Cloneable {
         this.maxAge = maxAge;
     }
 
+    @JSONField(serialize = false)
     public int getInsurance() {
         return insurance;
     }
 
+    @JSONField(deserialize = false)
     public void setInsurance(int insurance) {
         this.insurance = insurance;
+    }
+
+    public boolean isInsurance() {
+        return insurance == 1;
+    }
+
+    public void setInsurance(boolean insurance) {
+        this.insurance = insurance ? 1 : 0;
     }
 
     public int getJoined() {
@@ -143,6 +161,70 @@ public class Course implements Cloneable {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public boolean isBuyable() {
+        return buyable;
+    }
+
+    public void setBuyable(boolean buyable) {
+        this.buyable = buyable;
+    }
+
+    public List<CourseSku> getSkus() {
+        return skus;
+    }
+
+    public void setSkus(List<CourseSku> skus) {
+        this.skus = skus;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
+    }
+
+    public String getScheduler() {
+        return scheduler;
+    }
+
+    public void setScheduler(String scheduler) {
+        this.scheduler = scheduler;
+    }
+
+    public int getRegionId() {
+        return regionId;
+    }
+
+    public void setRegionId(int regionId) {
+        this.regionId = regionId;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
     }
 
     public String getGoal() {
@@ -193,14 +275,6 @@ public class Course implements Cloneable {
         this.institution = institution;
     }
 
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
     public List<String> getImgs() {
         return imgs;
     }
@@ -217,36 +291,12 @@ public class Course implements Cloneable {
         this.book = book;
     }
 
-    public List<CourseSku> getSkus() {
-        return skus;
+    public CourseSkuPlace getPlace() {
+        return place;
     }
 
-    public void setSkus(List<CourseSku> skus) {
-        this.skus = skus;
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
-    public int getStock() {
-        return stock;
-    }
-
-    public void setStock(int stock) {
-        this.stock = stock;
-    }
-
-    public boolean isBuyable() {
-        return buyable;
-    }
-
-    public void setBuyable(boolean buyable) {
-        this.buyable = buyable;
+    public void setPlace(CourseSkuPlace place) {
+        this.place = place;
     }
 
     @Override
@@ -262,6 +312,7 @@ public class Course implements Cloneable {
         return id > 0;
     }
 
+    @JSONField(serialize = false)
     public Date getStartTime() {
         Date now = new Date();
         List<Date> startTimes = new ArrayList<Date>();
@@ -273,6 +324,7 @@ public class Course implements Cloneable {
         return startTimes.isEmpty() ? null : startTimes.get(0);
     }
 
+    @JSONField(serialize = false)
     public Date getEndTime() {
         Date now = new Date();
         List<Date> endTimes = new ArrayList<Date>();
@@ -284,67 +336,12 @@ public class Course implements Cloneable {
         return endTimes.isEmpty() ? null : endTimes.get(endTimes.size() - 1);
     }
 
-    public int getRegionId() {
-        List<Integer> regionIds = new ArrayList<Integer>();
-        for (CourseSku sku : skus) {
-            CourseSkuPlace place = sku.getPlace();
-            int regionId = place.getRegionId();
-            if (!regionIds.contains(regionId)) regionIds.add(regionId);
-        }
-
-        if (regionIds.isEmpty()) return 0;
-        return regionIds.size() > 1 ? -1 : regionIds.get(0);
-    }
-
-    public String getAge() {
-        if (minAge <= 0 && maxAge <= 0) throw new MomiaErrorException("invalid age of course: " + id);
-        if (minAge <= 0) return maxAge + "岁";
-        if (maxAge <= 0) return minAge + "岁";
-        if (minAge == maxAge) return minAge + "岁";
-        return minAge + "-" + maxAge + "岁";
-    }
-
-    public String getScheduler() {
-        Date now = new Date();
-        List<Date> times = new ArrayList<Date>();
-        for (CourseSku sku : skus) {
-            if (sku.isAvaliable(now)) {
-                times.add(sku.getStartTime());
-                times.add(sku.getEndTime());
-            }
-        }
-        Collections.sort(times);
-
-        return format(times);
-    }
-
-    private String format(List<Date> times) {
-        if (times.isEmpty()) return "";
-        if (times.size() == 1) {
-            Date start = times.get(0);
-            return DATE_FORMAT.format(start) + " " + TimeUtil.getWeekDay(start);
-        } else {
-            Date start = times.get(0);
-            Date end = times.get(times.size() - 1);
-            if (TimeUtil.isSameDay(start, end)) {
-                return DATE_FORMAT.format(start) + " " + TimeUtil.getWeekDay(start);
-            } else {
-                return DATE_FORMAT.format(start) + "-" + DATE_FORMAT.format(end);
-            }
-        }
-    }
-
     public String getScheduler(long skuId) {
-        List<Date> times = new ArrayList<Date>();
         for (CourseSku sku : skus) {
-            if (sku.getId() == skuId) {
-                times.add(sku.getStartTime());
-                times.add(sku.getEndTime());
-            }
+            if (sku.getId() == skuId) return sku.getTime();
         }
-        Collections.sort(times);
 
-        return format(times);
+        return "";
     }
 
     public CourseSkuPlace getPlace(long skuId) {
@@ -353,5 +350,28 @@ public class Course implements Cloneable {
         }
 
         return null;
+    }
+
+    public static class Base extends Course {
+        protected Base() {
+
+        }
+
+        public Base(Course course) {
+            setId(course.getId());
+            setType(course.getType());
+            setSubjectId(course.getSubjectId());
+            setSubject(course.getSubject());
+            setTitle(course.getTitle());
+            setCover(course.getCover());
+            setAge(course.getAge());
+            setInsurance(course.isInsurance());
+            setJoined(course.getJoined());
+            setPrice(course.getPrice());
+            setScheduler(course.getScheduler());
+            setRegion(course.getRegion());
+            setStatus(course.getStatus());
+            setBuyable(course.isBuyable());
+        }
     }
 }

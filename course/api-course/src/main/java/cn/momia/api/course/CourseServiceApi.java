@@ -1,10 +1,10 @@
 package cn.momia.api.course;
 
-import cn.momia.api.course.dto.BookedCourseDto;
+import cn.momia.api.course.dto.BookedCourse;
+import cn.momia.api.course.dto.Course;
 import cn.momia.api.course.dto.CourseSku;
 import cn.momia.api.course.dto.UserCourseComment;
 import cn.momia.api.course.dto.CourseDetail;
-import cn.momia.api.course.dto.CourseDto;
 import cn.momia.api.course.dto.DatedCourseSkus;
 import cn.momia.api.course.dto.Favorite;
 import cn.momia.api.course.dto.Institution;
@@ -22,68 +22,68 @@ import java.util.Map;
 import java.util.Set;
 
 public class CourseServiceApi extends ServiceApi {
-    public PagedList<CourseDto> listRecommend(int cityId, int start, int count) {
+    public PagedList<Course> listRecommend(int cityId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
                 .add("start", start)
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/recommend"), builder.build());
 
-        return executeReturnPagedList(request, CourseDto.class);
+        return executeReturnPagedList(request, Course.class);
     }
 
-    public PagedList<CourseDto> listTrial(int cityId, int start, int count) {
+    public PagedList<Course> listTrial(int cityId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)
                 .add("start", start)
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/trial"), builder.build());
 
-        return executeReturnPagedList(request, CourseDto.class);
+        return executeReturnPagedList(request, Course.class);
     }
 
-    public CourseDto get(long courseId) {
-        return get(courseId, CourseDto.Type.FULL);
+    public Course get(long courseId) {
+        return get(courseId, Course.ShowType.FULL);
     }
 
-    public CourseDto get(long courseId, int type) {
+    public Course get(long courseId, int type) {
         return get(courseId, "", type);
     }
 
-    public CourseDto get(long courseId, String pos) {
-        return get(courseId, pos, CourseDto.Type.FULL);
+    public Course get(long courseId, String pos) {
+        return get(courseId, pos, Course.ShowType.FULL);
     }
 
-    public CourseDto get(long courseId, String pos, int type) {
+    public Course get(long courseId, String pos, int type) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("pos", pos)
                 .add("type", type);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d", courseId), builder.build());
 
-        return executeReturnObject(request, CourseDto.class);
+        return executeReturnObject(request, Course.class);
     }
 
-    public PagedList<CourseDto> listFinished(long userId, int start, int count) {
+    public PagedList<Course> listFinished(long userId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
                 .add("start", start)
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/finished/list"), builder.build());
 
-        return executeReturnPagedList(request, CourseDto.class);
+        return executeReturnPagedList(request, Course.class);
     }
 
-    public PagedList<CourseDto> query(long subjectId, int start, int count) {
+    public PagedList<Course> query(long subjectId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("suid", subjectId)
                 .add("start", start)
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/query"), builder.build());
 
-        return executeReturnPagedList(request, CourseDto.class);
+        return executeReturnPagedList(request, Course.class);
     }
 
-    public PagedList<CourseDto> query(long subjectId, long packageId, int minAge, int maxAge, int sortTypeId, int start, int count) {
+    public PagedList<Course> query(long subjectId, long packageId, int minAge, int maxAge, int sortTypeId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("suid", subjectId)
                 .add("pid", packageId)
@@ -94,7 +94,7 @@ public class CourseServiceApi extends ServiceApi {
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/query"), builder.build());
 
-        return executeReturnPagedList(request, CourseDto.class);
+        return executeReturnPagedList(request, Course.class);
     }
 
     public CourseDetail detail(long courseId) {
@@ -148,24 +148,24 @@ public class CourseServiceApi extends ServiceApi {
         return executeReturnList(request, DatedCourseSkus.class);
     }
 
-    public PagedList<BookedCourseDto> queryNotFinishedByUser(long userId, int start, int count) {
+    public PagedList<BookedCourse> queryNotFinishedByUser(long userId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
                 .add("start", start)
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/notfinished"), builder.build());
 
-        return executeReturnPagedList(request, BookedCourseDto.class);
+        return executeReturnPagedList(request, BookedCourse.class);
     }
 
-    public PagedList<BookedCourseDto> queryFinishedByUser(long userId, int start, int count) {
+    public PagedList<BookedCourse> queryFinishedByUser(long userId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
                 .add("start", start)
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/finished"), builder.build());
 
-        return executeReturnPagedList(request, BookedCourseDto.class);
+        return executeReturnPagedList(request, BookedCourse.class);
     }
 
     public boolean joined(long userId, long courseId) {
@@ -175,23 +175,23 @@ public class CourseServiceApi extends ServiceApi {
         return executeReturnObject(request, Boolean.class);
     }
 
-    public BookedCourseDto booking(String utoken, long packageId, long skuId) {
+    public BookedCourse booking(String utoken, long packageId, long skuId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("pid", packageId)
                 .add("sid", skuId);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/course/booking"), builder.build());
 
-        return executeReturnObject(request, BookedCourseDto.class);
+        return executeReturnObject(request, BookedCourse.class);
     }
 
-    public BookedCourseDto cancel(String utoken, long bookingId) {
+    public BookedCourse cancel(String utoken, long bookingId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("bid", bookingId);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/course/cancel"), builder.build());
 
-        return executeReturnObject(request, BookedCourseDto.class);
+        return executeReturnObject(request, BookedCourse.class);
     }
 
     public boolean comment(JSONObject commentJson) {

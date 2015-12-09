@@ -1,28 +1,38 @@
-package cn.momia.service.course.base;
+package cn.momia.api.course.dto;
 
 import cn.momia.common.util.TimeUtil;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.text.ParseException;
 import java.util.Date;
 
-public class BookedCourse {
+public class BookedCourse extends Course.Base {
     public static final BookedCourse NOT_EXIST_BOOKED_COURSE = new BookedCourse();
 
-    private long id;
-    private long userId;
-    private long orderId;
-    private long packageId;
-    private long courseId;
+    private long bookingId;
+    @JSONField(serialize = false) private long userId;
+    @JSONField(serialize = false) private long orderId;
+    @JSONField(serialize = false) private long packageId;
+    @JSONField(serialize = false) private long courseId;
     private long courseSkuId;
-    private Date startTime;
-    private Date endTime;
+    @JSONField(serialize = false) private Date startTime;
+    @JSONField(serialize = false) private Date endTime;
+    private boolean commented;
 
-    public long getId() {
-        return id;
+    public BookedCourse() {
+
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public BookedCourse(Course course) {
+        super(course);
+    }
+
+    public long getBookingId() {
+        return bookingId;
+    }
+
+    public void setBookingId(long bookingId) {
+        this.bookingId = bookingId;
     }
 
     public long getUserId() {
@@ -81,8 +91,16 @@ public class BookedCourse {
         this.endTime = endTime;
     }
 
+    public boolean isCommented() {
+        return commented;
+    }
+
+    public void setCommented(boolean commented) {
+        this.commented = commented;
+    }
+
     public boolean exists() {
-        return id > 0;
+        return bookingId > 0;
     }
 
     public boolean canCancel() {

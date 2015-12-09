@@ -2,10 +2,10 @@ package cn.momia.service.course.subject.impl;
 
 import cn.momia.api.base.MetaUtil;
 import cn.momia.api.base.dto.Region;
+import cn.momia.api.course.dto.Course;
 import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.common.util.TimeUtil;
-import cn.momia.service.course.base.Course;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.api.course.dto.Subject;
 import cn.momia.service.course.subject.SubjectService;
