@@ -681,8 +681,19 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public CourseDetail getDetail(long courseId) {
-        String sql = "SELECT Id, CourseId, Abstracts, Detail FROM SG_CourseDetail WHERE CourseId=? AND Status<>0";
-        return queryObject(sql, new Object[] { courseId }, CourseDetail.class, CourseDetail.NOT_EXIST_COURSE_DETAIL);
+        Set<Long> courseIds = Sets.newHashSet(courseId);
+        long parentId = getParentId(courseId);
+        if (parentId > 0) courseIds.add(parentId);
+
+        String sql = "SELECT Id, CourseId, Abstracts, Detail FROM SG_CourseDetail WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Status<>0";
+        List<CourseDetail> details = queryObjectList(sql, CourseDetail.class);
+
+        if (details.isEmpty()) return CourseDetail.NOT_EXIST_COURSE_DETAIL;
+        for (CourseDetail detail : details) {
+            if (detail.getCourseId() == courseId) return detail;
+        }
+
+        return details.get(0);
     }
 
     @Override
