@@ -31,7 +31,7 @@ public class Course implements Cloneable {
     private String cover;
     @JSONField(serialize = false) private int minAge;
     @JSONField(serialize = false) private int maxAge;
-    private int insurance;
+    private boolean insurance;
     private int joined;
     private BigDecimal price;
     @JSONField(serialize = false) private int stock;
@@ -129,22 +129,12 @@ public class Course implements Cloneable {
         this.maxAge = maxAge;
     }
 
-    @JSONField(serialize = false)
-    public int getInsurance() {
+    public boolean isInsurance() {
         return insurance;
     }
 
-    @JSONField(deserialize = false)
-    public void setInsurance(int insurance) {
-        this.insurance = insurance;
-    }
-
-    public boolean isInsurance() {
-        return insurance == 1;
-    }
-
     public void setInsurance(boolean insurance) {
-        this.insurance = insurance ? 1 : 0;
+        this.insurance = insurance;
     }
 
     public int getJoined() {
