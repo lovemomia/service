@@ -71,7 +71,6 @@ public class ImController extends BaseController {
         imUser.setId(userId);
         imUser.setNickName(user.getNickName());
         imUser.setAvatar(user.getAvatar());
-        imUser.setTeacher(user.isTeacher());
         imUser.setRole(user.getRole());
 
         return MomiaHttpResponse.SUCCESS(imUser);
@@ -150,7 +149,6 @@ public class ImController extends BaseController {
             imUser.setId(memberUser.getId());
             imUser.setNickName(memberUser.getNickName());
             imUser.setAvatar(memberUser.getAvatar());
-            imUser.setTeacher(member.getTeacher() == 1);
             imUser.setRole(memberUser.getRole());
 
             imUsers.add(imUser);
