@@ -146,11 +146,6 @@ public class UserServiceApi extends ServiceApi {
         return executeReturnObject(request, Contact.class);
     }
 
-    public boolean isTeacher(long userId) {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/user/%d/teacher", userId));
-        return executeReturnObject(request, Boolean.class);
-    }
-
     public boolean setPayed(long userId) {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/user/%d/payed", userId));
         return executeReturnObject(request, Boolean.class);

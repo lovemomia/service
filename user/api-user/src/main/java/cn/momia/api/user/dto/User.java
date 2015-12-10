@@ -15,6 +15,12 @@ public class User {
         public static final int FULL = 3;
     }
 
+    public static class Role {
+        public static final int NORMAL = 1;
+        public static final int TEACHER = 2;
+        public static final int ADMIN = 3;
+    }
+
     private long id;
     private String nickName;
     private String avatar;
@@ -180,6 +186,10 @@ public class User {
     public boolean isPayed() {
         if (payed == null) return true; // 默认按true处理
         return payed == 1;
+    }
+
+    public boolean isTeacher() {
+        return role == Role.TEACHER;
     }
 
     public static class Mini extends User {

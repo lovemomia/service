@@ -71,7 +71,8 @@ public class ImController extends BaseController {
         imUser.setId(userId);
         imUser.setNickName(user.getNickName());
         imUser.setAvatar(user.getAvatar());
-        imUser.setTeacher(userServiceApi.isTeacher(userId));
+        imUser.setTeacher(user.isTeacher());
+        imUser.setRole(user.getRole());
 
         return MomiaHttpResponse.SUCCESS(imUser);
     }
@@ -134,7 +135,7 @@ public class ImController extends BaseController {
             userIds.add(member.getUserId());
         }
 
-        List<User> users = userServiceApi.list(userIds, User.Type.MINI);
+        List<User> users = userServiceApi.list(userIds, User.Type.BASE);
         Map<Long, User> usersMap = new HashMap<Long, User>();
         for (User memberUser : users) {
             usersMap.put(memberUser.getId(), memberUser);
@@ -150,6 +151,7 @@ public class ImController extends BaseController {
             imUser.setNickName(memberUser.getNickName());
             imUser.setAvatar(memberUser.getAvatar());
             imUser.setTeacher(member.getTeacher() == 1);
+            imUser.setRole(memberUser.getRole());
 
             imUsers.add(imUser);
         }
@@ -163,7 +165,7 @@ public class ImController extends BaseController {
                                        @RequestParam(value = "sid") long courseSkuId) {
         if (courseId <= 0 || courseSkuId <= 0) return MomiaHttpResponse.BAD_REQUEST;
         User user = userServiceApi.get(utoken);
-        return MomiaHttpResponse.SUCCESS(imService.joinGroup(courseId, courseSkuId, user.getId(), userServiceApi.isTeacher(user.getId())));
+        return MomiaHttpResponse.SUCCESS(imService.joinGroup(courseId, courseSkuId, user.getId(), user.isTeacher()));
     }
 
     @RequestMapping(value = "/group/leave", method = RequestMethod.POST)

@@ -5,6 +5,7 @@ public class ImUser {
     private String nickName;
     private String avatar;
     private boolean teacher;
+    private int role;
 
     public long getId() {
         return id;
@@ -36,5 +37,13 @@ public class ImUser {
 
     public void setTeacher(boolean teacher) {
         this.teacher = teacher;
+    }
+
+    public int getRole() {
+        return role;
+    }
+
+    public void setRole(int role) {
+        this.role = role;
     }
 }
