@@ -131,19 +131,35 @@ public class CourseSku {
 
     public String getTime() {
         if (TimeUtil.isSameDay(startTime, endTime)) {
-            return TIME_FORMAT.format(startTime) + "-" + TIME_FORMAT.format(endTime);
+            return TIME_FORMAT.format(startTime) + " - " + TIME_FORMAT.format(endTime);
         } else {
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(startTime);
             calendar.add(Calendar.DATE, 1);
             Date nextDay = calendar.getTime();
             if (TimeUtil.isSameDay(nextDay, endTime)) {
-                return TIME_FORMAT.format(startTime) + "-次日" + TIME_FORMAT.format(endTime);
+                return TIME_FORMAT.format(startTime) + " - 次日 " + TIME_FORMAT.format(endTime);
             } else {
-                return TIME_FORMAT.format(startTime) + "-" + MONTH_DATE_FORMAT.format(endTime) + " " + TIME_FORMAT.format(endTime);
+                return TIME_FORMAT.format(startTime) + " - " + MONTH_DATE_FORMAT.format(endTime) + " " + TIME_FORMAT.format(endTime);
             }
         }
 
+    }
+
+    public String getScheduler() {
+        if (TimeUtil.isSameDay(startTime, endTime)) {
+            return MONTH_DATE_FORMAT.format(startTime) + " " + TimeUtil.getWeekDay(startTime) + " " + TIME_FORMAT.format(startTime);
+        } else {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(startTime);
+            calendar.add(Calendar.DATE, 1);
+            Date nextDay = calendar.getTime();
+            if (TimeUtil.isSameDay(nextDay, endTime)) {
+                return MONTH_DATE_FORMAT.format(startTime) + " " + TIME_FORMAT.format(startTime) + " - 次日 " + TIME_FORMAT.format(endTime);
+            } else {
+                return MONTH_DATE_FORMAT.format(startTime) + " " + TIME_FORMAT.format(startTime) + " - " + MONTH_DATE_FORMAT.format(endTime) + " " + TIME_FORMAT.format(endTime);
+            }
+        }
     }
 
     public int getStock() {

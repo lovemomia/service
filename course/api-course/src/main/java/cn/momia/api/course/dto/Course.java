@@ -328,7 +328,7 @@ public class Course implements Cloneable {
 
     public String getScheduler(long skuId) {
         for (CourseSku sku : skus) {
-            if (sku.getId() == skuId) return sku.getTime();
+            if (sku.getId() == skuId) return sku.getScheduler();
         }
 
         return "";
