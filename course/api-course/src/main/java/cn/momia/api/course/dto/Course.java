@@ -24,7 +24,7 @@ public class Course implements Cloneable {
 
     private long id;
     private int type;
-    @JSONField(serialize = false) private long parentId;
+    private long parentId;
     private long subjectId;
     private String subject;
     private String title;
@@ -349,6 +349,7 @@ public class Course implements Cloneable {
 
         public Base(Course course) {
             setId(course.getId());
+            setParentId(course.getParentId());
             setType(course.getType());
             setSubjectId(course.getSubjectId());
             setSubject(course.getSubject());

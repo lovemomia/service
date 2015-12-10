@@ -387,6 +387,7 @@ public class CourseController extends BaseController {
             BookedCourse completedBookedCourse = new BookedCourse(course);
             completedBookedCourse.setBookingId(bookedCourse.getBookingId());
             completedBookedCourse.setCourseSkuId(bookedCourse.getCourseSkuId());
+            completedBookedCourse.setParentCourseSkuId(bookedCourse.getParentCourseSkuId());
             if (commentBookingIds.contains(bookedCourse.getBookingId())) completedBookedCourse.setCommented(true);
             completedBookedCourse.setScheduler(course.getScheduler(bookedCourse.getCourseSkuId()));
             completedBookedCourse.setPlace(place);

@@ -15,6 +15,7 @@ public class BookedCourse extends Course.Base {
     @JSONField(serialize = false) private long packageId;
     @JSONField(serialize = false) private long courseId;
     private long courseSkuId;
+    private long parentCourseSkuId;
     @JSONField(serialize = false) private Date startTime;
     @JSONField(serialize = false) private Date endTime;
     private boolean commented;
@@ -73,6 +74,14 @@ public class BookedCourse extends Course.Base {
 
     public void setCourseSkuId(long courseSkuId) {
         this.courseSkuId = courseSkuId;
+    }
+
+    public long getParentCourseSkuId() {
+        return parentCourseSkuId;
+    }
+
+    public void setParentCourseSkuId(long parentCourseSkuId) {
+        this.parentCourseSkuId = parentCourseSkuId;
     }
 
     public Date getStartTime() {
