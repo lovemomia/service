@@ -32,6 +32,7 @@ public class User {
 
     private String token;
     private String imToken;
+    private Integer role;
 
     private List<Child> children;
 
@@ -155,6 +156,14 @@ public class User {
         this.imToken = imToken;
     }
 
+    public Integer getRole() {
+        return role;
+    }
+
+    public void setRole(Integer role) {
+        this.role = role;
+    }
+
     public List<Child> getChildren() {
         return children;
     }
@@ -202,6 +211,7 @@ public class User {
                 setToken(user.getToken());
                 setImToken(user.getImToken());
             }
+            setRole(user.getRole());
         }
     }
 
