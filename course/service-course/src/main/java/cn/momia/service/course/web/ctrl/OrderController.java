@@ -76,6 +76,7 @@ public class OrderController extends BaseController {
         if (order.isInvalid()) return false;
 
         User user = userServiceApi.get(order.getUserId());
+        if (!user.exists()) throw new MomiaErrorException("用户不存在");
         if (subjectService.isTrial(order.getSubjectId()) && (user.isPayed() || orderService.hasTrialOrder(user.getId()))) throw new MomiaErrorException("本课程包只供新用户专享");
 
         Map<Long, SubjectSku> skusMap = new HashMap<Long, SubjectSku>();
