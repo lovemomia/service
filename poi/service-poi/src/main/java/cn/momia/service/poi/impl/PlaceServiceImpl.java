@@ -2,7 +2,6 @@ package cn.momia.service.poi.impl;
 
 import cn.momia.api.poi.dto.Place;
 import cn.momia.common.service.AbstractService;
-import cn.momia.service.poi.PlaceImage;
 import cn.momia.service.poi.PlaceService;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
@@ -41,16 +40,11 @@ public class PlaceServiceImpl extends AbstractService implements PlaceService {
     private Map<Integer, List<String>> queryImgs(Collection<Integer> placeIds) {
         if (placeIds.isEmpty()) return new HashMap<Integer, List<String>>();
 
-        Map<Integer, List<String>> imgsMap = new HashMap<Integer, List<String>>();
+        String sql = "SELECT PlaceId, Url FROM SG_PlaceImg WHERE PlaceId IN (" + StringUtils.join(placeIds, ",") + ") AND Status<>0 ORDER BY AddTime DESC";
+        Map<Integer, List<String>> imgsMap = queryListMap(sql, Integer.class, String.class);
+
         for (int placeId : placeIds) {
-            imgsMap.put(placeId, new ArrayList<String>());
-        }
-
-        String sql = "SELECT Id, PlaceId, Url, Width, Height FROM SG_PlaceImg WHERE PlaceId IN (" + StringUtils.join(placeIds, ",") + ") AND Status<>0 ORDER BY AddTime DESC";
-        List<PlaceImage> imgs = queryObjectList(sql, PlaceImage.class);
-
-        for (PlaceImage img : imgs) {
-            imgsMap.get(img.getPlaceId()).add(img.getUrl());
+            if (!imgsMap.containsKey(placeId)) imgsMap.put(placeId, new ArrayList<String>());
         }
 
         return imgsMap;
