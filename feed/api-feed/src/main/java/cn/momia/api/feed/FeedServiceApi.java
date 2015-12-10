@@ -104,6 +104,13 @@ public class FeedServiceApi extends ServiceApi {
         return executeReturnObject(request, Boolean.class);
     }
 
+    public List<String> getLatestImgs(long userId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/feed/img"), builder.build());
+
+        return executeReturnList(request, String.class);
+    }
+
     public PagedList<UserFeedComment> listComments(long feedId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)

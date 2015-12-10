@@ -38,4 +38,6 @@ public interface FeedService {
     FeedTag query(String tagName);
     List<FeedTag> listRecommendedTags(int count);
     List<FeedTag> listHotTags(int count);
+
+    List<String> queryLatestImgs(long userId);
 }

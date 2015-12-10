@@ -237,4 +237,9 @@ public class FeedController extends BaseController {
         if (userId <= 0 || feedId <= 0) return MomiaHttpResponse.FAILED("无效的Feed");
         return MomiaHttpResponse.SUCCESS(feedService.delete(userId, feedId));
     }
+
+    @RequestMapping(value = "/img", method = RequestMethod.GET)
+    public MomiaHttpResponse getLatestImgs(@RequestParam(value = "uid") long userId) {
+        return MomiaHttpResponse.SUCCESS(feedService.queryLatestImgs(userId));
+    }
 }
