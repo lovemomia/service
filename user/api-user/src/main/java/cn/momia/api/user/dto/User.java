@@ -188,6 +188,7 @@ public class User {
         return payed == 1;
     }
 
+    @JSONField(serialize = false)
     public boolean isTeacher() {
         return role == Role.TEACHER;
     }
