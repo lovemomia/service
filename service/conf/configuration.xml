@@ -94,6 +94,7 @@
                 <UpdateGroup>https://api.cn.ronghub.com/group/refresh.json</UpdateGroup>
                 <JoinGroup>https://api.cn.ronghub.com/group/join.json</JoinGroup>
                 <LeaveGroup>https://api.cn.ronghub.com/group/quit.json</LeaveGroup>
+                <SystemPush>https://api.cn.ronghub.com/message/system/publish.json</SystemPush>
             </Service>
             <AppKey>0vnjpoadnwp2z</AppKey>
             <AppSecret>X44MIhxlhq</AppSecret>

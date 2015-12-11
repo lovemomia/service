@@ -5,4 +5,5 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean class="cn.momia.service.im.impl.ImServiceRongCloudImpl" parent="dbAccessService" />
+    <bean class="cn.momia.service.im.push.impl.PushServiceRongCloudImpl" parent="dbAccessService" />
 </beans>

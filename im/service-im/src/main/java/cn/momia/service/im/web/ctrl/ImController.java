@@ -8,6 +8,8 @@ import cn.momia.api.user.dto.User;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.im.ImService;
+import cn.momia.service.im.push.PushMsg;
+import cn.momia.service.im.push.PushService;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,7 @@ import java.util.Set;
 @RequestMapping("/im")
 public class ImController extends BaseController {
     @Autowired private ImService imService;
+    @Autowired private PushService pushService;
     @Autowired private UserServiceApi userServiceApi;
 
     @RequestMapping(value = "/token", method = RequestMethod.POST)
@@ -169,9 +172,19 @@ public class ImController extends BaseController {
     @RequestMapping(value = "/group/leave", method = RequestMethod.POST)
     public MomiaHttpResponse leaveGroup(@RequestParam String utoken,
                                         @RequestParam(value = "coid") long courseId,
-                                       @RequestParam(value = "sid") long courseSkuId) {
+                                        @RequestParam(value = "sid") long courseSkuId) {
         if (courseId <= 0 || courseSkuId <= 0) return MomiaHttpResponse.BAD_REQUEST;
         User user = userServiceApi.get(utoken);
         return MomiaHttpResponse.SUCCESS(imService.leaveGroup(courseId, courseSkuId, user.getId()));
+    }
+
+    @RequestMapping(value = "/push", method = RequestMethod.POST)
+    public MomiaHttpResponse push(@RequestParam String content, @RequestParam(required = false, defaultValue = "") String extra) {
+        if (StringUtils.isBlank(content)) return MomiaHttpResponse.BAD_REQUEST;
+
+        PushMsg msg = new PushMsg(content, extra);
+        pushService.push(msg);
+
+        return MomiaHttpResponse.SUCCESS;
     }
 }
