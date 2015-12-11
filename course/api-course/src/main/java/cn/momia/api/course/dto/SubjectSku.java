@@ -20,7 +20,7 @@ public class SubjectSku implements Cloneable {
     private int limit;
     private int status;
 
-    @JSONField(serialize = false) private int count;
+    private int count;
     private long courseId;
 
     public long getId() {
