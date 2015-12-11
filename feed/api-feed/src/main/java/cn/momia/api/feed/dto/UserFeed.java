@@ -22,6 +22,7 @@ public class UserFeed {
     private long userId;
     private String avatar = "";
     private String nickName;
+    private List<FeedChild> childrenDetail = new ArrayList<FeedChild>();
     private List<String> children = new ArrayList<String>();
     private boolean stared;
 
@@ -159,6 +160,14 @@ public class UserFeed {
 
     public void setNickName(String nickName) {
         this.nickName = nickName;
+    }
+
+    public List<FeedChild> getChildrenDetail() {
+        return childrenDetail;
+    }
+
+    public void setChildrenDetail(List<FeedChild> childrenDetail) {
+        this.childrenDetail = childrenDetail;
     }
 
     public List<String> getChildren() {

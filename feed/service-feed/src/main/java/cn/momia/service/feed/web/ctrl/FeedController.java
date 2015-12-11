@@ -1,5 +1,6 @@
 package cn.momia.service.feed.web.ctrl;
 
+import cn.momia.api.feed.dto.FeedChild;
 import cn.momia.api.feed.dto.UserFeed;
 import cn.momia.api.feed.dto.FeedTag;
 import cn.momia.api.user.dto.Child;
@@ -113,17 +114,35 @@ public class FeedController extends BaseController {
         userFeed.setUserId(user.getId());
         userFeed.setAvatar(user.getAvatar());
         userFeed.setNickName(user.getNickName());
-        userFeed.setChildren(formatChildren(user.getChildren()));
+
+        List<FeedChild> childrenDetail = formatChildrenDetail(user.getChildren());
+        List<String> children = formatChildren(childrenDetail);
+        userFeed.setChildrenDetail(childrenDetail);
+        userFeed.setChildren(children);
         userFeed.setStared(stared);
 
         return userFeed;
     }
 
-    private List<String> formatChildren(List<Child> children) {
-        List<String> formatedChildren = new ArrayList<String>();
+    private List<FeedChild> formatChildrenDetail(List<Child> children) {
+        List<FeedChild> feedChildren = new ArrayList<FeedChild>();
         for (int i = 0; i < Math.min(2, children.size()); i++) {
             Child child = children.get(i);
-            formatedChildren.add(child.getSex() + "孩" + TimeUtil.formatAge(child.getBirthday()));
+            FeedChild feedChild = new FeedChild();
+            feedChild.setSex(child.getSex());
+            feedChild.setName(child.getName());
+            feedChild.setAge(TimeUtil.formatAge(child.getBirthday()));
+
+            feedChildren.add(feedChild);
+        }
+
+        return feedChildren;
+    }
+
+    private List<String> formatChildren(List<FeedChild> childrenDetail) {
+        List<String> formatedChildren = new ArrayList<String>();
+        for (FeedChild child : childrenDetail) {
+            formatedChildren.add(child.getSex() + "孩" + child.getAge());
         }
 
         return formatedChildren;
