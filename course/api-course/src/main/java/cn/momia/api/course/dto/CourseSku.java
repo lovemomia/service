@@ -120,6 +120,11 @@ public class CourseSku {
     }
 
     @JSONField(serialize = false)
+    public String getRoute() {
+        return place == null ? "" : place.getRoute();
+    }
+
+    @JSONField(serialize = false)
     public int getJoinCount() {
         return adult + child;
     }

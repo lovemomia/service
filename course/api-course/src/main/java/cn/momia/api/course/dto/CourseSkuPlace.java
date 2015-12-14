@@ -8,6 +8,7 @@ public class CourseSkuPlace {
     private String address;
     private double lng;
     private double lat;
+    private String route;
     private String scheduler;
 
     public int getId() {
@@ -64,6 +65,14 @@ public class CourseSkuPlace {
 
     public void setLat(double lat) {
         this.lat = lat;
+    }
+
+    public String getRoute() {
+        return route;
+    }
+
+    public void setRoute(String route) {
+        this.route = route;
     }
 
     public String getScheduler() {

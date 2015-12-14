@@ -272,6 +272,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         courseSkuPlace.setAddress(place.getAddress());
         courseSkuPlace.setLng(place.getLng());
         courseSkuPlace.setLat(place.getLat());
+        courseSkuPlace.setRoute(place.getRoute());
 
         return courseSkuPlace;
     }

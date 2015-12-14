@@ -14,6 +14,7 @@ public class Place {
     private String cover;
     private double lng;
     private double lat;
+    private String route;
 
     private List<String> imgs;
 
@@ -87,6 +88,14 @@ public class Place {
 
     public void setLat(double lat) {
         this.lat = lat;
+    }
+
+    public String getRoute() {
+        return route;
+    }
+
+    public void setRoute(String route) {
+        this.route = route;
     }
 
     public List<String> getImgs() {
