@@ -26,7 +26,7 @@ public class PlaceServiceImpl extends AbstractService implements PlaceService {
     public List<Place> list(Collection<Integer> placeIds) {
         if (placeIds.isEmpty()) return new ArrayList<Place>();
 
-        String sql = "SELECT Id, CityId, RegionId, Name, Address, `Desc`, Cover, Lng, Lat FROM SG_Place WHERE Id IN (" + StringUtils.join(placeIds, ",") + ") AND Status<>0";
+        String sql = "SELECT Id, CityId, RegionId, Name, Address, `Desc`, Cover, Lng, Lat, Route FROM SG_Place WHERE Id IN (" + StringUtils.join(placeIds, ",") + ") AND Status<>0";
         List<Place> places = queryObjectList(sql, Place.class);
 
         Map<Integer, List<String>> imgsMap = queryImgs(placeIds);
