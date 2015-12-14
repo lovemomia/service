@@ -4,6 +4,7 @@ import cn.momia.api.user.dto.Child;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.api.util.CastUtil;
+import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.user.base.UserService;
 import cn.momia.service.user.child.ChildService;
 import com.alibaba.fastjson.JSON;
@@ -20,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/user/child")
-public class ChildController {
+public class ChildController extends BaseController {
     @Autowired private ChildService childService;
     @Autowired private UserService userService;
 

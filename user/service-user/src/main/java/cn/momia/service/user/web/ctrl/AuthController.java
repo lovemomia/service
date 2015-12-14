@@ -3,6 +3,7 @@ package cn.momia.service.user.web.ctrl;
 import cn.momia.api.base.SmsServiceApi;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.user.base.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthController {
+public class AuthController extends BaseController {
     @Autowired private SmsServiceApi smsServiceApi;
     @Autowired private UserService userService;
 

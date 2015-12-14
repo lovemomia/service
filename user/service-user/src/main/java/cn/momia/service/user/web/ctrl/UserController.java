@@ -3,6 +3,7 @@ package cn.momia.service.user.web.ctrl;
 import cn.momia.api.user.dto.Contact;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.user.base.UserService;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
@@ -20,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/user")
-public class UserController {
+public class UserController extends BaseController {
     @Autowired private UserService userService;
 
     @RequestMapping(method = RequestMethod.GET)
