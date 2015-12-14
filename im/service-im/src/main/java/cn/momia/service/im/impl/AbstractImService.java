@@ -36,20 +36,47 @@ public abstract class AbstractImService extends AbstractService implements ImSer
 
     private void logGroup(long groupId, String groupName, long courseId, long courseSkuId) {
         try {
-            String sql = "INSERT INTO SG_ImGroup (GroupId, GroupName, CourseId, CourseSkuId, AddTime) VALUES (?, ?, ?, ?, NOW())";
-            update(sql, new Object[] { groupId, groupName, courseId, courseSkuId });
+            if (exists(groupId)) {
+                String sql = "UPDATE SG_ImGroup SET GroupName=?, CourseId=?, CourseSkuId=?, Status=1 WHERE GroupId=?";
+                update(sql, new Object[] { groupName, courseId, courseSkuId, groupId });
+            } else {
+                String sql = "INSERT INTO SG_ImGroup (GroupId, GroupName, CourseId, CourseSkuId, AddTime) VALUES (?, ?, ?, ?, NOW())";
+                update(sql, new Object[] { groupId, groupName, courseId, courseSkuId });
+            }
         } catch (Exception e) {
             LOGGER.error("fail to log group info for group: {}", groupId, e);
         }
     }
 
+    private boolean exists(long groupId) {
+        String sql = "SELECT COUNT(1) FROM SG_ImGroup WHERE GroupId=?";
+        return queryInt(sql, new Object[] { groupId }) > 0;
+    }
+
     private void logGroupMembers(long groupId, Collection<Long> userIds, boolean teacher) {
+        Set<Long> existUserIds = Sets.newHashSet(getExistUserIds(groupId, userIds));
+        if (!existUserIds.isEmpty()) {
+            String sql = "UPDATE SG_ImGroupMember SET Status=1 WHERE GroupId=? AND UserId=?";
+            List<Object[]> args = new ArrayList<Object[]>();
+            for (long userId : userIds) {
+                args.add(new Object[] { groupId, userId });
+            }
+            batchUpdate(sql, args);
+        }
+
         String sql = "INSERT INTO SG_ImGroupMember (GroupId, UserId, Teacher, AddTime) VALUES (?, ?, ?, NOW())";
         List<Object[]> args = new ArrayList<Object[]>();
         for (long userId : userIds) {
-            args.add(new Object[] { groupId, userId, teacher });
+            if (!existUserIds.contains(userId)) args.add(new Object[] { groupId, userId, teacher });
         }
         batchUpdate(sql, args);
+    }
+
+    private List<Long> getExistUserIds(long groupId, Collection<Long> userIds) {
+        if (userIds.isEmpty()) return new ArrayList<Long>();
+
+        String sql = "SELECT UserId FROM SG_ImGroupMember WHERE GroupId=? AND UserId IN (" + StringUtils.join(userIds, ",") + ")";
+        return queryLongList(sql, new Object[] { groupId });
     }
 
     @Override
@@ -93,7 +120,7 @@ public abstract class AbstractImService extends AbstractService implements ImSer
 
     @Override
     public List<Member> queryMembersByGroup(long groupId) {
-        String sql = "SELECT Id FROM SG_ImGroupMember WHERE GroupId=? AND Status<>0 ORDER BY Teacher DESC, AddTime ASC";
+        String sql = "SELECT Id FROM SG_ImGroupMember WHERE GroupId=? AND Status<>0 GROUP BY UserId ORDER BY MAX(Teacher) DESC, MAX(AddTime) ASC";
         List<Long> memberIds = queryLongList(sql, new Object[] { groupId });
 
         return listMembers(memberIds);
@@ -121,7 +148,7 @@ public abstract class AbstractImService extends AbstractService implements ImSer
 
     @Override
     public List<Member> queryMembersByUser(long userId) {
-        String sql = "SELECT Id FROM SG_ImGroupMember WHERE UserId=? AND Status<>0 ORDER BY AddTime ASC";
+        String sql = "SELECT Id FROM SG_ImGroupMember WHERE UserId=? AND Status<>0 GROUP BY GroupId ORDER BY MAX(AddTime) ASC";
         List<Long> memberIds = queryLongList(sql, new Object[] { userId });
 
         return listMembers(memberIds);
