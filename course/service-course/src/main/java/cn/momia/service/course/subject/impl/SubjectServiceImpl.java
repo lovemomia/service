@@ -65,8 +65,12 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
         for (long subjectId : subjectIds) {
             Subject subject = subjectsMap.get(subjectId);
             if (subject != null) {
-                int stock = subject.getStock();
-                subject.setStatus((stock == -1 || stock > 0) ? Subject.Status.OK : Subject.Status.SOLD_OUT);
+                if (subject.getType() == Subject.Type.NORMAL) {
+                    subject.setStatus(Subject.Status.OK);
+                } else {
+                    int stock = subject.getStock();
+                    subject.setStatus(stock > 0 ? Subject.Status.OK : Subject.Status.SOLD_OUT);
+                }
 
                 SubjectSku minPriceSku = getMinPriceSku(subject);
                 subject.setPrice(minPriceSku.getPrice());
