@@ -4,7 +4,7 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="childService" class="cn.momia.service.user.base.child.impl.ChildServiceImpl" parent="dbAccessService" />
+    <bean id="childService" class="cn.momia.service.user.child.impl.ChildServiceImpl" parent="dbAccessService" />
     <bean id="userService" class="cn.momia.service.user.base.impl.UserServiceImpl" parent="dbAccessService">
         <property name="childService" ref="childService" />
     </bean>

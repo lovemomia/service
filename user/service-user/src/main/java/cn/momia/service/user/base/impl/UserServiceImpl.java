@@ -1,13 +1,13 @@
 package cn.momia.service.user.base.impl;
 
-import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.api.user.dto.Child;
+import cn.momia.api.user.dto.User;
+import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.config.Configuration;
-import cn.momia.service.user.base.User;
-import cn.momia.service.user.base.child.Child;
 import cn.momia.service.user.base.UserService;
-import cn.momia.service.user.base.child.ChildService;
+import cn.momia.service.user.child.ChildService;
 import com.google.common.collect.Sets;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -70,7 +70,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
 
             return new String(encryptedBase64);
         } catch (Exception e) {
-            throw new MomiaFailedException("fail to excrypt password of user: " + mobile, e);
+            throw new MomiaErrorException("fail to excrypt password of user: " + mobile, e);
         }
     }
 
@@ -79,7 +79,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
     }
 
     private String generateInviteCode(String nickName, String mobile) {
-        return DigestUtils.md5Hex(StringUtils.join(new String[] { nickName, mobile, TimeUtil.STANDARD_FORMAT.format(new Date()), Configuration.getString("SecretKey.UToken") }, "|"));
+        return DigestUtils.md5Hex(StringUtils.join(new String[] { nickName, mobile, TimeUtil.STANDARD_DATE_FORMAT.format(new Date()), Configuration.getString("SecretKey.UToken") }, "|"));
     }
 
     @Override
@@ -96,7 +96,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
         List<Long> userIds = queryLongList(sql, new Object[] { token });
         List<User> users = list(userIds);
 
-        return userIds.isEmpty() ? User.NOT_EXIST_USER : users.get(0);
+        return users.isEmpty() ? User.NOT_EXIST_USER : users.get(0);
     }
 
     @Override
@@ -105,7 +105,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
         List<Long> userIds = queryLongList(sql, new Object[] { mobile });
         List<User> users = list(userIds);
 
-        return userIds.isEmpty() ? User.NOT_EXIST_USER : users.get(0);
+        return users.isEmpty() ? User.NOT_EXIST_USER : users.get(0);
     }
 
     @Override
@@ -114,14 +114,14 @@ public class UserServiceImpl extends AbstractService implements UserService {
         List<Long> userIds = queryLongList(sql, new Object[] { inviteCode });
         List<User> users = list(userIds);
 
-        return userIds.isEmpty() ? User.NOT_EXIST_USER : users.get(0);
+        return users.isEmpty() ? User.NOT_EXIST_USER : users.get(0);
     }
 
     @Override
     public List<User> list(Collection<Long> userIds) {
         if (userIds.isEmpty()) return new ArrayList<User>();
 
-        String sql = "SELECT Id, NickName, Avatar, Mobile, Cover, Name, Sex, Birthday, CityId, RegionId, Address, Payed, InviteCode, Token FROM SG_User WHERE Id IN (" + StringUtils.join(userIds, ",") + ") AND Status<>0";
+        String sql = "SELECT Id, NickName, Avatar, Mobile, Cover, Name, Sex, Birthday, CityId, RegionId, Address, Payed, InviteCode, Token, ImToken, Role FROM SG_User WHERE Id IN (" + StringUtils.join(userIds, ",") + ") AND Status<>0";
         List<User> users = queryObjectList(sql, User.class);
 
         Map<Long, List<Child>> childrenMap = childService.queryByUsers(userIds);
@@ -134,7 +134,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
 
     @Override
     public boolean updateNickName(long userId, String nickName) {
-        if (exists("nickName", nickName)) throw new MomiaFailedException("昵称已存在，不能使用");
+        if (exists("nickName", nickName)) throw new MomiaErrorException("昵称已存在，不能使用");
 
         String sql = "UPDATE SG_User SET NickName=? WHERE Id=?";
         return update(sql, new Object[] { nickName, userId });
@@ -186,6 +186,12 @@ public class UserServiceImpl extends AbstractService implements UserService {
     public boolean updateAddress(long userId, String address) {
         String sql = "UPDATE SG_User SET Address=? WHERE Id=?";
         return update(sql, new Object[] { address, userId });
+    }
+
+    @Override
+    public boolean updateImToken(long userId, String imToken) {
+        String sql = "UPDATE SG_User SET ImToken=? WHERE Id=?";
+        return update(sql, new Object[] { imToken, userId });
     }
 
     @Override

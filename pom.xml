@@ -17,6 +17,7 @@
         <module>course</module>
         <module>event</module>
         <module>feed</module>
+        <module>im</module>
         <module>poi</module>
         <module>user</module>
 

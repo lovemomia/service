@@ -1,6 +1,6 @@
 package cn.momia.service.base.sms.impl;
 
-import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.base.sms.SmsSender;
@@ -35,7 +35,7 @@ public class SmsServiceImpl extends AbstractService implements SmsService {
     private void checkFrequency(String mobile) {
         Date lastSendTime = getLastSendTime(mobile);
         if (lastSendTime != null && new Date().getTime() - lastSendTime.getTime() < 60 * 1000)
-            throw new MomiaFailedException("发送频率过快，请稍后再试");
+            throw new MomiaErrorException("发送频率过快，请稍后再试");
     }
 
     private Date getLastSendTime(String mobile) {

@@ -4,5 +4,5 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="poiService" class="cn.momia.service.poi.impl.PlaceServiceImpl" parent="dbAccessService" />
+    <bean class="cn.momia.service.poi.impl.PlaceServiceImpl" parent="dbAccessService" />
 </beans>

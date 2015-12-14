@@ -4,10 +4,13 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean class="cn.momia.service.course.base.impl.CourseServiceImpl" parent="dbAccessService">
+    <bean id="courseService" class="cn.momia.service.course.base.impl.CourseServiceImpl" parent="dbAccessService">
         <property name="poiServiceApi" ref="poiServiceApi" />
     </bean>
-    <bean id="subjectService" class="cn.momia.service.course.subject.impl.SubjectServiceImpl" parent="dbAccessService" />
+    <bean class="cn.momia.service.course.comment.impl.CourseCommentServiceImpl" parent="dbAccessService" />
+    <bean class="cn.momia.service.course.subject.impl.SubjectServiceImpl" parent="dbAccessService">
+        <property name="courseService" ref="courseService" />
+    </bean>
     <bean class="cn.momia.service.course.order.impl.OrderServiceImpl" parent="dbAccessService" />
     <bean class="cn.momia.service.course.coupon.impl.CouponServiceImpl" parent="dbAccessService" />
     <bean class="cn.momia.service.course.favorite.impl.FavoriteServiceImpl" parent="dbAccessService" />

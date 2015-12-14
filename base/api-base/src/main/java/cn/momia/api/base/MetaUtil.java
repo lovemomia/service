@@ -1,9 +1,9 @@
 package cn.momia.api.base;
 
-import cn.momia.api.base.dto.AgeRangeDto;
-import cn.momia.api.base.dto.RegionDto;
-import cn.momia.api.base.dto.CityDto;
-import cn.momia.api.base.dto.SortTypeDto;
+import cn.momia.api.base.dto.AgeRange;
+import cn.momia.api.base.dto.Region;
+import cn.momia.api.base.dto.City;
+import cn.momia.api.base.dto.SortType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,13 +21,13 @@ public class MetaUtil {
 
     private static Date lastReloadTime = null;
 
-    private static List<AgeRangeDto> ageRangesCache = new ArrayList<AgeRangeDto>();
-    private static List<SortTypeDto> sortTypesCache = new ArrayList<SortTypeDto>();
+    private static List<AgeRange> ageRangesCache = new ArrayList<AgeRange>();
+    private static List<SortType> sortTypesCache = new ArrayList<SortType>();
 
-    private static Map<Integer, AgeRangeDto> ageRangesMap = new HashMap<Integer, AgeRangeDto>();
-    private static Map<Integer, CityDto> citiesMap = new HashMap<Integer, CityDto>();
-    private static Map<Integer, RegionDto> regionsMap = new HashMap<Integer, RegionDto>();
-    private static Map<Integer, SortTypeDto> sortTypesMap = new HashMap<Integer, SortTypeDto>();
+    private static Map<Integer, AgeRange> ageRangesMap = new HashMap<Integer, AgeRange>();
+    private static Map<Integer, City> citiesMap = new HashMap<Integer, City>();
+    private static Map<Integer, Region> regionsMap = new HashMap<Integer, Region>();
+    private static Map<Integer, SortType> sortTypesMap = new HashMap<Integer, SortType>();
 
     public void setAgeRangeServiceApi(AgeRangeServiceApi ageRangeServiceApi) {
         MetaUtil.ageRangeServiceApi = ageRangeServiceApi;
@@ -49,39 +49,39 @@ public class MetaUtil {
         if (!isOutOfDate()) return;
 
         try {
-            List<AgeRangeDto> newAgeRanges = ageRangeServiceApi.listAll();
-            newAgeRanges.add(AgeRangeDto.DEFAULT);
-            Collections.sort(newAgeRanges, new Comparator<AgeRangeDto>() {
+            List<AgeRange> newAgeRanges = ageRangeServiceApi.listAll();
+            newAgeRanges.add(AgeRange.DEFAULT);
+            Collections.sort(newAgeRanges, new Comparator<AgeRange>() {
                 @Override
-                public int compare(AgeRangeDto ageRange1, AgeRangeDto ageRange2) {
+                public int compare(AgeRange ageRange1, AgeRange ageRange2) {
                     return ageRange1.getId() - ageRange2.getId();
                 }
             });
-            Map<Integer, AgeRangeDto> newAgeRangesMap = new HashMap<Integer, AgeRangeDto>();
-            for (AgeRangeDto ageRange : newAgeRanges) {
+            Map<Integer, AgeRange> newAgeRangesMap = new HashMap<Integer, AgeRange>();
+            for (AgeRange ageRange : newAgeRanges) {
                 newAgeRangesMap.put(ageRange.getId(), ageRange);
             }
 
-            Map<Integer, CityDto> newCitiesMap = new HashMap<Integer, CityDto>();
-            for (CityDto city : cityServiceApi.listAll()) {
+            Map<Integer, City> newCitiesMap = new HashMap<Integer, City>();
+            for (City city : cityServiceApi.listAll()) {
                 newCitiesMap.put(city.getId(), city);
             }
 
-            Map<Integer, RegionDto> newRegionsMap = new HashMap<Integer, RegionDto>();
-            for (RegionDto region : regionServiceApi.listAll()) {
+            Map<Integer, Region> newRegionsMap = new HashMap<Integer, Region>();
+            for (Region region : regionServiceApi.listAll()) {
                 newRegionsMap.put(region.getId(), region);
             }
 
-            List<SortTypeDto> newSortTypes = sortTypeServiceApi.listAll();
-            newSortTypes.add(SortTypeDto.DEFAULT);
-            Collections.sort(newSortTypes, new Comparator<SortTypeDto>() {
+            List<SortType> newSortTypes = sortTypeServiceApi.listAll();
+            newSortTypes.add(SortType.DEFAULT);
+            Collections.sort(newSortTypes, new Comparator<SortType>() {
                 @Override
-                public int compare(SortTypeDto sortType1, SortTypeDto sortType2) {
+                public int compare(SortType sortType1, SortType sortType2) {
                     return sortType1.getId() - sortType2.getId();
                 }
             });
-            Map<Integer, SortTypeDto> newSortTypesMap = new HashMap<Integer, SortTypeDto>();
-            for (SortTypeDto sortType : newSortTypes) {
+            Map<Integer, SortType> newSortTypesMap = new HashMap<Integer, SortType>();
+            for (SortType sortType : newSortTypes) {
                 newSortTypesMap.put(sortType.getId(), sortType);
             }
 
@@ -103,41 +103,41 @@ public class MetaUtil {
         return lastReloadTime == null || lastReloadTime.before(new Date(new Date().getTime() - 24 * 60 * 60 * 1000));
     }
 
-    public static List<AgeRangeDto> listAgeRanges() {
+    public static List<AgeRange> listAgeRanges() {
         return ageRangesCache;
     }
 
-    public static AgeRangeDto getAgeRange(int ageRangeId) {
+    public static AgeRange getAgeRange(int ageRangeId) {
         if (isOutOfDate()) reload();
 
-        AgeRangeDto ageRange = ageRangesMap.get(ageRangeId);
-        return ageRange == null ? AgeRangeDto.DEFAULT : ageRange;
+        AgeRange ageRange = ageRangesMap.get(ageRangeId);
+        return ageRange == null ? AgeRange.DEFAULT : ageRange;
     }
 
     public static String getCityName(int cityId) {
         if (isOutOfDate()) reload();
 
-        CityDto city = citiesMap.get(cityId);
+        City city = citiesMap.get(cityId);
         return city == null ? "" : city.getName();
     }
 
     public static String getRegionName(int regionId) {
         if (isOutOfDate()) reload();
 
-        if (regionId == RegionDto.MULTI_REGION_ID) return "多商区";
+        if (regionId == Region.MULTI_REGION_ID) return "多商区";
 
-        RegionDto region = regionsMap.get(regionId);
+        Region region = regionsMap.get(regionId);
         return region == null ? "" : region.getName();
     }
 
-    public static List<SortTypeDto> listSortTypes() {
+    public static List<SortType> listSortTypes() {
         return sortTypesCache;
     }
 
-    public static SortTypeDto getSortType(int sortTypeId) {
+    public static SortType getSortType(int sortTypeId) {
         if (isOutOfDate()) reload();
 
-        SortTypeDto sortType = sortTypesMap.get(sortTypeId);
-        return sortType == null ? SortTypeDto.DEFAULT : sortType;
+        SortType sortType = sortTypesMap.get(sortTypeId);
+        return sortType == null ? SortType.DEFAULT : sortType;
     }
 }

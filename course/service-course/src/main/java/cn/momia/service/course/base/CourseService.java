@@ -1,5 +1,12 @@
 package cn.momia.service.course.base;
 
+import cn.momia.api.course.dto.BookedCourse;
+import cn.momia.api.course.dto.Course;
+import cn.momia.api.course.dto.CourseDetail;
+import cn.momia.api.course.dto.CourseSku;
+import cn.momia.api.course.dto.Institution;
+import cn.momia.api.course.dto.Teacher;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -63,18 +70,11 @@ public interface CourseService {
     CourseDetail getDetail(long courseId);
     Institution getInstitution(long courseId);
 
+    Map<Long, String> queryTips(Collection<Long> courseIds);
+
     boolean matched(long subjectId, long courseId);
 
     boolean joined(long userId, long courseId);
 
     boolean finished(long userId, long bookingId, long courseId);
-    boolean isCommented(long userId, long bookingId);
-    boolean comment(CourseComment comment);
-
-    long queryCommentCountByCourse(long courseId);
-    List<CourseComment> queryCommentsByCourse(long courseId, int start, int count);
-    long queryCommentCountBySubject(long subjectId);
-    List<CourseComment> queryCommentsBySubject(long subjectId, int start, int count);
-
-    List<Long> queryCommentedBookingIds(long userId, Collection<Long> courseIds);
 }

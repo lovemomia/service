@@ -1,12 +1,12 @@
 package cn.momia.service.course.coupon.impl;
 
-import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.service.course.coupon.Coupon;
 import cn.momia.service.course.coupon.CouponService;
 import cn.momia.service.course.coupon.InviteCoupon;
-import cn.momia.service.course.coupon.UserCoupon;
+import cn.momia.api.course.dto.UserCoupon;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -25,6 +25,7 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
     private static final Logger LOGGER = LoggerFactory.getLogger(CouponServiceImpl.class);
 
     private static final int COUPON_SRC_INVITE = 1;
+    private static final int COUPON_SRC_FIRST_PAY = 2;
 
     private static final int NOT_USED_STATUS = 1;
     private static final int USED_STATUS = 2;
@@ -49,10 +50,15 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
             userCouponsMap.put(userCoupon.getId(), userCoupon);
         }
 
+        Date now = new Date();
         List<UserCoupon> result = new ArrayList<UserCoupon>();
         for (long userCouponId : userCouponIds) {
             UserCoupon userCoupon = userCouponsMap.get(userCouponId);
-            if (userCoupon != null) result.add(userCoupon);
+            if (userCoupon != null) {
+                int status = userCoupon.getStatus();
+                if (status == UserCoupon.Status.USED && userCoupon.getEndTime().before(now)) userCoupon.setStatus(UserCoupon.Status.EXPIRED);
+                result.add(userCoupon);
+            }
         }
 
         return result;
@@ -151,7 +157,7 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
         List<Coupon> coupons = listCoupons(couponIds);
         if (!coupons.isEmpty()) return addInviteCoupon(mobile, inviteCode, coupons.get(0));
 
-        throw new MomiaFailedException("不能再领取了，活动已经结束了哦");
+        throw new MomiaErrorException("不能再领取了，活动已经结束了哦");
     }
 
     private List<Coupon> listCoupons(Collection<Integer> couponIds) {
@@ -227,5 +233,20 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
 
         String sql = "INSERT INTO SG_UserCoupon (UserId, CouponId, StartTime, EndTime, InviteCode, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
         batchUpdate(sql, args);
+    }
+
+    @Override
+    public void distributeFirstPayUserCoupon(long userId) {
+        List<Coupon> coupons = listFirstPayCoupons();
+        if (coupons.isEmpty()) return;
+
+        addUserCoupons(userId, "", coupons);
+    }
+
+    private List<Coupon> listFirstPayCoupons() {
+        String sql = "SELECT Id FROM SG_Coupon WHERE Src=? AND OnlineTime<=NOW() AND OfflineTime>NOW() AND Status<>0 ORDER BY AddTime DESC LIMIT 1";
+        List<Integer> couponIds = queryIntList(sql, new Object[] { COUPON_SRC_FIRST_PAY });
+
+        return listCoupons(couponIds);
     }
 }

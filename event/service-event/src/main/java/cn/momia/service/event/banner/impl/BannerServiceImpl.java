@@ -1,7 +1,7 @@
 package cn.momia.service.event.banner.impl;
 
+import cn.momia.api.event.dto.Banner;
 import cn.momia.common.service.AbstractService;
-import cn.momia.service.event.banner.Banner;
 import cn.momia.service.event.banner.BannerService;
 
 import java.util.List;

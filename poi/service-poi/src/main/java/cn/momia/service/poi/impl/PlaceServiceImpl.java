@@ -1,8 +1,7 @@
 package cn.momia.service.poi.impl;
 
+import cn.momia.api.poi.dto.Place;
 import cn.momia.common.service.AbstractService;
-import cn.momia.service.poi.Place;
-import cn.momia.service.poi.PlaceImage;
 import cn.momia.service.poi.PlaceService;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
@@ -27,29 +26,25 @@ public class PlaceServiceImpl extends AbstractService implements PlaceService {
     public List<Place> list(Collection<Integer> placeIds) {
         if (placeIds.isEmpty()) return new ArrayList<Place>();
 
-        String sql = "SELECT Id, CityId, RegionId, Name, Address, `Desc`, Cover, Lng, Lat FROM SG_Place WHERE Id IN (" + StringUtils.join(placeIds, ",") + ") AND Status<>0";
+        String sql = "SELECT Id, CityId, RegionId, Name, Address, `Desc`, Cover, Lng, Lat, Route FROM SG_Place WHERE Id IN (" + StringUtils.join(placeIds, ",") + ") AND Status<>0";
         List<Place> places = queryObjectList(sql, Place.class);
 
-        Map<Integer, List<PlaceImage>> placeImgsMap = queryImgs(placeIds);
+        Map<Integer, List<String>> imgsMap = queryImgs(placeIds);
         for (Place place : places) {
-            place.setImgs(placeImgsMap.get(place.getId()));
+            place.setImgs(imgsMap.get(place.getId()));
         }
 
         return places;
     }
 
-    private Map<Integer, List<PlaceImage>> queryImgs(Collection<Integer> placeIds) {
-        if (placeIds.isEmpty()) return new HashMap<Integer, List<PlaceImage>>();
+    private Map<Integer, List<String>> queryImgs(Collection<Integer> placeIds) {
+        if (placeIds.isEmpty()) return new HashMap<Integer, List<String>>();
 
-        String sql = "SELECT Id, PlaceId, Url, Width, Height FROM SG_PlaceImg WHERE PlaceId IN (" + StringUtils.join(placeIds, ",") + ") AND Status<>0 ORDER BY AddTime DESC";
-        List<PlaceImage> imgs = queryObjectList(sql, PlaceImage.class);
+        String sql = "SELECT PlaceId, Url FROM SG_PlaceImg WHERE PlaceId IN (" + StringUtils.join(placeIds, ",") + ") AND Status<>0 ORDER BY AddTime DESC";
+        Map<Integer, List<String>> imgsMap = queryListMap(sql, Integer.class, String.class);
 
-        Map<Integer, List<PlaceImage>> imgsMap = new HashMap<Integer, List<PlaceImage>>();
         for (int placeId : placeIds) {
-            imgsMap.put(placeId, new ArrayList<PlaceImage>());
-        }
-        for (PlaceImage img : imgs) {
-            imgsMap.get(img.getPlaceId()).add(img);
+            if (!imgsMap.containsKey(placeId)) imgsMap.put(placeId, new ArrayList<String>());
         }
 
         return imgsMap;

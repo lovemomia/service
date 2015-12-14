@@ -1,10 +1,10 @@
 package cn.momia.service.feed.base.impl;
 
-import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.api.feed.dto.FeedTag;
+import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.service.feed.base.Feed;
 import cn.momia.service.feed.base.FeedService;
-import cn.momia.service.feed.base.FeedTag;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -315,7 +315,7 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
 
             return keyHolder.getKey().longValue();
         } catch (Exception e) {
-            throw new MomiaFailedException("添加标签失败");
+            throw new MomiaErrorException("添加标签失败");
         }
     }
 
@@ -335,9 +335,14 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
         return queryObjectList(sql, new Object[] { recommended, count }, FeedTag.class);
     }
 
-
     @Override
     public List<FeedTag> listHotTags(int count) {
         return listTags(0, count);
+    }
+
+    @Override
+    public List<String> queryLatestImgs(long userId) {
+        String sql = "SELECT B.Url FROM SG_Feed A INNER JOIN SG_FeedImg B ON A.Id=B.FeedId WHERE A.UserId=? AND A.Status=1 AND B.Status=1 ORDER BY B.AddTime DESC LIMIT 4";
+        return queryStringList(sql, new Object[] { userId });
     }
 }

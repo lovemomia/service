@@ -1,12 +1,13 @@
 package cn.momia.service.course.web.ctrl;
 
-import cn.momia.api.course.dto.PaymentDto;
+import cn.momia.api.course.dto.PaymentResult;
 import cn.momia.api.user.UserServiceApi;
-import cn.momia.api.user.dto.UserDto;
-import cn.momia.common.api.exception.MomiaFailedException;
+import cn.momia.api.user.dto.User;
+import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.client.ClientType;
 import cn.momia.common.deal.gateway.CallbackParam;
+import cn.momia.common.deal.gateway.CallbackResult;
 import cn.momia.common.deal.gateway.PayType;
 import cn.momia.common.deal.gateway.PaymentGateway;
 import cn.momia.common.deal.gateway.PrepayParam;
@@ -16,13 +17,15 @@ import cn.momia.common.deal.gateway.factory.PaymentGatewayFactory;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.webapp.util.RequestUtil;
-import cn.momia.service.course.subject.Subject;
+import cn.momia.service.course.order.OrderPackage;
+import cn.momia.api.course.dto.Subject;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.coupon.CouponService;
-import cn.momia.service.course.coupon.UserCoupon;
+import cn.momia.api.course.dto.UserCoupon;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderService;
 import cn.momia.service.course.order.Payment;
+import com.google.common.base.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.util.Set;
 
 @RestController
 @RequestMapping(value = "/payment")
@@ -50,7 +54,7 @@ public class PaymentController extends BaseController {
     }
 
     private MomiaHttpResponse prepay(HttpServletRequest request, int payType) {
-        UserDto user = userServiceApi.get(request.getParameter("utoken"));
+        User user = userServiceApi.get(request.getParameter("utoken"));
         long orderId = Long.valueOf(request.getParameter("oid"));
         long userCouponId = Long.valueOf(request.getParameter("coupon"));
 
@@ -68,7 +72,7 @@ public class PaymentController extends BaseController {
             totalFee = couponService.calcTotalFee(totalFee, userCoupon);
         }
 
-        PrepayParam prepayParam = extractPrepayParam(request, order, totalFee, subject, payType);
+        PrepayParam prepayParam = buildPrepayParam(request, order, totalFee, subject, payType);
         PaymentGateway gateway = PaymentGatewayFactory.create(payType);
         PrepayResult prepayResult = gateway.prepay(prepayParam);
 
@@ -76,7 +80,7 @@ public class PaymentController extends BaseController {
         return MomiaHttpResponse.SUCCESS(prepayResult);
     }
 
-    private PrepayParam extractPrepayParam(HttpServletRequest request, Order order, BigDecimal totalFee, Subject subject, int payType) {
+    private PrepayParam buildPrepayParam(HttpServletRequest request, Order order, BigDecimal totalFee, Subject subject, int payType) {
         PrepayParam prepayParam = new PrepayParam();
 
         prepayParam.setClientType(extractClientType(request, payType));
@@ -93,7 +97,7 @@ public class PaymentController extends BaseController {
             case PayType.WEIXIN:
                 prepayParam.setTotalFee(new BigDecimal(totalFee.multiply(new BigDecimal(100)).intValue()));
                 break;
-            default: throw new MomiaFailedException("无效的支付类型: " + payType);
+            default: throw new MomiaErrorException("无效的支付类型: " + payType);
         }
 
         prepayParam.addAll(extractParams(request));
@@ -108,12 +112,12 @@ public class PaymentController extends BaseController {
                 String type = request.getParameter("type");
                 if ("app".equalsIgnoreCase(type)) return ClientType.APP;
                 else if ("wap".equalsIgnoreCase(type)) return ClientType.WAP;
-                else throw new MomiaFailedException("not supported type: " + type);
+                else throw new MomiaErrorException("not supported type: " + type);
             case PayType.WEIXIN:
                 String tradeType = request.getParameter("type");
                 if ("APP".equalsIgnoreCase(tradeType)) return ClientType.APP;
                 else if ("JSAPI".equalsIgnoreCase(tradeType)) return ClientType.WAP;
-                else throw new MomiaFailedException("not supported trade type: " + tradeType);
+                else throw new MomiaErrorException("not supported trade type: " + tradeType);
             default: return 0;
         }
     }
@@ -130,20 +134,35 @@ public class PaymentController extends BaseController {
 
     private MomiaHttpResponse callback(HttpServletRequest request, int payType) {
         CallbackParam callbackParam = CallbackParamFactory.create(extractParams(request), payType);
+        PaymentGateway gateway = PaymentGatewayFactory.create(payType);
+        CallbackResult callbackResult = gateway.callback(callbackParam, new Function<CallbackParam, Boolean>() {
+            @Override
+            public Boolean apply(CallbackParam callbackParam) {
+                return doCallback(callbackParam);
+            }
+        });
 
-        if (!callbackParam.isPayedSuccessfully()) return MomiaHttpResponse.SUCCESS("OK");
+        if (callbackResult.isSuccessful()) return MomiaHttpResponse.SUCCESS("OK");
+        return MomiaHttpResponse.SUCCESS("FAIL");
+    }
+
+    private boolean doCallback(CallbackParam callbackParam) {
+        if (!callbackParam.isPayedSuccessfully()) return true;
 
         long orderId = callbackParam.getOrderId();
         Order order = orderService.get(orderId);
         if (!order.exists()) {
             // TODO 自动退款
-            return MomiaHttpResponse.SUCCESS("OK");
+            return true;
         }
 
         if (order.isPayed()) {
             // TODO 判断是否重复付款，是则退款
-            return MomiaHttpResponse.SUCCESS("OK");
+            return true;
         }
+
+        boolean isFirstPay = setPayed(order.getUserId());
+        Set<Integer> packageTypes = orderService.getOrderPackageTypes(order.getId());
 
         if (callbackParam.getTotalFee().compareTo(order.getTotalFee()) < 0) {
             UserCoupon userCoupon = couponService.queryByOrder(order.getId());
@@ -152,24 +171,45 @@ public class PaymentController extends BaseController {
                     !couponService.useCoupon(order.getId(), userCoupon.getId())) {
                 // TODO 自动退款
                 LOGGER.error("红包/优惠券不匹配，订单: {}", order.getId());
-                return MomiaHttpResponse.SUCCESS("OK");
+                return true;
             }
 
-            try {
-                if (userServiceApi.setPayed(order.getUserId())) {
-                    UserDto inviteUser = userServiceApi.getByInviteCode(userCoupon.getInviteCode());
-                    if (inviteUser.exists() && inviteUser.getId() != order.getUserId()) {
-                        couponService.distributeInviteUserCoupon(inviteUser.getId(), userCoupon.getCouponId(), null);
-                    }
-                }
-            } catch (Exception e) {
-                LOGGER.error("返红包失败，订单: {}", order.getId(), e);
-            }
+            if (isFirstPay && packageTypes.contains(OrderPackage.Type.PACKAGE)) inviteUserCoupon(order, userCoupon);
         }
 
-        if (!finishPayment(order, createPayment(callbackParam))) return MomiaHttpResponse.SUCCESS("FAIL");
+        if (isFirstPay && packageTypes.contains(OrderPackage.Type.PACKAGE)) firstPayUserCoupon(order);
 
-        return MomiaHttpResponse.SUCCESS("OK");
+        if (!finishPayment(order, createPayment(callbackParam))) return false;
+
+        return true;
+    }
+
+    private boolean setPayed(long userId) {
+        try {
+            return userServiceApi.setPayed(userId);
+        } catch (Exception e) {
+            LOGGER.error("fail to set payed for user: {}", userId, e);
+            return false;
+        }
+    }
+
+    private void inviteUserCoupon(Order order, UserCoupon userCoupon) {
+        try {
+            User inviteUser = userServiceApi.getByInviteCode(userCoupon.getInviteCode());
+            if (inviteUser.exists() && inviteUser.getId() != order.getUserId()) {
+                couponService.distributeInviteUserCoupon(inviteUser.getId(), userCoupon.getCouponId(), null);
+            }
+        } catch (Exception e) {
+            LOGGER.error("返邀请红包失败，订单: {}", order.getId(), e);
+        }
+    }
+
+    private void firstPayUserCoupon(Order order) {
+        try {
+            couponService.distributeFirstPayUserCoupon(order.getUserId());
+        } catch (Exception e) {
+            LOGGER.error("返首次购买红包失败，订单: {}", order.getId(), e);
+        }
     }
 
     private Payment createPayment(CallbackParam callbackParam) {
@@ -206,17 +246,17 @@ public class PaymentController extends BaseController {
 
     @RequestMapping(value = "/check", method = RequestMethod.POST)
     public MomiaHttpResponse check(@RequestParam String utoken, @RequestParam(value = "oid") long orderId) {
-        UserDto user = userServiceApi.get(utoken);
+        User user = userServiceApi.get(utoken);
         Order order = orderService.get(orderId);
 
-        PaymentDto paymentDto = new PaymentDto();
+        PaymentResult paymentResult = new PaymentResult();
         if (order.exists() && order.getUserId() == user.getId() && order.isPayed()) {
-            paymentDto.setPayed(true);
-            paymentDto.setSubjectId(order.getSubjectId());
+            paymentResult.setPayed(true);
+            paymentResult.setSubjectId(order.getSubjectId());
         } else {
-            paymentDto.setPayed(false);
+            paymentResult.setPayed(false);
         }
 
-        return MomiaHttpResponse.SUCCESS(paymentDto);
+        return MomiaHttpResponse.SUCCESS(paymentResult);
     }
 }

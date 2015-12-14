@@ -1,0 +1,19 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>cn.momia</groupId>
+    <artifactId>im</artifactId>
+    <version>1.1.0</version>
+    <packaging>pom</packaging>
+
+    <name>Momia IM</name>
+    <url>http://www.momia.cn</url>
+
+    <modules>
+        <module>api-im</module>
+        <module>service-im</module>
+    </modules>
+</project>

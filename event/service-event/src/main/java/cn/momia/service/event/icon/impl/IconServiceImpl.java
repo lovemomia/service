@@ -1,7 +1,7 @@
 package cn.momia.service.event.icon.impl;
 
+import cn.momia.api.event.dto.Icon;
 import cn.momia.common.service.AbstractService;
-import cn.momia.service.event.icon.Icon;
 import cn.momia.service.event.icon.IconService;
 
 import java.util.List;

@@ -1,10 +1,11 @@
 package cn.momia.service.feed.web.ctrl;
 
-import cn.momia.api.feed.dto.FeedCommentDto;
+import cn.momia.api.feed.dto.UserFeedComment;
 import cn.momia.api.user.UserServiceApi;
-import cn.momia.api.user.dto.UserDto;
+import cn.momia.api.user.dto.User;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.feed.base.Feed;
 import cn.momia.service.feed.base.FeedService;
@@ -44,33 +45,37 @@ public class FeedCommentController extends BaseController {
         List<FeedComment> comments = feedCommentService.query(feedId, start, count);
 
         List<Long> userIds = new ArrayList<Long>();
-        for (FeedComment comment : comments) userIds.add(comment.getUserId());
-        List<UserDto> users = userServiceApi.list(userIds, UserDto.Type.MINI);
-        Map<Long, UserDto> usersMap = new HashMap<Long, UserDto>();
-        for (UserDto user : users) usersMap.put(user.getId(), user);
-
-        PagedList<FeedCommentDto> pagedFeedCommentDtos = new PagedList(totalCount, start, count);
-        List<FeedCommentDto> feedCommentDtos = new ArrayList<FeedCommentDto>();
         for (FeedComment comment : comments) {
-            UserDto user = usersMap.get(comment.getUserId());
+            userIds.add(comment.getUserId());
+        }
+        List<User> users = userServiceApi.list(userIds, User.Type.MINI);
+        Map<Long, User> usersMap = new HashMap<Long, User>();
+        for (User user : users) {
+            usersMap.put(user.getId(), user);
+        }
+
+        PagedList<UserFeedComment> pagedUserComments = new PagedList(totalCount, start, count);
+        List<UserFeedComment> userFeedComments = new ArrayList<UserFeedComment>();
+        for (FeedComment comment : comments) {
+            User user = usersMap.get(comment.getUserId());
             if (user == null) continue;
 
-            feedCommentDtos.add(buildFeedCommentDto(comment, user));
+            userFeedComments.add(buildUserComment(comment, user));
         }
-        pagedFeedCommentDtos.setList(feedCommentDtos);
+        pagedUserComments.setList(userFeedComments);
 
-        return MomiaHttpResponse.SUCCESS(pagedFeedCommentDtos);
+        return MomiaHttpResponse.SUCCESS(pagedUserComments);
     }
 
-    private FeedCommentDto buildFeedCommentDto(FeedComment comment, UserDto user) {
-        FeedCommentDto feedCommentDto = new FeedCommentDto();
-        feedCommentDto.setId(comment.getId());
-        feedCommentDto.setContent(comment.getContent());
-        feedCommentDto.setAddTime(comment.getAddTime());
-        feedCommentDto.setNickName(user.getNickName());
-        feedCommentDto.setAvatar(user.getAvatar());
+    private UserFeedComment buildUserComment(FeedComment comment, User user) {
+        UserFeedComment userFeedComment = new UserFeedComment();
+        userFeedComment.setId(comment.getId());
+        userFeedComment.setContent(comment.getContent());
+        userFeedComment.setAddTime(TimeUtil.formatAddTime(comment.getAddTime()));
+        userFeedComment.setNickName(user.getNickName());
+        userFeedComment.setAvatar(user.getAvatar());
 
-        return feedCommentDto;
+        return userFeedComment;
     }
 
     @RequestMapping(value = "/{fid}/comment", method = RequestMethod.POST)

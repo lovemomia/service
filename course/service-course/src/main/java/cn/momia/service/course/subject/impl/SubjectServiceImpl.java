@@ -1,21 +1,38 @@
 package cn.momia.service.course.subject.impl;
 
+import cn.momia.api.base.MetaUtil;
+import cn.momia.api.base.dto.Region;
+import cn.momia.api.course.dto.Course;
+import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
-import cn.momia.service.course.subject.Subject;
-import cn.momia.service.course.subject.SubjectImage;
+import cn.momia.common.util.TimeUtil;
+import cn.momia.service.course.base.CourseService;
+import cn.momia.api.course.dto.Subject;
 import cn.momia.service.course.subject.SubjectService;
-import cn.momia.service.course.subject.SubjectSku;
+import cn.momia.api.course.dto.SubjectSku;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class SubjectServiceImpl extends AbstractService implements SubjectService {
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("M月d日");
+
+    private CourseService courseService;
+
+    public void setCourseService(CourseService courseService) {
+        this.courseService = courseService;
+    }
+
     @Override
     public Subject get(long subjectId) {
         Set<Long> subjectIds = Sets.newHashSet(subjectId);
@@ -28,10 +45,10 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
     public List<Subject> list(Collection<Long> subjectIds) {
         if (subjectIds.isEmpty()) return new ArrayList<Subject>();
 
-        String sql = "SELECT Id, CityId, Title, Cover, Tags, Intro, Notice, Stock, Status FROM SG_Subject WHERE Id IN (" + StringUtils.join(subjectIds, ",") + ") AND Status<>0";
+        String sql = "SELECT Id, `Type`, CityId, Title, Cover, Tags, Intro, Notice, Stock, Status FROM SG_Subject WHERE Id IN (" + StringUtils.join(subjectIds, ",") + ") AND Status<>0";
         List<Subject> subjects = queryObjectList(sql, Subject.class);
 
-        Map<Long, List<SubjectImage>> imgs = queryImgs(subjectIds);
+        Map<Long, List<String>> imgs = queryImgs(subjectIds);
         Map<Long, List<SubjectSku>> skus = querySkus(subjectIds);
         for (Subject subject : subjects) {
             subject.setImgs(imgs.get(subject.getId()));
@@ -43,27 +60,40 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
             subjectsMap.put(subject.getId(), subject);
         }
 
+        Map<Long, List<Course>> coursesMap = courseService.queryAllBySubjects(subjectIds);
         List<Subject> result = new ArrayList<Subject>();
         for (long subjectId : subjectIds) {
             Subject subject = subjectsMap.get(subjectId);
-            if (subject != null) result.add(subject);
+            if (subject != null) {
+                int stock = subject.getStock();
+                subject.setStatus((stock == -1 || stock > 0) ? Subject.Status.OK : Subject.Status.SOLD_OUT);
+
+                SubjectSku minPriceSku = getMinPriceSku(subject);
+                subject.setPrice(minPriceSku.getPrice());
+                subject.setOriginalPrice(minPriceSku.getOriginalPrice());
+
+                List<Course> courses = coursesMap.get(subjectId);
+                if (subject.getType() == Subject.Type.TRIAL && !courses.isEmpty()) subject.setCover(courses.get(0).getCover());
+                subject.setAge(getAgeRange(courses));
+                subject.setJoined(getJoined(courses));
+                subject.setScheduler(getScheduler(courses));
+                subject.setRegion(getRegion(courses));
+
+                result.add(subject);
+            }
         }
 
         return result;
     }
 
-    private Map<Long, List<SubjectImage>> queryImgs(Collection<Long> subjectIds) {
-        if (subjectIds.isEmpty()) return new HashMap<Long, List<SubjectImage>>();
+    private Map<Long, List<String>> queryImgs(Collection<Long> subjectIds) {
+        if (subjectIds.isEmpty()) return new HashMap<Long, List<String>>();
 
-        String sql = "SELECT Id, SubjectId, Url, Width, Height FROM SG_SubjectImg WHERE SubjectId IN (" + StringUtils.join(subjectIds, ",") + ") AND Status<>0";
-        List<SubjectImage> imgs = queryObjectList(sql, SubjectImage.class);
+        String sql = "SELECT SubjectId, Url FROM SG_SubjectImg WHERE SubjectId IN (" + StringUtils.join(subjectIds, ",") + ") AND Status<>0";
+        Map<Long, List<String>> imgsMap = queryListMap(sql, Long.class, String.class);
 
-        final Map<Long, List<SubjectImage>> imgsMap = new HashMap<Long, List<SubjectImage>>();
         for (long subjectId : subjectIds) {
-            imgsMap.put(subjectId, new ArrayList<SubjectImage>());
-        }
-        for (SubjectImage img : imgs) {
-            imgsMap.get(img.getSubjectId()).add(img);
+            if (!imgsMap.containsKey(subjectId)) imgsMap.put(subjectId, new ArrayList<String>());
         }
 
         return imgsMap;
@@ -87,18 +117,89 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
         return skusMap;
     }
 
-    @Override
-    public long queryTrialCount(long cityId) {
-        String sql = "SELECT COUNT(1) FROM SG_Subject WHERE `Type`=? AND CityId=? AND Stock>=0 AND Status=1";
-        return queryLong(sql, new Object[] { Subject.Type.TRIAL, cityId });
+    private SubjectSku getMinPriceSku(Subject subject) {
+        SubjectSku minPriceSubjectSku = SubjectSku.NOT_EXIST_SUBJECT_SKU;
+        for (SubjectSku sku : subject.getSkus()) {
+            if (sku.getCourseId() > 0) continue;
+
+            if (!minPriceSubjectSku.exists()) {
+                minPriceSubjectSku = sku;
+            } else {
+                if (minPriceSubjectSku.getPrice().compareTo(sku.getPrice()) > 0) minPriceSubjectSku = sku;
+            }
+        }
+
+        return minPriceSubjectSku;
     }
 
-    @Override
-    public List<Subject> queryTrial(long cityId, int start, int count) {
-        String sql = "SELECT Id FROM SG_Subject WHERE `Type`=? AND CityId=? AND Stock>=0 AND Status=1 ORDER BY Stock DESC, AddTime DESC LIMIT ?,?";
-        List<Long> subjectIds = queryLongList(sql, new Object[] { Subject.Type.TRIAL, cityId, start, count });
+    private String getAgeRange(List<Course> courses) {
+        if (courses.isEmpty()) return "";
 
-        return list(subjectIds);
+        int minAge = Integer.MAX_VALUE;
+        int maxAge = 0;
+
+        for (Course course : courses) {
+            minAge = Math.min(minAge, course.getMinAge());
+            maxAge = Math.max(maxAge, course.getMaxAge());
+        }
+
+        if (minAge <= 0 && maxAge <= 0) throw new MomiaErrorException("invalid age of subject sku");
+        if (minAge <= 0) return maxAge + "岁";
+        if (maxAge <= 0) return minAge + "岁";
+        if (minAge == maxAge) return minAge + "岁";
+        return minAge + "-" + maxAge + "岁";
+    }
+
+    private int getJoined(List<Course> courses) {
+        int joined = 0;
+        for (Course course : courses) {
+            joined += course.getJoined();
+        }
+
+        return joined;
+    }
+
+    private String getScheduler(List<Course> courses) {
+        if (courses.isEmpty()) return "";
+
+        List<Date> times = new ArrayList<Date>();
+        for (Course course : courses) {
+            Date startTime = course.getStartTime();
+            Date endTime = course.getEndTime();
+            if (startTime != null) times.add(startTime);
+            if (endTime != null) times.add(endTime);
+        }
+        Collections.sort(times);
+
+        return format(times);
+    }
+
+    private String format(List<Date> times) {
+        if (times.isEmpty()) return "";
+        if (times.size() == 1) {
+            Date start = times.get(0);
+            return DATE_FORMAT.format(start) + " " + TimeUtil.getWeekDay(start);
+        } else {
+            Date start = times.get(0);
+            Date end = times.get(times.size() - 1);
+            if (TimeUtil.isSameDay(start, end)) {
+                return DATE_FORMAT.format(start) + " " + TimeUtil.getWeekDay(start);
+            } else {
+                return DATE_FORMAT.format(start) + "-" + DATE_FORMAT.format(end);
+            }
+        }
+    }
+
+    private String getRegion(List<Course> courses) {
+        if (courses.isEmpty()) return "";
+
+        List<Integer> regionIds = new ArrayList<Integer>();
+        for (Course course : courses) {
+            int regionId = course.getRegionId();
+            if (!regionIds.contains(regionId)) regionIds.add(regionId);
+        }
+
+        return MetaUtil.getRegionName(regionIds.size() > 1 ? Region.MULTI_REGION_ID : regionIds.get(0));
     }
 
     @Override
@@ -142,6 +243,20 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
     public boolean isTrial(long subjectId) {
         String sql = "SELECT Type FROM SG_Subject WHERE Id=?";
         return queryInt(sql, new Object[] { subjectId }) == Subject.Type.TRIAL;
+    }
+
+    @Override
+    public long queryTrialCount(long cityId) {
+        String sql = "SELECT COUNT(1) FROM SG_Subject WHERE `Type`=? AND CityId=? AND Stock>=0 AND Status=1";
+        return queryLong(sql, new Object[] { Subject.Type.TRIAL, cityId });
+    }
+
+    @Override
+    public List<Subject> queryTrial(long cityId, int start, int count) {
+        String sql = "SELECT Id FROM SG_Subject WHERE `Type`=? AND CityId=? AND Stock>=0 AND Status=1 ORDER BY Stock DESC, AddTime DESC LIMIT ?,?";
+        List<Long> subjectIds = queryLongList(sql, new Object[] { Subject.Type.TRIAL, cityId, start, count });
+
+        return list(subjectIds);
     }
 
     @Override
