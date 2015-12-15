@@ -280,7 +280,7 @@ public class CourseController extends BaseController {
         String end = DATE_FORMAT.format(new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000));
         List<CourseSku> skus = courseService.querySkus(courseId, start, end);
 
-        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkus(skus));
+        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkus(filterNotEndedSkus(skus)));
     }
 
     private List<DatedCourseSkus> buildDatedCourseSkus(List<CourseSku> skus) {
@@ -323,7 +323,7 @@ public class CourseController extends BaseController {
         String end = formatNextMonth(month);
         List<CourseSku> skus = courseService.querySkus(courseId, start, end);
 
-        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkus(skus));
+        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkus(filterNotEndedSkus(skus)));
     }
 
     private String formatCurrentMonth(int month) {

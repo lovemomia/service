@@ -17,9 +17,9 @@ public class CourseSku {
 
     private long id;
     private long courseId;
-    private Date startTime;
-    private Date endTime;
-    @JSONField(serialize = false) private Date deadline;
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss") private Date startTime;
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss") private Date endTime;
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss") private Date deadline;
     @JSONField(serialize = false) private int unlockedStock;
     @JSONField(serialize = false) private int placeId;
     @JSONField(serialize = false) private int adult;
