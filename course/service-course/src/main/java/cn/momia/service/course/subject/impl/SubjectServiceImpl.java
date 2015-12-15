@@ -269,13 +269,22 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
 
     @Override
     public long queryTrialCount(long cityId) {
-        String sql = "SELECT COUNT(1) FROM SG_Subject WHERE `Type`=? AND CityId=? AND Stock>=0 AND Status=1";
+        String sql = "SELECT COUNT(DISTINCT A.Id) " +
+                "FROM SG_Subject A " +
+                "INNER JOIN SG_Course B ON A.Id=B.SubjectId " +
+                "INNER JOIN SG_CourseSku C ON B.Id=C.CourseId " +
+                "WHERE A.Type=? AND A.CityId=? AND A.Status=1 AND B.Status=1 AND C.Status=1 AND C.EndTime>NOW()";
         return queryLong(sql, new Object[] { Subject.Type.TRIAL, cityId });
     }
 
     @Override
     public List<Subject> queryTrial(long cityId, int start, int count) {
-        String sql = "SELECT Id FROM SG_Subject WHERE `Type`=? AND CityId=? AND Stock>=0 AND Status=1 ORDER BY Stock DESC, AddTime DESC LIMIT ?,?";
+        String sql = "SELECT DISTINCT A.Id " +
+                "FROM SG_Subject A " +
+                "INNER JOIN SG_Course B ON A.Id=B.SubjectId " +
+                "INNER JOIN SG_CourseSku C ON B.Id=C.CourseId " +
+                "WHERE A.Type=? AND A.CityId=? AND A.Status=1 AND B.Status=1 AND C.Status=1 AND C.EndTime>NOW() " +
+                "ORDER BY A.Stock DESC, A.AddTime DESC LIMIT ?,?";
         List<Long> subjectIds = queryLongList(sql, new Object[] { Subject.Type.TRIAL, cityId, start, count });
 
         return list(subjectIds);

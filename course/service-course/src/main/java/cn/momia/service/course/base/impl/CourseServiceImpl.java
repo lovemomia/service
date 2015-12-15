@@ -60,28 +60,24 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public long queryRecommendCount(long cityId) {
-        String sql = "SELECT COUNT(A.CourseId) " +
+        String sql = "SELECT COUNT(DISTINCT A.CourseId) " +
                 "FROM SG_CourseRecommend A " +
                 "INNER JOIN SG_Course B ON A.CourseId=B.Id " +
                 "INNER JOIN SG_Subject C ON B.SubjectId=C.Id " +
                 "INNER JOIN SG_CourseSku D ON A.CourseId=D.CourseId " +
-                "WHERE A.Status<>0 AND B.Status=1 AND C.Status=1 AND C.CityId=? AND D.Status=1 " +
-                "GROUP BY A.CourseId " +
-                "HAVING MAX(D.EndTime)>NOW()";
+                "WHERE A.Status<>0 AND B.Status=1 AND C.Status=1 AND C.CityId=? AND D.Status=1 AND D.EndTime>NOW()";
         return queryLong(sql, new Object[] { cityId });
     }
 
     @Override
     public List<Course> queryRecomend(long cityId, int start, int count) {
-        String sql = "SELECT A.CourseId " +
+        String sql = "SELECT DISTINCT A.CourseId " +
                 "FROM SG_CourseRecommend A " +
                 "INNER JOIN SG_Course B ON A.CourseId=B.Id " +
                 "INNER JOIN SG_Subject C ON B.SubjectId=C.Id " +
                 "INNER JOIN SG_CourseSku D ON A.CourseId=D.CourseId " +
-                "WHERE A.Status<>0 AND B.Status=1 AND C.Status=1 AND C.CityId=? AND D.Status=1 " +
-                "GROUP BY A.CourseId " +
-                "HAVING MAX(D.EndTime)>NOW() " +
-                "ORDER BY MAX(A.Weight) DESC, MAX(A.AddTime) DESC LIMIT ?,?";
+                "WHERE A.Status<>0 AND B.Status=1 AND C.Status=1 AND C.CityId=? AND D.Status=1 AND D.EndTime>NOW() " +
+                "ORDER BY A.Weight DESC, A.AddTime DESC LIMIT ?,?";
         List<Long> courseIds = queryLongList(sql, new Object[] { cityId, start, count });
 
         return list(courseIds);
@@ -89,13 +85,22 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public long queryTrialCount(long cityId) {
-        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Status=1 AND B.Stock>=0 AND B.Status=1 AND B.CityId=? AND B.Type=2";
+        String sql = "SELECT COUNT(DISTINCT A.Id) " +
+                "FROM SG_Course A " +
+                "INNER JOIN SG_Subject B ON A.SubjectId=B.Id " +
+                "INNER JOIN SG_CourseSku C ON A.Id=C.CourseId " +
+                "WHERE A.Status=1 AND B.Status=1 AND B.CityId=? AND B.Type=2 AND C.Status=1 AND C.EndTime>NOW()";
         return queryLong(sql, new Object[] { cityId });
     }
 
     @Override
     public List<Course> queryTrial(long cityId, int start, int count) {
-        String sql = "SELECT DISTINCT A.Id FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Status=1 AND B.Stock>=0 AND B.Status=1 AND B.CityId=? AND B.Type=2 ORDER BY B.Stock DESC, A.Joined DESC, A.AddTime DESC LIMIT ?,?";
+        String sql = "SELECT DISTINCT A.Id " +
+                "FROM SG_Course A " +
+                "INNER JOIN SG_Subject B ON A.SubjectId=B.Id " +
+                "INNER JOIN SG_CourseSku C ON A.Id=C.CourseId " +
+                "WHERE A.Status=1 AND B.Status=1 AND B.CityId=? AND B.Type=2 AND C.Status=1 AND C.EndTime>NOW() " +
+                "ORDER BY B.Stock DESC, A.Joined DESC, A.AddTime DESC LIMIT ?,?";
         List<Long> courseIds = queryLongList(sql, new Object[] { cityId, start, count });
 
         return list(courseIds);
