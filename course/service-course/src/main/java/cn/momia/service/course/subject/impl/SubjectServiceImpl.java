@@ -273,7 +273,7 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
                 "FROM SG_Subject A " +
                 "INNER JOIN SG_Course B ON A.Id=B.SubjectId " +
                 "INNER JOIN SG_CourseSku C ON B.Id=C.CourseId " +
-                "WHERE A.Type=? AND A.CityId=? AND A.Status=1 AND B.Status=1 AND C.Status=1 AND C.EndTime>NOW()";
+                "WHERE A.Type=? AND A.CityId=? AND A.Status=1 AND B.Status=1 AND C.Status=1 AND DATE_ADD(DATE(C.EndTime), INTERVAL 1 DAY)>NOW()";
         return queryLong(sql, new Object[] { Subject.Type.TRIAL, cityId });
     }
 
@@ -283,7 +283,7 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
                 "FROM SG_Subject A " +
                 "INNER JOIN SG_Course B ON A.Id=B.SubjectId " +
                 "INNER JOIN SG_CourseSku C ON B.Id=C.CourseId " +
-                "WHERE A.Type=? AND A.CityId=? AND A.Status=1 AND B.Status=1 AND C.Status=1 AND C.EndTime>NOW() " +
+                "WHERE A.Type=? AND A.CityId=? AND A.Status=1 AND B.Status=1 AND C.Status=1 AND DATE_ADD(DATE(C.EndTime), INTERVAL 1 DAY)>NOW() " +
                 "ORDER BY A.Stock DESC, A.AddTime DESC LIMIT ?,?";
         List<Long> subjectIds = queryLongList(sql, new Object[] { Subject.Type.TRIAL, cityId, start, count });
 

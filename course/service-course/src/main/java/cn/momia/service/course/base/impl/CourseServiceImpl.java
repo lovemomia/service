@@ -65,7 +65,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
                 "INNER JOIN SG_Course B ON A.CourseId=B.Id " +
                 "INNER JOIN SG_Subject C ON B.SubjectId=C.Id " +
                 "INNER JOIN SG_CourseSku D ON A.CourseId=D.CourseId " +
-                "WHERE A.Status<>0 AND B.Status=1 AND C.Status=1 AND C.CityId=? AND D.Status=1 AND D.EndTime>NOW()";
+                "WHERE A.Status<>0 AND B.Status=1 AND C.Status=1 AND C.CityId=? AND D.Status=1 AND DATE_ADD(DATE(D.EndTime), INTERVAL 1 DAY)>NOW()";
         return queryLong(sql, new Object[] { cityId });
     }
 
@@ -76,7 +76,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
                 "INNER JOIN SG_Course B ON A.CourseId=B.Id " +
                 "INNER JOIN SG_Subject C ON B.SubjectId=C.Id " +
                 "INNER JOIN SG_CourseSku D ON A.CourseId=D.CourseId " +
-                "WHERE A.Status<>0 AND B.Status=1 AND C.Status=1 AND C.CityId=? AND D.Status=1 AND D.EndTime>NOW() " +
+                "WHERE A.Status<>0 AND B.Status=1 AND C.Status=1 AND C.CityId=? AND D.Status=1 AND DATE_ADD(DATE(D.EndTime), INTERVAL 1 DAY)>NOW() " +
                 "ORDER BY A.Weight DESC, A.AddTime DESC LIMIT ?,?";
         List<Long> courseIds = queryLongList(sql, new Object[] { cityId, start, count });
 
@@ -89,7 +89,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
                 "FROM SG_Course A " +
                 "INNER JOIN SG_Subject B ON A.SubjectId=B.Id " +
                 "INNER JOIN SG_CourseSku C ON A.Id=C.CourseId " +
-                "WHERE A.Status=1 AND B.Status=1 AND B.CityId=? AND B.Type=2 AND C.Status=1 AND C.EndTime>NOW()";
+                "WHERE A.Status=1 AND B.Status=1 AND B.CityId=? AND B.Type=2 AND C.Status=1 AND DATE_ADD(DATE(C.EndTime), INTERVAL 1 DAY)>NOW()";
         return queryLong(sql, new Object[] { cityId });
     }
 
@@ -99,7 +99,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
                 "FROM SG_Course A " +
                 "INNER JOIN SG_Subject B ON A.SubjectId=B.Id " +
                 "INNER JOIN SG_CourseSku C ON A.Id=C.CourseId " +
-                "WHERE A.Status=1 AND B.Status=1 AND B.CityId=? AND B.Type=2 AND C.Status=1 AND C.EndTime>NOW() " +
+                "WHERE A.Status=1 AND B.Status=1 AND B.CityId=? AND B.Type=2 AND C.Status=1 AND DATE_ADD(DATE(C.EndTime), INTERVAL 1 DAY)>NOW() " +
                 "ORDER BY B.Stock DESC, A.Joined DESC, A.AddTime DESC LIMIT ?,?";
         List<Long> courseIds = queryLongList(sql, new Object[] { cityId, start, count });
 
