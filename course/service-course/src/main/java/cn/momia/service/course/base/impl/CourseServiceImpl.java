@@ -60,13 +60,28 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public long queryRecommendCount(long cityId) {
-        String sql = "SELECT COUNT(DISTINCT A.CourseId) FROM SG_CourseRecommend A INNER JOIN SG_Course B ON A.CourseId=B.Id INNER JOIN SG_Subject C ON B.SubjectId=C.Id WHERE A.Status<>0 AND B.Status=1 AND C.Status=1 AND C.CityId=?";
+        String sql = "SELECT COUNT(A.CourseId) " +
+                "FROM SG_CourseRecommend A " +
+                "INNER JOIN SG_Course B ON A.CourseId=B.Id " +
+                "INNER JOIN SG_Subject C ON B.SubjectId=C.Id " +
+                "INNER JOIN SG_CourseSku D ON A.CourseId=D.CourseId " +
+                "WHERE A.Status<>0 AND B.Status=1 AND C.Status=1 AND C.CityId=? AND D.Status=1 " +
+                "GROUP BY A.CourseId " +
+                "HAVING MAX(D.EndTime)>NOW()";
         return queryLong(sql, new Object[] { cityId });
     }
 
     @Override
     public List<Course> queryRecomend(long cityId, int start, int count) {
-        String sql = "SELECT DISTINCT A.CourseId FROM SG_CourseRecommend A INNER JOIN SG_Course B ON A.CourseId=B.Id INNER JOIN SG_Subject C ON B.SubjectId=C.Id WHERE A.Status<>0 AND B.Status=1 AND C.Status=1 AND C.CityId=? ORDER BY A.Weight DESC, A.AddTime DESC LIMIT ?,?";
+        String sql = "SELECT A.CourseId " +
+                "FROM SG_CourseRecommend A " +
+                "INNER JOIN SG_Course B ON A.CourseId=B.Id " +
+                "INNER JOIN SG_Subject C ON B.SubjectId=C.Id " +
+                "INNER JOIN SG_CourseSku D ON A.CourseId=D.CourseId " +
+                "WHERE A.Status<>0 AND B.Status=1 AND C.Status=1 AND C.CityId=? AND D.Status=1 " +
+                "GROUP BY A.CourseId " +
+                "HAVING MAX(D.EndTime)>NOW() " +
+                "ORDER BY MAX(A.Weight) DESC, MAX(A.AddTime) DESC LIMIT ?,?";
         List<Long> courseIds = queryLongList(sql, new Object[] { cityId, start, count });
 
         return list(courseIds);
