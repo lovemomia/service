@@ -179,7 +179,7 @@ public class CourseController extends BaseController {
         CourseSku earliestSku = null;
         Date now = new Date();
         for (CourseSku sku : skus) {
-            if (sku.isAvaliable(now)) {
+            if (!sku.isEnded(now)) {
                 if (earliestSku == null) {
                     earliestSku = sku;
                 } else {

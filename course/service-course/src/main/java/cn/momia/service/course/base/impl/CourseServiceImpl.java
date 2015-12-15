@@ -338,7 +338,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         Date now = new Date();
         List<Date> times = new ArrayList<Date>();
         for (CourseSku sku : skus) {
-            if (sku.isAvaliable(now)) {
+            if (!sku.isEnded(now)) {
                 times.add(sku.getStartTime());
                 times.add(sku.getEndTime());
             }
