@@ -138,7 +138,12 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
             }
 
             int stock = course.getStock();
-            course.setStatus((stock == -1 || stock > 0) ? Course.Status.OK : Course.Status.SOLD_OUT);
+            int avaliableSkuCount = 0;
+            Date now = new Date();
+            for (CourseSku sku : course.getSkus()) {
+                if (sku.isAvaliable(now)) avaliableSkuCount++;
+            }
+            course.setStatus((stock != 0) ? (avaliableSkuCount > 0 ? Course.Status.OK : Course.Status.SOLD_OUT) : Course.Status.SOLD_OUT);
 
             course.setAge(formatAge(course));
             course.setScheduler(formatScheduler(course));
