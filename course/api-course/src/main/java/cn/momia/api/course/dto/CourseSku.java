@@ -4,6 +4,7 @@ import cn.momia.common.util.TimeUtil;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -132,6 +133,15 @@ public class CourseSku {
     @JSONField(serialize = false)
     public boolean isAvaliable(Date now) {
         return status == 1 && deadline.after(now);
+    }
+
+    @JSONField(serialize = false)
+    public boolean isEnded(Date now) {
+        try {
+            return TimeUtil.SHORT_DATE_FORMAT.parse(TimeUtil.SHORT_DATE_FORMAT.format(endTime)).getTime() + 24 * 60 * 60 * 1000 <= now.getTime();
+        } catch (ParseException e) {
+            return true;
+        }
     }
 
     public String getTime() {

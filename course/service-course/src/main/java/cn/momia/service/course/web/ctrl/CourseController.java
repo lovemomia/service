@@ -103,11 +103,21 @@ public class CourseController extends BaseController {
         if (!course.exists()) return MomiaHttpResponse.FAILED("课程不存在");
 
         if (type == Course.ShowType.FULL) {
-            course.setPlace(buildCourseSkuPlace(filterUnavaliableSkus(course.getSkus()), pos));
+            course.setPlace(buildCourseSkuPlace(filterNotEndedSkus(course.getSkus()), pos));
             return MomiaHttpResponse.SUCCESS(course);
         } else {
             return MomiaHttpResponse.SUCCESS(new Course.Base(course));
         }
+    }
+
+    private List<CourseSku> filterNotEndedSkus(List<CourseSku> skus) {
+        List<CourseSku> notEndedSkus = new ArrayList<CourseSku>();
+        Date now = new Date();
+        for (CourseSku sku : skus) {
+            if (!sku.isEnded(now)) notEndedSkus.add(sku);
+        }
+
+        return notEndedSkus;
     }
 
     private CourseSkuPlace buildCourseSkuPlace(List<CourseSku> skus, String pos) {
@@ -270,17 +280,7 @@ public class CourseController extends BaseController {
         String end = DATE_FORMAT.format(new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000));
         List<CourseSku> skus = courseService.querySkus(courseId, start, end);
 
-        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkus(filterUnavaliableSkus(skus)));
-    }
-
-    private List<CourseSku> filterUnavaliableSkus(List<CourseSku> skus) {
-        List<CourseSku> avaliableSkus = new ArrayList<CourseSku>();
-        Date now = new Date();
-        for (CourseSku sku : skus) {
-            if (sku.isAvaliable(now)) avaliableSkus.add(sku);
-        }
-
-        return avaliableSkus;
+        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkus(skus));
     }
 
     private List<DatedCourseSkus> buildDatedCourseSkus(List<CourseSku> skus) {
@@ -323,7 +323,7 @@ public class CourseController extends BaseController {
         String end = formatNextMonth(month);
         List<CourseSku> skus = courseService.querySkus(courseId, start, end);
 
-        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkus(filterUnavaliableSkus(skus)));
+        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkus(skus));
     }
 
     private String formatCurrentMonth(int month) {
