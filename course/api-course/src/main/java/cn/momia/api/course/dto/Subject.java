@@ -21,7 +21,7 @@ public class Subject {
     public static final Subject NOT_EXIST_SUBJECT = new Subject();
 
     private long id;
-    @JSONField(serialize = false) private int type;
+    private int type;
     @JSONField(serialize = false) private int cityId;
     private String title;
     private String cover;
@@ -49,7 +49,6 @@ public class Subject {
         this.id = id;
     }
 
-    @JSONField(serialize = false)
     public int getType() {
         return type;
     }
@@ -58,7 +57,6 @@ public class Subject {
         this.type = type;
     }
 
-    @JSONField(serialize = false)
     public int getCityId() {
         return cityId;
     }
@@ -107,7 +105,6 @@ public class Subject {
         this.notice = notice;
     }
 
-    @JSONField(serialize = false)
     public int getStock() {
         return stock;
     }
@@ -204,6 +201,7 @@ public class Subject {
         public Base(Subject subject) {
             super();
             setId(subject.getId());
+            setType(subject.getType());
             setTitle(subject.getTitle());
             setCover(subject.getCover());
             setTags(subject.getTags());
