@@ -138,7 +138,7 @@ public class CourseSku {
     @JSONField(serialize = false)
     public boolean isEnded(Date now) {
         try {
-            return TimeUtil.SHORT_DATE_FORMAT.parse(TimeUtil.SHORT_DATE_FORMAT.format(endTime)).getTime() + 24 * 60 * 60 * 1000 <= now.getTime();
+            return status != 1 || TimeUtil.SHORT_DATE_FORMAT.parse(TimeUtil.SHORT_DATE_FORMAT.format(endTime)).getTime() + 24 * 60 * 60 * 1000 <= now.getTime();
         } catch (ParseException e) {
             return true;
         }
