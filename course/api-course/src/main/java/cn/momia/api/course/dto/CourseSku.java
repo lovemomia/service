@@ -24,7 +24,7 @@ public class CourseSku {
     @JSONField(serialize = false) private int placeId;
     @JSONField(serialize = false) private int adult;
     @JSONField(serialize = false) private int child;
-    @JSONField(serialize = false) private int status;
+    private int status;
 
     private CourseSkuPlace place;
 
@@ -145,7 +145,7 @@ public class CourseSku {
     }
 
     public boolean isClosed() {
-        return deadline.before(new Date()) || unlockedStock <= 0;
+        return !isAvaliable(new Date()) || unlockedStock <= 0;
     }
 
     public String getTime() {
