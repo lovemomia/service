@@ -17,6 +17,11 @@ public class Course implements Cloneable {
         public static final int FULL = 2;
     }
 
+    public static class QueryType {
+        public static final int NOT_END = 1;
+        public static final int BOOKABLE = 2;
+    }
+
     public static class Status {
         public static final int OK = 1;
         public static final int SOLD_OUT = 2;
