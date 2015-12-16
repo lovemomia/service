@@ -144,6 +144,10 @@ public class CourseSku {
         }
     }
 
+    public boolean isClosed() {
+        return deadline.before(new Date()) || unlockedStock <= 0;
+    }
+
     public String getTime() {
         if (TimeUtil.isSameDay(startTime, endTime)) {
             return TIME_FORMAT.format(startTime) + " - " + TIME_FORMAT.format(endTime);
