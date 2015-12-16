@@ -214,7 +214,7 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
         for (Course course : courses) {
             List<CourseSku> skus = course.getSkus();
             for (CourseSku sku : skus) {
-                if (sku.isAvaliable(now)) {
+                if (sku.isBookable(now)) {
                     count++;
                     break;
                 }

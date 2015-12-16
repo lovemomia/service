@@ -131,8 +131,8 @@ public class CourseSku {
     }
 
     @JSONField(serialize = false)
-    public boolean isAvaliable(Date now) {
-        return status == 1 && deadline.after(now);
+    public boolean isBookable(Date now) {
+        return status == 1 && deadline.after(now) && unlockedStock > 0;
     }
 
     @JSONField(serialize = false)
@@ -145,7 +145,7 @@ public class CourseSku {
     }
 
     public boolean isClosed() {
-        return !isAvaliable(new Date()) || unlockedStock <= 0;
+        return status != 1 || deadline.before(new Date());
     }
 
     public String getTime() {

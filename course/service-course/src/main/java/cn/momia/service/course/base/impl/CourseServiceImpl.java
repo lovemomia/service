@@ -161,7 +161,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
             int avaliableSkuCount = 0;
             Date now = new Date();
             for (CourseSku sku : course.getSkus()) {
-                if (sku.isAvaliable(now)) avaliableSkuCount++;
+                if (sku.isBookable(now)) avaliableSkuCount++;
             }
             course.setStatus((stock != 0) ? (avaliableSkuCount > 0 ? Course.Status.OK : Course.Status.SOLD_OUT) : Course.Status.SOLD_OUT);
 
