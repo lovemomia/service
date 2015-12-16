@@ -60,13 +60,24 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public long queryRecommendCount(long cityId) {
-        String sql = "SELECT COUNT(DISTINCT A.CourseId) FROM SG_CourseRecommend A INNER JOIN SG_Course B ON A.CourseId=B.Id INNER JOIN SG_Subject C ON B.SubjectId=C.Id WHERE A.Status<>0 AND B.Status=1 AND C.Status=1 AND C.CityId=?";
+        String sql = "SELECT COUNT(DISTINCT A.CourseId) " +
+                "FROM SG_CourseRecommend A " +
+                "INNER JOIN SG_Course B ON A.CourseId=B.Id " +
+                "INNER JOIN SG_Subject C ON B.SubjectId=C.Id " +
+                "INNER JOIN SG_CourseSku D ON A.CourseId=D.CourseId " +
+                "WHERE A.Status<>0 AND B.Status=1 AND C.Status=1 AND C.CityId=? AND D.Status=1 AND DATE_ADD(DATE(D.EndTime), INTERVAL 1 DAY)>NOW()";
         return queryLong(sql, new Object[] { cityId });
     }
 
     @Override
     public List<Course> queryRecomend(long cityId, int start, int count) {
-        String sql = "SELECT DISTINCT A.CourseId FROM SG_CourseRecommend A INNER JOIN SG_Course B ON A.CourseId=B.Id INNER JOIN SG_Subject C ON B.SubjectId=C.Id WHERE A.Status<>0 AND B.Status=1 AND C.Status=1 AND C.CityId=? ORDER BY A.Weight DESC, A.AddTime DESC LIMIT ?,?";
+        String sql = "SELECT DISTINCT A.CourseId " +
+                "FROM SG_CourseRecommend A " +
+                "INNER JOIN SG_Course B ON A.CourseId=B.Id " +
+                "INNER JOIN SG_Subject C ON B.SubjectId=C.Id " +
+                "INNER JOIN SG_CourseSku D ON A.CourseId=D.CourseId " +
+                "WHERE A.Status<>0 AND B.Status=1 AND C.Status=1 AND C.CityId=? AND D.Status=1 AND DATE_ADD(DATE(D.EndTime), INTERVAL 1 DAY)>NOW() " +
+                "ORDER BY A.Weight DESC, A.AddTime DESC LIMIT ?,?";
         List<Long> courseIds = queryLongList(sql, new Object[] { cityId, start, count });
 
         return list(courseIds);
@@ -74,13 +85,22 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public long queryTrialCount(long cityId) {
-        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Status=1 AND B.Stock>=0 AND B.Status=1 AND B.CityId=? AND B.Type=2";
+        String sql = "SELECT COUNT(DISTINCT A.Id) " +
+                "FROM SG_Course A " +
+                "INNER JOIN SG_Subject B ON A.SubjectId=B.Id " +
+                "INNER JOIN SG_CourseSku C ON A.Id=C.CourseId " +
+                "WHERE A.Status=1 AND B.Status=1 AND B.CityId=? AND B.Type=2 AND C.Status=1 AND DATE_ADD(DATE(C.EndTime), INTERVAL 1 DAY)>NOW()";
         return queryLong(sql, new Object[] { cityId });
     }
 
     @Override
     public List<Course> queryTrial(long cityId, int start, int count) {
-        String sql = "SELECT DISTINCT A.Id FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Status=1 AND B.Stock>=0 AND B.Status=1 AND B.CityId=? AND B.Type=2 ORDER BY B.Stock DESC, A.Joined DESC, A.AddTime DESC LIMIT ?,?";
+        String sql = "SELECT DISTINCT A.Id " +
+                "FROM SG_Course A " +
+                "INNER JOIN SG_Subject B ON A.SubjectId=B.Id " +
+                "INNER JOIN SG_CourseSku C ON A.Id=C.CourseId " +
+                "WHERE A.Status=1 AND B.Status=1 AND B.CityId=? AND B.Type=2 AND C.Status=1 AND DATE_ADD(DATE(C.EndTime), INTERVAL 1 DAY)>NOW() " +
+                "ORDER BY B.Stock DESC, A.Joined DESC, A.AddTime DESC LIMIT ?,?";
         List<Long> courseIds = queryLongList(sql, new Object[] { cityId, start, count });
 
         return list(courseIds);
@@ -138,7 +158,12 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
             }
 
             int stock = course.getStock();
-            course.setStatus((stock == -1 || stock > 0) ? Course.Status.OK : Course.Status.SOLD_OUT);
+            int avaliableSkuCount = 0;
+            Date now = new Date();
+            for (CourseSku sku : course.getSkus()) {
+                if (sku.isBookable(now)) avaliableSkuCount++;
+            }
+            course.setStatus((stock != 0) ? (avaliableSkuCount > 0 ? Course.Status.OK : Course.Status.SOLD_OUT) : Course.Status.SOLD_OUT);
 
             course.setAge(formatAge(course));
             course.setScheduler(formatScheduler(course));
@@ -313,7 +338,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         Date now = new Date();
         List<Date> times = new ArrayList<Date>();
         for (CourseSku sku : skus) {
-            if (sku.isAvaliable(now)) {
+            if (!sku.isEnded(now)) {
                 times.add(sku.getStartTime());
                 times.add(sku.getEndTime());
             }
@@ -407,15 +432,37 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
-    public long queryCountBySubject(long subjectId, Collection<Long> exclusions, int minAge, int maxAge) {
+    public long queryCountBySubject(long subjectId, Collection<Long> exclusions, int minAge, int maxAge, int queryType) {
+        String query = "1=1";
+        if (queryType == Course.QueryType.BOOKABLE) {
+            query = "B.Deadline>NOW() AND B.UnlockedStock>0";
+        } else if (queryType == Course.QueryType.NOT_END) {
+            query = "DATE_ADD(DATE(B.EndTime), INTERVAL 1 DAY)>NOW()";
+        }
+
         String sql = exclusions.isEmpty() ?
-                "SELECT COUNT(DISTINCT A.Id) FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.MinAge>=? AND A.MaxAge<=? AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1" :
-                "SELECT COUNT(DISTINCT A.Id) FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.MinAge>=? AND A.MaxAge<=? AND A.Id NOT IN (" + StringUtils.join(exclusions, ",") + ") AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1";
+                "SELECT COUNT(DISTINCT A.Id) " +
+                        "FROM SG_Course A " +
+                        "INNER JOIN SG_CourseSku B ON A.Id=B.CourseId " +
+                        "WHERE A.SubjectId=? AND A.MinAge>=? AND A.MaxAge<=? AND A.Status=1 " +
+                        "AND " + query + " AND B.Status=1" :
+                "SELECT COUNT(DISTINCT A.Id) " +
+                        "FROM SG_Course A " +
+                        "INNER JOIN SG_CourseSku B ON A.Id=B.CourseId " +
+                        "WHERE A.SubjectId=? AND A.MinAge>=? AND A.MaxAge<=? AND A.Id NOT IN (" + StringUtils.join(exclusions, ",") + ") AND A.Status=1 " +
+                        "AND " + query + " AND B.Status=1";
         return queryLong(sql, new Object[] { subjectId, minAge, maxAge });
     }
 
     @Override
-    public List<Course> queryBySubject(long subjectId, int start, int count, Collection<Long> exclusions, int minAge, int maxAge, int sortTypeId) {
+    public List<Course> queryBySubject(long subjectId, int start, int count, Collection<Long> exclusions, int minAge, int maxAge, int sortTypeId, int queryType) {
+        String query = "1=1";
+        if (queryType == Course.QueryType.BOOKABLE) {
+            query = "B.Deadline>NOW() AND B.UnlockedStock>0";
+        } else if (queryType == Course.QueryType.NOT_END) {
+            query = "DATE_ADD(DATE(B.EndTime), INTERVAL 1 DAY)>NOW()";
+        }
+
         String sort = "MIN(B.StartTime) ASC";
         if (sortTypeId == SORT_TYPE_JOINED) {
             sort = "A.Joined DESC";
@@ -424,8 +471,20 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         }
 
         String sql = exclusions.isEmpty() ?
-                "SELECT A.Id FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.MinAge>=? AND A.MaxAge<=? AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1 GROUP BY A.Id ORDER BY " + sort + " LIMIT ?,?" :
-                "SELECT A.Id FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND A.MinAge>=? AND A.MaxAge<=? AND A.Id NOT IN (" + StringUtils.join(exclusions, ",") + ") AND A.Status=1 AND B.Deadline>NOW() AND B.Status=1 GROUP BY A.Id ORDER BY " + sort + " LIMIT ?,?";
+                "SELECT A.Id " +
+                        "FROM SG_Course A " +
+                        "INNER JOIN SG_CourseSku B ON A.Id=B.CourseId " +
+                        "WHERE A.SubjectId=? AND A.MinAge>=? AND A.MaxAge<=? AND A.Status=1 " +
+                        "AND " + query + " AND B.Status=1 " +
+                        "GROUP BY A.Id " +
+                        "ORDER BY " + sort + " LIMIT ?,?" :
+                "SELECT A.Id " +
+                        "FROM SG_Course A " +
+                        "INNER JOIN SG_CourseSku B ON A.Id=B.CourseId " +
+                        "WHERE A.SubjectId=? AND A.MinAge>=? AND A.MaxAge<=? AND A.Id NOT IN (" + StringUtils.join(exclusions, ",") + ") AND A.Status=1 " +
+                        "AND " + query + " AND B.Status=1 " +
+                        "GROUP BY A.Id " +
+                        "ORDER BY " + sort + " LIMIT ?,?";
         List<Long> courseIds = queryLongList(sql, new Object[] { subjectId, minAge, maxAge, start, count });
 
         return list(courseIds);

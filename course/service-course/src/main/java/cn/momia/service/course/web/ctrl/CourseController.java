@@ -103,11 +103,21 @@ public class CourseController extends BaseController {
         if (!course.exists()) return MomiaHttpResponse.FAILED("课程不存在");
 
         if (type == Course.ShowType.FULL) {
-            course.setPlace(buildCourseSkuPlace(filterUnavaliableSkus(course.getSkus()), pos));
+            course.setPlace(buildCourseSkuPlace(filterNotEndedSkus(course.getSkus()), pos));
             return MomiaHttpResponse.SUCCESS(course);
         } else {
             return MomiaHttpResponse.SUCCESS(new Course.Base(course));
         }
+    }
+
+    private List<CourseSku> filterNotEndedSkus(List<CourseSku> skus) {
+        List<CourseSku> notEndedSkus = new ArrayList<CourseSku>();
+        Date now = new Date();
+        for (CourseSku sku : skus) {
+            if (!sku.isEnded(now)) notEndedSkus.add(sku);
+        }
+
+        return notEndedSkus;
     }
 
     private CourseSkuPlace buildCourseSkuPlace(List<CourseSku> skus, String pos) {
@@ -169,7 +179,7 @@ public class CourseController extends BaseController {
         CourseSku earliestSku = null;
         Date now = new Date();
         for (CourseSku sku : skus) {
-            if (sku.isAvaliable(now)) {
+            if (!sku.isEnded(now)) {
                 if (earliestSku == null) {
                     earliestSku = sku;
                 } else {
@@ -200,8 +210,8 @@ public class CourseController extends BaseController {
                                    @RequestParam int start,
                                    @RequestParam int count) {
         List<Long> courseIds = courseService.queryBookedCourseIds(packageId);
-        long totalCount = courseService.queryCountBySubject(subjectId, courseIds, minAge, maxAge);
-        List<Course> courses = courseService.queryBySubject(subjectId, start, count, courseIds, minAge, maxAge, sortTypeId);
+        long totalCount = courseService.queryCountBySubject(subjectId, courseIds, minAge, maxAge, (packageId > 0 ? Course.QueryType.BOOKABLE : Course.QueryType.NOT_END));
+        List<Course> courses = courseService.queryBySubject(subjectId, start, count, courseIds, minAge, maxAge, sortTypeId, (packageId > 0 ? Course.QueryType.BOOKABLE : Course.QueryType.NOT_END));
 
         return MomiaHttpResponse.SUCCESS(buildPagedCourses(courses, totalCount, start, count));
     }
@@ -270,17 +280,7 @@ public class CourseController extends BaseController {
         String end = DATE_FORMAT.format(new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000));
         List<CourseSku> skus = courseService.querySkus(courseId, start, end);
 
-        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkus(filterUnavaliableSkus(skus)));
-    }
-
-    private List<CourseSku> filterUnavaliableSkus(List<CourseSku> skus) {
-        List<CourseSku> avaliableSkus = new ArrayList<CourseSku>();
-        Date now = new Date();
-        for (CourseSku sku : skus) {
-            if (sku.isAvaliable(now)) avaliableSkus.add(sku);
-        }
-
-        return avaliableSkus;
+        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkus(filterNotEndedSkus(skus)));
     }
 
     private List<DatedCourseSkus> buildDatedCourseSkus(List<CourseSku> skus) {
@@ -323,7 +323,7 @@ public class CourseController extends BaseController {
         String end = formatNextMonth(month);
         List<CourseSku> skus = courseService.querySkus(courseId, start, end);
 
-        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkus(filterUnavaliableSkus(skus)));
+        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkus(filterNotEndedSkus(skus)));
     }
 
     private String formatCurrentMonth(int month) {
@@ -427,7 +427,7 @@ public class CourseController extends BaseController {
         if (!subjectSku.exists()) return MomiaHttpResponse.FAILED("预约失败，无效的课程包");
 
         CourseSku sku = courseService.getSku(skuId);
-        if (!sku.exists() || !sku.isAvaliable(new Date())) return MomiaHttpResponse.FAILED("预约失败，无效的课程地点");
+        if (!sku.exists() || !sku.isBookable(new Date())) return MomiaHttpResponse.FAILED("预约失败，无效的课程场次或本场次已截止选课");
         if (orderPackage.getCourseId() > 0 && orderPackage.getCourseId() != sku.getCourseId()) return MomiaHttpResponse.FAILED("预约失败，课程与购买的包不匹配");
 
         Map<Long, Date> startTimes = courseService.queryStartTimesByPackages(Sets.newHashSet(packageId));

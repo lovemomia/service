@@ -3,6 +3,7 @@ package cn.momia.service.course.subject.impl;
 import cn.momia.api.base.MetaUtil;
 import cn.momia.api.base.dto.Region;
 import cn.momia.api.course.dto.Course;
+import cn.momia.api.course.dto.CourseSku;
 import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.common.util.TimeUtil;
@@ -65,13 +66,6 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
         for (long subjectId : subjectIds) {
             Subject subject = subjectsMap.get(subjectId);
             if (subject != null) {
-                if (subject.getType() == Subject.Type.NORMAL) {
-                    subject.setStatus(Subject.Status.OK);
-                } else {
-                    int stock = subject.getStock();
-                    subject.setStatus(stock > 0 ? Subject.Status.OK : Subject.Status.SOLD_OUT);
-                }
-
                 SubjectSku minPriceSku = getMinPriceSku(subject);
                 subject.setPrice(minPriceSku.getPrice());
                 subject.setOriginalPrice(minPriceSku.getOriginalPrice());
@@ -82,6 +76,14 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
                 subject.setJoined(getJoined(courses));
                 subject.setScheduler(getScheduler(courses));
                 subject.setRegion(getRegion(courses));
+
+                if (subject.getType() == Subject.Type.NORMAL) {
+                    subject.setStatus(Subject.Status.OK);
+                } else {
+                    int stock = subject.getStock();
+                    int avaliableCourseCount = getAvaliableCourseCount(courses);
+                    subject.setStatus(stock > 0 ? (avaliableCourseCount > 0 ? Subject.Status.OK : Subject.Status.SOLD_OUT) : Subject.Status.SOLD_OUT);
+                }
 
                 result.add(subject);
             }
@@ -206,6 +208,22 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
         return MetaUtil.getRegionName(regionIds.size() > 1 ? Region.MULTI_REGION_ID : regionIds.get(0));
     }
 
+    private int getAvaliableCourseCount(List<Course> courses) {
+        int count = 0;
+        Date now = new Date();
+        for (Course course : courses) {
+            List<CourseSku> skus = course.getSkus();
+            for (CourseSku sku : skus) {
+                if (sku.isBookable(now)) {
+                    count++;
+                    break;
+                }
+            }
+        }
+
+        return count;
+    }
+
     @Override
     public SubjectSku getSku(long skuId) {
         Set<Long> skuIds = Sets.newHashSet(skuId);
@@ -251,13 +269,22 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
 
     @Override
     public long queryTrialCount(long cityId) {
-        String sql = "SELECT COUNT(1) FROM SG_Subject WHERE `Type`=? AND CityId=? AND Stock>=0 AND Status=1";
+        String sql = "SELECT COUNT(DISTINCT A.Id) " +
+                "FROM SG_Subject A " +
+                "INNER JOIN SG_Course B ON A.Id=B.SubjectId " +
+                "INNER JOIN SG_CourseSku C ON B.Id=C.CourseId " +
+                "WHERE A.Type=? AND A.CityId=? AND A.Status=1 AND B.Status=1 AND C.Status=1 AND DATE_ADD(DATE(C.EndTime), INTERVAL 1 DAY)>NOW()";
         return queryLong(sql, new Object[] { Subject.Type.TRIAL, cityId });
     }
 
     @Override
     public List<Subject> queryTrial(long cityId, int start, int count) {
-        String sql = "SELECT Id FROM SG_Subject WHERE `Type`=? AND CityId=? AND Stock>=0 AND Status=1 ORDER BY Stock DESC, AddTime DESC LIMIT ?,?";
+        String sql = "SELECT DISTINCT A.Id " +
+                "FROM SG_Subject A " +
+                "INNER JOIN SG_Course B ON A.Id=B.SubjectId " +
+                "INNER JOIN SG_CourseSku C ON B.Id=C.CourseId " +
+                "WHERE A.Type=? AND A.CityId=? AND A.Status=1 AND B.Status=1 AND C.Status=1 AND DATE_ADD(DATE(C.EndTime), INTERVAL 1 DAY)>NOW() " +
+                "ORDER BY A.Stock DESC, A.AddTime DESC LIMIT ?,?";
         List<Long> subjectIds = queryLongList(sql, new Object[] { Subject.Type.TRIAL, cityId, start, count });
 
         return list(subjectIds);

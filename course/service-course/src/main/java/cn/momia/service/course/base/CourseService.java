@@ -30,8 +30,8 @@ public interface CourseService {
     long queryTeacherCount(long courseId);
     List<Teacher> queryTeachers(long courseId, int start, int count);
 
-    long queryCountBySubject(long subjectId, Collection<Long> exclusions, int minAge, int maxAge);
-    List<Course> queryBySubject(long subjectId, int start, int count, Collection<Long> exclusions, int minAge, int maxAge, int sortTypeId);
+    long queryCountBySubject(long subjectId, Collection<Long> exclusions, int minAge, int maxAge, int queryType);
+    List<Course> queryBySubject(long subjectId, int start, int count, Collection<Long> exclusions, int minAge, int maxAge, int sortTypeId, int queryType);
 
     List<Course> queryAllBySubject(long subjectId);
     Map<Long, List<Course>> queryAllBySubjects(Collection<Long> subjectIds);

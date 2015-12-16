@@ -17,6 +17,11 @@ public class Course implements Cloneable {
         public static final int FULL = 2;
     }
 
+    public static class QueryType {
+        public static final int NOT_END = 1;
+        public static final int BOOKABLE = 2;
+    }
+
     public static class Status {
         public static final int OK = 1;
         public static final int SOLD_OUT = 2;
@@ -307,7 +312,7 @@ public class Course implements Cloneable {
         Date now = new Date();
         List<Date> startTimes = new ArrayList<Date>();
         for (CourseSku sku : skus) {
-            if (sku.isAvaliable(now)) startTimes.add(sku.getStartTime());
+            if (!sku.isEnded(now)) startTimes.add(sku.getStartTime());
         }
         Collections.sort(startTimes);
 
@@ -319,7 +324,7 @@ public class Course implements Cloneable {
         Date now = new Date();
         List<Date> endTimes = new ArrayList<Date>();
         for (CourseSku sku : skus) {
-            if (sku.isAvaliable(now)) endTimes.add(sku.getEndTime());
+            if (!sku.isEnded(now)) endTimes.add(sku.getEndTime());
         }
         Collections.sort(endTimes);
 
