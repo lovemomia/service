@@ -162,12 +162,11 @@ public class CourseSku {
                 return TIME_FORMAT.format(startTime) + " - " + MONTH_DATE_FORMAT.format(endTime) + " " + TIME_FORMAT.format(endTime);
             }
         }
-
     }
 
     public String getScheduler() {
         if (TimeUtil.isSameDay(startTime, endTime)) {
-            return MONTH_DATE_FORMAT.format(startTime) + " " + TimeUtil.getWeekDay(startTime) + " " + TIME_FORMAT.format(startTime);
+            return MONTH_DATE_FORMAT.format(startTime) + TIME_FORMAT.format(startTime) + " - " + TIME_FORMAT.format(endTime);
         } else {
             return MONTH_DATE_FORMAT.format(startTime) + " - " + MONTH_DATE_FORMAT.format(endTime);
         }

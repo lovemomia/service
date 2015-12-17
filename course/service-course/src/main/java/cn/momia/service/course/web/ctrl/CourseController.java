@@ -188,7 +188,7 @@ public class CourseController extends BaseController {
             }
         }
 
-        return earliestSku == null ? "" : earliestSku.getTime();
+        return earliestSku == null ? "" : earliestSku.getScheduler();
     }
 
     @RequestMapping(value = "/finished/list", method = RequestMethod.GET)
