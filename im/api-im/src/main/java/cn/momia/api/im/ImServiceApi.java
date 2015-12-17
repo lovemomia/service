@@ -79,6 +79,11 @@ public class ImServiceApi extends ServiceApi {
         return executeReturnObject(request, Boolean.class);
     }
 
+    public boolean dismissGroup(long groupId) {
+        HttpUriRequest request = MomiaHttpRequestBuilder.DELETE(url("/im/group/%d", groupId));
+        return executeReturnObject(request, Boolean.class);
+    }
+
     public Group getGroup(long groupId) {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/im/group/%d", groupId));
         return executeReturnObject(request, Group.class);

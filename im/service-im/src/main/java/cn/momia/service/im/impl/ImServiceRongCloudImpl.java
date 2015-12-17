@@ -58,6 +58,25 @@ public class ImServiceRongCloudImpl extends AbstractImService {
     }
 
     @Override
+    protected boolean doDismissGroup(long groupId) {
+        try {
+            HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.DismissGroup"));
+
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("userId", String.valueOf(10000)));
+            params.add(new BasicNameValuePair("groupId", String.valueOf(groupId)));
+            HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
+            httpPost.setEntity(entity);
+
+            JSONObject responseJson = RongCloudUtil.executeRequest(httpPost);
+
+            return responseJson.getInteger("code") == 200;
+        } catch (Exception e) {
+            throw new MomiaErrorException("fail to dismiss group " + groupId, e);
+        }
+    }
+
+    @Override
     protected boolean doJoinGroup(long groupId, String groupName, long userId) {
         try {
             HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.JoinGroup"));

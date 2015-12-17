@@ -96,6 +96,29 @@ public abstract class AbstractImService extends AbstractService implements ImSer
         return update(sql, new Object[] { groupName, groupId, courseId, courseSkuId });
     }
 
+    public boolean dismissGroup(long groupId) {
+        if (doDismissGroup(groupId)) {
+            deleteGroupLog(groupId);
+            deleteGroupMembersLog(groupId);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    protected abstract boolean doDismissGroup(long groupId);
+
+    private void deleteGroupLog(long groupId) {
+        String sql = "UPDATE SG_ImGroup SET Status=0 WHERE GroupId=?";
+        update(sql, new Object[] { groupId });
+    }
+
+    private void deleteGroupMembersLog(long groupId) {
+        String sql = "UPDATE SG_ImGroupMember SET Status=0 WHERE GroupId=?";
+        update(sql, new Object[] { groupId });
+    }
+
     @Override
     public Group getGroup(long groupId) {
         Set<Long> groupIds = Sets.newHashSet(groupId);

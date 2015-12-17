@@ -92,6 +92,7 @@
                 <UpdateUser>https://api.cn.ronghub.com/user/refresh.json</UpdateUser>
                 <CreateGroup>https://api.cn.ronghub.com/group/create.json</CreateGroup>
                 <UpdateGroup>https://api.cn.ronghub.com/group/refresh.json</UpdateGroup>
+                <DismissGroup>https://api.cn.ronghub.com/group/dismiss.json</DismissGroup>
                 <JoinGroup>https://api.cn.ronghub.com/group/join.json</JoinGroup>
                 <LeaveGroup>https://api.cn.ronghub.com/group/quit.json</LeaveGroup>
                 <SystemPush>https://api.cn.ronghub.com/message/system/publish.json</SystemPush>
