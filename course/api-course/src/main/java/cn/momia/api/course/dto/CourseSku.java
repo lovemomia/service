@@ -166,7 +166,7 @@ public class CourseSku {
 
     public String getScheduler() {
         if (TimeUtil.isSameDay(startTime, endTime)) {
-            return MONTH_DATE_FORMAT.format(startTime) + TIME_FORMAT.format(startTime) + " - " + TIME_FORMAT.format(endTime);
+            return MONTH_DATE_FORMAT.format(startTime) + " " + TIME_FORMAT.format(startTime) + " - " + TIME_FORMAT.format(endTime);
         } else {
             return MONTH_DATE_FORMAT.format(startTime) + " - " + MONTH_DATE_FORMAT.format(endTime);
         }
