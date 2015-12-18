@@ -140,10 +140,11 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
         List<Feed> result = new ArrayList<Feed>();
         for (long feedId : feedIds) {
             Feed feed = feedsMap.get(feedId);
-            if (feed != null) result.add(feed);
+            if (feed == null) continue;
 
             String tagName = tagNamesMap.get(feed.getTagId());
             feed.setTagName(tagName == null ? "" : tagName);
+            result.add(feed);
         }
 
         return result;
