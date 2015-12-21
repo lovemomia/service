@@ -5,6 +5,7 @@ public class Icon {
     private String img;
     private String action;
     private int platform;
+    private String version;
 
     public String getTitle() {
         return title;
@@ -36,5 +37,13 @@ public class Icon {
 
     public void setPlatform(int platform) {
         this.platform = platform;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }
