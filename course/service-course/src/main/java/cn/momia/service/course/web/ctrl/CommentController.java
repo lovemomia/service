@@ -131,7 +131,7 @@ public class CommentController extends BaseController {
         return MomiaHttpResponse.SUCCESS(courseCommentService.queryLatestImgs(userId));
     }
 
-    @RequestMapping(value = "/timeline", method = RequestMethod.GET)
+    @RequestMapping(value = "/course/timeline", method = RequestMethod.GET)
     public MomiaHttpResponse timeline(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
@@ -142,12 +142,19 @@ public class CommentController extends BaseController {
         for(BookedCourse bookedCourse : bookedCourses) {
             courseIds.add(bookedCourse.getCourseId());
         }
+        List<Course> courses = courseService.list(courseIds);
+        Map<Long, Course> coursesMap = new HashMap<Long, Course>();
+        for (Course course : courses) {
+            coursesMap.put(course.getId(), course);
+        }
+
         List<CourseComment> comments = courseCommentService.queryComments(userId, courseIds);
         Map<Long, CourseComment> commentsMap = new HashMap<Long, CourseComment>();
         Set<Long> userIds = new HashSet<Long>();
         for (CourseComment comment : comments) {
             commentsMap.put(comment.getCourseId(), comment);
             userIds.add(comment.getUserId());
+
         }
 
         List<User> users = userServiceApi.list(userIds, User.Type.FULL);
@@ -158,9 +165,12 @@ public class CommentController extends BaseController {
 
         List<TimelineUnit> timeline = new ArrayList<TimelineUnit>();
         for (BookedCourse bookedCourse : bookedCourses) {
+            Course course = coursesMap.get(bookedCourse.getCourseId());
+            if (course == null) continue;
+
             TimelineUnit unit = new TimelineUnit();
             unit.setCourseId(bookedCourse.getCourseId());
-            unit.setCourseTitle(bookedCourse.getTitle());
+            unit.setCourseTitle(course.getTitle());
             unit.setStartTime(bookedCourse.getStartTime());
 
             CourseComment comment = commentsMap.get(bookedCourse.getCourseId());
