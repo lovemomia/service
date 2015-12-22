@@ -639,7 +639,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public List<BookedCourse> queryFinishedByUser(long userId, int start, int count) {
-        String sql = "SELECT A.Id FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status<>0 AND B.StartTime<=NOW() AND B.Status<>0 ORDER BY B.StartTime ASC LIMIT ?,?";
+        String sql = "SELECT A.Id FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status<>0 AND B.StartTime<=NOW() AND B.Status<>0 ORDER BY B.StartTime DESC LIMIT ?,?";
         List<Long> bookingIds = queryLongList(sql, new Object[] { userId, start, count });
 
         return listBookedCourses(bookingIds);

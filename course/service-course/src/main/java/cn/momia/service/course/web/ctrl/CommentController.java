@@ -1,7 +1,9 @@
 package cn.momia.service.course.web.ctrl;
 
+import cn.momia.api.course.dto.BookedCourse;
 import cn.momia.api.course.dto.Course;
 import cn.momia.api.course.dto.CourseCommentChild;
+import cn.momia.api.course.dto.TimelineUnit;
 import cn.momia.api.course.dto.UserCourseComment;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.Child;
@@ -127,6 +129,53 @@ public class CommentController extends BaseController {
     @RequestMapping(value = "/course/comment/img", method = RequestMethod.GET)
     public MomiaHttpResponse getLatestImgs(@RequestParam(value = "uid") long userId) {
         return MomiaHttpResponse.SUCCESS(courseCommentService.queryLatestImgs(userId));
+    }
+
+    @RequestMapping(value = "/timeline", method = RequestMethod.GET)
+    public MomiaHttpResponse timeline(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = courseService.queryFinishedCountByUser(userId);
+        List<BookedCourse> bookedCourses = courseService.queryFinishedByUser(userId, start, count);
+
+        Set<Long> courseIds = new HashSet<Long>();
+        for(BookedCourse bookedCourse : bookedCourses) {
+            courseIds.add(bookedCourse.getCourseId());
+        }
+        List<CourseComment> comments = courseCommentService.queryComments(userId, courseIds);
+        Map<Long, CourseComment> commentsMap = new HashMap<Long, CourseComment>();
+        Set<Long> userIds = new HashSet<Long>();
+        for (CourseComment comment : comments) {
+            commentsMap.put(comment.getCourseId(), comment);
+            userIds.add(comment.getUserId());
+        }
+
+        List<User> users = userServiceApi.list(userIds, User.Type.FULL);
+        Map<Long, User> usersMap = new HashMap<Long, User>();
+        for (User user : users) {
+            usersMap.put(user.getId(), user);
+        }
+
+        List<TimelineUnit> timeline = new ArrayList<TimelineUnit>();
+        for (BookedCourse bookedCourse : bookedCourses) {
+            TimelineUnit unit = new TimelineUnit();
+            unit.setCourseId(bookedCourse.getCourseId());
+            unit.setCourseTitle(bookedCourse.getTitle());
+            unit.setStartTime(bookedCourse.getStartTime());
+
+            CourseComment comment = commentsMap.get(bookedCourse.getCourseId());
+            if (comment != null) {
+                User user = usersMap.get(comment.getUserId());
+                if (user != null) unit.setComment(buildUserCourseComment(comment, user));
+            }
+
+            timeline.add(unit);
+        }
+
+        PagedList<TimelineUnit> pagedTimeline = new PagedList<TimelineUnit>(totalCount, start, count);
+        pagedTimeline.setList(timeline);
+
+        return MomiaHttpResponse.SUCCESS(pagedTimeline);
     }
 
     @RequestMapping(value = "/subject/{suid}/comment", method = RequestMethod.GET)
