@@ -154,4 +154,10 @@ public class CourseCommentServiceImpl extends AbstractService implements CourseC
         String sql = "SELECT BookingId FROM SG_CourseComment WHERE UserId=? AND BookingId IN (" + StringUtils.join(bookingIds, ",") + ")";
         return queryLongList(sql, new Object[] { userId });
     }
+
+    @Override
+    public List<String> queryLatestImgs(long userId) {
+        String sql = "SELECT B.Url FROM SG_CourseComment A INNER JOIN SG_CourseCommentImg B ON A.Id=B.CommentId WHERE A.UserId=? AND A.Status=1 AND B.Status=1 ORDER BY B.AddTime DESC LIMIT 4";
+        return queryStringList(sql, new Object[] { userId });
+    }
 }

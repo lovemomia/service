@@ -103,6 +103,11 @@ public class CommentController extends BaseController {
         return formatedChildren;
     }
 
+    @RequestMapping(value = "/course/comment/img", method = RequestMethod.GET)
+    public MomiaHttpResponse getLatestImgs(@RequestParam(value = "uid") long userId) {
+        return MomiaHttpResponse.SUCCESS(courseCommentService.queryLatestImgs(userId));
+    }
+
     @RequestMapping(value = "/subject/{suid}/comment", method = RequestMethod.GET)
     public MomiaHttpResponse listComments(@PathVariable(value = "suid") long subjectId, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);

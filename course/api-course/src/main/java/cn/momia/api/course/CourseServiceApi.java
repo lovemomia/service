@@ -208,6 +208,13 @@ public class CourseServiceApi extends ServiceApi {
         return executeReturnPagedList(request, UserCourseComment.class);
     }
 
+    public List<String> getLatestImgs(long userId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/comment/img"), builder.build());
+
+        return executeReturnList(request, String.class);
+    }
+
     public boolean isFavored(long userId, long courseId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/favored", courseId), builder.build());

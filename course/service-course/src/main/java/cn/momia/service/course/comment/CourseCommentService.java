@@ -13,4 +13,6 @@ public interface CourseCommentService {
     List<CourseComment> queryCommentsBySubject(long subjectId, int start, int count);
 
     List<Long> queryCommentedBookingIds(long userId, Collection<Long> courseIds);
+
+    List<String> queryLatestImgs(long userId);
 }
