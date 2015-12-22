@@ -1,6 +1,7 @@
 package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.course.dto.Course;
+import cn.momia.api.course.dto.CourseCommentChild;
 import cn.momia.api.course.dto.UserCourseComment;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.Child;
@@ -84,7 +85,12 @@ public class CommentController extends BaseController {
         userCourseComment.setUserId(user.getId());
         userCourseComment.setNickName(user.getNickName());
         userCourseComment.setAvatar(user.getAvatar());
-        userCourseComment.setChildren(formatChildren(user.getChildren()));
+
+        List<CourseCommentChild> childrenDetail = formatChildrenDetail(user.getChildren());
+        List<String> children = formatChildren(childrenDetail);
+        userCourseComment.setChildrenDetail(childrenDetail);
+        userCourseComment.setChildren(children);
+
         userCourseComment.setAddTime(TimeUtil.formatAddTime(comment.getAddTime()));
         userCourseComment.setStar(comment.getStar());
         userCourseComment.setContent(comment.getContent());
@@ -93,11 +99,26 @@ public class CommentController extends BaseController {
         return userCourseComment;
     }
 
-    private List<String> formatChildren(List<Child> children) {
-        List<String> formatedChildren = new ArrayList<String>();
+
+    private List<CourseCommentChild> formatChildrenDetail(List<Child> children) {
+        List<CourseCommentChild> commentChildren = new ArrayList<CourseCommentChild>();
         for (int i = 0; i < Math.min(2, children.size()); i++) {
             Child child = children.get(i);
-            formatedChildren.add(child.getSex() + "孩" + TimeUtil.formatAge(child.getBirthday()));
+            CourseCommentChild commentChild = new CourseCommentChild();
+            commentChild.setSex(child.getSex());
+            commentChild.setName(child.getName());
+            commentChild.setAge(TimeUtil.formatAge(child.getBirthday()));
+
+            commentChildren.add(commentChild);
+        }
+
+        return commentChildren;
+    }
+
+    private List<String> formatChildren(List<CourseCommentChild> childrenDetail) {
+        List<String> formatedChildren = new ArrayList<String>();
+        for (CourseCommentChild child : childrenDetail) {
+            formatedChildren.add(child.getSex() + "孩" + child.getAge());
         }
 
         return formatedChildren;

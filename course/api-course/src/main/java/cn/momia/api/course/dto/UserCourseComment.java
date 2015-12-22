@@ -11,6 +11,7 @@ public class UserCourseComment {
     private long userId;
     private String nickName;
     private String avatar;
+    private List<CourseCommentChild> childrenDetail;
     private List<String> children;
 
     private String addTime;
@@ -65,6 +66,14 @@ public class UserCourseComment {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public List<CourseCommentChild> getChildrenDetail() {
+        return childrenDetail;
+    }
+
+    public void setChildrenDetail(List<CourseCommentChild> childrenDetail) {
+        this.childrenDetail = childrenDetail;
     }
 
     public List<String> getChildren() {
