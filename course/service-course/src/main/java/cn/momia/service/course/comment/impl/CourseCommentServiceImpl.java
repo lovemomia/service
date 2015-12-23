@@ -148,10 +148,40 @@ public class CourseCommentServiceImpl extends AbstractService implements CourseC
     }
 
     @Override
+    public long queryCommentCountByUser(long userId) {
+        String sql = "SELECT COUNT(1) FROM SG_CourseComment WHERE UserId=? AND Status<>0";
+        return queryLong(sql, new Object[] { userId });
+    }
+
+    @Override
+    public List<CourseComment> queryCommentsByUser(long userId, int start, int count) {
+        String sql = "SELECT Id FROM SG_CourseComment WHERE UserId=? AND Status<>0 ORDER BY AddTime DESC LIMIT ?,?";
+        List<Long> commentIds = queryLongList(sql, new Object[] { userId, start, count });
+
+        return listComments(commentIds);
+    }
+
+    @Override
+    public List<CourseComment> queryComments(long userId, Collection<Long> courseIds) {
+        if (courseIds.isEmpty()) return new ArrayList<CourseComment>();
+
+        String sql = "SELECT Id FROM SG_CourseComment WHERE UserId=? AND CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Status<>0";
+        List<Long> commentIds = queryLongList(sql, new Object[] { userId });
+
+        return listComments(commentIds);
+    }
+
+    @Override
     public List<Long> queryCommentedBookingIds(long userId, Collection<Long> bookingIds) {
         if (userId <= 0 || bookingIds.isEmpty()) return new ArrayList<Long>();
 
         String sql = "SELECT BookingId FROM SG_CourseComment WHERE UserId=? AND BookingId IN (" + StringUtils.join(bookingIds, ",") + ")";
         return queryLongList(sql, new Object[] { userId });
+    }
+
+    @Override
+    public List<String> queryLatestImgs(long userId) {
+        String sql = "SELECT B.Url FROM SG_CourseComment A INNER JOIN SG_CourseCommentImg B ON A.Id=B.CommentId WHERE A.UserId=? AND A.Status<>0 AND B.Status<>0 ORDER BY B.AddTime DESC LIMIT 4";
+        return queryStringList(sql, new Object[] { userId });
     }
 }

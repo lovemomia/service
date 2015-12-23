@@ -101,19 +101,24 @@ public class ImController extends BaseController {
         return MomiaHttpResponse.SUCCESS(imService.createGroup(courseId, courseSkuId, teacherUserIds, groupName));
     }
 
-    @RequestMapping(value = "/group/{gid}", method = RequestMethod.GET)
-    public MomiaHttpResponse getGroup(@PathVariable(value = "gid") long groupId) {
-        Group group = imService.getGroup(groupId);
-        if (!group.exists()) return MomiaHttpResponse.FAILED("群组不存在");
-        return MomiaHttpResponse.SUCCESS(group);
-    }
-
     @RequestMapping(value = "/group", method = RequestMethod.PUT)
     public MomiaHttpResponse updateGroupName(@RequestParam(value = "coid") long courseId,
                                              @RequestParam(value = "sid") long courseSkuId,
                                              @RequestParam(value = "name") String groupName) {
         if (courseId <= 0 || courseSkuId <= 0 || StringUtils.isBlank(groupName)) return MomiaHttpResponse.BAD_REQUEST;
         return MomiaHttpResponse.SUCCESS(imService.updateGroupName(courseId, courseSkuId, groupName));
+    }
+
+    @RequestMapping(value = "/group/{gid}", method = RequestMethod.DELETE)
+    public MomiaHttpResponse deleteGroup(@PathVariable(value = "gid") long groupId) {
+        return MomiaHttpResponse.SUCCESS(imService.dismissGroup(groupId));
+    }
+
+    @RequestMapping(value = "/group/{gid}", method = RequestMethod.GET)
+    public MomiaHttpResponse getGroup(@PathVariable(value = "gid") long groupId) {
+        Group group = imService.getGroup(groupId);
+        if (!group.exists()) return MomiaHttpResponse.FAILED("群组不存在");
+        return MomiaHttpResponse.SUCCESS(group);
     }
 
     @RequestMapping(value = "/group/list", method = RequestMethod.GET)

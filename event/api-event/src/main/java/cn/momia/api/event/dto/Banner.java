@@ -4,6 +4,7 @@ public class Banner {
     private String cover;
     private String action;
     private int platform;
+    private String version;
 
     public String getCover() {
         return cover;
@@ -27,5 +28,13 @@ public class Banner {
 
     public void setPlatform(int platform) {
         this.platform = platform;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

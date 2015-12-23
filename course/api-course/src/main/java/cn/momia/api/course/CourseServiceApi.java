@@ -3,6 +3,7 @@ package cn.momia.api.course;
 import cn.momia.api.course.dto.BookedCourse;
 import cn.momia.api.course.dto.Course;
 import cn.momia.api.course.dto.CourseSku;
+import cn.momia.api.course.dto.TimelineUnit;
 import cn.momia.api.course.dto.UserCourseComment;
 import cn.momia.api.course.dto.CourseDetail;
 import cn.momia.api.course.dto.DatedCourseSkus;
@@ -208,6 +209,13 @@ public class CourseServiceApi extends ServiceApi {
         return executeReturnPagedList(request, UserCourseComment.class);
     }
 
+    public List<String> getLatestImgs(long userId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/comment/img"), builder.build());
+
+        return executeReturnList(request, String.class);
+    }
+
     public boolean isFavored(long userId, long courseId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/favored", courseId), builder.build());
@@ -237,5 +245,25 @@ public class CourseServiceApi extends ServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/favorite"), builder.build());
 
         return executeReturnPagedList(request, Favorite.class);
+    }
+
+    public PagedList<TimelineUnit> timelineOfUser(long userId, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("uid", userId)
+                .add("start", start)
+                .add("count", count);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/timeline"), builder.build());
+
+        return executeReturnPagedList(request, TimelineUnit.class);
+    }
+
+    public PagedList<TimelineUnit> commentTimelineOfUser(long userId, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("uid", userId)
+                .add("start", start)
+                .add("count", count);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/comment/timeline"), builder.build());
+
+        return executeReturnPagedList(request, TimelineUnit.class);
     }
 }
