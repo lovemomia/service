@@ -13,4 +13,13 @@ public class TeacherServiceApi extends ServiceApi {
 
         return executeReturnObject(request, TeacherStatus.class);
     }
+
+    public boolean signup(String utoken, String teacher) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("teacher", teacher);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/teacher/signup"), builder.build());
+
+        return executeReturnObject(request, Boolean.class);
+    }
 }
