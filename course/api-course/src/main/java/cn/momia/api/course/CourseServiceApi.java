@@ -256,4 +256,14 @@ public class CourseServiceApi extends ServiceApi {
 
         return executeReturnPagedList(request, TimelineUnit.class);
     }
+
+    public PagedList<TimelineUnit> commentTimelineOfUser(long userId, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("uid", userId)
+                .add("start", start)
+                .add("count", count);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/comment/timeline"), builder.build());
+
+        return executeReturnPagedList(request, TimelineUnit.class);
+    }
 }

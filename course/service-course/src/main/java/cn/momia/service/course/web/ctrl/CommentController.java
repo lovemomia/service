@@ -171,13 +171,62 @@ public class CommentController extends BaseController {
             TimelineUnit unit = new TimelineUnit();
             unit.setCourseId(bookedCourse.getCourseId());
             unit.setCourseTitle(course.getTitle());
-            unit.setStartTime(bookedCourse.getStartTime());
+            unit.setTime(bookedCourse.getStartTime());
 
             CourseComment comment = commentsMap.get(bookedCourse.getCourseId());
             if (comment != null) {
                 User user = usersMap.get(comment.getUserId());
                 if (user != null) unit.setComment(buildUserCourseComment(comment, user));
             }
+
+            timeline.add(unit);
+        }
+
+        PagedList<TimelineUnit> pagedTimeline = new PagedList<TimelineUnit>(totalCount, start, count);
+        pagedTimeline.setList(timeline);
+
+        return MomiaHttpResponse.SUCCESS(pagedTimeline);
+    }
+
+    @RequestMapping(value = "/comment/timeline", method = RequestMethod.GET)
+    public MomiaHttpResponse commentTimeline(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = courseCommentService.queryCommentCountByUser(userId);
+        List<CourseComment> comments = courseCommentService.queryCommentsByUser(userId, start, count);
+
+        Set<Long> courseIds = new HashSet<Long>();
+        Set<Long> userIds = new HashSet<Long>();
+        for(CourseComment comment : comments) {
+            courseIds.add(comment.getCourseId());
+            userIds.add(comment.getUserId());
+        }
+
+        List<Course> courses = courseService.list(courseIds);
+        Map<Long, Course> coursesMap = new HashMap<Long, Course>();
+        for (Course course : courses) {
+            coursesMap.put(course.getId(), course);
+        }
+
+        List<User> users = userServiceApi.list(userIds, User.Type.FULL);
+        Map<Long, User> usersMap = new HashMap<Long, User>();
+        for (User user : users) {
+            usersMap.put(user.getId(), user);
+        }
+
+        List<TimelineUnit> timeline = new ArrayList<TimelineUnit>();
+        for (CourseComment comment : comments) {
+            Course course = coursesMap.get(comment.getCourseId());
+            if (course == null) continue;
+
+            User user = usersMap.get(comment.getUserId());
+            if (user == null) continue;
+
+            TimelineUnit unit = new TimelineUnit();
+            unit.setCourseId(course.getId());
+            unit.setCourseTitle(course.getTitle());
+            unit.setTime(comment.getAddTime());
+            unit.setComment(buildUserCourseComment(comment, user));
 
             timeline.add(unit);
         }

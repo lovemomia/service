@@ -7,7 +7,7 @@ import java.util.Date;
 public class TimelineUnit {
     private long courseId;
     private String courseTitle;
-    @JSONField(format = "yyyy-MM-dd") private Date startTime;
+    @JSONField(format = "yyyy-MM-dd") private Date time;
     private UserCourseComment comment;
 
     public long getCourseId() {
@@ -26,12 +26,12 @@ public class TimelineUnit {
         this.courseTitle = courseTitle;
     }
 
-    public Date getStartTime() {
-        return startTime;
+    public Date getTime() {
+        return time;
     }
 
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+    public void setTime(Date time) {
+        this.time = time;
     }
 
     public UserCourseComment getComment() {
