@@ -5,10 +5,13 @@ import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
+import java.util.List;
 
 public class Teacher {
-    private long id;
-    private long userId;
+    public static final Teacher NOT_EXIST_TEACHER = new Teacher();
+
+    private int id;
+    @JSONField(serialize = false) private long userId;
     private String pic;
     private String name;
     private String idNo;
@@ -16,11 +19,14 @@ public class Teacher {
     @JSONField(format = "yyyy-MM-dd") private Date birthday;
     private String address;
 
-    public long getId() {
+    private List<Experience> experiences;
+    private List<Education> educations;
+
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -78,6 +84,26 @@ public class Teacher {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public List<Experience> getExperiences() {
+        return experiences;
+    }
+
+    public void setExperiences(List<Experience> experiences) {
+        this.experiences = experiences;
+    }
+
+    public List<Education> getEducations() {
+        return educations;
+    }
+
+    public void setEducations(List<Education> educations) {
+        this.educations = educations;
+    }
+
+    public boolean exists() {
+        return id > 0;
     }
 
     @JSONField(serialize = false)
