@@ -1,8 +1,10 @@
 package cn.momia.api.teacher;
 
+import cn.momia.api.teacher.dto.Material;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
 import cn.momia.common.api.ServiceApi;
+import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -85,5 +87,22 @@ public class TeacherServiceApi extends ServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/teacher/address"), builder.build());
 
         return executeReturnObject(request, Teacher.class);
+    }
+
+    public Material getMaterial(String utoken, int materialId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher/material/%d", materialId), builder.build());
+
+        return executeReturnObject(request, Material.class);
+    }
+
+    public PagedList<Material> listMaterials(String utoken, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("start", start)
+                .add("count", count);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher/material/list"), builder.build());
+
+        return executeReturnPagedList(request, Material.class);
     }
 }

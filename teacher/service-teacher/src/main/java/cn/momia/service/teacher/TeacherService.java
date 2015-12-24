@@ -1,9 +1,11 @@
 package cn.momia.service.teacher;
 
+import cn.momia.api.teacher.dto.Material;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
 
 import java.util.Date;
+import java.util.List;
 
 public interface TeacherService {
     TeacherStatus status(long userId);
@@ -18,4 +20,8 @@ public interface TeacherService {
     boolean updateSex(int teacherId, String sex);
     boolean updateBirthday(int teacherId, Date birthday);
     boolean updateAddress(int teacherId, String address);
+
+    Material getMaterial(long userId, int materialId);
+    long queryMaterialsCount(long userId);
+    List<Material> queryMaterials(long userId, int start, int count);
 }
