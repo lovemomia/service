@@ -6,6 +6,7 @@ import cn.momia.api.teacher.dto.TeacherStatus;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.api.dto.PagedList;
+import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.api.util.CastUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
@@ -49,19 +50,21 @@ public class TeacherController extends BaseController {
 
     @RequestMapping(method = RequestMethod.GET)
     public MomiaHttpResponse get(@RequestParam String utoken) {
+        Teacher teacher = checkTeacher(utoken);
+        return MomiaHttpResponse.SUCCESS(teacher);
+    }
+
+    private Teacher checkTeacher(String utoken) {
         User user = userServiceApi.get(utoken);
         Teacher teacher = teacherService.getByUser(user.getId());
-        if (!teacher.exists()) return MomiaHttpResponse.FAILED("您还没有申请成为老师");
+        if (!teacher.exists()) throw new MomiaErrorException("您还没有申请成为老师");
 
-        return MomiaHttpResponse.SUCCESS(teacher);
+        return teacher;
     }
 
     @RequestMapping(value = "/pic", method = RequestMethod.PUT)
     public MomiaHttpResponse updatePic(@RequestParam String utoken, @RequestParam String pic) {
-        User user = userServiceApi.get(utoken);
-        Teacher teacher = teacherService.getByUser(user.getId());
-        if (!teacher.exists()) return MomiaHttpResponse.FAILED("您还没有申请成为老师");
-
+        Teacher teacher = checkTeacher(utoken);
         boolean successful = teacherService.updatePic(teacher.getId(), pic);
         if (!successful) return MomiaHttpResponse.FAILED("更新用户照片失败");
 
@@ -71,10 +74,7 @@ public class TeacherController extends BaseController {
 
     @RequestMapping(value = "/name", method = RequestMethod.PUT)
     public MomiaHttpResponse updateName(@RequestParam String utoken, @RequestParam String name) {
-        User user = userServiceApi.get(utoken);
-        Teacher teacher = teacherService.getByUser(user.getId());
-        if (!teacher.exists()) return MomiaHttpResponse.FAILED("您还没有申请成为老师");
-
+        Teacher teacher = checkTeacher(utoken);
         boolean successful = teacherService.updateName(teacher.getId(), name);
         if (!successful) return MomiaHttpResponse.FAILED("更新姓名失败");
 
@@ -84,10 +84,7 @@ public class TeacherController extends BaseController {
 
     @RequestMapping(value = "/idno", method = RequestMethod.PUT)
     public MomiaHttpResponse updateIdNo(@RequestParam String utoken, @RequestParam String idno) {
-        User user = userServiceApi.get(utoken);
-        Teacher teacher = teacherService.getByUser(user.getId());
-        if (!teacher.exists()) return MomiaHttpResponse.FAILED("您还没有申请成为老师");
-
+        Teacher teacher = checkTeacher(utoken);
         boolean successful = teacherService.updateIdNo(teacher.getId(), idno);
         if (!successful) return MomiaHttpResponse.FAILED("更新身份证号码失败");
 
@@ -97,10 +94,7 @@ public class TeacherController extends BaseController {
 
     @RequestMapping(value = "/sex", method = RequestMethod.PUT)
     public MomiaHttpResponse updateSex(@RequestParam String utoken, @RequestParam String sex) {
-        User user = userServiceApi.get(utoken);
-        Teacher teacher = teacherService.getByUser(user.getId());
-        if (!teacher.exists()) return MomiaHttpResponse.FAILED("您还没有申请成为老师");
-
+        Teacher teacher = checkTeacher(utoken);
         boolean successful = teacherService.updateSex(teacher.getId(), sex);
         if (!successful) return MomiaHttpResponse.FAILED("更新性别失败");
 
@@ -110,10 +104,7 @@ public class TeacherController extends BaseController {
 
     @RequestMapping(value = "/birthday", method = RequestMethod.PUT)
     public MomiaHttpResponse updateBirthday(@RequestParam String utoken, @RequestParam Date birthday) {
-        User user = userServiceApi.get(utoken);
-        Teacher teacher = teacherService.getByUser(user.getId());
-        if (!teacher.exists()) return MomiaHttpResponse.FAILED("您还没有申请成为老师");
-
+        Teacher teacher = checkTeacher(utoken);
         boolean successful = teacherService.updateBirthday(teacher.getId(), birthday);
         if (!successful) return MomiaHttpResponse.FAILED("更新生日失败");
 
@@ -123,10 +114,7 @@ public class TeacherController extends BaseController {
 
     @RequestMapping(value = "/address", method = RequestMethod.PUT)
     public MomiaHttpResponse updateAddress(@RequestParam String utoken, @RequestParam String address) {
-        User user = userServiceApi.get(utoken);
-        Teacher teacher = teacherService.getByUser(user.getId());
-        if (!teacher.exists()) return MomiaHttpResponse.FAILED("您还没有申请成为老师");
-
+        Teacher teacher = checkTeacher(utoken);
         boolean successful = teacherService.updateAddress(teacher.getId(), address);
         if (!successful) return MomiaHttpResponse.FAILED("更新住址失败");
 
@@ -136,11 +124,8 @@ public class TeacherController extends BaseController {
 
     @RequestMapping(value = "/material/{mid}", method = RequestMethod.GET)
     public MomiaHttpResponse listMaterials(@RequestParam String utoken, @PathVariable(value = "mid") int materialId) {
-        User user = userServiceApi.get(utoken);
-        Teacher teacher = teacherService.getByUser(user.getId());
-        if (!teacher.exists()) return MomiaHttpResponse.FAILED("您还没有申请成为老师");
-
-        Material material = teacherService.getMaterial(user.getId(), materialId);
+        Teacher teacher = checkTeacher(utoken);
+        Material material = teacherService.getMaterial(teacher.getUserId(), materialId);
         if (!material.exists()) return MomiaHttpResponse.FAILED("教材不存在");
 
         return MomiaHttpResponse.SUCCESS(material);
@@ -150,12 +135,9 @@ public class TeacherController extends BaseController {
     public MomiaHttpResponse listMaterials(@RequestParam String utoken, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
-        User user = userServiceApi.get(utoken);
-        Teacher teacher = teacherService.getByUser(user.getId());
-        if (!teacher.exists()) return MomiaHttpResponse.FAILED("您还没有申请成为老师");
-
-        long totalCount = teacherService.queryMaterialsCount(user.getId());
-        List<Material> materials = getBaseInfo(teacherService.queryMaterials(user.getId(), start, count));
+        Teacher teacher = checkTeacher(utoken);
+        long totalCount = teacherService.queryMaterialsCount(teacher.getUserId());
+        List<Material> materials = getBaseInfo(teacherService.queryMaterials(teacher.getUserId(), start, count));
 
         PagedList<Material> pagedMaterials = new PagedList<Material>(totalCount, start, count);
         pagedMaterials.setList(materials);
