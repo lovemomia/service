@@ -1,13 +1,22 @@
 package cn.momia.api.teacher.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
+import java.util.ArrayList;
 import java.util.List;
 
-public class Record {
-    private long id;
-    private long userId;
-    private long childId;
-    private long courseId;
-    private long courseSkuId;
+public class ChildRecord {
+    public static final ChildRecord EMPTY_RECORD = new ChildRecord();
+    static {
+        EMPTY_RECORD.setTags(new ArrayList<Integer>());
+        EMPTY_RECORD.setContent("");
+    }
+
+    @JSONField(serialize = false) private long id;
+    @JSONField(serialize = false) private long userId;
+    @JSONField(serialize = false) private long childId;
+    @JSONField(serialize = false) private long courseId;
+    @JSONField(serialize = false) private long courseSkuId;
     private List<Integer> tags;
     private String content;
 

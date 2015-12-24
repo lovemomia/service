@@ -2,12 +2,10 @@ package cn.momia.service.teacher.web.ctrl;
 
 import cn.momia.api.teacher.dto.ChildComment;
 import cn.momia.api.teacher.dto.Material;
-import cn.momia.api.teacher.dto.Record;
+import cn.momia.api.teacher.dto.ChildRecord;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
-import cn.momia.api.user.ChildServiceApi;
 import cn.momia.api.user.UserServiceApi;
-import cn.momia.api.user.dto.Child;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.exception.MomiaErrorException;
@@ -16,14 +14,12 @@ import cn.momia.common.api.util.CastUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.teacher.TeacherService;
 import com.alibaba.fastjson.JSON;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import sun.jvm.hotspot.debugger.Page;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -178,21 +174,35 @@ public class TeacherController extends BaseController {
         return MomiaHttpResponse.SUCCESS(pagedComments);
     }
 
+    @RequestMapping(value = "/child/tag", method = RequestMethod.GET)
+    public MomiaHttpResponse tags() {
+        return MomiaHttpResponse.SUCCESS(teacherService.listTags());
+    }
+
+    @RequestMapping(value = "/child/{cid}/record", method = RequestMethod.GET)
+    public MomiaHttpResponse record(@RequestParam String utoken,
+                                    @PathVariable(value = "cid") long childId,
+                                    @RequestParam(value = "coid") long courseId,
+                                    @RequestParam(value = "sid") long courseSkuId) {
+        Teacher teacher = checkTeacher(utoken);
+        return MomiaHttpResponse.SUCCESS(teacherService.getRecord(teacher.getUserId(), childId, courseId, courseSkuId));
+    }
+
     @RequestMapping(value = "/child/{cid}/record", method = RequestMethod.POST)
     public MomiaHttpResponse record(@RequestParam String utoken,
                                     @PathVariable(value = "cid") long childId,
                                     @RequestParam(value = "coid") long courseId,
                                     @RequestParam(value = "sid") long courseSkuId,
-                                    @RequestParam(value = "record") String recordJson) {
+                                    @RequestParam String record) {
         Teacher teacher = checkTeacher(utoken);
 
-        Record record = CastUtil.toObject(JSON.parseObject(recordJson), Record.class);
-        record.setUserId(teacher.getUserId());
-        record.setChildId(childId);
-        record.setCourseId(courseId);
-        record.setCourseSkuId(courseSkuId);
+        ChildRecord childRecord = CastUtil.toObject(JSON.parseObject(record), ChildRecord.class);
+        childRecord.setUserId(teacher.getUserId());
+        childRecord.setChildId(childId);
+        childRecord.setCourseId(courseId);
+        childRecord.setCourseSkuId(courseSkuId);
 
-        return MomiaHttpResponse.SUCCESS(teacherService.record(record));
+        return MomiaHttpResponse.SUCCESS(teacherService.record(childRecord));
     }
 
     @RequestMapping(value = "/child/{cid}/comment", method = RequestMethod.POST)

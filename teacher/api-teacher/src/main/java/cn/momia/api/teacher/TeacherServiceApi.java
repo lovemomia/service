@@ -1,6 +1,8 @@
 package cn.momia.api.teacher;
 
 import cn.momia.api.teacher.dto.ChildComment;
+import cn.momia.api.teacher.dto.ChildRecord;
+import cn.momia.api.teacher.dto.ChildTag;
 import cn.momia.api.teacher.dto.Material;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
@@ -11,6 +13,7 @@ import cn.momia.common.api.http.MomiaHttpRequestBuilder;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.Date;
+import java.util.List;
 
 public class TeacherServiceApi extends ServiceApi {
     public TeacherStatus status(String utoken) {
@@ -115,6 +118,21 @@ public class TeacherServiceApi extends ServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher/child/%d/comment", childId), builder.build());
 
         return executeReturnPagedList(request, ChildComment.class);
+    }
+
+    public List<ChildTag> listAllChildTags() {
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher/child/tag"));
+        return executeReturnList(request, ChildTag.class);
+    }
+
+    public ChildRecord getChildRecord(String utoken, long childId, long courseId, long courseSkuId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("coid", courseId)
+                .add("sid", courseSkuId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher/child/%d/record", childId), builder.build());
+
+        return executeReturnObject(request, ChildRecord.class);
     }
 
     public boolean record(String utoken, long childId, long courseId, long courseSkuId, String record) {
