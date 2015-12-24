@@ -262,6 +262,7 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
 
     @Override
     public List<ChildTag> listTags() {
+        if (isOutOfDate()) reload();
         return tagsCache;
     }
 
