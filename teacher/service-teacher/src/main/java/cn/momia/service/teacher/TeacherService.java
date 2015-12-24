@@ -1,5 +1,6 @@
 package cn.momia.service.teacher;
 
+import cn.momia.api.teacher.dto.ChildComment;
 import cn.momia.api.teacher.dto.Material;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
@@ -24,4 +25,7 @@ public interface TeacherService {
     Material getMaterial(long userId, int materialId);
     long queryMaterialsCount(long userId);
     List<Material> queryMaterials(long userId, int start, int count);
+
+    long queryChildCommentsCount(long childId);
+    List<ChildComment> queryChildComments(long childId, int start, int count);
 }

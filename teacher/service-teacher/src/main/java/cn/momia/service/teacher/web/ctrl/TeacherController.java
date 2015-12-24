@@ -1,9 +1,12 @@
 package cn.momia.service.teacher.web.ctrl;
 
+import cn.momia.api.teacher.dto.ChildComment;
 import cn.momia.api.teacher.dto.Material;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
+import cn.momia.api.user.ChildServiceApi;
 import cn.momia.api.user.UserServiceApi;
+import cn.momia.api.user.dto.Child;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.exception.MomiaErrorException;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import sun.jvm.hotspot.debugger.Page;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -152,5 +156,23 @@ public class TeacherController extends BaseController {
         }
 
         return baseMaterials;
+    }
+
+    @RequestMapping(value = "/child/{cid}/comment", method = RequestMethod.GET)
+    public MomiaHttpResponse listChildComments(@RequestParam String utoken,
+                                               @PathVariable(value = "cid") long childId,
+                                               @RequestParam int start,
+                                               @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        checkTeacher(utoken);
+
+        long totalCount = teacherService.queryChildCommentsCount(childId);
+        List<ChildComment> comments = teacherService.queryChildComments(childId, start, count);
+
+        PagedList<ChildComment> pagedComments = new PagedList<ChildComment>(totalCount, start, count);
+        pagedComments.setList(comments);
+
+        return MomiaHttpResponse.SUCCESS(pagedComments);
     }
 }

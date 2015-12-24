@@ -1,5 +1,6 @@
 package cn.momia.api.teacher;
 
+import cn.momia.api.teacher.dto.ChildComment;
 import cn.momia.api.teacher.dto.Material;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
@@ -104,5 +105,15 @@ public class TeacherServiceApi extends ServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher/material/list"), builder.build());
 
         return executeReturnPagedList(request, Material.class);
+    }
+
+    public PagedList<ChildComment> listChildComments(String utoken, long childId, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("start", start)
+                .add("count", count);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher/child/%d/comment", childId), builder.build());
+
+        return executeReturnPagedList(request, ChildComment.class);
     }
 }

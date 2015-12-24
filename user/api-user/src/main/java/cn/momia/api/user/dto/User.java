@@ -189,8 +189,18 @@ public class User {
     }
 
     @JSONField(serialize = false)
+    public boolean isNormal() {
+        return role == Role.NORMAL;
+    }
+
+    @JSONField(serialize = false)
     public boolean isTeacher() {
         return role == Role.TEACHER;
+    }
+
+    @JSONField(serialize = false)
+    public boolean isAdmin() {
+        return role == Role.ADMIN;
     }
 
     public static class Mini extends User {

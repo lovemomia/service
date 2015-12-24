@@ -1,5 +1,6 @@
 package cn.momia.service.teacher.impl;
 
+import cn.momia.api.teacher.dto.ChildComment;
 import cn.momia.api.teacher.dto.Education;
 import cn.momia.api.teacher.dto.Experience;
 import cn.momia.api.teacher.dto.Material;
@@ -224,5 +225,24 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
         }
 
         return result;
+    }
+
+    @Override
+    public long queryChildCommentsCount(long childId) {
+        String sql = "SELECT COUNT(1) FROM SG_ChildComment WHERE ChildId=? AND Status<>0";
+        return queryLong(sql, new Object[] { childId });
+    }
+
+    @Override
+    public List<ChildComment> queryChildComments(long childId, int start, int count) {
+        String sql = "SELECT C.StartTime AS Date, B.Title, A.Content, D.NickName AS Teacher " +
+                "FROM SG_ChildComment A " +
+                "INNER JOIN SG_Course B ON A.CourseId=B.Id " +
+                "INNER JOIN SG_CourseSku C ON A.CourseSkuId=C.Id " +
+                "INNER JOIN SG_User D ON A.UserId=D.Id " +
+                "WHERE A.ChildId=? AND A.Status<>0 AND B.Status<>0 AND C.Status<>0 AND D.Status<>0 " +
+                "ORDER BY C.StartTime DESC, A.AddTime DESC " +
+                "LIMIT ?,?";
+        return queryObjectList(sql, new Object[] { childId, start, count }, ChildComment.class);
     }
 }

@@ -49,7 +49,7 @@ public class ChildController extends BaseController {
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
         Child child = childService.get(childId);
-        if (!child.exists() || child.getUserId() != user.getId()) return MomiaHttpResponse.FAILED("孩子不存在");
+        if (!child.exists() || (user.isNormal() && child.getUserId() != user.getId())) return MomiaHttpResponse.FAILED("孩子不存在");
 
         return MomiaHttpResponse.SUCCESS(child);
     }
