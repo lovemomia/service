@@ -51,13 +51,13 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
     public long add(final Teacher teacher) {
         int teacherId = getIdByUser(teacher.getUserId());
         if (teacherId > 0) {
-            String sql = "UPDATE SG_Teacher SET Pic=?, Name=?, IdNo=?, Sex=?, Birthday=?, Address=?, Status=? WHERE Id=? AND UserId=?";
+            String sql = "UPDATE SG_Teacher SET Pic=?, Name=?, IdNo=?, Gender=?, Birthday=?, Address=?, Status=? WHERE Id=? AND UserId=?";
             update(sql, new Object[] { teacher.getPic(), teacher.getName(), teacher.getIdNo(), teacher.getSex(), teacher.getBirthday(), teacher.getAddress(), TeacherStatus.Status.NOT_CHECKED, teacherId, teacher.getUserId() });
         } else {
             KeyHolder keyHolder = insert(new PreparedStatementCreator() {
                 @Override
                 public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                    String sql = "INSERT INTO SG_Teacher(UserId, Pic, Name, IdNo, Sex, Birthday, Address, Status, AddTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+                    String sql = "INSERT INTO SG_Teacher(UserId, Pic, Name, IdNo, Gender, Birthday, Address, Status, AddTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
                     PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                     ps.setLong(1, teacher.getUserId());
                     ps.setString(2, teacher.getPic());
@@ -95,7 +95,7 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
     private List<Teacher> listTeachers(Collection<Integer> teacherIds) {
         if (teacherIds.isEmpty()) return new ArrayList<Teacher>();
 
-        String sql = "SELECT Id, UserId, Pic, Name, IdNo, Sex, Birthday, Address FROM SG_Teacher WHERE Id IN (" + StringUtils.join(teacherIds, ",") + ") AND Status<>0";
+        String sql = "SELECT Id, UserId, Pic, Name, IdNo, Gender AS Sex, Birthday, Address FROM SG_Teacher WHERE Id IN (" + StringUtils.join(teacherIds, ",") + ") AND Status<>0";
         List<Teacher> teachers = queryObjectList(sql, Teacher.class);
 
         Map<Integer, Teacher> teachersMap = new HashMap<Integer, Teacher>();
@@ -176,7 +176,7 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
 
     @Override
     public boolean updateSex(int teacherId, String sex) {
-        String sql = "UPDATE SG_Teacher SET Sex=? WHERE Id=?";
+        String sql = "UPDATE SG_Teacher SET Gender=? WHERE Id=?";
         return update(sql, new Object[] { sex, teacherId });
     }
 
