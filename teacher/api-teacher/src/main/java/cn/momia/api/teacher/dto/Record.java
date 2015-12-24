@@ -1,20 +1,15 @@
 package cn.momia.api.teacher.dto;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import java.util.List;
 
-import java.util.Date;
-
-public class ChildComment {
-    @JSONField(serialize = false) private long id;
-    @JSONField(serialize = false) private long userId;
-    @JSONField(serialize = false) private long childId;
-    @JSONField(serialize = false) private long courseId;
-    @JSONField(serialize = false) private long courseSkuId;
-
-    @JSONField(format = "yyyy-MM-dd") private Date date;
-    private String title;
+public class Record {
+    private long id;
+    private long userId;
+    private long childId;
+    private long courseId;
+    private long courseSkuId;
+    private List<Integer> tags;
     private String content;
-    private String teacher;
 
     public long getId() {
         return id;
@@ -56,20 +51,12 @@ public class ChildComment {
         this.courseSkuId = courseSkuId;
     }
 
-    public Date getDate() {
-        return date;
+    public List<Integer> getTags() {
+        return tags;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
+    public void setTags(List<Integer> tags) {
+        this.tags = tags;
     }
 
     public String getContent() {
@@ -78,13 +65,5 @@ public class ChildComment {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public String getTeacher() {
-        return teacher;
-    }
-
-    public void setTeacher(String teacher) {
-        this.teacher = teacher;
     }
 }

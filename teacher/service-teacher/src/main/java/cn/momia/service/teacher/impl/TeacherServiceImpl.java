@@ -4,6 +4,7 @@ import cn.momia.api.teacher.dto.ChildComment;
 import cn.momia.api.teacher.dto.Education;
 import cn.momia.api.teacher.dto.Experience;
 import cn.momia.api.teacher.dto.Material;
+import cn.momia.api.teacher.dto.Record;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
 import cn.momia.common.service.AbstractService;
@@ -244,5 +245,39 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
                 "ORDER BY C.StartTime DESC, A.AddTime DESC " +
                 "LIMIT ?,?";
         return queryObjectList(sql, new Object[] { childId, start, count }, ChildComment.class);
+    }
+
+    @Override
+    public boolean record(Record record) {
+        long recordId = getRecordId(record.getChildId(), record.getCourseId(), record.getCourseSkuId());
+        if (recordId > 0) {
+            String sql = "UPDATE SG_ChildRecord SET UserId=?, Tags=?, Content=?, Status=1 WHERE ChildId=? AND CourseId=? AND CourseSkuId=?";
+            return update(sql, new Object[] { record.getUserId(), StringUtils.join(record.getTags(), ","), record.getContent(), record.getChildId(), record.getCourseId(), record.getCourseSkuId() });
+        } else {
+            String sql = "INSERT INTO SG_ChildRecord (UserId, ChildId, CourseId, CourseSkuId, Tags, Content, AddTime) VALUES (?, ?, ?, ?, ?, ?, NOW())";
+            return update(sql, new Object[] { record.getUserId(), record.getChildId(), record.getCourseId(), record.getCourseSkuId(), StringUtils.join(record.getTags(), ","), record.getContent() });
+        }
+    }
+
+    private long getRecordId(long childId, long courseId, long courseSkuId) {
+        String sql = "SELECT Id FROM SG_ChildRecord WHERE ChildId=? AND CourseId=? AND CourseSkuId=?";
+        return queryLong(sql, new Object[] { childId, courseId, courseSkuId });
+    }
+
+    @Override
+    public boolean comment(ChildComment childComment) {
+        long commentId = getCommentId(childComment.getChildId(), childComment.getCourseId(), childComment.getCourseSkuId());
+        if (commentId > 0) {
+            String sql = "UPDATE SG_ChildComment SET UserId=?, Content=?, Status=1 WHERE ChildId=? AND CourseId=? AND CourseSkuId=?";
+            return update(sql, new Object[] { childComment.getUserId(), childComment.getContent(), childComment.getChildId(), childComment.getCourseId(), childComment.getCourseSkuId() });
+        } else {
+            String sql = "INSERT INTO SG_ChildComment (UserId, ChildId, CourseId, CourseSkuId, Content, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
+            return update(sql, new Object[] { childComment.getUserId(), childComment.getChildId(), childComment.getCourseId(), childComment.getCourseSkuId(), childComment.getContent() });
+        }
+    }
+
+    private long getCommentId(long childId, long courseId, long courseSkuId) {
+        String sql = "SELECT Id FROM SG_ChildComment WHERE ChildId=? AND CourseId=? AND CourseSkuId=?";
+        return queryLong(sql, new Object[] { childId, courseId, courseSkuId });
     }
 }

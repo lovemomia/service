@@ -2,6 +2,7 @@ package cn.momia.service.teacher.web.ctrl;
 
 import cn.momia.api.teacher.dto.ChildComment;
 import cn.momia.api.teacher.dto.Material;
+import cn.momia.api.teacher.dto.Record;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
 import cn.momia.api.user.ChildServiceApi;
@@ -15,6 +16,7 @@ import cn.momia.common.api.util.CastUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.teacher.TeacherService;
 import com.alibaba.fastjson.JSON;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -174,5 +176,40 @@ public class TeacherController extends BaseController {
         pagedComments.setList(comments);
 
         return MomiaHttpResponse.SUCCESS(pagedComments);
+    }
+
+    @RequestMapping(value = "/child/{cid}/record", method = RequestMethod.POST)
+    public MomiaHttpResponse record(@RequestParam String utoken,
+                                    @PathVariable(value = "cid") long childId,
+                                    @RequestParam(value = "coid") long courseId,
+                                    @RequestParam(value = "sid") long courseSkuId,
+                                    @RequestParam(value = "record") String recordJson) {
+        Teacher teacher = checkTeacher(utoken);
+
+        Record record = CastUtil.toObject(JSON.parseObject(recordJson), Record.class);
+        record.setUserId(teacher.getUserId());
+        record.setChildId(childId);
+        record.setCourseId(courseId);
+        record.setCourseSkuId(courseSkuId);
+
+        return MomiaHttpResponse.SUCCESS(teacherService.record(record));
+    }
+
+    @RequestMapping(value = "/child/{cid}/comment", method = RequestMethod.POST)
+    public MomiaHttpResponse comment(@RequestParam String utoken,
+                                     @PathVariable(value = "cid") long childId,
+                                     @RequestParam(value = "coid") long courseId,
+                                     @RequestParam(value = "sid") long courseSkuId,
+                                     @RequestParam String comment) {
+        Teacher teacher = checkTeacher(utoken);
+
+        ChildComment childComment = new ChildComment();
+        childComment.setUserId(teacher.getUserId());
+        childComment.setChildId(childId);
+        childComment.setCourseId(courseId);
+        childComment.setCourseSkuId(courseSkuId);
+        childComment.setContent(comment);
+
+        return MomiaHttpResponse.SUCCESS(teacherService.comment(childComment));
     }
 }

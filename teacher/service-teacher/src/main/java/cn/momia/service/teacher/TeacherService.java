@@ -2,6 +2,7 @@ package cn.momia.service.teacher;
 
 import cn.momia.api.teacher.dto.ChildComment;
 import cn.momia.api.teacher.dto.Material;
+import cn.momia.api.teacher.dto.Record;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
 
@@ -28,4 +29,7 @@ public interface TeacherService {
 
     long queryChildCommentsCount(long childId);
     List<ChildComment> queryChildComments(long childId, int start, int count);
+
+    boolean record(Record record);
+    boolean comment(ChildComment childComment);
 }
