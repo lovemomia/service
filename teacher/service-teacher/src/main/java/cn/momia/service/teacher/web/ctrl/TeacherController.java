@@ -198,7 +198,7 @@ public class TeacherController extends BaseController {
         Teacher teacher = checkTeacher(utoken);
 
         ChildRecord childRecord = CastUtil.toObject(JSON.parseObject(record), ChildRecord.class);
-        childRecord.setUserId(teacher.getUserId());
+        childRecord.setTeacherUserId(teacher.getUserId());
         childRecord.setChildId(childId);
         childRecord.setCourseId(courseId);
         childRecord.setCourseSkuId(courseSkuId);
@@ -219,7 +219,7 @@ public class TeacherController extends BaseController {
         Teacher teacher = checkTeacher(utoken);
 
         ChildComment childComment = new ChildComment();
-        childComment.setUserId(teacher.getUserId());
+        childComment.setTeacherUserId(teacher.getUserId());
         childComment.setChildId(childId);
         childComment.setCourseId(courseId);
         childComment.setCourseSkuId(courseSkuId);

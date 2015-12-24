@@ -13,7 +13,7 @@ public class ChildRecord {
     }
 
     @JSONField(serialize = false) private long id;
-    @JSONField(serialize = false) private long userId;
+    @JSONField(serialize = false) private long teacherUserId;
     @JSONField(serialize = false) private long childId;
     @JSONField(serialize = false) private long courseId;
     @JSONField(serialize = false) private long courseSkuId;
@@ -28,12 +28,12 @@ public class ChildRecord {
         this.id = id;
     }
 
-    public long getUserId() {
-        return userId;
+    public long getTeacherUserId() {
+        return teacherUserId;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setTeacherUserId(long teacherUserId) {
+        this.teacherUserId = teacherUserId;
     }
 
     public long getChildId() {

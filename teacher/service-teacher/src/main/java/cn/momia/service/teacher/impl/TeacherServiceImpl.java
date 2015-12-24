@@ -8,7 +8,6 @@ import cn.momia.api.teacher.dto.Material;
 import cn.momia.api.teacher.dto.ChildRecord;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
-import cn.momia.api.user.dto.Child;
 import cn.momia.common.service.AbstractService;
 import cn.momia.service.teacher.TeacherService;
 import com.google.common.base.Splitter;
@@ -253,7 +252,7 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
                 "FROM SG_ChildComment A " +
                 "INNER JOIN SG_Course B ON A.CourseId=B.Id " +
                 "INNER JOIN SG_CourseSku C ON A.CourseSkuId=C.Id " +
-                "INNER JOIN SG_User D ON A.UserId=D.Id " +
+                "INNER JOIN SG_User D ON A.TeacherUserId=D.Id " +
                 "WHERE A.ChildId=? AND A.Status<>0 AND B.Status<>0 AND C.Status<>0 AND D.Status<>0 " +
                 "ORDER BY C.StartTime DESC, A.AddTime DESC " +
                 "LIMIT ?,?";
@@ -267,10 +266,10 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
     }
 
     @Override
-    public ChildRecord getRecord(long userId, long childId, long courseId, long courseSkuId) {
+    public ChildRecord getRecord(long teacherUerId, long childId, long courseId, long courseSkuId) {
         final List<ChildRecord> records = new ArrayList<ChildRecord>();
-        String sql = "SELECT Tags, Content FROM SG_ChildRecord WHERE UserId=? AND ChildId=? AND CourseId=? AND CourseSkuId=? AND Status<>0 LIMIT 1";
-        query(sql, new Object[] { userId, childId, courseId, courseSkuId }, new RowCallbackHandler() {
+        String sql = "SELECT Tags, Content FROM SG_ChildRecord WHERE TeacherUserId=? AND ChildId=? AND CourseId=? AND CourseSkuId=? AND Status<>0 LIMIT 1";
+        query(sql, new Object[] { teacherUerId, childId, courseId, courseSkuId }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 ChildRecord record = new ChildRecord();
@@ -292,11 +291,11 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
     public boolean record(ChildRecord childRecord) {
         long recordId = getRecordId(childRecord.getChildId(), childRecord.getCourseId(), childRecord.getCourseSkuId());
         if (recordId > 0) {
-            String sql = "UPDATE SG_ChildRecord SET UserId=?, Tags=?, Content=?, Status=1 WHERE ChildId=? AND CourseId=? AND CourseSkuId=?";
-            return update(sql, new Object[] { childRecord.getUserId(), StringUtils.join(childRecord.getTags(), ","), childRecord.getContent(), childRecord.getChildId(), childRecord.getCourseId(), childRecord.getCourseSkuId() });
+            String sql = "UPDATE SG_ChildRecord SET TeacherUserId=?, Tags=?, Content=?, Status=1 WHERE ChildId=? AND CourseId=? AND CourseSkuId=?";
+            return update(sql, new Object[] { childRecord.getTeacherUserId(), StringUtils.join(childRecord.getTags(), ","), childRecord.getContent(), childRecord.getChildId(), childRecord.getCourseId(), childRecord.getCourseSkuId() });
         } else {
-            String sql = "INSERT INTO SG_ChildRecord (UserId, ChildId, CourseId, CourseSkuId, Tags, Content, AddTime) VALUES (?, ?, ?, ?, ?, ?, NOW())";
-            return update(sql, new Object[] { childRecord.getUserId(), childRecord.getChildId(), childRecord.getCourseId(), childRecord.getCourseSkuId(), StringUtils.join(childRecord.getTags(), ","), childRecord.getContent() });
+            String sql = "INSERT INTO SG_ChildRecord (TeacherUserId, ChildId, CourseId, CourseSkuId, Tags, Content, AddTime) VALUES (?, ?, ?, ?, ?, ?, NOW())";
+            return update(sql, new Object[] { childRecord.getTeacherUserId(), childRecord.getChildId(), childRecord.getCourseId(), childRecord.getCourseSkuId(), StringUtils.join(childRecord.getTags(), ","), childRecord.getContent() });
         }
     }
 
@@ -309,11 +308,11 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
     public boolean comment(ChildComment childComment) {
         long commentId = getCommentId(childComment.getChildId(), childComment.getCourseId(), childComment.getCourseSkuId());
         if (commentId > 0) {
-            String sql = "UPDATE SG_ChildComment SET UserId=?, Content=?, Status=1 WHERE ChildId=? AND CourseId=? AND CourseSkuId=?";
-            return update(sql, new Object[] { childComment.getUserId(), childComment.getContent(), childComment.getChildId(), childComment.getCourseId(), childComment.getCourseSkuId() });
+            String sql = "UPDATE SG_ChildComment SET TeacherUserId=?, Content=?, Status=1 WHERE ChildId=? AND CourseId=? AND CourseSkuId=?";
+            return update(sql, new Object[] { childComment.getTeacherUserId(), childComment.getContent(), childComment.getChildId(), childComment.getCourseId(), childComment.getCourseSkuId() });
         } else {
-            String sql = "INSERT INTO SG_ChildComment (UserId, ChildId, CourseId, CourseSkuId, Content, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
-            return update(sql, new Object[] { childComment.getUserId(), childComment.getChildId(), childComment.getCourseId(), childComment.getCourseSkuId(), childComment.getContent() });
+            String sql = "INSERT INTO SG_ChildComment (TeacherUserUserId, ChildId, CourseId, CourseSkuId, Content, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
+            return update(sql, new Object[] { childComment.getTeacherUserId(), childComment.getChildId(), childComment.getCourseId(), childComment.getCourseSkuId(), childComment.getContent() });
         }
     }
 
