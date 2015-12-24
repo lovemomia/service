@@ -849,4 +849,20 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         String sql = "SELECT COUNT(1) FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Id=? AND A.CourseId=? AND A.Status<>0 AND B.StartTime<=NOW() AND B.Status<>0";
         return queryInt(sql, new Object[] { userId, bookingId, courseId }) > 0;
     }
+
+    @Override
+    public Map<Long, Long> queryCheckInCounts(Collection<Long> courseSkuIds) {
+        if (courseSkuIds.isEmpty()) return new HashMap<Long, Long>();
+
+        String sql = "SELECT CourseSkuId, COUNT(CourseSkuId) FROM SG_BookedCourse WHERE CourseSkuId IN (" + StringUtils.join(courseSkuIds, ",") + ") AND CheckIn>0 AND Status<>0 GROUP BY CourseSkuId";
+        return queryMap(sql, Long.class, Long.class);
+    }
+
+    @Override
+    public Map<Long, Long> queryCommentedChildrenCount(Collection<Long> courseSkuIds) {
+        if (courseSkuIds.isEmpty()) return new HashMap<Long, Long>();
+
+        String sql = "SELECT A.CourseSkuId, COUNT(A.CourseSkuId) FROM SG_BookedCourse A INNER JOIN SG_Child B ON A.UserId=B.UserId LEFT JOIN SG_ChildComment C ON A.CourseSkuId=C.CourseSkuId AND B.Id=C.ChildId WHERE A.CourseSkuId IN (" + StringUtils.join(courseSkuIds, ",") + ") AND A.CheckIn>0 AND A.Status<>0 AND B.Status<>0 AND C.Status<>0 GROUP BY A.CourseSkuId";
+        return queryMap(sql, Long.class, Long.class);
+    }
 }

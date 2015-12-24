@@ -79,8 +79,9 @@ public interface CourseService {
     Map<Long, String> queryTips(Collection<Long> courseIds);
 
     boolean matched(long subjectId, long courseId);
-
     boolean joined(long userId, long courseId);
-
     boolean finished(long userId, long bookingId, long courseId);
+
+    Map<Long, Long> queryCheckInCounts(Collection<Long> courseSkuIds);
+    Map<Long, Long> queryCommentedChildrenCount(Collection<Long> courseSkuIds);
 }

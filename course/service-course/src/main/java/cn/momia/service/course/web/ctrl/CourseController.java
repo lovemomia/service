@@ -418,12 +418,12 @@ public class CourseController extends BaseController {
         List<TeacherCourse> courses = courseService.queryNotFinishedByTeacher(userId, start, count);
 
         PagedList<TeacherCourse> pagedCourses = new PagedList<TeacherCourse>(totalCount, start, count);
-        pagedCourses.setList(completeTeacherCourses(userId, courses));
+        pagedCourses.setList(completeTeacherCourses(courses, false));
 
         return MomiaHttpResponse.SUCCESS(pagedCourses);
     }
 
-    private List<TeacherCourse> completeTeacherCourses(long userId, List<TeacherCourse> teacherCourses) {
+    private List<TeacherCourse> completeTeacherCourses(List<TeacherCourse> teacherCourses, boolean finished) {
         Set<Long> courseIds = new HashSet<Long>();
         for (TeacherCourse teacherCourse : teacherCourses) {
             courseIds.add(teacherCourse.getCourseId());
@@ -445,13 +445,26 @@ public class CourseController extends BaseController {
             TeacherCourse completedTeacherCourse = new TeacherCourse();
             completedTeacherCourse.setCourseId(teacherCourse.getCourseId());
             completedTeacherCourse.setCourseSkuId(teacherCourse.getCourseSkuId());
-//            if (commentBookingIds.contains(teacherCourse.getBookingId())) completedTeacherCourse.setCommented(true);
             completedTeacherCourse.setCover(course.getCover());
             completedTeacherCourse.setTitle(course.getTitle());
             completedTeacherCourse.setScheduler(course.getScheduler(teacherCourse.getCourseSkuId()));
             completedTeacherCourse.setAddress(place.getAddress());
 
             completedTeacherCourses.add(completedTeacherCourse);
+        }
+
+        if (finished) {
+            Set<Long> courseSkuIds = new HashSet<Long>();
+            for (TeacherCourse teacherCourse : completedTeacherCourses) {
+                courseSkuIds.add(teacherCourse.getCourseSkuId());
+            }
+
+            Map<Long, Long> checkInCountMap = courseService.queryCheckInCounts(courseSkuIds);
+            Map<Long, Long> commentedCountMap = courseService.queryCommentedChildrenCount(courseSkuIds);
+
+            for (TeacherCourse teacherCourse : completedTeacherCourses) {
+                if (checkInCountMap.get(teacherCourse.getCourseSkuId()) == commentedCountMap.get(teacherCourse.getCourseSkuId())) teacherCourse.setCommented(true);
+            }
         }
 
         return completedTeacherCourses;
@@ -465,7 +478,7 @@ public class CourseController extends BaseController {
         List<TeacherCourse> courses = courseService.queryFinishedByTeacher(userId, start, count);
 
         PagedList<TeacherCourse> pagedCourses = new PagedList<TeacherCourse>(totalCount, start, count);
-        pagedCourses.setList(completeTeacherCourses(userId, courses));
+        pagedCourses.setList(completeTeacherCourses(courses, true));
 
         return MomiaHttpResponse.SUCCESS(pagedCourses);
     }
