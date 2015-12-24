@@ -157,6 +157,16 @@ public class TeacherController extends BaseController {
         return baseMaterials;
     }
 
+    @RequestMapping(value = "/course/checkin", method = RequestMethod.POST)
+    public MomiaHttpResponse checkin(@RequestParam String utoken,
+                                     @RequestParam(value = "uid") long userId,
+                                     @RequestParam(value = "pid") long packageId,
+                                     @RequestParam(value = "coid") long courseId,
+                                     @RequestParam(value = "sid") long courseSkuId) {
+        checkTeacher(utoken);
+        return MomiaHttpResponse.SUCCESS(teacherService.checkin(userId, packageId, courseId, courseSkuId));
+    }
+
     @RequestMapping(value = "/child/{cid}/comment", method = RequestMethod.GET)
     public MomiaHttpResponse listChildComments(@RequestParam String utoken,
                                                @PathVariable(value = "cid") long childId,

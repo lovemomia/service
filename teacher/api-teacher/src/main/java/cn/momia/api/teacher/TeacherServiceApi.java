@@ -110,6 +110,18 @@ public class TeacherServiceApi extends ServiceApi {
         return executeReturnPagedList(request, Material.class);
     }
 
+    public boolean checkin(String utoken, long userId, long packageId, long courseId, long courseSkuId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("uid", userId)
+                .add("pid", packageId)
+                .add("coid", courseId)
+                .add("sid", courseSkuId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/teacher/course/checkin"), builder.build());
+
+        return executeReturnObject(request, Boolean.class);
+    }
+
     public PagedList<ChildComment> listChildComments(String utoken, long childId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)

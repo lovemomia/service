@@ -220,6 +220,12 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
         return listMaterials(materialIds);
     }
 
+    @Override
+    public boolean checkin(long userId, long packageId, long courseId, long courseSkuId) {
+        String sql = "UPDATE SG_BookedCourse SET CheckIn=1 WHERE UserId=? AND PackageId=? AND CourseId=? AND CourseSkuId=? AND Status<>0";
+        return update(sql, new Object[] { userId, packageId, courseId, courseSkuId });
+    }
+
     private List<Material> listMaterials(Collection<Integer> materialIds) {
         if (materialIds.isEmpty()) return new ArrayList<Material>();
 

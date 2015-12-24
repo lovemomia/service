@@ -28,6 +28,8 @@ public interface TeacherService {
     long queryMaterialsCount(long userId);
     List<Material> queryMaterials(long userId, int start, int count);
 
+    boolean checkin(long userId, long packageId, long courseId, long courseSkuId);
+
     long queryChildCommentsCount(long childId);
     List<ChildComment> queryChildComments(long childId, int start, int count);
 
