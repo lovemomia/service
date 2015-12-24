@@ -14,6 +14,7 @@ import cn.momia.common.api.util.CastUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.teacher.TeacherService;
 import com.alibaba.fastjson.JSON;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -202,6 +203,8 @@ public class TeacherController extends BaseController {
         childRecord.setCourseId(courseId);
         childRecord.setCourseSkuId(courseSkuId);
 
+        if (!StringUtils.isBlank(childRecord.getContent()) && childRecord.getContent().length() > 300) return MomiaHttpResponse.FAILED("纪录字数过多，超出限制");
+
         return MomiaHttpResponse.SUCCESS(teacherService.record(childRecord));
     }
 
@@ -211,6 +214,8 @@ public class TeacherController extends BaseController {
                                      @RequestParam(value = "coid") long courseId,
                                      @RequestParam(value = "sid") long courseSkuId,
                                      @RequestParam String comment) {
+        if (!StringUtils.isBlank(comment) && comment.length() > 500) return MomiaHttpResponse.FAILED("评语字数过多，超出限制");
+
         Teacher teacher = checkTeacher(utoken);
 
         ChildComment childComment = new ChildComment();
