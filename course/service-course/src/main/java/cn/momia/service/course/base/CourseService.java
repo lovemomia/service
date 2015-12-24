@@ -6,6 +6,7 @@ import cn.momia.api.course.dto.CourseDetail;
 import cn.momia.api.course.dto.CourseSku;
 import cn.momia.api.course.dto.Institution;
 import cn.momia.api.course.dto.Teacher;
+import cn.momia.api.course.dto.TeacherCourse;
 
 import java.util.Collection;
 import java.util.Date;
@@ -55,6 +56,11 @@ public interface CourseService {
     List<BookedCourse> queryNotFinishedByUser(long userId, int start, int count);
     long queryFinishedCountByUser(long userId);
     List<BookedCourse> queryFinishedByUser(long userId, int start, int count);
+
+    long queryNotFinishedCountByTeacher(long userId);
+    List<TeacherCourse> queryNotFinishedByTeacher(long userId, int start, int count);
+    long queryFinishedCountByTeacher(long userId);
+    List<TeacherCourse> queryFinishedByTeacher(long userId, int start, int count);
 
     Map<Long, Integer> queryBookedCourseCounts(Set<Long> orderIds);
     Map<Long, Integer> queryFinishedCourseCounts(Set<Long> orderIds);

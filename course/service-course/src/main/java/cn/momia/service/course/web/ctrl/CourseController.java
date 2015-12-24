@@ -4,6 +4,7 @@ import cn.momia.api.course.dto.Course;
 import cn.momia.api.course.dto.CourseDetail;
 import cn.momia.api.course.dto.CourseSkuPlace;
 import cn.momia.api.course.dto.DatedCourseSkus;
+import cn.momia.api.course.dto.TeacherCourse;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.api.dto.PagedList;
@@ -379,8 +380,6 @@ public class CourseController extends BaseController {
         for (BookedCourse bookedCourse : bookedCourses) {
             Course course = coursesMap.get(bookedCourse.getCourseId());
             if (course == null) continue;
-            List<CourseSku> skus = course.getSkus();
-            if (skus.isEmpty()) continue;
             CourseSkuPlace place = course.getPlace(bookedCourse.getCourseSkuId());
             if (place == null) continue;
 
@@ -409,6 +408,66 @@ public class CourseController extends BaseController {
         pagedBookedCourses.setList(completeBookedCourses(userId, bookedCourses));
 
         return MomiaHttpResponse.SUCCESS(pagedBookedCourses);
+    }
+
+    @RequestMapping(value = "/teacher/notfinished", method = RequestMethod.GET)
+    public MomiaHttpResponse teacherNotFinished(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = courseService.queryNotFinishedCountByTeacher(userId);
+        List<TeacherCourse> courses = courseService.queryNotFinishedByTeacher(userId, start, count);
+
+        PagedList<TeacherCourse> pagedCourses = new PagedList<TeacherCourse>(totalCount, start, count);
+        pagedCourses.setList(completeTeacherCourses(userId, courses));
+
+        return MomiaHttpResponse.SUCCESS(pagedCourses);
+    }
+
+    private List<TeacherCourse> completeTeacherCourses(long userId, List<TeacherCourse> teacherCourses) {
+        Set<Long> courseIds = new HashSet<Long>();
+        for (TeacherCourse teacherCourse : teacherCourses) {
+            courseIds.add(teacherCourse.getCourseId());
+        }
+
+        List<Course> courses = courseService.list(courseIds);
+        Map<Long, Course> coursesMap = new HashMap<Long, Course>();
+        for (Course course : courses) {
+            coursesMap.put(course.getId(), course);
+        }
+
+        List<TeacherCourse> completedTeacherCourses = new ArrayList<TeacherCourse>();
+        for (TeacherCourse teacherCourse : teacherCourses) {
+            Course course = coursesMap.get(teacherCourse.getCourseId());
+            if (course == null) continue;
+            CourseSkuPlace place = course.getPlace(teacherCourse.getCourseSkuId());
+            if (place == null) continue;
+
+            TeacherCourse completedTeacherCourse = new TeacherCourse();
+            completedTeacherCourse.setCourseId(teacherCourse.getCourseId());
+            completedTeacherCourse.setCourseSkuId(teacherCourse.getCourseSkuId());
+//            if (commentBookingIds.contains(teacherCourse.getBookingId())) completedTeacherCourse.setCommented(true);
+            completedTeacherCourse.setCover(course.getCover());
+            completedTeacherCourse.setTitle(course.getTitle());
+            completedTeacherCourse.setScheduler(course.getScheduler(teacherCourse.getCourseSkuId()));
+            completedTeacherCourse.setAddress(place.getAddress());
+
+            completedTeacherCourses.add(completedTeacherCourse);
+        }
+
+        return completedTeacherCourses;
+    }
+
+    @RequestMapping(value = "/teacher/finished", method = RequestMethod.GET)
+    public MomiaHttpResponse teacherFinished(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = courseService.queryFinishedCountByTeacher(userId);
+        List<TeacherCourse> courses = courseService.queryFinishedByTeacher(userId, start, count);
+
+        PagedList<TeacherCourse> pagedCourses = new PagedList<TeacherCourse>(totalCount, start, count);
+        pagedCourses.setList(completeTeacherCourses(userId, courses));
+
+        return MomiaHttpResponse.SUCCESS(pagedCourses);
     }
 
     @RequestMapping(value = "/{coid}/joined", method = RequestMethod.GET)

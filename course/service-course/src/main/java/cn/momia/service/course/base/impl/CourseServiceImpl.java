@@ -5,6 +5,7 @@ import cn.momia.api.base.dto.Region;
 import cn.momia.api.course.dto.Course;
 import cn.momia.api.course.dto.CourseDetail;
 import cn.momia.api.course.dto.CourseSkuPlace;
+import cn.momia.api.course.dto.TeacherCourse;
 import cn.momia.api.poi.PoiServiceApi;
 import cn.momia.api.poi.dto.Place;
 import cn.momia.common.api.exception.MomiaErrorException;
@@ -643,6 +644,54 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         List<Long> bookingIds = queryLongList(sql, new Object[] { userId, start, count });
 
         return listBookedCourses(bookingIds);
+    }
+
+    @Override
+    public long queryNotFinishedCountByTeacher(long userId) {
+        String sql = "SELECT COUNT(1) FROM SG_TeacherCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status<>0 AND B.StartTime>NOW() AND B.Status<>0";
+        return queryLong(sql, new Object[] { userId });
+    }
+
+    @Override
+    public List<TeacherCourse> queryNotFinishedByTeacher(long userId, int start, int count) {
+        String sql = "SELECT A.Id FROM SG_TeacherCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status<>0 AND B.StartTime>NOW() AND B.Status<>0 ORDER BY B.StartTime ASC LIMIT ?,?";
+        List<Long> teacherCourseIds = queryLongList(sql, new Object[] { userId, start, count });
+
+        return listTeacherCourses(teacherCourseIds);
+    }
+
+    private List<TeacherCourse> listTeacherCourses(Collection<Long> teacherCourseIds) {
+        if (teacherCourseIds.isEmpty()) return new ArrayList<TeacherCourse>();
+
+        String sql = "SELECT Id AS TeacherCourseId, CourseId, CourseSkuId FROM SG_TeacherCourse WHERE Id IN (" + StringUtils.join(teacherCourseIds, ",") + ") AND Status<>0";
+        List<TeacherCourse> teacherCourses = queryObjectList(sql, TeacherCourse.class);
+
+        Map<Long, TeacherCourse> teacherCoursesMap = new HashMap<Long, TeacherCourse>();
+        for (TeacherCourse teacherCourse : teacherCourses) {
+            teacherCoursesMap.put(teacherCourse.getTeacherCourseId(), teacherCourse);
+        }
+
+        List<TeacherCourse> result = new ArrayList<TeacherCourse>();
+        for (long teacherCourseId : teacherCourseIds) {
+            TeacherCourse teacherCourse = teacherCoursesMap.get(teacherCourseId);
+            if (teacherCourse != null) result.add(teacherCourse);
+        }
+
+        return result;
+    }
+
+    @Override
+    public long queryFinishedCountByTeacher(long userId) {
+        String sql = "SELECT COUNT(1) FROM SG_TeacherCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status<>0 AND B.EndTime<=NOW() AND B.Status<>0";
+        return queryLong(sql, new Object[] { userId });
+    }
+
+    @Override
+    public List<TeacherCourse> queryFinishedByTeacher(long userId, int start, int count) {
+        String sql = "SELECT A.Id FROM SG_TeacherCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status<>0 AND B.EndTime<=NOW() AND B.Status<>0 ORDER BY B.StartTime DESC LIMIT ?,?";
+        List<Long> teacherCourseIds = queryLongList(sql, new Object[] { userId, start, count });
+
+        return listTeacherCourses(teacherCourseIds);
     }
 
     @Override

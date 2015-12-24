@@ -3,6 +3,7 @@ package cn.momia.api.course;
 import cn.momia.api.course.dto.BookedCourse;
 import cn.momia.api.course.dto.Course;
 import cn.momia.api.course.dto.CourseSku;
+import cn.momia.api.course.dto.TeacherCourse;
 import cn.momia.api.course.dto.TimelineUnit;
 import cn.momia.api.course.dto.UserCourseComment;
 import cn.momia.api.course.dto.CourseDetail;
@@ -167,6 +168,26 @@ public class CourseServiceApi extends ServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/finished"), builder.build());
 
         return executeReturnPagedList(request, BookedCourse.class);
+    }
+
+    public PagedList<TeacherCourse> queryNotFinishedByTeacher(long userId, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("uid", userId)
+                .add("start", start)
+                .add("count", count);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/teacher/notfinished"), builder.build());
+
+        return executeReturnPagedList(request, TeacherCourse.class);
+    }
+
+    public PagedList<TeacherCourse> queryFinishedByTeacher(long userId, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("uid", userId)
+                .add("start", start)
+                .add("count", count);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/teacher/finished"), builder.build());
+
+        return executeReturnPagedList(request, TeacherCourse.class);
     }
 
     public boolean joined(long userId, long courseId) {
