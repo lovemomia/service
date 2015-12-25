@@ -57,6 +57,7 @@ public interface CourseService {
     long queryFinishedCountByUser(long userId);
     List<BookedCourse> queryFinishedByUser(long userId, int start, int count);
 
+    List<TeacherCourse> queryOngoingByTeacher(long userId);
     long queryNotFinishedCountByTeacher(long userId);
     List<TeacherCourse> queryNotFinishedByTeacher(long userId, int start, int count);
     long queryFinishedCountByTeacher(long userId);

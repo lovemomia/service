@@ -409,18 +409,12 @@ public class CourseController extends BaseController {
 
         return MomiaHttpResponse.SUCCESS(pagedBookedCourses);
     }
+    @RequestMapping(value = "/teacher/ongoing", method = RequestMethod.GET)
+    public MomiaHttpResponse teacherOngoing(@RequestParam(value = "uid") long userId) {
+        List<TeacherCourse> courses = completeTeacherCourses(courseService.queryOngoingByTeacher(userId), false);
+        if (courses.isEmpty()) return MomiaHttpResponse.SUCCESS(TeacherCourse.NOT_EXIST_TEACHER_COURSE);
 
-    @RequestMapping(value = "/teacher/notfinished", method = RequestMethod.GET)
-    public MomiaHttpResponse teacherNotFinished(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
-
-        long totalCount = courseService.queryNotFinishedCountByTeacher(userId);
-        List<TeacherCourse> courses = courseService.queryNotFinishedByTeacher(userId, start, count);
-
-        PagedList<TeacherCourse> pagedCourses = new PagedList<TeacherCourse>(totalCount, start, count);
-        pagedCourses.setList(completeTeacherCourses(courses, false));
-
-        return MomiaHttpResponse.SUCCESS(pagedCourses);
+        return MomiaHttpResponse.SUCCESS(courses.get(0));
     }
 
     private List<TeacherCourse> completeTeacherCourses(List<TeacherCourse> teacherCourses, boolean finished) {
@@ -468,6 +462,19 @@ public class CourseController extends BaseController {
         }
 
         return completedTeacherCourses;
+    }
+
+    @RequestMapping(value = "/teacher/notfinished", method = RequestMethod.GET)
+    public MomiaHttpResponse teacherNotFinished(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = courseService.queryNotFinishedCountByTeacher(userId);
+        List<TeacherCourse> courses = courseService.queryNotFinishedByTeacher(userId, start, count);
+
+        PagedList<TeacherCourse> pagedCourses = new PagedList<TeacherCourse>(totalCount, start, count);
+        pagedCourses.setList(completeTeacherCourses(courses, false));
+
+        return MomiaHttpResponse.SUCCESS(pagedCourses);
     }
 
     @RequestMapping(value = "/teacher/finished", method = RequestMethod.GET)

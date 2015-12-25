@@ -159,6 +159,16 @@ public class TeacherServiceApi extends ServiceApi {
         return executeReturnPagedList(request, Material.class);
     }
 
+    public List<Student> ongoingStudents(String utoken, long courseId, long courseSkuId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("coid", courseId)
+                .add("sid", courseSkuId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher/course/ongoing/student"), builder.build());
+
+        return executeReturnList(request, Student.class);
+    }
+
     public List<Student> notfinishedStudents(String utoken, long courseId, long courseSkuId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)

@@ -170,6 +170,13 @@ public class CourseServiceApi extends ServiceApi {
         return executeReturnPagedList(request, BookedCourse.class);
     }
 
+    public TeacherCourse getOngoingTeacherCourse(long userId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/teacher/ongoing"), builder.build());
+
+        return executeReturnObject(request, TeacherCourse.class);
+    }
+
     public PagedList<TeacherCourse> queryNotFinishedByTeacher(long userId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)

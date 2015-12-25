@@ -262,18 +262,24 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
     }
 
     @Override
-    public List<Student> queryNotfinishedStudents(long courseId, long courseSkuId) {
+    public List<Long> queryUserIdsWithoutChild(long courseId, long courseSkuId) {
+        String sql = "SELECT UserId FROM SG_BookedCourse WHERE CourseId=? AND CourseSkuId=? AND Status<>0 AND ChildId=0";
+        return queryLongList(sql, new Object[] { courseId, courseSkuId });
+    }
+
+    @Override
+    public List<Student> queryAllStudents(long courseId, long courseSkuId) {
         String sql = "SELECT B.Id FROM SG_BookedCourse A INNER JOIN SG_Child B ON A.ChildId=B.Id WHERE A.CourseId=? AND A.CourseSkuId=? AND A.Status<>0 AND B.Status<>0";
         List<Long> childIds = queryLongList(sql, new Object[] { courseId, courseSkuId });
 
-        return listStudents(childIds);
+        return listStudents(childIds, courseId, courseSkuId);
     }
 
-    private List<Student> listStudents(List<Long> childIds) {
+    private List<Student> listStudents(List<Long> childIds, long courseId, long courseSkuId) {
         if (childIds.isEmpty()) return new ArrayList<Student>();
 
-        String sql = "SELECT Id, UserId, Avatar, Name, Birthday, Sex FROM SG_Child WHERE Id IN (" + StringUtils.join(childIds, ",") + ") AND Status<>0";
-        List<Student> students = queryObjectList(sql, Student.class);
+        String sql = "SELECT B.Id, B.UserId, B.Avatar, B.Name, B.Birthday, B.Sex, A.PackageId, A.CheckIn FROM SG_BookedCourse A INNER JOIN SG_Child B ON A.ChildId=B.Id WHERE A.CourseId=? AND A.CourseSkuId=? AND A.Status<>0 AND B.Id IN (" + StringUtils.join(childIds, ",") + ") AND B.Status<>0";
+        List<Student> students = queryObjectList(sql, new Object[] {courseId, courseSkuId  }, Student.class);
         Map<Long, Student> studentsMap = new HashMap<Long, Student>();
         for (Student student : students) {
             studentsMap.put(student.getId(), student);
@@ -289,11 +295,11 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
     }
 
     @Override
-    public List<Student> queryFinishedStudents(long courseId, long courseSkuId) {
-        String sql = "SELECT B.Id FROM SG_BookedCourse A INNER JOIN SG_Child B ON A.ChildId=B.Id WHERE A.CourseId=? AND A.CourseSkuId=? AND A.Checkin>0 AND A.Status<>0 AND B.Status<>0";
+    public List<Student> queryCheckInStudents(long courseId, long courseSkuId) {
+        String sql = "SELECT B.Id FROM SG_BookedCourse A INNER JOIN SG_Child B ON A.ChildId=B.Id WHERE A.CourseId=? AND A.CourseSkuId=? AND A.CheckIn>0 AND A.Status<>0 AND B.Status<>0";
         List<Long> childIds = queryLongList(sql, new Object[] { courseId, courseSkuId });
 
-        return listStudents(childIds);
+        return listStudents(childIds, courseId, courseSkuId);
     }
 
     @Override

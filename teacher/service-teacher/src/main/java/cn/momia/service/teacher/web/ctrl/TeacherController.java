@@ -213,20 +213,44 @@ public class TeacherController extends BaseController {
         return baseMaterials;
     }
 
+    @RequestMapping(value = "/course/ongoing/student", method = RequestMethod.GET)
+    public MomiaHttpResponse ongoingStudents(@RequestParam String utoken,
+                                             @RequestParam(value = "coid") long courseId,
+                                             @RequestParam(value = "sid") long courseSkuId) {
+        checkTeacher(utoken);
+
+        List<Student> students = teacherService.queryAllStudents(courseId, courseSkuId);
+        List<Long> userIds = teacherService.queryUserIdsWithoutChild(courseId, courseSkuId);
+        List<User> users = userServiceApi.list(userIds, User.Type.MINI);
+        for (User user : users) {
+            Student student = new Student();
+            student.setType(Student.Type.PARENT);
+            student.setId(user.getId());
+            student.setUserId(user.getId());
+            student.setAvatar(user.getAvatar());
+            student.setName(user.getNickName());
+
+            students.add(student);
+        }
+
+        return MomiaHttpResponse.SUCCESS(students);
+    }
+
     @RequestMapping(value = "/course/notfinished/student", method = RequestMethod.GET)
     public MomiaHttpResponse notfinishedStudents(@RequestParam String utoken,
                                                  @RequestParam(value = "coid") long courseId,
                                                  @RequestParam(value = "sid") long courseSkuId) {
-        Teacher teacher = checkTeacher(utoken);
-        return MomiaHttpResponse.SUCCESS(teacherService.queryNotfinishedStudents(courseId, courseSkuId));
+        checkTeacher(utoken);
+        return MomiaHttpResponse.SUCCESS(teacherService.queryAllStudents(courseId, courseSkuId));
     }
 
     @RequestMapping(value = "/course/finished/student", method = RequestMethod.GET)
     public MomiaHttpResponse finishedStudents(@RequestParam String utoken,
                                               @RequestParam(value = "coid") long courseId,
                                               @RequestParam(value = "sid") long courseSkuId) {
-        Teacher teacher = checkTeacher(utoken);
-        List<Student> students = teacherService.queryFinishedStudents(courseId, courseSkuId);
+        checkTeacher(utoken);
+
+        List<Student> students = teacherService.queryCheckInStudents(courseId, courseSkuId);
 
         Set<Long> commentedChildIds = Sets.newHashSet(teacherService.queryCommentedChildIds(courseId, courseSkuId));
         for (Student student : students) {

@@ -647,6 +647,14 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
+    public List<TeacherCourse> queryOngoingByTeacher(long userId) {
+        String sql = "SELECT A.Id FROM SG_TeacherCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status<>0 AND B.StartTime<=NOW() AND B.EndTime>NOW() AND B.Status<>0 ORDER BY B.StartTime ASC";
+        List<Long> teacherCourseIds = queryLongList(sql, new Object[] { userId });
+
+        return listTeacherCourses(teacherCourseIds);
+    }
+
+    @Override
     public long queryNotFinishedCountByTeacher(long userId) {
         String sql = "SELECT COUNT(1) FROM SG_TeacherCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status<>0 AND B.StartTime>NOW() AND B.Status<>0";
         return queryLong(sql, new Object[] { userId });

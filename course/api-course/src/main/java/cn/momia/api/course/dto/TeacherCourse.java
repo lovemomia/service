@@ -3,6 +3,8 @@ package cn.momia.api.course.dto;
 import com.alibaba.fastjson.annotation.JSONField;
 
 public class TeacherCourse {
+    public static final TeacherCourse NOT_EXIST_TEACHER_COURSE = new TeacherCourse();
+
     @JSONField(serialize = false) private long teacherCourseId;
     private long courseId;
     private long courseSkuId;
@@ -75,5 +77,9 @@ public class TeacherCourse {
 
     public void setCommented(boolean commented) {
         this.commented = commented;
+    }
+
+    public boolean exists() {
+        return courseId > 0 && courseSkuId > 0;
     }
 }

@@ -31,8 +31,9 @@ public interface TeacherService {
     long queryMaterialsCount(long userId);
     List<Material> queryMaterials(long userId, int start, int count);
 
-    List<Student> queryNotfinishedStudents(long courseId, long courseSkuId);
-    List<Student> queryFinishedStudents(long courseId, long courseSkuId);
+    List<Long> queryUserIdsWithoutChild(long courseId, long courseSkuId);
+    List<Student> queryAllStudents(long courseId, long courseSkuId);
+    List<Student> queryCheckInStudents(long courseId, long courseSkuId);
     List<Long> queryCommentedChildIds(long courseId, long courseSkuId);
 
     boolean checkin(long userId, long packageId, long courseId, long courseSkuId);

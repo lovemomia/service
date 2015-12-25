@@ -20,6 +20,8 @@ public class Student {
     @JSONField(format = "yyyy-MM-dd") private Date birthday;
     private String sex;
 
+    private long packageId;
+    private boolean checkin;
     private boolean commented;
 
     public int getType() {
@@ -78,6 +80,22 @@ public class Student {
         this.sex = sex;
     }
 
+    public long getPackageId() {
+        return packageId;
+    }
+
+    public void setPackageId(long packageId) {
+        this.packageId = packageId;
+    }
+
+    public boolean isCheckin() {
+        return checkin;
+    }
+
+    public void setCheckin(boolean checkin) {
+        this.checkin = checkin;
+    }
+
     public boolean isCommented() {
         return commented;
     }
@@ -87,6 +105,6 @@ public class Student {
     }
 
     public String getAge() {
-        return TimeUtil.formatAge(birthday);
+        return birthday != null ? TimeUtil.formatAge(birthday) : "";
     }
 }
