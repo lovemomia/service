@@ -6,6 +6,7 @@ import cn.momia.api.teacher.dto.ChildTag;
 import cn.momia.api.teacher.dto.Education;
 import cn.momia.api.teacher.dto.Experience;
 import cn.momia.api.teacher.dto.Material;
+import cn.momia.api.teacher.dto.Student;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
 import cn.momia.common.api.ServiceApi;
@@ -156,6 +157,26 @@ public class TeacherServiceApi extends ServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher/material/list"), builder.build());
 
         return executeReturnPagedList(request, Material.class);
+    }
+
+    public List<Student> notfinishedStudents(String utoken, long courseId, long courseSkuId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("coid", courseId)
+                .add("sid", courseSkuId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher/course/notfinished/student"), builder.build());
+
+        return executeReturnList(request, Student.class);
+    }
+
+    public List<Student> finishedStudents(String utoken, long courseId, long courseSkuId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("coid", courseId)
+                .add("sid", courseSkuId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher/course/finished/student"), builder.build());
+
+        return executeReturnList(request, Student.class);
     }
 
     public boolean checkin(String utoken, long userId, long packageId, long courseId, long courseSkuId) {

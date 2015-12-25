@@ -6,6 +6,7 @@ import cn.momia.api.teacher.dto.Education;
 import cn.momia.api.teacher.dto.Experience;
 import cn.momia.api.teacher.dto.Material;
 import cn.momia.api.teacher.dto.ChildRecord;
+import cn.momia.api.teacher.dto.Student;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
 import cn.momia.common.service.AbstractService;
@@ -258,6 +259,47 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
         List<Integer> materialIds = queryIntList(sql, new Object[] { userId, start, count });
 
         return listMaterials(materialIds);
+    }
+
+    @Override
+    public List<Student> queryNotfinishedStudents(long courseId, long courseSkuId) {
+        String sql = "SELECT B.Id FROM SG_BookedCourse A INNER JOIN SG_Child B ON A.ChildId=B.Id WHERE A.CourseId=? AND A.CourseSkuId=? AND A.Status<>0 AND B.Status<>0";
+        List<Long> childIds = queryLongList(sql, new Object[] { courseId, courseSkuId });
+
+        return listStudents(childIds);
+    }
+
+    private List<Student> listStudents(List<Long> childIds) {
+        if (childIds.isEmpty()) return new ArrayList<Student>();
+
+        String sql = "SELECT Id, UserId, Avatar, Name, Birthday, Sex FROM SG_Child WHERE Id IN (" + StringUtils.join(childIds, ",") + ") AND Status<>0";
+        List<Student> students = queryObjectList(sql, Student.class);
+        Map<Long, Student> studentsMap = new HashMap<Long, Student>();
+        for (Student student : students) {
+            studentsMap.put(student.getId(), student);
+        }
+
+        List<Student> result = new ArrayList<Student>();
+        for (long childId : childIds) {
+            Student student = studentsMap.get(childId);
+            if (student != null) result.add(student);
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<Student> queryFinishedStudents(long courseId, long courseSkuId) {
+        String sql = "SELECT B.Id FROM SG_BookedCourse A INNER JOIN SG_Child B ON A.ChildId=B.Id WHERE A.CourseId=? AND A.CourseSkuId=? AND A.Checkin>0 AND A.Status<>0 AND B.Status<>0";
+        List<Long> childIds = queryLongList(sql, new Object[] { courseId, courseSkuId });
+
+        return listStudents(childIds);
+    }
+
+    @Override
+    public List<Long> queryCommentedChildIds(long courseId, long courseSkuId) {
+        String sql = "SELECT ChildId FROM SG_ChildComment WHERE CourseId=? AND CourseSkuId=? AND Status<>0";
+        return queryLongList(sql, new Object[] { courseId, courseSkuId });
     }
 
     @Override

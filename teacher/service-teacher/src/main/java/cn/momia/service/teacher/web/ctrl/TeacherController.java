@@ -5,8 +5,10 @@ import cn.momia.api.teacher.dto.Education;
 import cn.momia.api.teacher.dto.Experience;
 import cn.momia.api.teacher.dto.Material;
 import cn.momia.api.teacher.dto.ChildRecord;
+import cn.momia.api.teacher.dto.Student;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
+import cn.momia.api.user.ChildServiceApi;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.api.dto.PagedList;
@@ -16,6 +18,7 @@ import cn.momia.common.api.util.CastUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.teacher.TeacherService;
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,12 +30,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/teacher")
 public class TeacherController extends BaseController {
     @Autowired private TeacherService teacherService;
     @Autowired private UserServiceApi userServiceApi;
+    @Autowired private ChildServiceApi childServiceApi;
 
     @RequestMapping(value = "/status", method = RequestMethod.GET)
     public MomiaHttpResponse status(@RequestParam String utoken) {
@@ -206,6 +211,29 @@ public class TeacherController extends BaseController {
         }
 
         return baseMaterials;
+    }
+
+    @RequestMapping(value = "/course/notfinished/student", method = RequestMethod.GET)
+    public MomiaHttpResponse notfinishedStudents(@RequestParam String utoken,
+                                                 @RequestParam(value = "coid") long courseId,
+                                                 @RequestParam(value = "sid") long courseSkuId) {
+        Teacher teacher = checkTeacher(utoken);
+        return MomiaHttpResponse.SUCCESS(teacherService.queryNotfinishedStudents(courseId, courseSkuId));
+    }
+
+    @RequestMapping(value = "/course/finished/student", method = RequestMethod.GET)
+    public MomiaHttpResponse finishedStudents(@RequestParam String utoken,
+                                              @RequestParam(value = "coid") long courseId,
+                                              @RequestParam(value = "sid") long courseSkuId) {
+        Teacher teacher = checkTeacher(utoken);
+        List<Student> students = teacherService.queryFinishedStudents(courseId, courseSkuId);
+
+        Set<Long> commentedChildIds = Sets.newHashSet(teacherService.queryCommentedChildIds(courseId, courseSkuId));
+        for (Student student : students) {
+            if (commentedChildIds.contains(student.getId())) student.setCommented(true);
+        }
+
+        return MomiaHttpResponse.SUCCESS(students);
     }
 
     @RequestMapping(value = "/course/checkin", method = RequestMethod.POST)

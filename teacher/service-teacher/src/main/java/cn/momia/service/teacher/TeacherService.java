@@ -6,6 +6,7 @@ import cn.momia.api.teacher.dto.Education;
 import cn.momia.api.teacher.dto.Experience;
 import cn.momia.api.teacher.dto.Material;
 import cn.momia.api.teacher.dto.ChildRecord;
+import cn.momia.api.teacher.dto.Student;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
 
@@ -29,6 +30,10 @@ public interface TeacherService {
     Material getMaterial(long userId, int materialId);
     long queryMaterialsCount(long userId);
     List<Material> queryMaterials(long userId, int start, int count);
+
+    List<Student> queryNotfinishedStudents(long courseId, long courseSkuId);
+    List<Student> queryFinishedStudents(long courseId, long courseSkuId);
+    List<Long> queryCommentedChildIds(long courseId, long courseSkuId);
 
     boolean checkin(long userId, long packageId, long courseId, long courseSkuId);
 
