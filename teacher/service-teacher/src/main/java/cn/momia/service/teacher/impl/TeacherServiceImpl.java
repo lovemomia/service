@@ -129,13 +129,33 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
             experiencesMap.put(userId, new ArrayList<Experience>());
         }
 
-        String sql = "SELECT Id, UserId, School, Post, Time, Content FROM SG_TeacherExperience WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND Status<>0";
-        List<Experience> experiences = queryObjectList(sql, Experience.class);
+        String sql = "SELECT Id FROM SG_TeacherExperience WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND Status<>0 ORDER BY AddTime DESC";
+        List<Integer> experienceIds = queryIntList(sql);
+        List<Experience> experiences = listExperiences(experienceIds);
         for (Experience experience : experiences) {
             experiencesMap.get(experience.getUserId()).add(experience);
         }
 
         return experiencesMap;
+    }
+
+    private List<Experience> listExperiences(List<Integer> experienceIds) {
+        if (experienceIds.isEmpty()) return new ArrayList<Experience>();
+
+        String sql = "SELECT Id, UserId, School, Post, Time, Content FROM SG_TeacherExperience WHERE Id IN (" + StringUtils.join(experienceIds, ",") + ") AND Status<>0";
+        List<Experience> experiences = queryObjectList(sql, Experience.class);
+        Map<Integer, Experience> experiencesMap = new HashMap<Integer, Experience>();
+        for (Experience experience : experiences) {
+            experiencesMap.put(experience.getId(), experience);
+        }
+
+        List<Experience> result = new ArrayList<Experience>();
+        for (int experienceId : experienceIds) {
+            Experience experience = experiencesMap.get(experienceId);
+            if (experience != null) result.add(experience);
+        }
+
+        return result;
     }
 
     private Map<Long, List<Education>> queryEducations(Collection<Long> userIds) {
@@ -146,13 +166,33 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
             educationsMap.put(userId, new ArrayList<Education>());
         }
 
-        String sql = "SELECT Id, UserId, School, Major, Level, Time FROM SG_TeacherEducation WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND Status<>0";
-        List<Education> educations = queryObjectList(sql, Education.class);
+        String sql = "SELECT Id FROM SG_TeacherEducation WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND Status<>0 ORDER BY AddTime DESC";
+        List<Integer> educationIds = queryIntList(sql);
+        List<Education> educations = listEducations(educationIds);
         for (Education education : educations) {
             educationsMap.get(education.getUserId()).add(education);
         }
 
         return educationsMap;
+    }
+
+    private List<Education> listEducations(List<Integer> educationIds) {
+        if (educationIds.isEmpty()) return new ArrayList<Education>();
+
+        String sql = "SELECT Id, UserId, School, Major, Level, Time FROM SG_TeacherEducation WHERE UserId IN (" + StringUtils.join(educationIds, ",") + ") AND Status<>0";
+        List<Education> educations = queryObjectList(sql, Education.class);
+        Map<Integer, Education> educationsMap = new HashMap<Integer, Education>();
+        for (Education education : educations) {
+            educationsMap.put(education.getId(), education);
+        }
+
+        List<Education> result = new ArrayList<Education>();
+        for (int educationId : educationIds) {
+            Education education = educationsMap.get(educationId);
+            if (education != null) result.add(education);
+        }
+
+        return result;
     }
 
     @Override
@@ -325,5 +365,47 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
     private long getCommentId(long childId, long courseId, long courseSkuId) {
         String sql = "SELECT Id FROM SG_ChildComment WHERE ChildId=? AND CourseId=? AND CourseSkuId=?";
         return queryLong(sql, new Object[] { childId, courseId, courseSkuId });
+    }
+
+    @Override
+    public boolean addExperience(long userId, Experience experience) {
+        String sql = "INSERT INTO SG_TeacherExperience (UserId, School, Post, Time, Content, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
+        return update(sql, new Object[] { userId, experience.getSchool(), experience.getPost(), experience.getTime(), experience.getContent() });
+    }
+
+    @Override
+    public Experience getExperience(long userId, int experienceId) {
+        String sql = "SELECT Id FROM SG_TeacherExperience WHERE UserId=? AND Id=? AND Status<>0";
+        List<Integer> experienceIds = queryIntList(sql, new Object[] { userId, experienceId });
+        List<Experience> experiences = listExperiences(experienceIds);
+
+        return experiences.isEmpty() ? Experience.NOT_EXIST_EXPERIENCE : experiences.get(0);
+    }
+
+    @Override
+    public boolean deleteExperience(long userId, int experienceId) {
+        String sql = "UPDATE SG_TeacherExperience SET Status=0 WHERE UserId=? AND Id=?";
+        return update(sql, new Object[] { userId, experienceId });
+    }
+
+    @Override
+    public boolean addEducation(long userId, Education education) {
+        String sql = "INSERT INTO SG_TeacherEducation (UserId, School, Major, Level, Time, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
+        return update(sql, new Object[] { userId, education.getSchool(), education.getMajor(), education.getLevel(), education.getTime() });
+    }
+
+    @Override
+    public Education getEducation(long userId, int educationId) {
+        String sql = "SELECT Id FROM SG_TeacherEducation WHERE UserId=? AND Id=? AND Status<>0";
+        List<Integer> educationIds = queryIntList(sql, new Object[] { userId, educationId });
+        List<Education> educations = listEducations(educationIds);
+
+        return educations.isEmpty() ? Education.NOT_EXIST_EDUCATION : educations.get(0);
+    }
+
+    @Override
+    public boolean deleteEducation(long userId, int educationId) {
+        String sql = "UPDATE SG_TeacherEducation SET Status=0 WHERE UserId=? AND Id=?";
+        return update(sql, new Object[] { userId, educationId });
     }
 }

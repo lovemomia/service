@@ -1,6 +1,8 @@
 package cn.momia.service.teacher.web.ctrl;
 
 import cn.momia.api.teacher.dto.ChildComment;
+import cn.momia.api.teacher.dto.Education;
+import cn.momia.api.teacher.dto.Experience;
 import cn.momia.api.teacher.dto.Material;
 import cn.momia.api.teacher.dto.ChildRecord;
 import cn.momia.api.teacher.dto.Teacher;
@@ -49,6 +51,55 @@ public class TeacherController extends BaseController {
         if (teacher.isInvalid()) return MomiaHttpResponse.FAILED("信息不完整");
 
         return MomiaHttpResponse.SUCCESS(teacherService.add(teacher) > 0);
+    }
+
+    @RequestMapping(value = "/experience", method = RequestMethod.POST)
+    public MomiaHttpResponse addExperience(@RequestParam String utoken, @RequestParam(value = "experience") String experienceJsonStr) {
+        User user = userServiceApi.get(utoken);
+        Experience experience = CastUtil.toObject(JSON.parseObject(experienceJsonStr), Experience.class);
+        if (experience.isInvalid()) return MomiaHttpResponse.FAILED("工作经验信息不完整");
+        if (experience.getContent().length() > 500) return MomiaHttpResponse.FAILED("工作内容超出字数限制");
+
+        return MomiaHttpResponse.SUCCESS(teacherService.addExperience(user.getId(), experience));
+    }
+
+    @RequestMapping(value = "/experience/{expid}", method = RequestMethod.GET)
+    public MomiaHttpResponse getExperience(@RequestParam String utoken, @PathVariable(value = "expid") int experienceId) {
+        User user = userServiceApi.get(utoken);
+        Experience experience = teacherService.getExperience(user.getId(), experienceId);
+        if (!experience.exists()) return MomiaHttpResponse.FAILED("工作经验信息不存在");
+
+        return MomiaHttpResponse.SUCCESS(experience);
+    }
+
+    @RequestMapping(value = "/experience/{expid}", method = RequestMethod.DELETE)
+    public MomiaHttpResponse addExperience(@RequestParam String utoken, @PathVariable(value = "expid") int experienceId) {
+        User user = userServiceApi.get(utoken);
+        return MomiaHttpResponse.SUCCESS(teacherService.deleteExperience(user.getId(), experienceId));
+    }
+
+    @RequestMapping(value = "/education", method = RequestMethod.POST)
+    public MomiaHttpResponse addEducation(@RequestParam String utoken, @RequestParam(value = "education") String educationJsonStr) {
+        User user = userServiceApi.get(utoken);
+        Education education = CastUtil.toObject(JSON.parseObject(educationJsonStr), Education.class);
+        if (education.isInvalid()) return MomiaHttpResponse.FAILED("学历信息不完整");
+
+        return MomiaHttpResponse.SUCCESS(teacherService.addEducation(user.getId(), education));
+    }
+
+    @RequestMapping(value = "/education/{eduid}", method = RequestMethod.GET)
+    public MomiaHttpResponse getEducation(@RequestParam String utoken, @PathVariable(value = "eduid") int educationId) {
+        User user = userServiceApi.get(utoken);
+        Education education = teacherService.getEducation(user.getId(), educationId);
+        if (!education.exists()) return MomiaHttpResponse.FAILED("学历信息不存在");
+
+        return MomiaHttpResponse.SUCCESS(education);
+    }
+
+    @RequestMapping(value = "/education/{eduid}", method = RequestMethod.DELETE)
+    public MomiaHttpResponse addEducation(@RequestParam String utoken, @PathVariable(value = "eduid") int educationId) {
+        User user = userServiceApi.get(utoken);
+        return MomiaHttpResponse.SUCCESS(teacherService.deleteEducation(user.getId(), educationId));
     }
 
     @RequestMapping(method = RequestMethod.GET)
