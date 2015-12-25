@@ -3,6 +3,7 @@ package cn.momia.api.teacher;
 import cn.momia.api.teacher.dto.ChildComment;
 import cn.momia.api.teacher.dto.ChildRecord;
 import cn.momia.api.teacher.dto.ChildTag;
+import cn.momia.api.teacher.dto.Experience;
 import cn.momia.api.teacher.dto.Material;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
@@ -167,5 +168,29 @@ public class TeacherServiceApi extends ServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/teacher/child/%d/comment", childId), builder.build());
 
         return executeReturnObject(request, Boolean.class);
+    }
+
+    public boolean addExperience(String utoken, String experience) {
+        return true;
+    }
+
+    public boolean getExperience(String utoken, long experienceId) {
+        return false;
+    }
+
+    public boolean deleteExperience(String utoken, long experienceId) {
+        return false;
+    }
+
+    public boolean addEducation(String utoken, String education) {
+        return false;
+    }
+
+    public boolean getEducation(String utoken, long educationId) {
+        return false;
+    }
+
+    public boolean deleteEducation(String utoken, long educationId) {
+        return false;
     }
 }
