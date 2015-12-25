@@ -179,7 +179,7 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
     private List<Education> listEducations(List<Integer> educationIds) {
         if (educationIds.isEmpty()) return new ArrayList<Education>();
 
-        String sql = "SELECT Id, UserId, School, Major, Level, Time FROM SG_TeacherEducation WHERE UserId IN (" + StringUtils.join(educationIds, ",") + ") AND Status<>0";
+        String sql = "SELECT Id, UserId, School, Major, Level, Time FROM SG_TeacherEducation WHERE Id IN (" + StringUtils.join(educationIds, ",") + ") AND Status<>0";
         List<Education> educations = queryObjectList(sql, Education.class);
         Map<Integer, Education> educationsMap = new HashMap<Integer, Education>();
         for (Education education : educations) {
