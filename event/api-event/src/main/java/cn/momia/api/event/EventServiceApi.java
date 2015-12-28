@@ -11,30 +11,22 @@ import org.apache.http.client.methods.HttpUriRequest;
 import java.util.List;
 
 public class EventServiceApi extends ServiceApi {
-    public List<Banner> listBanners(int cityId, int count) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("city", cityId)
-                .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/event/banner"), builder.build());
-
-        return executeReturnList(request, Banner.class);
+    public List<Banner> listBanners(int cityId) {
+        return list("/event/banner", cityId, Banner.class);
     }
 
-    public List<Icon> listIcons(int cityId, int count) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("city", cityId)
-                .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/event/icon"), builder.build());
+    private  <T> List<T> list(String uri, int cityId, Class<T> clazz) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("city", cityId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url(uri), builder.build());
 
-        return executeReturnList(request, Icon.class);
+        return executeReturnList(request, clazz);
     }
 
-    public List<Event> listEvents(int cityId, int count) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("city", cityId)
-                .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/event/event"), builder.build());
+    public List<Icon> listIcons(int cityId) {
+        return list("/event/icon", cityId, Icon.class);
+    }
 
-        return executeReturnList(request, Event.class);
+    public List<Event> listEvents(int cityId) {
+        return list("/event/event", cityId, Event.class);
     }
 }

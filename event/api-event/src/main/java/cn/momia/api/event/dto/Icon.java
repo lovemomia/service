@@ -1,11 +1,8 @@
 package cn.momia.api.event.dto;
 
-public class Icon {
+public class Icon extends Version {
     private String title;
     private String img;
-    private String action;
-    private int platform;
-    private String version;
 
     public String getTitle() {
         return title;
@@ -21,29 +18,5 @@ public class Icon {
 
     public void setImg(String img) {
         this.img = img;
-    }
-
-    public String getAction() {
-        return action;
-    }
-
-    public void setAction(String action) {
-        this.action = action;
-    }
-
-    public int getPlatform() {
-        return platform;
-    }
-
-    public void setPlatform(int platform) {
-        this.platform = platform;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
     }
 }

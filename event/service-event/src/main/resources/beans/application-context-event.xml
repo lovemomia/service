@@ -4,7 +4,5 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean class="cn.momia.service.event.banner.impl.BannerServiceImpl" parent="dbAccessService" />
-    <bean class="cn.momia.service.event.icon.impl.IconServiceImpl" parent="dbAccessService" />
-    <bean class="cn.momia.service.event.base.impl.EventServiceImpl" parent="dbAccessService" />
+    <bean class="cn.momia.service.event.impl.EventServiceImpl" parent="dbAccessService" />
 </beans>

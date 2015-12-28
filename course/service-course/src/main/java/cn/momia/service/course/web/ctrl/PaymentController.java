@@ -5,7 +5,7 @@ import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.api.http.MomiaHttpResponse;
-import cn.momia.common.client.ClientType;
+import cn.momia.common.api.client.ClientType;
 import cn.momia.common.deal.gateway.CallbackParam;
 import cn.momia.common.deal.gateway.CallbackResult;
 import cn.momia.common.deal.gateway.PayType;
