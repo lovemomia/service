@@ -6,7 +6,7 @@ public class Member {
     private long id;
     private long groupId;
     private long userId;
-    private int teacher;
+    private boolean teacher;
     private Date addTime;
 
     public long getId() {
@@ -33,11 +33,11 @@ public class Member {
         this.userId = userId;
     }
 
-    public int getTeacher() {
+    public boolean isTeacher() {
         return teacher;
     }
 
-    public void setTeacher(int teacher) {
+    public void setTeacher(boolean teacher) {
         this.teacher = teacher;
     }
 

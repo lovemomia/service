@@ -1,7 +1,6 @@
 package cn.momia.api.im;
 
 import cn.momia.api.im.dto.Group;
-import cn.momia.api.im.dto.ImUser;
 import cn.momia.api.im.dto.Member;
 import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
@@ -13,9 +12,9 @@ import java.util.List;
 import java.util.Set;
 
 public class ImServiceApi extends ServiceApi {
-    public String generateImToken(String utoken, String nickName, String avatar) {
+    public String generateImToken(long userId, String nickName, String avatar) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("utoken", utoken)
+                .add("uid", userId)
                 .add("nickname", nickName)
                 .add("avatar", avatar);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/im/token"), builder.build());
@@ -23,39 +22,20 @@ public class ImServiceApi extends ServiceApi {
         return executeReturnObject(request, String.class);
     }
 
-    public String getImToken(String utoken) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/im/token"), builder.build());
-
-        return executeReturnObject(request, String.class);
-    }
-
-    public void updateImNickName(String utoken, String nickName) {
+    public void updateImNickName(long userId, String nickName) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("utoken", utoken)
+                .add("uid", userId)
                 .add("nickname", nickName);
         HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/im/user/nickname"), builder.build());
         execute(request);
     }
 
-    public void updateImAvatar(String utoken, String avatar) {
+    public void updateImAvatar(long userId, String avatar) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("utoken", utoken)
+                .add("uid", userId)
                 .add("avatar", avatar);
         HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/im/user/avatar"), builder.build());
         execute(request);
-    }
-
-    public ImUser getImUser(long userId) {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/im/user/%d", userId));
-        return executeReturnObject(request, ImUser.class);
-    }
-
-    public List<Member> queryMembersByUser(String utoken) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/im/user/member"), builder.build());
-
-        return executeReturnList(request, Member.class);
     }
 
     public boolean createGroup(long courseId, long courseSkuId, List<Long> teacherUserIds, String groupName) {
@@ -96,16 +76,9 @@ public class ImServiceApi extends ServiceApi {
         return executeReturnList(request, Group.class);
     }
 
-    public List<ImUser> listGroupMembers(String utoken, long groupId) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/im/group/%d/member", groupId), builder.build());
-
-        return executeReturnList(request, ImUser.class);
-    }
-
-    public boolean joinGroup(String utoken, long courseId, long courseSkuId) {
+    public boolean joinGroup(long userId, long courseId, long courseSkuId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("utoken", utoken)
+                .add("uid", userId)
                 .add("coid", courseId)
                 .add("sid", courseSkuId);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/im/group/join"), builder.build());
@@ -113,13 +86,27 @@ public class ImServiceApi extends ServiceApi {
         return executeReturnObject(request, Boolean.class);
     }
 
-    public boolean leaveGroup(String utoken, long courseId, long courseSkuId) {
+    public boolean leaveGroup(long userId, long courseId, long courseSkuId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("utoken", utoken)
+                .add("uid", userId)
                 .add("coid", courseId)
                 .add("sid", courseSkuId);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/im/group/leave"), builder.build());
 
         return executeReturnObject(request, Boolean.class);
+    }
+
+    public List<Member> listGroupMembers(long userId, long groupId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/im/group/%d/member", groupId), builder.build());
+
+        return executeReturnList(request, Member.class);
+    }
+
+    public List<Member> queryMembersByUser(long userId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/im/user/member"), builder.build());
+
+        return executeReturnList(request, Member.class);
     }
 }

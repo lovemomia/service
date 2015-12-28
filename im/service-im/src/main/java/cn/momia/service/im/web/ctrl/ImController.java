@@ -1,10 +1,6 @@
 package cn.momia.service.im.web.ctrl;
 
 import cn.momia.api.im.dto.Group;
-import cn.momia.api.im.dto.ImUser;
-import cn.momia.api.im.dto.Member;
-import cn.momia.api.user.UserServiceApi;
-import cn.momia.api.user.dto.User;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.im.ImService;
@@ -19,11 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -31,58 +23,24 @@ import java.util.Set;
 public class ImController extends BaseController {
     @Autowired private ImService imService;
     @Autowired private PushService pushService;
-    @Autowired private UserServiceApi userServiceApi;
 
     @RequestMapping(value = "/token", method = RequestMethod.POST)
-    public MomiaHttpResponse generateImToken(@RequestParam String utoken, @RequestParam(value = "nickname") String nickName, @RequestParam String avatar) {
-        User user = userServiceApi.get(utoken);
-        String imToken = imService.generateImToken(user.getId(), nickName, avatar);
-        if (!StringUtils.isBlank(imToken)) userServiceApi.updateImToken(utoken, imToken);
-
-        return MomiaHttpResponse.SUCCESS(imToken);
-    }
-
-    @RequestMapping(value = "/token", method = RequestMethod.GET)
-    public MomiaHttpResponse getImToken(@RequestParam String utoken) {
-        User user = userServiceApi.get(utoken);
-        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
-        return MomiaHttpResponse.SUCCESS(user.getImToken());
+    public MomiaHttpResponse generateImToken(@RequestParam(value = "uid") long userId,
+                                             @RequestParam(value = "nickname") String nickName,
+                                             @RequestParam String avatar) {
+        return MomiaHttpResponse.SUCCESS(imService.generateImToken(userId, nickName, avatar));
     }
 
     @RequestMapping(value = "/user/nickname", method = RequestMethod.PUT)
-    public MomiaHttpResponse updateNickName(@RequestParam String utoken, @RequestParam(value = "nickname") String nickName) {
-        User user = userServiceApi.get(utoken);
-        imService.updateNickName(user.getId(), nickName);
-
+    public MomiaHttpResponse updateNickName(@RequestParam(value = "uid") long userId, @RequestParam(value = "nickname") String nickName) {
+        imService.updateNickName(userId, nickName);
         return MomiaHttpResponse.SUCCESS;
     }
 
     @RequestMapping(value = "/user/avatar", method = RequestMethod.PUT)
-    public MomiaHttpResponse updateAvatar(@RequestParam String utoken, @RequestParam String avatar) {
-        User user = userServiceApi.get(utoken);
-        imService.updateAvatar(user.getId(), avatar);
-
+    public MomiaHttpResponse updateAvatar(@RequestParam(value = "uid") long userId, @RequestParam String avatar) {
+        imService.updateAvatar(userId, avatar);
         return MomiaHttpResponse.SUCCESS;
-    }
-
-    @RequestMapping(value = "/user/{uid}", method = RequestMethod.GET)
-    public MomiaHttpResponse getImUser(@PathVariable(value = "uid") long userId) {
-        User user = userServiceApi.get(userId);
-        if (!user.exists()) return MomiaHttpResponse.FAILED("用户不存在");
-
-        ImUser imUser = new ImUser();
-        imUser.setId(userId);
-        imUser.setNickName(user.getNickName());
-        imUser.setAvatar(user.getAvatar());
-        imUser.setRole(user.getRole());
-
-        return MomiaHttpResponse.SUCCESS(imUser);
-    }
-
-    @RequestMapping(value = "/user/member", method = RequestMethod.GET)
-    public MomiaHttpResponse queryMembersByUser(@RequestParam String utoken) {
-        User user = userServiceApi.get(utoken);
-        return MomiaHttpResponse.SUCCESS(imService.queryMembersByUser(user.getId()));
     }
 
     @RequestMapping(value = "/group", method = RequestMethod.POST)
@@ -131,56 +89,31 @@ public class ImController extends BaseController {
         return MomiaHttpResponse.SUCCESS(imService.listGroups(groupIds));
     }
 
-    @RequestMapping(value = "/group/{id}/member", method = RequestMethod.GET)
-    public MomiaHttpResponse listGroupMembers(@RequestParam String utoken, @PathVariable(value = "id") long groupId) {
-        User user = userServiceApi.get(utoken);
-        if (!imService.isInGroup(user.getId(), groupId)) return MomiaHttpResponse.FAILED("您不在该群组中，无权查看群组成员");
-
-        List<Member> members = imService.queryMembersByGroup(groupId);
-        Set<Long> userIds = new HashSet<Long>();
-        for (Member member : members) {
-            userIds.add(member.getUserId());
-        }
-
-        List<User> users = userServiceApi.list(userIds, User.Type.BASE);
-        Map<Long, User> usersMap = new HashMap<Long, User>();
-        for (User memberUser : users) {
-            usersMap.put(memberUser.getId(), memberUser);
-        }
-
-        List<ImUser> imUsers = new ArrayList<ImUser>();
-        for (Member member : members) {
-            User memberUser = usersMap.get(member.getUserId());
-            if (memberUser == null) continue;
-
-            ImUser imUser = new ImUser();
-            imUser.setId(memberUser.getId());
-            imUser.setNickName(memberUser.getNickName());
-            imUser.setAvatar(memberUser.getAvatar());
-            imUser.setRole(memberUser.getRole());
-
-            imUsers.add(imUser);
-        }
-
-        return MomiaHttpResponse.SUCCESS(imUsers);
-    }
-
     @RequestMapping(value = "/group/join", method = RequestMethod.POST)
-    public MomiaHttpResponse joinGroup(@RequestParam String utoken,
+    public MomiaHttpResponse joinGroup(@RequestParam(value = "uid") long userId,
                                        @RequestParam(value = "coid") long courseId,
                                        @RequestParam(value = "sid") long courseSkuId) {
         if (courseId <= 0 || courseSkuId <= 0) return MomiaHttpResponse.BAD_REQUEST;
-        User user = userServiceApi.get(utoken);
-        return MomiaHttpResponse.SUCCESS(imService.joinGroup(courseId, courseSkuId, user.getId(), user.isTeacher()));
+        return MomiaHttpResponse.SUCCESS(imService.joinGroup(userId, courseId, courseSkuId));
     }
 
     @RequestMapping(value = "/group/leave", method = RequestMethod.POST)
-    public MomiaHttpResponse leaveGroup(@RequestParam String utoken,
+    public MomiaHttpResponse leaveGroup(@RequestParam(value = "uid") long userId,
                                         @RequestParam(value = "coid") long courseId,
                                         @RequestParam(value = "sid") long courseSkuId) {
         if (courseId <= 0 || courseSkuId <= 0) return MomiaHttpResponse.BAD_REQUEST;
-        User user = userServiceApi.get(utoken);
-        return MomiaHttpResponse.SUCCESS(imService.leaveGroup(courseId, courseSkuId, user.getId()));
+        return MomiaHttpResponse.SUCCESS(imService.leaveGroup(userId, courseId, courseSkuId));
+    }
+
+    @RequestMapping(value = "/group/{id}/member", method = RequestMethod.GET)
+    public MomiaHttpResponse listGroupMembers(@RequestParam(value = "uid") long userId, @PathVariable(value = "id") long groupId) {
+        if (!imService.isInGroup(userId, groupId)) return MomiaHttpResponse.FAILED("您不在该群组中，无权查看群组成员");
+        return MomiaHttpResponse.SUCCESS(imService.queryMembersByGroup(groupId));
+    }
+
+    @RequestMapping(value = "/user/member", method = RequestMethod.GET)
+    public MomiaHttpResponse queryMembersByUser(@RequestParam(value = "uid") long userId) {
+        return MomiaHttpResponse.SUCCESS(imService.queryMembersByUser(userId));
     }
 
     @RequestMapping(value = "/push", method = RequestMethod.POST)

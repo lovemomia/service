@@ -134,6 +134,52 @@ public abstract class AbstractImService extends AbstractService implements ImSer
         String sql = "SELECT GroupId, GroupName, CourseId, CourseSkuId FROM SG_ImGroup WHERE GroupId IN (" + StringUtils.join(groupIds, ",") + ") AND Status<>0";
         return queryObjectList(sql, Group.class);
     }
+    @Override
+    public boolean joinGroup(long courseId, long courseSkuId, long userId) {
+        Group group = queryGroup(courseId, courseSkuId);
+        if (!group.exists()) return false;
+
+        if (doJoinGroup(group.getGroupId(), group.getGroupName(), userId)) {
+            logGroupMembers(group.getGroupId(), Sets.newHashSet(userId), false);
+            return true;
+        }
+
+        return false;
+    }
+
+    private Group queryGroup(long courseId, long courseSkuId) {
+        String sql = "SELECT GroupId FROM SG_ImGroup WHERE CourseId=? AND CourseSkuId=? AND Status=1 LIMIT 1";
+        List<Long> groupIds = queryLongList(sql, new Object[] { courseId, courseSkuId });
+        List<Group> groups = listGroups(groupIds);
+
+        return groups.isEmpty() ? Group.NOT_EXIST_GROUP : groups.get(0);
+    }
+
+    protected abstract boolean doJoinGroup(long groupId, String groupName, long userId);
+
+    @Override
+    public boolean leaveGroup(long courseId, long courseSkuId, long userId) {
+        Group group = queryGroup(courseId, courseSkuId);
+        if (!group.exists()) return false;
+
+        if (doLeaveGroup(group.getGroupId(), userId)) {
+            deleteGroupMembersLog(group.getGroupId(), Sets.newHashSet(userId));
+            return true;
+        }
+
+        return false;
+    }
+
+    protected abstract boolean doLeaveGroup(long groupId, long userId);
+
+    private void deleteGroupMembersLog(long groupId, Collection<Long> userIds) {
+        String sql = "UPDATE SG_ImGroupMember SET Status=0 WHERE GroupId=? AND UserId=?";
+        List<Object[]> args = new ArrayList<Object[]>();
+        for (long userId : userIds) {
+            args.add(new Object[] { groupId, userId });
+        }
+        batchUpdate(sql, args);
+    }
 
     @Override
     public boolean isInGroup(long userId, long groupId) {
@@ -177,50 +223,4 @@ public abstract class AbstractImService extends AbstractService implements ImSer
         return listMembers(memberIds);
     }
 
-    @Override
-    public boolean joinGroup(long courseId, long courseSkuId, long userId, boolean teacher) {
-        Group group = queryGroup(courseId, courseSkuId);
-        if (!group.exists()) return false;
-
-        if (doJoinGroup(group.getGroupId(), group.getGroupName(), userId)) {
-            logGroupMembers(group.getGroupId(), Sets.newHashSet(userId), teacher);
-            return true;
-        }
-
-        return false;
-    }
-
-    private Group queryGroup(long courseId, long courseSkuId) {
-        String sql = "SELECT GroupId FROM SG_ImGroup WHERE CourseId=? AND CourseSkuId=? AND Status=1 LIMIT 1";
-        List<Long> groupIds = queryLongList(sql, new Object[] { courseId, courseSkuId });
-        List<Group> groups = listGroups(groupIds);
-
-        return groups.isEmpty() ? Group.NOT_EXIST_GROUP : groups.get(0);
-    }
-
-    protected abstract boolean doJoinGroup(long groupId, String groupName, long userId);
-
-    @Override
-    public boolean leaveGroup(long courseId, long courseSkuId, long userId) {
-        Group group = queryGroup(courseId, courseSkuId);
-        if (!group.exists()) return false;
-
-        if (doLeaveGroup(group.getGroupId(), userId)) {
-            deleteGroupMembersLog(group.getGroupId(), Sets.newHashSet(userId));
-            return true;
-        }
-
-        return false;
-    }
-
-    protected abstract boolean doLeaveGroup(long groupId, long userId);
-
-    private void deleteGroupMembersLog(long groupId, Collection<Long> userIds) {
-        String sql = "UPDATE SG_ImGroupMember SET Status=0 WHERE GroupId=? AND UserId=?";
-        List<Object[]> args = new ArrayList<Object[]>();
-        for (long userId : userIds) {
-            args.add(new Object[] { groupId, userId });
-        }
-        batchUpdate(sql, args);
-    }
 }
