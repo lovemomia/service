@@ -25,7 +25,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -45,42 +44,6 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
     public TeacherStatus status(long userId) {
         String sql = "SELECT Status, Msg FROM SG_Teacher WHERE UserId=? AND Status<>0";
         return queryObject(sql, new Object[] { userId }, TeacherStatus.class, TeacherStatus.NOT_EXIST_TEACHER_STATUS);
-    }
-
-    @Override
-    public long add(final Teacher teacher) {
-        int teacherId = getIdByUser(teacher.getUserId());
-        if (teacherId > 0) {
-            String sql = "UPDATE SG_Teacher SET Pic=?, Name=?, IdNo=?, Gender=?, Birthday=?, Address=?, Status=? WHERE Id=? AND UserId=?";
-            update(sql, new Object[] { teacher.getPic(), teacher.getName(), teacher.getIdNo(), teacher.getSex(), teacher.getBirthday(), teacher.getAddress(), TeacherStatus.Status.NOT_CHECKED, teacherId, teacher.getUserId() });
-        } else {
-            KeyHolder keyHolder = insert(new PreparedStatementCreator() {
-                @Override
-                public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                    String sql = "INSERT INTO SG_Teacher(UserId, Pic, Name, IdNo, Gender, Birthday, Address, Status, AddTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
-                    PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                    ps.setLong(1, teacher.getUserId());
-                    ps.setString(2, teacher.getPic());
-                    ps.setString(3, teacher.getName());
-                    ps.setString(4, teacher.getIdNo());
-                    ps.setString(5, teacher.getSex());
-                    ps.setDate(6, new java.sql.Date(teacher.getBirthday().getTime()));
-                    ps.setString(7, teacher.getAddress());
-                    ps.setInt(8, TeacherStatus.Status.NOT_CHECKED);
-
-                    return ps;
-                }
-            });
-
-            teacherId = keyHolder.getKey().intValue();
-        }
-
-        return teacherId;
-    }
-
-    private int getIdByUser(long userId) {
-        String sql = "SELECT Id FROM SG_Teacher WHERE UserId=?";
-        return queryInt(sql, new Object[] { userId });
     }
 
     @Override
@@ -197,39 +160,39 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
     }
 
     @Override
-    public boolean updatePic(int teacherId, String pic) {
-        String sql = "UPDATE SG_Teacher SET Pic=? WHERE Id=?";
-        return update(sql, new Object[] { pic, teacherId });
+    public long add(final Teacher teacher) {
+        int teacherId = getIdByUser(teacher.getUserId());
+        if (teacherId > 0) {
+            String sql = "UPDATE SG_Teacher SET Pic=?, Name=?, IdNo=?, Gender=?, Birthday=?, Address=?, Status=? WHERE Id=? AND UserId=?";
+            update(sql, new Object[] { teacher.getPic(), teacher.getName(), teacher.getIdNo(), teacher.getSex(), teacher.getBirthday(), teacher.getAddress(), TeacherStatus.Status.NOT_CHECKED, teacherId, teacher.getUserId() });
+        } else {
+            KeyHolder keyHolder = insert(new PreparedStatementCreator() {
+                @Override
+                public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                    String sql = "INSERT INTO SG_Teacher(UserId, Pic, Name, IdNo, Gender, Birthday, Address, Status, AddTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+                    PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                    ps.setLong(1, teacher.getUserId());
+                    ps.setString(2, teacher.getPic());
+                    ps.setString(3, teacher.getName());
+                    ps.setString(4, teacher.getIdNo());
+                    ps.setString(5, teacher.getSex());
+                    ps.setDate(6, new java.sql.Date(teacher.getBirthday().getTime()));
+                    ps.setString(7, teacher.getAddress());
+                    ps.setInt(8, TeacherStatus.Status.NOT_CHECKED);
+
+                    return ps;
+                }
+            });
+
+            teacherId = keyHolder.getKey().intValue();
+        }
+
+        return teacherId;
     }
 
-    @Override
-    public boolean updateName(int teacherId, String name) {
-        String sql = "UPDATE SG_Teacher SET Name=? WHERE Id=?";
-        return update(sql, new Object[] { name, teacherId });
-    }
-
-    @Override
-    public boolean updateIdNo(int teacherId, String idno) {
-        String sql = "UPDATE SG_Teacher SET IdNo=? WHERE Id=?";
-        return update(sql, new Object[] { idno, teacherId });
-    }
-
-    @Override
-    public boolean updateSex(int teacherId, String sex) {
-        String sql = "UPDATE SG_Teacher SET Gender=? WHERE Id=?";
-        return update(sql, new Object[] { sex, teacherId });
-    }
-
-    @Override
-    public boolean updateBirthday(int teacherId, Date birthday) {
-        String sql = "UPDATE SG_Teacher SET Birthday=? WHERE Id=?";
-        return update(sql, new Object[] { birthday, teacherId });
-    }
-
-    @Override
-    public boolean updateAddress(int teacherId, String address) {
-        String sql = "UPDATE SG_Teacher SET Address=? WHERE Id=?";
-        return update(sql, new Object[] { address, teacherId });
+    private int getIdByUser(long userId) {
+        String sql = "SELECT Id FROM SG_Teacher WHERE UserId=?";
+        return queryInt(sql, new Object[] { userId });
     }
 
     @Override

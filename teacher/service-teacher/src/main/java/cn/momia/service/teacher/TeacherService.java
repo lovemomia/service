@@ -15,17 +15,9 @@ import java.util.List;
 
 public interface TeacherService {
     TeacherStatus status(long userId);
-
-    long add(Teacher teacher);
-
     Teacher getByUser(long userId);
 
-    boolean updatePic(int teacherId, String pic);
-    boolean updateName(int teacherId, String name);
-    boolean updateIdNo(int teacherId, String idno);
-    boolean updateSex(int teacherId, String sex);
-    boolean updateBirthday(int teacherId, Date birthday);
-    boolean updateAddress(int teacherId, String address);
+    long add(Teacher teacher);
 
     Material getMaterial(long userId, int materialId);
     long queryMaterialsCount(long userId);
