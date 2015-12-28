@@ -53,7 +53,6 @@ public class TeacherController extends BaseController {
 
         Teacher teacher = CastUtil.toObject(JSON.parseObject(teacherJson), Teacher.class);
         teacher.setUserId(user.getId());
-        if (teacher.isInvalid()) return MomiaHttpResponse.FAILED("信息不完整");
 
         return MomiaHttpResponse.SUCCESS(teacherService.add(teacher) > 0);
     }
