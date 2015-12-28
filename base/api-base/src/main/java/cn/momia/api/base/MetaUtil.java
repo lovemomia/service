@@ -14,42 +14,37 @@ import java.util.List;
 import java.util.Map;
 
 public class MetaUtil {
-    private static AgeRangeServiceApi ageRangeServiceApi;
-    private static CityServiceApi cityServiceApi;
-    private static RegionServiceApi regionServiceApi;
-    private static SortTypeServiceApi sortTypeServiceApi;
+    private static MetaServiceApi metaServiceApi;
 
     private static Date lastReloadTime = null;
 
     private static List<AgeRange> ageRangesCache = new ArrayList<AgeRange>();
     private static List<SortType> sortTypesCache = new ArrayList<SortType>();
 
-    private static Map<Integer, AgeRange> ageRangesMap = new HashMap<Integer, AgeRange>();
     private static Map<Integer, City> citiesMap = new HashMap<Integer, City>();
     private static Map<Integer, Region> regionsMap = new HashMap<Integer, Region>();
+    private static Map<Integer, AgeRange> ageRangesMap = new HashMap<Integer, AgeRange>();
     private static Map<Integer, SortType> sortTypesMap = new HashMap<Integer, SortType>();
 
-    public void setAgeRangeServiceApi(AgeRangeServiceApi ageRangeServiceApi) {
-        MetaUtil.ageRangeServiceApi = ageRangeServiceApi;
-    }
-
-    public void setCityServiceApi(CityServiceApi cityServiceApi) {
-        MetaUtil.cityServiceApi = cityServiceApi;
-    }
-
-    public void setRegionServiceApi(RegionServiceApi regionServiceApi) {
-        MetaUtil.regionServiceApi = regionServiceApi;
-    }
-
-    public void setSortTypeServiceApi(SortTypeServiceApi sortTypeServiceApi) {
-        MetaUtil.sortTypeServiceApi = sortTypeServiceApi;
+    public static void setMetaServiceApi(MetaServiceApi metaServiceApi) {
+        MetaUtil.metaServiceApi = metaServiceApi;
     }
 
     private synchronized static void reload() {
         if (!isOutOfDate()) return;
 
         try {
-            List<AgeRange> newAgeRanges = ageRangeServiceApi.listAll();
+            Map<Integer, City> newCitiesMap = new HashMap<Integer, City>();
+            for (City city : metaServiceApi.listAllCities()) {
+                newCitiesMap.put(city.getId(), city);
+            }
+
+            Map<Integer, Region> newRegionsMap = new HashMap<Integer, Region>();
+            for (Region region : metaServiceApi.listAllRegions()) {
+                newRegionsMap.put(region.getId(), region);
+            }
+
+            List<AgeRange> newAgeRanges = metaServiceApi.listAllAgeRanges();
             newAgeRanges.add(AgeRange.DEFAULT);
             Collections.sort(newAgeRanges, new Comparator<AgeRange>() {
                 @Override
@@ -62,17 +57,7 @@ public class MetaUtil {
                 newAgeRangesMap.put(ageRange.getId(), ageRange);
             }
 
-            Map<Integer, City> newCitiesMap = new HashMap<Integer, City>();
-            for (City city : cityServiceApi.listAll()) {
-                newCitiesMap.put(city.getId(), city);
-            }
-
-            Map<Integer, Region> newRegionsMap = new HashMap<Integer, Region>();
-            for (Region region : regionServiceApi.listAll()) {
-                newRegionsMap.put(region.getId(), region);
-            }
-
-            List<SortType> newSortTypes = sortTypeServiceApi.listAll();
+            List<SortType> newSortTypes = metaServiceApi.listAllSortTypes();
             newSortTypes.add(SortType.DEFAULT);
             Collections.sort(newSortTypes, new Comparator<SortType>() {
                 @Override
@@ -88,9 +73,9 @@ public class MetaUtil {
             ageRangesCache = newAgeRanges;
             sortTypesCache = newSortTypes;
 
-            ageRangesMap = newAgeRangesMap;
             citiesMap = newCitiesMap;
             regionsMap = newRegionsMap;
+            ageRangesMap = newAgeRangesMap;
             sortTypesMap = newSortTypesMap;
         } catch (Exception e) {
             // do nothing
@@ -101,17 +86,6 @@ public class MetaUtil {
 
     private static boolean isOutOfDate() {
         return lastReloadTime == null || lastReloadTime.before(new Date(new Date().getTime() - 24 * 60 * 60 * 1000));
-    }
-
-    public static List<AgeRange> listAgeRanges() {
-        return ageRangesCache;
-    }
-
-    public static AgeRange getAgeRange(int ageRangeId) {
-        if (isOutOfDate()) reload();
-
-        AgeRange ageRange = ageRangesMap.get(ageRangeId);
-        return ageRange == null ? AgeRange.DEFAULT : ageRange;
     }
 
     public static String getCityName(int cityId) {
@@ -128,6 +102,17 @@ public class MetaUtil {
 
         Region region = regionsMap.get(regionId);
         return region == null ? "" : region.getName();
+    }
+
+    public static List<AgeRange> listAgeRanges() {
+        return ageRangesCache;
+    }
+
+    public static AgeRange getAgeRange(int ageRangeId) {
+        if (isOutOfDate()) reload();
+
+        AgeRange ageRange = ageRangesMap.get(ageRangeId);
+        return ageRange == null ? AgeRange.DEFAULT : ageRange;
     }
 
     public static List<SortType> listSortTypes() {

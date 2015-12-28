@@ -123,18 +123,4 @@ public class SmsServiceImpl extends AbstractService implements SmsService {
         String sql = "UPDATE SG_Verify SET Status=0 WHERE Mobile=? AND Code=?";
         update(sql, new Object[] { mobile, code });
     }
-
-    @Override
-    public boolean notifyUser(final String mobile, final String msg) {
-        if (executorService == null) initExecutorService();
-
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                sender.send(mobile, msg);
-            }
-        });
-
-        return true;
-    }
 }

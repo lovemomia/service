@@ -4,10 +4,25 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="ageRangeService" class="cn.momia.service.base.age.impl.AgeRangeServiceImpl" parent="dbAccessService" />
-    <bean id="cityService" class="cn.momia.service.base.city.impl.CityServiceImpl" parent="dbAccessService" />
-    <bean id="regionService" class="cn.momia.service.base.region.impl.RegionServiceImpl" parent="dbAccessService" />
-    <bean id="sortTypeService" class="cn.momia.service.base.sort.impl.SortTypeServiceImpl" parent="dbAccessService" />
+    <bean id="cityService" class="cn.momia.common.service.CachedService" parent="dbAccessService">
+        <property name="type" value="cn.momia.api.base.dto.City" />
+        <property name="sql" value="SELECT Id, Name FROM SG_City WHERE Status=1" />
+    </bean>
+
+    <bean id="regionService" class="cn.momia.common.service.CachedService" parent="dbAccessService">
+        <property name="type" value="cn.momia.api.base.dto.Region" />
+        <property name="sql" value="SELECT Id, CityId, Name, ParentId FROM SG_Region WHERE Status=1" />
+    </bean>
+
+    <bean id="ageRangeService" class="cn.momia.common.service.CachedService" parent="dbAccessService">
+        <property name="type" value="cn.momia.api.base.dto.AgeRange" />
+        <property name="sql" value="SELECT Id, `Min`, `Max` FROM SG_AgeRange WHERE Status=1" />
+    </bean>
+
+    <bean id="sortTypeService" class="cn.momia.common.service.CachedService" parent="dbAccessService">
+        <property name="type" value="cn.momia.api.base.dto.SortType" />
+        <property name="sql" value="SELECT Id, Text FROM SG_SortType WHERE Status=1" />
+    </bean>
 
     <bean id="feedbackService" class="cn.momia.service.base.feedback.impl.FeedbackServiceImpl" parent="dbAccessService" />
     <bean id="smsSender" class="cn.momia.service.base.sms.impl.LuosimaoSmsSender" />
