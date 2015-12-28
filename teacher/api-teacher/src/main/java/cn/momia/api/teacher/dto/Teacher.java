@@ -12,12 +12,12 @@ public class Teacher {
 
     private int id;
     @JSONField(serialize = false) private long userId;
-    private String pic;
-    private String name;
-    private String idNo;
-    private String sex;
+    private String pic = "";
+    private String name = "";
+    private String idNo = "";
+    private String sex = "";
     @JSONField(format = "yyyy-MM-dd") private Date birthday;
-    private String address;
+    private String address = "";
 
     private List<Experience> experiences;
     private List<Education> educations;
