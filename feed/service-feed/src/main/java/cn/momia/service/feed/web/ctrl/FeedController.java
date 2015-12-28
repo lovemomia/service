@@ -3,13 +3,10 @@ package cn.momia.service.feed.web.ctrl;
 import cn.momia.api.feed.dto.FeedChild;
 import cn.momia.api.feed.dto.UserFeed;
 import cn.momia.api.feed.dto.FeedTag;
-import cn.momia.api.user.dto.Child;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.api.dto.PagedList;
-import cn.momia.api.user.UserServiceApi;
-import cn.momia.api.user.dto.User;
 import cn.momia.service.feed.base.Feed;
 import cn.momia.service.feed.base.FeedService;
 import cn.momia.service.feed.star.FeedStarService;
@@ -26,10 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -39,7 +34,6 @@ public class FeedController extends BaseController {
 
     @Autowired private FeedService feedService;
     @Autowired private FeedStarService feedStarService;
-    @Autowired private UserServiceApi userServiceApi;
 
     @RequestMapping(value = "/follow", method = RequestMethod.POST)
     public MomiaHttpResponse follow(@RequestParam(value = "uid") long userId, @RequestParam(value = "fuid") long followedId) {

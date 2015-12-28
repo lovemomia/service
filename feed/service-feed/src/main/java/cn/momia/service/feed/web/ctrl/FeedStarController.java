@@ -1,7 +1,5 @@
 package cn.momia.service.feed.web.ctrl;
 
-import cn.momia.api.user.UserServiceApi;
-import cn.momia.api.user.dto.User;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
@@ -23,8 +21,6 @@ public class FeedStarController extends BaseController {
     @Autowired private FeedService feedService;
     @Autowired private FeedStarService feedStarService;
 
-    @Autowired private UserServiceApi userServiceApi;
-
     @RequestMapping(value = "/{fid}/star/list", method = RequestMethod.GET)
     public MomiaHttpResponse listStaredUsers(@PathVariable(value = "fid") long feedId, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
@@ -32,16 +28,13 @@ public class FeedStarController extends BaseController {
         Feed feed = feedService.get(feedId);
         if (!feed.exists()) return MomiaHttpResponse.FAILED("无效的Feed");
 
-        long totalCount = feedStarService.queryUserCount(feedId);
-        if (totalCount <= 0) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
-
+        long totalCount = feedStarService.queryUserIdsCount(feedId);
         List<Long> userIds = feedStarService.queryUserIds(feedId, start, count);
-        List<User> users = userServiceApi.list(userIds, User.Type.MINI);
 
-        PagedList<User> pagedStaredUsers = new PagedList(totalCount, start, count);
-        pagedStaredUsers.setList(users);
+        PagedList<Long> pagedStaredUserIds = new PagedList<Long>(totalCount, start, count);
+        pagedStaredUserIds.setList(userIds);
 
-        return MomiaHttpResponse.SUCCESS(pagedStaredUsers);
+        return MomiaHttpResponse.SUCCESS(pagedStaredUserIds);
     }
 
     @RequestMapping(value = "/{fid}/star", method = RequestMethod.POST)

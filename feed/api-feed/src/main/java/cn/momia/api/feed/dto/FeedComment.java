@@ -1,4 +1,4 @@
-package cn.momia.service.feed.comment;
+package cn.momia.api.feed.dto;
 
 import java.util.Date;
 

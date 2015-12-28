@@ -10,6 +10,6 @@ public interface FeedStarService {
     boolean add(long userId, long feedId);
     boolean delete(long userId, long feedId);
 
-    int queryUserCount(long feedId);
+    long queryUserIdsCount(long feedId);
     List<Long> queryUserIds(long feedId, int start, int count);
 }

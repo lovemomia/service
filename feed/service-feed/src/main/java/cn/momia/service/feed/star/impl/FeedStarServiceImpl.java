@@ -47,7 +47,7 @@ public class FeedStarServiceImpl extends AbstractService implements FeedStarServ
     }
 
     @Override
-    public int queryUserCount(long feedId) {
+    public long queryUserIdsCount(long feedId) {
         String sql = "SELECT COUNT(DISTINCT UserId) FROM SG_FeedStar WHERE FeedId=? AND Status<>0";
         return queryInt(sql, new Object[] { feedId });
     }

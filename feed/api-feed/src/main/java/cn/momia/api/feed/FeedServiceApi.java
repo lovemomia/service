@@ -1,9 +1,8 @@
 package cn.momia.api.feed;
 
-import cn.momia.api.feed.dto.UserFeedComment;
+import cn.momia.api.feed.dto.FeedComment;
 import cn.momia.api.feed.dto.UserFeed;
 import cn.momia.api.feed.dto.FeedTag;
-import cn.momia.api.user.dto.User;
 import cn.momia.common.api.ServiceApi;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
@@ -104,20 +103,13 @@ public class FeedServiceApi extends ServiceApi {
         return executeReturnObject(request, Boolean.class);
     }
 
-    public List<String> getLatestImgs(long userId) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/feed/img"), builder.build());
-
-        return executeReturnList(request, String.class);
-    }
-
-    public PagedList<UserFeedComment> listComments(long feedId, int start, int count) {
+    public PagedList<FeedComment> listComments(long feedId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/feed/%d/comment/list", feedId), builder.build());
 
-        return executeReturnPagedList(request, UserFeedComment.class);
+        return executeReturnPagedList(request, FeedComment.class);
     }
 
     public void addComment(long userId, long feedId, String content) {
@@ -134,13 +126,13 @@ public class FeedServiceApi extends ServiceApi {
         execute(request);
     }
 
-    public PagedList<User> listStars(long feedId, int start, int count) {
+    public PagedList<Long> listStaredUserIds(long feedId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/feed/%d/star/list", feedId), builder.build());
 
-        return executeReturnPagedList(request, User.class);
+        return executeReturnPagedList(request, Long.class);
     }
 
     public void star(long userId, long feedId) {
