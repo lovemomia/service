@@ -4,13 +4,13 @@ import cn.momia.api.base.dto.AgeRange;
 import cn.momia.api.base.dto.City;
 import cn.momia.api.base.dto.Region;
 import cn.momia.api.base.dto.SortType;
-import cn.momia.common.api.ServiceApi;
+import cn.momia.common.api.HttpServiceApi;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.List;
 
-public class MetaServiceApi extends ServiceApi {
+public class MetaServiceApi extends HttpServiceApi {
     public List<City> listAllCities() {
         return listAll("/city", City.class);
     }

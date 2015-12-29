@@ -1,12 +1,12 @@
 package cn.momia.api.user;
 
 import cn.momia.api.user.dto.User;
-import cn.momia.common.api.ServiceApi;
+import cn.momia.common.api.HttpServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
 import org.apache.http.client.methods.HttpUriRequest;
 
-public class AuthServiceApi extends ServiceApi {
+public class AuthServiceApi extends HttpServiceApi {
     public User register(String nickName, String mobile, String password, String code) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("nickname", nickName)

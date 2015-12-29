@@ -2,7 +2,7 @@ package cn.momia.api.user;
 
 import cn.momia.api.user.dto.Contact;
 import cn.momia.api.user.dto.User;
-import cn.momia.common.api.ServiceApi;
+import cn.momia.common.api.HttpServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
 import cn.momia.common.util.TimeUtil;
@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-public class UserServiceApi extends ServiceApi {
+public class UserServiceApi extends HttpServiceApi {
     public User get(String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/user"), builder.build());

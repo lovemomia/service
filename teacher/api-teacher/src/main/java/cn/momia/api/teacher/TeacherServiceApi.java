@@ -9,7 +9,7 @@ import cn.momia.api.teacher.dto.Material;
 import cn.momia.api.teacher.dto.Student;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
-import cn.momia.common.api.ServiceApi;
+import cn.momia.common.api.HttpServiceApi;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
@@ -17,7 +17,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.List;
 
-public class TeacherServiceApi extends ServiceApi {
+public class TeacherServiceApi extends HttpServiceApi {
     public TeacherStatus status(String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher/status"), builder.build());

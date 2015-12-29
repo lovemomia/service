@@ -4,7 +4,7 @@ import cn.momia.api.course.dto.Subject;
 import cn.momia.api.course.dto.SubjectSku;
 import cn.momia.api.course.dto.UserCourseComment;
 import cn.momia.api.course.dto.Favorite;
-import cn.momia.common.api.ServiceApi;
+import cn.momia.common.api.HttpServiceApi;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
@@ -12,7 +12,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.List;
 
-public class SubjectServiceApi extends ServiceApi {
+public class SubjectServiceApi extends HttpServiceApi {
     public PagedList<Subject> listTrial(int cityId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)

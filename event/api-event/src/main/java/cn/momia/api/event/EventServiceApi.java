@@ -3,14 +3,14 @@ package cn.momia.api.event;
 import cn.momia.api.event.dto.Banner;
 import cn.momia.api.event.dto.Event;
 import cn.momia.api.event.dto.Icon;
-import cn.momia.common.api.ServiceApi;
+import cn.momia.common.api.HttpServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.List;
 
-public class EventServiceApi extends ServiceApi {
+public class EventServiceApi extends HttpServiceApi {
     public List<Banner> listBanners(int cityId) {
         return list("/event/banner", cityId, Banner.class);
     }

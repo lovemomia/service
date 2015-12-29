@@ -2,7 +2,7 @@ package cn.momia.api.user;
 
 import cn.momia.api.user.dto.Child;
 import cn.momia.api.user.dto.User;
-import cn.momia.common.api.ServiceApi;
+import cn.momia.common.api.HttpServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
 import cn.momia.common.util.TimeUtil;
@@ -11,7 +11,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import java.util.Date;
 import java.util.List;
 
-public class ChildServiceApi extends ServiceApi {
+public class ChildServiceApi extends HttpServiceApi {
     public User add(String utoken, String children) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)

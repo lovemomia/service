@@ -11,7 +11,7 @@ import cn.momia.api.course.dto.DatedCourseSkus;
 import cn.momia.api.course.dto.Favorite;
 import cn.momia.api.course.dto.Institution;
 import cn.momia.api.course.dto.Teacher;
-import cn.momia.common.api.ServiceApi;
+import cn.momia.common.api.HttpServiceApi;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class CourseServiceApi extends ServiceApi {
+public class CourseServiceApi extends HttpServiceApi {
     public PagedList<Course> listRecommend(int cityId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("city", cityId)

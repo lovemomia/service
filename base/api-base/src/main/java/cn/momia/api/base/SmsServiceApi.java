@@ -1,11 +1,11 @@
 package cn.momia.api.base;
 
-import cn.momia.common.api.ServiceApi;
+import cn.momia.common.api.HttpServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
 import org.apache.http.client.methods.HttpUriRequest;
 
-public class SmsServiceApi extends ServiceApi {
+public class SmsServiceApi extends HttpServiceApi {
     public boolean send(String mobile) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("mobile", mobile);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/sms/send"), builder.build());

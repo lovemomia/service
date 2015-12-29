@@ -2,7 +2,7 @@ package cn.momia.api.im;
 
 import cn.momia.api.im.dto.Group;
 import cn.momia.api.im.dto.Member;
-import cn.momia.common.api.ServiceApi;
+import cn.momia.common.api.HttpServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
 import org.apache.commons.lang3.StringUtils;
@@ -11,7 +11,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import java.util.List;
 import java.util.Set;
 
-public class ImServiceApi extends ServiceApi {
+public class ImServiceApi extends HttpServiceApi {
     public String generateImToken(long userId, String nickName, String avatar) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)

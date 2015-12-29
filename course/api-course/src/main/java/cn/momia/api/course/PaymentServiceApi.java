@@ -1,7 +1,7 @@
 package cn.momia.api.course;
 
 import cn.momia.api.course.dto.PaymentResult;
-import cn.momia.common.api.ServiceApi;
+import cn.momia.common.api.HttpServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
 import org.apache.commons.lang3.StringUtils;
@@ -9,7 +9,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.Map;
 
-public class PaymentServiceApi extends ServiceApi {
+public class PaymentServiceApi extends HttpServiceApi {
     public Object prepayAlipay(String utoken, long orderId, String type, long userCouponId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)

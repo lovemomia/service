@@ -2,14 +2,14 @@ package cn.momia.api.course;
 
 import cn.momia.api.course.dto.SubjectOrder;
 import cn.momia.api.course.dto.SubjectPackage;
-import cn.momia.common.api.ServiceApi;
+import cn.momia.common.api.HttpServiceApi;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.http.client.methods.HttpUriRequest;
 
-public class OrderServiceApi extends ServiceApi {
+public class OrderServiceApi extends HttpServiceApi {
     public SubjectOrder placeOrder(JSONObject orderJson) {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/order"), orderJson.toString());
         return executeReturnObject(request, SubjectOrder.class);

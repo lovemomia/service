@@ -3,7 +3,7 @@ package cn.momia.api.feed;
 import cn.momia.api.feed.dto.Feed;
 import cn.momia.api.feed.dto.FeedComment;
 import cn.momia.api.feed.dto.FeedTag;
-import cn.momia.common.api.ServiceApi;
+import cn.momia.common.api.HttpServiceApi;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
@@ -14,7 +14,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import java.util.Collection;
 import java.util.List;
 
-public class FeedServiceApi extends ServiceApi {
+public class FeedServiceApi extends HttpServiceApi {
     public void follow(long userId, long followedId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)

@@ -4,7 +4,7 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="abstractBaseApi" class="cn.momia.common.api.ServiceApi" abstract="true">
+    <bean id="abstractBaseApi" class="cn.momia.common.api.HttpServiceApi" abstract="true">
         <property name="service" value="${Service.Base}" />
     </bean>
 
