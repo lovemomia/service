@@ -340,10 +340,4 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
     public List<FeedTag> listHotTags(int count) {
         return listTags(0, count);
     }
-
-    @Override
-    public List<String> queryLatestImgs(long userId) {
-        String sql = "SELECT B.Url FROM SG_Feed A INNER JOIN SG_FeedImg B ON A.Id=B.FeedId WHERE A.UserId=? AND A.Status<>0 AND B.Status<>0 ORDER BY B.AddTime DESC LIMIT 4";
-        return queryStringList(sql, new Object[] { userId });
-    }
 }
