@@ -1,6 +1,6 @@
 package cn.momia.api.event.dto;
 
-import cn.momia.common.api.platform.Platform;
+import cn.momia.common.core.platform.Platform;
 import org.apache.commons.lang3.StringUtils;
 
 public class Version {

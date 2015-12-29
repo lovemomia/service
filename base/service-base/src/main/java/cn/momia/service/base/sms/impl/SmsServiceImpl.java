@@ -1,6 +1,6 @@
 package cn.momia.service.base.sms.impl;
 
-import cn.momia.common.api.exception.MomiaErrorException;
+import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.base.sms.SmsSender;

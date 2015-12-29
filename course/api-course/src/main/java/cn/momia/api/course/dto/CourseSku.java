@@ -1,6 +1,6 @@
 package cn.momia.api.course.dto;
 
-import cn.momia.common.api.util.TimeUtil;
+import cn.momia.common.core.util.TimeUtil;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.text.DateFormat;

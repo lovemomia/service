@@ -9,10 +9,10 @@ import cn.momia.api.teacher.dto.Material;
 import cn.momia.api.teacher.dto.Student;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
-import cn.momia.common.api.HttpServiceApi;
-import cn.momia.common.api.dto.PagedList;
-import cn.momia.common.api.http.MomiaHttpParamBuilder;
-import cn.momia.common.api.http.MomiaHttpRequestBuilder;
+import cn.momia.common.core.HttpServiceApi;
+import cn.momia.common.core.dto.PagedList;
+import cn.momia.common.core.http.MomiaHttpParamBuilder;
+import cn.momia.common.core.http.MomiaHttpRequestBuilder;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.List;

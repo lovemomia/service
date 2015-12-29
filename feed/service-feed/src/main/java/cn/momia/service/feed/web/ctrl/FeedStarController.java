@@ -1,7 +1,7 @@
 package cn.momia.service.feed.web.ctrl;
 
-import cn.momia.common.api.dto.PagedList;
-import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.core.dto.PagedList;
+import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.api.feed.dto.Feed;
 import cn.momia.service.feed.base.FeedService;

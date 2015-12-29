@@ -1,6 +1,6 @@
 package cn.momia.service.event.web.ctrl;
 
-import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.event.EventService;
 import org.springframework.beans.factory.annotation.Autowired;

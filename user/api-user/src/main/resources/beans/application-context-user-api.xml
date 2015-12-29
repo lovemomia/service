@@ -4,7 +4,7 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="abstractUserApi" class="cn.momia.common.api.HttpServiceApi" abstract="true">
+    <bean id="abstractUserApi" class="cn.momia.common.core.HttpServiceApi" abstract="true">
         <property name="service" value="${Service.User}" />
     </bean>
     <bean class="cn.momia.api.user.AuthServiceApi" parent="abstractUserApi" />

@@ -2,9 +2,9 @@ package cn.momia.service.user.base.impl;
 
 import cn.momia.api.user.dto.Child;
 import cn.momia.api.user.dto.User;
-import cn.momia.common.api.exception.MomiaErrorException;
+import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
-import cn.momia.common.api.util.TimeUtil;
+import cn.momia.common.core.util.TimeUtil;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.user.base.UserService;
 import cn.momia.service.user.child.ChildService;

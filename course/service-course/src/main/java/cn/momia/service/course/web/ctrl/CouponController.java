@@ -2,8 +2,8 @@ package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
-import cn.momia.common.api.dto.PagedList;
-import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.core.dto.PagedList;
+import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.coupon.CouponService;
 import cn.momia.service.course.coupon.InviteCoupon;

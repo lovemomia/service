@@ -1,7 +1,7 @@
 package cn.momia.service.feed.base.impl;
 
 import cn.momia.api.feed.dto.FeedTag;
-import cn.momia.common.api.exception.MomiaErrorException;
+import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.api.feed.dto.Feed;
 import cn.momia.service.feed.base.FeedService;

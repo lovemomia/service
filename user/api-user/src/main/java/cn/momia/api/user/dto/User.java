@@ -1,6 +1,6 @@
 package cn.momia.api.user.dto;
 
-import cn.momia.common.api.util.MobileUtil;
+import cn.momia.common.core.util.MobileUtil;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;

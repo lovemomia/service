@@ -2,7 +2,7 @@ package cn.momia.service.user.web.ctrl;
 
 import cn.momia.api.user.dto.Contact;
 import cn.momia.api.user.dto.User;
-import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.user.base.UserService;
 import com.google.common.base.Splitter;

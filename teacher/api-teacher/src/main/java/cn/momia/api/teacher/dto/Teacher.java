@@ -1,6 +1,6 @@
 package cn.momia.api.teacher.dto;
 
-import cn.momia.common.api.util.SexUtil;
+import cn.momia.common.core.util.SexUtil;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.lang3.StringUtils;
 

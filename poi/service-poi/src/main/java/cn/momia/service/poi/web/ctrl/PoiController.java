@@ -1,6 +1,6 @@
 package cn.momia.service.poi.web.ctrl;
 
-import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.poi.PlaceService;
 import com.google.common.base.Splitter;

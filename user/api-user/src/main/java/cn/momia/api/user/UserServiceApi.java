@@ -2,10 +2,10 @@ package cn.momia.api.user;
 
 import cn.momia.api.user.dto.Contact;
 import cn.momia.api.user.dto.User;
-import cn.momia.common.api.HttpServiceApi;
-import cn.momia.common.api.http.MomiaHttpParamBuilder;
-import cn.momia.common.api.http.MomiaHttpRequestBuilder;
-import cn.momia.common.api.util.TimeUtil;
+import cn.momia.common.core.HttpServiceApi;
+import cn.momia.common.core.http.MomiaHttpParamBuilder;
+import cn.momia.common.core.http.MomiaHttpRequestBuilder;
+import cn.momia.common.core.util.TimeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
 

@@ -1,7 +1,7 @@
 package cn.momia.service.im.web.ctrl;
 
 import cn.momia.api.im.dto.Group;
-import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.im.ImService;
 import cn.momia.service.im.push.PushMsg;

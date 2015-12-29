@@ -2,8 +2,8 @@ package cn.momia.service.user.web.ctrl;
 
 import cn.momia.api.user.dto.Child;
 import cn.momia.api.user.dto.User;
-import cn.momia.common.api.http.MomiaHttpResponse;
-import cn.momia.common.api.util.CastUtil;
+import cn.momia.common.core.http.MomiaHttpResponse;
+import cn.momia.common.core.util.CastUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.user.base.UserService;
 import cn.momia.service.user.child.ChildService;
