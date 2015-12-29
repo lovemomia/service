@@ -14,16 +14,6 @@
         <property name="sql" value="SELECT Id, CityId, Name, ParentId FROM SG_Region WHERE Status=1" />
     </bean>
 
-    <bean id="ageRangeService" class="cn.momia.common.service.CachedService" parent="dbAccessService">
-        <property name="type" value="cn.momia.api.base.dto.AgeRange" />
-        <property name="sql" value="SELECT Id, `Min`, `Max` FROM SG_AgeRange WHERE Status=1" />
-    </bean>
-
-    <bean id="sortTypeService" class="cn.momia.common.service.CachedService" parent="dbAccessService">
-        <property name="type" value="cn.momia.api.base.dto.SortType" />
-        <property name="sql" value="SELECT Id, Text FROM SG_SortType WHERE Status=1" />
-    </bean>
-
     <bean id="feedbackService" class="cn.momia.service.base.feedback.impl.FeedbackServiceImpl" parent="dbAccessService" />
     <bean id="smsSender" class="cn.momia.service.base.sms.impl.LuosimaoSmsSender" />
     <bean id="smsService" class="cn.momia.service.base.sms.impl.SmsServiceImpl" parent="dbAccessService">

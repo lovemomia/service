@@ -1,9 +1,7 @@
 package cn.momia.api.base;
 
-import cn.momia.api.base.dto.AgeRange;
 import cn.momia.api.base.dto.City;
 import cn.momia.api.base.dto.Region;
-import cn.momia.api.base.dto.SortType;
 import cn.momia.common.core.api.HttpServiceApi;
 import cn.momia.common.core.http.MomiaHttpRequestBuilder;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -22,13 +20,5 @@ public class MetaServiceApi extends HttpServiceApi {
 
     public List<Region> listAllRegions() {
         return listAll("/region", Region.class);
-    }
-
-    public List<AgeRange> listAllAgeRanges() {
-        return listAll("/agerange", AgeRange.class);
-    }
-
-    public List<SortType> listAllSortTypes() {
-        return listAll("/sorttype", SortType.class);
     }
 }
