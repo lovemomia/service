@@ -10,7 +10,7 @@ import cn.momia.api.poi.PoiServiceApi;
 import cn.momia.api.poi.dto.Place;
 import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
-import cn.momia.common.util.TimeUtil;
+import cn.momia.common.api.util.TimeUtil;
 import cn.momia.api.course.dto.BookedCourse;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.api.course.dto.CourseSku;

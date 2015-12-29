@@ -5,7 +5,7 @@ import cn.momia.api.user.dto.User;
 import cn.momia.common.api.HttpServiceApi;
 import cn.momia.common.api.http.MomiaHttpParamBuilder;
 import cn.momia.common.api.http.MomiaHttpRequestBuilder;
-import cn.momia.common.util.TimeUtil;
+import cn.momia.common.api.util.TimeUtil;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.Date;

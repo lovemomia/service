@@ -2,7 +2,7 @@ package cn.momia.service.course.coupon.impl;
 
 import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
-import cn.momia.common.util.TimeUtil;
+import cn.momia.common.api.util.TimeUtil;
 import cn.momia.service.course.coupon.Coupon;
 import cn.momia.service.course.coupon.CouponService;
 import cn.momia.service.course.coupon.InviteCoupon;

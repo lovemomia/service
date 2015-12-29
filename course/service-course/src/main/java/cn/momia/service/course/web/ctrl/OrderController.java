@@ -8,7 +8,7 @@ import cn.momia.api.user.dto.User;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.api.http.MomiaHttpResponse;
-import cn.momia.common.util.TimeUtil;
+import cn.momia.common.api.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.api.course.dto.UserCoupon;
