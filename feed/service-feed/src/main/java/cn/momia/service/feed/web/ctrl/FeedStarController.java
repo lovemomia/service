@@ -59,7 +59,7 @@ public class FeedStarController extends BaseController {
         return MomiaHttpResponse.SUCCESS;
     }
 
-    @RequestMapping(value = "/feed/star", method = RequestMethod.GET)
+    @RequestMapping(value = "/star", method = RequestMethod.GET)
     public MomiaHttpResponse queryStaredFeedIds(@RequestParam(value = "uid") long userId, @RequestParam String fids) {
         Set<Long> feedIds = new HashSet<Long>();
         for (String feedId : Splitter.on(",").trimResults().omitEmptyStrings().split(fids)) {
