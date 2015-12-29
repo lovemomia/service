@@ -1,6 +1,6 @@
 package cn.momia.api.event.dto;
 
-import cn.momia.common.api.client.ClientType;
+import cn.momia.common.api.platform.Platform;
 import org.apache.commons.lang3.StringUtils;
 
 public class Version {
@@ -32,12 +32,12 @@ public class Version {
         this.version = version;
     }
 
-    public boolean isInvalid(int clientType, String clientVersion) {
-        if (platform != 0 && platform != clientType) return true;
-        if (clientType == ClientType.APP &&
+    public boolean isInvalid(int platform, String version) {
+        if (this.platform != 0 && this.platform != platform) return true;
+        if (platform == Platform.APP &&
+                !StringUtils.isBlank(this.version) &&
                 !StringUtils.isBlank(version) &&
-                !StringUtils.isBlank(clientVersion) &&
-                version.compareTo(clientVersion) > 0) return true;
+                this.version.compareTo(version) > 0) return true;
         return false;
     }
 }
