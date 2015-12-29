@@ -1,7 +1,7 @@
 package cn.momia.api.poi;
 
 import cn.momia.api.poi.dto.Place;
-import cn.momia.common.core.HttpServiceApi;
+import cn.momia.common.core.api.HttpServiceApi;
 import cn.momia.common.core.http.MomiaHttpParamBuilder;
 import cn.momia.common.core.http.MomiaHttpRequestBuilder;
 import org.apache.commons.lang3.StringUtils;

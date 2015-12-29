@@ -3,7 +3,7 @@ package cn.momia.api.event;
 import cn.momia.api.event.dto.Banner;
 import cn.momia.api.event.dto.Event;
 import cn.momia.api.event.dto.Icon;
-import cn.momia.common.core.HttpServiceApi;
+import cn.momia.common.core.api.HttpServiceApi;
 import cn.momia.common.core.http.MomiaHttpParamBuilder;
 import cn.momia.common.core.http.MomiaHttpRequestBuilder;
 import org.apache.http.client.methods.HttpUriRequest;

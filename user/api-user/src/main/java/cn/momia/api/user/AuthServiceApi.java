@@ -1,7 +1,7 @@
 package cn.momia.api.user;
 
 import cn.momia.api.user.dto.User;
-import cn.momia.common.core.HttpServiceApi;
+import cn.momia.common.core.api.HttpServiceApi;
 import cn.momia.common.core.http.MomiaHttpParamBuilder;
 import cn.momia.common.core.http.MomiaHttpRequestBuilder;
 import org.apache.http.client.methods.HttpUriRequest;

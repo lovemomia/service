@@ -4,7 +4,7 @@ import cn.momia.api.base.dto.AgeRange;
 import cn.momia.api.base.dto.City;
 import cn.momia.api.base.dto.Region;
 import cn.momia.api.base.dto.SortType;
-import cn.momia.common.core.HttpServiceApi;
+import cn.momia.common.core.api.HttpServiceApi;
 import cn.momia.common.core.http.MomiaHttpRequestBuilder;
 import org.apache.http.client.methods.HttpUriRequest;
 

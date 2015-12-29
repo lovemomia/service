@@ -2,7 +2,7 @@ package cn.momia.api.course;
 
 import cn.momia.api.course.dto.SubjectOrder;
 import cn.momia.api.course.dto.SubjectPackage;
-import cn.momia.common.core.HttpServiceApi;
+import cn.momia.common.core.api.HttpServiceApi;
 import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.http.MomiaHttpParamBuilder;
 import cn.momia.common.core.http.MomiaHttpRequestBuilder;

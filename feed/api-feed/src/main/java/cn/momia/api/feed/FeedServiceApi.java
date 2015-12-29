@@ -3,7 +3,7 @@ package cn.momia.api.feed;
 import cn.momia.api.feed.dto.Feed;
 import cn.momia.api.feed.dto.FeedComment;
 import cn.momia.api.feed.dto.FeedTag;
-import cn.momia.common.core.HttpServiceApi;
+import cn.momia.common.core.api.HttpServiceApi;
 import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.http.MomiaHttpParamBuilder;
 import cn.momia.common.core.http.MomiaHttpRequestBuilder;
