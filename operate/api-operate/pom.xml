@@ -5,25 +5,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cn.momia</groupId>
-    <artifactId>duola-service-user</artifactId>
+    <artifactId>duola-api-operate</artifactId>
     <version>1.1.0</version>
     <packaging>jar</packaging>
 
-    <name>Momia Service User</name>
+    <name>Momia API Operate</name>
     <url>http://www.momia.cn</url>
 
     <dependencies>
-        <!-- Momia API -->
+        <!-- Momia Core -->
         <dependency>
             <groupId>cn.momia</groupId>
-            <artifactId>duola-api-user</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-
-        <!-- Momia Webapp -->
-        <dependency>
-            <groupId>cn.momia</groupId>
-            <artifactId>duola-common-webapp</artifactId>
+            <artifactId>duola-common-core</artifactId>
             <version>1.1.0</version>
         </dependency>
 

@@ -8,4 +8,9 @@
     <bean id="userService" class="cn.momia.service.user.base.impl.UserServiceImpl" parent="dbAccessService">
         <property name="childService" ref="childService" />
     </bean>
+
+    <bean id="smsSender" class="cn.momia.service.user.sms.impl.LuosimaoSmsSender" />
+    <bean id="smsService" class="cn.momia.service.user.sms.impl.SmsServiceImpl" parent="dbAccessService">
+        <property name="sender" ref="smsSender" />
+    </bean>
 </beans>
