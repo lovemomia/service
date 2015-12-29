@@ -3,7 +3,7 @@ package cn.momia.service.feed.base.impl;
 import cn.momia.api.feed.dto.FeedTag;
 import cn.momia.common.api.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
-import cn.momia.service.feed.base.Feed;
+import cn.momia.api.feed.dto.Feed;
 import cn.momia.service.feed.base.FeedService;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
@@ -63,7 +63,7 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
                 ps.setString(7, feed.getCourseTitle());
                 ps.setDouble(8, feed.getLng());
                 ps.setDouble(9, feed.getLat());
-                ps.setInt(10, feed.getOfficial());
+                ps.setBoolean(10, feed.isOfficial());
 
                 return ps;
             }

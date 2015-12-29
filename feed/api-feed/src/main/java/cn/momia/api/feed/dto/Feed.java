@@ -1,4 +1,4 @@
-package cn.momia.service.feed.base;
+package cn.momia.api.feed.dto;
 
 import java.util.Date;
 import java.util.List;
@@ -19,7 +19,7 @@ public class Feed {
     private double lat;
     private int commentCount;
     private int starCount;
-    private int official;
+    private boolean official;
     private Date addTime;
 
     private List<String> imgs;
@@ -128,11 +128,11 @@ public class Feed {
         this.starCount = starCount;
     }
 
-    public int getOfficial() {
+    public boolean isOfficial() {
         return official;
     }
 
-    public void setOfficial(int official) {
+    public void setOfficial(boolean official) {
         this.official = official;
     }
 

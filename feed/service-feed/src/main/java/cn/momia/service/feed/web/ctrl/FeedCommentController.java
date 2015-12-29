@@ -3,7 +3,7 @@ package cn.momia.service.feed.web.ctrl;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.service.feed.base.Feed;
+import cn.momia.api.feed.dto.Feed;
 import cn.momia.service.feed.base.FeedService;
 import cn.momia.api.feed.dto.FeedComment;
 import cn.momia.service.feed.comment.FeedCommentService;

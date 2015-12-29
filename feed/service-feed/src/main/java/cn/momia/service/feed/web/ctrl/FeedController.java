@@ -1,15 +1,11 @@
 package cn.momia.service.feed.web.ctrl;
 
-import cn.momia.api.feed.dto.FeedChild;
-import cn.momia.api.feed.dto.UserFeed;
 import cn.momia.api.feed.dto.FeedTag;
 import cn.momia.common.api.http.MomiaHttpResponse;
-import cn.momia.common.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.api.dto.PagedList;
-import cn.momia.service.feed.base.Feed;
+import cn.momia.api.feed.dto.Feed;
 import cn.momia.service.feed.base.FeedService;
-import cn.momia.service.feed.star.FeedStarService;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -22,10 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/feed")
@@ -33,7 +26,6 @@ public class FeedController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(FeedController.class);
 
     @Autowired private FeedService feedService;
-    @Autowired private FeedStarService feedStarService;
 
     @RequestMapping(value = "/follow", method = RequestMethod.POST)
     public MomiaHttpResponse follow(@RequestParam(value = "uid") long userId, @RequestParam(value = "fuid") long followedId) {
@@ -50,98 +42,16 @@ public class FeedController extends BaseController {
         long totalCount = userId > 0 ? feedService.queryFollowedCountByUser(userId) : feedService.queryOfficialFeedsCount();
         List<Feed> feeds = userId > 0 ? feedService.queryFollowedByUser(userId, start, count) : feedService.queryOfficialFeeds(start, count);
 
-        return MomiaHttpResponse.SUCCESS(buildPagedUserFeeds(userId, feeds, totalCount, start, count));
+        return MomiaHttpResponse.SUCCESS(buildPagedFeeds(feeds, totalCount, start, count));
     }
 
-    private PagedList<UserFeed> buildPagedUserFeeds(long userId, List<Feed> feeds, long totalCount, int start, int count) {
-        Set<Long> staredFeedIds = new HashSet<Long>();
-        if (userId > 0) {
-            Set<Long> feedIds = new HashSet<Long>();
-            for (Feed feed : feeds) {
-                feedIds.add(feed.getId());
-            }
-            staredFeedIds.addAll(feedStarService.queryStaredFeeds(userId, feedIds));
-        }
+    private PagedList<Feed> buildPagedFeeds(List<Feed> feeds, long totalCount, int start, int count) {
+        PagedList<Feed> pagedFeeds = new PagedList<Feed>(totalCount, start, count);
+        pagedFeeds.setList(feeds);
 
-        Set<Long> userIds = new HashSet<Long>();
-        for (Feed feed : feeds) {
-            userIds.add(feed.getUserId());
-        }
-
-        List<User> users = userServiceApi.list(userIds, User.Type.FULL);
-        Map<Long, User> usersMap = new HashMap<Long, User>();
-        for (User user : users) {
-            usersMap.put(user.getId(), user);
-        }
-
-        List<UserFeed> userFeeds = new ArrayList<UserFeed>();
-        for (Feed feed : feeds) {
-            User user = usersMap.get(feed.getUserId());
-            if (user == null) continue;
-
-            userFeeds.add(buildUserFeed(feed, user, staredFeedIds.contains(feed.getId())));
-        }
-
-        PagedList<UserFeed> pagedUserFeeds = new PagedList(totalCount, start, count);
-        pagedUserFeeds.setList(userFeeds);
-
-        return pagedUserFeeds;
+        return pagedFeeds;
     }
 
-    private UserFeed buildUserFeed(Feed feed, User user, boolean stared) {
-        UserFeed userFeed = new UserFeed();
-        userFeed.setId(feed.getId());
-        userFeed.setType(feed.getType());
-        userFeed.setContent(feed.getContent());
-        userFeed.setImgs(feed.getImgs());
-
-        userFeed.setTagId(feed.getTagId());
-        userFeed.setTagName(feed.getTagName());
-        userFeed.setCourseId(feed.getCourseId());
-        userFeed.setCourseTitle(feed.getCourseTitle());
-
-        userFeed.setAddTime(TimeUtil.formatAddTime(feed.getAddTime()));
-        userFeed.setPoi(feed.getLng() + ":" + feed.getLat());
-        userFeed.setCommentCount(feed.getCommentCount());
-        userFeed.setStarCount(feed.getStarCount());
-        userFeed.setOfficial(feed.getOfficial() > 0);
-        userFeed.setUserId(user.getId());
-        userFeed.setAvatar(user.getAvatar());
-        userFeed.setNickName(user.getNickName());
-
-        List<FeedChild> childrenDetail = formatChildrenDetail(user.getChildren());
-        List<String> children = formatChildren(childrenDetail);
-        userFeed.setChildrenDetail(childrenDetail);
-        userFeed.setChildren(children);
-        userFeed.setStared(stared);
-
-        return userFeed;
-    }
-
-    private List<FeedChild> formatChildrenDetail(List<Child> children) {
-        List<FeedChild> feedChildren = new ArrayList<FeedChild>();
-        for (int i = 0; i < Math.min(2, children.size()); i++) {
-            Child child = children.get(i);
-            FeedChild feedChild = new FeedChild();
-            feedChild.setSex(child.getSex());
-            feedChild.setName(child.getName());
-            feedChild.setAge(TimeUtil.formatAge(child.getBirthday()));
-
-            feedChildren.add(feedChild);
-        }
-
-        return feedChildren;
-    }
-
-    private List<String> formatChildren(List<FeedChild> childrenDetail) {
-        List<String> formatedChildren = new ArrayList<String>();
-        for (FeedChild child : childrenDetail) {
-            formatedChildren.add(child.getSex() + "孩" + child.getAge());
-        }
-
-        return formatedChildren;
-    }
-    
     @RequestMapping(value = "/user", method = RequestMethod.GET)
     public MomiaHttpResponse listFeedsOfUser(@RequestParam(value = "uid") long userId,
                                              @RequestParam int start,
@@ -151,12 +61,11 @@ public class FeedController extends BaseController {
         long totalCount =feedService.queryCountByUser(userId);
         List<Feed> feeds = feedService.queryByUser(userId, start, count);
 
-        return MomiaHttpResponse.SUCCESS(buildPagedUserFeeds(userId, feeds, totalCount, start, count));
+        return MomiaHttpResponse.SUCCESS(buildPagedFeeds(feeds, totalCount, start, count));
     }
 
     @RequestMapping(value = "/subject", method = RequestMethod.GET)
-    public MomiaHttpResponse queryBySubject(@RequestParam(value = "uid") long userId,
-                                            @RequestParam(value = "suid") long subjectId,
+    public MomiaHttpResponse queryBySubject(@RequestParam(value = "suid") long subjectId,
                                             @RequestParam int start,
                                             @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
@@ -164,12 +73,11 @@ public class FeedController extends BaseController {
         long totalCount = feedService.queryCountBySubject(subjectId);
         List<Feed> feeds = feedService.queryBySubject(subjectId, start, count);
 
-        return MomiaHttpResponse.SUCCESS(buildPagedUserFeeds(userId, feeds, totalCount, start, count));
+        return MomiaHttpResponse.SUCCESS(buildPagedFeeds(feeds, totalCount, start, count));
     }
 
     @RequestMapping(value = "/course", method = RequestMethod.GET)
-    public MomiaHttpResponse queryByCourse(@RequestParam(value = "uid") long userId,
-                                           @RequestParam(value = "coid") long courseId,
+    public MomiaHttpResponse queryByCourse(@RequestParam(value = "coid") long courseId,
                                            @RequestParam int start,
                                            @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
@@ -177,7 +85,7 @@ public class FeedController extends BaseController {
         long totalCount = feedService.queryCountByCourse(courseId);
         List<Feed> feeds = feedService.queryByCourse(courseId, start, count);
 
-        return MomiaHttpResponse.SUCCESS(buildPagedUserFeeds(userId, feeds, totalCount, start, count));
+        return MomiaHttpResponse.SUCCESS(buildPagedFeeds(feeds, totalCount, start, count));
     }
 
     @RequestMapping(value = "/official", method = RequestMethod.GET)
@@ -207,7 +115,7 @@ public class FeedController extends BaseController {
         }
 
         boolean isOfficialUser = feedService.isOfficialUser(feed.getUserId());
-        if (isOfficialUser) feed.setOfficial(1);
+        if (isOfficialUser) feed.setOfficial(true);
 
         long feedId = feedService.add(feed);
         if (feedId <= 0) return MomiaHttpResponse.FAILED("发表Feed失败");
@@ -233,26 +141,16 @@ public class FeedController extends BaseController {
     }
 
     @RequestMapping(value = "/{fid}", method = RequestMethod.GET)
-    public MomiaHttpResponse get(@RequestParam(value = "uid", defaultValue = "0") long userId, @PathVariable(value = "fid") long feedId) {
+    public MomiaHttpResponse get(@PathVariable(value = "fid") long feedId) {
         Feed feed = feedService.get(feedId);
         if (!feed.exists()) return MomiaHttpResponse.FAILED("无效的Feed");
 
-        User feedUser = userServiceApi.get(feed.getUserId());
-        if (!feedUser.exists()) return MomiaHttpResponse.FAILED("无效的Feed");
-
-        boolean stared = userId > 0 && feedStarService.isStared(userId, feedId);
-
-        return MomiaHttpResponse.SUCCESS(buildUserFeed(feed, feedUser, stared));
+        return MomiaHttpResponse.SUCCESS(feed);
     }
 
     @RequestMapping(value = "/{fid}", method = RequestMethod.DELETE)
     public MomiaHttpResponse delete(@RequestParam(value = "uid") long userId, @PathVariable(value = "fid") long feedId) {
         if (userId <= 0 || feedId <= 0) return MomiaHttpResponse.FAILED("无效的Feed");
         return MomiaHttpResponse.SUCCESS(feedService.delete(userId, feedId));
-    }
-
-    @RequestMapping(value = "/img", method = RequestMethod.GET)
-    public MomiaHttpResponse getLatestImgs(@RequestParam(value = "uid") long userId) {
-        return MomiaHttpResponse.SUCCESS(feedService.queryLatestImgs(userId));
     }
 }

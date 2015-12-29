@@ -16,7 +16,7 @@ public class FeedStarServiceImpl extends AbstractService implements FeedStarServ
     }
 
     @Override
-    public List<Long> queryStaredFeeds(long userId, Collection<Long> feedIds) {
+    public List<Long> queryStaredFeedIds(long userId, Collection<Long> feedIds) {
         if (feedIds.isEmpty()) return new ArrayList<Long>();
 
         String sql = "SELECT feedId FROM SG_FeedStar WHERE UserId=? AND FeedId IN(" + StringUtils.join(feedIds, ",") + ") AND Status<>0";

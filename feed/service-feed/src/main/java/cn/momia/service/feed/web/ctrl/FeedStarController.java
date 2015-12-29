@@ -3,9 +3,10 @@ package cn.momia.service.feed.web.ctrl;
 import cn.momia.common.api.dto.PagedList;
 import cn.momia.common.api.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.service.feed.base.Feed;
+import cn.momia.api.feed.dto.Feed;
 import cn.momia.service.feed.base.FeedService;
 import cn.momia.service.feed.star.FeedStarService;
+import com.google.common.base.Splitter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/feed")
@@ -54,5 +57,15 @@ public class FeedStarController extends BaseController {
 
         feedService.decreaseStarCount(feedId);
         return MomiaHttpResponse.SUCCESS;
+    }
+
+    @RequestMapping(value = "/feed/star", method = RequestMethod.GET)
+    public MomiaHttpResponse queryStaredFeedIds(@RequestParam(value = "uid") long userId, @RequestParam String fids) {
+        Set<Long> feedIds = new HashSet<Long>();
+        for (String feedId : Splitter.on(",").trimResults().omitEmptyStrings().split(fids)) {
+            feedIds.add(Long.valueOf(feedId));
+        }
+
+        return MomiaHttpResponse.SUCCESS(feedStarService.queryStaredFeedIds(userId, feedIds));
     }
 }
