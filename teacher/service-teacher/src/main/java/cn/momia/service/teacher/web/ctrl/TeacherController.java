@@ -8,7 +8,6 @@ import cn.momia.api.teacher.dto.ChildRecord;
 import cn.momia.api.teacher.dto.Student;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
-import cn.momia.api.user.ChildServiceApi;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.api.dto.PagedList;
@@ -36,7 +35,6 @@ import java.util.Set;
 public class TeacherController extends BaseController {
     @Autowired private TeacherService teacherService;
     @Autowired private UserServiceApi userServiceApi;
-    @Autowired private ChildServiceApi childServiceApi;
 
     @RequestMapping(value = "/status", method = RequestMethod.GET)
     public MomiaHttpResponse status(@RequestParam String utoken) {
