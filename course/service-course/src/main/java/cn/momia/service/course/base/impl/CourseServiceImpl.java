@@ -1,7 +1,7 @@
 package cn.momia.service.course.base.impl;
 
-import cn.momia.api.base.MetaUtil;
-import cn.momia.api.base.dto.Region;
+import cn.momia.api.poi.MetaUtil;
+import cn.momia.api.poi.dto.Region;
 import cn.momia.api.course.dto.Course;
 import cn.momia.api.course.dto.CourseDetail;
 import cn.momia.api.course.dto.CourseSkuPlace;
@@ -271,7 +271,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
             placeIds.add(sku.getPlaceId());
         }
 
-        List<Place> places = poiServiceApi.list(placeIds);
+        List<Place> places = poiServiceApi.listPlaces(placeIds);
         Map<Integer, Place> placesMap = new HashMap<Integer, Place>();
         for (Place place : places) {
             placesMap.put(place.getId(), place);

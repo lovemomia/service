@@ -4,17 +4,8 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="cityService" class="cn.momia.common.service.CachedService" parent="dbAccessService">
-        <property name="type" value="cn.momia.api.base.dto.City" />
-        <property name="sql" value="SELECT Id, Name FROM SG_City WHERE Status=1" />
-    </bean>
-
-    <bean id="regionService" class="cn.momia.common.service.CachedService" parent="dbAccessService">
-        <property name="type" value="cn.momia.api.base.dto.Region" />
-        <property name="sql" value="SELECT Id, CityId, Name, ParentId FROM SG_Region WHERE Status=1" />
-    </bean>
-
     <bean id="feedbackService" class="cn.momia.service.base.feedback.impl.FeedbackServiceImpl" parent="dbAccessService" />
+
     <bean id="smsSender" class="cn.momia.service.base.sms.impl.LuosimaoSmsSender" />
     <bean id="smsService" class="cn.momia.service.base.sms.impl.SmsServiceImpl" parent="dbAccessService">
         <property name="sender" ref="smsSender" />

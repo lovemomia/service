@@ -1,8 +1,8 @@
-package cn.momia.service.poi.impl;
+package cn.momia.service.poi.place.impl;
 
 import cn.momia.api.poi.dto.Place;
 import cn.momia.common.service.AbstractService;
-import cn.momia.service.poi.PlaceService;
+import cn.momia.service.poi.place.PlaceService;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 

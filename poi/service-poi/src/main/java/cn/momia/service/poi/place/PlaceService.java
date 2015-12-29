@@ -1,4 +1,4 @@
-package cn.momia.service.poi;
+package cn.momia.service.poi.place;
 
 import cn.momia.api.poi.dto.Place;
 

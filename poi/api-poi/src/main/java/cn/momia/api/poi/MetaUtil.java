@@ -1,22 +1,22 @@
-package cn.momia.api.base;
+package cn.momia.api.poi;
 
-import cn.momia.api.base.dto.Region;
-import cn.momia.api.base.dto.City;
+import cn.momia.api.poi.dto.City;
+import cn.momia.api.poi.dto.Region;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MetaUtil {
-    private static MetaServiceApi metaServiceApi;
+    private static PoiServiceApi poiServiceApi;
 
     private static Date lastReloadTime = null;
 
     private static Map<Integer, City> citiesMap = new HashMap<Integer, City>();
     private static Map<Integer, Region> regionsMap = new HashMap<Integer, Region>();
 
-    public static void setMetaServiceApi(MetaServiceApi metaServiceApi) {
-        MetaUtil.metaServiceApi = metaServiceApi;
+    public static void setPoiServiceApi(PoiServiceApi poiServiceApi) {
+        MetaUtil.poiServiceApi = poiServiceApi;
     }
 
     private synchronized static void reload() {
@@ -24,12 +24,12 @@ public class MetaUtil {
 
         try {
             Map<Integer, City> newCitiesMap = new HashMap<Integer, City>();
-            for (City city : metaServiceApi.listAllCities()) {
+            for (City city : poiServiceApi.listAllCities()) {
                 newCitiesMap.put(city.getId(), city);
             }
 
             Map<Integer, Region> newRegionsMap = new HashMap<Integer, Region>();
-            for (Region region : metaServiceApi.listAllRegions()) {
+            for (Region region : poiServiceApi.listAllRegions()) {
                 newRegionsMap.put(region.getId(), region);
             }
 

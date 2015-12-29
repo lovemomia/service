@@ -1,4 +1,4 @@
-package cn.momia.api.base.dto;
+package cn.momia.api.poi.dto;
 
 public class Region {
     public static final int MULTI_REGION_ID = -1;

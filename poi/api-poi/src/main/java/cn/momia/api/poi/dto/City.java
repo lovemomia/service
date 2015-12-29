@@ -1,4 +1,4 @@
-package cn.momia.api.base.dto;
+package cn.momia.api.poi.dto;
 
 public class City {
     private int id;

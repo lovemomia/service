@@ -1,7 +1,7 @@
 package cn.momia.service.course.subject.impl;
 
-import cn.momia.api.base.MetaUtil;
-import cn.momia.api.base.dto.Region;
+import cn.momia.api.poi.MetaUtil;
+import cn.momia.api.poi.dto.Region;
 import cn.momia.api.course.dto.Course;
 import cn.momia.api.course.dto.CourseSku;
 import cn.momia.common.core.exception.MomiaErrorException;
