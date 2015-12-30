@@ -191,7 +191,7 @@ public class ChildController extends BaseController {
         return MomiaHttpResponse.SUCCESS(pagedComments);
     }
 
-    @RequestMapping(value = "/child/{cid}/comment", method = RequestMethod.POST)
+    @RequestMapping(value = "/{cid}/comment", method = RequestMethod.POST)
     public MomiaHttpResponse comment(@RequestParam String utoken,
                                      @PathVariable(value = "cid") long childId,
                                      @RequestParam(value = "coid") long courseId,
