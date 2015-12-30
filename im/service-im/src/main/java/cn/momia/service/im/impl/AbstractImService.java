@@ -195,7 +195,7 @@ public abstract class AbstractImService extends AbstractService implements ImSer
 
     @Override
     public List<UserGroup> listUserGroups(long userId) {
-        String sql = "SELECT A.UserId, A.Id AS MemberId, A.GroupId, B.GroupName, B.CourseId, B.CourseSkuId, A.AddTime FROM SG_ImGroupMember A INNER JOIN SG_ImGroup B ON A.GroupId=B.Id WHERE A.UserId=? AND A.Status<>0 AND B.Status<>0 GROUP BY A.GroupId ORDER BY B.GroupName ASC";
+        String sql = "SELECT A.UserId, A.GroupId, B.GroupName, B.CourseId, A.AddTime FROM SG_ImGroupMember A INNER JOIN SG_ImGroup B ON A.GroupId=B.GroupId WHERE A.UserId=? AND A.Status<>0 AND B.Status<>0 GROUP BY A.GroupId ORDER BY B.GroupName ASC";
         return queryObjectList(sql, new Object[] { userId }, UserGroup.class);
     }
 }

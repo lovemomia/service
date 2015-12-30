@@ -6,11 +6,9 @@ import java.util.Date;
 
 public class UserGroup {
     private long userId;
-    private long memberId;
     private long groupId;
     private String groupName;
     private long courseId;
-    private long courseSkuId;
     @JSONField(format = "yyyy-MM-dd HH:mm:ss") private Date addTime;
 
     private String tips;
@@ -21,14 +19,6 @@ public class UserGroup {
 
     public void setUserId(long userId) {
         this.userId = userId;
-    }
-
-    public long getMemberId() {
-        return memberId;
-    }
-
-    public void setMemberId(long memberId) {
-        this.memberId = memberId;
     }
 
     public long getGroupId() {
@@ -61,14 +51,6 @@ public class UserGroup {
 
     public void setCourseId(long courseId) {
         this.courseId = courseId;
-    }
-
-    public long getCourseSkuId() {
-        return courseSkuId;
-    }
-
-    public void setCourseSkuId(long courseSkuId) {
-        this.courseSkuId = courseSkuId;
     }
 
     public String getTips() {
