@@ -6,6 +6,7 @@ import cn.momia.api.user.dto.TeacherExperience;
 import cn.momia.api.user.dto.TeacherStatus;
 import cn.momia.common.service.AbstractService;
 import cn.momia.service.user.teacher.TeacherService;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.KeyHolder;
@@ -36,7 +37,13 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
         List<Integer> teacherIds = queryIntList(sql, new Object[] { userId });
         List<Teacher> teachers = listTeachers(teacherIds);
 
-        return teachers.isEmpty() ? Teacher.NOT_EXIST_TEACHER : teachers.get(0);
+        if (!teachers.isEmpty()) return teachers.get(0);
+
+        Teacher teacher = new Teacher();
+        teacher.setExperiences(queryExperiences(Sets.newHashSet(userId)).get(userId));
+        teacher.setEducations(queryEducations(Sets.newHashSet(userId)).get(userId));
+
+        return teacher;
     }
 
     private List<Teacher> listTeachers(Collection<Integer> teacherIds) {
@@ -58,7 +65,7 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
         List<Teacher> result = new ArrayList<Teacher>();
         for (int teacherId : teacherIds) {
             Teacher teacher = teachersMap.get(teacherId);
-            if (teacher == null) teacher = new Teacher();
+            if (teacher == null) continue;
 
             teacher.setExperiences(experiencesMap.get(teacher.getUserId()));
             teacher.setEducations(educationsMap.get(teacher.getUserId()));
