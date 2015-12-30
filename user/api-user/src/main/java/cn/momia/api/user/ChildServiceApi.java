@@ -1,6 +1,7 @@
 package cn.momia.api.user;
 
 import cn.momia.api.user.dto.Child;
+import cn.momia.api.user.dto.ChildRecord;
 import cn.momia.api.user.dto.ChildTag;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.core.api.HttpServiceApi;
@@ -91,5 +92,26 @@ public class ChildServiceApi extends HttpServiceApi {
     public List<ChildTag> listAllTags() {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/child/tag"));
         return executeReturnList(request, ChildTag.class);
+    }
+
+    public ChildRecord getRecord(String utoken, long childId, long courseId, long courseSkuId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("coid", courseId)
+                .add("sid", courseSkuId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/child/%d/record", childId), builder.build());
+
+        return executeReturnObject(request, ChildRecord.class);
+    }
+
+    public boolean record(String utoken, long childId, long courseId, long courseSkuId, String record) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("coid", courseId)
+                .add("sid", courseSkuId)
+                .add("record", record);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/child/%d/record", childId), builder.build());
+
+        return executeReturnObject(request, Boolean.class);
     }
 }

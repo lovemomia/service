@@ -1,6 +1,7 @@
 package cn.momia.service.user.web.ctrl;
 
 import cn.momia.api.user.dto.Child;
+import cn.momia.api.user.dto.ChildRecord;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.core.util.CastUtil;
@@ -9,6 +10,7 @@ import cn.momia.service.user.base.UserService;
 import cn.momia.service.user.child.ChildService;
 import com.alibaba.fastjson.JSON;
 import com.google.common.base.Splitter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -136,5 +138,35 @@ public class ChildController extends BaseController {
     @RequestMapping(value = "/tag", method = RequestMethod.GET)
     public MomiaHttpResponse tags() {
         return MomiaHttpResponse.SUCCESS(childService.listAllTags());
+    }
+
+    @RequestMapping(value = "/{cid}/record", method = RequestMethod.GET)
+    public MomiaHttpResponse record(@RequestParam String utoken,
+                                    @PathVariable(value = "cid") long childId,
+                                    @RequestParam(value = "coid") long courseId,
+                                    @RequestParam(value = "sid") long courseSkuId) {
+        User user = userService.getByToken(utoken);
+        if (!user.isNormal()) return MomiaHttpResponse.FAILED("您无权查看记录");
+        return MomiaHttpResponse.SUCCESS(childService.getRecord(user.getId(), childId, courseId, courseSkuId));
+    }
+
+    @RequestMapping(value = "/{cid}/record", method = RequestMethod.POST)
+    public MomiaHttpResponse record(@RequestParam String utoken,
+                                    @PathVariable(value = "cid") long childId,
+                                    @RequestParam(value = "coid") long courseId,
+                                    @RequestParam(value = "sid") long courseSkuId,
+                                    @RequestParam String record) {
+        User user = userService.getByToken(utoken);
+        if (!user.isTeacher()) return MomiaHttpResponse.FAILED("只有老师才有资格记录");
+
+        ChildRecord childRecord = CastUtil.toObject(JSON.parseObject(record), ChildRecord.class);
+        childRecord.setTeacherUserId(user.getId());
+        childRecord.setChildId(childId);
+        childRecord.setCourseId(courseId);
+        childRecord.setCourseSkuId(courseSkuId);
+
+        if (!StringUtils.isBlank(childRecord.getContent()) && childRecord.getContent().length() > 300) return MomiaHttpResponse.FAILED("记录字数过多，超出限制");
+
+        return MomiaHttpResponse.SUCCESS(childService.record(childRecord));
     }
 }

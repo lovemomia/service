@@ -4,7 +4,6 @@ import cn.momia.api.teacher.dto.ChildComment;
 import cn.momia.api.teacher.dto.Education;
 import cn.momia.api.teacher.dto.Experience;
 import cn.momia.api.teacher.dto.Material;
-import cn.momia.api.teacher.dto.ChildRecord;
 import cn.momia.api.teacher.dto.Student;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
@@ -222,34 +221,6 @@ public class TeacherController extends BaseController {
         pagedComments.setList(comments);
 
         return MomiaHttpResponse.SUCCESS(pagedComments);
-    }
-
-    @RequestMapping(value = "/child/{cid}/record", method = RequestMethod.GET)
-    public MomiaHttpResponse record(@RequestParam String utoken,
-                                    @PathVariable(value = "cid") long childId,
-                                    @RequestParam(value = "coid") long courseId,
-                                    @RequestParam(value = "sid") long courseSkuId) {
-        Teacher teacher = checkTeacher(utoken);
-        return MomiaHttpResponse.SUCCESS(teacherService.getRecord(teacher.getUserId(), childId, courseId, courseSkuId));
-    }
-
-    @RequestMapping(value = "/child/{cid}/record", method = RequestMethod.POST)
-    public MomiaHttpResponse record(@RequestParam String utoken,
-                                    @PathVariable(value = "cid") long childId,
-                                    @RequestParam(value = "coid") long courseId,
-                                    @RequestParam(value = "sid") long courseSkuId,
-                                    @RequestParam String record) {
-        Teacher teacher = checkTeacher(utoken);
-
-        ChildRecord childRecord = CastUtil.toObject(JSON.parseObject(record), ChildRecord.class);
-        childRecord.setTeacherUserId(teacher.getUserId());
-        childRecord.setChildId(childId);
-        childRecord.setCourseId(courseId);
-        childRecord.setCourseSkuId(courseSkuId);
-
-        if (!StringUtils.isBlank(childRecord.getContent()) && childRecord.getContent().length() > 300) return MomiaHttpResponse.FAILED("纪录字数过多，超出限制");
-
-        return MomiaHttpResponse.SUCCESS(teacherService.record(childRecord));
     }
 
     @RequestMapping(value = "/child/{cid}/comment", method = RequestMethod.POST)

@@ -1,6 +1,7 @@
 package cn.momia.service.user.child;
 
 import cn.momia.api.user.dto.Child;
+import cn.momia.api.user.dto.ChildRecord;
 import cn.momia.api.user.dto.ChildTag;
 
 import java.util.Collection;
@@ -24,4 +25,6 @@ public interface ChildService {
     boolean delete(long userId, long childId);
 
     List<ChildTag> listAllTags();
+    ChildRecord getRecord(long userId, long childId, long courseId, long courseSkuId);
+    boolean record(ChildRecord childRecord);
 }
