@@ -1,0 +1,81 @@
+package cn.momia.api.user;
+
+import cn.momia.api.user.dto.Teacher;
+import cn.momia.api.user.dto.TeacherEducation;
+import cn.momia.api.user.dto.TeacherExperience;
+import cn.momia.api.user.dto.TeacherStatus;
+import cn.momia.common.core.api.HttpServiceApi;
+import cn.momia.common.core.http.MomiaHttpParamBuilder;
+import cn.momia.common.core.http.MomiaHttpRequestBuilder;
+import org.apache.http.client.methods.HttpUriRequest;
+
+public class TeacherServiceApi extends HttpServiceApi {
+    public TeacherStatus status(String utoken) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher/status"), builder.build());
+
+        return executeReturnObject(request, TeacherStatus.class);
+    }
+
+    public boolean add(String utoken, String teacher) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("teacher", teacher);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/teacher"), builder.build());
+
+        return executeReturnObject(request, Boolean.class);
+    }
+
+    public boolean addExperience(String utoken, String experience) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("experience", experience);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/teacher/experience"), builder.build());
+
+        return executeReturnObject(request, Boolean.class);
+    }
+
+    public TeacherExperience getExperience(String utoken, int experienceId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher/experience/%d", experienceId), builder.build());
+
+        return executeReturnObject(request, TeacherExperience.class);
+    }
+
+    public boolean deleteExperience(String utoken, int experienceId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        HttpUriRequest request = MomiaHttpRequestBuilder.DELETE(url("/teacher/experience/%d", experienceId), builder.build());
+
+        return executeReturnObject(request, Boolean.class);
+    }
+
+    public boolean addEducation(String utoken, String education) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("education", education);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/teacher/education"), builder.build());
+
+        return executeReturnObject(request, Boolean.class);
+    }
+
+    public TeacherEducation getEducation(String utoken, int educationId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher/education/%d", educationId), builder.build());
+
+        return executeReturnObject(request, TeacherEducation.class);
+    }
+
+    public boolean deleteEducation(String utoken, int educationId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        HttpUriRequest request = MomiaHttpRequestBuilder.DELETE(url("/teacher/education/%d", educationId), builder.build());
+
+        return executeReturnObject(request, Boolean.class);
+    }
+
+    public Teacher get(String utoken) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher"), builder.build());
+
+        return executeReturnObject(request, Teacher.class);
+    }
+}

@@ -1,10 +1,10 @@
-package cn.momia.api.teacher.dto;
+package cn.momia.api.user.dto;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.lang3.StringUtils;
 
-public class Education {
-    public static final Education NOT_EXIST_EDUCATION = new Education();
+public class TeacherEducation {
+    public static final TeacherEducation NOT_EXIST_TEACHER_EDUCATION = new TeacherEducation();
 
     private int id;
     private long userId;

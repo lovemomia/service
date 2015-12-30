@@ -10,5 +10,6 @@
     <bean class="cn.momia.api.user.AuthServiceApi" parent="abstractUserApi" />
     <bean class="cn.momia.api.user.ChildServiceApi" parent="abstractUserApi" />
     <bean class="cn.momia.api.user.UserServiceApi" parent="abstractUserApi" />
+    <bean class="cn.momia.api.user.TeacherServiceApi" parent="abstractUserApi" />
     <bean class="cn.momia.api.user.SmsServiceApi" parent="abstractUserApi" />
 </beans>

@@ -1,4 +1,4 @@
-package cn.momia.api.teacher.dto;
+package cn.momia.api.user.dto;
 
 public class TeacherStatus {
     public static class Status {

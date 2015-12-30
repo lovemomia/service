@@ -1,4 +1,4 @@
-package cn.momia.api.teacher.dto;
+package cn.momia.api.user.dto;
 
 import cn.momia.common.core.util.SexUtil;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -19,8 +19,8 @@ public class Teacher {
     @JSONField(format = "yyyy-MM-dd") private Date birthday;
     private String address = "";
 
-    private List<Experience> experiences;
-    private List<Education> educations;
+    private List<TeacherExperience> experiences;
+    private List<TeacherEducation> educations;
 
     public int getId() {
         return id;
@@ -86,19 +86,19 @@ public class Teacher {
         this.address = address;
     }
 
-    public List<Experience> getExperiences() {
+    public List<TeacherExperience> getExperiences() {
         return experiences;
     }
 
-    public void setExperiences(List<Experience> experiences) {
+    public void setExperiences(List<TeacherExperience> experiences) {
         this.experiences = experiences;
     }
 
-    public List<Education> getEducations() {
+    public List<TeacherEducation> getEducations() {
         return educations;
     }
 
-    public void setEducations(List<Education> educations) {
+    public void setEducations(List<TeacherEducation> educations) {
         this.educations = educations;
     }
 
