@@ -198,7 +198,7 @@ public class ChildServiceImpl extends AbstractService implements ChildService {
             String sql = "UPDATE SG_ChildComment SET TeacherUserId=?, Content=?, Status=1 WHERE ChildId=? AND CourseId=? AND CourseSkuId=?";
             return update(sql, new Object[] { childComment.getTeacherUserId(), childComment.getContent(), childComment.getChildId(), childComment.getCourseId(), childComment.getCourseSkuId() });
         } else {
-            String sql = "INSERT INTO SG_ChildComment (TeacherUserUserId, ChildId, CourseId, CourseSkuId, Content, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
+            String sql = "INSERT INTO SG_ChildComment (TeacherUserId, ChildId, CourseId, CourseSkuId, Content, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
             return update(sql, new Object[] { childComment.getTeacherUserId(), childComment.getChildId(), childComment.getCourseId(), childComment.getCourseSkuId(), childComment.getContent() });
         }
     }
