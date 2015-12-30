@@ -1,6 +1,7 @@
 package cn.momia.api.user;
 
 import cn.momia.api.user.dto.Child;
+import cn.momia.api.user.dto.ChildTag;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.core.api.HttpServiceApi;
 import cn.momia.common.core.http.MomiaHttpParamBuilder;
@@ -18,28 +19,28 @@ public class ChildServiceApi extends HttpServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("children", children);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/user/child"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/child"), builder.build());
 
         return executeReturnObject(request, User.class);
     }
 
     public Child get(String utoken, long childId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/user/child/%d", childId), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/child/%d", childId), builder.build());
 
         return executeReturnObject(request, Child.class);
     }
 
     public List<Child> list(String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/user/child"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/child"), builder.build());
 
         return executeReturnList(request, Child.class);
     }
 
     public List<Child> list(Collection<Long> childrenIds) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("cids", StringUtils.join(childrenIds, ","));
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/user/child/list"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/child/list"), builder.build());
 
         return executeReturnList(request, Child.class);
     }
@@ -48,7 +49,7 @@ public class ChildServiceApi extends HttpServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("avatar", avatar);
-        HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/user/child/%d/avatar", childId), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/child/%d/avatar", childId), builder.build());
 
         return executeReturnObject(request, User.class);
     }
@@ -57,7 +58,7 @@ public class ChildServiceApi extends HttpServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("name", name);
-        HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/user/child/%d/name", childId), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/child/%d/name", childId), builder.build());
 
         return executeReturnObject(request, User.class);
     }
@@ -66,7 +67,7 @@ public class ChildServiceApi extends HttpServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("sex", sex);
-        HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/user/child/%d/sex", childId), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/child/%d/sex", childId), builder.build());
 
         return executeReturnObject(request, User.class);
     }
@@ -75,15 +76,20 @@ public class ChildServiceApi extends HttpServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("birthday", TimeUtil.SHORT_DATE_FORMAT.format(birthday));
-        HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/user/child/%d/birthday", childId), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/child/%d/birthday", childId), builder.build());
 
         return executeReturnObject(request, User.class);
     }
 
     public User delete(String utoken, long childId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        HttpUriRequest request = MomiaHttpRequestBuilder.DELETE(url("/user/child/%d", childId), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.DELETE(url("/child/%d", childId), builder.build());
 
         return executeReturnObject(request, User.class);
+    }
+
+    public List<ChildTag> listAllTags() {
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/child/tag"));
+        return executeReturnList(request, ChildTag.class);
     }
 }

@@ -2,7 +2,6 @@ package cn.momia.api.teacher;
 
 import cn.momia.api.teacher.dto.ChildComment;
 import cn.momia.api.teacher.dto.ChildRecord;
-import cn.momia.api.teacher.dto.ChildTag;
 import cn.momia.api.teacher.dto.Education;
 import cn.momia.api.teacher.dto.Experience;
 import cn.momia.api.teacher.dto.Material;
@@ -154,11 +153,6 @@ public class TeacherServiceApi extends HttpServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher/child/%d/comment", childId), builder.build());
 
         return executeReturnPagedList(request, ChildComment.class);
-    }
-
-    public List<ChildTag> listAllChildTags() {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher/child/tag"));
-        return executeReturnList(request, ChildTag.class);
     }
 
     public ChildRecord getChildRecord(String utoken, long childId, long courseId, long courseSkuId) {

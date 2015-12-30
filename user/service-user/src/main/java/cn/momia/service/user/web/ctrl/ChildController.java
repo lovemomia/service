@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/user/child")
+@RequestMapping("/child")
 public class ChildController extends BaseController {
     @Autowired private ChildService childService;
     @Autowired private UserService userService;
@@ -131,5 +131,10 @@ public class ChildController extends BaseController {
         if (!childService.delete(user.getId(), childId)) return MomiaHttpResponse.FAILED("删除孩子信息失败");
 
         return MomiaHttpResponse.SUCCESS(new User.Full(userService.get(user.getId())));
+    }
+
+    @RequestMapping(value = "/tag", method = RequestMethod.GET)
+    public MomiaHttpResponse tags() {
+        return MomiaHttpResponse.SUCCESS(childService.listAllTags());
     }
 }

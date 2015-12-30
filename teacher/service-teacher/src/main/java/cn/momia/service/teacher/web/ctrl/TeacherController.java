@@ -224,11 +224,6 @@ public class TeacherController extends BaseController {
         return MomiaHttpResponse.SUCCESS(pagedComments);
     }
 
-    @RequestMapping(value = "/child/tag", method = RequestMethod.GET)
-    public MomiaHttpResponse tags() {
-        return MomiaHttpResponse.SUCCESS(teacherService.listTags());
-    }
-
     @RequestMapping(value = "/child/{cid}/record", method = RequestMethod.GET)
     public MomiaHttpResponse record(@RequestParam String utoken,
                                     @PathVariable(value = "cid") long childId,

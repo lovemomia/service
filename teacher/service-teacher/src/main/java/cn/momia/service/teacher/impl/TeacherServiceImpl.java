@@ -1,7 +1,6 @@
 package cn.momia.service.teacher.impl;
 
 import cn.momia.api.teacher.dto.ChildComment;
-import cn.momia.api.teacher.dto.ChildTag;
 import cn.momia.api.teacher.dto.Education;
 import cn.momia.api.teacher.dto.Experience;
 import cn.momia.api.teacher.dto.Material;
@@ -32,14 +31,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class TeacherServiceImpl extends AbstractService implements TeacherService {
-    private List<ChildTag> tagsCache = new ArrayList<ChildTag>();
-
-    @Override
-    protected void doReload() {
-        String sql = "SELECT Id, Name FROM SG_ChildTag WHERE Status<>0";
-        tagsCache = queryObjectList(sql, ChildTag.class);
-    }
-
     @Override
     public TeacherStatus status(long userId) {
         String sql = "SELECT Status, Msg FROM SG_Teacher WHERE UserId=? AND Status<>0";
@@ -314,12 +305,6 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
                 "ORDER BY C.StartTime DESC, A.AddTime DESC " +
                 "LIMIT ?,?";
         return queryObjectList(sql, new Object[] { childId, start, count }, ChildComment.class);
-    }
-
-    @Override
-    public List<ChildTag> listTags() {
-        if (isOutOfDate()) reload();
-        return tagsCache;
     }
 
     @Override

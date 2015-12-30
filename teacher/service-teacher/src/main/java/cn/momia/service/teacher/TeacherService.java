@@ -1,7 +1,6 @@
 package cn.momia.service.teacher;
 
 import cn.momia.api.teacher.dto.ChildComment;
-import cn.momia.api.teacher.dto.ChildTag;
 import cn.momia.api.teacher.dto.Education;
 import cn.momia.api.teacher.dto.Experience;
 import cn.momia.api.teacher.dto.Material;
@@ -10,7 +9,6 @@ import cn.momia.api.teacher.dto.Student;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
 
-import java.util.Date;
 import java.util.List;
 
 public interface TeacherService {
@@ -33,7 +31,6 @@ public interface TeacherService {
     long queryChildCommentsCount(long childId);
     List<ChildComment> queryChildComments(long childId, int start, int count);
 
-    List<ChildTag> listTags();
     ChildRecord getRecord(long userId, long childId, long courseId, long courseSkuId);
 
     boolean record(ChildRecord childRecord);

@@ -1,6 +1,7 @@
 package cn.momia.service.user.child;
 
 import cn.momia.api.user.dto.Child;
+import cn.momia.api.user.dto.ChildTag;
 
 import java.util.Collection;
 import java.util.Date;
@@ -21,4 +22,6 @@ public interface ChildService {
     boolean updateBirthday(long userId, long childId, Date birthday);
 
     boolean delete(long userId, long childId);
+
+    List<ChildTag> listAllTags();
 }

@@ -1,6 +1,7 @@
 package cn.momia.service.user.child.impl;
 
 import cn.momia.api.user.dto.Child;
+import cn.momia.api.user.dto.ChildTag;
 import cn.momia.common.service.AbstractService;
 import cn.momia.service.user.child.ChildService;
 import com.google.common.collect.Sets;
@@ -21,6 +22,14 @@ import java.util.Map;
 import java.util.Set;
 
 public class ChildServiceImpl extends AbstractService implements ChildService {
+    private List<ChildTag> tagsCache = new ArrayList<ChildTag>();
+
+    @Override
+    protected void doReload() {
+        String sql = "SELECT Id, Name FROM SG_ChildTag WHERE Status<>0";
+        tagsCache = queryObjectList(sql, ChildTag.class);
+    }
+
     @Override
     public long add(final Child child) {
         KeyHolder keyHolder = insert(new PreparedStatementCreator() {
@@ -118,5 +127,11 @@ public class ChildServiceImpl extends AbstractService implements ChildService {
     public boolean delete(long userId, long childId) {
         String sql = "UPDATE SG_Child SET Status=0 WHERE UserId=? AND Id=?";
         return update(sql, new Object[] { userId, childId });
+    }
+
+    @Override
+    public List<ChildTag> listAllTags() {
+        if (isOutOfDate()) reload();
+        return tagsCache;
     }
 }
