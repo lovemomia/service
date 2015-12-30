@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -159,7 +160,8 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
                     ps.setString(3, teacher.getName());
                     ps.setString(4, teacher.getIdNo());
                     ps.setString(5, teacher.getSex());
-                    ps.setDate(6, new java.sql.Date(teacher.getBirthday().getTime()));
+                    Date birthday = teacher.getBirthday();
+                    ps.setDate(6, birthday == null ? null : new java.sql.Date(birthday.getTime()));
                     ps.setString(7, teacher.getAddress());
                     ps.setInt(8, TeacherStatus.Status.NOT_CHECKED);
 
