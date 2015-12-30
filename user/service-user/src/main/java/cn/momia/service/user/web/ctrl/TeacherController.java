@@ -31,7 +31,7 @@ public class TeacherController extends BaseController {
         return MomiaHttpResponse.SUCCESS(teacherService.status(user.getId()));
     }
 
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     public MomiaHttpResponse add(@RequestParam String utoken, @RequestParam(value = "teacher") String teacherJson) {
         User user = userService.getByToken(utoken);
         TeacherStatus status = teacherService.status(user.getId());
