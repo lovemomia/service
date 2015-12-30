@@ -75,15 +75,19 @@ public class CourseController extends BaseController {
     }
 
     private PagedList<Course> buildPagedCourses(List<Course> courses, long totalCount, int start, int count) {
+        PagedList<Course> pagedCourses = new PagedList<Course>(totalCount, start, count);
+        pagedCourses.setList(buildBaseCourses(courses));
+
+        return pagedCourses;
+    }
+
+    private List<Course> buildBaseCourses(List<Course> courses) {
         List<Course> baseCourses = new ArrayList<Course>();
         for (Course course : courses) {
             baseCourses.add(new Course.Base(course));
         }
 
-        PagedList<Course> pagedCourses = new PagedList<Course>(totalCount, start, count);
-        pagedCourses.setList(baseCourses);
-
-        return pagedCourses;
+        return baseCourses;
     }
 
     @RequestMapping(value = "/trial", method = RequestMethod.GET)
@@ -192,6 +196,17 @@ public class CourseController extends BaseController {
         return earliestSku == null ? "" : earliestSku.getScheduler();
     }
 
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public MomiaHttpResponse listCourses(@RequestParam String coids) {
+        Set<Long> courseIds = new HashSet<Long>();
+        for (String courseId : Splitter.on(",").trimResults().omitEmptyStrings().split(coids)) {
+            courseIds.add(Long.valueOf(courseId));
+        }
+        List<Course> courses = courseService.list(courseIds);
+
+        return MomiaHttpResponse.SUCCESS(buildBaseCourses(courses));
+    }
+
     @RequestMapping(value = "/finished/list", method = RequestMethod.GET)
     public MomiaHttpResponse listFinished(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
@@ -265,6 +280,16 @@ public class CourseController extends BaseController {
         }
 
         return MomiaHttpResponse.SUCCESS(courseService.queryTips(courseIds));
+    }
+
+    @RequestMapping(value = "/sku/list", method = RequestMethod.GET)
+    public MomiaHttpResponse listSkus(@RequestParam String sids) {
+        Set<Long> skuIds = new HashSet<Long>();
+        for (String skuId : Splitter.on(",").trimResults().omitEmptyStrings().split(sids)) {
+            skuIds.add(Long.valueOf(skuId));
+        }
+
+        return MomiaHttpResponse.SUCCESS(courseService.listSkus(skuIds));
     }
 
     @RequestMapping(value = "/{coid}/sku/{sid}", method = RequestMethod.GET)

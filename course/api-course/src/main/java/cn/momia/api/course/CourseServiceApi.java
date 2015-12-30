@@ -19,6 +19,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -63,6 +64,13 @@ public class CourseServiceApi extends HttpServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d", courseId), builder.build());
 
         return executeReturnObject(request, Course.class);
+    }
+
+    public List<Course> list(Collection<Long> courseIds) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("coids", StringUtils.join(courseIds, ","));
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/list"), builder.build());
+
+        return executeReturnList(request, Course.class);
     }
 
     public PagedList<Course> listFinished(long userId, int start, int count) {
@@ -136,6 +144,13 @@ public class CourseServiceApi extends HttpServiceApi {
     public CourseSku getSku(long courseId, long skuId) {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/sku/%d", courseId, skuId));
         return executeReturnObject(request, CourseSku.class);
+    }
+
+    public List<CourseSku> listSkus(Collection<Long> courseSkuIds) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("sids", StringUtils.join(courseSkuIds, ","));
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/sku/list"), builder.build());
+
+        return executeReturnList(request, CourseSku.class);
     }
 
     public List<DatedCourseSkus> listWeekSkus(long courseId) {

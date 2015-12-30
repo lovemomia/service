@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public interface CourseService {
     boolean isRecommended(long courseId);
@@ -24,6 +23,7 @@ public interface CourseService {
 
     Course get(long courseId);
     List<Course> list(Collection<Long> courseIds);
+    List<CourseSku> listSkus(Collection<Long> skuIds);
 
     long queryBookImgCount(long courseId);
     List<String> queryBookImgs(long courseId, int start, int count);
@@ -43,7 +43,7 @@ public interface CourseService {
     boolean lockSku(long skuId);
     boolean unlockSku(long skuId);
 
-    Map<Long, Date> queryStartTimesByPackages(Set<Long> packageIds);
+    Map<Long, Date> queryStartTimesByPackages(Collection<Long> packageIds);
 
     BookedCourse getBookedCourse(long bookingId);
 
@@ -63,8 +63,8 @@ public interface CourseService {
     long queryFinishedCountByTeacher(long userId);
     List<TeacherCourse> queryFinishedByTeacher(long userId, int start, int count);
 
-    Map<Long, Integer> queryBookedCourseCounts(Set<Long> orderIds);
-    Map<Long, Integer> queryFinishedCourseCounts(Set<Long> orderIds);
+    Map<Long, Integer> queryBookedCourseCounts(Collection<Long> orderIds);
+    Map<Long, Integer> queryFinishedCourseCounts(Collection<Long> orderIds);
 
     List<Long> queryBookedCourseIds(long packageId);
 

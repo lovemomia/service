@@ -245,7 +245,8 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         return skusMap;
     }
 
-    private List<CourseSku> listSkus(Collection<Long> skuIds) {
+    @Override
+    public List<CourseSku> listSkus(Collection<Long> skuIds) {
         if (skuIds.isEmpty()) return new ArrayList<CourseSku>();
 
         String sql = "SELECT Id, CourseId, StartTime, EndTime, Deadline, UnlockedStock, PlaceId, Adult, Child, Status FROM SG_CourseSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status<>0";
@@ -547,7 +548,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
-    public Map<Long, Date> queryStartTimesByPackages(Set<Long> packageIds) {
+    public Map<Long, Date> queryStartTimesByPackages(Collection<Long> packageIds) {
         if (packageIds.isEmpty()) return new HashMap<Long, Date>();
 
         final Map<Long, Date> startTimesMap = new HashMap<Long, Date>();
@@ -703,7 +704,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
-    public Map<Long, Integer> queryBookedCourseCounts(Set<Long> orderIds) {
+    public Map<Long, Integer> queryBookedCourseCounts(Collection<Long> orderIds) {
         if (orderIds.isEmpty()) return new HashMap<Long, Integer>();
 
         final Map<Long, Integer> map = new HashMap<Long, Integer>();
@@ -724,7 +725,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
-    public Map<Long, Integer> queryFinishedCourseCounts(Set<Long> orderIds) {
+    public Map<Long, Integer> queryFinishedCourseCounts(Collection<Long> orderIds) {
         if (orderIds.isEmpty()) return new HashMap<Long, Integer>();
 
         final Map<Long, Integer> map = new HashMap<Long, Integer>();
