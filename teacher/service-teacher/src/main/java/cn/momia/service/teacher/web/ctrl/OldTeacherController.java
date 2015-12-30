@@ -22,7 +22,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/teacher")
-public class TeacherController extends BaseController {
+public class OldTeacherController extends BaseController {
     @Autowired private TeacherService teacherService;
     @Autowired private UserServiceApi userServiceApi;
 

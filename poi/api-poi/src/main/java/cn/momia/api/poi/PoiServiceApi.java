@@ -14,12 +14,12 @@ import java.util.List;
 
 public class PoiServiceApi extends HttpServiceApi {
     public List<City> listAllCities() {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/city"));
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/poi/city"));
         return executeReturnList(request, City.class);
     }
 
     public List<Region> listAllRegions() {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/region"));
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/poi/region"));
         return executeReturnList(request, Region.class);
     }
 
