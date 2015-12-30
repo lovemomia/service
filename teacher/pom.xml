@@ -6,7 +6,7 @@
 
     <groupId>cn.momia</groupId>
     <artifactId>teacher</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <packaging>pom</packaging>
 
     <name>Momia Teacher</name>

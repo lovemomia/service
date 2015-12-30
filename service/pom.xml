@@ -6,7 +6,7 @@
 
     <groupId>cn.momia</groupId>
     <artifactId>duola-service</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <packaging>jar</packaging>
 
     <name>Momia Service</name>
@@ -16,43 +16,38 @@
         <!-- Momia Service -->
         <dependency>
             <groupId>cn.momia</groupId>
-            <artifactId>duola-service-base</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.momia</groupId>
             <artifactId>duola-service-course</artifactId>
-            <version>1.1.0</version>
+            <version>1.2.0</version>
         </dependency>
         <dependency>
             <groupId>cn.momia</groupId>
             <artifactId>duola-service-feed</artifactId>
-            <version>1.1.0</version>
+            <version>1.2.0</version>
         </dependency>
         <dependency>
             <groupId>cn.momia</groupId>
             <artifactId>duola-service-im</artifactId>
-            <version>1.1.0</version>
+            <version>1.2.0</version>
         </dependency>
         <dependency>
             <groupId>cn.momia</groupId>
             <artifactId>duola-service-operate</artifactId>
-            <version>1.1.0</version>
+            <version>1.2.0</version>
         </dependency>
         <dependency>
             <groupId>cn.momia</groupId>
             <artifactId>duola-service-poi</artifactId>
-            <version>1.1.0</version>
+            <version>1.2.0</version>
         </dependency>
         <dependency>
             <groupId>cn.momia</groupId>
             <artifactId>duola-service-teacher</artifactId>
-            <version>1.1.0</version>
+            <version>1.2.0</version>
         </dependency>
         <dependency>
             <groupId>cn.momia</groupId>
             <artifactId>duola-service-user</artifactId>
-            <version>1.1.0</version>
+            <version>1.2.0</version>
         </dependency>
 
         <!-- Test -->
