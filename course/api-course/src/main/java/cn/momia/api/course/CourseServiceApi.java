@@ -2,6 +2,7 @@ package cn.momia.api.course;
 
 import cn.momia.api.course.dto.BookedCourse;
 import cn.momia.api.course.dto.Course;
+import cn.momia.api.course.dto.CourseMaterial;
 import cn.momia.api.course.dto.CourseSku;
 import cn.momia.api.course.dto.TeacherCourse;
 import cn.momia.api.course.dto.TimelineUnit;
@@ -308,5 +309,21 @@ public class CourseServiceApi extends HttpServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/comment/timeline"), builder.build());
 
         return executeReturnPagedList(request, TimelineUnit.class);
+    }
+
+    public CourseMaterial getMaterial(String utoken, int materialId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/material/%d", materialId), builder.build());
+        return executeReturnObject(request, CourseMaterial.class);
+    }
+
+    public PagedList<CourseMaterial> listMaterials(String utoken, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("start", start)
+                .add("count", count);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/material/list"), builder.build());
+
+        return executeReturnPagedList(request, CourseMaterial.class);
     }
 }

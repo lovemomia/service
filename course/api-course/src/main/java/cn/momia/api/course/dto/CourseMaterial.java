@@ -1,7 +1,7 @@
-package cn.momia.api.teacher.dto;
+package cn.momia.api.course.dto;
 
-public class Material {
-    public static final Material NOT_EXIST_MATERIAL = new Material();
+public class CourseMaterial {
+    public static final CourseMaterial NOT_EXIST_COURSE_MATERIAL = new CourseMaterial();
 
     private int id;
     private String cover;
@@ -53,8 +53,8 @@ public class Material {
         return id > 0;
     }
 
-    public static class Base extends Material {
-        public Base(Material material) {
+    public static class Base extends CourseMaterial {
+        public Base(CourseMaterial material) {
             setId(material.getId());
             setCover(material.getCover());
             setTitle(material.getTitle());
