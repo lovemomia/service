@@ -1,7 +1,8 @@
 package cn.momia.api.im;
 
 import cn.momia.api.im.dto.Group;
-import cn.momia.api.im.dto.Member;
+import cn.momia.api.im.dto.GroupMember;
+import cn.momia.api.im.dto.UserGroup;
 import cn.momia.common.core.api.HttpServiceApi;
 import cn.momia.common.core.http.MomiaHttpParamBuilder;
 import cn.momia.common.core.http.MomiaHttpRequestBuilder;
@@ -76,6 +77,13 @@ public class ImServiceApi extends HttpServiceApi {
         return executeReturnList(request, Group.class);
     }
 
+    public List<GroupMember> listGroupMembers(long userId, long groupId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/im/group/%d/member", groupId), builder.build());
+
+        return executeReturnList(request, GroupMember.class);
+    }
+
     public boolean joinGroup(long userId, long courseId, long courseSkuId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
@@ -96,17 +104,10 @@ public class ImServiceApi extends HttpServiceApi {
         return executeReturnObject(request, Boolean.class);
     }
 
-    public List<Member> listGroupMembers(long userId, long groupId) {
+    public List<UserGroup> listUserGroups(long userId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/im/group/%d/member", groupId), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/im/user/group"), builder.build());
 
-        return executeReturnList(request, Member.class);
-    }
-
-    public List<Member> queryMembersByUser(long userId) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/im/user/member"), builder.build());
-
-        return executeReturnList(request, Member.class);
+        return executeReturnList(request, UserGroup.class);
     }
 }

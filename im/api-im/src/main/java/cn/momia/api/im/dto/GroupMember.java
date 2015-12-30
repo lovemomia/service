@@ -2,7 +2,7 @@ package cn.momia.api.im.dto;
 
 import java.util.Date;
 
-public class Member {
+public class GroupMember {
     private long id;
     private long groupId;
     private long userId;

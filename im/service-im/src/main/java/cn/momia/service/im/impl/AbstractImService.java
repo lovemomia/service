@@ -1,7 +1,8 @@
 package cn.momia.service.im.impl;
 
 import cn.momia.api.im.dto.Group;
-import cn.momia.api.im.dto.Member;
+import cn.momia.api.im.dto.GroupMember;
+import cn.momia.api.im.dto.UserGroup;
 import cn.momia.common.service.AbstractService;
 import cn.momia.service.im.ImService;
 import com.google.common.collect.Sets;
@@ -11,9 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public abstract class AbstractImService extends AbstractService implements ImService {
@@ -134,6 +133,19 @@ public abstract class AbstractImService extends AbstractService implements ImSer
         String sql = "SELECT GroupId, GroupName, CourseId, CourseSkuId FROM SG_ImGroup WHERE GroupId IN (" + StringUtils.join(groupIds, ",") + ") AND Status<>0";
         return queryObjectList(sql, Group.class);
     }
+
+    @Override
+    public boolean isInGroup(long userId, long groupId) {
+        String sql = "SELECT COUNT(1) FROM SG_ImGroupMember WHERE UserId=? AND GroupId=? AND Status<>0";
+        return queryInt(sql, new Object[] { userId, groupId }) > 0;
+    }
+
+    @Override
+    public List<GroupMember> listGroupMembers(long groupId) {
+        String sql = "SELECT Id, GroupId, UserId, Teacher, AddTime FROM SG_ImGroupMember WHERE GroupId=? AND Status<>0 GROUP BY UserId ORDER BY MAX(Teacher) DESC, MAX(AddTime) ASC";
+        return queryObjectList(sql, new Object[] { groupId }, GroupMember.class);
+    }
+
     @Override
     public boolean joinGroup(long courseId, long courseSkuId, long userId) {
         Group group = queryGroup(courseId, courseSkuId);
@@ -182,45 +194,8 @@ public abstract class AbstractImService extends AbstractService implements ImSer
     }
 
     @Override
-    public boolean isInGroup(long userId, long groupId) {
-        String sql = "SELECT COUNT(1) FROM SG_ImGroupMember WHERE UserId=? AND GroupId=? AND Status<>0";
-        return queryInt(sql, new Object[] { userId, groupId }) > 0;
+    public List<UserGroup> listUserGroups(long userId) {
+        String sql = "SELECT A.UserId, A.Id AS MemberId, A.GroupId, B.GroupName, B.CourseId, B.CourseSkuId, A.AddTime FROM SG_ImGroupMember A INNER JOIN SG_ImGroup B ON A.GroupId=B.Id WHERE A.UserId=? AND A.Status<>0 AND B.Status<>0 GROUP BY A.GroupId ORDER BY B.GroupName ASC";
+        return queryObjectList(sql, new Object[] { userId }, UserGroup.class);
     }
-
-    @Override
-    public List<Member> queryMembersByGroup(long groupId) {
-        String sql = "SELECT Id FROM SG_ImGroupMember WHERE GroupId=? AND Status<>0 GROUP BY UserId ORDER BY MAX(Teacher) DESC, MAX(AddTime) ASC";
-        List<Long> memberIds = queryLongList(sql, new Object[] { groupId });
-
-        return listMembers(memberIds);
-    }
-
-    private List<Member> listMembers(Collection<Long> memberIds) {
-        if (memberIds.isEmpty()) return new ArrayList<Member>();
-
-        String sql = "SELECT Id, GroupId, UserId, Teacher, AddTime FROM SG_ImGroupMember WHERE Id IN (" + StringUtils.join(memberIds, ",") + ")";
-        List<Member> members = queryObjectList(sql, Member.class);
-
-        Map<Long, Member> membersMap = new HashMap<Long, Member>();
-        for (Member member : members) {
-            membersMap.put(member.getId(), member);
-        }
-
-        List<Member> result = new ArrayList<Member>();
-        for (long memberId : memberIds) {
-            Member member = membersMap.get(memberId);
-            if (member != null) result.add(member);
-        }
-
-        return result;
-    }
-
-    @Override
-    public List<Member> queryMembersByUser(long userId) {
-        String sql = "SELECT Id FROM SG_ImGroupMember WHERE UserId=? AND Status<>0 GROUP BY GroupId ORDER BY MAX(AddTime) ASC";
-        List<Long> memberIds = queryLongList(sql, new Object[] { userId });
-
-        return listMembers(memberIds);
-    }
-
 }

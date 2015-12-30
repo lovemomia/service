@@ -1,7 +1,8 @@
 package cn.momia.service.im;
 
 import cn.momia.api.im.dto.Group;
-import cn.momia.api.im.dto.Member;
+import cn.momia.api.im.dto.GroupMember;
+import cn.momia.api.im.dto.UserGroup;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,13 +15,15 @@ public interface ImService {
     boolean createGroup(long courseId, long courseSkuId, Collection<Long> teacherUserIds, String groupName);
     boolean updateGroupName(long courseId, long courseSkuId, String groupName);
     boolean dismissGroup(long groupId);
+
     Group getGroup(long groupId);
     List<Group> listGroups(Collection<Long> groupIds);
+
+    boolean isInGroup(long userId, long groupId);
+    List<GroupMember> listGroupMembers(long groupId);
 
     boolean joinGroup(long userId, long courseId, long courseSkuId);
     boolean leaveGroup(long userId, long courseId, long courseSkuId);
 
-    boolean isInGroup(long userId, long groupId);
-    List<Member> queryMembersByGroup(long groupId);
-    List<Member> queryMembersByUser(long userId);
+    List<UserGroup> listUserGroups(long userId);
 }

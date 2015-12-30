@@ -32,13 +32,13 @@ public class ImController extends BaseController {
     }
 
     @RequestMapping(value = "/user/nickname", method = RequestMethod.PUT)
-    public MomiaHttpResponse updateNickName(@RequestParam(value = "uid") long userId, @RequestParam(value = "nickname") String nickName) {
+    public MomiaHttpResponse updateImNickName(@RequestParam(value = "uid") long userId, @RequestParam(value = "nickname") String nickName) {
         imService.updateNickName(userId, nickName);
         return MomiaHttpResponse.SUCCESS;
     }
 
     @RequestMapping(value = "/user/avatar", method = RequestMethod.PUT)
-    public MomiaHttpResponse updateAvatar(@RequestParam(value = "uid") long userId, @RequestParam String avatar) {
+    public MomiaHttpResponse updateImAvatar(@RequestParam(value = "uid") long userId, @RequestParam String avatar) {
         imService.updateAvatar(userId, avatar);
         return MomiaHttpResponse.SUCCESS;
     }
@@ -89,6 +89,12 @@ public class ImController extends BaseController {
         return MomiaHttpResponse.SUCCESS(imService.listGroups(groupIds));
     }
 
+    @RequestMapping(value = "/group/{id}/member", method = RequestMethod.GET)
+    public MomiaHttpResponse listGroupMembers(@RequestParam(value = "uid") long userId, @PathVariable(value = "id") long groupId) {
+        if (!imService.isInGroup(userId, groupId)) return MomiaHttpResponse.FAILED("您不在该群组中，无权查看群组成员");
+        return MomiaHttpResponse.SUCCESS(imService.listGroupMembers(groupId));
+    }
+
     @RequestMapping(value = "/group/join", method = RequestMethod.POST)
     public MomiaHttpResponse joinGroup(@RequestParam(value = "uid") long userId,
                                        @RequestParam(value = "coid") long courseId,
@@ -105,15 +111,9 @@ public class ImController extends BaseController {
         return MomiaHttpResponse.SUCCESS(imService.leaveGroup(userId, courseId, courseSkuId));
     }
 
-    @RequestMapping(value = "/group/{id}/member", method = RequestMethod.GET)
-    public MomiaHttpResponse listGroupMembers(@RequestParam(value = "uid") long userId, @PathVariable(value = "id") long groupId) {
-        if (!imService.isInGroup(userId, groupId)) return MomiaHttpResponse.FAILED("您不在该群组中，无权查看群组成员");
-        return MomiaHttpResponse.SUCCESS(imService.queryMembersByGroup(groupId));
-    }
-
-    @RequestMapping(value = "/user/member", method = RequestMethod.GET)
-    public MomiaHttpResponse queryMembersByUser(@RequestParam(value = "uid") long userId) {
-        return MomiaHttpResponse.SUCCESS(imService.queryMembersByUser(userId));
+    @RequestMapping(value = "/user/group", method = RequestMethod.GET)
+    public MomiaHttpResponse listUserGroup(@RequestParam(value = "uid") long userId) {
+        return MomiaHttpResponse.SUCCESS(imService.listUserGroups(userId));
     }
 
     @RequestMapping(value = "/push", method = RequestMethod.POST)
