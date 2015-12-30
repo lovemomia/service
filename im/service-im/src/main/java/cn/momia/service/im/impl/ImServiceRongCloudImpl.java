@@ -127,7 +127,7 @@ public class ImServiceRongCloudImpl extends AbstractImService {
     }
 
     @Override
-    protected boolean doJoinGroup(long groupId, String groupName, long userId) {
+    protected boolean doJoinGroup(long userId, long groupId, String groupName) {
         try {
             HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.JoinGroup"));
 
@@ -147,7 +147,7 @@ public class ImServiceRongCloudImpl extends AbstractImService {
     }
 
     @Override
-    protected boolean doLeaveGroup(long groupId, long userId) {
+    protected boolean doLeaveGroup(long userId, long groupId) {
         try {
             HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.LeaveGroup"));
 

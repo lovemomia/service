@@ -147,11 +147,11 @@ public abstract class AbstractImService extends AbstractService implements ImSer
     }
 
     @Override
-    public boolean joinGroup(long courseId, long courseSkuId, long userId) {
+    public boolean joinGroup(long userId, long courseId, long courseSkuId) {
         Group group = queryGroup(courseId, courseSkuId);
         if (!group.exists()) return false;
 
-        if (doJoinGroup(group.getGroupId(), group.getGroupName(), userId)) {
+        if (doJoinGroup(userId, group.getGroupId(), group.getGroupName())) {
             logGroupMembers(group.getGroupId(), Sets.newHashSet(userId), false);
             return true;
         }
@@ -167,14 +167,14 @@ public abstract class AbstractImService extends AbstractService implements ImSer
         return groups.isEmpty() ? Group.NOT_EXIST_GROUP : groups.get(0);
     }
 
-    protected abstract boolean doJoinGroup(long groupId, String groupName, long userId);
+    protected abstract boolean doJoinGroup(long userId, long groupId, String groupName);
 
     @Override
-    public boolean leaveGroup(long courseId, long courseSkuId, long userId) {
+    public boolean leaveGroup(long userId, long courseId, long courseSkuId) {
         Group group = queryGroup(courseId, courseSkuId);
         if (!group.exists()) return false;
 
-        if (doLeaveGroup(group.getGroupId(), userId)) {
+        if (doLeaveGroup(userId, group.getGroupId())) {
             deleteGroupMembersLog(group.getGroupId(), Sets.newHashSet(userId));
             return true;
         }
@@ -182,7 +182,7 @@ public abstract class AbstractImService extends AbstractService implements ImSer
         return false;
     }
 
-    protected abstract boolean doLeaveGroup(long groupId, long userId);
+    protected abstract boolean doLeaveGroup(long userId, long groupId);
 
     private void deleteGroupMembersLog(long groupId, Collection<Long> userIds) {
         String sql = "UPDATE SG_ImGroupMember SET Status=0 WHERE GroupId=? AND UserId=?";
