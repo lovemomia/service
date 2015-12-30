@@ -15,7 +15,6 @@
         <IM>http://localhost:7070</IM>
         <Operate>http://localhost:7070</Operate>
         <Poi>http://localhost:7070</Poi>
-        <Teacher>http://localhost:7070</Teacher>
         <User>http://localhost:7070</User>
     </Service>
 

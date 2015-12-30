@@ -18,7 +18,6 @@
         <module>im</module>
         <module>operate</module>
         <module>poi</module>
-        <module>teacher</module>
         <module>user</module>
 
         <module>service</module>

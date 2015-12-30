@@ -5,6 +5,7 @@ import cn.momia.api.course.dto.CourseDetail;
 import cn.momia.api.course.dto.CourseMaterial;
 import cn.momia.api.course.dto.CourseSkuPlace;
 import cn.momia.api.course.dto.DatedCourseSkus;
+import cn.momia.api.course.dto.Student;
 import cn.momia.api.course.dto.TeacherCourse;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
@@ -631,5 +632,60 @@ public class CourseController extends BaseController {
         }
 
         return baseMaterials;
+    }
+
+    @RequestMapping(value = "/course/checkin", method = RequestMethod.POST)
+    public MomiaHttpResponse checkin(@RequestParam String utoken,
+                                     @RequestParam(value = "uid") long userId,
+                                     @RequestParam(value = "pid") long packageId,
+                                     @RequestParam(value = "coid") long courseId,
+                                     @RequestParam(value = "sid") long courseSkuId) {
+        User user = userServiceApi.get(utoken);
+        return MomiaHttpResponse.SUCCESS(courseService.checkin(userId, packageId, courseId, courseSkuId));
+    }
+
+    @RequestMapping(value = "/course/ongoing/student", method = RequestMethod.GET)
+    public MomiaHttpResponse ongoingStudents(@RequestParam String utoken,
+                                             @RequestParam(value = "coid") long courseId,
+                                             @RequestParam(value = "sid") long courseSkuId) {
+        List<Student> students = courseService.queryAllStudents(courseId, courseSkuId);
+        List<Long> userIds = courseService.queryUserIdsWithoutChild(courseId, courseSkuId);
+        List<User> users = userServiceApi.list(userIds, User.Type.MINI);
+        for (User user : users) {
+            Student student = new Student();
+            student.setType(Student.Type.PARENT);
+            student.setId(user.getId());
+            student.setUserId(user.getId());
+            student.setAvatar(user.getAvatar());
+            student.setName(user.getNickName());
+
+            students.add(student);
+        }
+
+        return MomiaHttpResponse.SUCCESS(students);
+    }
+
+    @RequestMapping(value = "/course/notfinished/student", method = RequestMethod.GET)
+    public MomiaHttpResponse notfinishedStudents(@RequestParam String utoken,
+                                                 @RequestParam(value = "coid") long courseId,
+                                                 @RequestParam(value = "sid") long courseSkuId) {
+        User user = userServiceApi.get(utoken);
+        return MomiaHttpResponse.SUCCESS(courseService.queryAllStudents(courseId, courseSkuId));
+    }
+
+    @RequestMapping(value = "/course/finished/student", method = RequestMethod.GET)
+    public MomiaHttpResponse finishedStudents(@RequestParam String utoken,
+                                              @RequestParam(value = "coid") long courseId,
+                                              @RequestParam(value = "sid") long courseSkuId) {
+        User user = userServiceApi.get(utoken);
+
+        List<Student> students = courseService.queryCheckInStudents(courseId, courseSkuId);
+
+        Set<Long> commentedChildIds = Sets.newHashSet(courseService.queryCommentedChildIds(courseId, courseSkuId));
+        for (Student student : students) {
+            if (commentedChildIds.contains(student.getId())) student.setCommented(true);
+        }
+
+        return MomiaHttpResponse.SUCCESS(students);
     }
 }

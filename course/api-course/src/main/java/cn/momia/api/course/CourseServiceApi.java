@@ -4,6 +4,7 @@ import cn.momia.api.course.dto.BookedCourse;
 import cn.momia.api.course.dto.Course;
 import cn.momia.api.course.dto.CourseMaterial;
 import cn.momia.api.course.dto.CourseSku;
+import cn.momia.api.course.dto.Student;
 import cn.momia.api.course.dto.TeacherCourse;
 import cn.momia.api.course.dto.TimelineUnit;
 import cn.momia.api.course.dto.UserCourseComment;
@@ -325,5 +326,47 @@ public class CourseServiceApi extends HttpServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/material/list"), builder.build());
 
         return executeReturnPagedList(request, CourseMaterial.class);
+    }
+
+    public boolean checkin(String utoken, long userId, long packageId, long courseId, long courseSkuId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("uid", userId)
+                .add("pid", packageId)
+                .add("coid", courseId)
+                .add("sid", courseSkuId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/course/checkin"), builder.build());
+
+        return executeReturnObject(request, Boolean.class);
+    }
+
+    public List<Student> ongoingStudents(String utoken, long courseId, long courseSkuId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("coid", courseId)
+                .add("sid", courseSkuId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/ongoing/student"), builder.build());
+
+        return executeReturnList(request, Student.class);
+    }
+
+    public List<Student> notfinishedStudents(String utoken, long courseId, long courseSkuId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("coid", courseId)
+                .add("sid", courseSkuId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/notfinished/student"), builder.build());
+
+        return executeReturnList(request, Student.class);
+    }
+
+    public List<Student> finishedStudents(String utoken, long courseId, long courseSkuId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("coid", courseId)
+                .add("sid", courseSkuId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/finished/student"), builder.build());
+
+        return executeReturnList(request, Student.class);
     }
 }

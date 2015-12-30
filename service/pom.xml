@@ -41,11 +41,6 @@
         </dependency>
         <dependency>
             <groupId>cn.momia</groupId>
-            <artifactId>duola-service-teacher</artifactId>
-            <version>1.2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.momia</groupId>
             <artifactId>duola-service-user</artifactId>
             <version>1.2.0</version>
         </dependency>

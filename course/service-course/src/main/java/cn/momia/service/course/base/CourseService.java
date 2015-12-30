@@ -6,6 +6,7 @@ import cn.momia.api.course.dto.CourseDetail;
 import cn.momia.api.course.dto.CourseMaterial;
 import cn.momia.api.course.dto.CourseSku;
 import cn.momia.api.course.dto.Institution;
+import cn.momia.api.course.dto.Student;
 import cn.momia.api.course.dto.Teacher;
 import cn.momia.api.course.dto.TeacherCourse;
 
@@ -90,4 +91,11 @@ public interface CourseService {
     CourseMaterial getMaterial(long userId, int materialId);
     long queryMaterialsCount(long userId);
     List<CourseMaterial> queryMaterials(long userId, int start, int count);
+
+    boolean checkin(long userId, long packageId, long courseId, long courseSkuId);
+
+    List<Long> queryUserIdsWithoutChild(long courseId, long courseSkuId);
+    List<Student> queryAllStudents(long courseId, long courseSkuId);
+    List<Student> queryCheckInStudents(long courseId, long courseSkuId);
+    List<Long> queryCommentedChildIds(long courseId, long courseSkuId);
 }
