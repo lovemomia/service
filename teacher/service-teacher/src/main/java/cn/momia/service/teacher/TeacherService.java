@@ -4,7 +4,6 @@ import cn.momia.api.teacher.dto.ChildComment;
 import cn.momia.api.teacher.dto.Education;
 import cn.momia.api.teacher.dto.Experience;
 import cn.momia.api.teacher.dto.Material;
-import cn.momia.api.teacher.dto.ChildRecord;
 import cn.momia.api.teacher.dto.Student;
 import cn.momia.api.teacher.dto.Teacher;
 import cn.momia.api.teacher.dto.TeacherStatus;
@@ -31,9 +30,6 @@ public interface TeacherService {
     long queryChildCommentsCount(long childId);
     List<ChildComment> queryChildComments(long childId, int start, int count);
 
-    ChildRecord getRecord(long userId, long childId, long courseId, long courseSkuId);
-
-    boolean record(ChildRecord childRecord);
     boolean comment(ChildComment childComment);
 
     boolean addExperience(long userId, Experience experience);
