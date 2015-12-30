@@ -152,10 +152,19 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
 
     @Override
     public long add(final Teacher teacher) {
+        String pic = teacher.getPic();
+        if (pic.startsWith("http://")) {
+            pic = pic.substring("http://".length());
+            int index = pic.indexOf("/");
+            if (index == -1) pic = "";
+            else pic = pic.substring(index);
+        }
+        final String teacherPic = pic;
+
         int teacherId = getIdByUser(teacher.getUserId());
         if (teacherId > 0) {
             String sql = "UPDATE SG_Teacher SET Pic=?, Name=?, IdNo=?, Gender=?, Birthday=?, Address=?, Status=? WHERE Id=? AND UserId=?";
-            update(sql, new Object[] { teacher.getPic(), teacher.getName(), teacher.getIdNo(), teacher.getSex(), teacher.getBirthday(), teacher.getAddress(), TeacherStatus.Status.NOT_CHECKED, teacherId, teacher.getUserId() });
+            update(sql, new Object[] { teacherPic, teacher.getName(), teacher.getIdNo(), teacher.getSex(), teacher.getBirthday(), teacher.getAddress(), TeacherStatus.Status.NOT_CHECKED, teacherId, teacher.getUserId() });
         } else {
             KeyHolder keyHolder = insert(new PreparedStatementCreator() {
                 @Override
@@ -163,14 +172,7 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
                     String sql = "INSERT INTO SG_Teacher(UserId, Pic, Name, IdNo, Gender, Birthday, Address, Status, AddTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
                     PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                     ps.setLong(1, teacher.getUserId());
-                    String pic = teacher.getPic();
-                    if (pic.startsWith("http://")) {
-                        pic = pic.substring("http://".length());
-                        int index = pic.indexOf("/");
-                        if (index == -1) pic = "";
-                        else pic = pic.substring(index);
-                    }
-                    ps.setString(2, pic);
+                    ps.setString(2, teacherPic);
                     ps.setString(3, teacher.getName());
                     ps.setString(4, teacher.getIdNo());
                     ps.setString(5, teacher.getSex());
