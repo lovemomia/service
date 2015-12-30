@@ -5,7 +5,6 @@ import cn.momia.api.user.dto.TeacherEducation;
 import cn.momia.api.user.dto.TeacherExperience;
 import cn.momia.api.user.dto.TeacherStatus;
 import cn.momia.api.user.dto.User;
-import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.core.util.CastUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
@@ -29,6 +28,13 @@ public class TeacherController extends BaseController {
     public MomiaHttpResponse status(@RequestParam String utoken) {
         User user = userService.getByToken(utoken);
         return MomiaHttpResponse.SUCCESS(teacherService.status(user.getId()));
+    }
+
+    @RequestMapping(method = RequestMethod.GET)
+    public MomiaHttpResponse get(@RequestParam String utoken) {
+        User user = userService.getByToken(utoken);
+        Teacher teacher = teacherService.getByUser(user.getId());
+        return MomiaHttpResponse.SUCCESS(teacher);
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -90,14 +96,5 @@ public class TeacherController extends BaseController {
     public MomiaHttpResponse addEducation(@RequestParam String utoken, @PathVariable(value = "eduid") int educationId) {
         User user = userService.getByToken(utoken);
         return MomiaHttpResponse.SUCCESS(teacherService.deleteEducation(user.getId(), educationId));
-    }
-
-    @RequestMapping(method = RequestMethod.GET)
-    public MomiaHttpResponse get(@RequestParam String utoken) {
-        User user = userService.getByToken(utoken);
-        Teacher teacher = teacherService.getByUser(user.getId());
-        if (!teacher.exists()) throw new MomiaErrorException("您还没有申请成为老师");
-
-        return MomiaHttpResponse.SUCCESS(teacher);
     }
 }

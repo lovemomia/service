@@ -58,7 +58,7 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
         List<Teacher> result = new ArrayList<Teacher>();
         for (int teacherId : teacherIds) {
             Teacher teacher = teachersMap.get(teacherId);
-            if (teacher == null) continue;
+            if (teacher == null) teacher = new Teacher();
 
             teacher.setExperiences(experiencesMap.get(teacher.getUserId()));
             teacher.setEducations(educationsMap.get(teacher.getUserId()));

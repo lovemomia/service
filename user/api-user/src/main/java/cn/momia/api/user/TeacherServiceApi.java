@@ -17,6 +17,13 @@ public class TeacherServiceApi extends HttpServiceApi {
         return executeReturnObject(request, TeacherStatus.class);
     }
 
+    public Teacher get(String utoken) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher"), builder.build());
+
+        return executeReturnObject(request, Teacher.class);
+    }
+
     public boolean add(String utoken, String teacher) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -70,12 +77,5 @@ public class TeacherServiceApi extends HttpServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.DELETE(url("/teacher/education/%d", educationId), builder.build());
 
         return executeReturnObject(request, Boolean.class);
-    }
-
-    public Teacher get(String utoken) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher"), builder.build());
-
-        return executeReturnObject(request, Teacher.class);
     }
 }
