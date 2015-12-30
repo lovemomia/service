@@ -50,10 +50,10 @@ public class ChildServiceImpl extends AbstractService implements ChildService {
     }
 
     @Override
-    public List<Child> list(Collection<Long> childIds) {
-        if (childIds.isEmpty()) return new ArrayList<Child>();
+    public List<Child> list(Collection<Long> childrenIds) {
+        if (childrenIds.isEmpty()) return new ArrayList<Child>();
 
-        String sql = "SELECT Id, UserId, Avatar, Name, Sex, Birthday FROM SG_Child WHERE Id IN (" + StringUtils.join(childIds, ",") + ") AND Status<>0";
+        String sql = "SELECT Id, UserId, Avatar, Name, Sex, Birthday FROM SG_Child WHERE Id IN (" + StringUtils.join(childrenIds, ",") + ") AND Status<>0";
         List<Child> children = queryObjectList(sql, Child.class);
 
         Map<Long, Child> childrenMap = new HashMap<Long, Child>();
@@ -62,7 +62,7 @@ public class ChildServiceImpl extends AbstractService implements ChildService {
         }
 
         List<Child> result = new ArrayList<Child>();
-        for (long childId : childIds) {
+        for (long childId : childrenIds) {
             Child child = childrenMap.get(childId);
             if (child != null) result.add(child);
         }

@@ -6,8 +6,10 @@ import cn.momia.common.core.api.HttpServiceApi;
 import cn.momia.common.core.http.MomiaHttpParamBuilder;
 import cn.momia.common.core.http.MomiaHttpRequestBuilder;
 import cn.momia.common.core.util.TimeUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +33,13 @@ public class ChildServiceApi extends HttpServiceApi {
     public List<Child> list(String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/user/child"), builder.build());
+
+        return executeReturnList(request, Child.class);
+    }
+
+    public List<Child> list(Collection<Long> childrenIds) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("cids", StringUtils.join(childrenIds, ","));
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/user/child/list"), builder.build());
 
         return executeReturnList(request, Child.class);
     }

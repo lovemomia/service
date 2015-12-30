@@ -8,6 +8,7 @@ import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.user.base.UserService;
 import cn.momia.service.user.child.ChildService;
 import com.alibaba.fastjson.JSON;
+import com.google.common.base.Splitter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/user/child")
@@ -55,11 +58,21 @@ public class ChildController extends BaseController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public MomiaHttpResponse listChildren(@RequestParam String utoken) {
+    public MomiaHttpResponse listUserChildren(@RequestParam String utoken) {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
         return MomiaHttpResponse.SUCCESS(user.getChildren());
+    }
+
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public MomiaHttpResponse listChildren(@RequestParam String cids) {
+        Set<Long> childrenIds = new HashSet<Long>();
+        for (String childId : Splitter.on(",").trimResults().omitEmptyStrings().split(cids)) {
+            childrenIds.add(Long.valueOf(childId));
+        }
+
+        return MomiaHttpResponse.SUCCESS(childService.list(childrenIds));
     }
 
     @RequestMapping(value = "/{cid}/avatar",method = RequestMethod.PUT)

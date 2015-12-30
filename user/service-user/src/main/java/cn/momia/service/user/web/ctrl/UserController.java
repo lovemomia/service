@@ -197,7 +197,7 @@ public class UserController extends BaseController {
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
         boolean successful = userService.updateImToken(user.getId(), imToken);
-        if (!successful) return MomiaHttpResponse.FAILED("更新Im Token失败");
+        if (!successful) return MomiaHttpResponse.FAILED("更新ImToken失败");
 
         user.setImToken(imToken);
         return MomiaHttpResponse.SUCCESS(new User.Full(user));

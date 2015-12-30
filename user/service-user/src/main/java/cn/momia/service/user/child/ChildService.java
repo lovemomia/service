@@ -11,7 +11,7 @@ public interface ChildService {
     long add(Child child);
 
     Child get(long childId);
-    List<Child> list(Collection<Long> childIds);
+    List<Child> list(Collection<Long> childrenIds);
 
     Map<Long, List<Child>> queryByUsers(Collection<Long> userIds);
 
