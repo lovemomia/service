@@ -1,6 +1,7 @@
 package cn.momia.service.user.child.impl;
 
 import cn.momia.api.user.dto.Child;
+import cn.momia.api.user.dto.ChildComment;
 import cn.momia.api.user.dto.ChildRecord;
 import cn.momia.api.user.dto.ChildTag;
 import cn.momia.common.service.AbstractService;
@@ -175,6 +176,35 @@ public class ChildServiceImpl extends AbstractService implements ChildService {
 
     private long getRecordId(long childId, long courseId, long courseSkuId) {
         String sql = "SELECT Id FROM SG_ChildRecord WHERE ChildId=? AND CourseId=? AND CourseSkuId=?";
+        return queryLong(sql, new Object[] { childId, courseId, courseSkuId });
+    }
+
+    @Override
+    public long queryCommentsCount(long childId) {
+        String sql = "SELECT COUNT(1) FROM SG_ChildComment WHERE ChildId=? AND Status<>0";
+        return queryLong(sql, new Object[] { childId });
+    }
+
+    @Override
+    public List<ChildComment> queryComments(long childId, int start, int count) {
+        String sql = "SELECT Id, TeacherUserId, ChildId, CourseId, CourseSkuId, Content FROM SG_ChildComment WHERE ChildId=? AND Status<>0 ORDER BY AddTime DESC LIMIT ?,?";
+        return queryObjectList(sql, new Object[] { childId, start, count }, ChildComment.class);
+    }
+
+    @Override
+    public boolean comment(ChildComment childComment) {
+        long commentId = getCommentId(childComment.getChildId(), childComment.getCourseId(), childComment.getCourseSkuId());
+        if (commentId > 0) {
+            String sql = "UPDATE SG_ChildComment SET TeacherUserId=?, Content=?, Status=1 WHERE ChildId=? AND CourseId=? AND CourseSkuId=?";
+            return update(sql, new Object[] { childComment.getTeacherUserId(), childComment.getContent(), childComment.getChildId(), childComment.getCourseId(), childComment.getCourseSkuId() });
+        } else {
+            String sql = "INSERT INTO SG_ChildComment (TeacherUserUserId, ChildId, CourseId, CourseSkuId, Content, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
+            return update(sql, new Object[] { childComment.getTeacherUserId(), childComment.getChildId(), childComment.getCourseId(), childComment.getCourseSkuId(), childComment.getContent() });
+        }
+    }
+
+    private long getCommentId(long childId, long courseId, long courseSkuId) {
+        String sql = "SELECT Id FROM SG_ChildComment WHERE ChildId=? AND CourseId=? AND CourseSkuId=?";
         return queryLong(sql, new Object[] { childId, courseId, courseSkuId });
     }
 }

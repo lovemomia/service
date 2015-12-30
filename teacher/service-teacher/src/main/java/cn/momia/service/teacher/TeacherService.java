@@ -1,6 +1,5 @@
 package cn.momia.service.teacher;
 
-import cn.momia.api.teacher.dto.ChildComment;
 import cn.momia.api.teacher.dto.Education;
 import cn.momia.api.teacher.dto.Experience;
 import cn.momia.api.teacher.dto.Material;
@@ -26,11 +25,6 @@ public interface TeacherService {
     List<Long> queryCommentedChildIds(long courseId, long courseSkuId);
 
     boolean checkin(long userId, long packageId, long courseId, long courseSkuId);
-
-    long queryChildCommentsCount(long childId);
-    List<ChildComment> queryChildComments(long childId, int start, int count);
-
-    boolean comment(ChildComment childComment);
 
     boolean addExperience(long userId, Experience experience);
     Experience getExperience(long userId, int experienceId);

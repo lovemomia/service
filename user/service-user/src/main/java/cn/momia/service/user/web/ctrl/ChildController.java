@@ -1,8 +1,10 @@
 package cn.momia.service.user.web.ctrl;
 
 import cn.momia.api.user.dto.Child;
+import cn.momia.api.user.dto.ChildComment;
 import cn.momia.api.user.dto.ChildRecord;
 import cn.momia.api.user.dto.User;
+import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.core.util.CastUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
@@ -146,7 +148,7 @@ public class ChildController extends BaseController {
                                     @RequestParam(value = "coid") long courseId,
                                     @RequestParam(value = "sid") long courseSkuId) {
         User user = userService.getByToken(utoken);
-        if (!user.isNormal()) return MomiaHttpResponse.FAILED("您无权查看记录");
+        if (!user.exists() || user.isNormal()) return MomiaHttpResponse.FAILED("您无权查看记录");
         return MomiaHttpResponse.SUCCESS(childService.getRecord(user.getId(), childId, courseId, courseSkuId));
     }
 
@@ -157,7 +159,7 @@ public class ChildController extends BaseController {
                                     @RequestParam(value = "sid") long courseSkuId,
                                     @RequestParam String record) {
         User user = userService.getByToken(utoken);
-        if (!user.isTeacher()) return MomiaHttpResponse.FAILED("只有老师才有资格记录");
+        if (!user.exists() || !user.isTeacher()) return MomiaHttpResponse.FAILED("只有老师才有资格记录");
 
         ChildRecord childRecord = CastUtil.toObject(JSON.parseObject(record), ChildRecord.class);
         childRecord.setTeacherUserId(user.getId());
@@ -168,5 +170,45 @@ public class ChildController extends BaseController {
         if (!StringUtils.isBlank(childRecord.getContent()) && childRecord.getContent().length() > 300) return MomiaHttpResponse.FAILED("记录字数过多，超出限制");
 
         return MomiaHttpResponse.SUCCESS(childService.record(childRecord));
+    }
+
+    @RequestMapping(value = "/{cid}/comment", method = RequestMethod.GET)
+    public MomiaHttpResponse listChildComments(@RequestParam String utoken,
+                                               @PathVariable(value = "cid") long childId,
+                                               @RequestParam int start,
+                                               @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        User user = userService.getByToken(utoken);
+        if (!user.exists() || user.isNormal()) return MomiaHttpResponse.FAILED("您无权查看孩子的评价信息");
+
+        long totalCount = childService.queryCommentsCount(childId);
+        List<ChildComment> comments = childService.queryComments(childId, start, count);
+
+        PagedList<ChildComment> pagedComments = new PagedList<ChildComment>(totalCount, start, count);
+        pagedComments.setList(comments);
+
+        return MomiaHttpResponse.SUCCESS(pagedComments);
+    }
+
+    @RequestMapping(value = "/child/{cid}/comment", method = RequestMethod.POST)
+    public MomiaHttpResponse comment(@RequestParam String utoken,
+                                     @PathVariable(value = "cid") long childId,
+                                     @RequestParam(value = "coid") long courseId,
+                                     @RequestParam(value = "sid") long courseSkuId,
+                                     @RequestParam String comment) {
+        if (!StringUtils.isBlank(comment) && comment.length() > 500) return MomiaHttpResponse.FAILED("评语字数过多，超出限制");
+
+        User user = userService.getByToken(utoken);
+        if (!user.exists() || !user.isTeacher()) return MomiaHttpResponse.FAILED("只有老师才有资格评价");
+
+        ChildComment childComment = new ChildComment();
+        childComment.setTeacherUserId(user.getId());
+        childComment.setChildId(childId);
+        childComment.setCourseId(courseId);
+        childComment.setCourseSkuId(courseSkuId);
+        childComment.setContent(comment);
+
+        return MomiaHttpResponse.SUCCESS(childService.comment(childComment));
     }
 }

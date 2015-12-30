@@ -1,6 +1,7 @@
 package cn.momia.service.user.child;
 
 import cn.momia.api.user.dto.Child;
+import cn.momia.api.user.dto.ChildComment;
 import cn.momia.api.user.dto.ChildRecord;
 import cn.momia.api.user.dto.ChildTag;
 
@@ -27,4 +28,8 @@ public interface ChildService {
     List<ChildTag> listAllTags();
     ChildRecord getRecord(long userId, long childId, long courseId, long courseSkuId);
     boolean record(ChildRecord childRecord);
+
+    long queryCommentsCount(long childId);
+    List<ChildComment> queryComments(long childId, int start, int count);
+    boolean comment(ChildComment childComment);
 }

@@ -1,10 +1,12 @@
 package cn.momia.api.user;
 
 import cn.momia.api.user.dto.Child;
+import cn.momia.api.user.dto.ChildComment;
 import cn.momia.api.user.dto.ChildRecord;
 import cn.momia.api.user.dto.ChildTag;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.core.api.HttpServiceApi;
+import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.http.MomiaHttpParamBuilder;
 import cn.momia.common.core.http.MomiaHttpRequestBuilder;
 import cn.momia.common.core.util.TimeUtil;
@@ -111,6 +113,27 @@ public class ChildServiceApi extends HttpServiceApi {
                 .add("sid", courseSkuId)
                 .add("record", record);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/child/%d/record", childId), builder.build());
+
+        return executeReturnObject(request, Boolean.class);
+    }
+
+    public PagedList<ChildComment> listComments(String utoken, long childId, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("start", start)
+                .add("count", count);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/child/%d/comment", childId), builder.build());
+
+        return executeReturnPagedList(request, ChildComment.class);
+    }
+
+    public boolean comment(String utoken, long childId, long courseId, long courseSkuId, String comment) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("coid", courseId)
+                .add("sid", courseSkuId)
+                .add("comment", comment);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/child/%d/comment", childId), builder.build());
 
         return executeReturnObject(request, Boolean.class);
     }

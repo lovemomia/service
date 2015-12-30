@@ -1,6 +1,5 @@
 package cn.momia.service.teacher.web.ctrl;
 
-import cn.momia.api.teacher.dto.ChildComment;
 import cn.momia.api.teacher.dto.Education;
 import cn.momia.api.teacher.dto.Experience;
 import cn.momia.api.teacher.dto.Material;
@@ -17,7 +16,6 @@ import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.teacher.TeacherService;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -203,43 +201,5 @@ public class TeacherController extends BaseController {
                                      @RequestParam(value = "sid") long courseSkuId) {
         checkTeacher(utoken);
         return MomiaHttpResponse.SUCCESS(teacherService.checkin(userId, packageId, courseId, courseSkuId));
-    }
-
-    @RequestMapping(value = "/child/{cid}/comment", method = RequestMethod.GET)
-    public MomiaHttpResponse listChildComments(@RequestParam String utoken,
-                                               @PathVariable(value = "cid") long childId,
-                                               @RequestParam int start,
-                                               @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
-
-        checkTeacher(utoken);
-
-        long totalCount = teacherService.queryChildCommentsCount(childId);
-        List<ChildComment> comments = teacherService.queryChildComments(childId, start, count);
-
-        PagedList<ChildComment> pagedComments = new PagedList<ChildComment>(totalCount, start, count);
-        pagedComments.setList(comments);
-
-        return MomiaHttpResponse.SUCCESS(pagedComments);
-    }
-
-    @RequestMapping(value = "/child/{cid}/comment", method = RequestMethod.POST)
-    public MomiaHttpResponse comment(@RequestParam String utoken,
-                                     @PathVariable(value = "cid") long childId,
-                                     @RequestParam(value = "coid") long courseId,
-                                     @RequestParam(value = "sid") long courseSkuId,
-                                     @RequestParam String comment) {
-        if (!StringUtils.isBlank(comment) && comment.length() > 500) return MomiaHttpResponse.FAILED("评语字数过多，超出限制");
-
-        Teacher teacher = checkTeacher(utoken);
-
-        ChildComment childComment = new ChildComment();
-        childComment.setTeacherUserId(teacher.getUserId());
-        childComment.setChildId(childId);
-        childComment.setCourseId(courseId);
-        childComment.setCourseSkuId(courseSkuId);
-        childComment.setContent(comment);
-
-        return MomiaHttpResponse.SUCCESS(teacherService.comment(childComment));
     }
 }
