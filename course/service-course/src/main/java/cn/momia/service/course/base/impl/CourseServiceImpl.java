@@ -911,10 +911,4 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
         return listStudents(childIds, courseId, courseSkuId);
     }
-
-    @Override
-    public List<Long> queryCommentedChildIds(long courseId, long courseSkuId) {
-        String sql = "SELECT ChildId FROM SG_ChildComment WHERE CourseId=? AND CourseSkuId=? AND Status<>0";
-        return queryLongList(sql, new Object[] { courseId, courseSkuId });
-    }
 }

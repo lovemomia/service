@@ -6,6 +6,7 @@ import cn.momia.api.course.dto.course.CourseSkuPlace;
 import cn.momia.api.course.dto.course.DatedCourseSkus;
 import cn.momia.api.course.dto.course.Student;
 import cn.momia.api.course.dto.course.TeacherCourse;
+import cn.momia.api.user.ChildServiceApi;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.core.dto.PagedList;
@@ -62,6 +63,7 @@ public class CourseController extends BaseController {
     @Autowired private OrderService orderService;
 
     @Autowired private UserServiceApi userServiceApi;
+    @Autowired private ChildServiceApi childServiceApi;
 
     @RequestMapping(value = "/recommend", method = RequestMethod.GET)
     public MomiaHttpResponse listRecommend(@RequestParam(value = "city") long cityId, @RequestParam int start, @RequestParam int count) {
@@ -605,7 +607,9 @@ public class CourseController extends BaseController {
                                      @RequestParam(value = "pid") long packageId,
                                      @RequestParam(value = "coid") long courseId,
                                      @RequestParam(value = "sid") long courseSkuId) {
-        User user = userServiceApi.get(utoken);
+        User teacherUser = userServiceApi.get(utoken);
+        if (teacherUser.isNormal()) return MomiaHttpResponse.FAILED("您无权操作");
+
         return MomiaHttpResponse.SUCCESS(courseService.checkin(userId, packageId, courseId, courseSkuId));
     }
 
@@ -613,6 +617,9 @@ public class CourseController extends BaseController {
     public MomiaHttpResponse ongoingStudents(@RequestParam String utoken,
                                              @RequestParam(value = "coid") long courseId,
                                              @RequestParam(value = "sid") long courseSkuId) {
+        User teacherUser = userServiceApi.get(utoken);
+        if (teacherUser.isNormal()) return MomiaHttpResponse.FAILED("您无权查看");
+
         List<Student> students = courseService.queryAllStudents(courseId, courseSkuId);
         List<Long> userIds = courseService.queryUserIdsWithoutChild(courseId, courseSkuId);
         List<User> users = userServiceApi.list(userIds, User.Type.MINI);
@@ -634,7 +641,9 @@ public class CourseController extends BaseController {
     public MomiaHttpResponse notfinishedStudents(@RequestParam String utoken,
                                                  @RequestParam(value = "coid") long courseId,
                                                  @RequestParam(value = "sid") long courseSkuId) {
-        User user = userServiceApi.get(utoken);
+        User teacherUser = userServiceApi.get(utoken);
+        if (teacherUser.isNormal()) return MomiaHttpResponse.FAILED("您无权查看");
+
         return MomiaHttpResponse.SUCCESS(courseService.queryAllStudents(courseId, courseSkuId));
     }
 
@@ -642,11 +651,12 @@ public class CourseController extends BaseController {
     public MomiaHttpResponse finishedStudents(@RequestParam String utoken,
                                               @RequestParam(value = "coid") long courseId,
                                               @RequestParam(value = "sid") long courseSkuId) {
-        User user = userServiceApi.get(utoken);
+        User teacherUser = userServiceApi.get(utoken);
+        if (teacherUser.isNormal()) return MomiaHttpResponse.FAILED("您无权查看");
 
         List<Student> students = courseService.queryCheckInStudents(courseId, courseSkuId);
 
-        Set<Long> commentedChildIds = Sets.newHashSet(courseService.queryCommentedChildIds(courseId, courseSkuId));
+        Set<Long> commentedChildIds = Sets.newHashSet(childServiceApi.queryCommentedChildIds(courseId, courseSkuId));
         for (Student student : students) {
             if (commentedChildIds.contains(student.getId())) student.setCommented(true);
         }

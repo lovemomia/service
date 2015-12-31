@@ -90,5 +90,4 @@ public interface CourseService {
     List<Long> queryUserIdsWithoutChild(long courseId, long courseSkuId);
     List<Student> queryAllStudents(long courseId, long courseSkuId);
     List<Student> queryCheckInStudents(long courseId, long courseSkuId);
-    List<Long> queryCommentedChildIds(long courseId, long courseSkuId);
 }

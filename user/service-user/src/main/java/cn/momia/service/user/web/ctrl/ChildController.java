@@ -211,4 +211,9 @@ public class ChildController extends BaseController {
 
         return MomiaHttpResponse.SUCCESS(childService.comment(childComment));
     }
+
+    @RequestMapping(value = "/comment", method = RequestMethod.POST)
+    public MomiaHttpResponse queryCommentedChildIds(@RequestParam(value = "coid") long courseId, @RequestParam(value = "sid") long courseSkuId) {
+        return MomiaHttpResponse.SUCCESS(childService.queryCommentedChildIds(courseId, courseSkuId));
+    }
 }

@@ -32,4 +32,6 @@ public interface ChildService {
     long queryCommentsCount(long childId);
     List<ChildComment> queryComments(long childId, int start, int count);
     boolean comment(ChildComment childComment);
+
+    List<Long> queryCommentedChildIds(long courseId, long courseSkuId);
 }

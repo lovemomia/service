@@ -207,4 +207,10 @@ public class ChildServiceImpl extends AbstractService implements ChildService {
         String sql = "SELECT Id FROM SG_ChildComment WHERE ChildId=? AND CourseId=? AND CourseSkuId=?";
         return queryLong(sql, new Object[] { childId, courseId, courseSkuId });
     }
+
+    @Override
+    public List<Long> queryCommentedChildIds(long courseId, long courseSkuId) {
+        String sql = "SELECT ChildId FROM SG_ChildComment WHERE CourseId=? AND CourseSkuId=? AND Status<>0";
+        return queryLongList(sql, new Object[] { courseId, courseSkuId });
+    }
 }

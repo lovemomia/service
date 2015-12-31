@@ -137,4 +137,13 @@ public class ChildServiceApi extends HttpServiceApi {
 
         return executeReturnObject(request, Boolean.class);
     }
+
+    public List<Long> queryCommentedChildIds(long courseId, long courseSkuId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("coid", courseId)
+                .add("sid", courseSkuId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/child/comment"), builder.build());
+
+        return executeReturnList(request, Long.class);
+    }
 }
