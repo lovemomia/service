@@ -14,7 +14,6 @@
     <context:component-scan base-package="cn.momia.service.feed.web.ctrl" />
     <context:component-scan base-package="cn.momia.service.im.web.ctrl" />
     <context:component-scan base-package="cn.momia.service.poi.web.ctrl" />
-    <context:component-scan base-package="cn.momia.service.teacher.web.ctrl" />
     <context:component-scan base-package="cn.momia.service.user.web.ctrl" />
 
     <mvc:annotation-driven>
