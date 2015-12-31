@@ -1,13 +1,13 @@
 package cn.momia.service.course.base.impl;
 
-import cn.momia.api.course.dto.teacher.Student;
+import cn.momia.api.course.dto.course.Student;
 import cn.momia.api.poi.MetaUtil;
 import cn.momia.api.poi.dto.Institution;
 import cn.momia.api.poi.dto.Region;
 import cn.momia.api.course.dto.course.Course;
 import cn.momia.api.course.dto.course.CourseDetail;
 import cn.momia.api.course.dto.course.CourseSkuPlace;
-import cn.momia.api.course.dto.teacher.TeacherCourse;
+import cn.momia.api.course.dto.course.TeacherCourse;
 import cn.momia.api.poi.PoiServiceApi;
 import cn.momia.api.poi.dto.Place;
 import cn.momia.common.core.exception.MomiaErrorException;
@@ -16,7 +16,6 @@ import cn.momia.common.core.util.TimeUtil;
 import cn.momia.api.course.dto.course.BookedCourse;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.api.course.dto.course.CourseSku;
-import cn.momia.api.course.dto.teacher.Teacher;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
@@ -405,7 +404,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
-    public long queryTeacherCount(long courseId) {
+    public long queryTeacherIdsCount(long courseId) {
         Set<Long> courseIds = Sets.newHashSet(courseId);
         long parentId = getParentId(courseId);
         if (parentId > 0) courseIds.add(parentId);
@@ -415,22 +414,13 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
-    public List<Teacher> queryTeachers(long courseId, int start, int count) {
+    public List<Integer> queryTeacherIds(long courseId, int start, int count) {
         Set<Long> courseIds = Sets.newHashSet(courseId);
         long parentId = getParentId(courseId);
         if (parentId > 0) courseIds.add(parentId);
 
         String sql = "SELECT TeacherId FROM SG_CourseTeacher WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Status<>0 GROUP BY TeacherId LIMIT ?,?";
-        List<Integer> teacherIds = queryIntList(sql, new Object[] { start, count });
-
-        return listTeachers(teacherIds);
-    }
-
-    private List<Teacher> listTeachers(List<Integer> teacherIds) {
-        if (teacherIds.isEmpty()) return new ArrayList<Teacher>();
-
-        String sql = "SELECT Id, Name, Avatar, Education, Experience FROM SG_Teacher WHERE Id IN (" + StringUtils.join(teacherIds, ",") + ") AND Status<>0";
-        return queryObjectList(sql, Teacher.class);
+        return queryIntList(sql, new Object[] { start, count });
     }
 
     @Override

@@ -1,4 +1,4 @@
-package cn.momia.api.course.dto.teacher;
+package cn.momia.api.course.dto.course;
 
 import cn.momia.common.core.util.TimeUtil;
 import com.alibaba.fastjson.annotation.JSONField;

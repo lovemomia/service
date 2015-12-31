@@ -4,14 +4,13 @@ import cn.momia.api.course.dto.course.BookedCourse;
 import cn.momia.api.course.dto.course.Course;
 import cn.momia.api.course.dto.material.CourseMaterial;
 import cn.momia.api.course.dto.course.CourseSku;
-import cn.momia.api.course.dto.teacher.Student;
-import cn.momia.api.course.dto.teacher.TeacherCourse;
+import cn.momia.api.course.dto.course.Student;
+import cn.momia.api.course.dto.course.TeacherCourse;
 import cn.momia.api.course.dto.comment.TimelineUnit;
 import cn.momia.api.course.dto.comment.UserCourseComment;
 import cn.momia.api.course.dto.course.CourseDetail;
 import cn.momia.api.course.dto.course.DatedCourseSkus;
 import cn.momia.api.course.dto.favorite.Favorite;
-import cn.momia.api.course.dto.teacher.Teacher;
 import cn.momia.common.core.api.HttpServiceApi;
 import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.http.MomiaHttpParamBuilder;
@@ -122,13 +121,13 @@ public class CourseServiceApi extends HttpServiceApi {
         return executeReturnPagedList(request, String.class);
     }
 
-    public PagedList<Teacher> teacher(long courseId, int start, int count) {
+    public PagedList<Integer> teacherIds(long courseId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("start", start)
                 .add("count", count);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/teacher", courseId), builder.build());
 
-        return executeReturnPagedList(request, Teacher.class);
+        return executeReturnPagedList(request, Integer.class);
     }
 
     public int getInstitutionId(long courseId) {

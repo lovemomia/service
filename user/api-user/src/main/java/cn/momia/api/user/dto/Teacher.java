@@ -116,4 +116,16 @@ public class Teacher {
                 birthday == null ||
                 StringUtils.isBlank(address);
     }
+
+    public String getAvatar() {
+        return pic;
+    }
+
+    public String getExperience() {
+        return StringUtils.join(experiences, "\n");
+    }
+
+    public String getEducation() {
+        return StringUtils.join(educations, "\n");
+    }
 }

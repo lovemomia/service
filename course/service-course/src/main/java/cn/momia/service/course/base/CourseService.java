@@ -4,9 +4,8 @@ import cn.momia.api.course.dto.course.BookedCourse;
 import cn.momia.api.course.dto.course.Course;
 import cn.momia.api.course.dto.course.CourseDetail;
 import cn.momia.api.course.dto.course.CourseSku;
-import cn.momia.api.course.dto.teacher.Student;
-import cn.momia.api.course.dto.teacher.Teacher;
-import cn.momia.api.course.dto.teacher.TeacherCourse;
+import cn.momia.api.course.dto.course.Student;
+import cn.momia.api.course.dto.course.TeacherCourse;
 
 import java.util.Collection;
 import java.util.Date;
@@ -28,8 +27,8 @@ public interface CourseService {
     long queryBookImgCount(long courseId);
     List<String> queryBookImgs(long courseId, int start, int count);
 
-    long queryTeacherCount(long courseId);
-    List<Teacher> queryTeachers(long courseId, int start, int count);
+    long queryTeacherIdsCount(long courseId);
+    List<Integer> queryTeacherIds(long courseId, int start, int count);
 
     long queryCountBySubject(long subjectId, Collection<Long> exclusions, int minAge, int maxAge, int queryType);
     List<Course> queryBySubject(long subjectId, int start, int count, Collection<Long> exclusions, int minAge, int maxAge, int sortTypeId, int queryType);

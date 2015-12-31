@@ -11,12 +11,16 @@ import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.user.base.UserService;
 import cn.momia.service.user.teacher.TeacherService;
 import com.alibaba.fastjson.JSON;
+import com.google.common.base.Splitter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/teacher")
@@ -35,6 +39,16 @@ public class TeacherController extends BaseController {
         User user = userService.getByToken(utoken);
         Teacher teacher = teacherService.getByUser(user.getId());
         return MomiaHttpResponse.SUCCESS(teacher);
+    }
+
+    @RequestMapping(method = RequestMethod.GET)
+    public MomiaHttpResponse list(@RequestParam String tids) {
+        Set<Integer> teacherIds = new HashSet<Integer>();
+        for (String teacherId : Splitter.on(",").trimResults().omitEmptyStrings().split(tids)) {
+            teacherIds.add(Integer.valueOf(teacherId));
+        }
+
+        return MomiaHttpResponse.SUCCESS(teacherService.list(teacherIds));
     }
 
     @RequestMapping(method = RequestMethod.POST)

@@ -4,8 +4,8 @@ import cn.momia.api.course.dto.course.Course;
 import cn.momia.api.course.dto.course.CourseDetail;
 import cn.momia.api.course.dto.course.CourseSkuPlace;
 import cn.momia.api.course.dto.course.DatedCourseSkus;
-import cn.momia.api.course.dto.teacher.Student;
-import cn.momia.api.course.dto.teacher.TeacherCourse;
+import cn.momia.api.course.dto.course.Student;
+import cn.momia.api.course.dto.course.TeacherCourse;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.core.dto.PagedList;
@@ -16,7 +16,6 @@ import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.api.course.dto.course.BookedCourse;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.api.course.dto.course.CourseSku;
-import cn.momia.api.course.dto.teacher.Teacher;
 import cn.momia.service.course.comment.CourseCommentService;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderPackage;
@@ -261,15 +260,15 @@ public class CourseController extends BaseController {
     }
 
     @RequestMapping(value = "/{coid}/teacher", method = RequestMethod.GET)
-    public MomiaHttpResponse teacher(@PathVariable(value = "coid") long courseId, @RequestParam int start, @RequestParam int count) {
+    public MomiaHttpResponse teacherIds(@PathVariable(value = "coid") long courseId, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
-        long totalCount = courseService.queryTeacherCount(courseId);
-        List<Teacher> teachers = courseService.queryTeachers(courseId, start, count);
-        PagedList<Teacher> pagedTeachers = new PagedList<Teacher>(totalCount, start, count);
-        pagedTeachers.setList(teachers);
+        long totalCount = courseService.queryTeacherIdsCount(courseId);
+        List<Integer> teacherIds = courseService.queryTeacherIds(courseId, start, count);
+        PagedList<Integer> pagedTeacherIds = new PagedList<Integer>(totalCount, start, count);
+        pagedTeacherIds.setList(teacherIds);
 
-        return MomiaHttpResponse.SUCCESS(pagedTeachers);
+        return MomiaHttpResponse.SUCCESS(pagedTeacherIds);
     }
 
     @RequestMapping(value = "/tips", method = RequestMethod.GET)

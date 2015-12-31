@@ -69,4 +69,9 @@ public class TeacherEducation {
     public boolean isInvalid() {
         return StringUtils.isBlank(school) || StringUtils.isBlank(major) || StringUtils.isBlank(level) || StringUtils.isBlank(time);
     }
+
+    @Override
+    public String toString() {
+        return time + " " + school + " " + major + " " + level;
+    }
 }

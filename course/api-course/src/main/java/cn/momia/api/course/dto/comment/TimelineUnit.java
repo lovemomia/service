@@ -1,6 +1,5 @@
 package cn.momia.api.course.dto.comment;
 
-import cn.momia.api.course.dto.comment.UserCourseComment;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;

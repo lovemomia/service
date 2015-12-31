@@ -5,9 +5,13 @@ import cn.momia.api.user.dto.TeacherEducation;
 import cn.momia.api.user.dto.TeacherExperience;
 import cn.momia.api.user.dto.TeacherStatus;
 
+import java.util.Collection;
+import java.util.List;
+
 public interface TeacherService {
     TeacherStatus status(long userId);
     Teacher getByUser(long userId);
+    List<Teacher> list(Collection<Integer> teacherIds);
 
     long add(Teacher teacher);
 

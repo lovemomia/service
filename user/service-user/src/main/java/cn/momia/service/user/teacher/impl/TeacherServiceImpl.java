@@ -35,7 +35,7 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
     public Teacher getByUser(long userId) {
         String sql = "SELECT Id FROM SG_Teacher WHERE UserId=? AND Status<>0";
         List<Integer> teacherIds = queryIntList(sql, new Object[] { userId });
-        List<Teacher> teachers = listTeachers(teacherIds);
+        List<Teacher> teachers = list(teacherIds);
 
         if (!teachers.isEmpty()) return teachers.get(0);
 
@@ -46,7 +46,8 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
         return teacher;
     }
 
-    private List<Teacher> listTeachers(Collection<Integer> teacherIds) {
+    @Override
+    public List<Teacher> list(Collection<Integer> teacherIds) {
         if (teacherIds.isEmpty()) return new ArrayList<Teacher>();
 
         String sql = "SELECT Id, UserId, Pic, Name, IdNo, Gender AS Sex, Birthday, Address FROM SG_Teacher WHERE Id IN (" + StringUtils.join(teacherIds, ",") + ") AND Status<>0";
