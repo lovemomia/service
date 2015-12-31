@@ -16,6 +16,7 @@ public class FeedbackController extends BaseController {
 
     @RequestMapping(method = RequestMethod.POST)
     public MomiaHttpResponse add(@RequestParam String content, @RequestParam String contact) {
+        if (content.length() > 480) return MomiaHttpResponse.FAILED("反馈内容字数超出限制");
         return MomiaHttpResponse.SUCCESS(feedbackService.add(content, contact) > 0);
     }
 }
