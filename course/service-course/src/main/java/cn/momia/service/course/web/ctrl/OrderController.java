@@ -1,8 +1,8 @@
 package cn.momia.service.course.web.ctrl;
 
-import cn.momia.api.course.dto.Course;
-import cn.momia.api.course.dto.SubjectOrder;
-import cn.momia.api.course.dto.SubjectPackage;
+import cn.momia.api.course.dto.course.Course;
+import cn.momia.api.course.dto.subject.SubjectOrder;
+import cn.momia.api.course.dto.subject.SubjectPackage;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.core.dto.PagedList;
@@ -12,9 +12,9 @@ import cn.momia.common.core.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.api.course.dto.coupon.UserCoupon;
-import cn.momia.api.course.dto.Subject;
+import cn.momia.api.course.dto.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
-import cn.momia.api.course.dto.SubjectSku;
+import cn.momia.api.course.dto.subject.SubjectSku;
 import cn.momia.service.course.coupon.CouponService;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderService;

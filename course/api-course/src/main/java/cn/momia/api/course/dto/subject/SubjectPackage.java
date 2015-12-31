@@ -1,4 +1,4 @@
-package cn.momia.api.course.dto;
+package cn.momia.api.course.dto.subject;
 
 public class SubjectPackage {
     private long packageId;

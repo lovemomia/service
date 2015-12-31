@@ -1,8 +1,8 @@
 package cn.momia.api.course;
 
-import cn.momia.api.course.dto.Subject;
-import cn.momia.api.course.dto.SubjectSku;
-import cn.momia.api.course.dto.UserCourseComment;
+import cn.momia.api.course.dto.subject.Subject;
+import cn.momia.api.course.dto.subject.SubjectSku;
+import cn.momia.api.course.dto.comment.UserCourseComment;
 import cn.momia.api.course.dto.favorite.Favorite;
 import cn.momia.common.core.api.HttpServiceApi;
 import cn.momia.common.core.dto.PagedList;

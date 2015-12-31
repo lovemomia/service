@@ -1,10 +1,10 @@
 package cn.momia.service.course.web.ctrl;
 
-import cn.momia.api.course.dto.BookedCourse;
-import cn.momia.api.course.dto.Course;
-import cn.momia.api.course.dto.CourseCommentChild;
-import cn.momia.api.course.dto.TimelineUnit;
-import cn.momia.api.course.dto.UserCourseComment;
+import cn.momia.api.course.dto.course.BookedCourse;
+import cn.momia.api.course.dto.course.Course;
+import cn.momia.api.course.dto.comment.CourseCommentChild;
+import cn.momia.api.course.dto.comment.TimelineUnit;
+import cn.momia.api.course.dto.comment.UserCourseComment;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.Child;
 import cn.momia.api.user.dto.User;

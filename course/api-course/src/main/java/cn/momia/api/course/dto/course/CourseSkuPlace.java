@@ -1,4 +1,4 @@
-package cn.momia.api.course.dto;
+package cn.momia.api.course.dto.course;
 
 public class CourseSkuPlace {
     private int id;

@@ -1,4 +1,4 @@
-package cn.momia.api.course.dto;
+package cn.momia.api.course.dto.course;
 
 public class CourseDetail {
     public static final CourseDetail NOT_EXIST_COURSE_DETAIL = new CourseDetail();

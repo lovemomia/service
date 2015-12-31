@@ -1,4 +1,4 @@
-package cn.momia.api.course.dto;
+package cn.momia.api.course.dto.teacher;
 
 public class Teacher {
     private int id;

@@ -1,8 +1,8 @@
 package cn.momia.service.course.web.ctrl;
 
-import cn.momia.api.course.dto.Course;
+import cn.momia.api.course.dto.course.Course;
 import cn.momia.api.course.dto.favorite.Favorite;
-import cn.momia.api.course.dto.Subject;
+import cn.momia.api.course.dto.subject.Subject;
 import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
