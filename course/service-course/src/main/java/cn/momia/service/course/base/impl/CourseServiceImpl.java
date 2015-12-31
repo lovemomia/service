@@ -879,36 +879,23 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public List<Student> queryAllStudents(long courseId, long courseSkuId) {
-        String sql = "SELECT B.Id FROM SG_BookedCourse A INNER JOIN SG_Child B ON A.ChildId=B.Id WHERE A.CourseId=? AND A.CourseSkuId=? AND A.Status<>0 AND B.Status<>0";
-        List<Long> childIds = queryLongList(sql, new Object[] { courseId, courseSkuId });
-
-        return listStudents(childIds, courseId, courseSkuId);
-    }
-
-    private List<Student> listStudents(List<Long> childIds, long courseId, long courseSkuId) {
-        if (childIds.isEmpty()) return new ArrayList<Student>();
-
-        String sql = "SELECT B.Id, B.UserId, B.Avatar, B.Name, B.Birthday, B.Sex, A.PackageId, A.CheckIn FROM SG_BookedCourse A INNER JOIN SG_Child B ON A.ChildId=B.Id WHERE A.CourseId=? AND A.CourseSkuId=? AND A.Status<>0 AND B.Id IN (" + StringUtils.join(childIds, ",") + ") AND B.Status<>0";
-        List<Student> students = queryObjectList(sql, new Object[] {courseId, courseSkuId  }, Student.class);
-        Map<Long, Student> studentsMap = new HashMap<Long, Student>();
-        for (Student student : students) {
-            studentsMap.put(student.getId(), student);
-        }
-
-        List<Student> result = new ArrayList<Student>();
-        for (long childId : childIds) {
-            Student student = studentsMap.get(childId);
-            if (student != null) result.add(student);
-        }
-
-        return result;
+        String sql = "SELECT B.Id, B.UserId, B.Avatar, B.Name, B.Birthday, B.Sex, A.PackageId, A.CheckIn " +
+                "FROM SG_BookedCourse A " +
+                "INNER JOIN SG_Child B ON A.ChildId=B.Id " +
+                "INNER JOIN SG_Course C ON A.CourseId=C.Id " +
+                "INNER JOIN SG_CourseSku D ON A.CourseSkuId=D.Id " +
+                "WHERE (C.Id=? OR C.ParentId=?) AND (D.Id=? OR D.ParentId=?) AND A.Status<>0 AND B.Status<>0 AND C.Status<>0 AND D.Status<>0";
+        return queryObjectList(sql, new Object[] { courseId, courseId, courseSkuId, courseSkuId }, Student.class);
     }
 
     @Override
     public List<Student> queryCheckInStudents(long courseId, long courseSkuId) {
-        String sql = "SELECT B.Id FROM SG_BookedCourse A INNER JOIN SG_Child B ON A.ChildId=B.Id WHERE A.CourseId=? AND A.CourseSkuId=? AND A.CheckIn>0 AND A.Status<>0 AND B.Status<>0";
-        List<Long> childIds = queryLongList(sql, new Object[] { courseId, courseSkuId });
-
-        return listStudents(childIds, courseId, courseSkuId);
+        String sql = "SELECT B.Id, B.UserId, B.Avatar, B.Name, B.Birthday, B.Sex, A.PackageId, A.CheckIn " +
+                "FROM SG_BookedCourse A " +
+                "INNER JOIN SG_Child B ON A.ChildId=B.Id " +
+                "INNER JOIN SG_Course C ON A.CourseId=C.Id " +
+                "INNER JOIN SG_CourseSku D ON A.CourseSkuId=D.Id " +
+                "WHERE A.CheckIn>0 AND (C.Id=? OR C.ParentId=?) AND (D.Id=? OR D.ParentId=?) AND A.Status<>0 AND B.Status<>0 AND C.Status<>0 AND D.Status<>0";
+        return queryObjectList(sql, new Object[] { courseId, courseId, courseSkuId, courseSkuId }, Student.class);
     }
 }
