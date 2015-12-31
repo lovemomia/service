@@ -2,7 +2,7 @@ package cn.momia.api.course;
 
 import cn.momia.api.course.dto.BookedCourse;
 import cn.momia.api.course.dto.Course;
-import cn.momia.api.course.dto.CourseMaterial;
+import cn.momia.api.course.dto.material.CourseMaterial;
 import cn.momia.api.course.dto.CourseSku;
 import cn.momia.api.course.dto.Student;
 import cn.momia.api.course.dto.TeacherCourse;
@@ -10,7 +10,7 @@ import cn.momia.api.course.dto.TimelineUnit;
 import cn.momia.api.course.dto.UserCourseComment;
 import cn.momia.api.course.dto.CourseDetail;
 import cn.momia.api.course.dto.DatedCourseSkus;
-import cn.momia.api.course.dto.Favorite;
+import cn.momia.api.course.dto.favorite.Favorite;
 import cn.momia.api.course.dto.Teacher;
 import cn.momia.api.poi.dto.Institution;
 import cn.momia.common.core.api.HttpServiceApi;

@@ -1,6 +1,6 @@
 package cn.momia.service.course.favorite;
 
-import cn.momia.api.course.dto.Favorite;
+import cn.momia.api.course.dto.favorite.Favorite;
 
 import java.util.List;
 

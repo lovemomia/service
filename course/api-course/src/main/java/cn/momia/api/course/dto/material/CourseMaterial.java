@@ -1,4 +1,4 @@
-package cn.momia.api.course.dto;
+package cn.momia.api.course.dto.material;
 
 public class CourseMaterial {
     public static final CourseMaterial NOT_EXIST_COURSE_MATERIAL = new CourseMaterial();

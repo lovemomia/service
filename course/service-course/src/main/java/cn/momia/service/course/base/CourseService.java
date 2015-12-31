@@ -3,7 +3,6 @@ package cn.momia.service.course.base;
 import cn.momia.api.course.dto.BookedCourse;
 import cn.momia.api.course.dto.Course;
 import cn.momia.api.course.dto.CourseDetail;
-import cn.momia.api.course.dto.CourseMaterial;
 import cn.momia.api.course.dto.CourseSku;
 import cn.momia.api.course.dto.Student;
 import cn.momia.api.course.dto.Teacher;
@@ -87,10 +86,6 @@ public interface CourseService {
 
     Map<Long, Long> queryCheckInCounts(Collection<Long> courseSkuIds);
     Map<Long, Long> queryCommentedChildrenCount(Collection<Long> courseSkuIds);
-
-    CourseMaterial getMaterial(long userId, int materialId);
-    long queryMaterialsCount(long userId);
-    List<CourseMaterial> queryMaterials(long userId, int start, int count);
 
     boolean checkin(long userId, long packageId, long courseId, long courseSkuId);
 

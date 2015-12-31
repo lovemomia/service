@@ -2,7 +2,6 @@ package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.course.dto.Course;
 import cn.momia.api.course.dto.CourseDetail;
-import cn.momia.api.course.dto.CourseMaterial;
 import cn.momia.api.course.dto.CourseSkuPlace;
 import cn.momia.api.course.dto.DatedCourseSkus;
 import cn.momia.api.course.dto.Student;
@@ -600,38 +599,6 @@ public class CourseController extends BaseController {
         if (completedBookedCourses.isEmpty()) return MomiaHttpResponse.FAILED("取消选课失败");
 
         return MomiaHttpResponse.SUCCESS(completedBookedCourses.get(0));
-    }
-
-    @RequestMapping(value = "/material/{mid}", method = RequestMethod.GET)
-    public MomiaHttpResponse listMaterials(@RequestParam String utoken, @PathVariable(value = "mid") int materialId) {
-        User user = userServiceApi.get(utoken);
-        CourseMaterial material = courseService.getMaterial(user.getId(), materialId);
-        if (!material.exists()) return MomiaHttpResponse.FAILED("教材不存在");
-
-        return MomiaHttpResponse.SUCCESS(material);
-    }
-
-    @RequestMapping(value = "/material/list", method = RequestMethod.GET)
-    public MomiaHttpResponse listMaterials(@RequestParam String utoken, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
-
-        User user = userServiceApi.get(utoken);
-        long totalCount = courseService.queryMaterialsCount(user.getId());
-        List<CourseMaterial> materials = buildBaseMaterials(courseService.queryMaterials(user.getId(), start, count));
-
-        PagedList<CourseMaterial> pagedMaterials = new PagedList<CourseMaterial>(totalCount, start, count);
-        pagedMaterials.setList(materials);
-
-        return MomiaHttpResponse.SUCCESS(pagedMaterials);
-    }
-
-    private List<CourseMaterial> buildBaseMaterials(List<CourseMaterial> materials) {
-        List<CourseMaterial> baseMaterials = new ArrayList<CourseMaterial>();
-        for (CourseMaterial material : materials) {
-            baseMaterials.add(new CourseMaterial.Base(material));
-        }
-
-        return baseMaterials;
     }
 
     @RequestMapping(value = "/course/checkin", method = RequestMethod.POST)
