@@ -6,7 +6,7 @@ import cn.momia.common.core.util.TimeUtil;
 import cn.momia.service.course.coupon.Coupon;
 import cn.momia.service.course.coupon.CouponService;
 import cn.momia.service.course.coupon.InviteCoupon;
-import cn.momia.api.course.dto.UserCoupon;
+import cn.momia.api.course.dto.coupon.UserCoupon;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

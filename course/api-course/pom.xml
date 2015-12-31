@@ -19,11 +19,6 @@
             <artifactId>duola-common-core</artifactId>
             <version>1.2.0</version>
         </dependency>
-        <dependency>
-            <groupId>cn.momia</groupId>
-            <artifactId>duola-api-poi</artifactId>
-            <version>1.2.0</version>
-        </dependency>
 
         <!-- Test -->
         <dependency>

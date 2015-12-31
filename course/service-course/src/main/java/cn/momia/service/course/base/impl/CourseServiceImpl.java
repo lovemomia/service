@@ -815,11 +815,9 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
-    public Institution getInstitution(long courseId) {
+    public int getInstitutionId(long courseId) {
         String sql = "SELECT InstitutionId FROM SG_Course WHERE Id=? AND Status<>0";
-        int institutionId = queryInt(sql, new Object[] { courseId });
-
-        return poiServiceApi.getInstitution(institutionId);
+        return queryInt(sql, new Object[] { courseId });
     }
 
     @Override

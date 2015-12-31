@@ -6,7 +6,6 @@ import cn.momia.api.course.dto.CourseSkuPlace;
 import cn.momia.api.course.dto.DatedCourseSkus;
 import cn.momia.api.course.dto.Student;
 import cn.momia.api.course.dto.TeacherCourse;
-import cn.momia.api.poi.dto.Institution;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.core.dto.PagedList;
@@ -243,10 +242,10 @@ public class CourseController extends BaseController {
 
     @RequestMapping(value = "/{coid}/institution", method = RequestMethod.GET)
     public MomiaHttpResponse institution(@PathVariable(value = "coid") long courseId) {
-        Institution institution = courseService.getInstitution(courseId);
-        if (!institution.exists()) return MomiaHttpResponse.FAILED("机构不存在");
+        int institutionId = courseService.getInstitutionId(courseId);
+        if (institutionId <= 0) return MomiaHttpResponse.FAILED("机构不存在");
 
-        return MomiaHttpResponse.SUCCESS(institution);
+        return MomiaHttpResponse.SUCCESS(institutionId);
     }
 
     @RequestMapping(value = "/{coid}/book", method = RequestMethod.GET)

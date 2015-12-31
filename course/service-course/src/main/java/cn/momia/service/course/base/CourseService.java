@@ -7,7 +7,6 @@ import cn.momia.api.course.dto.CourseSku;
 import cn.momia.api.course.dto.Student;
 import cn.momia.api.course.dto.Teacher;
 import cn.momia.api.course.dto.TeacherCourse;
-import cn.momia.api.poi.dto.Institution;
 
 import java.util.Collection;
 import java.util.Date;
@@ -76,7 +75,7 @@ public interface CourseService {
     void decreaseJoined(long courseId, int joinCount);
 
     CourseDetail getDetail(long courseId);
-    Institution getInstitution(long courseId);
+    int getInstitutionId(long courseId);
 
     Map<Long, String> queryTips(Collection<Long> courseIds);
 

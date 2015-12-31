@@ -7,7 +7,7 @@ import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.coupon.CouponService;
 import cn.momia.service.course.coupon.InviteCoupon;
-import cn.momia.api.course.dto.UserCoupon;
+import cn.momia.api.course.dto.coupon.UserCoupon;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
