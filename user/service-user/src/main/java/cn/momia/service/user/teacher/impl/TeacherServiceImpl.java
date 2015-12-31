@@ -161,11 +161,12 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
             else pic = pic.substring(index);
         }
         final String teacherPic = pic;
+        final int status = teacher.isCompleted() ? TeacherStatus.Status.NOT_CHECKED : TeacherStatus.Status.NOT_FINISHED;
 
         int teacherId = getIdByUser(teacher.getUserId());
         if (teacherId > 0) {
             String sql = "UPDATE SG_Teacher SET Pic=?, Name=?, IdNo=?, Gender=?, Birthday=?, Address=?, Status=? WHERE Id=? AND UserId=?";
-            update(sql, new Object[] { teacherPic, teacher.getName(), teacher.getIdNo(), teacher.getSex(), teacher.getBirthday(), teacher.getAddress(), TeacherStatus.Status.NOT_CHECKED, teacherId, teacher.getUserId() });
+            update(sql, new Object[] { teacherPic, teacher.getName(), teacher.getIdNo(), teacher.getSex(), teacher.getBirthday(), teacher.getAddress(), status, teacherId, teacher.getUserId() });
         } else {
             KeyHolder keyHolder = insert(new PreparedStatementCreator() {
                 @Override
@@ -180,7 +181,7 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
                     Date birthday = teacher.getBirthday();
                     ps.setDate(6, birthday == null ? null : new java.sql.Date(birthday.getTime()));
                     ps.setString(7, teacher.getAddress());
-                    ps.setInt(8, TeacherStatus.Status.NOT_CHECKED);
+                    ps.setInt(8, status);
 
                     return ps;
                 }
@@ -224,6 +225,14 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
     }
 
     @Override
+    public List<TeacherExperience> listExperiences(long userId) {
+        String sql = "SELECT Id FROM SG_TeacherExperience WHERE UserId=? AND Status<>0 ORDER BY AddTime DESC";
+        List<Integer> experienceIds = queryIntList(sql, new Object[] { userId });
+
+        return listExperiences(experienceIds);
+    }
+
+    @Override
     public boolean addEducation(long userId, TeacherEducation education) {
         if (education.getId() <= 0) {
             String sql = "INSERT INTO SG_TeacherEducation (UserId, School, Major, Level, Time, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
@@ -247,5 +256,13 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
     public boolean deleteEducation(long userId, int educationId) {
         String sql = "UPDATE SG_TeacherEducation SET Status=0 WHERE UserId=? AND Id=?";
         return update(sql, new Object[] { userId, educationId });
+    }
+
+    @Override
+    public List<TeacherEducation> listEducations(long userId) {
+        String sql = "SELECT Id FROM SG_TeacherEducation WHERE UserId=? AND Status<>0 ORDER BY AddTime DESC";
+        List<Integer> educationIds = queryIntList(sql, new Object[] { userId });
+
+        return listEducations(educationIds);
     }
 }

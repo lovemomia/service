@@ -117,6 +117,11 @@ public class Teacher {
                 StringUtils.isBlank(address);
     }
 
+    @JSONField(serialize = false)
+    public boolean isCompleted() {
+        return !(isInvalid() || experiences == null | experiences.isEmpty() || educations == null || educations.isEmpty());
+    }
+
     public String getAvatar() {
         return pic;
     }

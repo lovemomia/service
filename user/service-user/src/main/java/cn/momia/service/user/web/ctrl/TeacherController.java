@@ -55,10 +55,13 @@ public class TeacherController extends BaseController {
     public MomiaHttpResponse add(@RequestParam String utoken, @RequestParam(value = "teacher") String teacherJson) {
         User user = userService.getByToken(utoken);
         TeacherStatus status = teacherService.status(user.getId());
-        if (status.getStatus() == TeacherStatus.Status.PASSED) return MomiaHttpResponse.FAILED("您已通过教师资格审核，无需重复提交申请");
+        if (status.getStatus() == TeacherStatus.Status.NOT_CHECKED ||
+                status.getStatus() == TeacherStatus.Status.PASSED) return MomiaHttpResponse.FAILED("您已通过教师资格审核，或之前的申请正在审核中，无需重复提交申请");
 
         Teacher teacher = CastUtil.toObject(JSON.parseObject(teacherJson), Teacher.class);
         teacher.setUserId(user.getId());
+        teacher.setExperiences(teacherService.listExperiences(user.getId()));
+        teacher.setEducations(teacherService.listEducations(user.getId()));
 
         return MomiaHttpResponse.SUCCESS(teacherService.add(teacher) > 0);
     }

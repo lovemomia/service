@@ -4,8 +4,9 @@ public class TeacherStatus {
     public static class Status {
         public static final int NOT_EXIST = 0;
         public static final int PASSED = 1;
-        public static final int NOT_CHECKED = 2;
-        public static final int REJECTED = 3;
+        public static final int NOT_FINISHED = 2;
+        public static final int NOT_CHECKED = 3;
+        public static final int REJECTED = 4;
     }
 
     public static final TeacherStatus NOT_EXIST_TEACHER_STATUS = new TeacherStatus();
