@@ -41,7 +41,7 @@ public class TeacherController extends BaseController {
         return MomiaHttpResponse.SUCCESS(teacher);
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
     public MomiaHttpResponse list(@RequestParam String tids) {
         Set<Integer> teacherIds = new HashSet<Integer>();
         for (String teacherId : Splitter.on(",").trimResults().omitEmptyStrings().split(tids)) {
