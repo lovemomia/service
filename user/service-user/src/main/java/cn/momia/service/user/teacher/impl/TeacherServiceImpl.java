@@ -199,8 +199,13 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
 
     @Override
     public boolean addExperience(long userId, TeacherExperience experience) {
-        String sql = "INSERT INTO SG_TeacherExperience (UserId, School, Post, Time, Content, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
-        return update(sql, new Object[] { userId, experience.getSchool(), experience.getPost(), experience.getTime(), experience.getContent() });
+        if (experience.getId() <= 0) {
+            String sql = "INSERT INTO SG_TeacherExperience (UserId, School, Post, Time, Content, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
+            return update(sql, new Object[] { userId, experience.getSchool(), experience.getPost(), experience.getTime(), experience.getContent() });
+        } else {
+            String sql = "UPDATE SG_TeacherExperience SET School=?, Post=?, Time=?, Content=? WHERE Id=? AND UserId=?";
+            return update(sql, new Object[] { experience.getSchool(), experience.getPost(), experience.getTime(), experience.getContent(), experience.getId(), userId });
+        }
     }
 
     @Override
@@ -220,8 +225,13 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
 
     @Override
     public boolean addEducation(long userId, TeacherEducation education) {
-        String sql = "INSERT INTO SG_TeacherEducation (UserId, School, Major, Level, Time, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
-        return update(sql, new Object[] { userId, education.getSchool(), education.getMajor(), education.getLevel(), education.getTime() });
+        if (education.getId() <= 0) {
+            String sql = "INSERT INTO SG_TeacherEducation (UserId, School, Major, Level, Time, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
+            return update(sql, new Object[] { userId, education.getSchool(), education.getMajor(), education.getLevel(), education.getTime() });
+        } else {
+            String sql = "UPDATE SG_TeacherEducation SET School=?, Major=?, Level=?, Time=? WHERE Id=? AND UserId=?";
+            return update(sql, new Object[] { education.getSchool(), education.getMajor(), education.getLevel(), education.getTime(), education.getId(), userId });
+        }
     }
 
     @Override
