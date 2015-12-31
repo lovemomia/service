@@ -59,10 +59,10 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     }
 
     private void addOrderSkus(long orderId, Order order) {
-        String sql = "INSERT INTO SG_SubjectOrderPackage (OrderId, SkuId, Price, CourseCount, BookableCount, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
+        String sql = "INSERT INTO SG_SubjectOrderPackage (OrderId, SkuId, Price, CourseCount, BookableCount, Time, TimeUnit, AddTime) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
         List<Object[]> args = new ArrayList<Object[]>();
         for (OrderPackage orderPackage : order.getPackages()) {
-            args.add(new Object[] { orderId, orderPackage.getSkuId(), orderPackage.getPrice(), orderPackage.getBookableCount(), orderPackage.getBookableCount() });
+            args.add(new Object[] { orderId, orderPackage.getSkuId(), orderPackage.getPrice(), orderPackage.getBookableCount(), orderPackage.getBookableCount(), orderPackage.getTime(), orderPackage.getTimeUnit() });
         }
         batchUpdate(sql, args);
     }
@@ -130,7 +130,7 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     private List<OrderPackage> listOrderPackages(Collection<Long> packageIds) {
         if (packageIds.isEmpty()) return new ArrayList<OrderPackage>();
 
-        String sql = "SELECT A.Id, A.OrderId, A.SkuId, A.Price, A.CourseCount, A.BookableCount, B.CourseId FROM SG_SubjectOrderPackage A INNER JOIN SG_SubjectSku B ON A.SkuId=B.Id WHERE A.Id IN (" + StringUtils.join(packageIds, ",") + ") AND A.Status<>0 AND B.Status<>0";
+        String sql = "SELECT A.Id, A.OrderId, A.SkuId, A.Price, A.CourseCount, A.BookableCount, A.Time, A.TimeUnit, B.CourseId FROM SG_SubjectOrderPackage A INNER JOIN SG_SubjectSku B ON A.SkuId=B.Id WHERE A.Id IN (" + StringUtils.join(packageIds, ",") + ") AND A.Status<>0 AND B.Status<>0";
         List<OrderPackage> packages = queryObjectList(sql, OrderPackage.class);
 
         Map<Long, OrderPackage> packagesMap = new HashMap<Long, OrderPackage>();

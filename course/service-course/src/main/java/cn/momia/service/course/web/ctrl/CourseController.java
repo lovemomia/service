@@ -21,8 +21,6 @@ import cn.momia.service.course.comment.CourseCommentService;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderPackage;
 import cn.momia.service.course.order.OrderService;
-import cn.momia.service.course.subject.SubjectService;
-import cn.momia.api.course.dto.subject.SubjectSku;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -59,7 +57,6 @@ public class CourseController extends BaseController {
 
     @Autowired private CourseService courseService;
     @Autowired private CourseCommentService courseCommentService;
-    @Autowired private SubjectService subjectService;
     @Autowired private OrderService orderService;
 
     @Autowired private UserServiceApi userServiceApi;
@@ -528,9 +525,6 @@ public class CourseController extends BaseController {
         OrderPackage orderPackage = orderService.getOrderPackage(packageId);
         if (!orderPackage.exists()) return MomiaHttpResponse.FAILED("预约失败，无效的课程包");
 
-        SubjectSku subjectSku = subjectService.getSku(orderPackage.getSkuId());
-        if (!subjectSku.exists()) return MomiaHttpResponse.FAILED("预约失败，无效的课程包");
-
         CourseSku sku = courseService.getSku(skuId);
         if (!sku.exists() || !sku.isBookable(new Date())) return MomiaHttpResponse.FAILED("预约失败，无效的课程场次或本场次已截止选课");
         if (orderPackage.getCourseId() > 0 && orderPackage.getCourseId() != sku.getCourseId()) return MomiaHttpResponse.FAILED("预约失败，课程与购买的包不匹配");
@@ -538,7 +532,7 @@ public class CourseController extends BaseController {
         Map<Long, Date> startTimes = courseService.queryStartTimesByPackages(Sets.newHashSet(packageId));
         Date startTime = startTimes.get(packageId);
         if (startTime != null) {
-            Date endTime = TimeUtil.add(startTime, subjectSku.getTime(), subjectSku.getTimeUnit());
+            Date endTime = TimeUtil.add(startTime, orderPackage.getTime(), orderPackage.getTimeUnit());
             if (endTime.before(sku.getStartTime())) return MomiaHttpResponse.FAILED("预约失败，该课程的时间超出了课程包的有效期");
         }
 

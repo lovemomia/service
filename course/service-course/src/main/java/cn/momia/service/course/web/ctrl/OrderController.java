@@ -94,6 +94,8 @@ public class OrderController extends BaseController {
 
             orderPackage.setPrice(sku.getPrice());
             orderPackage.setBookableCount(sku.getCourseCount());
+            orderPackage.setTime(sku.getTime());
+            orderPackage.setTimeUnit(sku.getTimeUnit());
         }
 
         return true;
@@ -256,7 +258,7 @@ public class OrderController extends BaseController {
             if (startTime == null) {
                 subjectPackage.setExpireTime("购买日期: " + TimeUtil.SHORT_DATE_FORMAT.format(order.getAddTime()));
             } else {
-                Date endTime = TimeUtil.add(startTime, sku.getTime(), sku.getTimeUnit());
+                Date endTime = TimeUtil.add(startTime, orderPackage.getTime(), orderPackage.getTimeUnit());
                 subjectPackage.setExpireTime("有效期至: " + TimeUtil.SHORT_DATE_FORMAT.format(endTime));
             }
 
