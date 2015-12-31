@@ -5,10 +5,10 @@ import cn.momia.api.course.dto.Course;
 import cn.momia.api.course.dto.CourseDetail;
 import cn.momia.api.course.dto.CourseMaterial;
 import cn.momia.api.course.dto.CourseSku;
-import cn.momia.api.course.dto.Institution;
 import cn.momia.api.course.dto.Student;
 import cn.momia.api.course.dto.Teacher;
 import cn.momia.api.course.dto.TeacherCourse;
+import cn.momia.api.poi.dto.Institution;
 
 import java.util.Collection;
 import java.util.Date;

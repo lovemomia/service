@@ -1,4 +1,4 @@
-package cn.momia.api.course.dto;
+package cn.momia.api.poi.dto;
 
 public class Institution {
     public static final Institution NOT_EXIST_INSTITUTION = new Institution();

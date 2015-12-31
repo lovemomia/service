@@ -15,4 +15,5 @@
     </bean>
 
     <bean class="cn.momia.service.poi.place.impl.PlaceServiceImpl" parent="dbAccessService" />
+    <bean class="cn.momia.service.poi.inst.impl.InstitutionServiceImpl" parent="dbAccessService" />
 </beans>

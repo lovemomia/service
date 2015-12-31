@@ -3,6 +3,7 @@ package cn.momia.service.course.base.impl;
 import cn.momia.api.course.dto.CourseMaterial;
 import cn.momia.api.course.dto.Student;
 import cn.momia.api.poi.MetaUtil;
+import cn.momia.api.poi.dto.Institution;
 import cn.momia.api.poi.dto.Region;
 import cn.momia.api.course.dto.Course;
 import cn.momia.api.course.dto.CourseDetail;
@@ -16,7 +17,6 @@ import cn.momia.common.core.util.TimeUtil;
 import cn.momia.api.course.dto.BookedCourse;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.api.course.dto.CourseSku;
-import cn.momia.api.course.dto.Institution;
 import cn.momia.api.course.dto.Teacher;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
@@ -192,8 +192,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     private Map<Integer, Institution> queryInstitutions(Collection<Integer> institutionIds) {
         if (institutionIds.isEmpty()) return new HashMap<Integer, Institution>();
 
-        String sql = "SELECT Id, Name, Cover, Intro FROM SG_Institution WHERE Id IN (" + StringUtils.join(institutionIds, ",") + ") AND Status<>0";
-        List<Institution> institutions = queryObjectList(sql, Institution.class);
+        List<Institution> institutions = poiServiceApi.listInstitutions(institutionIds);
 
         Map<Integer, Institution> institutionsMap = new HashMap<Integer, Institution>();
         for (Institution institution : institutions) {
@@ -818,8 +817,10 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public Institution getInstitution(long courseId) {
-        String sql = "SELECT B.Id, B.Name, B.Cover, B.Intro FROM SG_Course A INNER JOIN SG_Institution B ON A.InstitutionId=B.Id WHERE A.Id=? AND A.Status<>0 AND B.Status<>0";
-        return queryObject(sql, new Object[] { courseId }, Institution.class, Institution.NOT_EXIST_INSTITUTION);
+        String sql = "SELECT InstitutionId FROM SG_Course WHERE Id=? AND Status<>0";
+        int institutionId = queryInt(sql, new Object[] { courseId });
+
+        return poiServiceApi.getInstitution(institutionId);
     }
 
     @Override
