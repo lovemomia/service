@@ -3,6 +3,7 @@ package cn.momia.api.user.dto;
 public class ChildTag {
     private int id;
     private String name;
+    private boolean selected;
 
     public int getId() {
         return id;
@@ -18,5 +19,13 @@ public class ChildTag {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }
