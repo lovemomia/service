@@ -244,7 +244,7 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
                 "INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId " +
                 "INNER JOIN SG_BookedCourse C ON B.Id=C.PackageId " +
                 "INNER JOIN SG_CourseSku D ON C.CourseSkuId=D.Id " +
-                "WHERE A.UserId IN (" + StringUtils.join(userIds, ",") + ") AND A.SubjectId=? AND A.Status>=? AND B.BookableCount>0 AND B.Status<>0 AND C.Status<>0 AND D.Status<>0" +
+                "WHERE A.UserId IN (" + StringUtils.join(userIds, ",") + ") AND A.SubjectId=? AND A.Status>=? AND B.BookableCount>0 AND B.Status<>0 AND C.Status<>0 AND D.Status<>0 " +
                 "ORDER BY D.StartTime ASC";
         query(sql, new Object[] { subjectId, Order.Status.PAYED }, new RowCallbackHandler() {
             @Override
