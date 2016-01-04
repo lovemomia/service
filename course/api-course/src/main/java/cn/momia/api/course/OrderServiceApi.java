@@ -66,7 +66,7 @@ public class OrderServiceApi extends HttpServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("pid", packageId)
                 .add("time", time);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/order/package/time/extend"), builder.build());
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/order/package/time/extend"), builder.build());
 
         return executeReturnObject(request, Boolean.class);
     }
