@@ -10,6 +10,7 @@ import cn.momia.api.user.ChildServiceApi;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.core.dto.PagedList;
+import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.core.util.PoiUtil;
 import cn.momia.common.core.util.TimeUtil;
@@ -522,54 +523,83 @@ public class CourseController extends BaseController {
     public MomiaHttpResponse booking(@RequestParam String utoken,
                                      @RequestParam(value = "pid") long packageId,
                                      @RequestParam(value = "sid") long skuId) {
+        User user = userServiceApi.get(utoken);
+        return MomiaHttpResponse.SUCCESS(doBooking(user.getId(), packageId, skuId));
+    }
+
+    private BookedCourse doBooking(long userId, long packageId, long skuId) {
         OrderPackage orderPackage = orderService.getOrderPackage(packageId);
-        if (!orderPackage.exists()) return MomiaHttpResponse.FAILED("预约失败，无效的课程包");
+        if (!orderPackage.exists()) throw new MomiaErrorException("预约失败，无效的课程包");
 
         CourseSku sku = courseService.getSku(skuId);
-        if (!sku.exists() || !sku.isBookable(new Date())) return MomiaHttpResponse.FAILED("预约失败，无效的课程场次或本场次已截止选课");
-        if (orderPackage.getCourseId() > 0 && orderPackage.getCourseId() != sku.getCourseId()) return MomiaHttpResponse.FAILED("预约失败，课程与购买的包不匹配");
+        if (!sku.exists() || !sku.isBookable(new Date())) throw new MomiaErrorException("预约失败，无效的课程场次或本场次已截止选课");
+        if (orderPackage.getCourseId() > 0 && orderPackage.getCourseId() != sku.getCourseId()) throw new MomiaErrorException("预约失败，课程与购买的包不匹配");
 
         Map<Long, Date> startTimes = courseService.queryStartTimesByPackages(Sets.newHashSet(packageId));
         Date startTime = startTimes.get(packageId);
         if (startTime != null) {
             Date endTime = TimeUtil.add(startTime, orderPackage.getTime(), orderPackage.getTimeUnit());
-            if (endTime.before(sku.getStartTime())) return MomiaHttpResponse.FAILED("预约失败，该课程的时间超出了课程包的有效期");
+            if (endTime.before(sku.getStartTime())) throw new MomiaErrorException("预约失败，该课程的时间超出了课程包的有效期");
         }
 
         Order order = orderService.get(orderPackage.getOrderId());
-        User user = userServiceApi.get(utoken);
-        if (!order.exists() || !order.isPayed() || order.getUserId() != user.getId()) return MomiaHttpResponse.FAILED("预约失败，无效的订单");
+        if (!order.exists() || !order.isPayed() || order.getUserId() != userId) throw new MomiaErrorException("预约失败，无效的订单");
 
-        if (courseService.booked(packageId, sku.getCourseId())) return MomiaHttpResponse.FAILED("一门课程在一个课程包内只能约一次");
-        if (!courseService.matched(order.getSubjectId(), sku.getCourseId())) return MomiaHttpResponse.FAILED("课程不匹配");
+        if (courseService.booked(packageId, sku.getCourseId())) throw new MomiaErrorException("一门课程在一个课程包内只能约一次");
+        if (!courseService.matched(order.getSubjectId(), sku.getCourseId())) throw new MomiaErrorException("课程不匹配");
 
-        if (!courseService.lockSku(skuId)) return MomiaHttpResponse.FAILED("库存不足");
-        LOGGER.info("course sku locked: {}/{}/{}", new Object[] { user, packageId, skuId });
+        if (!courseService.lockSku(skuId)) throw new MomiaErrorException("库存不足");
+        LOGGER.info("course sku locked: {}/{}/{}", new Object[] { userId, packageId, skuId });
 
         long bookingId = 0;
         try {
             if (orderService.decreaseBookableCount(packageId)) {
-                bookingId = courseService.booking(user.getId(), order.getId(), packageId, sku);
-                if (bookingId > 0) {
-                    courseService.increaseJoined(sku.getCourseId(), sku.getJoinCount());
-                }
+                bookingId = courseService.booking(userId, order.getId(), packageId, sku);
+                if (bookingId > 0) courseService.increaseJoined(sku.getCourseId(), sku.getJoinCount());
             } else {
-                return MomiaHttpResponse.FAILED("本课程包的课程已经约满");
+                throw new MomiaErrorException("本课程包的课程已经约满");
             }
-        } catch (Exception e) {
-            LOGGER.error("exception when booking course, {}/{}/{}", new Object[] { user.getId(), packageId, skuId, e });
         } finally {
             // TODO 需要告警
             if (bookingId <= 0 && !courseService.unlockSku(skuId)) LOGGER.error("fail to unlock course sku, skuId: {}", skuId);
         }
 
-        if (bookingId <= 0) return MomiaHttpResponse.FAILED("选课失败");
+        if (bookingId <= 0) throw new MomiaErrorException("选课失败");
 
         BookedCourse bookedCourse = courseService.getBookedCourse(bookingId);
-        List<BookedCourse> completedBookedCourses = completeBookedCourses(user.getId(), Lists.newArrayList(bookedCourse));
-        if (completedBookedCourses.isEmpty()) return MomiaHttpResponse.FAILED("选课失败");
+        List<BookedCourse> completedBookedCourses = completeBookedCourses(userId, Lists.newArrayList(bookedCourse));
+        if (completedBookedCourses.isEmpty()) throw new MomiaErrorException("选课失败");
 
-        return MomiaHttpResponse.SUCCESS(completedBookedCourses.get(0));
+        return completedBookedCourses.get(0);
+    }
+
+    @RequestMapping(value = "/booking/batch", method = RequestMethod.POST)
+    public MomiaHttpResponse batchBooking(@RequestParam String uids,
+                                          @RequestParam(value = "coid") long courseId,
+                                          @RequestParam(value = "sid") long skuId) {
+        Set<Long> userIds = new HashSet<Long>();
+        for (String userId : Splitter.on(",").omitEmptyStrings().trimResults().split(uids)) {
+            userIds.add(Long.valueOf(userId));
+        }
+
+        long subjectId = courseService.querySubjectId(courseId);
+        Map<Long, Long> packageIds = orderService.queryBookablePackageIds(userIds, subjectId);
+
+        Set<Long> failedUserIds = new HashSet<Long>();
+        for (long userId : userIds) {
+            if (packageIds.containsKey(userId)) {
+                try {
+                    doBooking(userId, packageIds.get(userId), skuId);
+                } catch (Exception e) {
+                    LOGGER.error("batch booking error, {}/{}/{}", new Object[] { userId, courseId, skuId, e });
+                    failedUserIds.add(userId);
+                }
+            } else {
+                failedUserIds.add(userId);
+            }
+        }
+
+        return failedUserIds.isEmpty() ? MomiaHttpResponse.SUCCESS : MomiaHttpResponse.SUCCESS(failedUserIds);
     }
 
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
@@ -593,6 +623,18 @@ public class CourseController extends BaseController {
         if (completedBookedCourses.isEmpty()) return MomiaHttpResponse.FAILED("取消选课失败");
 
         return MomiaHttpResponse.SUCCESS(completedBookedCourses.get(0));
+    }
+
+    @RequestMapping(value = "/cancel/batch", method = RequestMethod.POST)
+    public MomiaHttpResponse batchCancel(@RequestParam String uids,
+                                         @RequestParam(value = "coid") long courseId,
+                                         @RequestParam(value = "sid") long skuId) {
+        Set<Long> userIds = new HashSet<Long>();
+        for (String userId : Splitter.on(",").omitEmptyStrings().trimResults().split(uids)) {
+            userIds.add(Long.valueOf(userId));
+        }
+
+        return null;
     }
 
     @RequestMapping(value = "/course/checkin", method = RequestMethod.POST)

@@ -221,6 +221,62 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     }
 
     @Override
+    public Map<Long, Long> queryBookablePackageIds(Set<Long> userIds, long subjectId) {
+        if (userIds.isEmpty()) return new HashMap<Long, Long>();
+
+        Map<Long, Long> packageIdsMap = queryBookedBookablePackageIds(userIds, subjectId);
+
+        Set<Long> notBookedUserIds = new HashSet<Long>();
+        for (long userId : userIds) {
+            if (!packageIdsMap.containsKey(userId)) notBookedUserIds.add(userId);
+        }
+        if (!notBookedUserIds.isEmpty()) {
+            packageIdsMap.putAll(queryNotBookedBookablePackageIds(notBookedUserIds, subjectId));
+        }
+
+        return packageIdsMap;
+    }
+
+    private Map<Long, Long> queryBookedBookablePackageIds(Collection<Long> userIds, long subjectId) {
+        final Map<Long, Long> packageIdsMap = new HashMap<Long, Long>();
+        String sql = "SELECT A.UserId, B.Id AS PackageId " +
+                "FROM SG_SubjectOrder A " +
+                "INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId " +
+                "INNER JOIN SG_BookedCourse C ON B.Id=C.PackageId " +
+                "INNER JOIN SG_CourseSku D ON C.CourseSkuId=D.Id " +
+                "WHERE A.UserId IN (" + StringUtils.join(userIds, ",") + ") AND A.SubjectId=? AND A.Status>=? AND B.BookableCount>0 AND B.Status<>0 AND C.Status<>0 AND D.Status<>0" +
+                "ORDER BY D.StartTime ASC";
+        query(sql, new Object[] { subjectId, Order.Status.PAYED }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                long userId = rs.getLong("userId");
+                long packageId = rs.getLong("packageId");
+                if (!packageIdsMap.containsKey(userId)) packageIdsMap.put(userId, packageId);
+            }
+        });
+
+        return packageIdsMap;
+    }
+
+    private Map<Long, Long> queryNotBookedBookablePackageIds(Collection<Long> userIds, long subjectId) {
+        final Map<Long, Long> packageIdsMap = new HashMap<Long, Long>();
+        String sql = "SELECT A.UserId, B.Id AS PackageId " +
+                "FROM SG_SubjectOrder A " +
+                "INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId " +
+                "WHERE A.UserId IN (" + StringUtils.join(userIds, ",") + ") AND A.SubjectId=? AND A.Status>=? AND B.BookableCount>0 AND B.Status<>0";
+        query(sql, new Object[] { subjectId, Order.Status.PAYED }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                long userId = rs.getLong("userId");
+                long packageId = rs.getLong("packageId");
+                if (!packageIdsMap.containsKey(userId)) packageIdsMap.put(userId, packageId);
+            }
+        });
+
+        return packageIdsMap;
+    }
+
+    @Override
     public OrderPackage getOrderPackage(long packageId) {
         Set<Long> packageIds = Sets.newHashSet(packageId);
         List<OrderPackage> packages = listOrderPackages(packageIds);

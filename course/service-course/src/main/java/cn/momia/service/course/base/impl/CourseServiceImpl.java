@@ -811,6 +811,12 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
+    public long querySubjectId(long courseId) {
+        String sql = "SELECT SubjectId FROM SG_Course WHERE Id=?";
+        return queryInt(sql, new Object[] { courseId });
+    }
+
+    @Override
     public Map<Long, String> queryTips(Collection<Long> courseIds) {
         if (courseIds.isEmpty()) return new HashMap<Long, String>();
 
