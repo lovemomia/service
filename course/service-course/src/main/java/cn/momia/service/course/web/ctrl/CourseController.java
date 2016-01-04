@@ -599,7 +599,7 @@ public class CourseController extends BaseController {
             }
         }
 
-        return failedUserIds.isEmpty() ? MomiaHttpResponse.SUCCESS : MomiaHttpResponse.SUCCESS(failedUserIds);
+        return MomiaHttpResponse.SUCCESS(failedUserIds);
     }
 
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)

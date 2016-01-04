@@ -229,6 +229,16 @@ public class CourseServiceApi extends HttpServiceApi {
         return executeReturnObject(request, BookedCourse.class);
     }
 
+    public List<Long> batchBooking(Set<Long> userIds, long courseId, long skuId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("uids", StringUtils.join(userIds, ","))
+                .add("coid", courseId)
+                .add("sid", skuId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/course/booking/batch"), builder.build());
+
+        return executeReturnList(request, Long.class);
+    }
+
     public BookedCourse cancel(String utoken, long bookingId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
