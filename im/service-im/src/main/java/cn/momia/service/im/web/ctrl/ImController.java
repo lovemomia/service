@@ -48,8 +48,6 @@ public class ImController extends BaseController {
                                          @RequestParam(value = "sid") long courseSkuId,
                                          @RequestParam(value = "tids") String teachers,
                                          @RequestParam(value = "name") String groupName) {
-        if (courseId <= 0 || courseSkuId <= 0 || StringUtils.isBlank(teachers) || StringUtils.isBlank(groupName)) return MomiaHttpResponse.BAD_REQUEST;
-
         Set<Long> teacherUserIds = new HashSet<Long>();
         for (String teacher : Splitter.on(",").trimResults().omitEmptyStrings().split(teachers)) {
             teacherUserIds.add(Long.valueOf(teacher));

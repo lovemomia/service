@@ -9,6 +9,7 @@ import cn.momia.common.core.http.MomiaHttpRequestBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -39,7 +40,7 @@ public class ImServiceApi extends HttpServiceApi {
         execute(request);
     }
 
-    public boolean createGroup(long courseId, long courseSkuId, List<Long> teacherUserIds, String groupName) {
+    public boolean createGroup(long courseId, long courseSkuId, Collection<Long> teacherUserIds, String groupName) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("coid", courseId)
                 .add("sid", courseSkuId)
