@@ -637,7 +637,7 @@ public class CourseController extends BaseController {
         return null;
     }
 
-    @RequestMapping(value = "/course/checkin", method = RequestMethod.POST)
+    @RequestMapping(value = "/checkin", method = RequestMethod.POST)
     public MomiaHttpResponse checkin(@RequestParam String utoken,
                                      @RequestParam(value = "uid") long userId,
                                      @RequestParam(value = "pid") long packageId,
@@ -649,7 +649,7 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(courseService.checkin(userId, packageId, courseId, courseSkuId));
     }
 
-    @RequestMapping(value = "/course/ongoing/student", method = RequestMethod.GET)
+    @RequestMapping(value = "/ongoing/student", method = RequestMethod.GET)
     public MomiaHttpResponse ongoingStudents(@RequestParam String utoken,
                                              @RequestParam(value = "coid") long courseId,
                                              @RequestParam(value = "sid") long courseSkuId) {
@@ -673,7 +673,7 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(students);
     }
 
-    @RequestMapping(value = "/course/notfinished/student", method = RequestMethod.GET)
+    @RequestMapping(value = "/notfinished/student", method = RequestMethod.GET)
     public MomiaHttpResponse notfinishedStudents(@RequestParam String utoken,
                                                  @RequestParam(value = "coid") long courseId,
                                                  @RequestParam(value = "sid") long courseSkuId) {
@@ -683,7 +683,7 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(courseService.queryAllStudents(courseId, courseSkuId));
     }
 
-    @RequestMapping(value = "/course/finished/student", method = RequestMethod.GET)
+    @RequestMapping(value = "/finished/student", method = RequestMethod.GET)
     public MomiaHttpResponse finishedStudents(@RequestParam String utoken,
                                               @RequestParam(value = "coid") long courseId,
                                               @RequestParam(value = "sid") long courseSkuId) {
