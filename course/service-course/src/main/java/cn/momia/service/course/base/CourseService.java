@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface CourseService {
     boolean isRecommended(long courseId);
@@ -72,6 +73,9 @@ public interface CourseService {
     void increaseJoined(long courseId, int joinCount);
     boolean cancel(long userId, long bookingId);
     void decreaseJoined(long courseId, int joinCount);
+
+    List<Long> queryCancelPackageIds(Set<Long> userIds, long courseId, long courseSkuId);
+    void batchCancel(Set<Long> userIds, long courseId, long courseSkuId);
 
     CourseDetail getDetail(long courseId);
     int getInstitutionId(long courseId);

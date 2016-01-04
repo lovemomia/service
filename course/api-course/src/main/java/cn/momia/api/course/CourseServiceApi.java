@@ -248,6 +248,16 @@ public class CourseServiceApi extends HttpServiceApi {
         return executeReturnObject(request, BookedCourse.class);
     }
 
+    public boolean batchCancel(Set<Long> userIds, long courseId, long skuId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("uids", StringUtils.join(userIds, ","))
+                .add("coid", courseId)
+                .add("sid", skuId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/course/cancel/batch"), builder.build());
+
+        return executeReturnObject(request, Boolean.class);
+    }
+
     public boolean comment(JSONObject commentJson) {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/course/comment"), commentJson.toString());
         return executeReturnObject(request, Boolean.class);

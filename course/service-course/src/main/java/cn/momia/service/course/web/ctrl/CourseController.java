@@ -634,7 +634,23 @@ public class CourseController extends BaseController {
             userIds.add(Long.valueOf(userId));
         }
 
-        return null;
+        CourseSku sku = courseService.getSku(skuId);
+        List<Long> packageIds = courseService.queryCancelPackageIds(userIds, courseId, skuId);
+        if (packageIds.size() > 0) {
+            courseService.batchCancel(userIds, courseId, skuId);
+            List<Long> failedIncreaseCountPackageIds = new ArrayList<Long>();
+            List<Long> failedUnlockSkuPackageIds = new ArrayList<Long>();
+            for (long packageId : packageIds) {
+                if (!orderService.increaseBookableCount(packageId)) failedIncreaseCountPackageIds.add(packageId);
+                if (!courseService.unlockSku(skuId)) failedUnlockSkuPackageIds.add(packageId);
+                courseService.decreaseJoined(courseId, sku.getJoinCount());
+            }
+
+            if (failedIncreaseCountPackageIds.size() > 0) LOGGER.error("fail to increase bookable count of packages: {}", failedIncreaseCountPackageIds);
+            if (failedUnlockSkuPackageIds.size() > 0) LOGGER.error("fail to unlock skus of packages: {}", failedUnlockSkuPackageIds);
+        }
+
+        return MomiaHttpResponse.SUCCESS(true);
     }
 
     @RequestMapping(value = "/checkin", method = RequestMethod.POST)
