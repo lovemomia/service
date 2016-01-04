@@ -307,6 +307,12 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     }
 
     @Override
+    public boolean extendPackageTime(long packageId, int time, int timeUnit) {
+        String sql = "UPDATE SG_SubjectOrderPackage SET Time=?, TimeUnit=? WHERE Id=?";
+        return update(sql, new Object[] { time, timeUnit, packageId });
+    }
+
+    @Override
     public boolean prepay(long orderId) {
         String sql = "UPDATE SG_SubjectOrder SET Status=? WHERE Id=? AND (Status=? OR Status=?)";
         int updateCount = singleUpdate(sql, new Object[] { Order.Status.PRE_PAYED, orderId, Order.Status.NOT_PAYED, Order.Status.PRE_PAYED });

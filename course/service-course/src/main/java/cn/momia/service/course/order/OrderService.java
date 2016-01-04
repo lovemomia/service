@@ -25,6 +25,8 @@ public interface OrderService {
     OrderPackage getOrderPackage(long packageId);
     Set<Integer> getOrderPackageTypes(long orderId);
 
+    boolean extendPackageTime(long packageId, int newTime, int newTimeUnit);
+
     boolean prepay(long orderId);
     boolean pay(Payment payment);
 

@@ -61,4 +61,13 @@ public class OrderServiceApi extends HttpServiceApi {
 
         return executeReturnPagedList(request, SubjectOrder.class);
     }
+
+    public boolean extendPackageTime(long packageId, int time) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("pid", packageId)
+                .add("time", time);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/order/package/time/extend"), builder.build());
+
+        return executeReturnObject(request, Boolean.class);
+    }
 }

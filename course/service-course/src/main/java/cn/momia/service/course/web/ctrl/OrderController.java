@@ -354,4 +354,29 @@ public class OrderController extends BaseController {
 
         return pagedSubjectOrders;
     }
+
+    @RequestMapping(value = "/package/time/extend", method = RequestMethod.POST)
+    public MomiaHttpResponse extendPackageTime(@RequestParam(value = "pid") long packageId, @RequestParam int time) {
+        OrderPackage orderPackage = orderService.getOrderPackage(packageId);
+        int originTime = orderPackage.getTime();
+        int originTimeUnit = orderPackage.getTimeUnit();
+
+        int newTime = 0;
+        int newTimeUnit = TimeUtil.TimeUnit.MONTH;
+
+        switch (originTimeUnit) {
+            case TimeUtil.TimeUnit.MONTH:
+                newTime = originTime + time;
+                break;
+            case TimeUtil.TimeUnit.QUARTER:
+                newTime = originTime * 3 + time;
+                break;
+            case TimeUtil.TimeUnit.YEAR:
+                newTime = originTime * 12 + time;
+                break;
+            default: throw new MomiaErrorException("无效的课程包");
+        }
+
+        return MomiaHttpResponse.SUCCESS(orderService.extendPackageTime(packageId, newTime, newTimeUnit));
+    }
 }
