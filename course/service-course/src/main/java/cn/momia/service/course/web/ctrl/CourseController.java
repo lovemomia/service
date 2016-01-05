@@ -8,6 +8,7 @@ import cn.momia.api.course.dto.course.Student;
 import cn.momia.api.course.dto.course.TeacherCourse;
 import cn.momia.api.user.ChildServiceApi;
 import cn.momia.api.user.UserServiceApi;
+import cn.momia.api.user.dto.Child;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.exception.MomiaErrorException;
@@ -433,6 +434,7 @@ public class CourseController extends BaseController {
 
         return MomiaHttpResponse.SUCCESS(pagedBookedCourses);
     }
+
     @RequestMapping(value = "/teacher/ongoing", method = RequestMethod.GET)
     public MomiaHttpResponse teacherOngoing(@RequestParam(value = "uid") long userId) {
         List<TeacherCourse> courses = completeTeacherCourses(courseService.queryOngoingByTeacher(userId), false);
@@ -521,13 +523,14 @@ public class CourseController extends BaseController {
 
     @RequestMapping(value = "/booking", method = RequestMethod.POST)
     public MomiaHttpResponse booking(@RequestParam String utoken,
+                                     @RequestParam(value = "cid") long childId,
                                      @RequestParam(value = "pid") long packageId,
                                      @RequestParam(value = "sid") long skuId) {
         User user = userServiceApi.get(utoken);
-        return MomiaHttpResponse.SUCCESS(doBooking(user.getId(), packageId, skuId));
+        return MomiaHttpResponse.SUCCESS(doBooking(user, childId, packageId, skuId));
     }
 
-    private BookedCourse doBooking(long userId, long packageId, long skuId) {
+    private BookedCourse doBooking(User user, long childId, long packageId, long skuId) {
         OrderPackage orderPackage = orderService.getOrderPackage(packageId);
         if (!orderPackage.exists()) throw new MomiaErrorException("预约失败，无效的课程包");
 
@@ -543,18 +546,18 @@ public class CourseController extends BaseController {
         }
 
         Order order = orderService.get(orderPackage.getOrderId());
-        if (!order.exists() || !order.isPayed() || order.getUserId() != userId) throw new MomiaErrorException("预约失败，无效的订单");
+        if (!order.exists() || !order.isPayed() || order.getUserId() != user.getId()) throw new MomiaErrorException("预约失败，无效的订单");
 
         if (courseService.booked(packageId, sku.getCourseId())) throw new MomiaErrorException("一门课程在一个课程包内只能约一次");
         if (!courseService.matched(order.getSubjectId(), sku.getCourseId())) throw new MomiaErrorException("课程不匹配");
 
         if (!courseService.lockSku(skuId)) throw new MomiaErrorException("库存不足");
-        LOGGER.info("course sku locked: {}/{}/{}", new Object[] { userId, packageId, skuId });
+        LOGGER.info("course sku locked: {}/{}/{}", new Object[] { user.getId(), packageId, skuId });
 
         long bookingId = 0;
         try {
             if (orderService.decreaseBookableCount(packageId)) {
-                bookingId = courseService.booking(userId, order.getId(), packageId, sku);
+                bookingId = courseService.booking(user.getId(), childId > 0 ? childId : getChildId(user), order.getId(), packageId, sku);
                 if (bookingId > 0) courseService.increaseJoined(sku.getCourseId(), sku.getJoinCount());
             } else {
                 throw new MomiaErrorException("本课程包的课程已经约满");
@@ -567,10 +570,16 @@ public class CourseController extends BaseController {
         if (bookingId <= 0) throw new MomiaErrorException("选课失败");
 
         BookedCourse bookedCourse = courseService.getBookedCourse(bookingId);
-        List<BookedCourse> completedBookedCourses = completeBookedCourses(userId, Lists.newArrayList(bookedCourse));
+        List<BookedCourse> completedBookedCourses = completeBookedCourses(user.getId(), Lists.newArrayList(bookedCourse));
         if (completedBookedCourses.isEmpty()) throw new MomiaErrorException("选课失败");
 
         return completedBookedCourses.get(0);
+    }
+
+    private long getChildId(User user) {
+        List<Child> children = user.getChildren();
+        if (children != null && !children.isEmpty()) return children.get(0).getId();
+        return 0;
     }
 
     @RequestMapping(value = "/booking/batch", method = RequestMethod.POST)
@@ -585,11 +594,18 @@ public class CourseController extends BaseController {
         long subjectId = courseService.querySubjectId(courseId);
         Map<Long, Long> packageIds = orderService.queryBookablePackageIds(userIds, subjectId);
 
+        List<User> users = userServiceApi.list(userIds, User.Type.FULL);
+        Map<Long, User> usersMap = new HashMap<Long, User>();
+        for (User user : users) {
+            usersMap.put(user.getId(), user);
+        }
+
         Set<Long> failedUserIds = new HashSet<Long>();
         for (long userId : userIds) {
-            if (packageIds.containsKey(userId)) {
+            if (packageIds.containsKey(userId) && usersMap.containsKey(userId)) {
                 try {
-                    doBooking(userId, packageIds.get(userId), skuId);
+                    User user = usersMap.get(userId);
+                    doBooking(user, 0, packageIds.get(userId), skuId);
                 } catch (Exception e) {
                     LOGGER.error("batch booking error, {}/{}/{}", new Object[] { userId, courseId, skuId, e });
                     failedUserIds.add(userId);

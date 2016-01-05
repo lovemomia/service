@@ -69,7 +69,7 @@ public interface CourseService {
     List<Long> queryBookedCourseIds(long packageId);
 
     boolean booked(long packageId, long courseId);
-    long booking(long userId, long orderId, long packageId, CourseSku sku);
+    long booking(long userId, long childId, long orderId, long packageId, CourseSku sku);
     void increaseJoined(long courseId, int joinCount);
     boolean cancel(long userId, long bookingId);
     void decreaseJoined(long courseId, int joinCount);
