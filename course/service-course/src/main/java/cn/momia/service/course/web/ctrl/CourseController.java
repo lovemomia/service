@@ -689,8 +689,8 @@ public class CourseController extends BaseController {
         if (teacherUser.isNormal()) return MomiaHttpResponse.FAILED("您无权查看");
 
         List<Student> students = courseService.queryAllStudents(courseId, courseSkuId);
-        List<Long> userIds = courseService.queryUserIdsWithoutChild(courseId, courseSkuId);
-        List<User> users = userServiceApi.list(userIds, User.Type.MINI);
+        Map<Long, Long> userPackageIds = courseService.queryUserPackageIdsWithoutChild(courseId, courseSkuId);
+        List<User> users = userServiceApi.list(userPackageIds.keySet(), User.Type.MINI);
         for (User user : users) {
             Student student = new Student();
             student.setType(Student.Type.PARENT);
@@ -698,6 +698,7 @@ public class CourseController extends BaseController {
             student.setUserId(user.getId());
             student.setAvatar(user.getAvatar());
             student.setName(user.getNickName());
+            student.setPackageId(userPackageIds.get(user.getId()));
 
             students.add(student);
         }

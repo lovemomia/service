@@ -750,17 +750,18 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
-    public long booking(final long userId, final long orderId, final long packageId, final CourseSku sku) {
+    public long booking(final long userId, final long childId, final long orderId, final long packageId, final CourseSku sku) {
         KeyHolder keyHolder = insert(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO SG_BookedCourse(UserId, OrderId, PackageId, CourseId, CourseSkuId, AddTime) VALUES(?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO SG_BookedCourse(UserId, ChildId, OrderId, PackageId, CourseId, CourseSkuId, AddTime) VALUES(?, ?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setLong(1, userId);
-                ps.setLong(2, orderId);
-                ps.setLong(3, packageId);
-                ps.setLong(4, sku.getCourseId());
-                ps.setLong(5, sku.getId());
+                ps.setLong(2, childId);
+                ps.setLong(3, orderId);
+                ps.setLong(4, packageId);
+                ps.setLong(5, sku.getCourseId());
+                ps.setLong(6, sku.getId());
 
                 return ps;
             }
@@ -894,9 +895,9 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
-    public List<Long> queryUserIdsWithoutChild(long courseId, long courseSkuId) {
-        String sql = "SELECT UserId FROM SG_BookedCourse WHERE CourseId=? AND CourseSkuId=? AND Status<>0 AND ChildId=0";
-        return queryLongList(sql, new Object[] { courseId, courseSkuId });
+    public Map<Long, Long> queryUserPackageIdsWithoutChild(long courseId, long courseSkuId) {
+        String sql = "SELECT UserId, PackageId FROM SG_BookedCourse WHERE CourseId=? AND CourseSkuId=? AND Status<>0 AND ChildId=0";
+        return queryMap(sql, new Object[] { courseId, courseSkuId }, Long.class, Long.class);
     }
 
     @Override
