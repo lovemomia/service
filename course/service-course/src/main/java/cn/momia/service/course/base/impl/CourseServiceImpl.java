@@ -895,9 +895,14 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
-    public Map<Long, Long> queryUserPackageIdsWithoutChild(long courseId, long courseSkuId) {
-        String sql = "SELECT UserId, PackageId FROM SG_BookedCourse WHERE CourseId=? AND CourseSkuId=? AND Status<>0 AND ChildId=0";
-        return queryMap(sql, new Object[] { courseId, courseSkuId }, Long.class, Long.class);
+    public List<Student.Parent> queryParentWithoutChild(long courseId, long courseSkuId) {
+        String sql = "SELECT B.Id, B.Id AS UserId, B.Avatar, B.NickName, A.PackageId, A.CheckIn " +
+                "FROM SG_BookedCourse A " +
+                "INNER JOIN SG_User B ON A.UserId=B.Id " +
+                "INNER JOIN SG_Course C ON A.CourseId=C.Id " +
+                "INNER JOIN SG_CourseSku D ON A.CourseSkuId=D.Id " +
+                "WHERE A.ChildId=0 AND (C.Id=? OR C.ParentId=?) AND (D.Id=? OR D.ParentId=?) AND A.Status<>0 AND B.Status<>0 AND C.Status<>0 AND D.Status<>0";
+        return queryObjectList(sql, new Object[] { courseId, courseId, courseSkuId, courseSkuId }, Student.Parent.class);
     }
 
     @Override

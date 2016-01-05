@@ -107,4 +107,11 @@ public class Student {
     public String getAge() {
         return birthday != null ? TimeUtil.formatAge(birthday) : "";
     }
+
+    public static class Parent extends Student {
+        public Parent() {
+            super();
+            this.setType(Type.PARENT);
+        }
+    }
 }

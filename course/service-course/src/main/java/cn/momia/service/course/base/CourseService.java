@@ -93,7 +93,7 @@ public interface CourseService {
 
     boolean checkin(long userId, long packageId, long courseId, long courseSkuId);
 
-    Map<Long, Long> queryUserPackageIdsWithoutChild(long courseId, long courseSkuId);
+    List<Student.Parent> queryParentWithoutChild(long courseId, long courseSkuId);
     List<Student> queryAllStudents(long courseId, long courseSkuId);
     List<Student> queryCheckInStudents(long courseId, long courseSkuId);
 }
