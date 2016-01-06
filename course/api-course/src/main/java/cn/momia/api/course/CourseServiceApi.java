@@ -257,11 +257,11 @@ public class CourseServiceApi extends HttpServiceApi {
                 .add("sid", skuId);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/course/cancel/batch"), builder.build());
 
-        Map<String, Long> data = executeReturnObject(request, Map.class);
+        Map<String, Object> data = executeReturnObject(request, Map.class);
 
         Map<Long, Long> result = new HashMap<Long, Long>();
-        for (Map.Entry<String, Long> entry : data.entrySet()) {
-            result.put(Long.valueOf(entry.getKey()), Long.class.cast(entry.getValue()));
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            result.put(Long.valueOf(entry.getKey()), ((Number) (entry.getValue())).longValue());
         }
 
         return result;
