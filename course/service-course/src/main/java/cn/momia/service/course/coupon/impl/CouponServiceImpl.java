@@ -56,7 +56,7 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
             UserCoupon userCoupon = userCouponsMap.get(userCouponId);
             if (userCoupon != null) {
                 int status = userCoupon.getStatus();
-                if (status == UserCoupon.Status.USED && userCoupon.getEndTime().before(now)) userCoupon.setStatus(UserCoupon.Status.EXPIRED);
+                if (status != UserCoupon.Status.USED && userCoupon.getEndTime().before(now)) userCoupon.setStatus(UserCoupon.Status.EXPIRED);
                 result.add(userCoupon);
             }
         }
