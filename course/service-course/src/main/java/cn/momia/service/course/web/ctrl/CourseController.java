@@ -651,12 +651,13 @@ public class CourseController extends BaseController {
         }
 
         CourseSku sku = courseService.getSku(skuId);
-        List<Long> packageIds = courseService.queryBookedPackageIds(userIds, courseId, skuId);
-        if (packageIds.size() > 0) {
+        Map<Long, Long> packageUsers = courseService.queryBookedPackageUsers(userIds, courseId, skuId);
+        List<Long> successfulUserIds = new ArrayList<Long>();
+        if (!packageUsers.isEmpty()) {
             courseService.batchCancel(userIds, courseId, skuId);
             List<Long> failedIncreaseCountPackageIds = new ArrayList<Long>();
             List<Long> failedUnlockSkuPackageIds = new ArrayList<Long>();
-            for (long packageId : packageIds) {
+            for (long packageId : packageUsers.keySet()) {
                 if (!orderService.increaseBookableCount(packageId)) failedIncreaseCountPackageIds.add(packageId);
                 if (!courseService.unlockSku(skuId)) failedUnlockSkuPackageIds.add(packageId);
                 courseService.decreaseJoined(courseId, sku.getJoinCount());
@@ -664,9 +665,13 @@ public class CourseController extends BaseController {
 
             if (failedIncreaseCountPackageIds.size() > 0) LOGGER.error("fail to increase bookable count of packages: {}", failedIncreaseCountPackageIds);
             if (failedUnlockSkuPackageIds.size() > 0) LOGGER.error("fail to unlock skus of packages: {}", failedUnlockSkuPackageIds);
+
+            for (Map.Entry<Long, Long> entry : packageUsers.entrySet()) {
+                if (!failedIncreaseCountPackageIds.contains(entry.getKey())) successfulUserIds.add(entry.getValue());
+            }
         }
 
-        return MomiaHttpResponse.SUCCESS(true);
+        return MomiaHttpResponse.SUCCESS(successfulUserIds);
     }
 
     @RequestMapping(value = "/checkin", method = RequestMethod.POST)

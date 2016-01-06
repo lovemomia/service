@@ -390,7 +390,7 @@ public class OrderController extends BaseController {
     }
 
     @RequestMapping(value = "/package/time/extend/batch", method = RequestMethod.POST)
-    public MomiaHttpResponse batchExtendPackageTime(@RequestParam(value = "uid") String uids,
+    public MomiaHttpResponse batchExtendPackageTime(@RequestParam(value = "uids") String uids,
                                                     @RequestParam(value = "coid") long courseId,
                                                     @RequestParam(value = "sid") long skuId,
                                                     @RequestParam int time) {

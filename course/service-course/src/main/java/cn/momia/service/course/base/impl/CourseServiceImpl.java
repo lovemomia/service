@@ -789,7 +789,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
-    public List<Long> queryBookedPackageIds(Set<Long> userIds, long courseId, long courseSkuId) {
+    public List<Long> queryBookedPackageIds(Collection<Long> userIds, long courseId, long courseSkuId) {
         if (userIds.isEmpty()) return new ArrayList<Long>();
 
         String sql = "SELECT PackageId FROM SG_BookedCourse WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND CourseId=? AND CourseSkuId=? AND Status<>0";
@@ -797,11 +797,19 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
-    public void batchCancel(Set<Long> userIds, long courseId, long courseSkuId) {
+    public void batchCancel(Collection<Long> userIds, long courseId, long courseSkuId) {
         if (userIds.isEmpty()) return;
 
         String sql = "UPDATE SG_BookedCourse SET Status=0 WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND CourseId=? AND CourseSkuId=? AND Status<>0";
         update(sql, new Object[] { courseId, courseSkuId });
+    }
+
+    @Override
+    public Map<Long, Long> queryBookedPackageUsers(Collection<Long> userIds, long courseId, long courseSkuId) {
+        if (userIds.isEmpty()) return new HashMap<Long, Long>();
+
+        String sql = "SELECT PackageId, UserId FROM SG_BookedCourse WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND CourseId=? AND CourseSkuId=? AND Status<>0";
+        return queryMap(sql, new Object[] { courseId, courseSkuId }, Long.class, Long.class);
     }
 
     @Override
