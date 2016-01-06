@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -256,7 +257,14 @@ public class CourseServiceApi extends HttpServiceApi {
                 .add("sid", skuId);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/course/cancel/batch"), builder.build());
 
-        return executeReturnObject(request, Map.class);
+        Map<String, Long> data = executeReturnObject(request, Map.class);
+
+        Map<Long, Long> result = new HashMap<Long, Long>();
+        for (Map.Entry<String, Long> entry : data.entrySet()) {
+            result.put(Long.valueOf(entry.getKey()), entry.getValue());
+        }
+
+        return result;
     }
 
     public boolean comment(JSONObject commentJson) {
