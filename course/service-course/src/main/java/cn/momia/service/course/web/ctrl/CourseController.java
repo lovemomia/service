@@ -655,12 +655,12 @@ public class CourseController extends BaseController {
         Map<Long, Long> successfulPackageUsers = new HashMap<Long, Long>();
         if (!packageUsers.isEmpty()) {
             courseService.batchCancel(packageUsers.values(), courseId, skuId);
-            List<Long> failedIncreaseCountPackageIds = new ArrayList<Long>();
-            List<Long> failedUnlockSkuPackageIds = new ArrayList<Long>();
+            Set<Long> failedIncreaseCountPackageIds = new HashSet<Long>();
+            Set<Long> failedUnlockSkuPackageIds = new HashSet<Long>();
             for (long packageId : packageUsers.keySet()) {
-                if (!orderService.increaseBookableCount(packageId)) failedIncreaseCountPackageIds.add(packageId);
-                if (!courseService.unlockSku(skuId)) failedUnlockSkuPackageIds.add(packageId);
-                courseService.decreaseJoined(courseId, sku.getJoinCount());
+                returnBookableCount(packageId, failedIncreaseCountPackageIds);
+                unlockSku(packageId, skuId, failedUnlockSkuPackageIds);
+                decreaseJoinCount(packageId, courseId, sku.getJoinCount());
             }
 
             if (failedIncreaseCountPackageIds.size() > 0) LOGGER.error("fail to increase bookable count of packages: {}", failedIncreaseCountPackageIds);
@@ -672,6 +672,32 @@ public class CourseController extends BaseController {
         }
 
         return MomiaHttpResponse.SUCCESS(successfulPackageUsers);
+    }
+
+    private void returnBookableCount(long packageId, Set<Long> failedIncreaseCountPackageIds) {
+        try {
+            if (!orderService.increaseBookableCount(packageId)) failedIncreaseCountPackageIds.add(packageId);
+        } catch (Exception e) {
+            LOGGER.error("exception when increasing bookable count of package: {}", packageId, e);
+            failedIncreaseCountPackageIds.add(packageId);
+        }
+    }
+
+    private void unlockSku(long packageId, long skuId, Set<Long> failedUnlockSkuPackageIds) {
+        try {
+            if (!courseService.unlockSku(skuId)) failedUnlockSkuPackageIds.add(packageId);
+        } catch (Exception e) {
+            LOGGER.error("exception when unlocking sku of package: {}", packageId, e);
+            failedUnlockSkuPackageIds.add(packageId);
+        }
+    }
+
+    private void decreaseJoinCount(long packageId,long courseId, int joinCount) {
+        try {
+            courseService.decreaseJoined(courseId, joinCount);
+        } catch (Exception e) {
+            LOGGER.error("exception when decreasing join count of package: {}", packageId, e);
+        }
     }
 
     @RequestMapping(value = "/checkin", method = RequestMethod.POST)
