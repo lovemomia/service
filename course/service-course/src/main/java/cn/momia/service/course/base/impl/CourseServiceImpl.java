@@ -789,7 +789,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
-    public List<Long> queryCancelPackageIds(Set<Long> userIds, long courseId, long courseSkuId) {
+    public List<Long> queryBookedPackageIds(Set<Long> userIds, long courseId, long courseSkuId) {
         if (userIds.isEmpty()) return new ArrayList<Long>();
 
         String sql = "SELECT PackageId FROM SG_BookedCourse WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND CourseId=? AND CourseSkuId=? AND Status<>0";

@@ -19,7 +19,10 @@ import cn.momia.service.course.coupon.CouponService;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderService;
 import cn.momia.service.course.order.OrderPackage;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,6 +42,8 @@ import java.util.Set;
 @RestController
 @RequestMapping(value = "/order")
 public class OrderController extends BaseController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
+
     @Autowired private CourseService courseService;
     @Autowired private SubjectService subjectService;
     @Autowired private OrderService orderService;
@@ -357,11 +362,15 @@ public class OrderController extends BaseController {
 
     @RequestMapping(value = "/package/time/extend", method = RequestMethod.POST)
     public MomiaHttpResponse extendPackageTime(@RequestParam(value = "pid") long packageId, @RequestParam int time) {
+        return MomiaHttpResponse.SUCCESS(doExtendPackageTime(packageId, time));
+    }
+
+    private boolean doExtendPackageTime(@RequestParam(value = "pid") long packageId, @RequestParam int time) {
         OrderPackage orderPackage = orderService.getOrderPackage(packageId);
         int originTime = orderPackage.getTime();
         int originTimeUnit = orderPackage.getTimeUnit();
 
-        int newTime = 0;
+        int newTime;
         int newTimeUnit = TimeUtil.TimeUnit.MONTH;
 
         switch (originTimeUnit) {
@@ -377,6 +386,30 @@ public class OrderController extends BaseController {
             default: throw new MomiaErrorException("无效的课程包");
         }
 
-        return MomiaHttpResponse.SUCCESS(orderService.extendPackageTime(packageId, newTime, newTimeUnit));
+        return orderService.extendPackageTime(packageId, newTime, newTimeUnit);
+    }
+
+    @RequestMapping(value = "/package/time/extend/batch", method = RequestMethod.POST)
+    public MomiaHttpResponse batchExtendPackageTime(@RequestParam(value = "uid") String uids,
+                                                    @RequestParam(value = "coid") long courseId,
+                                                    @RequestParam(value = "sid") long skuId,
+                                                    @RequestParam int time) {
+        Set<Long> userIds = new HashSet<Long>();
+        for (String userId : Splitter.on(",").omitEmptyStrings().trimResults().split(uids)) {
+            userIds.add(Long.valueOf(userId));
+        }
+
+        List<Long> packageIds = courseService.queryBookedPackageIds(userIds, courseId, skuId);
+        List<Long> failedPackageIds = new ArrayList<Long>();
+        for (long packageId : packageIds) {
+            try {
+                if (!doExtendPackageTime(packageId, time)) failedPackageIds.add(packageId);
+            } catch (Exception e) {
+                failedPackageIds.add(packageId);
+            }
+        }
+        if (!failedPackageIds.isEmpty()) LOGGER.error("fail to extend package times of: {}", failedPackageIds);
+
+        return MomiaHttpResponse.SUCCESS(failedPackageIds);
     }
 }

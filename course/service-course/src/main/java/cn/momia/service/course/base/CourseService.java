@@ -74,7 +74,7 @@ public interface CourseService {
     boolean cancel(long userId, long bookingId);
     void decreaseJoined(long courseId, int joinCount);
 
-    List<Long> queryCancelPackageIds(Set<Long> userIds, long courseId, long courseSkuId);
+    List<Long> queryBookedPackageIds(Set<Long> userIds, long courseId, long courseSkuId);
     void batchCancel(Set<Long> userIds, long courseId, long courseSkuId);
 
     CourseDetail getDetail(long courseId);

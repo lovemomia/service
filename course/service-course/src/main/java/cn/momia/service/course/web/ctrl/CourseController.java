@@ -651,7 +651,7 @@ public class CourseController extends BaseController {
         }
 
         CourseSku sku = courseService.getSku(skuId);
-        List<Long> packageIds = courseService.queryCancelPackageIds(userIds, courseId, skuId);
+        List<Long> packageIds = courseService.queryBookedPackageIds(userIds, courseId, skuId);
         if (packageIds.size() > 0) {
             courseService.batchCancel(userIds, courseId, skuId);
             List<Long> failedIncreaseCountPackageIds = new ArrayList<Long>();
