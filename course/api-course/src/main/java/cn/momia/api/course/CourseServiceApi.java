@@ -261,7 +261,7 @@ public class CourseServiceApi extends HttpServiceApi {
 
         Map<Long, Long> result = new HashMap<Long, Long>();
         for (Map.Entry<String, Long> entry : data.entrySet()) {
-            result.put(Long.valueOf(entry.getKey()), entry.getValue());
+            result.put(Long.valueOf(entry.getKey()), Long.class.cast(entry.getValue()));
         }
 
         return result;
