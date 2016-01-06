@@ -806,9 +806,9 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public Map<Long, Long> queryBookedPackageUsers(Collection<Long> userIds, long courseId, long courseSkuId) {
-        if (userIds.isEmpty()) return new HashMap<Long, Long>();
-
-        String sql = "SELECT PackageId, UserId FROM SG_BookedCourse WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND CourseId=? AND CourseSkuId=? AND Status<>0";
+        String sql = userIds.isEmpty() ?
+                "SELECT PackageId, UserId FROM SG_BookedCourse WHERE CourseId=? AND CourseSkuId=? AND Status<>0" :
+                "SELECT PackageId, UserId FROM SG_BookedCourse WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND CourseId=? AND CourseSkuId=? AND Status<>0";
         return queryMap(sql, new Object[] { courseId, courseSkuId }, Long.class, Long.class);
     }
 
