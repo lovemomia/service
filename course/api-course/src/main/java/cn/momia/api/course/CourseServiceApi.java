@@ -249,14 +249,14 @@ public class CourseServiceApi extends HttpServiceApi {
         return executeReturnObject(request, BookedCourse.class);
     }
 
-    public List<Long> batchCancel(Set<Long> userIds, long courseId, long skuId) {
+    public Map<Long, Long> batchCancel(Set<Long> userIds, long courseId, long skuId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uids", StringUtils.join(userIds, ","))
                 .add("coid", courseId)
                 .add("sid", skuId);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/course/cancel/batch"), builder.build());
 
-        return executeReturnList(request, Long.class);
+        return executeReturnObject(request, Map.class);
     }
 
     public boolean comment(JSONObject commentJson) {

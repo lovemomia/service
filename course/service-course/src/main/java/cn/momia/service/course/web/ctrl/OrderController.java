@@ -19,7 +19,6 @@ import cn.momia.service.course.coupon.CouponService;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderService;
 import cn.momia.service.course.order.OrderPackage;
-import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -362,10 +361,6 @@ public class OrderController extends BaseController {
 
     @RequestMapping(value = "/package/time/extend", method = RequestMethod.POST)
     public MomiaHttpResponse extendPackageTime(@RequestParam(value = "pid") long packageId, @RequestParam int time) {
-        return MomiaHttpResponse.SUCCESS(doExtendPackageTime(packageId, time));
-    }
-
-    private boolean doExtendPackageTime(@RequestParam(value = "pid") long packageId, @RequestParam int time) {
         OrderPackage orderPackage = orderService.getOrderPackage(packageId);
         int originTime = orderPackage.getTime();
         int originTimeUnit = orderPackage.getTimeUnit();
@@ -386,30 +381,6 @@ public class OrderController extends BaseController {
             default: throw new MomiaErrorException("无效的课程包");
         }
 
-        return orderService.extendPackageTime(packageId, newTime, newTimeUnit);
-    }
-
-    @RequestMapping(value = "/package/time/extend/batch", method = RequestMethod.POST)
-    public MomiaHttpResponse batchExtendPackageTime(@RequestParam(value = "uids") String uids,
-                                                    @RequestParam(value = "coid") long courseId,
-                                                    @RequestParam(value = "sid") long skuId,
-                                                    @RequestParam int time) {
-        Set<Long> userIds = new HashSet<Long>();
-        for (String userId : Splitter.on(",").omitEmptyStrings().trimResults().split(uids)) {
-            userIds.add(Long.valueOf(userId));
-        }
-
-        List<Long> packageIds = courseService.queryBookedPackageIds(userIds, courseId, skuId);
-        List<Long> failedPackageIds = new ArrayList<Long>();
-        for (long packageId : packageIds) {
-            try {
-                if (!doExtendPackageTime(packageId, time)) failedPackageIds.add(packageId);
-            } catch (Exception e) {
-                failedPackageIds.add(packageId);
-            }
-        }
-        if (!failedPackageIds.isEmpty()) LOGGER.error("fail to extend package times of: {}", failedPackageIds);
-
-        return MomiaHttpResponse.SUCCESS(failedPackageIds);
+        return MomiaHttpResponse.SUCCESS(orderService.extendPackageTime(packageId, newTime, newTimeUnit));
     }
 }

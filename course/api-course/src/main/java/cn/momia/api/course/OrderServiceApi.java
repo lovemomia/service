@@ -7,11 +7,7 @@ import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.http.MomiaHttpParamBuilder;
 import cn.momia.common.core.http.MomiaHttpRequestBuilder;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
-
-import java.util.Collection;
-import java.util.List;
 
 public class OrderServiceApi extends HttpServiceApi {
     public SubjectOrder placeOrder(JSONObject orderJson) {
@@ -73,16 +69,5 @@ public class OrderServiceApi extends HttpServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/order/package/time/extend"), builder.build());
 
         return executeReturnObject(request, Boolean.class);
-    }
-
-    public List<Long> batchExtendPackageTimes(Collection<Long> userIds, long courseId, long skuId, int time) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("uids", StringUtils.join(userIds, ","))
-                .add("coid", courseId)
-                .add("sid", skuId)
-                .add("time", time);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/order/package/time/extend/batch"), builder.build());
-
-        return executeReturnList(request, Long.class);
     }
 }
