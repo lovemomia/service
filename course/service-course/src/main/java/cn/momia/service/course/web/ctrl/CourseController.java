@@ -654,7 +654,7 @@ public class CourseController extends BaseController {
         Map<Long, Long> packageUsers = courseService.queryBookedPackageUsers(userIds, courseId, skuId);
         List<Long> successfulUserIds = new ArrayList<Long>();
         if (!packageUsers.isEmpty()) {
-            courseService.batchCancel(userIds, courseId, skuId);
+            courseService.batchCancel(packageUsers.values(), courseId, skuId);
             List<Long> failedIncreaseCountPackageIds = new ArrayList<Long>();
             List<Long> failedUnlockSkuPackageIds = new ArrayList<Long>();
             for (long packageId : packageUsers.keySet()) {
