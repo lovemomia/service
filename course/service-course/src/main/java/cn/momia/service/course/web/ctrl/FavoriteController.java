@@ -1,10 +1,10 @@
 package cn.momia.service.course.web.ctrl;
 
-import cn.momia.api.course.dto.Course;
-import cn.momia.api.course.dto.Favorite;
-import cn.momia.api.course.dto.Subject;
-import cn.momia.common.api.dto.PagedList;
-import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.api.course.dto.course.Course;
+import cn.momia.api.course.dto.favorite.Favorite;
+import cn.momia.api.course.dto.subject.Subject;
+import cn.momia.common.core.dto.PagedList;
+import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.favorite.FavoriteService;

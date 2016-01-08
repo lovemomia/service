@@ -1,11 +1,11 @@
 package cn.momia.service.course.web.ctrl;
 
-import cn.momia.api.course.dto.PaymentResult;
+import cn.momia.api.course.dto.subject.PaymentResult;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
-import cn.momia.common.api.exception.MomiaErrorException;
-import cn.momia.common.api.http.MomiaHttpResponse;
-import cn.momia.common.client.ClientType;
+import cn.momia.common.core.exception.MomiaErrorException;
+import cn.momia.common.core.http.MomiaHttpResponse;
+import cn.momia.common.core.platform.Platform;
 import cn.momia.common.deal.gateway.CallbackParam;
 import cn.momia.common.deal.gateway.CallbackResult;
 import cn.momia.common.deal.gateway.PayType;
@@ -18,10 +18,10 @@ import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.webapp.util.RequestUtil;
 import cn.momia.service.course.order.OrderPackage;
-import cn.momia.api.course.dto.Subject;
+import cn.momia.api.course.dto.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.coupon.CouponService;
-import cn.momia.api.course.dto.UserCoupon;
+import cn.momia.api.course.dto.coupon.UserCoupon;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderService;
 import cn.momia.service.course.order.Payment;
@@ -83,7 +83,7 @@ public class PaymentController extends BaseController {
     private PrepayParam buildPrepayParam(HttpServletRequest request, Order order, BigDecimal totalFee, Subject subject, int payType) {
         PrepayParam prepayParam = new PrepayParam();
 
-        prepayParam.setClientType(extractClientType(request, payType));
+        prepayParam.setPlatform(extractClientType(request, payType));
         prepayParam.setOrderId(order.getId());
         prepayParam.setProductId(subject.getId());
         prepayParam.setProductTitle(subject.getTitle());
@@ -110,13 +110,13 @@ public class PaymentController extends BaseController {
         switch (payType) {
             case PayType.ALIPAY:
                 String type = request.getParameter("type");
-                if ("app".equalsIgnoreCase(type)) return ClientType.APP;
-                else if ("wap".equalsIgnoreCase(type)) return ClientType.WAP;
+                if ("app".equalsIgnoreCase(type)) return Platform.APP;
+                else if ("wap".equalsIgnoreCase(type)) return Platform.WAP;
                 else throw new MomiaErrorException("not supported type: " + type);
             case PayType.WEIXIN:
                 String tradeType = request.getParameter("type");
-                if ("APP".equalsIgnoreCase(tradeType)) return ClientType.APP;
-                else if ("JSAPI".equalsIgnoreCase(tradeType)) return ClientType.WAP;
+                if ("APP".equalsIgnoreCase(tradeType)) return Platform.APP;
+                else if ("JSAPI".equalsIgnoreCase(tradeType)) return Platform.WAP;
                 else throw new MomiaErrorException("not supported trade type: " + tradeType);
             default: return 0;
         }

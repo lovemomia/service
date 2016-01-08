@@ -2,6 +2,7 @@ package cn.momia.service.course.order;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface OrderService {
@@ -19,8 +20,12 @@ public interface OrderService {
     long queryBookableCountByUser(long userId);
     List<OrderPackage> queryBookableByUser(long userId, int start, int count);
 
+    Map<Long,Long> queryBookablePackageIds(Set<Long> userIds, long subjectId);
+
     OrderPackage getOrderPackage(long packageId);
     Set<Integer> getOrderPackageTypes(long orderId);
+
+    boolean extendPackageTime(long packageId, int newTime, int newTimeUnit);
 
     boolean prepay(long orderId);
     boolean pay(Payment payment);

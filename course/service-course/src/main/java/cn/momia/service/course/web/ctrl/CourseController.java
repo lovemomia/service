@@ -1,27 +1,28 @@
 package cn.momia.service.course.web.ctrl;
 
-import cn.momia.api.course.dto.Course;
-import cn.momia.api.course.dto.CourseDetail;
-import cn.momia.api.course.dto.CourseSkuPlace;
-import cn.momia.api.course.dto.DatedCourseSkus;
+import cn.momia.api.course.dto.course.Course;
+import cn.momia.api.course.dto.course.CourseDetail;
+import cn.momia.api.course.dto.course.CourseSkuPlace;
+import cn.momia.api.course.dto.course.DatedCourseSkus;
+import cn.momia.api.course.dto.course.Student;
+import cn.momia.api.course.dto.course.TeacherCourse;
+import cn.momia.api.user.ChildServiceApi;
 import cn.momia.api.user.UserServiceApi;
+import cn.momia.api.user.dto.Child;
 import cn.momia.api.user.dto.User;
-import cn.momia.common.api.dto.PagedList;
-import cn.momia.common.api.http.MomiaHttpResponse;
-import cn.momia.common.util.PoiUtil;
-import cn.momia.common.util.TimeUtil;
+import cn.momia.common.core.dto.PagedList;
+import cn.momia.common.core.exception.MomiaErrorException;
+import cn.momia.common.core.http.MomiaHttpResponse;
+import cn.momia.common.core.util.PoiUtil;
+import cn.momia.common.core.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.api.course.dto.BookedCourse;
+import cn.momia.api.course.dto.course.BookedCourse;
 import cn.momia.service.course.base.CourseService;
-import cn.momia.api.course.dto.CourseSku;
-import cn.momia.api.course.dto.Institution;
-import cn.momia.api.course.dto.Teacher;
+import cn.momia.api.course.dto.course.CourseSku;
 import cn.momia.service.course.comment.CourseCommentService;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderPackage;
 import cn.momia.service.course.order.OrderService;
-import cn.momia.service.course.subject.SubjectService;
-import cn.momia.api.course.dto.SubjectSku;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -58,10 +59,10 @@ public class CourseController extends BaseController {
 
     @Autowired private CourseService courseService;
     @Autowired private CourseCommentService courseCommentService;
-    @Autowired private SubjectService subjectService;
     @Autowired private OrderService orderService;
 
     @Autowired private UserServiceApi userServiceApi;
+    @Autowired private ChildServiceApi childServiceApi;
 
     @RequestMapping(value = "/recommend", method = RequestMethod.GET)
     public MomiaHttpResponse listRecommend(@RequestParam(value = "city") long cityId, @RequestParam int start, @RequestParam int count) {
@@ -74,15 +75,19 @@ public class CourseController extends BaseController {
     }
 
     private PagedList<Course> buildPagedCourses(List<Course> courses, long totalCount, int start, int count) {
+        PagedList<Course> pagedCourses = new PagedList<Course>(totalCount, start, count);
+        pagedCourses.setList(buildBaseCourses(courses));
+
+        return pagedCourses;
+    }
+
+    private List<Course> buildBaseCourses(List<Course> courses) {
         List<Course> baseCourses = new ArrayList<Course>();
         for (Course course : courses) {
             baseCourses.add(new Course.Base(course));
         }
 
-        PagedList<Course> pagedCourses = new PagedList<Course>(totalCount, start, count);
-        pagedCourses.setList(baseCourses);
-
-        return pagedCourses;
+        return baseCourses;
     }
 
     @RequestMapping(value = "/trial", method = RequestMethod.GET)
@@ -191,6 +196,17 @@ public class CourseController extends BaseController {
         return earliestSku == null ? "" : earliestSku.getScheduler();
     }
 
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public MomiaHttpResponse listCourses(@RequestParam String coids) {
+        Set<Long> courseIds = new HashSet<Long>();
+        for (String courseId : Splitter.on(",").trimResults().omitEmptyStrings().split(coids)) {
+            courseIds.add(Long.valueOf(courseId));
+        }
+        List<Course> courses = courseService.list(courseIds);
+
+        return MomiaHttpResponse.SUCCESS(buildBaseCourses(courses));
+    }
+
     @RequestMapping(value = "/finished/list", method = RequestMethod.GET)
     public MomiaHttpResponse listFinished(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
@@ -226,10 +242,10 @@ public class CourseController extends BaseController {
 
     @RequestMapping(value = "/{coid}/institution", method = RequestMethod.GET)
     public MomiaHttpResponse institution(@PathVariable(value = "coid") long courseId) {
-        Institution institution = courseService.getInstitution(courseId);
-        if (!institution.exists()) return MomiaHttpResponse.FAILED("机构不存在");
+        int institutionId = courseService.getInstitutionId(courseId);
+        if (institutionId <= 0) return MomiaHttpResponse.FAILED("机构不存在");
 
-        return MomiaHttpResponse.SUCCESS(institution);
+        return MomiaHttpResponse.SUCCESS(institutionId);
     }
 
     @RequestMapping(value = "/{coid}/book", method = RequestMethod.GET)
@@ -245,15 +261,15 @@ public class CourseController extends BaseController {
     }
 
     @RequestMapping(value = "/{coid}/teacher", method = RequestMethod.GET)
-    public MomiaHttpResponse teacher(@PathVariable(value = "coid") long courseId, @RequestParam int start, @RequestParam int count) {
+    public MomiaHttpResponse teacherIds(@PathVariable(value = "coid") long courseId, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
-        long totalCount = courseService.queryTeacherCount(courseId);
-        List<Teacher> teachers = courseService.queryTeachers(courseId, start, count);
-        PagedList<Teacher> pagedTeachers = new PagedList<Teacher>(totalCount, start, count);
-        pagedTeachers.setList(teachers);
+        long totalCount = courseService.queryTeacherIdsCount(courseId);
+        List<Integer> teacherIds = courseService.queryTeacherIds(courseId, start, count);
+        PagedList<Integer> pagedTeacherIds = new PagedList<Integer>(totalCount, start, count);
+        pagedTeacherIds.setList(teacherIds);
 
-        return MomiaHttpResponse.SUCCESS(pagedTeachers);
+        return MomiaHttpResponse.SUCCESS(pagedTeacherIds);
     }
 
     @RequestMapping(value = "/tips", method = RequestMethod.GET)
@@ -264,6 +280,16 @@ public class CourseController extends BaseController {
         }
 
         return MomiaHttpResponse.SUCCESS(courseService.queryTips(courseIds));
+    }
+
+    @RequestMapping(value = "/sku/list", method = RequestMethod.GET)
+    public MomiaHttpResponse listSkus(@RequestParam String sids) {
+        Set<Long> skuIds = new HashSet<Long>();
+        for (String skuId : Splitter.on(",").trimResults().omitEmptyStrings().split(sids)) {
+            skuIds.add(Long.valueOf(skuId));
+        }
+
+        return MomiaHttpResponse.SUCCESS(courseService.listSkus(skuIds));
     }
 
     @RequestMapping(value = "/{coid}/sku/{sid}", method = RequestMethod.GET)
@@ -379,8 +405,6 @@ public class CourseController extends BaseController {
         for (BookedCourse bookedCourse : bookedCourses) {
             Course course = coursesMap.get(bookedCourse.getCourseId());
             if (course == null) continue;
-            List<CourseSku> skus = course.getSkus();
-            if (skus.isEmpty()) continue;
             CourseSkuPlace place = course.getPlace(bookedCourse.getCourseSkuId());
             if (place == null) continue;
 
@@ -411,6 +435,87 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(pagedBookedCourses);
     }
 
+    @RequestMapping(value = "/teacher/ongoing", method = RequestMethod.GET)
+    public MomiaHttpResponse teacherOngoing(@RequestParam(value = "uid") long userId) {
+        List<TeacherCourse> courses = completeTeacherCourses(courseService.queryOngoingByTeacher(userId), false);
+        if (courses.isEmpty()) return MomiaHttpResponse.SUCCESS(TeacherCourse.NOT_EXIST_TEACHER_COURSE);
+
+        return MomiaHttpResponse.SUCCESS(courses.get(0));
+    }
+
+    private List<TeacherCourse> completeTeacherCourses(List<TeacherCourse> teacherCourses, boolean finished) {
+        Set<Long> courseIds = new HashSet<Long>();
+        for (TeacherCourse teacherCourse : teacherCourses) {
+            courseIds.add(teacherCourse.getCourseId());
+        }
+
+        List<Course> courses = courseService.list(courseIds);
+        Map<Long, Course> coursesMap = new HashMap<Long, Course>();
+        for (Course course : courses) {
+            coursesMap.put(course.getId(), course);
+        }
+
+        List<TeacherCourse> completedTeacherCourses = new ArrayList<TeacherCourse>();
+        for (TeacherCourse teacherCourse : teacherCourses) {
+            Course course = coursesMap.get(teacherCourse.getCourseId());
+            if (course == null) continue;
+            CourseSkuPlace place = course.getPlace(teacherCourse.getCourseSkuId());
+            if (place == null) continue;
+
+            TeacherCourse completedTeacherCourse = new TeacherCourse();
+            completedTeacherCourse.setCourseId(teacherCourse.getCourseId());
+            completedTeacherCourse.setCourseSkuId(teacherCourse.getCourseSkuId());
+            completedTeacherCourse.setCover(course.getCover());
+            completedTeacherCourse.setTitle(course.getTitle());
+            completedTeacherCourse.setScheduler(course.getScheduler(teacherCourse.getCourseSkuId()));
+            completedTeacherCourse.setAddress(place.getAddress());
+
+            completedTeacherCourses.add(completedTeacherCourse);
+        }
+
+        if (finished) {
+            Set<Long> courseSkuIds = new HashSet<Long>();
+            for (TeacherCourse teacherCourse : completedTeacherCourses) {
+                courseSkuIds.add(teacherCourse.getCourseSkuId());
+            }
+
+            Map<Long, Long> checkInCountMap = courseService.queryCheckInCounts(courseSkuIds);
+            Map<Long, Long> commentedCountMap = courseService.queryCommentedChildrenCount(courseSkuIds);
+
+            for (TeacherCourse teacherCourse : completedTeacherCourses) {
+                if (checkInCountMap.get(teacherCourse.getCourseSkuId()) == commentedCountMap.get(teacherCourse.getCourseSkuId())) teacherCourse.setCommented(true);
+            }
+        }
+
+        return completedTeacherCourses;
+    }
+
+    @RequestMapping(value = "/teacher/notfinished", method = RequestMethod.GET)
+    public MomiaHttpResponse teacherNotFinished(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = courseService.queryNotFinishedCountByTeacher(userId);
+        List<TeacherCourse> courses = courseService.queryNotFinishedByTeacher(userId, start, count);
+
+        PagedList<TeacherCourse> pagedCourses = new PagedList<TeacherCourse>(totalCount, start, count);
+        pagedCourses.setList(completeTeacherCourses(courses, false));
+
+        return MomiaHttpResponse.SUCCESS(pagedCourses);
+    }
+
+    @RequestMapping(value = "/teacher/finished", method = RequestMethod.GET)
+    public MomiaHttpResponse teacherFinished(@RequestParam(value = "uid") long userId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        long totalCount = courseService.queryFinishedCountByTeacher(userId);
+        List<TeacherCourse> courses = courseService.queryFinishedByTeacher(userId, start, count);
+
+        PagedList<TeacherCourse> pagedCourses = new PagedList<TeacherCourse>(totalCount, start, count);
+        pagedCourses.setList(completeTeacherCourses(courses, true));
+
+        return MomiaHttpResponse.SUCCESS(pagedCourses);
+    }
+
     @RequestMapping(value = "/{coid}/joined", method = RequestMethod.GET)
     public MomiaHttpResponse finished(@RequestParam(value = "uid") long userId, @PathVariable(value = "coid") long courseId) {
         return MomiaHttpResponse.SUCCESS(courseService.joined(userId, courseId));
@@ -418,59 +523,99 @@ public class CourseController extends BaseController {
 
     @RequestMapping(value = "/booking", method = RequestMethod.POST)
     public MomiaHttpResponse booking(@RequestParam String utoken,
+                                     @RequestParam(value = "cid") long childId,
                                      @RequestParam(value = "pid") long packageId,
                                      @RequestParam(value = "sid") long skuId) {
-        OrderPackage orderPackage = orderService.getOrderPackage(packageId);
-        if (!orderPackage.exists()) return MomiaHttpResponse.FAILED("预约失败，无效的课程包");
+        User user = userServiceApi.get(utoken);
+        return MomiaHttpResponse.SUCCESS(doBooking(user, childId, packageId, skuId));
+    }
 
-        SubjectSku subjectSku = subjectService.getSku(orderPackage.getSkuId());
-        if (!subjectSku.exists()) return MomiaHttpResponse.FAILED("预约失败，无效的课程包");
+    private BookedCourse doBooking(User user, long childId, long packageId, long skuId) {
+        OrderPackage orderPackage = orderService.getOrderPackage(packageId);
+        if (!orderPackage.exists()) throw new MomiaErrorException("预约失败，无效的课程包");
 
         CourseSku sku = courseService.getSku(skuId);
-        if (!sku.exists() || !sku.isBookable(new Date())) return MomiaHttpResponse.FAILED("预约失败，无效的课程场次或本场次已截止选课");
-        if (orderPackage.getCourseId() > 0 && orderPackage.getCourseId() != sku.getCourseId()) return MomiaHttpResponse.FAILED("预约失败，课程与购买的包不匹配");
+        if (!sku.exists() || !sku.isBookable(new Date())) throw new MomiaErrorException("预约失败，无效的课程场次或本场次已截止选课");
+        if (orderPackage.getCourseId() > 0 && orderPackage.getCourseId() != sku.getCourseId()) throw new MomiaErrorException("预约失败，课程与购买的包不匹配");
 
         Map<Long, Date> startTimes = courseService.queryStartTimesByPackages(Sets.newHashSet(packageId));
         Date startTime = startTimes.get(packageId);
         if (startTime != null) {
-            Date endTime = TimeUtil.add(startTime, subjectSku.getTime(), subjectSku.getTimeUnit());
-            if (endTime.before(sku.getStartTime())) return MomiaHttpResponse.FAILED("预约失败，该课程的时间超出了课程包的有效期");
+            Date endTime = TimeUtil.add(startTime, orderPackage.getTime(), orderPackage.getTimeUnit());
+            if (endTime.before(sku.getStartTime())) throw new MomiaErrorException("预约失败，该课程的时间超出了课程包的有效期");
         }
 
         Order order = orderService.get(orderPackage.getOrderId());
-        User user = userServiceApi.get(utoken);
-        if (!order.exists() || !order.isPayed() || order.getUserId() != user.getId()) return MomiaHttpResponse.FAILED("预约失败，无效的订单");
+        if (!order.exists() || !order.isPayed() || order.getUserId() != user.getId()) throw new MomiaErrorException("预约失败，无效的订单");
 
-        if (courseService.booked(packageId, sku.getCourseId())) return MomiaHttpResponse.FAILED("一门课程在一个课程包内只能约一次");
-        if (!courseService.matched(order.getSubjectId(), sku.getCourseId())) return MomiaHttpResponse.FAILED("课程不匹配");
+        if (courseService.booked(packageId, sku.getCourseId())) throw new MomiaErrorException("一门课程在一个课程包内只能约一次");
+        if (!courseService.matched(order.getSubjectId(), sku.getCourseId())) throw new MomiaErrorException("课程不匹配");
 
-        if (!courseService.lockSku(skuId)) return MomiaHttpResponse.FAILED("库存不足");
-        LOGGER.info("course sku locked: {}/{}/{}", new Object[] { user, packageId, skuId });
+        if (!courseService.lockSku(skuId)) throw new MomiaErrorException("库存不足");
+        LOGGER.info("course sku locked: {}/{}/{}", new Object[] { user.getId(), packageId, skuId });
 
         long bookingId = 0;
         try {
             if (orderService.decreaseBookableCount(packageId)) {
-                bookingId = courseService.booking(user.getId(), order.getId(), packageId, sku);
-                if (bookingId > 0) {
-                    courseService.increaseJoined(sku.getCourseId(), sku.getJoinCount());
-                }
+                bookingId = courseService.booking(user.getId(), childId > 0 ? childId : getChildId(user), order.getId(), packageId, sku);
+                if (bookingId > 0) courseService.increaseJoined(sku.getCourseId(), sku.getJoinCount());
             } else {
-                return MomiaHttpResponse.FAILED("本课程包的课程已经约满");
+                throw new MomiaErrorException("本课程包的课程已经约满");
             }
-        } catch (Exception e) {
-            LOGGER.error("exception when booking course, {}/{}/{}", new Object[] { user.getId(), packageId, skuId, e });
         } finally {
             // TODO 需要告警
             if (bookingId <= 0 && !courseService.unlockSku(skuId)) LOGGER.error("fail to unlock course sku, skuId: {}", skuId);
         }
 
-        if (bookingId <= 0) return MomiaHttpResponse.FAILED("选课失败");
+        if (bookingId <= 0) throw new MomiaErrorException("选课失败");
 
         BookedCourse bookedCourse = courseService.getBookedCourse(bookingId);
         List<BookedCourse> completedBookedCourses = completeBookedCourses(user.getId(), Lists.newArrayList(bookedCourse));
-        if (completedBookedCourses.isEmpty()) return MomiaHttpResponse.FAILED("选课失败");
+        if (completedBookedCourses.isEmpty()) throw new MomiaErrorException("选课失败");
 
-        return MomiaHttpResponse.SUCCESS(completedBookedCourses.get(0));
+        return completedBookedCourses.get(0);
+    }
+
+    private long getChildId(User user) {
+        List<Child> children = user.getChildren();
+        if (children != null && children.size() == 1) return children.get(0).getId();
+        return 0;
+    }
+
+    @RequestMapping(value = "/booking/batch", method = RequestMethod.POST)
+    public MomiaHttpResponse batchBooking(@RequestParam String uids,
+                                          @RequestParam(value = "coid") long courseId,
+                                          @RequestParam(value = "sid") long skuId) {
+        Set<Long> userIds = new HashSet<Long>();
+        for (String userId : Splitter.on(",").omitEmptyStrings().trimResults().split(uids)) {
+            userIds.add(Long.valueOf(userId));
+        }
+
+        long subjectId = courseService.querySubjectId(courseId);
+        Map<Long, Long> packageIds = orderService.queryBookablePackageIds(userIds, subjectId);
+
+        List<User> users = userServiceApi.list(userIds, User.Type.FULL);
+        Map<Long, User> usersMap = new HashMap<Long, User>();
+        for (User user : users) {
+            usersMap.put(user.getId(), user);
+        }
+
+        Set<Long> failedUserIds = new HashSet<Long>();
+        for (long userId : userIds) {
+            if (packageIds.containsKey(userId) && usersMap.containsKey(userId)) {
+                try {
+                    User user = usersMap.get(userId);
+                    doBooking(user, 0, packageIds.get(userId), skuId);
+                } catch (Exception e) {
+                    LOGGER.error("batch booking error, {}/{}/{}", new Object[] { userId, courseId, skuId, e });
+                    failedUserIds.add(userId);
+                }
+            } else {
+                failedUserIds.add(userId);
+            }
+        }
+
+        return MomiaHttpResponse.SUCCESS(failedUserIds);
     }
 
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
@@ -494,5 +639,116 @@ public class CourseController extends BaseController {
         if (completedBookedCourses.isEmpty()) return MomiaHttpResponse.FAILED("取消选课失败");
 
         return MomiaHttpResponse.SUCCESS(completedBookedCourses.get(0));
+    }
+
+    @RequestMapping(value = "/cancel/batch", method = RequestMethod.POST)
+    public MomiaHttpResponse batchCancel(@RequestParam String uids,
+                                         @RequestParam(value = "coid") long courseId,
+                                         @RequestParam(value = "sid") long skuId) {
+        Set<Long> userIds = new HashSet<Long>();
+        for (String userId : Splitter.on(",").omitEmptyStrings().trimResults().split(uids)) {
+            userIds.add(Long.valueOf(userId));
+        }
+
+        CourseSku sku = courseService.getSku(skuId);
+        Map<Long, Long> packageUsers = courseService.queryBookedPackageUsers(userIds, courseId, skuId);
+        Map<Long, Long> successfulPackageUsers = new HashMap<Long, Long>();
+        if (!packageUsers.isEmpty()) {
+            courseService.batchCancel(packageUsers.values(), courseId, skuId);
+            Set<Long> failedIncreaseCountPackageIds = new HashSet<Long>();
+            Set<Long> failedUnlockSkuPackageIds = new HashSet<Long>();
+            for (long packageId : packageUsers.keySet()) {
+                returnBookableCount(packageId, failedIncreaseCountPackageIds);
+                unlockSku(packageId, skuId, failedUnlockSkuPackageIds);
+                decreaseJoinCount(packageId, courseId, sku.getJoinCount());
+            }
+
+            if (failedIncreaseCountPackageIds.size() > 0) LOGGER.error("fail to increase bookable count of packages: {}", failedIncreaseCountPackageIds);
+            if (failedUnlockSkuPackageIds.size() > 0) LOGGER.error("fail to unlock skus of packages: {}", failedUnlockSkuPackageIds);
+
+            for (Map.Entry<Long, Long> entry : packageUsers.entrySet()) {
+                if (!failedIncreaseCountPackageIds.contains(entry.getKey())) successfulPackageUsers.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        return MomiaHttpResponse.SUCCESS(successfulPackageUsers);
+    }
+
+    private void returnBookableCount(long packageId, Set<Long> failedIncreaseCountPackageIds) {
+        try {
+            if (!orderService.increaseBookableCount(packageId)) failedIncreaseCountPackageIds.add(packageId);
+        } catch (Exception e) {
+            LOGGER.error("exception when increasing bookable count of package: {}", packageId, e);
+            failedIncreaseCountPackageIds.add(packageId);
+        }
+    }
+
+    private void unlockSku(long packageId, long skuId, Set<Long> failedUnlockSkuPackageIds) {
+        try {
+            if (!courseService.unlockSku(skuId)) failedUnlockSkuPackageIds.add(packageId);
+        } catch (Exception e) {
+            LOGGER.error("exception when unlocking sku of package: {}", packageId, e);
+            failedUnlockSkuPackageIds.add(packageId);
+        }
+    }
+
+    private void decreaseJoinCount(long packageId,long courseId, int joinCount) {
+        try {
+            courseService.decreaseJoined(courseId, joinCount);
+        } catch (Exception e) {
+            LOGGER.error("exception when decreasing join count of package: {}", packageId, e);
+        }
+    }
+
+    @RequestMapping(value = "/checkin", method = RequestMethod.POST)
+    public MomiaHttpResponse checkin(@RequestParam String utoken,
+                                     @RequestParam(value = "uid") long userId,
+                                     @RequestParam(value = "pid") long packageId,
+                                     @RequestParam(value = "coid") long courseId,
+                                     @RequestParam(value = "sid") long courseSkuId) {
+        User teacherUser = userServiceApi.get(utoken);
+        if (teacherUser.isNormal()) return MomiaHttpResponse.FAILED("您无权操作");
+
+        return MomiaHttpResponse.SUCCESS(courseService.checkin(userId, packageId, courseId, courseSkuId));
+    }
+
+    @RequestMapping(value = "/ongoing/student", method = RequestMethod.GET)
+    public MomiaHttpResponse ongoingStudents(@RequestParam String utoken,
+                                             @RequestParam(value = "coid") long courseId,
+                                             @RequestParam(value = "sid") long courseSkuId) {
+        User teacherUser = userServiceApi.get(utoken);
+        if (teacherUser.isNormal()) return MomiaHttpResponse.FAILED("您无权查看");
+
+        List<Student> students = courseService.queryAllStudents(courseId, courseSkuId);
+        students.addAll(courseService.queryParentWithoutChild(courseId, courseSkuId));
+
+        return MomiaHttpResponse.SUCCESS(students);
+    }
+
+    @RequestMapping(value = "/notfinished/student", method = RequestMethod.GET)
+    public MomiaHttpResponse notfinishedStudents(@RequestParam String utoken,
+                                                 @RequestParam(value = "coid") long courseId,
+                                                 @RequestParam(value = "sid") long courseSkuId) {
+        User teacherUser = userServiceApi.get(utoken);
+        if (teacherUser.isNormal()) return MomiaHttpResponse.FAILED("您无权查看");
+
+        return MomiaHttpResponse.SUCCESS(courseService.queryAllStudents(courseId, courseSkuId));
+    }
+
+    @RequestMapping(value = "/finished/student", method = RequestMethod.GET)
+    public MomiaHttpResponse finishedStudents(@RequestParam String utoken,
+                                              @RequestParam(value = "coid") long courseId,
+                                              @RequestParam(value = "sid") long courseSkuId) {
+        User teacherUser = userServiceApi.get(utoken);
+        if (teacherUser.isNormal()) return MomiaHttpResponse.FAILED("您无权查看");
+
+        List<Student> students = courseService.queryCheckInStudents(courseId, courseSkuId);
+
+        Set<Long> commentedChildIds = Sets.newHashSet(childServiceApi.queryCommentedChildIds(courseId, courseSkuId));
+        for (Student student : students) {
+            if (commentedChildIds.contains(student.getId())) student.setCommented(true);
+        }
+
+        return MomiaHttpResponse.SUCCESS(students);
     }
 }

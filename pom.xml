@@ -6,18 +6,17 @@
 
     <groupId>cn.momia</groupId>
     <artifactId>service</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <packaging>pom</packaging>
 
     <name>Momia Service</name>
     <url>http://www.momia.cn</url>
 
     <modules>
-        <module>base</module>
         <module>course</module>
-        <module>event</module>
         <module>feed</module>
         <module>im</module>
+        <module>operate</module>
         <module>poi</module>
         <module>user</module>
 

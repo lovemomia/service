@@ -1,11 +1,11 @@
 package cn.momia.service.course.web.ctrl;
 
-import cn.momia.common.api.dto.PagedList;
-import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.core.dto.PagedList;
+import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.api.course.dto.Subject;
+import cn.momia.api.course.dto.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
-import cn.momia.api.course.dto.SubjectSku;
+import cn.momia.api.course.dto.subject.SubjectSku;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

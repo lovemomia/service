@@ -1,9 +1,9 @@
 package cn.momia.service.feed.base.impl;
 
 import cn.momia.api.feed.dto.FeedTag;
-import cn.momia.common.api.exception.MomiaErrorException;
+import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
-import cn.momia.service.feed.base.Feed;
+import cn.momia.api.feed.dto.Feed;
 import cn.momia.service.feed.base.FeedService;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
@@ -63,7 +63,7 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
                 ps.setString(7, feed.getCourseTitle());
                 ps.setDouble(8, feed.getLng());
                 ps.setDouble(9, feed.getLat());
-                ps.setInt(10, feed.getOfficial());
+                ps.setBoolean(10, feed.isOfficial());
 
                 return ps;
             }
@@ -339,11 +339,5 @@ public class FeedServiceImpl extends AbstractService implements FeedService {
     @Override
     public List<FeedTag> listHotTags(int count) {
         return listTags(0, count);
-    }
-
-    @Override
-    public List<String> queryLatestImgs(long userId) {
-        String sql = "SELECT B.Url FROM SG_Feed A INNER JOIN SG_FeedImg B ON A.Id=B.FeedId WHERE A.UserId=? AND A.Status<>0 AND B.Status<>0 ORDER BY B.AddTime DESC LIMIT 4";
-        return queryStringList(sql, new Object[] { userId });
     }
 }

@@ -5,11 +5,11 @@ import java.util.List;
 
 public interface FeedStarService {
     boolean isStared(long userId, long feedId);
-    List<Long> queryStaredFeeds(long userId, Collection<Long> feedIds);
+    List<Long> queryStaredFeedIds(long userId, Collection<Long> feedIds);
 
     boolean add(long userId, long feedId);
     boolean delete(long userId, long feedId);
 
-    int queryUserCount(long feedId);
+    long queryUserIdsCount(long feedId);
     List<Long> queryUserIds(long feedId, int start, int count);
 }

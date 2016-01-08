@@ -1,7 +1,8 @@
 package cn.momia.service.im.impl;
 
 import cn.momia.api.im.dto.Group;
-import cn.momia.api.im.dto.Member;
+import cn.momia.api.im.dto.GroupMember;
+import cn.momia.api.im.dto.UserGroup;
 import cn.momia.common.service.AbstractService;
 import cn.momia.service.im.ImService;
 import com.google.common.collect.Sets;
@@ -11,9 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public abstract class AbstractImService extends AbstractService implements ImService {
@@ -142,48 +141,18 @@ public abstract class AbstractImService extends AbstractService implements ImSer
     }
 
     @Override
-    public List<Member> queryMembersByGroup(long groupId) {
-        String sql = "SELECT Id FROM SG_ImGroupMember WHERE GroupId=? AND Status<>0 GROUP BY UserId ORDER BY MAX(Teacher) DESC, MAX(AddTime) ASC";
-        List<Long> memberIds = queryLongList(sql, new Object[] { groupId });
-
-        return listMembers(memberIds);
-    }
-
-    private List<Member> listMembers(Collection<Long> memberIds) {
-        if (memberIds.isEmpty()) return new ArrayList<Member>();
-
-        String sql = "SELECT Id, GroupId, UserId, Teacher, AddTime FROM SG_ImGroupMember WHERE Id IN (" + StringUtils.join(memberIds, ",") + ")";
-        List<Member> members = queryObjectList(sql, Member.class);
-
-        Map<Long, Member> membersMap = new HashMap<Long, Member>();
-        for (Member member : members) {
-            membersMap.put(member.getId(), member);
-        }
-
-        List<Member> result = new ArrayList<Member>();
-        for (long memberId : memberIds) {
-            Member member = membersMap.get(memberId);
-            if (member != null) result.add(member);
-        }
-
-        return result;
+    public List<GroupMember> listGroupMembers(long groupId) {
+        String sql = "SELECT Id, GroupId, UserId, Teacher, AddTime FROM SG_ImGroupMember WHERE GroupId=? AND Status<>0 GROUP BY UserId ORDER BY MAX(Teacher) DESC, MAX(AddTime) ASC";
+        return queryObjectList(sql, new Object[] { groupId }, GroupMember.class);
     }
 
     @Override
-    public List<Member> queryMembersByUser(long userId) {
-        String sql = "SELECT Id FROM SG_ImGroupMember WHERE UserId=? AND Status<>0 GROUP BY GroupId ORDER BY MAX(AddTime) ASC";
-        List<Long> memberIds = queryLongList(sql, new Object[] { userId });
-
-        return listMembers(memberIds);
-    }
-
-    @Override
-    public boolean joinGroup(long courseId, long courseSkuId, long userId, boolean teacher) {
+    public boolean joinGroup(long userId, long courseId, long courseSkuId) {
         Group group = queryGroup(courseId, courseSkuId);
         if (!group.exists()) return false;
 
-        if (doJoinGroup(group.getGroupId(), group.getGroupName(), userId)) {
-            logGroupMembers(group.getGroupId(), Sets.newHashSet(userId), teacher);
+        if (doJoinGroup(userId, group.getGroupId(), group.getGroupName())) {
+            logGroupMembers(group.getGroupId(), Sets.newHashSet(userId), false);
             return true;
         }
 
@@ -198,14 +167,14 @@ public abstract class AbstractImService extends AbstractService implements ImSer
         return groups.isEmpty() ? Group.NOT_EXIST_GROUP : groups.get(0);
     }
 
-    protected abstract boolean doJoinGroup(long groupId, String groupName, long userId);
+    protected abstract boolean doJoinGroup(long userId, long groupId, String groupName);
 
     @Override
-    public boolean leaveGroup(long courseId, long courseSkuId, long userId) {
+    public boolean leaveGroup(long userId, long courseId, long courseSkuId) {
         Group group = queryGroup(courseId, courseSkuId);
         if (!group.exists()) return false;
 
-        if (doLeaveGroup(group.getGroupId(), userId)) {
+        if (doLeaveGroup(userId, group.getGroupId())) {
             deleteGroupMembersLog(group.getGroupId(), Sets.newHashSet(userId));
             return true;
         }
@@ -213,7 +182,7 @@ public abstract class AbstractImService extends AbstractService implements ImSer
         return false;
     }
 
-    protected abstract boolean doLeaveGroup(long groupId, long userId);
+    protected abstract boolean doLeaveGroup(long userId, long groupId);
 
     private void deleteGroupMembersLog(long groupId, Collection<Long> userIds) {
         String sql = "UPDATE SG_ImGroupMember SET Status=0 WHERE GroupId=? AND UserId=?";
@@ -222,5 +191,11 @@ public abstract class AbstractImService extends AbstractService implements ImSer
             args.add(new Object[] { groupId, userId });
         }
         batchUpdate(sql, args);
+    }
+
+    @Override
+    public List<UserGroup> listUserGroups(long userId) {
+        String sql = "SELECT A.UserId, A.GroupId, B.GroupName, B.CourseId, A.AddTime FROM SG_ImGroupMember A INNER JOIN SG_ImGroup B ON A.GroupId=B.GroupId WHERE A.UserId=? AND A.Status<>0 AND B.Status<>0 GROUP BY A.GroupId ORDER BY B.GroupName ASC";
+        return queryObjectList(sql, new Object[] { userId }, UserGroup.class);
     }
 }

@@ -1,6 +1,6 @@
 package cn.momia.service.course.favorite.impl;
 
-import cn.momia.api.course.dto.Favorite;
+import cn.momia.api.course.dto.favorite.Favorite;
 import cn.momia.common.service.AbstractService;
 import cn.momia.service.course.favorite.FavoriteService;
 

@@ -1,5 +1,6 @@
 package cn.momia.service.feed.base;
 
+import cn.momia.api.feed.dto.Feed;
 import cn.momia.api.feed.dto.FeedTag;
 
 import java.util.Collection;
@@ -38,6 +39,4 @@ public interface FeedService {
     FeedTag query(String tagName);
     List<FeedTag> listRecommendedTags(int count);
     List<FeedTag> listHotTags(int count);
-
-    List<String> queryLatestImgs(long userId);
 }

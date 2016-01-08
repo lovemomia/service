@@ -1,12 +1,12 @@
 package cn.momia.service.course.coupon.impl;
 
-import cn.momia.common.api.exception.MomiaErrorException;
+import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
-import cn.momia.common.util.TimeUtil;
+import cn.momia.common.core.util.TimeUtil;
 import cn.momia.service.course.coupon.Coupon;
 import cn.momia.service.course.coupon.CouponService;
 import cn.momia.service.course.coupon.InviteCoupon;
-import cn.momia.api.course.dto.UserCoupon;
+import cn.momia.api.course.dto.coupon.UserCoupon;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -56,7 +56,7 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
             UserCoupon userCoupon = userCouponsMap.get(userCouponId);
             if (userCoupon != null) {
                 int status = userCoupon.getStatus();
-                if (status == UserCoupon.Status.USED && userCoupon.getEndTime().before(now)) userCoupon.setStatus(UserCoupon.Status.EXPIRED);
+                if (status != UserCoupon.Status.USED && userCoupon.getEndTime().before(now)) userCoupon.setStatus(UserCoupon.Status.EXPIRED);
                 result.add(userCoupon);
             }
         }

@@ -2,7 +2,7 @@ package cn.momia.service.user.web.ctrl;
 
 import cn.momia.api.user.dto.Contact;
 import cn.momia.api.user.dto.User;
-import cn.momia.common.api.http.MomiaHttpResponse;
+import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.user.base.UserService;
 import com.google.common.base.Splitter;
@@ -197,7 +197,7 @@ public class UserController extends BaseController {
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
         boolean successful = userService.updateImToken(user.getId(), imToken);
-        if (!successful) return MomiaHttpResponse.FAILED("更新Im Token失败");
+        if (!successful) return MomiaHttpResponse.FAILED("更新ImToken失败");
 
         user.setImToken(imToken);
         return MomiaHttpResponse.SUCCESS(new User.Full(user));

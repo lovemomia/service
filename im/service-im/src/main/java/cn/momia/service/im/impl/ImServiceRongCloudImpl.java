@@ -1,6 +1,6 @@
 package cn.momia.service.im.impl;
 
-import cn.momia.common.api.exception.MomiaErrorException;
+import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.im.rongcloud.RongCloudUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -16,6 +16,56 @@ import java.util.Collection;
 import java.util.List;
 
 public class ImServiceRongCloudImpl extends AbstractImService {
+    @Override
+    public String generateImToken(long userId, String nickName, String avatar) {
+        try {
+            HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.GetToken"));
+
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("userId", String.valueOf(userId)));
+            params.add(new BasicNameValuePair("name", nickName));
+            params.add(new BasicNameValuePair("portraitUri", avatar));
+            HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
+            httpPost.setEntity(entity);
+
+            JSONObject responseJson = RongCloudUtil.executeRequest(httpPost);
+
+            String token = responseJson.getString("token");
+            if (StringUtils.isBlank(token)) throw new MomiaErrorException("fail to register im");
+
+            return token;
+        } catch (Exception e) {
+            throw new MomiaErrorException("fail to register im", e);
+        }
+    }
+
+    @Override
+    public void updateNickName(long userId, String nickName) {
+        updateUserInfo(userId, nickName, null);
+    }
+
+    private void updateUserInfo(long userId, String nickName, String avatar) {
+        try {
+            HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.UpdateUser"));
+
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("userId", String.valueOf(userId)));
+            if (nickName != null) params.add(new BasicNameValuePair("name", nickName));
+            if (avatar != null) params.add(new BasicNameValuePair("portraitUri", avatar));
+            HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
+            httpPost.setEntity(entity);
+
+            RongCloudUtil.executeRequest(httpPost);
+        } catch (Exception e) {
+            throw new MomiaErrorException("fail to update user info " + userId, e);
+        }
+    }
+
+    @Override
+    public void updateAvatar(long userId, String avatar) {
+        updateUserInfo(userId, null, avatar);
+    }
+
     @Override
     protected boolean doCreateGroup(long groupId, String groupName, Collection<Long> userIds) {
         try {
@@ -77,7 +127,7 @@ public class ImServiceRongCloudImpl extends AbstractImService {
     }
 
     @Override
-    protected boolean doJoinGroup(long groupId, String groupName, long userId) {
+    protected boolean doJoinGroup(long userId, long groupId, String groupName) {
         try {
             HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.JoinGroup"));
 
@@ -97,7 +147,7 @@ public class ImServiceRongCloudImpl extends AbstractImService {
     }
 
     @Override
-    protected boolean doLeaveGroup(long groupId, long userId) {
+    protected boolean doLeaveGroup(long userId, long groupId) {
         try {
             HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.LeaveGroup"));
 
@@ -113,55 +163,5 @@ public class ImServiceRongCloudImpl extends AbstractImService {
         } catch (Exception e) {
             throw new MomiaErrorException("fail to leave group " + groupId + "/" + userId, e);
         }
-    }
-
-    @Override
-    public String generateImToken(long userId, String nickName, String avatar) {
-        try {
-            HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.GetToken"));
-
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair("userId", String.valueOf(userId)));
-            params.add(new BasicNameValuePair("name", nickName));
-            params.add(new BasicNameValuePair("portraitUri", avatar));
-            HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
-            httpPost.setEntity(entity);
-
-            JSONObject responseJson = RongCloudUtil.executeRequest(httpPost);
-
-            String token = responseJson.getString("token");
-            if (StringUtils.isBlank(token)) throw new MomiaErrorException("fail to register im");
-
-            return token;
-        } catch (Exception e) {
-            throw new MomiaErrorException("fail to register im", e);
-        }
-    }
-
-    @Override
-    public void updateNickName(long userId, String nickName) {
-        updateUserInfo(userId, nickName, null);
-    }
-
-    private void updateUserInfo(long userId, String nickName, String avatar) {
-        try {
-            HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.UpdateUser"));
-
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair("userId", String.valueOf(userId)));
-            if (nickName != null) params.add(new BasicNameValuePair("name", nickName));
-            if (avatar != null) params.add(new BasicNameValuePair("portraitUri", avatar));
-            HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
-            httpPost.setEntity(entity);
-
-            RongCloudUtil.executeRequest(httpPost);
-        } catch (Exception e) {
-            throw new MomiaErrorException("fail to update user info " + userId, e);
-        }
-    }
-
-    @Override
-    public void updateAvatar(long userId, String avatar) {
-        updateUserInfo(userId, null, avatar);
     }
 }

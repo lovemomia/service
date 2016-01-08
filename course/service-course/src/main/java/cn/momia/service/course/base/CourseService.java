@@ -1,17 +1,16 @@
 package cn.momia.service.course.base;
 
-import cn.momia.api.course.dto.BookedCourse;
-import cn.momia.api.course.dto.Course;
-import cn.momia.api.course.dto.CourseDetail;
-import cn.momia.api.course.dto.CourseSku;
-import cn.momia.api.course.dto.Institution;
-import cn.momia.api.course.dto.Teacher;
+import cn.momia.api.course.dto.course.BookedCourse;
+import cn.momia.api.course.dto.course.Course;
+import cn.momia.api.course.dto.course.CourseDetail;
+import cn.momia.api.course.dto.course.CourseSku;
+import cn.momia.api.course.dto.course.Student;
+import cn.momia.api.course.dto.course.TeacherCourse;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public interface CourseService {
     boolean isRecommended(long courseId);
@@ -23,12 +22,13 @@ public interface CourseService {
 
     Course get(long courseId);
     List<Course> list(Collection<Long> courseIds);
+    List<CourseSku> listSkus(Collection<Long> skuIds);
 
     long queryBookImgCount(long courseId);
     List<String> queryBookImgs(long courseId, int start, int count);
 
-    long queryTeacherCount(long courseId);
-    List<Teacher> queryTeachers(long courseId, int start, int count);
+    long queryTeacherIdsCount(long courseId);
+    List<Integer> queryTeacherIds(long courseId, int start, int count);
 
     long queryCountBySubject(long subjectId, Collection<Long> exclusions, int minAge, int maxAge, int queryType);
     List<Course> queryBySubject(long subjectId, int start, int count, Collection<Long> exclusions, int minAge, int maxAge, int sortTypeId, int queryType);
@@ -42,7 +42,7 @@ public interface CourseService {
     boolean lockSku(long skuId);
     boolean unlockSku(long skuId);
 
-    Map<Long, Date> queryStartTimesByPackages(Set<Long> packageIds);
+    Map<Long, Date> queryStartTimesByPackages(Collection<Long> packageIds);
 
     BookedCourse getBookedCourse(long bookingId);
 
@@ -56,25 +56,44 @@ public interface CourseService {
     long queryFinishedCountByUser(long userId);
     List<BookedCourse> queryFinishedByUser(long userId, int start, int count);
 
-    Map<Long, Integer> queryBookedCourseCounts(Set<Long> orderIds);
-    Map<Long, Integer> queryFinishedCourseCounts(Set<Long> orderIds);
+    List<TeacherCourse> queryOngoingByTeacher(long userId);
+    long queryNotFinishedCountByTeacher(long userId);
+    List<TeacherCourse> queryNotFinishedByTeacher(long userId, int start, int count);
+    long queryFinishedCountByTeacher(long userId);
+    List<TeacherCourse> queryFinishedByTeacher(long userId, int start, int count);
+
+    Map<Long, Integer> queryBookedCourseCounts(Collection<Long> orderIds);
+    Map<Long, Integer> queryFinishedCourseCounts(Collection<Long> orderIds);
 
     List<Long> queryBookedCourseIds(long packageId);
 
     boolean booked(long packageId, long courseId);
-    long booking(long userId, long orderId, long packageId, CourseSku sku);
+    long booking(long userId, long childId, long orderId, long packageId, CourseSku sku);
     void increaseJoined(long courseId, int joinCount);
     boolean cancel(long userId, long bookingId);
     void decreaseJoined(long courseId, int joinCount);
 
+    List<Long> queryBookedPackageIds(Collection<Long> userIds, long courseId, long courseSkuId);
+    void batchCancel(Collection<Long> userIds, long courseId, long courseSkuId);
+    Map<Long,Long> queryBookedPackageUsers(Collection<Long> userIds, long courseId, long courseSkuId);
+
     CourseDetail getDetail(long courseId);
-    Institution getInstitution(long courseId);
+    int getInstitutionId(long courseId);
+
+    long querySubjectId(long courseId);
 
     Map<Long, String> queryTips(Collection<Long> courseIds);
 
     boolean matched(long subjectId, long courseId);
-
     boolean joined(long userId, long courseId);
-
     boolean finished(long userId, long bookingId, long courseId);
+
+    Map<Long, Long> queryCheckInCounts(Collection<Long> courseSkuIds);
+    Map<Long, Long> queryCommentedChildrenCount(Collection<Long> courseSkuIds);
+
+    boolean checkin(long userId, long packageId, long courseId, long courseSkuId);
+
+    List<Student.Parent> queryParentWithoutChild(long courseId, long courseSkuId);
+    List<Student> queryAllStudents(long courseId, long courseSkuId);
+    List<Student> queryCheckInStudents(long courseId, long courseSkuId);
 }

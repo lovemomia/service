@@ -1,25 +1,27 @@
 package cn.momia.service.course.web.ctrl;
 
-import cn.momia.api.course.dto.Course;
-import cn.momia.api.course.dto.SubjectOrder;
-import cn.momia.api.course.dto.SubjectPackage;
+import cn.momia.api.course.dto.course.Course;
+import cn.momia.api.course.dto.subject.SubjectOrder;
+import cn.momia.api.course.dto.subject.SubjectPackage;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
-import cn.momia.common.api.dto.PagedList;
-import cn.momia.common.api.exception.MomiaErrorException;
-import cn.momia.common.api.http.MomiaHttpResponse;
-import cn.momia.common.util.TimeUtil;
+import cn.momia.common.core.dto.PagedList;
+import cn.momia.common.core.exception.MomiaErrorException;
+import cn.momia.common.core.http.MomiaHttpResponse;
+import cn.momia.common.core.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.CourseService;
-import cn.momia.api.course.dto.UserCoupon;
-import cn.momia.api.course.dto.Subject;
+import cn.momia.api.course.dto.coupon.UserCoupon;
+import cn.momia.api.course.dto.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
-import cn.momia.api.course.dto.SubjectSku;
+import cn.momia.api.course.dto.subject.SubjectSku;
 import cn.momia.service.course.coupon.CouponService;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderService;
 import cn.momia.service.course.order.OrderPackage;
 import com.google.common.collect.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,6 +41,8 @@ import java.util.Set;
 @RestController
 @RequestMapping(value = "/order")
 public class OrderController extends BaseController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
+
     @Autowired private CourseService courseService;
     @Autowired private SubjectService subjectService;
     @Autowired private OrderService orderService;
@@ -94,6 +98,8 @@ public class OrderController extends BaseController {
 
             orderPackage.setPrice(sku.getPrice());
             orderPackage.setBookableCount(sku.getCourseCount());
+            orderPackage.setTime(sku.getTime());
+            orderPackage.setTimeUnit(sku.getTimeUnit());
         }
 
         return true;
@@ -256,7 +262,7 @@ public class OrderController extends BaseController {
             if (startTime == null) {
                 subjectPackage.setExpireTime("购买日期: " + TimeUtil.SHORT_DATE_FORMAT.format(order.getAddTime()));
             } else {
-                Date endTime = TimeUtil.add(startTime, sku.getTime(), sku.getTimeUnit());
+                Date endTime = TimeUtil.add(startTime, orderPackage.getTime(), orderPackage.getTimeUnit());
                 subjectPackage.setExpireTime("有效期至: " + TimeUtil.SHORT_DATE_FORMAT.format(endTime));
             }
 
@@ -351,5 +357,30 @@ public class OrderController extends BaseController {
         pagedSubjectOrders.setList(subjectOrders);
 
         return pagedSubjectOrders;
+    }
+
+    @RequestMapping(value = "/package/time/extend", method = RequestMethod.POST)
+    public MomiaHttpResponse extendPackageTime(@RequestParam(value = "pid") long packageId, @RequestParam int time) {
+        OrderPackage orderPackage = orderService.getOrderPackage(packageId);
+        int originTime = orderPackage.getTime();
+        int originTimeUnit = orderPackage.getTimeUnit();
+
+        int newTime;
+        int newTimeUnit = TimeUtil.TimeUnit.MONTH;
+
+        switch (originTimeUnit) {
+            case TimeUtil.TimeUnit.MONTH:
+                newTime = originTime + time;
+                break;
+            case TimeUtil.TimeUnit.QUARTER:
+                newTime = originTime * 3 + time;
+                break;
+            case TimeUtil.TimeUnit.YEAR:
+                newTime = originTime * 12 + time;
+                break;
+            default: throw new MomiaErrorException("无效的课程包");
+        }
+
+        return MomiaHttpResponse.SUCCESS(orderService.extendPackageTime(packageId, newTime, newTimeUnit));
     }
 }

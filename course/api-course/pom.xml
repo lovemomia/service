@@ -6,18 +6,18 @@
 
     <groupId>cn.momia</groupId>
     <artifactId>duola-api-course</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <packaging>jar</packaging>
 
     <name>Momia API Course</name>
     <url>http://www.momia.cn</url>
 
     <dependencies>
-        <!-- Momia API -->
+        <!-- Momia Core -->
         <dependency>
             <groupId>cn.momia</groupId>
-            <artifactId>duola-common-api</artifactId>
-            <version>1.1.0</version>
+            <artifactId>duola-common-core</artifactId>
+            <version>1.2.0</version>
         </dependency>
 
         <!-- Test -->

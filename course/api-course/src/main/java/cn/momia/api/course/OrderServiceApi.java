@@ -1,15 +1,15 @@
 package cn.momia.api.course;
 
-import cn.momia.api.course.dto.SubjectOrder;
-import cn.momia.api.course.dto.SubjectPackage;
-import cn.momia.common.api.ServiceApi;
-import cn.momia.common.api.dto.PagedList;
-import cn.momia.common.api.http.MomiaHttpParamBuilder;
-import cn.momia.common.api.http.MomiaHttpRequestBuilder;
+import cn.momia.api.course.dto.subject.SubjectOrder;
+import cn.momia.api.course.dto.subject.SubjectPackage;
+import cn.momia.common.core.api.HttpServiceApi;
+import cn.momia.common.core.dto.PagedList;
+import cn.momia.common.core.http.MomiaHttpParamBuilder;
+import cn.momia.common.core.http.MomiaHttpRequestBuilder;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.http.client.methods.HttpUriRequest;
 
-public class OrderServiceApi extends ServiceApi {
+public class OrderServiceApi extends HttpServiceApi {
     public SubjectOrder placeOrder(JSONObject orderJson) {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/order"), orderJson.toString());
         return executeReturnObject(request, SubjectOrder.class);
@@ -60,5 +60,14 @@ public class OrderServiceApi extends ServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/order/list"), builder.build());
 
         return executeReturnPagedList(request, SubjectOrder.class);
+    }
+
+    public boolean extendPackageTime(long packageId, int time) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("pid", packageId)
+                .add("time", time);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/order/package/time/extend"), builder.build());
+
+        return executeReturnObject(request, Boolean.class);
     }
 }

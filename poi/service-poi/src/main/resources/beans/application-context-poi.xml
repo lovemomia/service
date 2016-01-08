@@ -4,5 +4,16 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean class="cn.momia.service.poi.impl.PlaceServiceImpl" parent="dbAccessService" />
+    <bean id="cityService" class="cn.momia.common.service.CachedService" parent="dbAccessService">
+        <property name="type" value="cn.momia.api.poi.dto.City" />
+        <property name="sql" value="SELECT Id, Name FROM SG_City WHERE Status=1" />
+    </bean>
+
+    <bean id="regionService" class="cn.momia.common.service.CachedService" parent="dbAccessService">
+        <property name="type" value="cn.momia.api.poi.dto.Region" />
+        <property name="sql" value="SELECT Id, CityId, Name, ParentId FROM SG_Region WHERE Status=1" />
+    </bean>
+
+    <bean class="cn.momia.service.poi.place.impl.PlaceServiceImpl" parent="dbAccessService" />
+    <bean class="cn.momia.service.poi.inst.impl.InstitutionServiceImpl" parent="dbAccessService" />
 </beans>

@@ -17,6 +17,8 @@ public class OrderPackage {
     private BigDecimal price;
     private int courseCount;
     private int bookableCount;
+    private int time;
+    private int timeUnit;
 
     private long courseId;
 
@@ -66,6 +68,22 @@ public class OrderPackage {
 
     public void setBookableCount(int bookableCount) {
         this.bookableCount = bookableCount;
+    }
+
+    public int getTime() {
+        return time;
+    }
+
+    public void setTime(int time) {
+        this.time = time;
+    }
+
+    public int getTimeUnit() {
+        return timeUnit;
+    }
+
+    public void setTimeUnit(int timeUnit) {
+        this.timeUnit = timeUnit;
     }
 
     public long getCourseId() {

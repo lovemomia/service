@@ -1,15 +1,21 @@
 package cn.momia.service.user.child.impl;
 
 import cn.momia.api.user.dto.Child;
+import cn.momia.api.user.dto.ChildComment;
+import cn.momia.api.user.dto.ChildRecord;
+import cn.momia.api.user.dto.ChildTag;
 import cn.momia.common.service.AbstractService;
 import cn.momia.service.user.child.ChildService;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.support.KeyHolder;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -21,6 +27,14 @@ import java.util.Map;
 import java.util.Set;
 
 public class ChildServiceImpl extends AbstractService implements ChildService {
+    private List<ChildTag> tagsCache = new ArrayList<ChildTag>();
+
+    @Override
+    protected void doReload() {
+        String sql = "SELECT Id, Name FROM SG_ChildTag WHERE Status<>0";
+        tagsCache = queryObjectList(sql, ChildTag.class);
+    }
+
     @Override
     public long add(final Child child) {
         KeyHolder keyHolder = insert(new PreparedStatementCreator() {
@@ -50,10 +64,10 @@ public class ChildServiceImpl extends AbstractService implements ChildService {
     }
 
     @Override
-    public List<Child> list(Collection<Long> childIds) {
-        if (childIds.isEmpty()) return new ArrayList<Child>();
+    public List<Child> list(Collection<Long> childrenIds) {
+        if (childrenIds.isEmpty()) return new ArrayList<Child>();
 
-        String sql = "SELECT Id, UserId, Avatar, Name, Sex, Birthday FROM SG_Child WHERE Id IN (" + StringUtils.join(childIds, ",") + ") AND Status<>0";
+        String sql = "SELECT Id, UserId, Avatar, Name, Sex, Birthday FROM SG_Child WHERE Id IN (" + StringUtils.join(childrenIds, ",") + ") AND Status<>0";
         List<Child> children = queryObjectList(sql, Child.class);
 
         Map<Long, Child> childrenMap = new HashMap<Long, Child>();
@@ -62,7 +76,7 @@ public class ChildServiceImpl extends AbstractService implements ChildService {
         }
 
         List<Child> result = new ArrayList<Child>();
-        for (long childId : childIds) {
+        for (long childId : childrenIds) {
             Child child = childrenMap.get(childId);
             if (child != null) result.add(child);
         }
@@ -118,5 +132,85 @@ public class ChildServiceImpl extends AbstractService implements ChildService {
     public boolean delete(long userId, long childId) {
         String sql = "UPDATE SG_Child SET Status=0 WHERE UserId=? AND Id=?";
         return update(sql, new Object[] { userId, childId });
+    }
+
+    @Override
+    public List<ChildTag> listAllTags() {
+        if (isOutOfDate()) reload();
+        return tagsCache;
+    }
+
+    @Override
+    public ChildRecord getRecord(long teacherUerId, long childId, long courseId, long courseSkuId) {
+        final List<ChildRecord> records = new ArrayList<ChildRecord>();
+        String sql = "SELECT Tags, Content FROM SG_ChildRecord WHERE TeacherUserId=? AND ChildId=? AND CourseId=? AND CourseSkuId=? AND Status<>0 LIMIT 1";
+        query(sql, new Object[] { teacherUerId, childId, courseId, courseSkuId }, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                ChildRecord record = new ChildRecord();
+                List<Integer> tags = new ArrayList<Integer>();
+                for (String tagId : Splitter.on(",").trimResults().omitEmptyStrings().split(rs.getString("Tags"))) {
+                    tags.add(Integer.valueOf(tagId));
+                }
+                record.setTags(tags);
+                record.setContent(rs.getString("Content"));
+
+                records.add(record);
+            }
+        });
+
+        return records.isEmpty() ? ChildRecord.EMPTY_RECORD : records.get(0);
+    }
+
+    @Override
+    public boolean record(ChildRecord childRecord) {
+        long recordId = getRecordId(childRecord.getChildId(), childRecord.getCourseId(), childRecord.getCourseSkuId());
+        if (recordId > 0) {
+            String sql = "UPDATE SG_ChildRecord SET TeacherUserId=?, Tags=?, Content=?, Status=1 WHERE ChildId=? AND CourseId=? AND CourseSkuId=?";
+            return update(sql, new Object[] { childRecord.getTeacherUserId(), StringUtils.join(childRecord.getTags(), ","), childRecord.getContent(), childRecord.getChildId(), childRecord.getCourseId(), childRecord.getCourseSkuId() });
+        } else {
+            String sql = "INSERT INTO SG_ChildRecord (TeacherUserId, ChildId, CourseId, CourseSkuId, Tags, Content, AddTime) VALUES (?, ?, ?, ?, ?, ?, NOW())";
+            return update(sql, new Object[] { childRecord.getTeacherUserId(), childRecord.getChildId(), childRecord.getCourseId(), childRecord.getCourseSkuId(), StringUtils.join(childRecord.getTags(), ","), childRecord.getContent() });
+        }
+    }
+
+    private long getRecordId(long childId, long courseId, long courseSkuId) {
+        String sql = "SELECT Id FROM SG_ChildRecord WHERE ChildId=? AND CourseId=? AND CourseSkuId=?";
+        return queryLong(sql, new Object[] { childId, courseId, courseSkuId });
+    }
+
+    @Override
+    public long queryCommentsCount(long childId) {
+        String sql = "SELECT COUNT(1) FROM SG_ChildComment WHERE ChildId=? AND Status<>0";
+        return queryLong(sql, new Object[] { childId });
+    }
+
+    @Override
+    public List<ChildComment> queryComments(long childId, int start, int count) {
+        String sql = "SELECT Id, TeacherUserId, ChildId, CourseId, CourseSkuId, Content FROM SG_ChildComment WHERE ChildId=? AND Status<>0 ORDER BY AddTime DESC LIMIT ?,?";
+        return queryObjectList(sql, new Object[] { childId, start, count }, ChildComment.class);
+    }
+
+    @Override
+    public boolean comment(ChildComment childComment) {
+        long commentId = getCommentId(childComment.getChildId(), childComment.getCourseId(), childComment.getCourseSkuId());
+        if (commentId > 0) {
+            String sql = "UPDATE SG_ChildComment SET TeacherUserId=?, Content=?, Status=1 WHERE ChildId=? AND CourseId=? AND CourseSkuId=?";
+            return update(sql, new Object[] { childComment.getTeacherUserId(), childComment.getContent(), childComment.getChildId(), childComment.getCourseId(), childComment.getCourseSkuId() });
+        } else {
+            String sql = "INSERT INTO SG_ChildComment (TeacherUserId, ChildId, CourseId, CourseSkuId, Content, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
+            return update(sql, new Object[] { childComment.getTeacherUserId(), childComment.getChildId(), childComment.getCourseId(), childComment.getCourseSkuId(), childComment.getContent() });
+        }
+    }
+
+    private long getCommentId(long childId, long courseId, long courseSkuId) {
+        String sql = "SELECT Id FROM SG_ChildComment WHERE ChildId=? AND CourseId=? AND CourseSkuId=?";
+        return queryLong(sql, new Object[] { childId, courseId, courseSkuId });
+    }
+
+    @Override
+    public List<Long> queryCommentedChildIds(long courseId, long courseSkuId) {
+        String sql = "SELECT ChildId FROM SG_ChildComment WHERE CourseId=? AND CourseSkuId=? AND Status<>0";
+        return queryLongList(sql, new Object[] { courseId, courseSkuId });
     }
 }

@@ -1,7 +1,7 @@
 package cn.momia.service.feed.comment.impl;
 
 import cn.momia.common.service.AbstractService;
-import cn.momia.service.feed.comment.FeedComment;
+import cn.momia.api.feed.dto.FeedComment;
 import cn.momia.service.feed.comment.FeedCommentService;
 
 import java.util.List;
@@ -20,7 +20,7 @@ public class FeedCommentServiceImpl extends AbstractService implements FeedComme
     }
 
     @Override
-    public int queryCount(long feedId) {
+    public long queryCount(long feedId) {
         String sql = "SELECT COUNT(1) FROM SG_FeedComment WHERE FeedId=? AND Status<>0";
         return queryInt(sql, new Object[] { feedId });
     }

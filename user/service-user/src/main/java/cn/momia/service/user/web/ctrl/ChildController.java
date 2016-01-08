@@ -1,13 +1,18 @@
 package cn.momia.service.user.web.ctrl;
 
 import cn.momia.api.user.dto.Child;
+import cn.momia.api.user.dto.ChildComment;
+import cn.momia.api.user.dto.ChildRecord;
 import cn.momia.api.user.dto.User;
-import cn.momia.common.api.http.MomiaHttpResponse;
-import cn.momia.common.api.util.CastUtil;
+import cn.momia.common.core.dto.PagedList;
+import cn.momia.common.core.http.MomiaHttpResponse;
+import cn.momia.common.core.util.CastUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.user.base.UserService;
 import cn.momia.service.user.child.ChildService;
 import com.alibaba.fastjson.JSON;
+import com.google.common.base.Splitter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,10 +22,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
-@RequestMapping("/user/child")
+@RequestMapping("/child")
 public class ChildController extends BaseController {
     @Autowired private ChildService childService;
     @Autowired private UserService userService;
@@ -49,17 +56,27 @@ public class ChildController extends BaseController {
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
         Child child = childService.get(childId);
-        if (!child.exists() || child.getUserId() != user.getId()) return MomiaHttpResponse.FAILED("孩子不存在");
+        if (!child.exists() || (user.isNormal() && child.getUserId() != user.getId())) return MomiaHttpResponse.FAILED("孩子不存在");
 
         return MomiaHttpResponse.SUCCESS(child);
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public MomiaHttpResponse listChildren(@RequestParam String utoken) {
+    public MomiaHttpResponse listUserChildren(@RequestParam String utoken) {
         User user = userService.getByToken(utoken);
         if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
 
         return MomiaHttpResponse.SUCCESS(user.getChildren());
+    }
+
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public MomiaHttpResponse listChildren(@RequestParam String cids) {
+        Set<Long> childrenIds = new HashSet<Long>();
+        for (String childId : Splitter.on(",").trimResults().omitEmptyStrings().split(cids)) {
+            childrenIds.add(Long.valueOf(childId));
+        }
+
+        return MomiaHttpResponse.SUCCESS(childService.list(childrenIds));
     }
 
     @RequestMapping(value = "/{cid}/avatar",method = RequestMethod.PUT)
@@ -118,5 +135,85 @@ public class ChildController extends BaseController {
         if (!childService.delete(user.getId(), childId)) return MomiaHttpResponse.FAILED("删除孩子信息失败");
 
         return MomiaHttpResponse.SUCCESS(new User.Full(userService.get(user.getId())));
+    }
+
+    @RequestMapping(value = "/tag", method = RequestMethod.GET)
+    public MomiaHttpResponse tags() {
+        return MomiaHttpResponse.SUCCESS(childService.listAllTags());
+    }
+
+    @RequestMapping(value = "/{cid}/record", method = RequestMethod.GET)
+    public MomiaHttpResponse record(@RequestParam String utoken,
+                                    @PathVariable(value = "cid") long childId,
+                                    @RequestParam(value = "coid") long courseId,
+                                    @RequestParam(value = "sid") long courseSkuId) {
+        User user = userService.getByToken(utoken);
+        if (!user.exists() || user.isNormal()) return MomiaHttpResponse.FAILED("您无权查看记录");
+        return MomiaHttpResponse.SUCCESS(childService.getRecord(user.getId(), childId, courseId, courseSkuId));
+    }
+
+    @RequestMapping(value = "/{cid}/record", method = RequestMethod.POST)
+    public MomiaHttpResponse record(@RequestParam String utoken,
+                                    @PathVariable(value = "cid") long childId,
+                                    @RequestParam(value = "coid") long courseId,
+                                    @RequestParam(value = "sid") long courseSkuId,
+                                    @RequestParam String record) {
+        User user = userService.getByToken(utoken);
+        if (!user.exists() || !user.isTeacher()) return MomiaHttpResponse.FAILED("只有老师才有资格记录");
+
+        ChildRecord childRecord = CastUtil.toObject(JSON.parseObject(record), ChildRecord.class);
+        childRecord.setTeacherUserId(user.getId());
+        childRecord.setChildId(childId);
+        childRecord.setCourseId(courseId);
+        childRecord.setCourseSkuId(courseSkuId);
+
+        if (!StringUtils.isBlank(childRecord.getContent()) && childRecord.getContent().length() > 300) return MomiaHttpResponse.FAILED("记录字数过多，超出限制");
+
+        return MomiaHttpResponse.SUCCESS(childService.record(childRecord));
+    }
+
+    @RequestMapping(value = "/{cid}/comment", method = RequestMethod.GET)
+    public MomiaHttpResponse listChildComments(@RequestParam String utoken,
+                                               @PathVariable(value = "cid") long childId,
+                                               @RequestParam int start,
+                                               @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        User user = userService.getByToken(utoken);
+        if (!user.exists() || user.isNormal()) return MomiaHttpResponse.FAILED("您无权查看孩子的评价信息");
+
+        long totalCount = childService.queryCommentsCount(childId);
+        List<ChildComment> comments = childService.queryComments(childId, start, count);
+
+        PagedList<ChildComment> pagedComments = new PagedList<ChildComment>(totalCount, start, count);
+        pagedComments.setList(comments);
+
+        return MomiaHttpResponse.SUCCESS(pagedComments);
+    }
+
+    @RequestMapping(value = "/{cid}/comment", method = RequestMethod.POST)
+    public MomiaHttpResponse comment(@RequestParam String utoken,
+                                     @PathVariable(value = "cid") long childId,
+                                     @RequestParam(value = "coid") long courseId,
+                                     @RequestParam(value = "sid") long courseSkuId,
+                                     @RequestParam String comment) {
+        if (!StringUtils.isBlank(comment) && comment.length() > 500) return MomiaHttpResponse.FAILED("评语字数过多，超出限制");
+
+        User user = userService.getByToken(utoken);
+        if (!user.exists() || !user.isTeacher()) return MomiaHttpResponse.FAILED("只有老师才有资格评价");
+
+        ChildComment childComment = new ChildComment();
+        childComment.setTeacherUserId(user.getId());
+        childComment.setChildId(childId);
+        childComment.setCourseId(courseId);
+        childComment.setCourseSkuId(courseSkuId);
+        childComment.setContent(comment);
+
+        return MomiaHttpResponse.SUCCESS(childService.comment(childComment));
+    }
+
+    @RequestMapping(value = "/comment", method = RequestMethod.POST)
+    public MomiaHttpResponse queryCommentedChildIds(@RequestParam(value = "coid") long courseId, @RequestParam(value = "sid") long courseSkuId) {
+        return MomiaHttpResponse.SUCCESS(childService.queryCommentedChildIds(courseId, courseSkuId));
     }
 }
