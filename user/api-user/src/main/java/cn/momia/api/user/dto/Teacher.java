@@ -22,6 +22,10 @@ public class Teacher {
     private List<TeacherExperience> experiences;
     private List<TeacherEducation> educations;
 
+    // 为了兼容老的
+    private String experience;
+    private String education;
+
     public int getId() {
         return id;
     }
@@ -102,6 +106,22 @@ public class Teacher {
         this.educations = educations;
     }
 
+    public String getExperience() {
+        return StringUtils.isBlank(experience) ? StringUtils.join(experiences, "\n") : experience;
+    }
+
+    public void setExperience(String experience) {
+        this.experience = experience;
+    }
+
+    public String getEducation() {
+        return StringUtils.isBlank(education) ? StringUtils.join(educations, "\n") : education;
+    }
+
+    public void setEducation(String education) {
+        this.education = education;
+    }
+
     public boolean exists() {
         return id > 0;
     }
@@ -124,13 +144,5 @@ public class Teacher {
 
     public String getAvatar() {
         return pic;
-    }
-
-    public String getExperience() {
-        return StringUtils.join(experiences, "\n");
-    }
-
-    public String getEducation() {
-        return StringUtils.join(educations, "\n");
     }
 }
