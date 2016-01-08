@@ -50,7 +50,7 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
     public List<Teacher> list(Collection<Integer> teacherIds) {
         if (teacherIds.isEmpty()) return new ArrayList<Teacher>();
 
-        String sql = "SELECT Id, UserId, Pic, Name, IdNo, Gender AS Sex, Birthday, Address FROM SG_Teacher WHERE Id IN (" + StringUtils.join(teacherIds, ",") + ") AND Status<>0";
+        String sql = "SELECT Id, UserId, Pic, Name, IdNo, Gender AS Sex, Birthday, Address, Experience, Education FROM SG_Teacher WHERE Id IN (" + StringUtils.join(teacherIds, ",") + ") AND Status<>0";
         List<Teacher> teachers = queryObjectList(sql, Teacher.class);
 
         Map<Integer, Teacher> teachersMap = new HashMap<Integer, Teacher>();
