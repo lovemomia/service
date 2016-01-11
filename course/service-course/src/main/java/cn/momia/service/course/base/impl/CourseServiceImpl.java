@@ -526,6 +526,15 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
+    public CourseSku getBookedSku(long userId, long bookingId) {
+        String sql = "SELECT CourseSkuId FROM SG_BookedCourse WHERE UserId=? AND Id=? WHERE Status<>0";
+        List<Long> skuIds = queryLongList(sql, new Object[] { userId, bookingId });
+        List<CourseSku> skus = listSkus(skuIds);
+
+        return skus.isEmpty() ? CourseSku.NOT_EXIST_COURSE_SKU : skus.get(0);
+    }
+
+    @Override
     public boolean lockSku(long skuId) {
         String sql = "UPDATE SG_CourseSku SET UnlockedStock=UnlockedStock-1, LockedStock=LockedStock+1 WHERE Id=? AND Status=1 AND UnlockedStock>=1";
         return update(sql, new Object[] { skuId });
