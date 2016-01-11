@@ -51,6 +51,16 @@ public class TeacherController extends BaseController {
         return MomiaHttpResponse.SUCCESS(teacherService.list(teacherIds));
     }
 
+    @RequestMapping(value = "/list/user", method = RequestMethod.GET)
+    public MomiaHttpResponse listByUserIds(@RequestParam String uids) {
+        Set<Long> teacherUserIds = new HashSet<Long>();
+        for (String teacherUserId : Splitter.on(",").trimResults().omitEmptyStrings().split(uids)) {
+            teacherUserIds.add(Long.valueOf(teacherUserId));
+        }
+
+        return MomiaHttpResponse.SUCCESS(teacherService.listByUser(teacherUserIds));
+    }
+
     @RequestMapping(method = RequestMethod.POST)
     public MomiaHttpResponse add(@RequestParam String utoken, @RequestParam(value = "teacher") String teacherJson) {
         User user = userService.getByToken(utoken);

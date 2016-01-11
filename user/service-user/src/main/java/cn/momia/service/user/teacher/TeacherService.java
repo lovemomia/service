@@ -12,6 +12,7 @@ public interface TeacherService {
     TeacherStatus status(long userId);
     Teacher getByUser(long userId);
     List<Teacher> list(Collection<Integer> teacherIds);
+    List<Teacher> listByUser(Collection<Long> teacherUserIds);
 
     long add(Teacher teacher);
 

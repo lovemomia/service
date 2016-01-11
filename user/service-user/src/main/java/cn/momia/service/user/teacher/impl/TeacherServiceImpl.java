@@ -152,6 +152,16 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
     }
 
     @Override
+    public List<Teacher> listByUser(Collection<Long> teacherUserIds) {
+        if (teacherUserIds.isEmpty()) return new ArrayList<Teacher>();
+
+        String sql = "SELECT Id FROM SG_Teacher WHERE UserId IN (" + StringUtils.join(teacherUserIds, ",") + ") AND Status<>0";
+        List<Integer> teacherIds = queryIntList(sql);
+
+        return  list(teacherIds);
+    }
+
+    @Override
     public long add(final Teacher teacher) {
         String pic = teacher.getPic();
         if (pic.startsWith("http://")) {

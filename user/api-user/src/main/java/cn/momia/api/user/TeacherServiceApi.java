@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.List;
+import java.util.Set;
 
 public class TeacherServiceApi extends HttpServiceApi {
     public TeacherStatus status(String utoken) {
@@ -30,6 +31,13 @@ public class TeacherServiceApi extends HttpServiceApi {
     public List<Teacher> list(List<Integer> teacherIds) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("tids", StringUtils.join(teacherIds, ","));
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher/list"), builder.build());
+
+        return executeReturnList(request, Teacher.class);
+    }
+
+    public List<Teacher> listByUserIds(Set<Long> teacherUserIds) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uids", StringUtils.join(teacherUserIds, ","));
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher/list/user"), builder.build());
 
         return executeReturnList(request, Teacher.class);
     }
