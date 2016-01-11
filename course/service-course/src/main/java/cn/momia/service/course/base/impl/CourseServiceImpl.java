@@ -527,7 +527,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public CourseSku getBookedSku(long userId, long bookingId) {
-        String sql = "SELECT CourseSkuId FROM SG_BookedCourse WHERE UserId=? AND Id=? WHERE Status<>0";
+        String sql = "SELECT CourseSkuId FROM SG_BookedCourse WHERE UserId=? AND Id=? AND Status<>0";
         List<Long> skuIds = queryLongList(sql, new Object[] { userId, bookingId });
         List<CourseSku> skus = listSkus(skuIds);
 
