@@ -209,14 +209,28 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
     }
 
     @Override
-    public boolean addExperience(long userId, TeacherExperience experience) {
+    public int addExperience(final long userId, final TeacherExperience experience) {
         if (experience.getId() <= 0) {
-            String sql = "INSERT INTO SG_TeacherExperience (UserId, School, Post, Time, Content, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
-            return update(sql, new Object[] { userId, experience.getSchool(), experience.getPost(), experience.getTime(), experience.getContent() });
+            return insert(new PreparedStatementCreator() {
+                @Override
+                public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                    String sql = "INSERT INTO SG_TeacherExperience (UserId, School, Post, Time, Content, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
+                    PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                    ps.setLong(1, userId);
+                    ps.setString(2, experience.getSchool());
+                    ps.setString(3, experience.getPost());
+                    ps.setString(4, experience.getTime());
+                    ps.setString(5, experience.getContent());
+
+                    return ps;
+                }
+            }).getKey().intValue();
         } else {
             String sql = "UPDATE SG_TeacherExperience SET School=?, Post=?, Time=?, Content=? WHERE Id=? AND UserId=?";
-            return update(sql, new Object[] { experience.getSchool(), experience.getPost(), experience.getTime(), experience.getContent(), experience.getId(), userId });
+            if (update(sql, new Object[] { experience.getSchool(), experience.getPost(), experience.getTime(), experience.getContent(), experience.getId(), userId })) return experience.getId();
         }
+
+        return 0;
     }
 
     @Override
@@ -243,14 +257,28 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
     }
 
     @Override
-    public boolean addEducation(long userId, TeacherEducation education) {
+    public int addEducation(final long userId, final TeacherEducation education) {
         if (education.getId() <= 0) {
-            String sql = "INSERT INTO SG_TeacherEducation (UserId, School, Major, Level, Time, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
-            return update(sql, new Object[] { userId, education.getSchool(), education.getMajor(), education.getLevel(), education.getTime() });
+            return insert(new PreparedStatementCreator() {
+                @Override
+                public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                    String sql = "INSERT INTO SG_TeacherEducation (UserId, School, Major, Level, Time, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
+                    PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                    ps.setLong(1, userId);
+                    ps.setString(2, education.getSchool());
+                    ps.setString(3, education.getMajor());
+                    ps.setString(4, education.getLevel());
+                    ps.setString(5, education.getTime());
+
+                    return ps;
+                }
+            }).getKey().intValue();
         } else {
             String sql = "UPDATE SG_TeacherEducation SET School=?, Major=?, Level=?, Time=? WHERE Id=? AND UserId=?";
-            return update(sql, new Object[] { education.getSchool(), education.getMajor(), education.getLevel(), education.getTime(), education.getId(), userId });
+            if (update(sql, new Object[] { education.getSchool(), education.getMajor(), education.getLevel(), education.getTime(), education.getId(), userId })) return education.getId();
         }
+
+        return 0;
     }
 
     @Override

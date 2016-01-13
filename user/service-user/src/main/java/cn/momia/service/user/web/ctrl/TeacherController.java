@@ -83,7 +83,11 @@ public class TeacherController extends BaseController {
         if (experience.isInvalid()) return MomiaHttpResponse.FAILED("工作经验信息不完整");
         if (experience.getContent().length() > 500) return MomiaHttpResponse.FAILED("工作内容超出字数限制");
 
-        return MomiaHttpResponse.SUCCESS(teacherService.addExperience(user.getId(), experience));
+        int experienceId = teacherService.addExperience(user.getId(), experience);
+        if (experienceId <= 0) return MomiaHttpResponse.FAILED("添加/更改工作经历失败");
+
+        experience.setId(experienceId);
+        return MomiaHttpResponse.SUCCESS(experience);
     }
 
     @RequestMapping(value = "/experience/{expid}", method = RequestMethod.GET)
@@ -107,7 +111,11 @@ public class TeacherController extends BaseController {
         TeacherEducation education = CastUtil.toObject(JSON.parseObject(educationJsonStr), TeacherEducation.class);
         if (education.isInvalid()) return MomiaHttpResponse.FAILED("学历信息不完整");
 
-        return MomiaHttpResponse.SUCCESS(teacherService.addEducation(user.getId(), education));
+        int educationId = teacherService.addEducation(user.getId(), education);
+        if (educationId <= 0) return MomiaHttpResponse.FAILED("添加/更改教育背景失败");
+
+        education.setId(educationId);
+        return MomiaHttpResponse.SUCCESS(education);
     }
 
     @RequestMapping(value = "/education/{eduid}", method = RequestMethod.GET)

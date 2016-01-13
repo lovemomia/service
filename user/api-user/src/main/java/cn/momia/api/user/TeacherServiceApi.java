@@ -51,13 +51,13 @@ public class TeacherServiceApi extends HttpServiceApi {
         return executeReturnObject(request, Boolean.class);
     }
 
-    public boolean addExperience(String utoken, String experience) {
+    public TeacherExperience addExperience(String utoken, String experience) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("experience", experience);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/teacher/experience"), builder.build());
 
-        return executeReturnObject(request, Boolean.class);
+        return executeReturnObject(request, TeacherExperience.class);
     }
 
     public TeacherExperience getExperience(String utoken, int experienceId) {
@@ -74,13 +74,13 @@ public class TeacherServiceApi extends HttpServiceApi {
         return executeReturnObject(request, Boolean.class);
     }
 
-    public boolean addEducation(String utoken, String education) {
+    public TeacherEducation addEducation(String utoken, String education) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("education", education);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/teacher/education"), builder.build());
 
-        return executeReturnObject(request, Boolean.class);
+        return executeReturnObject(request, TeacherEducation.class);
     }
 
     public TeacherEducation getEducation(String utoken, int educationId) {
