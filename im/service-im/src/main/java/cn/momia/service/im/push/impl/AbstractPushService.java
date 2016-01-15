@@ -11,13 +11,21 @@ import java.util.Queue;
 
 public abstract class AbstractPushService extends AbstractService implements PushService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPushService.class);
+    protected static final long SYSTEM_PUSH_USERID = 10000;
 
     private Queue<PushMsg> msgs = new LinkedList<PushMsg>();
     private boolean isRunning = false;
     private PushMsg currentMsg = null;
 
     @Override
-    public void push(PushMsg msg) {
+    public boolean push(long userId, PushMsg msg) {
+        return doPush(userId, msg);
+    }
+
+    protected abstract boolean doPush(long userId, PushMsg msg);
+
+    @Override
+    public void pushAll(PushMsg msg) {
         synchronized (msgs) {
             msgs.offer(msg);
             if (!isRunning) {
@@ -46,7 +54,7 @@ public abstract class AbstractPushService extends AbstractService implements Pus
                     Thread.sleep(5000); // 发送间隔5s
 
                     try {
-                        doPublishMsg(currentMsg);
+                        doBatchPush(currentMsg);
                     } catch (Exception e) {
                         LOGGER.error("fail to publish msg: {}", currentMsg, e);
                     }
@@ -60,5 +68,5 @@ public abstract class AbstractPushService extends AbstractService implements Pus
         }
     }
 
-    protected abstract void doPublishMsg(PushMsg msg);
+    protected abstract void doBatchPush(PushMsg msg);
 }

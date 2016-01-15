@@ -111,4 +111,14 @@ public class ImServiceApi extends HttpServiceApi {
 
         return executeReturnList(request, UserGroup.class);
     }
+
+    public boolean push(long userId, String content, String extra) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("uid", userId)
+                .add("content", content)
+                .add("extra", extra);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/im/push"), builder.build());
+
+        return executeReturnObject(request, Boolean.class);
+    }
 }

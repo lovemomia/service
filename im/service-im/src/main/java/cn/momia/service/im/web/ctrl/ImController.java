@@ -115,11 +115,17 @@ public class ImController extends BaseController {
     }
 
     @RequestMapping(value = "/push", method = RequestMethod.POST)
-    public MomiaHttpResponse push(@RequestParam String content, @RequestParam(required = false, defaultValue = "") String extra) {
-        if (StringUtils.isBlank(content)) return MomiaHttpResponse.BAD_REQUEST;
-
+    public MomiaHttpResponse push(@RequestParam(value = "uid") long userId,
+                                  @RequestParam String content,
+                                  @RequestParam(required = false, defaultValue = "") String extra) {
         PushMsg msg = new PushMsg(content, extra);
-        pushService.push(msg);
+        return MomiaHttpResponse.SUCCESS(pushService.push(userId, msg));
+    }
+
+    @RequestMapping(value = "/push/all", method = RequestMethod.POST)
+    public MomiaHttpResponse pushAll(@RequestParam String content, @RequestParam(required = false, defaultValue = "") String extra) {
+        PushMsg msg = new PushMsg(content, extra);
+        pushService.pushAll(msg);
 
         return MomiaHttpResponse.SUCCESS;
     }

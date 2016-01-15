@@ -20,7 +20,32 @@ public class PushServiceRongCloudImpl extends AbstractPushService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PushServiceRongCloudImpl.class);
 
     @Override
-    protected void doPublishMsg(PushMsg msg) {
+    protected boolean doPush(long userId, PushMsg msg) {
+        try {
+            HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.SystemPush"));
+
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("fromUserId", String.valueOf(SYSTEM_PUSH_USERID)));
+            params.add(new BasicNameValuePair("toUserId", String.valueOf(userId)));
+            params.add(new BasicNameValuePair("objectName", "RC:TxtMsg"));
+            params.add(new BasicNameValuePair("content", msg.toString()));
+            HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
+            httpPost.setEntity(entity);
+
+            JSONObject responseJson = RongCloudUtil.executeRequest(httpPost);
+            if (responseJson.getInteger("code") != 200) {
+                LOGGER.error("push failed: {}/{}", userId, msg);
+                return false;
+            }
+        } catch (Exception e) {
+            throw new MomiaErrorException("publish msg exception", e);
+        }
+
+        return true;
+    }
+
+    @Override
+    protected void doBatchPush(PushMsg msg) {
         long totalUserCount = queryTotalUserCount();
         if (totalUserCount <= 0) return;
         int start = 0;
@@ -31,7 +56,7 @@ public class PushServiceRongCloudImpl extends AbstractPushService {
                 HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.SystemPush"));
 
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
-                params.add(new BasicNameValuePair("fromUserId", "10000"));
+                params.add(new BasicNameValuePair("fromUserId", String.valueOf(SYSTEM_PUSH_USERID)));
                 for (long userId : userIds) {
                     params.add(new BasicNameValuePair("toUserId", String.valueOf(userId)));
                 }
