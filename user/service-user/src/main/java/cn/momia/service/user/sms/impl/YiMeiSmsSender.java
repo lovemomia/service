@@ -32,7 +32,7 @@ public class YiMeiSmsSender implements SmsSender {
             params.add(new BasicNameValuePair("cdkey", Configuration.getString("Sms.Yimei.CDKey")));
             params.add(new BasicNameValuePair("password", Configuration.getString("Sms.Yimei.Password")));
             params.add(new BasicNameValuePair("phone", mobile));
-            params.add(new BasicNameValuePair("message", message));
+            params.add(new BasicNameValuePair("message", "【松果亲子】" + message));
             HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
             httpPost.setEntity(entity);
 

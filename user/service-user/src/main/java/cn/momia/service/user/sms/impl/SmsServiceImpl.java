@@ -80,7 +80,7 @@ public class SmsServiceImpl extends AbstractService implements SmsService {
     }
 
     private String buildCodeMsg(String code) {
-        return "验证码：" + code + "，30分钟内有效【松果亲子】";
+        return "验证码：" + code + "，30分钟内有效";
     }
 
     private void sendCodeAsync(final String mobile, final String codeMsg) {

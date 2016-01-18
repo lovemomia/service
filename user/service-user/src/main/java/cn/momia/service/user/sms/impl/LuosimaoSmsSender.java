@@ -37,7 +37,7 @@ public class LuosimaoSmsSender implements SmsSender {
 
             List<NameValuePair> params = new ArrayList<NameValuePair>();
             params.add(new BasicNameValuePair("mobile", mobile));
-            params.add(new BasicNameValuePair("message", message));
+            params.add(new BasicNameValuePair("message", message + "【松果亲子】"));
             HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
             httpPost.setEntity(entity);
 
