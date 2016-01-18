@@ -122,11 +122,16 @@ public class ImController extends BaseController {
         return MomiaHttpResponse.SUCCESS(pushService.push(userId, msg));
     }
 
-    @RequestMapping(value = "/push/all", method = RequestMethod.POST)
-    public MomiaHttpResponse pushAll(@RequestParam String content, @RequestParam(required = false, defaultValue = "") String extra) {
+    @RequestMapping(value = "/push/batch", method = RequestMethod.POST)
+    public MomiaHttpResponse pushBatch(@RequestParam(value = "uids") String uids,
+                                       @RequestParam String content,
+                                       @RequestParam(required = false, defaultValue = "") String extra) {
+        Set<Long> userIds = new HashSet<Long>();
+        for (String userId : Splitter.on(",").omitEmptyStrings().trimResults().split(uids)) {
+            userIds.add(Long.valueOf(userId));
+        }
         PushMsg msg = new PushMsg(content, extra);
-        pushService.pushAll(msg);
 
-        return MomiaHttpResponse.SUCCESS;
+        return MomiaHttpResponse.SUCCESS(pushService.push(userIds, msg));
     }
 }
