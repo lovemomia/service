@@ -10,8 +10,8 @@ import cn.momia.common.core.http.MomiaHttpRequestBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 public class TeacherServiceApi extends HttpServiceApi {
     public TeacherStatus status(String utoken) {
@@ -35,7 +35,7 @@ public class TeacherServiceApi extends HttpServiceApi {
         return executeReturnList(request, Teacher.class);
     }
 
-    public List<Teacher> listByUserIds(Set<Long> teacherUserIds) {
+    public List<Teacher> listByUserIds(Collection<Long> teacherUserIds) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uids", StringUtils.join(teacherUserIds, ","));
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/teacher/list/user"), builder.build());
 
