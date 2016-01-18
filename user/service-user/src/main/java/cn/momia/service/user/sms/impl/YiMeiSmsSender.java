@@ -1,12 +1,9 @@
 package cn.momia.service.user.sms.impl;
 
+import cn.momia.common.core.util.XmlUtil;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.user.sms.SmsSender;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
@@ -21,22 +18,20 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class LuosimaoSmsSender implements SmsSender {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LuosimaoSmsSender.class);
+public class YiMeiSmsSender implements SmsSender {
+    private static final Logger LOGGER = LoggerFactory.getLogger(YiMeiSmsSender.class);
 
     @Override
     public boolean send(String mobile, String message) {
         try {
-            HttpPost httpPost = new HttpPost(Configuration.getString("Sms.Luosimao.Service"));
-
-            String auth = "api:" + Configuration.getString("Sms.Luosimao.Key");
-            byte[] encodedAuth = Base64.encodeBase64(auth.getBytes());
-            String authHeader = "Basic " + new String(encodedAuth);
-            httpPost.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+            HttpPost httpPost = new HttpPost(Configuration.getString("Sms.Yimei.Service"));
 
             List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair("mobile", mobile));
+            params.add(new BasicNameValuePair("cdkey", Configuration.getString("Sms.Yimei.CDKey")));
+            params.add(new BasicNameValuePair("password", Configuration.getString("Sms.Yimei.Password")));
+            params.add(new BasicNameValuePair("phone", mobile));
             params.add(new BasicNameValuePair("message", message));
             HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
             httpPost.setEntity(entity);
@@ -49,9 +44,9 @@ public class LuosimaoSmsSender implements SmsSender {
             }
 
             String responseEntity = EntityUtils.toString(response.getEntity());
-            JSONObject responseJson = JSON.parseObject(responseEntity);
+            Map<String, String> responseXml = XmlUtil.xmlToMap(responseEntity);
 
-            int error = responseJson.getInteger("error");
+            int error = Integer.valueOf(responseXml.get("error"));
             if (error == 0) return true;
 
             LOGGER.error("fail to send msg to user, {}/{}, error code is: {}", mobile, message, error);

@@ -23,4 +23,9 @@ public class SmsController extends BaseController {
     public MomiaHttpResponse verify(@RequestParam String mobile, @RequestParam String code) {
         return MomiaHttpResponse.SUCCESS(smsService.verifyCode(mobile, code));
     }
+
+    @RequestMapping(value = "/notify", method = RequestMethod.POST)
+    public MomiaHttpResponse notify(@RequestParam String mobile, @RequestParam String message) {
+        return MomiaHttpResponse.SUCCESS(smsService.notify(mobile, message));
+    }
 }

@@ -10,8 +10,18 @@
     </bean>
     <bean id="teacherService" class="cn.momia.service.user.teacher.impl.TeacherServiceImpl" parent="dbAccessService" />
 
-    <bean id="smsSender" class="cn.momia.service.user.sms.impl.LuosimaoSmsSender" />
+    <bean id="luosimao" class="cn.momia.service.user.sms.impl.LuosimaoSmsSender" />
+    <bean id="yimei" class="cn.momia.service.user.sms.impl.YiMeiSmsSender" />
+    <bean id="smsSenderFactory" class="cn.momia.service.user.sms.SmsSenderFactory">
+        <property name="prototypes">
+            <map>
+                <entry key="luosimao" value-ref="luosimao" />
+                <entry key="yimei" value-ref="yimei" />
+            </map>
+        </property>
+    </bean>
+
     <bean id="smsService" class="cn.momia.service.user.sms.impl.SmsServiceImpl" parent="dbAccessService">
-        <property name="sender" ref="smsSender" />
+        <property name="smsSenderFactory" ref="smsSenderFactory" />
     </bean>
 </beans>
