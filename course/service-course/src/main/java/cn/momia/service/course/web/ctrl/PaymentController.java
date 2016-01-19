@@ -200,7 +200,7 @@ public class PaymentController extends BaseController {
             User inviteUser = userServiceApi.getByInviteCode(userCoupon.getInviteCode());
             if (inviteUser.exists() && inviteUser.getId() != order.getUserId()) {
                 UserCoupon couponOfInviteUser = couponService.distributeInviteUserCoupon(inviteUser.getId(), userCoupon.getCouponId(), null);
-                if (couponOfInviteUser.exists()) imServiceApi.push(inviteUser.getId(), String.format(Configuration.getString("PushMsg.Coupon"), couponOfInviteUser.getEndTime()), "");
+                if (couponOfInviteUser.exists()) imServiceApi.push(inviteUser.getId(), String.format(Configuration.getString("PushMsg.Coupon"), userCoupon.getDiscount(), couponOfInviteUser.getEndTime()), "");
             }
         } catch (Exception e) {
             LOGGER.error("返邀请红包失败，订单: {}", order.getId(), e);
@@ -210,7 +210,7 @@ public class PaymentController extends BaseController {
     private void firstPayUserCoupon(Order order) {
         try {
             UserCoupon userCoupon = couponService.distributeFirstPayUserCoupon(order.getUserId());
-            if (userCoupon.exists()) imServiceApi.push(order.getUserId(), String.format(Configuration.getString("PushMsg.Coupon"), userCoupon.getEndTime()), "");
+            if (userCoupon.exists()) imServiceApi.push(order.getUserId(), String.format(Configuration.getString("PushMsg.Coupon"), userCoupon.getDiscount(), userCoupon.getEndTime()), "");
         } catch (Exception e) {
             LOGGER.error("返首次购买红包失败，订单: {}", order.getId(), e);
         }

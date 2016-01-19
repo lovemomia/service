@@ -59,7 +59,7 @@ public class CouponController extends BaseController {
         InviteCoupon inviteCoupon = couponService.getInviteCoupon(mobile);
         if (inviteCoupon.exists() && couponService.updateInviteCouponStatus(mobile)) {
             UserCoupon userCoupon = couponService.distributeInviteUserCoupon(userId, inviteCoupon.getCouponId(), inviteCoupon.getInviteCode());
-            if (userCoupon.exists()) imServiceApi.push(userId, String.format(Configuration.getString("PushMsg.Coupon"), userCoupon.getEndTime()), "");
+            if (userCoupon.exists()) imServiceApi.push(userId, String.format(Configuration.getString("PushMsg.Coupon"), userCoupon.getDiscount(), userCoupon.getEndTime()), "");
         }
 
         return MomiaHttpResponse.SUCCESS;
