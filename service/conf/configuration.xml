@@ -9,7 +9,6 @@
     </Image>
 
     <Service>
-        <Base>http://localhost:7070</Base>
         <Course>http://localhost:7070</Course>
         <Feed>http://localhost:7070</Feed>
         <IM>http://localhost:7070</IM>
