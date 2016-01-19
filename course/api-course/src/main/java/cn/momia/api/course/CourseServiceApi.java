@@ -84,6 +84,15 @@ public class CourseServiceApi extends HttpServiceApi {
         return executeReturnPagedList(request, Course.class);
     }
 
+    public CourseSku getBookedSku(long userId, long bookingId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("uid", userId)
+                .add("bid", bookingId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/booked/sku"), builder.build());
+
+        return executeReturnObject(request, CourseSku.class);
+    }
+
     public PagedList<Course> query(long subjectId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("suid", subjectId)

@@ -11,8 +11,15 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.KeyHolder;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -205,17 +212,22 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
     }
 
     @Override
-    public void distributeInviteUserCoupon(long userId, int couponId, String inviteCode) {
+    public UserCoupon distributeInviteUserCoupon(long userId, int couponId, String inviteCode) {
         List<Coupon> coupons = listCoupons(Sets.newHashSet(couponId));
-        if (coupons.isEmpty()) return;
+        if (coupons.isEmpty()) return UserCoupon.NOT_EXIST_USER_COUPON;
 
-        addUserCoupons(userId, StringUtils.isBlank(inviteCode) ? "" : inviteCode, coupons);
+        return addUserCoupon(userId, StringUtils.isBlank(inviteCode) ? "" : inviteCode, coupons.get(0));
     }
 
-    private void addUserCoupons(long userId, String inviteCode, List<Coupon> coupons) {
-        List<Object[]> args = new ArrayList<Object[]>();
-        for (Coupon coupon : coupons) {
-            for (int i = 0; i < coupon.getCount(); i++) {
+    private UserCoupon addUserCoupon(final long userId, final String inviteCode, final Coupon coupon) {
+        KeyHolder keyHolder = insert(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                String sql = "INSERT INTO SG_UserCoupon (UserId, CouponId, StartTime, EndTime, InviteCode, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
+                PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ps.setLong(1, userId);
+                ps.setInt(2, coupon.getId());
+
                 int timeType = coupon.getTimeType();
                 Date startTime;
                 Date endTime;
@@ -226,21 +238,32 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
                     startTime = coupon.getStartTime();
                     endTime = coupon.getEndTime();
                 }
+                ps.setTimestamp(3, new Timestamp(startTime.getTime()));
+                ps.setTimestamp(4, new Timestamp(endTime.getTime()));
 
-                args.add(new Object[] { userId, coupon.getId(), startTime, endTime, inviteCode });
+                ps.setString(5, inviteCode);
+
+                return ps;
             }
-        }
+        });
 
-        String sql = "INSERT INTO SG_UserCoupon (UserId, CouponId, StartTime, EndTime, InviteCode, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
-        batchUpdate(sql, args);
+        long userCouponId = keyHolder.getKey().longValue();
+        return userCouponId > 0 ? getUserCoupon(userCouponId) : UserCoupon.NOT_EXIST_USER_COUPON;
+    }
+
+    private UserCoupon getUserCoupon(long userCouponId) {
+        Set<Long> userCouponIds = Sets.newHashSet(userCouponId);
+        List<UserCoupon> userCoupons = listUserCoupons(userCouponIds);
+
+        return userCoupons.isEmpty() ? UserCoupon.NOT_EXIST_USER_COUPON : userCoupons.get(0);
     }
 
     @Override
-    public void distributeFirstPayUserCoupon(long userId) {
+    public UserCoupon distributeFirstPayUserCoupon(long userId) {
         List<Coupon> coupons = listFirstPayCoupons();
-        if (coupons.isEmpty()) return;
+        if (coupons.isEmpty()) return UserCoupon.NOT_EXIST_USER_COUPON;
 
-        addUserCoupons(userId, "", coupons);
+        return addUserCoupon(userId, "", coupons.get(0));
     }
 
     private List<Coupon> listFirstPayCoupons() {

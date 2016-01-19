@@ -19,6 +19,7 @@
     </Service>
 
     <Sms>
+        <Enabled>luosimao</Enabled>
         <CorePoolSize>5</CorePoolSize>
         <MaxPoolSize>20</MaxPoolSize>
         <QueueSize>1000</QueueSize>
@@ -26,6 +27,11 @@
             <Key></Key>
             <Service>http://sms-api.luosimao.com/v1/send.json</Service>
         </Luosimao>
+        <Yimei>
+            <CDKey></CDKey>
+            <Password></Password>
+            <Service>http://hprpt2.eucp.b2m.cn:8080/sdkproxy/sendsms.action</Service>
+        </Yimei>
     </Sms>
 
     <Limit>
@@ -101,4 +107,8 @@
             <AppSecret>X44MIhxlhq</AppSecret>
         </RongCloud>
     </Im>
+
+    <PushMsg>
+        <Coupon>您已获得50元红包一枚，有效期至：%s，每个订单只可以使用一个红包，记得在有效期内使用哦~</Coupon>
+    </PushMsg>
 </Configuration>

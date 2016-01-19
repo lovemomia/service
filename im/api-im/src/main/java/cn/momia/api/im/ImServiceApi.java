@@ -11,7 +11,6 @@ import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 public class ImServiceApi extends HttpServiceApi {
     public String generateImToken(long userId, String nickName, String avatar) {
@@ -71,7 +70,7 @@ public class ImServiceApi extends HttpServiceApi {
         return executeReturnObject(request, Group.class);
     }
 
-    public List<Group> listGroups(Set<Long> groupIds) {
+    public List<Group> listGroups(Collection<Long> groupIds) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("gids", StringUtils.join(groupIds, ","));
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/im/group/list"), builder.build());
 
@@ -110,5 +109,25 @@ public class ImServiceApi extends HttpServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/im/user/group"), builder.build());
 
         return executeReturnList(request, UserGroup.class);
+    }
+
+    public boolean push(long userId, String content, String extra) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("uid", userId)
+                .add("content", content)
+                .add("extra", extra);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/im/push"), builder.build());
+
+        return executeReturnObject(request, Boolean.class);
+    }
+
+    public boolean pushBatch(Collection<Long> userIds, String content, String extra) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("uids", StringUtils.join(userIds, ","))
+                .add("content", content)
+                .add("extra", extra);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/im/push/batch"), builder.build());
+
+        return executeReturnObject(request, Boolean.class);
     }
 }

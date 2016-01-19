@@ -217,6 +217,13 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(buildPagedCourses(courses, totalCount, start, count));
     }
 
+    @RequestMapping(value = "/booked/sku", method = RequestMethod.GET)
+    public MomiaHttpResponse getBookedSku(@RequestParam(value = "uid") long userId, @RequestParam(value = "bid") long bookingId) {
+        CourseSku sku = courseService.getBookedSku(userId, bookingId);
+        if (!sku.exists()) return MomiaHttpResponse.FAILED("无效的选课场次");
+        return MomiaHttpResponse.SUCCESS(sku);
+    }
+
     @RequestMapping(value = "/query", method = RequestMethod.GET)
     public MomiaHttpResponse query(@RequestParam(value = "suid") long subjectId,
                                    @RequestParam(value = "pid", required = false, defaultValue = "0") long packageId,

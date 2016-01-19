@@ -21,4 +21,13 @@ public class SmsServiceApi extends HttpServiceApi {
 
         return executeReturnObject(request, Boolean.class);
     }
+
+    public boolean notify(String mobile, String message) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("mobile", mobile)
+                .add("message", message);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/sms/notify"), builder.build());
+
+        return executeReturnObject(request, Boolean.class);
+    }
 }

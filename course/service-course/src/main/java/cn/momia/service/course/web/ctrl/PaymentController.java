@@ -1,6 +1,7 @@
 package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.course.dto.subject.PaymentResult;
+import cn.momia.api.im.ImServiceApi;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.core.exception.MomiaErrorException;
@@ -46,6 +47,7 @@ public class PaymentController extends BaseController {
     @Autowired private SubjectService subjectService;
     @Autowired private OrderService orderService;
     @Autowired private CouponService couponService;
+    @Autowired private ImServiceApi imServiceApi;
     @Autowired private UserServiceApi userServiceApi;
 
     @RequestMapping(value = "/prepay/alipay", method = RequestMethod.POST)
@@ -197,7 +199,8 @@ public class PaymentController extends BaseController {
         try {
             User inviteUser = userServiceApi.getByInviteCode(userCoupon.getInviteCode());
             if (inviteUser.exists() && inviteUser.getId() != order.getUserId()) {
-                couponService.distributeInviteUserCoupon(inviteUser.getId(), userCoupon.getCouponId(), null);
+                UserCoupon couponOfInviteUser = couponService.distributeInviteUserCoupon(inviteUser.getId(), userCoupon.getCouponId(), null);
+                if (couponOfInviteUser.exists()) imServiceApi.push(inviteUser.getId(), String.format(Configuration.getString("PushMsg.Coupon"), couponOfInviteUser.getEndTime()), "");
             }
         } catch (Exception e) {
             LOGGER.error("返邀请红包失败，订单: {}", order.getId(), e);
@@ -206,7 +209,8 @@ public class PaymentController extends BaseController {
 
     private void firstPayUserCoupon(Order order) {
         try {
-            couponService.distributeFirstPayUserCoupon(order.getUserId());
+            UserCoupon userCoupon = couponService.distributeFirstPayUserCoupon(order.getUserId());
+            if (userCoupon.exists()) imServiceApi.push(order.getUserId(), String.format(Configuration.getString("PushMsg.Coupon"), userCoupon.getEndTime()), "");
         } catch (Exception e) {
             LOGGER.error("返首次购买红包失败，订单: {}", order.getId(), e);
         }

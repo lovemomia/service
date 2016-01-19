@@ -1,9 +1,11 @@
 package cn.momia.service.course.web.ctrl;
 
+import cn.momia.api.im.ImServiceApi;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.http.MomiaHttpResponse;
+import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.coupon.CouponService;
 import cn.momia.service.course.coupon.InviteCoupon;
@@ -24,6 +26,7 @@ import java.util.List;
 public class CouponController extends BaseController {
     @Autowired private CouponService couponService;
     @Autowired private OrderService orderService;
+    @Autowired private ImServiceApi imServiceApi;
     @Autowired private UserServiceApi userServiceApi;
 
     @RequestMapping(method = RequestMethod.GET)
@@ -54,7 +57,11 @@ public class CouponController extends BaseController {
     @RequestMapping(value = "/invite/distribute", method = RequestMethod.POST)
     public MomiaHttpResponse inviteUserCoupon(@RequestParam(value = "uid") long userId, @RequestParam String mobile) {
         InviteCoupon inviteCoupon = couponService.getInviteCoupon(mobile);
-        if (inviteCoupon.exists() && couponService.updateInviteCouponStatus(mobile)) couponService.distributeInviteUserCoupon(userId, inviteCoupon.getCouponId(), inviteCoupon.getInviteCode());
+        if (inviteCoupon.exists() && couponService.updateInviteCouponStatus(mobile)) {
+            UserCoupon userCoupon = couponService.distributeInviteUserCoupon(userId, inviteCoupon.getCouponId(), inviteCoupon.getInviteCode());
+            if (userCoupon.exists()) imServiceApi.push(userId, String.format(Configuration.getString("PushMsg.Coupon"), userCoupon.getEndTime()), "");
+        }
+
         return MomiaHttpResponse.SUCCESS;
     }
 

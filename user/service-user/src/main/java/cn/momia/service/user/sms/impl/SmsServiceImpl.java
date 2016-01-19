@@ -4,6 +4,7 @@ import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.user.sms.SmsSender;
+import cn.momia.service.user.sms.SmsSenderFactory;
 import cn.momia.service.user.sms.SmsService;
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,10 +17,10 @@ import java.util.concurrent.TimeUnit;
 public class SmsServiceImpl extends AbstractService implements SmsService {
     private ExecutorService executorService;
 
-    private SmsSender sender;
+    private SmsSenderFactory smsSenderFactory;
 
-    public void setSender(SmsSender sender) {
-        this.sender = sender;
+    public void setSmsSenderFactory(SmsSenderFactory smsSenderFactory) {
+        this.smsSenderFactory = smsSenderFactory;
     }
 
     @Override
@@ -27,7 +28,7 @@ public class SmsServiceImpl extends AbstractService implements SmsService {
         checkFrequency(mobile);
 
         String code = getOrGenerateCode(mobile);
-        sendAsync(mobile, buildCodeMsg(code));
+        sendCodeAsync(mobile, buildCodeMsg(code));
 
         return true;
     }
@@ -79,15 +80,16 @@ public class SmsServiceImpl extends AbstractService implements SmsService {
     }
 
     private String buildCodeMsg(String code) {
-        return "验证码：" + code + "，30分钟内有效【松果亲子】";
+        return "验证码：" + code + "，30分钟内有效";
     }
 
-    private void sendAsync(final String mobile, final String codeMsg) {
+    private void sendCodeAsync(final String mobile, final String codeMsg) {
         if (executorService == null) initExecutorService();
 
         executorService.execute(new Runnable() {
             @Override
             public void run() {
+                SmsSender sender = smsSenderFactory.getSmsSender(Configuration.getString("Sms.Enabled"));
                 if (sender.send(mobile, codeMsg)) {
                     updateSendTime(mobile);
                 }
@@ -122,5 +124,20 @@ public class SmsServiceImpl extends AbstractService implements SmsService {
     private void disable(String mobile, String code) {
         String sql = "UPDATE SG_Verify SET Status=0 WHERE Mobile=? AND Code=?";
         update(sql, new Object[] { mobile, code });
+    }
+
+    @Override
+    public boolean notify(final String mobile, final String message) {
+        if (executorService == null) initExecutorService();
+
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                SmsSender sender = smsSenderFactory.getSmsSender(Configuration.getString("Sms.Enabled"));
+                sender.send(mobile, message);
+            }
+        });
+
+        return true;
     }
 }

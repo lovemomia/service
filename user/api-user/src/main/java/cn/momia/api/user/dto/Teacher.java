@@ -11,7 +11,7 @@ public class Teacher {
     public static final Teacher NOT_EXIST_TEACHER = new Teacher();
 
     private int id;
-    @JSONField(serialize = false) private long userId;
+    private long userId;
     private String pic = "";
     private String name = "";
     private String idNo = "";

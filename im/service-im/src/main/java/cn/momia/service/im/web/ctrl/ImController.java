@@ -115,12 +115,23 @@ public class ImController extends BaseController {
     }
 
     @RequestMapping(value = "/push", method = RequestMethod.POST)
-    public MomiaHttpResponse push(@RequestParam String content, @RequestParam(required = false, defaultValue = "") String extra) {
-        if (StringUtils.isBlank(content)) return MomiaHttpResponse.BAD_REQUEST;
-
+    public MomiaHttpResponse push(@RequestParam(value = "uid") long userId,
+                                  @RequestParam String content,
+                                  @RequestParam(required = false, defaultValue = "") String extra) {
         PushMsg msg = new PushMsg(content, extra);
-        pushService.push(msg);
+        return MomiaHttpResponse.SUCCESS(pushService.push(userId, msg));
+    }
 
-        return MomiaHttpResponse.SUCCESS;
+    @RequestMapping(value = "/push/batch", method = RequestMethod.POST)
+    public MomiaHttpResponse pushBatch(@RequestParam(value = "uids") String uids,
+                                       @RequestParam String content,
+                                       @RequestParam(required = false, defaultValue = "") String extra) {
+        Set<Long> userIds = new HashSet<Long>();
+        for (String userId : Splitter.on(",").omitEmptyStrings().trimResults().split(uids)) {
+            userIds.add(Long.valueOf(userId));
+        }
+        PushMsg msg = new PushMsg(content, extra);
+
+        return MomiaHttpResponse.SUCCESS(pushService.push(userIds, msg));
     }
 }
