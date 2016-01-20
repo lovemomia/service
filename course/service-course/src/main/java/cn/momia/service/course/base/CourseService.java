@@ -97,4 +97,6 @@ public interface CourseService {
     List<Student.Parent> queryParentWithoutChild(long courseId, long courseSkuId);
     List<Student> queryAllStudents(long courseId, long courseSkuId);
     List<Student> queryCheckInStudents(long courseId, long courseSkuId);
+
+    List<Long> queryUserIdsOfTodaysCourse();
 }

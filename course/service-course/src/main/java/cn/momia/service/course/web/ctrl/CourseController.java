@@ -758,4 +758,9 @@ public class CourseController extends BaseController {
 
         return MomiaHttpResponse.SUCCESS(students);
     }
+
+    @RequestMapping(value = "/today/user", method = RequestMethod.GET)
+    public MomiaHttpResponse queryUserIdsOfTodaysCourse() {
+        return MomiaHttpResponse.SUCCESS(courseService.queryUserIdsOfTodaysCourse());
+    }
 }

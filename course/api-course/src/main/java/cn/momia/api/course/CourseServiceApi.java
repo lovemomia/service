@@ -405,4 +405,9 @@ public class CourseServiceApi extends HttpServiceApi {
 
         return executeReturnList(request, Student.class);
     }
+
+    public List<Long> queryUserIdsOfTodaysCourse() {
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/today/user"));
+        return executeReturnList(request, Long.class);
+    }
 }

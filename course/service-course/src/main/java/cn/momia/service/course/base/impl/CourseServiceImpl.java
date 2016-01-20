@@ -943,4 +943,14 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
                 "WHERE A.CheckIn>0 AND (C.Id=? OR C.ParentId=?) AND (D.Id=? OR D.ParentId=?) AND A.Status<>0 AND B.Status<>0 AND C.Status<>0 AND D.Status<>0";
         return queryObjectList(sql, new Object[] { courseId, courseId, courseSkuId, courseSkuId }, Student.class);
     }
+
+    @Override
+    public List<Long> queryUserIdsOfTodaysCourse() {
+        Date now = new Date();
+        String lower = TimeUtil.SHORT_DATE_FORMAT.format(now);
+        String upper = TimeUtil.SHORT_DATE_FORMAT.format(new Date(now.getTime() + 24 * 60 * 60 * 1000));
+        String sql = "SELECT DISTINCT B.UserId FROM SG_CourseSku A INNER JOIN SG_BookedCourse B ON A.Id=B.CourseSkuId WHERE A.Status<>0 AND A.EndTime>=? AND A.EndTime<? AND B.Status<>0";
+
+        return queryLongList(sql, new Object[] { lower, upper });
+    }
 }
