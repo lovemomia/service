@@ -422,7 +422,7 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
 
         if (bookablePackageIds.isEmpty()) return new ArrayList<Long>();
 
-        sql = "SELECT B.UserId " +
+        sql = "SELECT DISTINCT B.UserId " +
                 "FROM SG_SubjectOrderPackage A " +
                 "INNER JOIN SG_SubjectOrder B ON A.OrderId=B.Id " +
                 "WHERE A.Id IN(" + StringUtils.join(bookablePackageIds, ",") + ") AND B.Status=?";
