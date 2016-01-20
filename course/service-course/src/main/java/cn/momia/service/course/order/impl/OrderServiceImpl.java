@@ -1,6 +1,7 @@
 package cn.momia.service.course.order.impl;
 
 import cn.momia.common.core.exception.MomiaErrorException;
+import cn.momia.common.core.util.TimeUtil;
 import cn.momia.common.service.AbstractService;
 import cn.momia.api.course.dto.subject.Subject;
 import cn.momia.service.course.order.Order;
@@ -24,6 +25,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -376,5 +378,55 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     public int getBoughtCount(long userId, long skuId) {
         String sql = "SELECT COUNT(1) FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND B.SkuId=? AND A.Status<>0 AND B.Status<>0";
         return queryInt(sql, new Object[] { userId, skuId });
+    }
+
+    @Override
+    public Map<Long, Date> queryStartTimesOfPackages(Collection<Long> packageIds) {
+        if (packageIds.isEmpty()) return new HashMap<Long, Date>();
+
+        final Map<Long, Date> startTimesMap = new HashMap<Long, Date>();
+        String sql = "SELECT A.PackageId, MIN(B.StartTime) AS StartTime FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.PackageId IN (" + StringUtils.join(packageIds, ",") + ") AND A.Status<>0 AND B.Status<>0 GROUP BY A.PackageId";
+        query(sql, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                startTimesMap.put(rs.getLong("PackageId"), rs.getTimestamp("StartTime"));
+            }
+        });
+
+        return startTimesMap;
+    }
+
+    @Override
+    public List<Long> queryBookableUserIds() {
+        String sql = "SELECT A.Id " +
+                "FROM SG_SubjectOrderPackage A " +
+                "INNER JOIN SG_SubjectOrder B ON A.OrderId=B.Id " +
+                "WHERE A.Status<>0 AND A.CourseCount>1 AND A.BookableCount>0 AND B.Status=?";
+        List<Long> packageIds = queryLongList(sql, new Object[] { Order.Status.PAYED });
+        if (packageIds.isEmpty()) return new ArrayList<Long>();
+
+        List<OrderPackage> packages = listOrderPackages(packageIds);
+        if (packages.isEmpty()) return new ArrayList<Long>();
+
+        Map<Long, Date> startTimesMap = queryStartTimesOfPackages(packageIds);
+        Set<Long> bookablePackageIds = new HashSet<Long>();
+        Date now = new Date();
+        for (OrderPackage orderPackage : packages) {
+            Date startTime = startTimesMap.get(orderPackage.getId());
+            if (startTime == null) {
+                bookablePackageIds.add(orderPackage.getId());
+            } else {
+                if (TimeUtil.add(startTime, orderPackage.getTime(), orderPackage.getTimeUnit()).after(now)) bookablePackageIds.add(orderPackage.getId());
+            }
+        }
+
+        if (bookablePackageIds.isEmpty()) return new ArrayList<Long>();
+
+        sql = "SELECT B.UserId " +
+                "FROM SG_SubjectOrderPackage A " +
+                "INNER JOIN SG_SubjectOrder B ON A.OrderId=B.Id " +
+                "WHERE A.Id IN(" + StringUtils.join(bookablePackageIds, ",") + ") AND B.Status=?";
+
+        return queryLongList(sql, new Object[] { Order.Status.PAYED });
     }
 }

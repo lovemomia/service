@@ -1,6 +1,7 @@
 package cn.momia.service.course.order;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,4 +36,7 @@ public interface OrderService {
 
     boolean hasTrialOrder(long userId);
     int getBoughtCount(long userId, long skuId);
+
+    Map<Long, Date> queryStartTimesOfPackages(Collection<Long> packageIds);
+    List<Long> queryBookableUserIds();
 }

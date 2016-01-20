@@ -545,7 +545,7 @@ public class CourseController extends BaseController {
         if (!sku.exists() || !sku.isBookable(new Date())) throw new MomiaErrorException("预约失败，无效的课程场次或本场次已截止选课");
         if (orderPackage.getCourseId() > 0 && orderPackage.getCourseId() != sku.getCourseId()) throw new MomiaErrorException("预约失败，课程与购买的包不匹配");
 
-        Map<Long, Date> startTimes = courseService.queryStartTimesByPackages(Sets.newHashSet(packageId));
+        Map<Long, Date> startTimes = orderService.queryStartTimesOfPackages(Sets.newHashSet(packageId));
         Date startTime = startTimes.get(packageId);
         if (startTime != null) {
             Date endTime = TimeUtil.add(startTime, orderPackage.getTime(), orderPackage.getTimeUnit());
@@ -762,5 +762,10 @@ public class CourseController extends BaseController {
     @RequestMapping(value = "/today/user", method = RequestMethod.GET)
     public MomiaHttpResponse queryUserIdsOfTodaysCourse() {
         return MomiaHttpResponse.SUCCESS(courseService.queryUserIdsOfTodaysCourse());
+    }
+
+    @RequestMapping(value = "/hot/new", method = RequestMethod.GET)
+    public MomiaHttpResponse queryHotNewCourses() {
+        return MomiaHttpResponse.SUCCESS(courseService.queryHotNewCourses());
     }
 }

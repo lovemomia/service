@@ -8,7 +8,6 @@ import cn.momia.api.course.dto.course.Student;
 import cn.momia.api.course.dto.course.TeacherCourse;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -42,8 +41,6 @@ public interface CourseService {
 
     boolean lockSku(long skuId);
     boolean unlockSku(long skuId);
-
-    Map<Long, Date> queryStartTimesByPackages(Collection<Long> packageIds);
 
     BookedCourse getBookedCourse(long bookingId);
 
@@ -99,4 +96,6 @@ public interface CourseService {
     List<Student> queryCheckInStudents(long courseId, long courseSkuId);
 
     List<Long> queryUserIdsOfTodaysCourse();
+
+    List<String> queryHotNewCourses();
 }

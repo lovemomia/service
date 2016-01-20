@@ -20,8 +20,6 @@ import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderService;
 import cn.momia.service.course.order.OrderPackage;
 import com.google.common.collect.Sets;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,8 +39,6 @@ import java.util.Set;
 @RestController
 @RequestMapping(value = "/order")
 public class OrderController extends BaseController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
-
     @Autowired private CourseService courseService;
     @Autowired private SubjectService subjectService;
     @Autowired private OrderService orderService;
@@ -221,7 +217,7 @@ public class OrderController extends BaseController {
             if (orderPackage.getCourseId() > 0) courseIds.add(orderPackage.getCourseId());
         }
 
-        Map<Long, Date> startTimes = courseService.queryStartTimesByPackages(packageIds);
+        Map<Long, Date> startTimes = orderService.queryStartTimesOfPackages(packageIds);
         List<Course> courses = courseService.list(courseIds);
         Map<Long, Course> coursesMap = new HashMap<Long, Course>();
         for (Course course : courses) {
@@ -382,5 +378,10 @@ public class OrderController extends BaseController {
         }
 
         return MomiaHttpResponse.SUCCESS(orderService.extendPackageTime(packageId, newTime, newTimeUnit));
+    }
+
+    @RequestMapping(value = "/bookable/user", method = RequestMethod.GET)
+    public MomiaHttpResponse queryBookableUserIds() {
+        return MomiaHttpResponse.SUCCESS(orderService.queryBookableUserIds());
     }
 }

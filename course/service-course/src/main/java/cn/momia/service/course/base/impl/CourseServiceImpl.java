@@ -547,22 +547,6 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
-    public Map<Long, Date> queryStartTimesByPackages(Collection<Long> packageIds) {
-        if (packageIds.isEmpty()) return new HashMap<Long, Date>();
-
-        final Map<Long, Date> startTimesMap = new HashMap<Long, Date>();
-        String sql = "SELECT A.PackageId, MIN(B.StartTime) AS StartTime FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.PackageId IN (" + StringUtils.join(packageIds, ",") + ") AND A.Status<>0 AND B.Status<>0 GROUP BY A.PackageId";
-        query(sql, new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                startTimesMap.put(rs.getLong("PackageId"), rs.getTimestamp("StartTime"));
-            }
-        });
-
-        return startTimesMap;
-    }
-
-    @Override
     public BookedCourse getBookedCourse(long bookingId) {
         Set<Long> bookingIds = Sets.newHashSet(bookingId);
         List<BookedCourse> bookedCourses = listBookedCourses(bookingIds);
@@ -952,5 +936,15 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         String sql = "SELECT DISTINCT B.UserId FROM SG_CourseSku A INNER JOIN SG_BookedCourse B ON A.Id=B.CourseSkuId WHERE A.Status<>0 AND A.EndTime>=? AND A.EndTime<? AND B.Status<>0";
 
         return queryLongList(sql, new Object[] { lower, upper });
+    }
+
+    @Override
+    public List<String> queryHotNewCourses() {
+        Date now = new Date();
+        String lower = TimeUtil.SHORT_DATE_FORMAT.format(new Date(now.getTime() + 24 * 60 * 60 * 1000));
+        String upper = TimeUtil.SHORT_DATE_FORMAT.format(new Date(now.getTime() + 8L * 24 * 60 * 60 * 1000));
+        String sql = "SELECT B.KeyWord FROM SG_CourseSku A INNER JOIN SG_Course B ON A.CourseId=B.Id WHERE A.Status=1 AND A.StartTime>=? AND A.StartTime<? AND B.Status=1 AND B.ParentId=0 AND B.KeyWord<>'' ORDER BY B.Joined DESC LIMIT 3";
+
+        return queryStringList(sql, new Object[] { lower, upper });
     }
 }
