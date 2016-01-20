@@ -26,4 +26,6 @@ public interface CouponService {
     UserCoupon distributeInviteUserCoupon(long userId, int couponId, String inviteCode);
 
     UserCoupon distributeFirstPayUserCoupon(long userId);
+
+    List<UserCoupon> queryUserCouponsToExpired(int days);
 }

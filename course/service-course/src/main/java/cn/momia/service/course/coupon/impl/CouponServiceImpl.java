@@ -272,4 +272,16 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
 
         return listCoupons(couponIds);
     }
+
+    @Override
+    public List<UserCoupon> queryUserCouponsToExpired(int days) {
+        Date now = new Date();
+        String lower = TimeUtil.calcLower(now, days);
+        String upper = TimeUtil.calcUpper(now, days);
+
+        String sql = "SELECT Id FROM SG_UserCoupon WHERE Status=? AND StartTime>=? AND ENdTime<?";
+        List<Long> userCouponIds = queryLongList(sql, new Object[] { UserCoupon.Status.NOT_USED, lower, upper });
+
+        return listUserCoupons(userCouponIds);
+    }
 }
