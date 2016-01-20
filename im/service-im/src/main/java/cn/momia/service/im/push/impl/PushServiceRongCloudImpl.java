@@ -21,13 +21,15 @@ public class PushServiceRongCloudImpl extends AbstractPushService {
 
     @Override
     protected boolean doPush(Collection<Long> userIds, PushMsg msg) {
+        LOGGER.info("start push: {} to {} users", msg, userIds.size());
         boolean successful = true;
 
+        int count = 0;
         List<Long> subUserIds = new ArrayList<Long>();
         for (long userId : userIds) {
-            if (subUserIds.size() < 1000) {
-                subUserIds.add(userId);
-            } else {
+            subUserIds.add(userId);
+            count++;
+            if (subUserIds.size() == 1000 || count == userIds.size()) {
                 try {
                     HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.SystemPush"));
 
