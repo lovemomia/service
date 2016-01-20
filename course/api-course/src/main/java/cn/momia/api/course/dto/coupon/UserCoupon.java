@@ -16,7 +16,7 @@ public class UserCoupon {
 
     private long id;
     private int type;
-    @JSONField(serialize = false) private long userId;
+    private long userId;
     @JSONField(serialize = false) private int couponId;
     private String title;
     private String desc;

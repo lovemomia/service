@@ -279,7 +279,7 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
         String lower = TimeUtil.calcLower(now, days);
         String upper = TimeUtil.calcUpper(now, days);
 
-        String sql = "SELECT Id FROM SG_UserCoupon WHERE Status=? AND StartTime>=? AND ENdTime<?";
+        String sql = "SELECT Id FROM SG_UserCoupon WHERE Status=? AND EndTime>=? AND EndTime<?";
         List<Long> userCouponIds = queryLongList(sql, new Object[] { UserCoupon.Status.NOT_USED, lower, upper });
 
         return listUserCoupons(userCouponIds);
