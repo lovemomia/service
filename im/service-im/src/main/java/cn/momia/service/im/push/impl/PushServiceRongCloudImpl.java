@@ -1,6 +1,5 @@
 package cn.momia.service.im.push.impl;
 
-import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.im.push.PushMsg;
 import cn.momia.service.im.rongcloud.RongCloudUtil;
@@ -22,28 +21,40 @@ public class PushServiceRongCloudImpl extends AbstractPushService {
 
     @Override
     protected boolean doPush(Collection<Long> userIds, PushMsg msg) {
-        try {
-            HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.SystemPush"));
+        boolean successful = true;
 
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair("fromUserId", String.valueOf(SYSTEM_PUSH_USERID)));
-            for (long userId : userIds) {
-                params.add(new BasicNameValuePair("toUserId", String.valueOf(userId)));
-            }
-            params.add(new BasicNameValuePair("objectName", "RC:TxtMsg"));
-            params.add(new BasicNameValuePair("content", msg.toString()));
-            HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
-            httpPost.setEntity(entity);
+        List<Long> subUserIds = new ArrayList<Long>();
+        for (long userId : userIds) {
+            if (subUserIds.size() < 1000) {
+                subUserIds.add(userId);
+            } else {
+                try {
+                    HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.SystemPush"));
 
-            JSONObject responseJson = RongCloudUtil.executeRequest(httpPost);
-            if (responseJson.getInteger("code") != 200) {
-                LOGGER.error("push failed: {}/{}", userIds, msg);
-                return false;
+                    List<NameValuePair> params = new ArrayList<NameValuePair>();
+                    params.add(new BasicNameValuePair("fromUserId", String.valueOf(SYSTEM_PUSH_USERID)));
+                    for (long subUserId : subUserIds) {
+                        params.add(new BasicNameValuePair("toUserId", String.valueOf(subUserId)));
+                    }
+                    params.add(new BasicNameValuePair("objectName", "RC:TxtMsg"));
+                    params.add(new BasicNameValuePair("content", msg.toString()));
+                    HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
+                    httpPost.setEntity(entity);
+
+                    JSONObject responseJson = RongCloudUtil.executeRequest(httpPost);
+                    if (responseJson.getInteger("code") != 200) {
+                        LOGGER.error("push failed: {}/{}", subUserIds, msg);
+                        successful = false;
+                    }
+                } catch (Exception e) {
+                    LOGGER.error("publish msg exception: {}/{}", new Object[] { subUserIds, msg, e });
+                    successful = false;
+                } finally {
+                    subUserIds.clear();
+                }
             }
-        } catch (Exception e) {
-            throw new MomiaErrorException("publish msg exception", e);
         }
 
-        return true;
+        return successful;
     }
 }
