@@ -28,6 +28,13 @@ public class SubjectServiceApi extends HttpServiceApi {
         return executeReturnObject(request, Subject.class);
     }
 
+    public List<Subject> list(int cityId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("city", cityId);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/list"), builder.build());
+
+        return executeReturnList(request, Subject.class);
+    }
+
     public List<SubjectSku> querySkus(long subjectId) {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/%d/sku", subjectId));
         return executeReturnList(request, SubjectSku.class);
