@@ -22,7 +22,7 @@ public abstract class AbstractPushService extends AbstractService implements Pus
 
     private Object signal = new Object();
     private ExecutorService executorService = new ThreadPoolExecutor(5, 10, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(10000));
-    private Queue<PushTask> tasksQueue = new LinkedList<PushTask>();
+    private Queue<Runnable> tasksQueue = new LinkedList<Runnable>();
 
     public void init() {
         new Thread(new Runnable() {
@@ -48,7 +48,7 @@ public abstract class AbstractPushService extends AbstractService implements Pus
 
             int count = 0;
             while (!tasksQueue.isEmpty() && count++ < 1000) {
-                PushTask task = tasksQueue.poll();
+                Runnable task = tasksQueue.poll();
                 if (task == null) continue;
                 executorService.submit(task);
             }
@@ -63,7 +63,7 @@ public abstract class AbstractPushService extends AbstractService implements Pus
     @Override
     public boolean push(Collection<Long> userIds, PushMsg msg) {
         synchronized (signal) {
-            tasksQueue.add(new PushTask(userIds, msg));
+            tasksQueue.add(new PushUserTask(userIds, msg));
 
             LOGGER.info("notify new tasks");
             signal.notify();
@@ -72,20 +72,49 @@ public abstract class AbstractPushService extends AbstractService implements Pus
         return true;
     }
 
-    private class PushTask implements Runnable {
+    private class PushUserTask implements Runnable {
         private Collection<Long> targets;
         private PushMsg msg;
 
-        public PushTask(Collection<Long> targets, PushMsg msg) {
+        public PushUserTask(Collection<Long> targets, PushMsg msg) {
             this.targets = targets;
             this.msg = msg;
         }
 
         @Override
         public void run() {
-            doPush(targets, msg);
+            doPushUser(targets, msg);
         }
     }
 
-    protected abstract boolean doPush(Collection<Long> userIds, PushMsg msg);
+    protected abstract boolean doPushUser(Collection<Long> userIds, PushMsg msg);
+
+    @Override
+    public boolean pushGroup(long groupId, PushMsg msg) {
+        synchronized (signal) {
+            tasksQueue.add(new PushGroupTask(groupId, msg));
+
+            LOGGER.info("notify new tasks");
+            signal.notify();
+        }
+
+        return true;
+    }
+
+    private class PushGroupTask implements Runnable {
+        private long groupId;
+        private PushMsg msg;
+
+        public PushGroupTask(long groupId, PushMsg msg) {
+            this.groupId = groupId;
+            this.msg = msg;
+        }
+
+        @Override
+        public void run() {
+            doPushGroup(groupId, msg);
+        }
+    }
+
+    protected abstract boolean doPushGroup(long groupId, PushMsg msg);
 }

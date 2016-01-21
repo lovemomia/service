@@ -768,4 +768,14 @@ public class CourseController extends BaseController {
     public MomiaHttpResponse queryHotNewCourses() {
         return MomiaHttpResponse.SUCCESS(courseService.queryHotNewCourses());
     }
+
+    @RequestMapping(value = "/sku/closed/today", method = RequestMethod.GET)
+    public MomiaHttpResponse queryCourseSkusClosedToday() {
+        return MomiaHttpResponse.SUCCESS(courseService.queryCourseSkusClosedToday());
+    }
+
+    @RequestMapping(value = "/sku/booked/user", method = RequestMethod.GET)
+    public MomiaHttpResponse queryBookedUserIds(@RequestParam(value = "sid") long courseSkuId) {
+        return MomiaHttpResponse.SUCCESS(courseService.queryBookedUserIds(courseSkuId));
+    }
 }

@@ -16,11 +16,14 @@ public class CourseSku {
     private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
 
     private long id;
+    private long parentId;
     private long courseId;
     @JSONField(format = "yyyy-MM-dd HH:mm:ss") private Date startTime;
     @JSONField(format = "yyyy-MM-dd HH:mm:ss") private Date endTime;
     @JSONField(format = "yyyy-MM-dd HH:mm:ss") private Date deadline;
     @JSONField(serialize = false) private int unlockedStock;
+    private int booked;
+    private int minBooked;
     @JSONField(serialize = false) private int placeId;
     @JSONField(serialize = false) private int adult;
     @JSONField(serialize = false) private int child;
@@ -34,6 +37,14 @@ public class CourseSku {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(long parentId) {
+        this.parentId = parentId;
     }
 
     public long getCourseId() {
@@ -74,6 +85,22 @@ public class CourseSku {
 
     public void setUnlockedStock(int unlockedStock) {
         this.unlockedStock = unlockedStock;
+    }
+
+    public int getBooked() {
+        return booked;
+    }
+
+    public void setBooked(int booked) {
+        this.booked = booked;
+    }
+
+    public int getMinBooked() {
+        return minBooked;
+    }
+
+    public void setMinBooked(int minBooked) {
+        this.minBooked = minBooked;
     }
 
     public int getPlaceId() {

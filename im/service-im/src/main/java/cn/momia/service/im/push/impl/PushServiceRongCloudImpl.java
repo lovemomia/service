@@ -20,7 +20,7 @@ public class PushServiceRongCloudImpl extends AbstractPushService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PushServiceRongCloudImpl.class);
 
     @Override
-    protected boolean doPush(Collection<Long> userIds, PushMsg msg) {
+    protected boolean doPushUser(Collection<Long> userIds, PushMsg msg) {
         LOGGER.info("start push: {} to {} users", msg, userIds.size());
         boolean successful = true;
 
@@ -58,5 +58,31 @@ public class PushServiceRongCloudImpl extends AbstractPushService {
         }
 
         return successful;
+    }
+
+    @Override
+    protected boolean doPushGroup(long groupId, PushMsg msg) {
+        try {
+            HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.GroupPush"));
+
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("fromUserId", String.valueOf(SYSTEM_PUSH_USERID)));
+            params.add(new BasicNameValuePair("toGroupId", String.valueOf(groupId)));
+            params.add(new BasicNameValuePair("objectName", "RC:TxtMsg"));
+            params.add(new BasicNameValuePair("content", msg.toString()));
+            HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
+            httpPost.setEntity(entity);
+
+            JSONObject responseJson = RongCloudUtil.executeRequest(httpPost);
+            if (responseJson.getInteger("code") != 200) {
+                LOGGER.error("push group failed: {}/{}", groupId, msg);
+                return false;
+            }
+        } catch (Exception e) {
+            LOGGER.error("publish group msg exception: {}/{}", new Object[] { groupId, msg, e });
+            return false;
+        }
+
+        return true;
     }
 }

@@ -96,6 +96,7 @@ public interface CourseService {
     List<Student> queryCheckInStudents(long courseId, long courseSkuId);
 
     List<Long> queryUserIdsOfTodaysCourse();
-
     List<String> queryHotNewCourses();
+    List<CourseSku> queryCourseSkusClosedToday();
+    List<Long> queryBookedUserIds(long courseSkuId);
 }
