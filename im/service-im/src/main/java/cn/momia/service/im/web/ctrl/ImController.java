@@ -96,9 +96,10 @@ public class ImController extends BaseController {
     @RequestMapping(value = "/group/join", method = RequestMethod.POST)
     public MomiaHttpResponse joinGroup(@RequestParam(value = "uid") long userId,
                                        @RequestParam(value = "coid") long courseId,
-                                       @RequestParam(value = "sid") long courseSkuId) {
+                                       @RequestParam(value = "sid") long courseSkuId,
+                                       @RequestParam(required = false, defaultValue = "false") boolean teacher) {
         if (courseId <= 0 || courseSkuId <= 0) return MomiaHttpResponse.BAD_REQUEST;
-        return MomiaHttpResponse.SUCCESS(imService.joinGroup(userId, courseId, courseSkuId));
+        return MomiaHttpResponse.SUCCESS(imService.joinGroup(userId, courseId, courseSkuId, teacher));
     }
 
     @RequestMapping(value = "/group/leave", method = RequestMethod.POST)

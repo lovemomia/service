@@ -84,11 +84,12 @@ public class ImServiceApi extends HttpServiceApi {
         return executeReturnList(request, GroupMember.class);
     }
 
-    public boolean joinGroup(long userId, long courseId, long courseSkuId) {
+    public boolean joinGroup(long userId, long courseId, long courseSkuId, boolean teacher) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
                 .add("coid", courseId)
-                .add("sid", courseSkuId);
+                .add("sid", courseSkuId)
+                .add("teacher", teacher);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/im/group/join"), builder.build());
 
         return executeReturnObject(request, Boolean.class);

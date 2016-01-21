@@ -147,12 +147,12 @@ public abstract class AbstractImService extends AbstractService implements ImSer
     }
 
     @Override
-    public boolean joinGroup(long userId, long courseId, long courseSkuId) {
+    public boolean joinGroup(long userId, long courseId, long courseSkuId, boolean teacher) {
         Group group = queryGroup(courseId, courseSkuId);
         if (!group.exists()) return false;
 
         if (doJoinGroup(userId, group.getGroupId(), group.getGroupName())) {
-            logGroupMembers(group.getGroupId(), Sets.newHashSet(userId), false);
+            logGroupMembers(group.getGroupId(), Sets.newHashSet(userId), teacher);
             return true;
         }
 

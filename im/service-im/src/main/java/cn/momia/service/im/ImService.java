@@ -22,7 +22,7 @@ public interface ImService {
     boolean isInGroup(long userId, long groupId);
     List<GroupMember> listGroupMembers(long groupId);
 
-    boolean joinGroup(long userId, long courseId, long courseSkuId);
+    boolean joinGroup(long userId, long courseId, long courseSkuId, boolean teacher);
     boolean leaveGroup(long userId, long courseId, long courseSkuId);
 
     List<UserGroup> listUserGroups(long userId);
