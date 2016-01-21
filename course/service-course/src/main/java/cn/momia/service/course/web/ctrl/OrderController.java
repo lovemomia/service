@@ -384,4 +384,9 @@ public class OrderController extends BaseController {
     public MomiaHttpResponse queryBookableUserIds() {
         return MomiaHttpResponse.SUCCESS(orderService.queryBookableUserIds());
     }
+
+    @RequestMapping(value = "/package/expired/user", method = RequestMethod.GET)
+    public MomiaHttpResponse queryUserIdsOfPackagesToExpired(@RequestParam int days) {
+        return MomiaHttpResponse.SUCCESS(orderService.queryUserIdsOfPackagesToExpired(days));
+    }
 }

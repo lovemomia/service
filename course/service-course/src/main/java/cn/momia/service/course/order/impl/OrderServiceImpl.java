@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -422,11 +423,49 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
 
         if (bookablePackageIds.isEmpty()) return new ArrayList<Long>();
 
-        sql = "SELECT DISTINCT B.UserId " +
+        return listUserIdsOfPackages(bookablePackageIds);
+    }
+
+    private List<Long> listUserIdsOfPackages(Collection<Long> packageIds) {
+        String sql = "SELECT DISTINCT B.UserId " +
                 "FROM SG_SubjectOrderPackage A " +
                 "INNER JOIN SG_SubjectOrder B ON A.OrderId=B.Id " +
-                "WHERE A.Id IN(" + StringUtils.join(bookablePackageIds, ",") + ") AND B.Status=?";
+                "WHERE A.Id IN(" + StringUtils.join(packageIds, ",") + ") AND B.Status=?";
 
         return queryLongList(sql, new Object[] { Order.Status.PAYED });
+    }
+
+    @Override
+    public List<Long> queryUserIdsOfPackagesToExpired(int days) {
+        try {
+            String sql = "SELECT A.Id " +
+                    "FROM SG_SubjectOrderPackage A " +
+                    "INNER JOIN SG_SubjectOrder B ON A.OrderId=B.Id " +
+                    "WHERE A.Status<>0 AND A.BookableCount>0 AND B.Status=?";
+            List<Long> packageIds = queryLongList(sql, new Object[] { Order.Status.PAYED });
+            if (packageIds.isEmpty()) return new ArrayList<Long>();
+
+            List<OrderPackage> packages = listOrderPackages(packageIds);
+            if (packages.isEmpty()) return new ArrayList<Long>();
+
+            Map<Long, Date> startTimesMap = queryStartTimesOfPackages(packageIds);
+            Set<Long> packageIdsToExpired = new HashSet<Long>();
+            Date now = new Date();
+            Date lower = TimeUtil.SHORT_DATE_FORMAT.parse(TimeUtil.SHORT_DATE_FORMAT.format(new Date(now.getTime() + 11L * 24 * 60 * 60 * 1000)));
+            Date upper = TimeUtil.SHORT_DATE_FORMAT.parse(TimeUtil.SHORT_DATE_FORMAT.format(new Date(now.getTime() + 12L * 24 * 60 * 60 * 1000)));
+            for (OrderPackage orderPackage : packages) {
+                Date startTime = startTimesMap.get(orderPackage.getId());
+                if (startTime == null) continue;
+
+                Date expiredTime = TimeUtil.add(startTime, orderPackage.getTime(), orderPackage.getTimeUnit());
+                if (expiredTime.after(lower) && expiredTime.before(upper)) packageIdsToExpired.add(orderPackage.getId());
+            }
+
+            if (packageIdsToExpired.isEmpty()) return new ArrayList<Long>();
+
+            return listUserIdsOfPackages(packageIdsToExpired);
+        } catch (ParseException e) {
+            return new ArrayList<Long>();
+        }
     }
 }

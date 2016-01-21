@@ -211,4 +211,12 @@ public class UserServiceImpl extends AbstractService implements UserService {
         String sql = "UPDATE SG_User SET Payed=1 WHERE Id=? AND Payed=0";
         return update(sql, new Object[] { userId });
     }
+
+    @Override
+    public List<String> listMobiles(Collection<Long> userIds) {
+        if (userIds.isEmpty()) return new ArrayList<String>();
+
+        String sql = "SELECT Mobile FROM SG_User WHERE Id IN (" + StringUtils.join(userIds, ",") + ") AND Status<>0";
+        return queryStringList(sql);
+    }
 }

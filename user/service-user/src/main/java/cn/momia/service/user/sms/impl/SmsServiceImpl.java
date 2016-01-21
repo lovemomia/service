@@ -6,21 +6,63 @@ import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.user.sms.SmsSender;
 import cn.momia.service.user.sms.SmsSenderFactory;
 import cn.momia.service.user.sms.SmsService;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class SmsServiceImpl extends AbstractService implements SmsService {
-    private ExecutorService executorService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SmsServiceImpl.class);
+
+    private ExecutorService sendCodeExecutorService;
+
+    private Object signal = new Object();
+    private ExecutorService notifyExecutorService = new ThreadPoolExecutor(5, 10, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(10000));
+    private Queue<NotifyTask> tasksQueue = new LinkedList<NotifyTask>();
 
     private SmsSenderFactory smsSenderFactory;
 
     public void setSmsSenderFactory(SmsSenderFactory smsSenderFactory) {
         this.smsSenderFactory = smsSenderFactory;
+    }
+
+    public void init() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        consume();
+                    } catch (InterruptedException e) {
+                        LOGGER.error("InterruptedException", e);
+                    }
+                }
+            }
+        }).start();
+    }
+
+    private void consume() throws InterruptedException {
+        synchronized (signal) {
+            if (tasksQueue.isEmpty()) {
+                signal.wait();
+            }
+
+            int count = 0;
+            while (!tasksQueue.isEmpty() && count++ < 1000) {
+                NotifyTask task = tasksQueue.poll();
+                if (task == null) continue;
+                notifyExecutorService.submit(task);
+            }
+        }
     }
 
     @Override
@@ -84,9 +126,9 @@ public class SmsServiceImpl extends AbstractService implements SmsService {
     }
 
     private void sendCodeAsync(final String mobile, final String codeMsg) {
-        if (executorService == null) initExecutorService();
+        if (sendCodeExecutorService == null) initExecutorService();
 
-        executorService.execute(new Runnable() {
+        sendCodeExecutorService.execute(new Runnable() {
             @Override
             public void run() {
                 SmsSender sender = smsSenderFactory.getSmsSender(Configuration.getString("Sms.Enabled"));
@@ -98,12 +140,12 @@ public class SmsServiceImpl extends AbstractService implements SmsService {
     }
 
     private synchronized void initExecutorService() {
-        if (executorService != null) return;
+        if (sendCodeExecutorService != null) return;
 
         int corePoolSize = Configuration.getInt("Sms.CorePoolSize");
         int maxPoolSize = Configuration.getInt("Sms.MaxPoolSize");
         int queueSize = Configuration.getInt("Sms.QueueSize");
-        executorService = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 5, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(queueSize));
+        sendCodeExecutorService = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 5, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(queueSize));
     }
 
     private boolean updateSendTime(String mobile) {
@@ -127,17 +169,35 @@ public class SmsServiceImpl extends AbstractService implements SmsService {
     }
 
     @Override
-    public boolean notify(final String mobile, final String message) {
-        if (executorService == null) initExecutorService();
+    public boolean notify(String mobile, String message) {
+        return notify(Sets.newHashSet(mobile), message);
+    }
 
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                SmsSender sender = smsSenderFactory.getSmsSender(Configuration.getString("Sms.Enabled"));
-                sender.send(mobile, message);
+    @Override
+    public boolean notify(Collection<String> mobiles, String message) {
+        synchronized (signal) {
+            for (String mobile : mobiles) {
+                tasksQueue.add(new NotifyTask(mobile, message));
             }
-        });
+            signal.notify();
+        }
 
         return true;
+    }
+
+    private class NotifyTask implements Runnable {
+        private String mobile;
+        private String message;
+
+        public NotifyTask(String mobile, String message) {
+            this.mobile = mobile;
+            this.message = message;
+        }
+
+        @Override
+        public void run() {
+            SmsSender sender = smsSenderFactory.getSmsSender(Configuration.getString("Sms.Enabled"));
+            sender.send(mobile, message);
+        }
     }
 }

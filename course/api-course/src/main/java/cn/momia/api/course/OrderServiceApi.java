@@ -77,4 +77,11 @@ public class OrderServiceApi extends HttpServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/order/bookable/user"));
         return executeReturnList(request, Long.class);
     }
+
+    public List<Long> queryUserIdsOfPackagesToExpired(int days) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("days", days);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/order/package/expired/user"), builder.build());
+
+        return executeReturnList(request, Long.class);
+    }
 }

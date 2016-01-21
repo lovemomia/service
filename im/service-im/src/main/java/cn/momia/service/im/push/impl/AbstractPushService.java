@@ -48,7 +48,7 @@ public abstract class AbstractPushService extends AbstractService implements Pus
 
             int count = 0;
             while (!tasksQueue.isEmpty() && count++ < 1000) {
-                final PushTask task = tasksQueue.poll();
+                PushTask task = tasksQueue.poll();
                 if (task == null) continue;
                 executorService.submit(task);
             }

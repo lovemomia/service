@@ -150,4 +150,12 @@ public class UserServiceApi extends HttpServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/user/%d/payed", userId));
         return executeReturnObject(request, Boolean.class);
     }
+
+    public void notifyBatch(List<Long> userIds, String message) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("uids", StringUtils.join(userIds, ","))
+                .add("message", message);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/user/notify/batch"), builder.build());
+        execute(request);
+    }
 }

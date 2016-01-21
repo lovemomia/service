@@ -5,6 +5,7 @@ import cn.momia.api.user.dto.User;
 import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.user.base.UserService;
+import cn.momia.service.user.sms.SmsService;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/user")
 public class UserController extends BaseController {
+    @Autowired private SmsService smsService;
     @Autowired private UserService userService;
 
     @RequestMapping(method = RequestMethod.GET)
@@ -214,5 +218,18 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/{uid}/payed", method = RequestMethod.POST)
     public MomiaHttpResponse setPayed(@PathVariable(value = "uid") long userId) {
         return MomiaHttpResponse.SUCCESS(userService.setPayed(userId));
+    }
+
+    @RequestMapping(value = "/notify/batch", method = RequestMethod.POST)
+    public MomiaHttpResponse notifyBatch(@RequestParam String uids, @RequestParam String message) {
+        Set<Long> userIds = new HashSet<Long>();
+        for (String userId : Splitter.on(",").omitEmptyStrings().trimResults().split(uids)) {
+            userIds.add(Long.valueOf(userId));
+        }
+
+        List<String> mobiles = userService.listMobiles(userIds);
+        if (!mobiles.isEmpty()) smsService.notify(mobiles, message);
+
+        return MomiaHttpResponse.SUCCESS;
     }
 }

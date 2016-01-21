@@ -39,4 +39,5 @@ public interface OrderService {
 
     Map<Long, Date> queryStartTimesOfPackages(Collection<Long> packageIds);
     List<Long> queryBookableUserIds();
+    List<Long> queryUserIdsOfPackagesToExpired(int days);
 }
