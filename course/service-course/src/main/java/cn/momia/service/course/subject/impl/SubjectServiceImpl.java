@@ -227,8 +227,8 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
 
     @Override
     public List<Subject> list(int cityId) {
-        String sql = "SELECT Id FROM SG_Subject WHERE CityId=? AND Status=1";
-        List<Long> subjectIds = queryLongList(sql, new Object[] { cityId });
+        String sql = "SELECT Id FROM SG_Subject WHERE CityId=? AND `Type`=? AND Status=1";
+        List<Long> subjectIds = queryLongList(sql, new Object[] { cityId, Subject.Type.NORMAL });
 
         return list(subjectIds);
     }
