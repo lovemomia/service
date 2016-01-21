@@ -451,14 +451,14 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
             Map<Long, Date> startTimesMap = queryStartTimesOfPackages(packageIds);
             Set<Long> packageIdsToExpired = new HashSet<Long>();
             Date now = new Date();
-            Date lower = TimeUtil.SHORT_DATE_FORMAT.parse(TimeUtil.SHORT_DATE_FORMAT.format(new Date(now.getTime() + 11L * 24 * 60 * 60 * 1000)));
-            Date upper = TimeUtil.SHORT_DATE_FORMAT.parse(TimeUtil.SHORT_DATE_FORMAT.format(new Date(now.getTime() + 12L * 24 * 60 * 60 * 1000)));
+            Date lower = TimeUtil.SHORT_DATE_FORMAT.parse(TimeUtil.SHORT_DATE_FORMAT.format(new Date(now.getTime() + (days + 1L) * 24 * 60 * 60 * 1000)));
+            Date upper = TimeUtil.SHORT_DATE_FORMAT.parse(TimeUtil.SHORT_DATE_FORMAT.format(new Date(now.getTime() + (days + 2L) * 24 * 60 * 60 * 1000)));
             for (OrderPackage orderPackage : packages) {
                 Date startTime = startTimesMap.get(orderPackage.getId());
                 if (startTime == null) continue;
 
                 Date expiredTime = TimeUtil.add(startTime, orderPackage.getTime(), orderPackage.getTimeUnit());
-                if (expiredTime.after(lower) && expiredTime.before(upper)) packageIdsToExpired.add(orderPackage.getId());
+                if ((expiredTime.equals(lower) || expiredTime.after(lower)) && expiredTime.before(upper)) packageIdsToExpired.add(orderPackage.getId());
             }
 
             if (packageIdsToExpired.isEmpty()) return new ArrayList<Long>();
