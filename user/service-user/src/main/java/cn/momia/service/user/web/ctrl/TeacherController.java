@@ -19,7 +19,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -48,7 +50,16 @@ public class TeacherController extends BaseController {
             teacherIds.add(Integer.valueOf(teacherId));
         }
 
-        return MomiaHttpResponse.SUCCESS(teacherService.list(teacherIds));
+        return MomiaHttpResponse.SUCCESS(toBaseInfoList(teacherService.list(teacherIds)));
+    }
+
+    private List<Teacher> toBaseInfoList(List<Teacher> teachers) {
+        List<Teacher> baseInfos = new ArrayList<Teacher>();
+        for (Teacher teacher : teachers) {
+            baseInfos.add(new Teacher.Base(teacher));
+        }
+
+        return baseInfos;
     }
 
     @RequestMapping(value = "/list/user", method = RequestMethod.GET)
@@ -58,7 +69,7 @@ public class TeacherController extends BaseController {
             teacherUserIds.add(Long.valueOf(teacherUserId));
         }
 
-        return MomiaHttpResponse.SUCCESS(teacherService.listByUser(teacherUserIds));
+        return MomiaHttpResponse.SUCCESS(toBaseInfoList(teacherService.listByUser(teacherUserIds)));
     }
 
     @RequestMapping(method = RequestMethod.POST)

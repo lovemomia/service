@@ -115,7 +115,7 @@ public class Teacher {
     }
 
     public String getEducation() {
-        return StringUtils.isBlank(education) ? StringUtils.join(educations, "\n") : education;
+        return StringUtils.isBlank(education) ? (educations != null && educations.size() > 0 ? educations.get(0).toString() : "") : education;
     }
 
     public void setEducation(String education) {
@@ -144,5 +144,22 @@ public class Teacher {
 
     public String getAvatar() {
         return pic;
+    }
+
+    public static class Base extends Teacher {
+        public Base(Teacher teacher) {
+            super();
+            setId(teacher.getId());
+            setUserId(teacher.getUserId());
+            setPic(teacher.getPic());
+            setName(teacher.getName());
+            setIdNo(teacher.getIdNo());
+            setSex(teacher.getSex());
+            setBirthday(teacher.getBirthday());
+            setAddress(teacher.getAddress());
+
+            setExperience(teacher.getExperience());
+            setEducation(teacher.getEducation());
+        }
     }
 }

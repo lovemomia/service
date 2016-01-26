@@ -85,7 +85,7 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
             experiencesMap.put(userId, new ArrayList<TeacherExperience>());
         }
 
-        String sql = "SELECT Id FROM SG_TeacherExperience WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND Status<>0 ORDER BY AddTime DESC";
+        String sql = "SELECT Id FROM SG_TeacherExperience WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND Status<>0 ORDER BY Time DESC";
         List<Integer> experienceIds = queryIntList(sql);
         List<TeacherExperience> experiences = listExperiences(experienceIds);
         for (TeacherExperience experience : experiences) {
@@ -122,7 +122,7 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
             educationsMap.put(userId, new ArrayList<TeacherEducation>());
         }
 
-        String sql = "SELECT Id FROM SG_TeacherEducation WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND Status<>0 ORDER BY AddTime DESC";
+        String sql = "SELECT Id FROM SG_TeacherEducation WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND Status<>0 ORDER BY Time DESC";
         List<Integer> educationIds = queryIntList(sql);
         List<TeacherEducation> educations = listEducations(educationIds);
         for (TeacherEducation education : educations) {
