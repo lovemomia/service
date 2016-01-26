@@ -150,13 +150,8 @@ public class Teacher {
         public Base(Teacher teacher) {
             super();
             setId(teacher.getId());
-            setUserId(teacher.getUserId());
             setPic(teacher.getPic());
             setName(teacher.getName());
-            setIdNo(teacher.getIdNo());
-            setSex(teacher.getSex());
-            setBirthday(teacher.getBirthday());
-            setAddress(teacher.getAddress());
 
             setExperience(teacher.getExperience());
             setEducation(teacher.getEducation());
