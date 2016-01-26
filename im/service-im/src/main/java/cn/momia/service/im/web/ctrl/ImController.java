@@ -135,4 +135,12 @@ public class ImController extends BaseController {
 
         return MomiaHttpResponse.SUCCESS(pushService.push(userIds, msg));
     }
+
+    @RequestMapping(value = "/push/group", method = RequestMethod.POST)
+    public MomiaHttpResponse pushGroup(@RequestParam(value = "gid") long groupId,
+                                       @RequestParam String content,
+                                       @RequestParam(required = false, defaultValue = "") String extra) {
+        PushMsg msg = new PushMsg(content, extra);
+        return MomiaHttpResponse.SUCCESS(pushService.pushGroup(groupId, msg));
+    }
 }

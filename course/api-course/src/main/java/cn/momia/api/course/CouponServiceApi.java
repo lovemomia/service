@@ -8,6 +8,7 @@ import cn.momia.common.core.http.MomiaHttpRequestBuilder;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class CouponServiceApi extends HttpServiceApi {
     public BigDecimal coupon(String utoken, long orderId, long userCouponId) {
@@ -45,5 +46,12 @@ public class CouponServiceApi extends HttpServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/coupon/list"), builder.build());
 
         return executeReturnPagedList(request, UserCoupon.class);
+    }
+
+    public List<UserCoupon> queryUserCouponsToExpired(int days) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("days", days);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/coupon/expired"), builder.build());
+
+        return executeReturnList(request, UserCoupon.class);
     }
 }

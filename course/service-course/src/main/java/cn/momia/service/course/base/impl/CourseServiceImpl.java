@@ -119,7 +119,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     public List<Course> list(Collection<Long> courseIds) {
         if (courseIds.isEmpty()) return new ArrayList<Course>();
 
-        String sql = "SELECT A.Id, A.Type, A.ParentId, A.SubjectId, A.Title, A.Cover, A.MinAge, A.MaxAge, A.Insurance, A.Joined, A.Price, A.Goal, A.Flow, A.Tips, A.Notice, A.InstitutionId, A.Status, B.Title AS Subject, B.Stock FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Id IN (" + StringUtils.join(courseIds, ",") + ") AND A.Status<>0 AND B.Status<>0";
+        String sql = "SELECT A.Id, A.Type, A.ParentId, A.SubjectId, A.Title, A.KeyWord, A.Cover, A.MinAge, A.MaxAge, A.Insurance, A.Joined, A.Price, A.Goal, A.Flow, A.Tips, A.Notice, A.InstitutionId, A.Status, B.Title AS Subject, B.Stock FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Id IN (" + StringUtils.join(courseIds, ",") + ") AND A.Status<>0 AND B.Status<>0";
         List<Course> courses = queryObjectList(sql, Course.class);
 
         Set<Integer> institutionIds = new HashSet<Integer>();
@@ -248,7 +248,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     public List<CourseSku> listSkus(Collection<Long> skuIds) {
         if (skuIds.isEmpty()) return new ArrayList<CourseSku>();
 
-        String sql = "SELECT Id, CourseId, StartTime, EndTime, Deadline, UnlockedStock, PlaceId, Adult, Child, Status FROM SG_CourseSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status<>0";
+        String sql = "SELECT Id, ParentId, CourseId, StartTime, EndTime, Deadline, UnlockedStock, LockedStock AS Booked, MinBooked, PlaceId, Adult, Child, Status FROM SG_CourseSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status<>0";
         List<CourseSku> skus = queryObjectList(sql, CourseSku.class);
 
         Map<Long, CourseSku> skusMap = new HashMap<Long, CourseSku>();
@@ -544,22 +544,6 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     public boolean unlockSku(long skuId) {
         String sql = "UPDATE SG_CourseSku SET UnlockedStock=UnlockedStock+1, LockedStock=LockedStock-1 WHERE Id=? AND Status=1 AND LockedStock>=1";
         return update(sql, new Object[] { skuId });
-    }
-
-    @Override
-    public Map<Long, Date> queryStartTimesByPackages(Collection<Long> packageIds) {
-        if (packageIds.isEmpty()) return new HashMap<Long, Date>();
-
-        final Map<Long, Date> startTimesMap = new HashMap<Long, Date>();
-        String sql = "SELECT A.PackageId, MIN(B.StartTime) AS StartTime FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.PackageId IN (" + StringUtils.join(packageIds, ",") + ") AND A.Status<>0 AND B.Status<>0 GROUP BY A.PackageId";
-        query(sql, new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                startTimesMap.put(rs.getLong("PackageId"), rs.getTimestamp("StartTime"));
-            }
-        });
-
-        return startTimesMap;
     }
 
     @Override
@@ -942,5 +926,42 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
                 "INNER JOIN SG_CourseSku D ON A.CourseSkuId=D.Id " +
                 "WHERE A.CheckIn>0 AND (C.Id=? OR C.ParentId=?) AND (D.Id=? OR D.ParentId=?) AND A.Status<>0 AND B.Status<>0 AND C.Status<>0 AND D.Status<>0";
         return queryObjectList(sql, new Object[] { courseId, courseId, courseSkuId, courseSkuId }, Student.class);
+    }
+
+    @Override
+    public List<Long> queryUserIdsOfTodaysCourse() {
+        Date now = new Date();
+        String lower = TimeUtil.SHORT_DATE_FORMAT.format(now);
+        String upper = TimeUtil.SHORT_DATE_FORMAT.format(new Date(now.getTime() + 24 * 60 * 60 * 1000));
+        String sql = "SELECT DISTINCT B.UserId FROM SG_CourseSku A INNER JOIN SG_BookedCourse B ON A.Id=B.CourseSkuId WHERE A.Status<>0 AND A.EndTime>=? AND A.EndTime<? AND B.Status<>0";
+
+        return queryLongList(sql, new Object[] { lower, upper });
+    }
+
+    @Override
+    public List<String> queryHotNewCourses() {
+        Date now = new Date();
+        String lower = TimeUtil.SHORT_DATE_FORMAT.format(new Date(now.getTime() + 24 * 60 * 60 * 1000));
+        String upper = TimeUtil.SHORT_DATE_FORMAT.format(new Date(now.getTime() + 8L * 24 * 60 * 60 * 1000));
+        String sql = "SELECT B.KeyWord FROM SG_CourseSku A INNER JOIN SG_Course B ON A.CourseId=B.Id WHERE A.Status=1 AND A.StartTime>=? AND A.StartTime<? AND B.Status=1 AND B.ParentId=0 AND B.KeyWord<>'' ORDER BY B.Joined DESC LIMIT 3";
+
+        return queryStringList(sql, new Object[] { lower, upper });
+    }
+
+    @Override
+    public List<CourseSku> queryCourseSkusClosedToday() {
+        Date now = new Date();
+        String lower = TimeUtil.SHORT_DATE_FORMAT.format(now);
+        String upper = TimeUtil.SHORT_DATE_FORMAT.format(new Date(now.getTime() + 24 * 60 * 60 * 1000));
+        String sql = "SELECT Id FROM SG_CourseSku WHERE Status<>0 AND Deadline>=? AND Deadline<?";
+        List<Long> skuIds = queryLongList(sql, new Object[] { lower, upper });
+
+        return listSkus(skuIds);
+    }
+
+    @Override
+    public List<Long> queryBookedUserIds(long courseSkuId) {
+        String sql = "SELECT DISTINCT A.UserId FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.Status<>0 AND B.Status<>0 AND (B.Id=? OR B.ParentId=?)";
+        return queryLongList(sql, new Object[] { courseSkuId, courseSkuId });
     }
 }

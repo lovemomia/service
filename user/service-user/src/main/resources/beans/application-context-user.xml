@@ -21,7 +21,7 @@
         </property>
     </bean>
 
-    <bean id="smsService" class="cn.momia.service.user.sms.impl.SmsServiceImpl" parent="dbAccessService">
+    <bean id="smsService" class="cn.momia.service.user.sms.impl.SmsServiceImpl" parent="dbAccessService" init-method="init">
         <property name="smsSenderFactory" ref="smsSenderFactory" />
     </bean>
 </beans>

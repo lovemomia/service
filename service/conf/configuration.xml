@@ -9,7 +9,6 @@
     </Image>
 
     <Service>
-        <Base>http://localhost:7070</Base>
         <Course>http://localhost:7070</Course>
         <Feed>http://localhost:7070</Feed>
         <IM>http://localhost:7070</IM>
@@ -101,6 +100,7 @@
                 <DismissGroup>https://api.cn.ronghub.com/group/dismiss.json</DismissGroup>
                 <JoinGroup>https://api.cn.ronghub.com/group/join.json</JoinGroup>
                 <LeaveGroup>https://api.cn.ronghub.com/group/quit.json</LeaveGroup>
+                <GroupPush>https://api.cn.ronghub.com/message/group/publish.json</GroupPush>
                 <SystemPush>https://api.cn.ronghub.com/message/system/publish.json</SystemPush>
             </Service>
             <AppKey>0vnjpoadnwp2z</AppKey>

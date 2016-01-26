@@ -9,6 +9,8 @@ import cn.momia.common.core.http.MomiaHttpRequestBuilder;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.http.client.methods.HttpUriRequest;
 
+import java.util.List;
+
 public class OrderServiceApi extends HttpServiceApi {
     public SubjectOrder placeOrder(JSONObject orderJson) {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/order"), orderJson.toString());
@@ -69,5 +71,17 @@ public class OrderServiceApi extends HttpServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/order/package/time/extend"), builder.build());
 
         return executeReturnObject(request, Boolean.class);
+    }
+
+    public List<Long> queryBookableUserIds() {
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/order/bookable/user"));
+        return executeReturnList(request, Long.class);
+    }
+
+    public List<Long> queryUserIdsOfPackagesToExpired(int days) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("days", days);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/order/package/expired/user"), builder.build());
+
+        return executeReturnList(request, Long.class);
     }
 }

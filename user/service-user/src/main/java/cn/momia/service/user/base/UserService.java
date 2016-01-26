@@ -31,4 +31,6 @@ public interface UserService {
     boolean updatePassword(long userId, String mobile, String password);
 
     boolean setPayed(long userId);
+
+    List<String> listMobiles(Collection<Long> userIds);
 }

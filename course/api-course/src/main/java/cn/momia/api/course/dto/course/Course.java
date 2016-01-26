@@ -33,6 +33,7 @@ public class Course implements Cloneable {
     private long subjectId;
     private String subject;
     private String title;
+    private String keyWord;
     private String cover;
     @JSONField(serialize = false) private int minAge;
     @JSONField(serialize = false) private int maxAge;
@@ -108,6 +109,14 @@ public class Course implements Cloneable {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getKeyWord() {
+        return keyWord;
+    }
+
+    public void setKeyWord(String keyWord) {
+        this.keyWord = keyWord;
     }
 
     public String getCover() {
@@ -359,6 +368,7 @@ public class Course implements Cloneable {
             setSubjectId(course.getSubjectId());
             setSubject(course.getSubject());
             setTitle(course.getTitle());
+            setKeyWord(course.getKeyWord());
             setCover(course.getCover());
             setAge(course.getAge());
             setInsurance(course.isInsurance());

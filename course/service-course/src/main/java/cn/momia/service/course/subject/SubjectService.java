@@ -9,6 +9,7 @@ import java.util.List;
 public interface SubjectService {
     Subject get(long subjectId);
     List<Subject> list(Collection<Long> subjectIds);
+    List<Subject> list(int cityId);
 
     SubjectSku getSku(long skuId);
     List<SubjectSku> listSkus(Collection<Long> skuIds);
