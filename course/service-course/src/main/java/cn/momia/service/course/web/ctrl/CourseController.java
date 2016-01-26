@@ -593,7 +593,7 @@ public class CourseController extends BaseController {
 
     private long getChildId(User user) {
         List<Child> children = user.getChildren();
-        if (children != null && children.size() == 1) return children.get(0).getId();
+        if (children != null && children.size() >= 1) return children.get(0).getId();
         return 0;
     }
 
