@@ -46,7 +46,7 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
     public List<Subject> list(Collection<Long> subjectIds) {
         if (subjectIds.isEmpty()) return new ArrayList<Subject>();
 
-        String sql = "SELECT Id, `Type`, CityId, Title, SubTitle, Cover, Tags, Intro, Notice, Stock, Status FROM SG_Subject WHERE Id IN (" + StringUtils.join(subjectIds, ",") + ") AND Status<>0";
+        String sql = "SELECT Id, `Type`, CityId, Title, SubTitle, Cover, VCover, Tags, Intro, Notice, Stock, Status FROM SG_Subject WHERE Id IN (" + StringUtils.join(subjectIds, ",") + ") AND Status<>0";
         List<Subject> subjects = queryObjectList(sql, Subject.class);
 
         Map<Long, List<String>> imgs = queryImgs(subjectIds);
