@@ -153,4 +153,9 @@ public class SubjectSku implements Cloneable {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public String toString() {
+        return price.intValue() + "元 " + desc;
+    }
 }

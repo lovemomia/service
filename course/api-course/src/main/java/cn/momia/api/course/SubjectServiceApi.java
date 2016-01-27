@@ -49,6 +49,15 @@ public class SubjectServiceApi extends HttpServiceApi {
         return executeReturnPagedList(request, UserCourseComment.class);
     }
 
+    public List<UserCourseComment> queryRecommendedCommentsBySubject(long subjectId, int start, int count) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("start", start)
+                .add("count", count);
+        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/%d/comment/recommend", subjectId), builder.build());
+
+        return executeReturnList(request, UserCourseComment.class);
+    }
+
     public boolean favor(long userId, long subjectId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/subject/%d/favor", subjectId), builder.build());

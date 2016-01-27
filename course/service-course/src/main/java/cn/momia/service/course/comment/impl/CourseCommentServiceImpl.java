@@ -148,6 +148,23 @@ public class CourseCommentServiceImpl extends AbstractService implements CourseC
     }
 
     @Override
+    public List<CourseComment> queryRecommendedCommentsBySubject(long subjectId, int start, int count) {
+        String sql = "SELECT Id FROM SG_Course WHERE SubjectId=? AND Status<>0";
+        List<Long> courseIds = queryLongList(sql, new Object[] { subjectId });
+
+        return queryRecommendedCommentsByCourses(courseIds, start, count);
+    }
+
+    private List<CourseComment> queryRecommendedCommentsByCourses(List<Long> courseIds, int start, int count) {
+        if (courseIds.isEmpty()) return new ArrayList<CourseComment>();
+
+        String sql = "SELECT Id FROM SG_CourseComment WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Recommended=1 AND Status<>0 ORDER BY AddTime DESC LIMIT ?,?";
+        List<Long> commentIds = queryLongList(sql, new Object[] { start, count });
+
+        return listComments(commentIds);
+    }
+
+    @Override
     public long queryCommentCountByUser(long userId) {
         String sql = "SELECT COUNT(1) FROM SG_CourseComment WHERE UserId=? AND Status<>0";
         return queryLong(sql, new Object[] { userId });

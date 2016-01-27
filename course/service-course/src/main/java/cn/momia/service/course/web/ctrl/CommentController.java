@@ -243,6 +243,13 @@ public class CommentController extends BaseController {
         long totalCount = courseCommentService.queryCommentCountBySubject(subjectId);
         List<CourseComment> comments = courseCommentService.queryCommentsBySubject(subjectId, start, count);
 
+        PagedList<UserCourseComment> pagedUserCourseComments = new PagedList<UserCourseComment>(totalCount, start, count);
+        pagedUserCourseComments.setList(buildUserCourseComments(comments));
+
+        return MomiaHttpResponse.SUCCESS(pagedUserCourseComments);
+    }
+
+    private List<UserCourseComment> buildUserCourseComments(List<CourseComment> comments) {
         Set<Long> courseIds = new HashSet<Long>();
         Set<Long> userIds = new HashSet<Long>();
         for (CourseComment comment : comments) {
@@ -271,11 +278,7 @@ public class CommentController extends BaseController {
 
             userCourseComments.add(buildUserCourseComment(comment, user, course));
         }
-
-        PagedList<UserCourseComment> pagedUserCourseComments = new PagedList<UserCourseComment>(totalCount, start, count);
-        pagedUserCourseComments.setList(userCourseComments);
-
-        return MomiaHttpResponse.SUCCESS(pagedUserCourseComments);
+        return userCourseComments;
     }
 
     private UserCourseComment buildUserCourseComment(CourseComment comment, User user, Course course) {
@@ -285,5 +288,13 @@ public class CommentController extends BaseController {
         userCourseComment.setCourseTitle(course.getTitle());
 
         return userCourseComment;
+    }
+
+    @RequestMapping(value = "/subject/{suid}/comment/recommend", method = RequestMethod.GET)
+    public MomiaHttpResponse listRecommendedComments(@PathVariable(value = "suid") long subjectId, @RequestParam int start, @RequestParam int count) {
+        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
+
+        List<CourseComment> comments = courseCommentService.queryRecommendedCommentsBySubject(subjectId, start, count);
+        return MomiaHttpResponse.SUCCESS(buildUserCourseComments(comments));
     }
 }
