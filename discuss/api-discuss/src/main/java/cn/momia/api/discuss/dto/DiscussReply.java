@@ -1,10 +1,14 @@
 package cn.momia.api.discuss.dto;
 
+import java.util.Date;
+
 public class DiscussReply {
     private long id;
     private int topicId;
     private long userId;
     private String content;
+    private Date addTime;
+    private long staredCount;
     private boolean stared;
 
     public long getId() {
@@ -37,6 +41,22 @@ public class DiscussReply {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public Date getAddTime() {
+        return addTime;
+    }
+
+    public void setAddTime(Date addTime) {
+        this.addTime = addTime;
+    }
+
+    public long getStaredCount() {
+        return staredCount;
+    }
+
+    public void setStaredCount(long staredCount) {
+        this.staredCount = staredCount;
     }
 
     public boolean isStared() {

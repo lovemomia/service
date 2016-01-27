@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/discuss")
 public class DiscussController extends BaseController {
-    @Autowired DiscussService discussService;
+    @Autowired private DiscussService discussService;
 
     @RequestMapping(value = "/topic/list", method = RequestMethod.GET)
     public MomiaHttpResponse listTopics(@RequestParam(value = "city") int cityId, @RequestParam int start, @RequestParam int count) {

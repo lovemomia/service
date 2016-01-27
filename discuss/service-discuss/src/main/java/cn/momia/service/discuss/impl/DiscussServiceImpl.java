@@ -65,7 +65,7 @@ public class DiscussServiceImpl extends AbstractService implements DiscussServic
 
     @Override
     public List<DiscussReply> queryReplies(int topicId, int start, int count) {
-        String sql = "SELECT Id, TopicId, UserId, Content FROM SG_DiscussReply WHERE TopicId=? AND Status<>0 ORDER BY AddTime DESC LIMIT ?,?";
+        String sql = "SELECT A.Id, A.TopicId, A.UserId, A.Content, A.AddTime, COUNT(B.Id) AS StaredCount FROM SG_DiscussReply A LEFT JOIN SG_DiscussReplyStar B ON A.Id=B.ReplyId AND B.Status<>0 WHERE A.TopicId=? AND A.Status<>0 GROUP BY A.Id ORDER BY A.AddTime DESC LIMIT ?,?";
         return queryObjectList(sql, new Object[] { topicId, start, count }, DiscussReply.class);
     }
 

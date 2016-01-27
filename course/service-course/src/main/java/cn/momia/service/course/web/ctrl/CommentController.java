@@ -101,7 +101,6 @@ public class CommentController extends BaseController {
         return userCourseComment;
     }
 
-
     private List<CourseCommentChild> formatChildrenDetail(List<Child> children) {
         List<CourseCommentChild> commentChildren = new ArrayList<CourseCommentChild>();
         for (int i = 0; i < Math.min(2, children.size()); i++) {
