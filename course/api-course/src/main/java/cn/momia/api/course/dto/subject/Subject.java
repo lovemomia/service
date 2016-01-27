@@ -96,11 +96,11 @@ public class Subject {
         this.cover = cover;
     }
 
-    public String getvCover() {
+    public String getVCover() {
         return vCover;
     }
 
-    public void setvCover(String vCover) {
+    public void setVCover(String vCover) {
         this.vCover = vCover;
     }
 
@@ -253,7 +253,7 @@ public class Subject {
             setTitle(subject.getTitle());
             setSubTitle(subject.getSubTitle());
             setCover(subject.getCover());
-            setvCover(subject.getvCover());
+            setVCover(subject.getVCover());
             setTags(subject.getTags());
             setPrice(subject.getPrice());
             setOriginalPrice(subject.getOriginalPrice());
