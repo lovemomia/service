@@ -8,6 +8,7 @@ public class DiscussTopic {
     private String cover;
     private String title;
     private String content;
+    private long joined;
 
     public int getId() {
         return id;
@@ -47,6 +48,14 @@ public class DiscussTopic {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public long getJoined() {
+        return joined;
+    }
+
+    public void setJoined(long joined) {
+        this.joined = joined;
     }
 
     public boolean exists() {

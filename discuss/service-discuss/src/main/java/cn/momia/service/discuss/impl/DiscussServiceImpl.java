@@ -32,7 +32,7 @@ public class DiscussServiceImpl extends AbstractService implements DiscussServic
     private List<DiscussTopic> listTopics(Collection<Integer> topicIds) {
         if (topicIds.isEmpty()) return new ArrayList<DiscussTopic>();
 
-        String sql = "SELECT Id, CityId, Cover, Title, Content FROM SG_DiscussTopic WHERE Id IN (" + StringUtils.join(topicIds, ",") + ") AND Status<>0";
+        String sql = "SELECT A.Id, A.CityId, A.Cover, A.Title, A.Content, COUNT(DISTINCT B.UserId) AS Joined FROM SG_DiscussTopic A LEFT JOIN SG_DiscussReply B ON A.Id=B.TopicId AND B.Status<>0 WHERE A.Id IN (" + StringUtils.join(topicIds, ",") + ") AND A.Status<>0 GROUP BY A.Id";
         List<DiscussTopic> topics = queryObjectList(sql, DiscussTopic.class);
 
         Map<Integer, DiscussTopic> topicsMap = new HashMap<Integer, DiscussTopic>();
