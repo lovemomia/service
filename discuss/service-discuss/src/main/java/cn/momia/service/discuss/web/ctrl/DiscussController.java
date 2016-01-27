@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -49,10 +50,20 @@ public class DiscussController extends BaseController {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
         long totalCount = discussService.queryRepliesCount(topicId);
-        List<DiscussReply> replyes = discussService.queryReplies(userId, topicId, start, count);
+        List<DiscussReply> replies = discussService.queryReplies(topicId, start, count);
+
+        List<Long> replyIds = new ArrayList<Long>();
+        for (DiscussReply reply : replies) {
+            replyIds.add(reply.getId());
+        }
+
+        List<Long> staredReplyIds = discussService.queryStaredReplyIds(userId, replyIds);
+        for (DiscussReply reply : replies) {
+            if (staredReplyIds.contains(reply.getId())) reply.setStared(true);
+        }
 
         PagedList<DiscussReply> pagedReplies = new PagedList<DiscussReply>(totalCount, start, count);
-        pagedReplies.setList(replyes);
+        pagedReplies.setList(replies);
 
         return MomiaHttpResponse.SUCCESS(pagedReplies);
     }

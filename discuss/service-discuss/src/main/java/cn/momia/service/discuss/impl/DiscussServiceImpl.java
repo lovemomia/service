@@ -4,47 +4,103 @@ import cn.momia.api.discuss.dto.DiscussReply;
 import cn.momia.api.discuss.dto.DiscussTopic;
 import cn.momia.common.service.AbstractService;
 import cn.momia.service.discuss.DiscussService;
+import com.google.common.collect.Sets;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class DiscussServiceImpl extends AbstractService implements DiscussService {
     @Override
     public int queryTopicCount(int cityId) {
-        return 0;
+        String sql = "SELECT COUNT(1) FROM SG_DiscussTopic WHERE CityId=? AND Status<>0";
+        return queryInt(sql, new Object[] { cityId });
     }
 
     @Override
     public List<DiscussTopic> queryTopics(int cityId, int start, int count) {
-        return null;
+        String sql = "SELECT Id FROM SG_DiscussTopic WHERE CityId=? AND Status<>0 ORDER BY AddTime DESC LIMIT ?,?";
+        List<Integer> topicIds = queryIntList(sql, new Object[] { cityId, start, count });
+
+        return listTopics(topicIds);
+    }
+
+    private List<DiscussTopic> listTopics(Collection<Integer> topicIds) {
+        if (topicIds.isEmpty()) return new ArrayList<DiscussTopic>();
+
+        String sql = "SELECT Id, CityId, Cover, Title, Content FROM SG_DiscussTopic WHERE Id IN (" + StringUtils.join(topicIds, ",") + ") AND Status<>0";
+        List<DiscussTopic> topics = queryObjectList(sql, DiscussTopic.class);
+
+        Map<Integer, DiscussTopic> topicsMap = new HashMap<Integer, DiscussTopic>();
+        for (DiscussTopic topic : topics) {
+            topicsMap.put(topic.getId(), topic);
+        }
+
+        List<DiscussTopic> result = new ArrayList<DiscussTopic>();
+        for (int topicId : topicIds) {
+            DiscussTopic topic = topicsMap.get(topicId);
+            if (topic != null) result.add(topic);
+        }
+
+        return result;
     }
 
     @Override
     public DiscussTopic getTopic(int topicId) {
-        return null;
+        Set<Integer> topicIds = Sets.newHashSet(topicId);
+        List<DiscussTopic> topics = listTopics(topicIds);
+
+        return topics.isEmpty() ? DiscussTopic.NOT_EXIST_DISCUSS_TOPIC : topics.get(0);
     }
 
     @Override
     public long queryRepliesCount(int topicId) {
-        return 0;
+        String sql = "SELECT COUNT(1) FROM SG_DiscussReply WHERE TopicId=? AND Status<>0";
+        return queryLong(sql, new Object[] { topicId });
     }
 
     @Override
-    public List<DiscussReply> queryReplies(long userId, int topicId, int start, int count) {
-        return null;
+    public List<DiscussReply> queryReplies(int topicId, int start, int count) {
+        String sql = "SELECT Id, TopicId, UserId, Content FROM SG_DiscussReply WHERE TopicId=? AND Status<>0 ORDER BY AddTime DESC LIMIT ?,?";
+        return queryObjectList(sql, new Object[] { topicId, start, count }, DiscussReply.class);
+    }
+
+    @Override
+    public List<Long> queryStaredReplyIds(long userId, Collection<Long> replyIds) {
+        if (replyIds.isEmpty()) return new ArrayList<Long>();
+
+        String sql = "SELECT ReplyId FROM SG_DiscussReplyStar WHERE UserId=? AND ReplyId IN (" + StringUtils.join(replyIds, ",") + ") AND Status<>0";
+        return queryLongList(sql, new Object[] { userId });
     }
 
     @Override
     public boolean reply(long userId, int topicId, String content) {
-        return false;
+        String sql = "INSERT INTO SG_DiscussReply (TopicId, UserId, Content, AddTime) VALUES (?, ?, ?, NOW())";
+        return update(sql, new Object[] { topicId, userId, content });
     }
 
     @Override
     public boolean star(long userId, int replyId) {
-        return false;
+        if (isStared(userId, replyId)) return false;
+
+        String sql = "INSERT INTO SG_DiscussReplyStar (ReplyId, UserId, AddTime) VALUES (?, ?, NOW())";
+        return update(sql, new Object[] { replyId, userId });
+    }
+
+    private boolean isStared(long userId, int replyId) {
+        String sql = "SELECT COUNT(1) FROM SG_DiscussReplyStar WHERE ReplyId=? AND UserId=? AND Status<>0";
+        return queryInt(sql, new Object[] { replyId, userId }) > 0;
     }
 
     @Override
     public boolean unstar(long userId, int replyId) {
-        return false;
+        if (!isStared(userId, replyId)) return false;
+
+        String sql = "UPDATE SG_DiscussReplyStar SET Status=0 WHERE ReplyId=? AND UserId=?";
+        return update(sql, new Object[] { replyId, userId });
     }
 }
