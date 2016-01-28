@@ -197,28 +197,28 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
 
     @Override
     public long queryBookableCountByUserAndOrder(long userId, long orderId) {
-        String sql = "SELECT COUNT(1) FROM SG_SubjectOrderPackage WHERE UserId=? AND OrderId=? AND Status=1 AND BookableCount>0";
-        return queryLong(sql, new Object[] { userId, orderId });
+        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_SubjectOrderPackage A LEFT JOIN SG_SubjectOrderPackageGift B ON A.Id=B.PackageId AND B.Status<>0 WHERE A.UserId=? AND A.OrderId=? AND A.Status=1 AND A.BookableCount>0 AND (B.Id IS NULL OR (B.ToUserId=0 AND B.Deadline<=NOW()) OR B.ToUserId=?)";
+        return queryLong(sql, new Object[] { userId, orderId, userId });
     }
 
     @Override
     public List<OrderPackage> queryBookableByUserAndOrder(long userId, long orderId, int start, int count) {
-        String sql = "SELECT Id FROM SG_SubjectOrderPackage WHERE UserId=? AND OrderId=? AND Status=1 AND BookableCount>0 ORDER BY AddTime ASC LIMIT ?,?";
-        List<Long> packageIds = queryLongList(sql, new Object[] { userId, orderId, start, count });
+        String sql = "SELECT DISTINCT A.Id FROM SG_SubjectOrderPackage A LEFT JOIN SG_SubjectOrderPackageGift B ON A.Id=B.PackageId AND B.Status<>0 WHERE A.UserId=? AND A.OrderId=? AND A.Status=1 AND A.BookableCount>0 AND (B.Id IS NULL OR (B.ToUserId=0 AND B.Deadline<=NOW()) OR B.ToUserId=?) ORDER BY A.AddTime ASC LIMIT ?,?";
+        List<Long> packageIds = queryLongList(sql, new Object[] { userId, orderId, userId, start, count });
 
         return listOrderPackages(packageIds);
     }
 
     @Override
     public long queryBookableCountByUser(long userId) {
-        String sql = "SELECT COUNT(1) FROM SG_SubjectOrderPackage WHERE UserId=? AND Status=1 AND BookableCount>0";
-        return queryLong(sql, new Object[] { userId });
+        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_SubjectOrderPackage A LEFT JOIN SG_SubjectOrderPackageGift B ON A.Id=B.PackageId AND B.Status<>0 WHERE A.UserId=? AND A.Status=1 AND A.BookableCount>0 AND (B.Id IS NULL OR (B.ToUserId=0 AND B.Deadline<=NOW()) OR B.ToUserId=?)";
+        return queryLong(sql, new Object[] { userId, userId });
     }
 
     @Override
     public List<OrderPackage> queryBookableByUser(long userId, int start, int count) {
-        String sql = "SELECT Id FROM SG_SubjectOrderPackage WHERE UserId=? AND Status=1 AND BookableCount>0 ORDER BY AddTime ASC LIMIT ?,?";
-        List<Long> packageIds = queryLongList(sql, new Object[] { userId, start, count });
+        String sql = "SELECT DISTINCT A.Id FROM SG_SubjectOrderPackage A LEFT JOIN SG_SubjectOrderPackageGift B ON A.Id=B.PackageId AND B.Status<>0 WHERE A.UserId=? AND A.Status=1 AND A.BookableCount>0 AND (B.Id IS NULL OR (B.ToUserId=0 AND B.Deadline<=NOW()) OR B.ToUserId=?) ORDER BY A.AddTime ASC LIMIT ?,?";
+        List<Long> packageIds = queryLongList(sql, new Object[] { userId, userId, start, count });
 
         return listOrderPackages(packageIds);
     }
@@ -266,14 +266,14 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
         String sql = "SELECT A.UserId, A.Id AS PackageId " +
                 "FROM SG_SubjectOrderPackage A " +
                 "INNER JOIN SG_SubjectSku B ON A.SkuId=B.Id " +
-                "LEFT JOIN SG_BookedCourse C ON A.Id=C.PackageId " +
+                "LEFT JOIN SG_BookedCourse C ON A.Id=C.PackageId AND C.Status<>0 " +
                 "WHERE A.UserId IN (" + StringUtils.join(userIds, ",") + ") AND A.BookableCount>0 AND A.Status=1 AND B.SubjectId=? AND B.Status<>0 AND C.Id IS NULL";
         query(sql, new Object[] { subjectId }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 long userId = rs.getLong("userId");
                 long packageId = rs.getLong("packageId");
-                if (!packageIdsMap.containsKey(userId)) packageIdsMap.put(userId, packageId);
+                if (!isGift(userId, packageId) && !packageIdsMap.containsKey(userId)) packageIdsMap.put(userId, packageId);
             }
         });
 
