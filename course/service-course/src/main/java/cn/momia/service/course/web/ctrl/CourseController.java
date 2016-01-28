@@ -543,6 +543,8 @@ public class CourseController extends BaseController {
         OrderPackage orderPackage = orderService.getOrderPackage(packageId);
         if (!orderPackage.exists() || orderPackage.getUserId() != user.getId()) throw new MomiaErrorException("预约失败，无效的课程包");
 
+        if (orderService.isGift(user.getId(), packageId)) throw new MomiaErrorException("您已将该课程包作为礼物送人了哦~");
+
         Order order = orderService.get(orderPackage.getOrderId());
         if (!order.exists() || !order.isPayed() || (order.getUserId() != orderPackage.getUserId() && !isGift(order.getUserId(), orderPackage.getUserId(), packageId))) throw new MomiaErrorException("预约失败，无效的订单"); // TODO
 
