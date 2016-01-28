@@ -538,8 +538,13 @@ public class CourseController extends BaseController {
     }
 
     private BookedCourse doBooking(User user, long childId, long packageId, long skuId) {
+        if (childId > 0 && !user.hasChild(childId)) throw new MomiaErrorException("无效的孩子信息");
+
         OrderPackage orderPackage = orderService.getOrderPackage(packageId);
-        if (!orderPackage.exists()) throw new MomiaErrorException("预约失败，无效的课程包");
+        if (!orderPackage.exists() || orderPackage.getUserId() != user.getId()) throw new MomiaErrorException("预约失败，无效的课程包");
+
+        Order order = orderService.get(orderPackage.getOrderId());
+        if (!order.exists() || !order.isPayed() || (order.getUserId() != orderPackage.getUserId() && !isGift(order.getUserId(), orderPackage.getUserId(), packageId))) throw new MomiaErrorException("预约失败，无效的订单"); // TODO
 
         CourseSku sku = courseService.getSku(skuId);
         if (!sku.exists() || !sku.isBookable(new Date())) throw new MomiaErrorException("预约失败，无效的课程场次或本场次已截止选课");
@@ -551,9 +556,6 @@ public class CourseController extends BaseController {
             Date endTime = TimeUtil.add(startTime, orderPackage.getTime(), orderPackage.getTimeUnit());
             if (endTime.before(sku.getStartTime())) throw new MomiaErrorException("预约失败，该课程的时间超出了课程包的有效期");
         }
-
-        Order order = orderService.get(orderPackage.getOrderId());
-        if (!order.exists() || !order.isPayed() || order.getUserId() != user.getId()) throw new MomiaErrorException("预约失败，无效的订单");
 
         if (courseService.booked(packageId, sku.getCourseId())) throw new MomiaErrorException("一门课程在一个课程包内只能约一次");
         if (!courseService.matched(order.getSubjectId(), sku.getCourseId())) throw new MomiaErrorException("课程不匹配");
@@ -581,6 +583,10 @@ public class CourseController extends BaseController {
         if (completedBookedCourses.isEmpty()) throw new MomiaErrorException("选课失败");
 
         return completedBookedCourses.get(0);
+    }
+
+    private boolean isGift(long fromUserId, long toUserId, long packageId) {
+        return orderService.isGift(fromUserId, toUserId, packageId);
     }
 
     private long getChildId(User user) {

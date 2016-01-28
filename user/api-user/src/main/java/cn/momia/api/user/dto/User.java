@@ -203,6 +203,16 @@ public class User {
         return role == Role.ADMIN;
     }
 
+    public boolean hasChild(long childId) {
+        if (children == null || children.isEmpty()) return false;
+
+        for (Child child : children) {
+            if (child.getId() == childId) return true;
+        }
+
+        return false;
+    }
+
     public static class Mini extends User {
         public Mini(User user) {
             setId(user.getId());

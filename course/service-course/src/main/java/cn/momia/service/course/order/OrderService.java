@@ -26,6 +26,8 @@ public interface OrderService {
     OrderPackage getOrderPackage(long packageId);
     Set<Integer> getOrderPackageTypes(long orderId);
 
+    boolean isGift(long fromUserId, long toUserId, long packageId);
+
     boolean extendPackageTime(long packageId, int newTime, int newTimeUnit);
 
     boolean prepay(long orderId);

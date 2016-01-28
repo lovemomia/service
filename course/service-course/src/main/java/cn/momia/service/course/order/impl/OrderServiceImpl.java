@@ -133,7 +133,7 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     private List<OrderPackage> listOrderPackages(Collection<Long> packageIds) {
         if (packageIds.isEmpty()) return new ArrayList<OrderPackage>();
 
-        String sql = "SELECT A.Id, A.OrderId, A.SkuId, A.Price, A.CourseCount, A.BookableCount, A.Time, A.TimeUnit, B.CourseId FROM SG_SubjectOrderPackage A INNER JOIN SG_SubjectSku B ON A.SkuId=B.Id WHERE A.Id IN (" + StringUtils.join(packageIds, ",") + ") AND A.Status<>0 AND B.Status<>0";
+        String sql = "SELECT A.Id, A.UserId, A.OrderId, A.SkuId, A.Price, A.CourseCount, A.BookableCount, A.Time, A.TimeUnit, B.CourseId FROM SG_SubjectOrderPackage A INNER JOIN SG_SubjectSku B ON A.SkuId=B.Id WHERE A.Id IN (" + StringUtils.join(packageIds, ",") + ") AND A.Status<>0 AND B.Status<>0";
         List<OrderPackage> packages = queryObjectList(sql, OrderPackage.class);
 
         Map<Long, OrderPackage> packagesMap = new HashMap<Long, OrderPackage>();
@@ -308,6 +308,12 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
         });
 
         return packageTypes;
+    }
+
+    @Override
+    public boolean isGift(long fromUserId, long toUserId, long packageId) {
+        String sql = "SELECT COUNT(1) FROM SG_SubjectOrderPackageGift WHERE FromUserId=? AND ToUserId=? AND PackageId=? AND Status=1";
+        return queryInt(sql, new Object[] { fromUserId, toUserId, packageId }) > 0;
     }
 
     @Override
