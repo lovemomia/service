@@ -331,6 +331,7 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
                 @Override
                 public Object doInTransaction(TransactionStatus status) {
                     payOrder(payment.getOrderId());
+                    enablePackage(payment.getOrderId());
                     logPayment(payment);
 
                     return null;
@@ -348,7 +349,14 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
         String sql = "UPDATE SG_SubjectOrder SET Status=? WHERE Id=? AND Status=?";
         int updateCount = singleUpdate(sql, new Object[] { Order.Status.PAYED, orderId, Order.Status.PRE_PAYED });
 
-        if (updateCount != 1) throw new RuntimeException("fail to pay order: {}" + orderId);
+        if (updateCount != 1) throw new RuntimeException("fail to pay order: " + orderId);
+    }
+
+    private void enablePackage(long orderId) {
+        String sql = "UPDATE SG_SubjectOrderPackage SET Status=1 WHERE OrderId=?";
+        int updateCount = singleUpdate(sql, new Object[] { orderId });
+
+        if (!(updateCount > 0)) throw new RuntimeException("fail to enable package of order: " + orderId);
     }
 
     private void logPayment(final Payment payment) {
