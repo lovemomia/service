@@ -197,13 +197,13 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
 
     @Override
     public long queryBookableCountByUserAndOrder(long userId, long orderId) {
-        String sql = "SELECT COUNT(1) FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Id=? AND A.Status>=? AND B.Status<>0 AND B.BookableCount>0";
+        String sql = "SELECT COUNT(1) FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Id=? AND A.Status>=? AND B.Status=1 AND B.BookableCount>0";
         return queryLong(sql, new Object[] { userId, orderId, Order.Status.PAYED });
     }
 
     @Override
     public List<OrderPackage> queryBookableByUserAndOrder(long userId, long orderId, int start, int count) {
-        String sql = "SELECT B.Id FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Id=? AND A.Status>=? AND B.Status<>0 AND B.BookableCount>0 ORDER BY B.AddTime ASC LIMIT ?,?";
+        String sql = "SELECT B.Id FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Id=? AND A.Status>=? AND B.Status=1 AND B.BookableCount>0 ORDER BY B.AddTime ASC LIMIT ?,?";
         List<Long> packageIds = queryLongList(sql, new Object[] { userId, orderId, Order.Status.PAYED, start, count });
 
         return listOrderPackages(packageIds);
@@ -211,13 +211,13 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
 
     @Override
     public long queryBookableCountByUser(long userId) {
-        String sql = "SELECT COUNT(1) FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Status>=? AND B.Status<>0 AND B.BookableCount>0";
+        String sql = "SELECT COUNT(1) FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Status>=? AND B.Status=1 AND B.BookableCount>0";
         return queryLong(sql, new Object[] { userId, Order.Status.PAYED });
     }
 
     @Override
     public List<OrderPackage> queryBookableByUser(long userId, int start, int count) {
-        String sql = "SELECT B.Id FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Status>=? AND B.Status<>0 AND B.BookableCount>0 ORDER BY B.AddTime ASC LIMIT ?,?";
+        String sql = "SELECT B.Id FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Status>=? AND B.Status=1 AND B.BookableCount>0 ORDER BY B.AddTime ASC LIMIT ?,?";
         List<Long> packageIds = queryLongList(sql, new Object[] { userId, Order.Status.PAYED, start, count });
 
         return listOrderPackages(packageIds);
@@ -247,7 +247,7 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
                 "INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId " +
                 "INNER JOIN SG_BookedCourse C ON B.Id=C.PackageId " +
                 "INNER JOIN SG_CourseSku D ON C.CourseSkuId=D.Id " +
-                "WHERE A.UserId IN (" + StringUtils.join(userIds, ",") + ") AND A.SubjectId=? AND A.Status>=? AND B.BookableCount>0 AND B.Status<>0 AND C.Status<>0 AND D.Status<>0 " +
+                "WHERE A.UserId IN (" + StringUtils.join(userIds, ",") + ") AND A.SubjectId=? AND A.Status>=? AND B.BookableCount>0 AND B.Status=1 AND C.Status<>0 AND D.Status<>0 " +
                 "ORDER BY D.StartTime ASC";
         query(sql, new Object[] { subjectId, Order.Status.PAYED }, new RowCallbackHandler() {
             @Override
@@ -266,7 +266,7 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
         String sql = "SELECT A.UserId, B.Id AS PackageId " +
                 "FROM SG_SubjectOrder A " +
                 "INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId " +
-                "WHERE A.UserId IN (" + StringUtils.join(userIds, ",") + ") AND A.SubjectId=? AND A.Status>=? AND B.BookableCount>0 AND B.Status<>0";
+                "WHERE A.UserId IN (" + StringUtils.join(userIds, ",") + ") AND A.SubjectId=? AND A.Status>=? AND B.BookableCount>0 AND B.Status=1";
         query(sql, new Object[] { subjectId, Order.Status.PAYED }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -359,13 +359,13 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
 
     @Override
     public boolean decreaseBookableCount(long packageId) {
-        String sql = "UPDATE SG_SubjectOrderPackage SET BookableCount=BookableCount-1 WHERE Id=? AND Status<>0 AND BookableCount>=1";
+        String sql = "UPDATE SG_SubjectOrderPackage SET BookableCount=BookableCount-1 WHERE Id=? AND Status=1 AND BookableCount>=1";
         return update(sql, new Object[] { packageId });
     }
 
     @Override
     public boolean increaseBookableCount(long packageId) {
-        String sql = "UPDATE SG_SubjectOrderPackage SET BookableCount=BookableCount+1 WHERE Id=? AND Status<>0 AND BookableCount<CourseCount";
+        String sql = "UPDATE SG_SubjectOrderPackage SET BookableCount=BookableCount+1 WHERE Id=? AND Status=1 AND BookableCount<CourseCount";
         return update(sql, new Object[] { packageId });
     }
 
