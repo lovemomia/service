@@ -62,7 +62,7 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     }
 
     private void addOrderSkus(long orderId, Order order) {
-        String sql = "INSERT INTO SG_SubjectOrderPackage (UserId, OrderId, SkuId, Price, CourseCount, BookableCount, Time, TimeUnit, AddTime) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+        String sql = "INSERT INTO SG_SubjectOrderPackage (UserId, OrderId, SkuId, Price, CourseCount, BookableCount, Time, TimeUnit, AddTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
         List<Object[]> args = new ArrayList<Object[]>();
         for (OrderPackage orderPackage : order.getPackages()) {
             args.add(new Object[] { order.getUserId(), orderId, orderPackage.getSkuId(), orderPackage.getPrice(), orderPackage.getBookableCount(), orderPackage.getBookableCount(), orderPackage.getTime(), orderPackage.getTimeUnit() });
