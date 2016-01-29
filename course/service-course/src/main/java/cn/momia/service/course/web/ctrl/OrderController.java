@@ -376,7 +376,7 @@ public class OrderController extends BaseController {
 
     @RequestMapping(value = "/{oid}/gift/receive", method = RequestMethod.POST)
     public MomiaHttpResponse receiveGift(@RequestParam String utoken,
-                                         @RequestParam(value = "oid") long orderId,
+                                         @PathVariable(value = "oid") long orderId,
                                          @RequestParam long expired,
                                          @RequestParam String giftsign) {
         Order order = orderService.get(orderId);
