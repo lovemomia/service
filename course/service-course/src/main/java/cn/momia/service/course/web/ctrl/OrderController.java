@@ -382,7 +382,7 @@ public class OrderController extends BaseController {
         Order order = orderService.get(orderId);
         if (!order.exists() || !order.isPayed()) return MomiaHttpResponse.FAILED("无效的订单");
 
-        if (new Date().getTime() <= expired) return MomiaHttpResponse.FAILED("来晚了，礼包已经过期了~");
+        if (new Date().getTime() >= expired) return MomiaHttpResponse.FAILED("来晚了，礼包已经过期了~");
 
         if (!giftsign.equals(DigestUtils.md5Hex(order.getUserId() + "|" + orderId + "|" + expired + "|" + Configuration.getString("Validation.WapKey"))))
             return MomiaHttpResponse.FAILED("无效的礼包");
