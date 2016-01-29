@@ -4,6 +4,10 @@
         <Level>INFO</Level>
     </Logger>
 
+    <Validation>
+        <WapKey>578890d82212ae548d883bc7a201cdf4</WapKey>
+    </Validation>
+
     <Image>
         <Domain>http://s.momia.cn</Domain>
     </Image>
