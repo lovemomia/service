@@ -355,8 +355,8 @@ public class OrderController extends BaseController {
         return pagedSubjectOrders;
     }
 
-    @RequestMapping(value = "/gift/send", method = RequestMethod.POST)
-    public MomiaHttpResponse sendGift(@RequestParam String utoken, @RequestParam(value = "oid") long orderId) {
+    @RequestMapping(value = "/{oid}/gift/send", method = RequestMethod.POST)
+    public MomiaHttpResponse sendGift(@RequestParam String utoken, @PathVariable(value = "oid") long orderId) {
         User user = userServiceApi.get(utoken);
 
         Order order = orderService.get(orderId);
