@@ -347,7 +347,10 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     @Override
     public boolean receiveGift(long fromUserId, long toUserId, long packageId) {
         String sql = "UPDATE SG_SubjectOrderPackageGift SET ToUserId=? WHERE FromUserId=? AND ToUserId=0 AND PackageId=? AND Deadline>NOW() AND Status<>0";
-        return update(sql, new Object[] { toUserId, fromUserId, packageId });
+        if (!update(sql, new Object[] { toUserId, fromUserId, packageId })) return false;
+
+        sql = "UPDATE SG_SubjectOrderPackage SET UserId=? WHERE Id=? AND UserId=? AND Status=1";
+        return update(sql, new Object[] { toUserId, packageId, fromUserId });
     }
 
     @Override
