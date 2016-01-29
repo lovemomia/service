@@ -351,9 +351,9 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     }
 
     @Override
-    public boolean disablePackage(long packageId) {
-        String sql = "UPDATE SG_SubjectOrderPackage SET Status=3 WHERE Id=? AND Status=1";
-        return update(sql, new Object[] { packageId });
+    public boolean disablePackage(long userId, long packageId) {
+        String sql = "UPDATE SG_SubjectOrderPackage SET Status=3 WHERE Id=? AND UserId=? AND Status=1";
+        return update(sql, new Object[] { packageId, userId });
     }
 
     @Override
