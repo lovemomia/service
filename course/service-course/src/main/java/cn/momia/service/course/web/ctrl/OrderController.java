@@ -391,6 +391,8 @@ public class OrderController extends BaseController {
         if (orderPackages.isEmpty() || orderPackages.size() > 1) return MomiaHttpResponse.FAILED("无效的礼包");
 
         User user = userServiceApi.get(utoken);
+        if (user.getId() == order.getUserId()) return MomiaHttpResponse.FAILED("不能自己领取自己的礼包哦~");
+
         OrderPackage orderPackage = orderPackages.get(0);
         if (!orderService.receiveGift(order.getUserId(), user.getId(), orderPackage.getId()))
             return MomiaHttpResponse.FAILED("手慢了，礼包已经过期或被别人领走了");
