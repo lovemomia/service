@@ -397,6 +397,9 @@ public class OrderController extends BaseController {
         if (!orderService.receiveGift(order.getUserId(), user.getId(), orderPackage.getId()))
             return MomiaHttpResponse.FAILED("手慢了，礼包已经过期或被别人领走了");
 
+        if (!orderService.disablePackage(orderPackage.getId()) || !orderService.createNewPackage(user.getId(), orderPackage))
+            return MomiaHttpResponse.FAILED("领取礼包失败，请与客服联系");
+
         return MomiaHttpResponse.SUCCESS(true);
     }
 
