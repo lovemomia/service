@@ -311,6 +311,20 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     }
 
     @Override
+    public List<OrderPackage> getOrderPackages(long orderId) {
+        String sql = "SELECT Id FROM SG_SubjectOrderPackage WHERE OrderId=? AND Status<>0";
+        List<Long> packageIds = queryLongList(sql, new Object[] { orderId });
+
+        return listOrderPackages(packageIds);
+    }
+
+    @Override
+    public boolean isUsed(long packageId) {
+        String sql = "SELECT COUNT(1) FROM SG_BookedCourse WHERE PackageId=? AND Status<>0";
+        return queryInt(sql, new Object[] { packageId }) > 0;
+    }
+
+    @Override
     public boolean isGift(long fromUserId, long packageId) {
         String sql = "SELECT COUNT(1) FROM SG_SubjectOrderPackageGift WHERE FromUserId=? AND PackageId=? AND ((ToUserId=0 && Deadline>NOW()) OR (ToUserId<>0 AND ToUserId<>?)) AND Status=1";
         return queryInt(sql, new Object[] { fromUserId, packageId, fromUserId }) > 0;
@@ -320,6 +334,14 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     public boolean isGift(long fromUserId, long toUserId, long packageId) {
         String sql = "SELECT COUNT(1) FROM SG_SubjectOrderPackageGift WHERE FromUserId=? AND ToUserId=? AND PackageId=? AND Status=1";
         return queryInt(sql, new Object[] { fromUserId, toUserId, packageId }) > 0;
+    }
+
+    @Override
+    public boolean sendGift(long fromUserId, long packageId) {
+        Date deadline = new Date(new Date().getTime() + 10L * 24 * 60 * 60 * 1000);
+        String sql = "INSERT INTO SG_SubjectOrderPackageGift (FromUserId, ToUserId, PackageId, Deadline, AddTime) VALUES (?, 0, ?, ?, NOW())";
+
+        return update(sql, new Object[] { fromUserId, packageId, deadline });
     }
 
     @Override

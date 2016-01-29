@@ -355,6 +355,23 @@ public class OrderController extends BaseController {
         return pagedSubjectOrders;
     }
 
+    @RequestMapping(value = "/gift/send", method = RequestMethod.POST)
+    public MomiaHttpResponse sendGift(@RequestParam String utoken, @RequestParam(value = "oid") long orderId) {
+        User user = userServiceApi.get(utoken);
+
+        Order order = orderService.get(orderId);
+        if (!order.exists() || !order.isPayed() || order.getUserId() != user.getId()) return MomiaHttpResponse.FAILED("无效的订单");
+
+        List<OrderPackage> orderPackages = orderService.getOrderPackages(orderId);
+        if (orderPackages.isEmpty() || orderPackages.size() > 1) return MomiaHttpResponse.FAILED("无效的礼包，该订单下有多个课程包");
+
+        OrderPackage orderPackage = orderPackages.get(0);
+        if (orderService.isUsed(orderPackage.getId()) || orderService.isGift(user.getId(), orderPackage.getId()))
+            return MomiaHttpResponse.FAILED("该课程包已使用或已送人");
+
+        return MomiaHttpResponse.SUCCESS(orderService.sendGift(user.getId(), orderPackage.getId()));
+    }
+
     @RequestMapping(value = "/package/time/extend", method = RequestMethod.POST)
     public MomiaHttpResponse extendPackageTime(@RequestParam(value = "pid") long packageId, @RequestParam int time) {
         OrderPackage orderPackage = orderService.getOrderPackage(packageId);
