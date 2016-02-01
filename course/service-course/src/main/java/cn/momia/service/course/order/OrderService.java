@@ -33,9 +33,6 @@ public interface OrderService {
     boolean sendGift(long fromUserId, long packageId);
     boolean receiveGift(long fromUserId, long toUserId, long packageId);
 
-    boolean disablePackage(long userId, long packageId);
-    boolean createNewPackage(long userId, OrderPackage orderPackage);
-
     boolean extendPackageTime(long packageId, int newTime, int newTimeUnit);
 
     boolean prepay(long orderId);

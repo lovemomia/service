@@ -354,18 +354,6 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     }
 
     @Override
-    public boolean disablePackage(long userId, long packageId) {
-        String sql = "UPDATE SG_SubjectOrderPackage SET Status=3 WHERE Id=? AND UserId=? AND Status=1";
-        return update(sql, new Object[] { packageId, userId });
-    }
-
-    @Override
-    public boolean createNewPackage(long userId, OrderPackage orderPackage) {
-        String sql = "INSERT INTO SG_SubjectOrderPackage (UserId, OrderId, SkuId, Price, CourseCount, BookableCount, Time, TimeUnit, Status, AddTime) VALUES (?, ?, ?, 0, ?, ?, ?, ?, 1, NOW())";
-        return update(sql, new Object[] { userId, orderPackage.getOrderId(), orderPackage.getSkuId(), orderPackage.getCourseCount(), orderPackage.getBookableCount(), orderPackage.getTime(), orderPackage.getTimeUnit() });
-    }
-
-    @Override
     public boolean extendPackageTime(long packageId, int time, int timeUnit) {
         String sql = "UPDATE SG_SubjectOrderPackage SET Time=?, TimeUnit=? WHERE Id=?";
         return update(sql, new Object[] { time, timeUnit, packageId });
