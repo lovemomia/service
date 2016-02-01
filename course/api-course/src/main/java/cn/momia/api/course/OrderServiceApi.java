@@ -64,6 +64,23 @@ public class OrderServiceApi extends HttpServiceApi {
         return executeReturnPagedList(request, SubjectOrder.class);
     }
 
+    public boolean sendGift(String utoken, long orderId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/order/%d/gift/send", orderId), builder.build());
+
+        return executeReturnObject(request, Boolean.class);
+    }
+
+    public boolean receiveGift(String utoken, long orderId, long expired, String giftsign) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("expired", expired)
+                .add("giftsign", giftsign);
+        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/order/%d/gift/receive", orderId), builder.build());
+
+        return executeReturnObject(request, Boolean.class);
+    }
+
     public boolean extendPackageTime(long packageId, int time) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("pid", packageId)

@@ -181,7 +181,7 @@ public class PaymentController extends BaseController {
 
         if (isFirstPay && packageTypes.contains(OrderPackage.Type.PACKAGE)) firstPayUserCoupon(order);
 
-        if (!finishPayment(order, createPayment(callbackParam))) return false;
+        if (!finishPayment(createPayment(callbackParam))) return false;
 
         return true;
     }
@@ -228,19 +228,8 @@ public class PaymentController extends BaseController {
         return payment;
     }
 
-    private boolean finishPayment(Order order, Payment payment) {
-        // TODO 后续的一些操作
-        if (orderService.pay(payment)) {
-            try {
-                userServiceApi.setPayed(order.getUserId());
-            } catch (Exception e) {
-                LOGGER.error("fail to set payed of user: {}", order.getUserId(), e);
-            }
-
-            return true;
-        }
-
-        return false;
+    private boolean finishPayment(Payment payment) {
+        return orderService.pay(payment);
     }
 
     @RequestMapping(value = "/callback/weixin", method = RequestMethod.POST)

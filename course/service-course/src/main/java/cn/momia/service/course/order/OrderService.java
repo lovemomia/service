@@ -25,6 +25,16 @@ public interface OrderService {
 
     OrderPackage getOrderPackage(long packageId);
     Set<Integer> getOrderPackageTypes(long orderId);
+    List<OrderPackage> getOrderPackages(long orderId);
+
+    boolean isUsed(long packageId);
+    boolean isGift(long fromUserId, long packageId);
+    boolean isGift(long fromUserId, long toUserId, long packageId);
+    boolean sendGift(long fromUserId, long packageId);
+    boolean receiveGift(long fromUserId, long toUserId, long packageId);
+
+    boolean disablePackage(long userId, long packageId);
+    boolean createNewPackage(long userId, OrderPackage orderPackage);
 
     boolean extendPackageTime(long packageId, int newTime, int newTimeUnit);
 

@@ -12,6 +12,7 @@ public class OrderPackage {
     public static final OrderPackage NOT_EXIST_ORDER_PACKAGE = new OrderPackage();
 
     private long id;
+    private long userId;
     private long orderId;
     private long skuId;
     private BigDecimal price;
@@ -28,6 +29,14 @@ public class OrderPackage {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
     public long getOrderId() {

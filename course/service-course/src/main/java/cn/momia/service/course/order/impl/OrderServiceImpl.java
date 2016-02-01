@@ -62,10 +62,10 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     }
 
     private void addOrderSkus(long orderId, Order order) {
-        String sql = "INSERT INTO SG_SubjectOrderPackage (OrderId, SkuId, Price, CourseCount, BookableCount, Time, TimeUnit, AddTime) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+        String sql = "INSERT INTO SG_SubjectOrderPackage (UserId, OrderId, SkuId, Price, CourseCount, BookableCount, Time, TimeUnit, AddTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
         List<Object[]> args = new ArrayList<Object[]>();
         for (OrderPackage orderPackage : order.getPackages()) {
-            args.add(new Object[] { orderId, orderPackage.getSkuId(), orderPackage.getPrice(), orderPackage.getBookableCount(), orderPackage.getBookableCount(), orderPackage.getTime(), orderPackage.getTimeUnit() });
+            args.add(new Object[] { order.getUserId(), orderId, orderPackage.getSkuId(), orderPackage.getPrice(), orderPackage.getBookableCount(), orderPackage.getBookableCount(), orderPackage.getTime(), orderPackage.getTimeUnit() });
         }
         batchUpdate(sql, args);
     }
@@ -133,7 +133,7 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     private List<OrderPackage> listOrderPackages(Collection<Long> packageIds) {
         if (packageIds.isEmpty()) return new ArrayList<OrderPackage>();
 
-        String sql = "SELECT A.Id, A.OrderId, A.SkuId, A.Price, A.CourseCount, A.BookableCount, A.Time, A.TimeUnit, B.CourseId FROM SG_SubjectOrderPackage A INNER JOIN SG_SubjectSku B ON A.SkuId=B.Id WHERE A.Id IN (" + StringUtils.join(packageIds, ",") + ") AND A.Status<>0 AND B.Status<>0";
+        String sql = "SELECT A.Id, A.UserId, A.OrderId, A.SkuId, A.Price, A.CourseCount, A.BookableCount, A.Time, A.TimeUnit, B.CourseId FROM SG_SubjectOrderPackage A INNER JOIN SG_SubjectSku B ON A.SkuId=B.Id WHERE A.Id IN (" + StringUtils.join(packageIds, ",") + ") AND A.Status<>0 AND B.Status<>0";
         List<OrderPackage> packages = queryObjectList(sql, OrderPackage.class);
 
         Map<Long, OrderPackage> packagesMap = new HashMap<Long, OrderPackage>();
@@ -197,28 +197,28 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
 
     @Override
     public long queryBookableCountByUserAndOrder(long userId, long orderId) {
-        String sql = "SELECT COUNT(1) FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Id=? AND A.Status>=? AND B.Status<>0 AND B.BookableCount>0";
-        return queryLong(sql, new Object[] { userId, orderId, Order.Status.PAYED });
+        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_SubjectOrderPackage A LEFT JOIN SG_SubjectOrderPackageGift B ON A.Id=B.PackageId AND B.Status<>0 WHERE A.UserId=? AND A.OrderId=? AND A.Status=1 AND A.BookableCount>0 AND (B.Id IS NULL OR (B.ToUserId=0 AND B.Deadline<=NOW()) OR B.ToUserId=?)";
+        return queryLong(sql, new Object[] { userId, orderId, userId });
     }
 
     @Override
     public List<OrderPackage> queryBookableByUserAndOrder(long userId, long orderId, int start, int count) {
-        String sql = "SELECT B.Id FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Id=? AND A.Status>=? AND B.Status<>0 AND B.BookableCount>0 ORDER BY B.AddTime ASC LIMIT ?,?";
-        List<Long> packageIds = queryLongList(sql, new Object[] { userId, orderId, Order.Status.PAYED, start, count });
+        String sql = "SELECT DISTINCT A.Id FROM SG_SubjectOrderPackage A LEFT JOIN SG_SubjectOrderPackageGift B ON A.Id=B.PackageId AND B.Status<>0 WHERE A.UserId=? AND A.OrderId=? AND A.Status=1 AND A.BookableCount>0 AND (B.Id IS NULL OR (B.ToUserId=0 AND B.Deadline<=NOW()) OR B.ToUserId=?) ORDER BY A.AddTime ASC LIMIT ?,?";
+        List<Long> packageIds = queryLongList(sql, new Object[] { userId, orderId, userId, start, count });
 
         return listOrderPackages(packageIds);
     }
 
     @Override
     public long queryBookableCountByUser(long userId) {
-        String sql = "SELECT COUNT(1) FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Status>=? AND B.Status<>0 AND B.BookableCount>0";
-        return queryLong(sql, new Object[] { userId, Order.Status.PAYED });
+        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_SubjectOrderPackage A LEFT JOIN SG_SubjectOrderPackageGift B ON A.Id=B.PackageId AND B.Status<>0 WHERE A.UserId=? AND A.Status=1 AND A.BookableCount>0 AND (B.Id IS NULL OR (B.ToUserId=0 AND B.Deadline<=NOW()) OR B.ToUserId=?)";
+        return queryLong(sql, new Object[] { userId, userId });
     }
 
     @Override
     public List<OrderPackage> queryBookableByUser(long userId, int start, int count) {
-        String sql = "SELECT B.Id FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.Status>=? AND B.Status<>0 AND B.BookableCount>0 ORDER BY B.AddTime ASC LIMIT ?,?";
-        List<Long> packageIds = queryLongList(sql, new Object[] { userId, Order.Status.PAYED, start, count });
+        String sql = "SELECT DISTINCT A.Id FROM SG_SubjectOrderPackage A LEFT JOIN SG_SubjectOrderPackageGift B ON A.Id=B.PackageId AND B.Status<>0 WHERE A.UserId=? AND A.Status=1 AND A.BookableCount>0 AND (B.Id IS NULL OR (B.ToUserId=0 AND B.Deadline<=NOW()) OR B.ToUserId=?) ORDER BY A.AddTime ASC LIMIT ?,?";
+        List<Long> packageIds = queryLongList(sql, new Object[] { userId, userId, start, count });
 
         return listOrderPackages(packageIds);
     }
@@ -242,14 +242,14 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
 
     private Map<Long, Long> queryBookedBookablePackageIds(Collection<Long> userIds, long subjectId) {
         final Map<Long, Long> packageIdsMap = new HashMap<Long, Long>();
-        String sql = "SELECT A.UserId, B.Id AS PackageId " +
-                "FROM SG_SubjectOrder A " +
-                "INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId " +
-                "INNER JOIN SG_BookedCourse C ON B.Id=C.PackageId " +
+        String sql = "SELECT A.UserId, A.Id AS PackageId " +
+                "FROM SG_SubjectOrderPackage A " +
+                "INNER JOIN SG_SubjectSku B ON A.SkuId=B.Id " +
+                "INNER JOIN SG_BookedCourse C ON A.Id=C.PackageId " +
                 "INNER JOIN SG_CourseSku D ON C.CourseSkuId=D.Id " +
-                "WHERE A.UserId IN (" + StringUtils.join(userIds, ",") + ") AND A.SubjectId=? AND A.Status>=? AND B.BookableCount>0 AND B.Status<>0 AND C.Status<>0 AND D.Status<>0 " +
+                "WHERE A.UserId IN (" + StringUtils.join(userIds, ",") + ") AND A.BookableCount>0 AND A.Status=1 AND B.SubjectId=? AND B.Status<>0 AND C.Status<>0 AND D.Status<>0 " +
                 "ORDER BY D.StartTime ASC";
-        query(sql, new Object[] { subjectId, Order.Status.PAYED }, new RowCallbackHandler() {
+        query(sql, new Object[] { subjectId }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 long userId = rs.getLong("userId");
@@ -263,16 +263,17 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
 
     private Map<Long, Long> queryNotBookedBookablePackageIds(Collection<Long> userIds, long subjectId) {
         final Map<Long, Long> packageIdsMap = new HashMap<Long, Long>();
-        String sql = "SELECT A.UserId, B.Id AS PackageId " +
-                "FROM SG_SubjectOrder A " +
-                "INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId " +
-                "WHERE A.UserId IN (" + StringUtils.join(userIds, ",") + ") AND A.SubjectId=? AND A.Status>=? AND B.BookableCount>0 AND B.Status<>0";
-        query(sql, new Object[] { subjectId, Order.Status.PAYED }, new RowCallbackHandler() {
+        String sql = "SELECT A.UserId, A.Id AS PackageId " +
+                "FROM SG_SubjectOrderPackage A " +
+                "INNER JOIN SG_SubjectSku B ON A.SkuId=B.Id " +
+                "LEFT JOIN SG_BookedCourse C ON A.Id=C.PackageId AND C.Status<>0 " +
+                "WHERE A.UserId IN (" + StringUtils.join(userIds, ",") + ") AND A.BookableCount>0 AND A.Status=1 AND B.SubjectId=? AND B.Status<>0 AND C.Id IS NULL";
+        query(sql, new Object[] { subjectId }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 long userId = rs.getLong("userId");
                 long packageId = rs.getLong("packageId");
-                if (!packageIdsMap.containsKey(userId)) packageIdsMap.put(userId, packageId);
+                if (!isGift(userId, packageId) && !packageIdsMap.containsKey(userId)) packageIdsMap.put(userId, packageId);
             }
         });
 
@@ -290,7 +291,7 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     @Override
     public Set<Integer> getOrderPackageTypes(long orderId) {
         final Set<Integer> packageTypes = new HashSet<Integer>();
-        String sql = "SELECT B.CourseId, C.Type FROM SG_SubjectOrderPackage A INNER JOIN SG_SubjectSku B ON A.SkuId=B.Id INNER JOIN SG_Subject C ON B.SubjectId=C.Id WHERE A.OrderId=? AND A.Status=1 AND B.Status<>0 AND C.Status<>0";
+        String sql = "SELECT B.CourseId, C.Type FROM SG_SubjectOrderPackage A INNER JOIN SG_SubjectSku B ON A.SkuId=B.Id INNER JOIN SG_Subject C ON B.SubjectId=C.Id WHERE A.OrderId=? AND A.Status<>0 AND B.Status<>0 AND C.Status<>0";
         query(sql, new Object[] { orderId }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -307,6 +308,61 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
         });
 
         return packageTypes;
+    }
+
+    @Override
+    public List<OrderPackage> getOrderPackages(long orderId) {
+        String sql = "SELECT Id FROM SG_SubjectOrderPackage WHERE OrderId=? AND Status<>0";
+        List<Long> packageIds = queryLongList(sql, new Object[] { orderId });
+
+        return listOrderPackages(packageIds);
+    }
+
+    @Override
+    public boolean isUsed(long packageId) {
+        String sql = "SELECT COUNT(1) FROM SG_BookedCourse WHERE PackageId=? AND Status<>0";
+        return queryInt(sql, new Object[] { packageId }) > 0;
+    }
+
+    @Override
+    public boolean isGift(long fromUserId, long packageId) {
+        String sql = "SELECT COUNT(1) FROM SG_SubjectOrderPackageGift WHERE FromUserId=? AND PackageId=? AND ((ToUserId=0 && Deadline>NOW()) OR (ToUserId<>0 AND ToUserId<>?)) AND Status=1";
+        return queryInt(sql, new Object[] { fromUserId, packageId, fromUserId }) > 0;
+    }
+
+    @Override
+    public boolean isGift(long fromUserId, long toUserId, long packageId) {
+        String sql = "SELECT COUNT(1) FROM SG_SubjectOrderPackageGift WHERE FromUserId=? AND ToUserId=? AND PackageId=? AND Status=1";
+        return queryInt(sql, new Object[] { fromUserId, toUserId, packageId }) > 0;
+    }
+
+    @Override
+    public boolean sendGift(long fromUserId, long packageId) {
+        Date deadline = new Date(new Date().getTime() + 10L * 24 * 60 * 60 * 1000);
+        String sql = "INSERT INTO SG_SubjectOrderPackageGift (FromUserId, ToUserId, PackageId, Deadline, AddTime) VALUES (?, 0, ?, ?, NOW())";
+
+        return update(sql, new Object[] { fromUserId, packageId, deadline });
+    }
+
+    @Override
+    public boolean receiveGift(long fromUserId, long toUserId, long packageId) {
+        String sql = "UPDATE SG_SubjectOrderPackageGift SET ToUserId=? WHERE FromUserId=? AND ToUserId=0 AND PackageId=? AND Deadline>NOW() AND Status<>0";
+        if (!update(sql, new Object[] { toUserId, fromUserId, packageId })) return false;
+
+        sql = "UPDATE SG_SubjectOrderPackage SET UserId=? WHERE Id=? AND UserId=? AND Status=1";
+        return update(sql, new Object[] { toUserId, packageId, fromUserId });
+    }
+
+    @Override
+    public boolean disablePackage(long userId, long packageId) {
+        String sql = "UPDATE SG_SubjectOrderPackage SET Status=3 WHERE Id=? AND UserId=? AND Status=1";
+        return update(sql, new Object[] { packageId, userId });
+    }
+
+    @Override
+    public boolean createNewPackage(long userId, OrderPackage orderPackage) {
+        String sql = "INSERT INTO SG_SubjectOrderPackage (UserId, OrderId, SkuId, Price, CourseCount, BookableCount, Time, TimeUnit, Status, AddTime) VALUES (?, ?, ?, 0, ?, ?, ?, ?, 1, NOW())";
+        return update(sql, new Object[] { userId, orderPackage.getOrderId(), orderPackage.getSkuId(), orderPackage.getCourseCount(), orderPackage.getBookableCount(), orderPackage.getTime(), orderPackage.getTimeUnit() });
     }
 
     @Override
@@ -330,6 +386,7 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
                 @Override
                 public Object doInTransaction(TransactionStatus status) {
                     payOrder(payment.getOrderId());
+                    enablePackage(payment.getOrderId());
                     logPayment(payment);
 
                     return null;
@@ -347,7 +404,14 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
         String sql = "UPDATE SG_SubjectOrder SET Status=? WHERE Id=? AND Status=?";
         int updateCount = singleUpdate(sql, new Object[] { Order.Status.PAYED, orderId, Order.Status.PRE_PAYED });
 
-        if (updateCount != 1) throw new RuntimeException("fail to pay order: {}" + orderId);
+        if (updateCount != 1) throw new RuntimeException("fail to pay order: " + orderId);
+    }
+
+    private void enablePackage(long orderId) {
+        String sql = "UPDATE SG_SubjectOrderPackage SET Status=1 WHERE OrderId=?";
+        int updateCount = singleUpdate(sql, new Object[] { orderId });
+
+        if (!(updateCount > 0)) throw new RuntimeException("fail to enable package of order: " + orderId);
     }
 
     private void logPayment(final Payment payment) {
@@ -359,13 +423,13 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
 
     @Override
     public boolean decreaseBookableCount(long packageId) {
-        String sql = "UPDATE SG_SubjectOrderPackage SET BookableCount=BookableCount-1 WHERE Id=? AND Status<>0 AND BookableCount>=1";
+        String sql = "UPDATE SG_SubjectOrderPackage SET BookableCount=BookableCount-1 WHERE Id=? AND Status=1 AND BookableCount>=1";
         return update(sql, new Object[] { packageId });
     }
 
     @Override
     public boolean increaseBookableCount(long packageId) {
-        String sql = "UPDATE SG_SubjectOrderPackage SET BookableCount=BookableCount+1 WHERE Id=? AND Status<>0 AND BookableCount<CourseCount";
+        String sql = "UPDATE SG_SubjectOrderPackage SET BookableCount=BookableCount+1 WHERE Id=? AND Status=1 AND BookableCount<CourseCount";
         return update(sql, new Object[] { packageId });
     }
 
@@ -399,11 +463,8 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
 
     @Override
     public List<Long> queryBookableUserIds() {
-        String sql = "SELECT A.Id " +
-                "FROM SG_SubjectOrderPackage A " +
-                "INNER JOIN SG_SubjectOrder B ON A.OrderId=B.Id " +
-                "WHERE A.Status<>0 AND A.CourseCount>1 AND A.BookableCount>0 AND B.Status=?";
-        List<Long> packageIds = queryLongList(sql, new Object[] { Order.Status.PAYED });
+        String sql = "SELECT Id FROM SG_SubjectOrderPackage WHERE Status=1 AND CourseCount>1 AND BookableCount>0";
+        List<Long> packageIds = queryLongList(sql);
         if (packageIds.isEmpty()) return new ArrayList<Long>();
 
         List<OrderPackage> packages = listOrderPackages(packageIds);
@@ -427,22 +488,15 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     }
 
     private List<Long> listUserIdsOfPackages(Collection<Long> packageIds) {
-        String sql = "SELECT DISTINCT B.UserId " +
-                "FROM SG_SubjectOrderPackage A " +
-                "INNER JOIN SG_SubjectOrder B ON A.OrderId=B.Id " +
-                "WHERE A.Id IN(" + StringUtils.join(packageIds, ",") + ") AND B.Status=?";
-
-        return queryLongList(sql, new Object[] { Order.Status.PAYED });
+        String sql = "SELECT DISTINCT UserId FROM SG_SubjectOrderPackage WHERE Id IN(" + StringUtils.join(packageIds, ",") + ")";
+        return queryLongList(sql);
     }
 
     @Override
     public List<Long> queryUserIdsOfPackagesToExpired(int days) {
         try {
-            String sql = "SELECT A.Id " +
-                    "FROM SG_SubjectOrderPackage A " +
-                    "INNER JOIN SG_SubjectOrder B ON A.OrderId=B.Id " +
-                    "WHERE A.Status<>0 AND A.BookableCount>0 AND B.Status=?";
-            List<Long> packageIds = queryLongList(sql, new Object[] { Order.Status.PAYED });
+            String sql = "SELECT Id FROM SG_SubjectOrderPackage WHERE Status=1 AND BookableCount>0";
+            List<Long> packageIds = queryLongList(sql);
             if (packageIds.isEmpty()) return new ArrayList<Long>();
 
             List<OrderPackage> packages = listOrderPackages(packageIds);
