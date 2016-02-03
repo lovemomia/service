@@ -345,6 +345,24 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     }
 
     @Override
+    public boolean isGiftTo(long toUserId, long packageId) {
+        String sql = "SELECT COUNT(1) FROM SG_SubjectOrderPackageGift WHERE ToUserId=? AND PackageId=? AND Status=1";
+        return queryInt(sql, new Object[] { toUserId, packageId }) > 0;
+    }
+
+    @Override
+    public boolean isGiftReceived(long packageId) {
+        String sql = "SELECT COUNT(1) FROM SG_SubjectOrderPackageGift WHERE ToUserId>0 AND PackageId=? AND Status=1";
+        return queryInt(sql, new Object[] { packageId }) > 0;
+    }
+
+    @Override
+    public boolean isGiftExpired(long packageId) {
+        String sql = "SELECT COUNT(1) FROM SG_SubjectOrderPackageGift WHERE PackageId=? AND Deadline<=NOW() AND Status=1";
+        return queryInt(sql, new Object[] { packageId }) > 0;
+    }
+
+    @Override
     public boolean receiveGift(long fromUserId, long toUserId, long packageId) {
         String sql = "UPDATE SG_SubjectOrderPackageGift SET ToUserId=? WHERE FromUserId=? AND ToUserId=0 AND PackageId=? AND Deadline>NOW() AND Status<>0";
         if (!update(sql, new Object[] { toUserId, fromUserId, packageId })) return false;

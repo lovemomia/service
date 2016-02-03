@@ -31,6 +31,9 @@ public interface OrderService {
     boolean isGift(long fromUserId, long packageId);
     boolean isGift(long fromUserId, long toUserId, long packageId);
     boolean sendGift(long fromUserId, long packageId);
+    boolean isGiftTo(long toUserId, long packageId);
+    boolean isGiftReceived(long packageId);
+    boolean isGiftExpired(long packageId);
     boolean receiveGift(long fromUserId, long toUserId, long packageId);
 
     boolean extendPackageTime(long packageId, int newTime, int newTimeUnit);

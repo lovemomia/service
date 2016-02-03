@@ -374,6 +374,23 @@ public class OrderController extends BaseController {
         return MomiaHttpResponse.SUCCESS(orderService.sendGift(user.getId(), orderPackage.getId()));
     }
 
+    @RequestMapping(value = "/{oid}/gift/status", method = RequestMethod.GET)
+    public MomiaHttpResponse giftStatus(@RequestParam String utoken, @PathVariable(value = "oid") long orderId) {
+        Order order = orderService.get(orderId);
+        if (!order.exists() || !order.isPayed()) return MomiaHttpResponse.FAILED("无效的订单");
+
+        List<OrderPackage> orderPackages = orderService.getOrderPackages(orderId);
+        if (orderPackages.isEmpty() || orderPackages.size() > 1) return MomiaHttpResponse.FAILED("无效的礼包");
+
+        User user = userServiceApi.get(utoken);
+        OrderPackage orderPackage = orderPackages.get(0);
+
+        if (orderService.isGiftTo(user.getId(), orderPackage.getId())) return MomiaHttpResponse.SUCCESS(1);
+        if (orderService.isGiftReceived(orderPackage.getId())) return MomiaHttpResponse.SUCCESS(2);
+        if (orderService.isGiftExpired(orderPackage.getId())) return MomiaHttpResponse.SUCCESS(3);
+        return MomiaHttpResponse.SUCCESS(4);
+    }
+
     @RequestMapping(value = "/{oid}/gift/receive", method = RequestMethod.POST)
     public MomiaHttpResponse receiveGift(@RequestParam String utoken,
                                          @PathVariable(value = "oid") long orderId,
