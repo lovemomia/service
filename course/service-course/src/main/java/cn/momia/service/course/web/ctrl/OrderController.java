@@ -385,10 +385,11 @@ public class OrderController extends BaseController {
         User user = userServiceApi.get(utoken);
         OrderPackage orderPackage = orderPackages.get(0);
 
-        if (orderService.isGiftTo(user.getId(), orderPackage.getId())) return MomiaHttpResponse.SUCCESS(1);
-        if (orderService.isGiftReceived(orderPackage.getId())) return MomiaHttpResponse.SUCCESS(2);
-        if (orderService.isGiftExpired(orderPackage.getId())) return MomiaHttpResponse.SUCCESS(3);
-        return MomiaHttpResponse.SUCCESS(4);
+        if (orderService.isGift(user.getId(), orderPackage.getId())) return MomiaHttpResponse.SUCCESS(1);
+        if (orderService.isGiftTo(user.getId(), orderPackage.getId())) return MomiaHttpResponse.SUCCESS(2);
+        if (orderService.isGiftReceived(orderPackage.getId())) return MomiaHttpResponse.SUCCESS(3);
+        if (orderService.isGiftExpired(orderPackage.getId())) return MomiaHttpResponse.SUCCESS(4);
+        return MomiaHttpResponse.SUCCESS(5);
     }
 
     @RequestMapping(value = "/{oid}/gift/receive", method = RequestMethod.POST)
