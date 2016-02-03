@@ -345,6 +345,12 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     }
 
     @Override
+    public boolean isGiftFrom(long fromUserId, long packageId) {
+        String sql = "SELECT COUNT(1) FROM SG_SubjectOrderPackageGift WHERE FromUserId=? AND PackageId=? AND Status=1";
+        return queryInt(sql, new Object[] { fromUserId, packageId }) > 0;
+    }
+
+    @Override
     public boolean isGiftTo(long toUserId, long packageId) {
         String sql = "SELECT COUNT(1) FROM SG_SubjectOrderPackageGift WHERE ToUserId=? AND PackageId=? AND Status=1";
         return queryInt(sql, new Object[] { toUserId, packageId }) > 0;
