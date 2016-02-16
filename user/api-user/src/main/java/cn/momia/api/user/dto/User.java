@@ -1,6 +1,6 @@
 package cn.momia.api.user.dto;
 
-import cn.momia.common.core.util.MobileUtil;
+import cn.momia.common.core.util.MomiaUtil;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
@@ -228,7 +228,7 @@ public class User {
 
         public Base(User user, boolean showToken) {
             super(user);
-            setMobile(MobileUtil.encrypt(user.getMobile()));
+            setMobile(MomiaUtil.encrypt(user.getMobile()));
             setCover(user.getCover());
             setName(user.getName());
             setSex(user.getSex());
