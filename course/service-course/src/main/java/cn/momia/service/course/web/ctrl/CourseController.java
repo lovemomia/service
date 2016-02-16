@@ -13,7 +13,7 @@ import cn.momia.api.user.dto.User;
 import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.core.http.MomiaHttpResponse;
-import cn.momia.common.core.util.PoiUtil;
+import cn.momia.common.core.util.MomiaUtil;
 import cn.momia.common.core.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.api.course.dto.course.BookedCourse;
@@ -162,8 +162,8 @@ public class CourseController extends BaseController {
                         if (place1HasNoPosition) return 1;
                         if (place2HasNoPosition) return -1;
 
-                        int distance1 = PoiUtil.distance(place1.getLng(), place1.getLat(), lng, lat);
-                        int distance2 = PoiUtil.distance(place2.getLng(), place2.getLat(), lng, lat);
+                        int distance1 = MomiaUtil.distance(place1.getLng(), place1.getLat(), lng, lat);
+                        int distance2 = MomiaUtil.distance(place2.getLng(), place2.getLat(), lng, lat);
 
                         return distance1 - distance2;
                     }
