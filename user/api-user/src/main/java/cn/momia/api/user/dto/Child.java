@@ -1,6 +1,6 @@
 package cn.momia.api.user.dto;
 
-import cn.momia.common.core.util.SexUtil;
+import cn.momia.common.core.util.MomiaUtil;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.lang3.StringUtils;
 
@@ -70,6 +70,6 @@ public class Child {
 
     @JSONField(serialize = false)
     public boolean isInvalid() {
-        return userId <= 0 || StringUtils.isBlank(name) || SexUtil.isInvalid(sex) || birthday == null;
+        return userId <= 0 || StringUtils.isBlank(name) || MomiaUtil.isInvalidSex(sex) || birthday == null;
     }
 }
