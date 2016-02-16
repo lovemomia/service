@@ -228,7 +228,7 @@ public class User {
 
         public Base(User user, boolean showToken) {
             super(user);
-            setMobile(MomiaUtil.encrypt(user.getMobile()));
+            setMobile(MomiaUtil.encryptMobile(user.getMobile()));
             setCover(user.getCover());
             setName(user.getName());
             setSex(user.getSex());
