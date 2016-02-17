@@ -3,11 +3,9 @@ package cn.momia.service.feed.web.ctrl;
 import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
-import cn.momia.api.feed.dto.Feed;
 import cn.momia.service.feed.base.FeedService;
-import cn.momia.api.feed.dto.FeedComment;
+import cn.momia.service.feed.comment.FeedComment;
 import cn.momia.service.feed.comment.FeedCommentService;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,9 +25,6 @@ public class FeedCommentController extends BaseController {
     public MomiaHttpResponse listComments(@PathVariable(value = "fid") long feedId, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
-        Feed feed = feedService.get(feedId);
-        if (!feed.exists()) return MomiaHttpResponse.FAILED("无效的Feed");
-
         long totalCount = feedCommentService.queryCount(feedId);
         List<FeedComment> comments = feedCommentService.query(feedId, start, count);
 
@@ -43,11 +38,7 @@ public class FeedCommentController extends BaseController {
     public MomiaHttpResponse addComment(@RequestParam(value = "uid") long userId,
                                         @PathVariable(value = "fid") long feedId,
                                         @RequestParam String content) {
-        Feed feed = feedService.get(feedId);
-        if (!feed.exists()) return MomiaHttpResponse.FAILED("无效的Feed");
-
-        if (userId <= 0 || StringUtils.isBlank(content) || !feedCommentService.add(userId, feedId, content)) return MomiaHttpResponse.FAILED("发表评论失败");
-
+        if (!feedCommentService.add(userId, feedId, content)) return MomiaHttpResponse.FAILED("发表评论失败");
         feedService.increaseCommentCount(feedId);
         return MomiaHttpResponse.SUCCESS;
     }
@@ -56,8 +47,7 @@ public class FeedCommentController extends BaseController {
     public MomiaHttpResponse deleteComment(@RequestParam(value = "uid") long userId,
                                            @PathVariable(value = "fid") long feedId,
                                            @PathVariable(value = "cmid") long commentId) {
-        if (userId <= 0 || feedId <= 0 || commentId <= 0 || !feedCommentService.delete(userId, feedId, commentId)) return MomiaHttpResponse.FAILED("删除评论失败");
-
+        if (!feedCommentService.delete(userId, feedId, commentId)) return MomiaHttpResponse.FAILED("删除评论失败");
         feedService.decreaseCommentCount(feedId);
         return MomiaHttpResponse.SUCCESS;
     }

@@ -11,15 +11,15 @@ import java.util.List;
 public class FeedStarServiceImpl extends AbstractService implements FeedStarService {
     @Override
     public boolean isStared(long userId, long feedId) {
-        String sql = "SELECT COUNT(1) FROM SG_FeedStar WHERE UserId=? AND FeedId=? AND Status<>0";
+        String sql = "SELECT COUNT(1) FROM SG_FeedStar WHERE UserId=? AND FeedId=? AND Status=1";
         return queryInt(sql, new Object[] { userId, feedId }) > 0;
     }
 
     @Override
-    public List<Long> queryStaredFeedIds(long userId, Collection<Long> feedIds) {
+    public List<Long> filterNotStaredFeedIds(long userId, Collection<Long> feedIds) {
         if (feedIds.isEmpty()) return new ArrayList<Long>();
 
-        String sql = "SELECT feedId FROM SG_FeedStar WHERE UserId=? AND FeedId IN(" + StringUtils.join(feedIds, ",") + ") AND Status<>0";
+        String sql = String.format("SELECT feedId FROM SG_FeedStar WHERE UserId=? AND FeedId IN(%s) AND Status=1", StringUtils.join(feedIds, ","));
         return queryLongList(sql, new Object[] { userId });
     }
 
@@ -42,19 +42,19 @@ public class FeedStarServiceImpl extends AbstractService implements FeedStarServ
 
     @Override
     public boolean delete(long userId, long feedId) {
-        String sql = "UPDATE SG_FeedStar SET Status=0 WHERE UserId=? AND FeedId=? AND Status<>0";
+        String sql = "UPDATE SG_FeedStar SET Status=0 WHERE UserId=? AND FeedId=? AND Status=1";
         return update(sql, new Object[] { userId, feedId });
     }
 
     @Override
     public long queryUserIdsCount(long feedId) {
-        String sql = "SELECT COUNT(DISTINCT UserId) FROM SG_FeedStar WHERE FeedId=? AND Status<>0";
+        String sql = "SELECT COUNT(DISTINCT UserId) FROM SG_FeedStar WHERE FeedId=? AND Status=1";
         return queryInt(sql, new Object[] { feedId });
     }
 
     @Override
     public List<Long> queryUserIds(long feedId, int start, int count) {
-        String sql = "SELECT UserId FROM SG_FeedStar WHERE FeedId=? AND Status<>0 LIMIT ?,?";
+        String sql = "SELECT UserId FROM SG_FeedStar WHERE FeedId=? AND Status=1 LIMIT ?,?";
         return queryLongList(sql, new Object[] { feedId, start, count });
     }
 }

@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface FeedStarService {
     boolean isStared(long userId, long feedId);
-    List<Long> queryStaredFeedIds(long userId, Collection<Long> feedIds);
+    List<Long> filterNotStaredFeedIds(long userId, Collection<Long> feedIds);
 
     boolean add(long userId, long feedId);
     boolean delete(long userId, long feedId);

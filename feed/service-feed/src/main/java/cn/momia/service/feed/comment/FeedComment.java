@@ -1,4 +1,4 @@
-package cn.momia.api.feed.dto;
+package cn.momia.service.feed.comment;
 
 import java.util.Date;
 
@@ -47,5 +47,9 @@ public class FeedComment {
 
     public void setAddTime(Date addTime) {
         this.addTime = addTime;
+    }
+
+    public boolean exists() {
+        return id > 0;
     }
 }

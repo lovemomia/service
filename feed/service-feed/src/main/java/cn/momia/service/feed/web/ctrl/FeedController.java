@@ -1,11 +1,11 @@
 package cn.momia.service.feed.web.ctrl;
 
-import cn.momia.api.feed.dto.FeedTag;
 import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.core.dto.PagedList;
-import cn.momia.api.feed.dto.Feed;
+import cn.momia.service.feed.base.Feed;
 import cn.momia.service.feed.base.FeedService;
+import cn.momia.service.feed.base.FeedTag;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -143,14 +143,11 @@ public class FeedController extends BaseController {
     @RequestMapping(value = "/{fid}", method = RequestMethod.GET)
     public MomiaHttpResponse get(@PathVariable(value = "fid") long feedId) {
         Feed feed = feedService.get(feedId);
-        if (!feed.exists()) return MomiaHttpResponse.FAILED("无效的Feed");
-
-        return MomiaHttpResponse.SUCCESS(feed);
+        return feed.exists() ? MomiaHttpResponse.SUCCESS(feed) : MomiaHttpResponse.FAILED("无效的Feed");
     }
 
     @RequestMapping(value = "/{fid}", method = RequestMethod.DELETE)
     public MomiaHttpResponse delete(@RequestParam(value = "uid") long userId, @PathVariable(value = "fid") long feedId) {
-        if (userId <= 0 || feedId <= 0) return MomiaHttpResponse.FAILED("无效的Feed");
         return MomiaHttpResponse.SUCCESS(feedService.delete(userId, feedId));
     }
 }

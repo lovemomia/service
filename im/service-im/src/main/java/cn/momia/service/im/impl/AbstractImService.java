@@ -128,7 +128,7 @@ public abstract class AbstractImService extends AbstractService implements ImSer
 
     @Override
     public List<Group> listGroups(Collection<Long> groupIds) {
-        String sql = String.format("SELECT GroupId, GroupName, CourseId, CourseSkuId FROM SG_ImGroup WHERE GroupId IN (%s) AND Status=1", StringUtils.join(groupIds, ","));
+        String sql = "SELECT GroupId, GroupName, CourseId, CourseSkuId FROM SG_ImGroup WHERE GroupId IN (%s) AND Status=1";
         return listByIds(sql, groupIds, Long.class, Group.class);
     }
 
