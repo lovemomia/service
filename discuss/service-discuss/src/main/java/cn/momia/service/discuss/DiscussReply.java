@@ -1,4 +1,4 @@
-package cn.momia.api.discuss.dto;
+package cn.momia.service.discuss;
 
 import java.util.Date;
 

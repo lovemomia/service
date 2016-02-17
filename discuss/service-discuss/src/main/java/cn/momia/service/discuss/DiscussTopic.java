@@ -1,6 +1,8 @@
-package cn.momia.api.discuss.dto;
+package cn.momia.service.discuss;
 
 public class DiscussTopic {
+    public static final DiscussTopic NOT_EXIST_DISCUSS_TOPIC = new DiscussTopic();
+
     private int id;
     private int cityId;
     private String cover;
@@ -55,5 +57,9 @@ public class DiscussTopic {
 
     public void setJoined(long joined) {
         this.joined = joined;
+    }
+
+    public boolean exists() {
+        return id > 0;
     }
 }

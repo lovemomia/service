@@ -1,8 +1,5 @@
 package cn.momia.service.discuss;
 
-import cn.momia.api.discuss.dto.DiscussReply;
-import cn.momia.api.discuss.dto.DiscussTopic;
-
 import java.util.Collection;
 import java.util.List;
 
@@ -15,9 +12,9 @@ public interface DiscussService {
     long queryRepliesCount(int topicId);
     List<DiscussReply> queryReplies(int topicId, int start, int count);
 
-    List<Long> queryStaredReplyIds(long userId, Collection<Long> replyIds);
-
     boolean reply(long userId, int topicId, String content);
+
+    List<Long> filterNotStaredReplyIds(long userId, Collection<Long> replyIds);
 
     boolean star(long userId, int replyId);
     boolean unstar(long userId, int replyId);

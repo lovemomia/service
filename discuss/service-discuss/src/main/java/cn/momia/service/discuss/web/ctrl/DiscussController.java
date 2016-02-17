@@ -1,11 +1,12 @@
 package cn.momia.service.discuss.web.ctrl;
 
-import cn.momia.api.discuss.dto.DiscussReply;
-import cn.momia.api.discuss.dto.DiscussTopic;
 import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.http.MomiaHttpResponse;
+import cn.momia.common.core.util.MomiaUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
+import cn.momia.service.discuss.DiscussReply;
 import cn.momia.service.discuss.DiscussService;
+import cn.momia.service.discuss.DiscussTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -37,30 +37,15 @@ public class DiscussController extends BaseController {
     @RequestMapping(value = "/topic/{topicid}", method = RequestMethod.GET)
     public MomiaHttpResponse getTopic(@PathVariable(value = "topicid") int topicId) {
         DiscussTopic topic = discussService.getTopic(topicId);
-        if (!topic.exists()) return MomiaHttpResponse.FAILED("话题不存在");
-
-        return MomiaHttpResponse.SUCCESS(topic);
+        return topic.exists() ? MomiaHttpResponse.SUCCESS(topic) : MomiaHttpResponse.FAILED("话题不存在");
     }
 
     @RequestMapping(value = "/topic/{topicid}/reply", method = RequestMethod.GET)
-    public MomiaHttpResponse listReplies(@RequestParam(value = "uid") long userId,
-                                         @PathVariable(value = "topicid") int topicId,
-                                         @RequestParam int start,
-                                         @RequestParam int count) {
+    public MomiaHttpResponse listReplies(@PathVariable(value = "topicid") int topicId, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
 
         long totalCount = discussService.queryRepliesCount(topicId);
         List<DiscussReply> replies = discussService.queryReplies(topicId, start, count);
-
-        List<Long> replyIds = new ArrayList<Long>();
-        for (DiscussReply reply : replies) {
-            replyIds.add(reply.getId());
-        }
-
-        List<Long> staredReplyIds = discussService.queryStaredReplyIds(userId, replyIds);
-        for (DiscussReply reply : replies) {
-            if (staredReplyIds.contains(reply.getId())) reply.setStared(true);
-        }
 
         PagedList<DiscussReply> pagedReplies = new PagedList<DiscussReply>(totalCount, start, count);
         pagedReplies.setList(replies);
@@ -73,6 +58,11 @@ public class DiscussController extends BaseController {
                                    @PathVariable(value = "topicid") int topicId,
                                    @RequestParam String content) {
         return MomiaHttpResponse.SUCCESS(discussService.reply(userId, topicId, content));
+    }
+
+    @RequestMapping(value = "/reply/filter/notstared", method = RequestMethod.GET)
+    public MomiaHttpResponse filterNotStared(@RequestParam(value = "uid") long userId, @RequestParam(value = "replyids") String replyIds) {
+        return MomiaHttpResponse.SUCCESS(discussService.filterNotStaredReplyIds(userId, MomiaUtil.splitDistinctLongs(replyIds)));
     }
 
     @RequestMapping(value = "/reply/{replyid}/star", method = RequestMethod.POST)
