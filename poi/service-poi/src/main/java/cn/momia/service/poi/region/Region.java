@@ -1,8 +1,6 @@
 package cn.momia.service.poi.region;
 
 public class Region {
-    public static final int MULTI_REGION_ID = -1;
-
     private int id;
     private int cityId;
     private String name;
@@ -38,9 +36,5 @@ public class Region {
 
     public void setParentId(int parentId) {
         this.parentId = parentId;
-    }
-
-    public boolean exists() {
-        return id == MULTI_REGION_ID || id > 0;
     }
 }

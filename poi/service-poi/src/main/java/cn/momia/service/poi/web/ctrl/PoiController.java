@@ -4,7 +4,9 @@ import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.core.util.MomiaUtil;
 import cn.momia.common.service.CachedService;
 import cn.momia.common.webapp.ctrl.BaseController;
+import cn.momia.service.poi.inst.Institution;
 import cn.momia.service.poi.inst.InstitutionService;
+import cn.momia.service.poi.place.Place;
 import cn.momia.service.poi.place.PlaceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -34,7 +36,8 @@ public class PoiController extends BaseController {
 
     @RequestMapping(value = "/place/{plid}", method = RequestMethod.GET)
     public MomiaHttpResponse getPlace(@PathVariable(value = "plid") int placeId) {
-        return MomiaHttpResponse.SUCCESS(placeService.get(placeId));
+        Place place = placeService.get(placeId);
+        return place.exists() ? MomiaHttpResponse.SUCCESS(place) : MomiaHttpResponse.FAILED("地点信息不存在");
     }
 
     @RequestMapping(value = "/place/list", method = RequestMethod.GET)
@@ -44,7 +47,8 @@ public class PoiController extends BaseController {
 
     @RequestMapping(value = "/inst/{instid}", method = RequestMethod.GET)
     public MomiaHttpResponse getInstitution(@PathVariable(value = "instid") int institutionId) {
-        return MomiaHttpResponse.SUCCESS(institutionService.get(institutionId));
+        Institution institution = institutionService.get(institutionId);
+        return institution.exists() ? MomiaHttpResponse.SUCCESS(institution) : MomiaHttpResponse.FAILED("机构信息不存在");
     }
 
     @RequestMapping(value = "/inst/list", method = RequestMethod.GET)

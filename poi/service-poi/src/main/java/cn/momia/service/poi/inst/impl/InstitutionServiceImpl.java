@@ -7,20 +7,17 @@ import com.google.common.collect.Sets;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 public class InstitutionServiceImpl extends AbstractService implements InstitutionService {
     @Override
     public Institution get(int institutionId) {
-        Set<Integer> institutionIds = Sets.newHashSet(institutionId);
-        List<Institution> institutions = list(institutionIds);
-
+        List<Institution> institutions = list(Sets.newHashSet(institutionId));
         return institutions.isEmpty() ? Institution.NOT_EXIST_INSTITUTION : institutions.get(0);
     }
 
     @Override
     public List<Institution> list(Collection<Integer> institutionIds) {
-        String sql = "SELECT Id, Name, Cover, Intro FROM SG_Institution WHERE Id IN (%s) AND Status<>0";
+        String sql = "SELECT Id, Name, Cover, Intro FROM SG_Institution WHERE Id IN (%s) AND Status=1";
         return listByIds(sql, institutionIds, Integer.class, Institution.class);
     }
 }

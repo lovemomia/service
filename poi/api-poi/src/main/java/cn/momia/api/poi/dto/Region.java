@@ -39,8 +39,4 @@ public class Region {
     public void setParentId(int parentId) {
         this.parentId = parentId;
     }
-
-    public boolean exists() {
-        return id == MULTI_REGION_ID || id > 0;
-    }
 }

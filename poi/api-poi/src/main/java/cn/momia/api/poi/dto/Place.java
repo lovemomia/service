@@ -3,8 +3,6 @@ package cn.momia.api.poi.dto;
 import java.util.List;
 
 public class Place {
-    public static final Place NOT_EXIST_PLACE = new Place();
-
     private int id;
     private int cityId;
     private int regionId;
@@ -104,9 +102,5 @@ public class Place {
 
     public void setImgs(List<String> imgs) {
         this.imgs = imgs;
-    }
-
-    public boolean exists() {
-        return id > 0;
     }
 }
