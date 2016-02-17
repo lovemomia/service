@@ -18,8 +18,6 @@ import java.util.concurrent.TimeUnit;
 public abstract class AbstractPushService extends AbstractService implements PushService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPushService.class);
 
-    protected static final long SYSTEM_PUSH_USERID = 10000;
-
     private Object signal = new Object();
     private ExecutorService executorService = new ThreadPoolExecutor(5, 10, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(10000));
     private Queue<Runnable> tasksQueue = new LinkedList<Runnable>();

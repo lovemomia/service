@@ -2,6 +2,7 @@ package cn.momia.service.im.impl;
 
 import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.webapp.config.Configuration;
+import cn.momia.service.im.Consts;
 import cn.momia.service.im.rongcloud.RongCloudUtil;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -40,11 +41,11 @@ public class ImServiceRongCloudImpl extends AbstractImService {
     }
 
     @Override
-    public void updateNickName(long userId, String nickName) {
-        updateUserInfo(userId, nickName, null);
+    public boolean updateNickName(long userId, String nickName) {
+        return updateUserInfo(userId, nickName, null);
     }
 
-    private void updateUserInfo(long userId, String nickName, String avatar) {
+    private boolean updateUserInfo(long userId, String nickName, String avatar) {
         try {
             HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.UpdateUser"));
 
@@ -55,15 +56,17 @@ public class ImServiceRongCloudImpl extends AbstractImService {
             HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
             httpPost.setEntity(entity);
 
-            RongCloudUtil.executeRequest(httpPost);
+            JSONObject responseJson = RongCloudUtil.executeRequest(httpPost);
+
+            return responseJson.getInteger("code") == 200;
         } catch (Exception e) {
             throw new MomiaErrorException("fail to update user info " + userId, e);
         }
     }
 
     @Override
-    public void updateAvatar(long userId, String avatar) {
-        updateUserInfo(userId, null, avatar);
+    public boolean updateAvatar(long userId, String avatar) {
+        return updateUserInfo(userId, null, avatar);
     }
 
     @Override
@@ -113,7 +116,7 @@ public class ImServiceRongCloudImpl extends AbstractImService {
             HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.DismissGroup"));
 
             List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair("userId", String.valueOf(10000)));
+            params.add(new BasicNameValuePair("userId", String.valueOf(Consts.SYSTEM_USERID)));
             params.add(new BasicNameValuePair("groupId", String.valueOf(groupId)));
             HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
             httpPost.setEntity(entity);

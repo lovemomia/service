@@ -83,7 +83,7 @@ public class SmsServiceImpl extends AbstractService implements SmsService {
 
     private Date getLastSendTime(String mobile) {
         String sql = "SELECT SendTime FROM SG_Verify WHERE Mobile=?";
-        return queryDate(sql, new Object[] { mobile }, null);
+        return queryDate(sql, new Object[] { mobile });
     }
 
     private String getOrGenerateCode(String mobile) {
@@ -98,7 +98,7 @@ public class SmsServiceImpl extends AbstractService implements SmsService {
 
     private String getGeneratedCode(String mobile) {
         String sql = "SELECT Code FROM SG_Verify WHERE Mobile=? AND GenerateTime>? AND Status<>0";
-        return queryString(sql, new Object[] { mobile, new Date(new Date().getTime() - 30 * 60 * 1000) }, null);
+        return queryString(sql, new Object[] { mobile, new Date(new Date().getTime() - 30 * 60 * 1000) });
     }
 
     private String generateCode(String mobile) {

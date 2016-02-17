@@ -1,16 +1,14 @@
 package cn.momia.service.im;
 
-import cn.momia.api.im.dto.Group;
-import cn.momia.api.im.dto.GroupMember;
-import cn.momia.api.im.dto.UserGroup;
-
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface ImService {
     String generateImToken(long userId, String nickName, String avatar);
-    void updateNickName(long userId, String nickName);
-    void updateAvatar(long userId, String avatar);
+    boolean updateNickName(long userId, String nickName);
+    boolean updateAvatar(long userId, String avatar);
 
     boolean createGroup(long courseId, long courseSkuId, Collection<Long> teacherUserIds, String groupName);
     boolean updateGroupName(long courseId, long courseSkuId, String groupName);
@@ -25,5 +23,6 @@ public interface ImService {
     boolean joinGroup(long userId, long courseId, long courseSkuId, boolean teacher);
     boolean leaveGroup(long userId, long courseId, long courseSkuId);
 
-    List<UserGroup> listUserGroups(long userId);
+    List<Group> listUserGroups(long userId);
+    Map<Long, Date> queryJoinTimes(long userId, Collection<Long> groupIds);
 }
