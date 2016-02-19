@@ -1,12 +1,12 @@
 package cn.momia.service.user.base.impl;
 
-import cn.momia.api.user.dto.Child;
-import cn.momia.api.user.dto.User;
 import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.common.core.util.TimeUtil;
 import cn.momia.common.webapp.config.Configuration;
+import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
+import cn.momia.service.user.child.Child;
 import cn.momia.service.user.child.ChildService;
 import com.google.common.collect.Sets;
 import org.apache.commons.codec.binary.Base64;
@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class UserServiceImpl extends AbstractService implements UserService {
     private ChildService childService;
@@ -84,15 +83,13 @@ public class UserServiceImpl extends AbstractService implements UserService {
 
     @Override
     public User get(long userId) {
-        Set<Long> userIds = Sets.newHashSet(userId);
-        List<User> users = list(userIds);
-
+        List<User> users = list(Sets.newHashSet(userId));
         return users.isEmpty() ? User.NOT_EXIST_USER : users.get(0);
     }
 
     @Override
     public User getByToken(String token) {
-        String sql = "SELECT Id FROM SG_User WHERE Token=? AND Status<>0";
+        String sql = "SELECT Id FROM SG_User WHERE Token=? AND Status=1";
         List<Long> userIds = queryLongList(sql, new Object[] { token });
         List<User> users = list(userIds);
 
@@ -101,7 +98,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
 
     @Override
     public User getByMobile(String mobile) {
-        String sql = "SELECT Id FROM SG_User WHERE Mobile=? AND Status<>0";
+        String sql = "SELECT Id FROM SG_User WHERE Mobile=? AND Status=1";
         List<Long> userIds = queryLongList(sql, new Object[] { mobile });
         List<User> users = list(userIds);
 
@@ -110,7 +107,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
 
     @Override
     public User getByInviteCode(String inviteCode) {
-        String sql = "SELECT Id FROM SG_User WHERE InviteCode=? AND Status<>0";
+        String sql = "SELECT Id FROM SG_User WHERE InviteCode=? AND Status=1";
         List<Long> userIds = queryLongList(sql, new Object[] { inviteCode });
         List<User> users = list(userIds);
 
@@ -121,8 +118,8 @@ public class UserServiceImpl extends AbstractService implements UserService {
     public List<User> list(Collection<Long> userIds) {
         if (userIds.isEmpty()) return new ArrayList<User>();
 
-        String sql = "SELECT Id, NickName, Avatar, Mobile, Cover, Name, Sex, Birthday, CityId, RegionId, Address, Payed, InviteCode, Token, ImToken, Role FROM SG_User WHERE Id IN (" + StringUtils.join(userIds, ",") + ") AND Status<>0";
-        List<User> users = queryObjectList(sql, User.class);
+        String sql = "SELECT Id, NickName, Avatar, Mobile, Cover, Name, Sex, Birthday, CityId, RegionId, Address, Payed, InviteCode, Token, ImToken, Role FROM SG_User WHERE Id IN (%s) AND Status=1";
+        List<User> users = listByIds(sql, userIds, Long.class, User.class);
 
         Map<Long, List<Child>> childrenMap = childService.queryByUsers(userIds);
         for (User user : users) {
@@ -216,7 +213,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
     public List<String> listMobiles(Collection<Long> userIds) {
         if (userIds.isEmpty()) return new ArrayList<String>();
 
-        String sql = "SELECT Mobile FROM SG_User WHERE Id IN (" + StringUtils.join(userIds, ",") + ") AND Status<>0";
+        String sql = String.format("SELECT Mobile FROM SG_User WHERE Id IN (%s) AND Status=1", StringUtils.join(userIds, ","));
         return queryStringList(sql);
     }
 }

@@ -1,11 +1,11 @@
 package cn.momia.service.user.teacher.impl;
 
-import cn.momia.api.user.dto.Teacher;
-import cn.momia.api.user.dto.TeacherEducation;
-import cn.momia.api.user.dto.TeacherExperience;
-import cn.momia.api.user.dto.TeacherStatus;
 import cn.momia.common.service.AbstractService;
+import cn.momia.service.user.teacher.Teacher;
+import cn.momia.service.user.teacher.TeacherEducation;
+import cn.momia.service.user.teacher.TeacherExperience;
 import cn.momia.service.user.teacher.TeacherService;
+import cn.momia.service.user.teacher.TeacherStatus;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -48,33 +48,23 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
 
     @Override
     public List<Teacher> list(Collection<Integer> teacherIds) {
-        if (teacherIds.isEmpty()) return new ArrayList<Teacher>();
+        String sql = "SELECT Id, UserId, Pic, Name, IdNo, Gender AS Sex, Birthday, Address, Experience, Education FROM SG_Teacher WHERE Id IN (%s) AND Status<>0";
+        List<Teacher> teachers = listByIds(sql, teacherIds, Integer.class, Teacher.class);
 
-        String sql = "SELECT Id, UserId, Pic, Name, IdNo, Gender AS Sex, Birthday, Address, Experience, Education FROM SG_Teacher WHERE Id IN (" + StringUtils.join(teacherIds, ",") + ") AND Status<>0";
-        List<Teacher> teachers = queryObjectList(sql, Teacher.class);
-
-        Map<Integer, Teacher> teachersMap = new HashMap<Integer, Teacher>();
         Set<Long> userIds = new HashSet<Long>();
         for (Teacher teacher : teachers) {
-            teachersMap.put(teacher.getId(), teacher);
             userIds.add(teacher.getUserId());
         }
 
         Map<Long, List<TeacherExperience>> experiencesMap = queryExperiences(userIds);
         Map<Long, List<TeacherEducation>> educationsMap = queryEducations(userIds);
 
-        List<Teacher> result = new ArrayList<Teacher>();
-        for (int teacherId : teacherIds) {
-            Teacher teacher = teachersMap.get(teacherId);
-            if (teacher == null) continue;
-
+        for (Teacher teacher : teachers) {
             teacher.setExperiences(experiencesMap.get(teacher.getUserId()));
             teacher.setEducations(educationsMap.get(teacher.getUserId()));
-
-            result.add(teacher);
         }
 
-        return result;
+        return teachers;
     }
 
     private Map<Long, List<TeacherExperience>> queryExperiences(Collection<Long> userIds) {
@@ -85,7 +75,7 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
             experiencesMap.put(userId, new ArrayList<TeacherExperience>());
         }
 
-        String sql = "SELECT Id FROM SG_TeacherExperience WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND Status<>0 ORDER BY Time DESC";
+        String sql = String.format("SELECT Id FROM SG_TeacherExperience WHERE UserId IN (%s) AND Status<>0 ORDER BY Time DESC", StringUtils.join(userIds, ","));
         List<Integer> experienceIds = queryIntList(sql);
         List<TeacherExperience> experiences = listExperiences(experienceIds);
         for (TeacherExperience experience : experiences) {
@@ -96,22 +86,8 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
     }
 
     private List<TeacherExperience> listExperiences(List<Integer> experienceIds) {
-        if (experienceIds.isEmpty()) return new ArrayList<TeacherExperience>();
-
-        String sql = "SELECT Id, UserId, School, Post, Time, Content FROM SG_TeacherExperience WHERE Id IN (" + StringUtils.join(experienceIds, ",") + ") AND Status<>0";
-        List<TeacherExperience> experiences = queryObjectList(sql, TeacherExperience.class);
-        Map<Integer, TeacherExperience> experiencesMap = new HashMap<Integer, TeacherExperience>();
-        for (TeacherExperience experience : experiences) {
-            experiencesMap.put(experience.getId(), experience);
-        }
-
-        List<TeacherExperience> result = new ArrayList<TeacherExperience>();
-        for (int experienceId : experienceIds) {
-            TeacherExperience experience = experiencesMap.get(experienceId);
-            if (experience != null) result.add(experience);
-        }
-
-        return result;
+        String sql = "SELECT Id, UserId, School, Post, Time, Content FROM SG_TeacherExperience WHERE Id IN (%s) AND Status<>0";
+        return listByIds(sql, experienceIds, Integer.class, TeacherExperience.class);
     }
 
     private Map<Long, List<TeacherEducation>> queryEducations(Collection<Long> userIds) {
@@ -122,7 +98,7 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
             educationsMap.put(userId, new ArrayList<TeacherEducation>());
         }
 
-        String sql = "SELECT Id FROM SG_TeacherEducation WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND Status<>0 ORDER BY Time DESC";
+        String sql = String.format("SELECT Id FROM SG_TeacherEducation WHERE UserId IN (%s) AND Status<>0 ORDER BY Time DESC", StringUtils.join(userIds, ","));
         List<Integer> educationIds = queryIntList(sql);
         List<TeacherEducation> educations = listEducations(educationIds);
         for (TeacherEducation education : educations) {
@@ -133,22 +109,8 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
     }
 
     private List<TeacherEducation> listEducations(List<Integer> educationIds) {
-        if (educationIds.isEmpty()) return new ArrayList<TeacherEducation>();
-
-        String sql = "SELECT Id, UserId, School, Major, Level, Time FROM SG_TeacherEducation WHERE Id IN (" + StringUtils.join(educationIds, ",") + ") AND Status<>0";
-        List<TeacherEducation> educations = queryObjectList(sql, TeacherEducation.class);
-        Map<Integer, TeacherEducation> educationsMap = new HashMap<Integer, TeacherEducation>();
-        for (TeacherEducation education : educations) {
-            educationsMap.put(education.getId(), education);
-        }
-
-        List<TeacherEducation> result = new ArrayList<TeacherEducation>();
-        for (int educationId : educationIds) {
-            TeacherEducation education = educationsMap.get(educationId);
-            if (education != null) result.add(education);
-        }
-
-        return result;
+        String sql = "SELECT Id, UserId, School, Major, Level, Time FROM SG_TeacherEducation WHERE Id IN (%s) AND Status<>0";
+        return listByIds(sql, educationIds, Integer.class, TeacherEducation.class);
     }
 
     @Override

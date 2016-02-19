@@ -1,11 +1,15 @@
-package cn.momia.api.user.dto;
+package cn.momia.service.user.base;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import cn.momia.common.core.util.MomiaUtil;
+import cn.momia.service.user.child.Child;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.List;
 
 public class User {
+    public static final User NOT_EXIST_USER = new User();
+
     public static class Type {
         public static final int MINI = 1;
         public static final int BASE = 2;
@@ -95,7 +99,6 @@ public class User {
         this.sex = sex;
     }
 
-    @JSONField(format = "yyyy-MM-dd")
     public Date getBirthday() {
         return birthday;
     }
@@ -180,23 +183,19 @@ public class User {
         return id > 0;
     }
 
-    @JSONField(serialize = false)
     public boolean isPayed() {
         if (payed == null) return true; // 默认按true处理
         return payed == 1;
     }
 
-    @JSONField(serialize = false)
     public boolean isNormal() {
         return role == Role.NORMAL;
     }
 
-    @JSONField(serialize = false)
     public boolean isTeacher() {
         return role == Role.TEACHER;
     }
 
-    @JSONField(serialize = false)
     public boolean isAdmin() {
         return role == Role.ADMIN;
     }
@@ -209,5 +208,75 @@ public class User {
         }
 
         return false;
+    }
+
+    public static class Contact {
+        private String name;
+        private String mobile;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getMobile() {
+            return mobile;
+        }
+
+        public void setMobile(String mobile) {
+            this.mobile = mobile;
+        }
+
+        public Contact(User user) {
+            this.name = StringUtils.isBlank(user.getName()) ? user.getNickName() : user.getName();
+            this.mobile = user.getMobile();
+        }
+    }
+
+    public static class Mini extends User {
+        public Mini(User user) {
+            setId(user.getId());
+            setNickName(user.getNickName());
+            setAvatar(user.getAvatar());
+        }
+    }
+
+    public static class Base extends Mini {
+        public Base(User user) {
+            this(user, true);
+        }
+
+        public Base(User user, boolean showToken) {
+            super(user);
+            setMobile(MomiaUtil.encryptMobile(user.getMobile()));
+            setCover(user.getCover());
+            setName(user.getName());
+            setSex(user.getSex());
+            setBirthday(user.getBirthday());
+            setCityId(user.getCityId());
+            setRegionId(user.getRegionId());
+            setAddress(user.getAddress());
+            setPayed(user.getPayed());
+            setInviteCode(user.getInviteCode());
+            if (showToken) {
+                setToken(user.getToken());
+                setImToken(user.getImToken());
+            }
+            setRole(user.getRole());
+        }
+    }
+
+    public static class Full extends Base {
+        public Full(User user) {
+            this(user, true);
+        }
+
+        public Full(User user, boolean showToken) {
+            super(user, showToken);
+            setChildren(user.getChildren());
+        }
     }
 }

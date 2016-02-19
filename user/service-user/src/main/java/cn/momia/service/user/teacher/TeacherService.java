@@ -1,10 +1,5 @@
 package cn.momia.service.user.teacher;
 
-import cn.momia.api.user.dto.Teacher;
-import cn.momia.api.user.dto.TeacherEducation;
-import cn.momia.api.user.dto.TeacherExperience;
-import cn.momia.api.user.dto.TeacherStatus;
-
 import java.util.Collection;
 import java.util.List;
 

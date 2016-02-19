@@ -1,19 +1,21 @@
-package cn.momia.api.user.dto;
+package cn.momia.service.user.teacher;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import cn.momia.common.core.util.MomiaUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.List;
 
 public class Teacher {
+    public static final Teacher NOT_EXIST_TEACHER = new Teacher();
+
     private int id;
     private long userId;
     private String pic = "";
     private String name = "";
     private String idNo = "";
     private String sex = "";
-    @JSONField(format = "yyyy-MM-dd") private Date birthday;
+    private Date birthday;
     private String address = "";
 
     private List<TeacherExperience> experiences;
@@ -123,7 +125,33 @@ public class Teacher {
         return id > 0;
     }
 
+    public boolean isInvalid() {
+        return userId <= 0 ||
+                StringUtils.isBlank(pic) ||
+                StringUtils.isBlank(name) ||
+                StringUtils.isBlank(idNo) ||
+                MomiaUtil.isInvalidSex(sex) ||
+                birthday == null ||
+                StringUtils.isBlank(address);
+    }
+
+    public boolean isCompleted() {
+        return !(isInvalid() || experiences == null | experiences.isEmpty() || educations == null || educations.isEmpty());
+    }
+
     public String getAvatar() {
         return pic;
+    }
+
+    public static class Base extends Teacher {
+        public Base(Teacher teacher) {
+            super();
+            setId(teacher.getId());
+            setPic(teacher.getPic());
+            setName(teacher.getName());
+
+            setExperience(teacher.getExperience());
+            setEducation(teacher.getEducation());
+        }
     }
 }
