@@ -36,11 +36,6 @@
         </dependency>
         <dependency>
             <groupId>cn.momia</groupId>
-            <artifactId>duola-service-operate</artifactId>
-            <version>1.2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.momia</groupId>
             <artifactId>duola-service-poi</artifactId>
             <version>1.2.0</version>
         </dependency>
