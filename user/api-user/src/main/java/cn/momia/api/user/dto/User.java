@@ -30,7 +30,7 @@ public class User {
     private Integer cityId;
     private Integer regionId;
     private String address;
-    private Integer payed;
+    private Boolean payed;
     private String inviteCode;
 
     private String token;
@@ -128,11 +128,11 @@ public class User {
         this.address = address;
     }
 
-    public Integer getPayed() {
+    public Boolean isPayed() {
         return payed;
     }
 
-    public void setPayed(Integer payed) {
+    public void setPayed(Boolean payed) {
         this.payed = payed;
     }
 
@@ -178,12 +178,6 @@ public class User {
 
     public boolean exists() {
         return id > 0;
-    }
-
-    @JSONField(serialize = false)
-    public boolean isPayed() {
-        if (payed == null) return true; // 默认按true处理
-        return payed == 1;
     }
 
     @JSONField(serialize = false)

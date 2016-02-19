@@ -13,7 +13,7 @@ public class Teacher {
     private String name = "";
     private String idNo = "";
     private String sex = "";
-    @JSONField(format = "yyyy-MM-dd") private Date birthday;
+    private Date birthday;
     private String address = "";
 
     private List<TeacherExperience> experiences;
@@ -71,6 +71,7 @@ public class Teacher {
         this.sex = sex;
     }
 
+    @JSONField(format = "yyyy-MM-dd")
     public Date getBirthday() {
         return birthday;
     }
@@ -117,10 +118,6 @@ public class Teacher {
 
     public void setEducation(String education) {
         this.education = education;
-    }
-
-    public boolean exists() {
-        return id > 0;
     }
 
     public String getAvatar() {

@@ -117,7 +117,7 @@ public class TeacherServiceImpl extends AbstractService implements TeacherServic
     public List<Teacher> listByUser(Collection<Long> teacherUserIds) {
         if (teacherUserIds.isEmpty()) return new ArrayList<Teacher>();
 
-        String sql = "SELECT Id FROM SG_Teacher WHERE UserId IN (" + StringUtils.join(teacherUserIds, ",") + ") AND Status<>0";
+        String sql = String.format("SELECT Id FROM SG_Teacher WHERE UserId IN (%s) AND Status<>0", StringUtils.join(teacherUserIds, ","));
         List<Integer> teacherIds = queryIntList(sql);
 
         return  list(teacherIds);

@@ -7,8 +7,6 @@ import java.util.Date;
 import java.util.List;
 
 public class Teacher {
-    public static final Teacher NOT_EXIST_TEACHER = new Teacher();
-
     private int id;
     private long userId;
     private String pic = "";
@@ -147,6 +145,7 @@ public class Teacher {
         public Base(Teacher teacher) {
             super();
             setId(teacher.getId());
+            setUserId(teacher.getUserId());
             setPic(teacher.getPic());
             setName(teacher.getName());
 
