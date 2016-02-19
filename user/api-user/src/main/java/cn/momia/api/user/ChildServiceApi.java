@@ -10,8 +10,10 @@ import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.http.MomiaHttpParamBuilder;
 import cn.momia.common.core.http.MomiaHttpRequestBuilder;
 import cn.momia.common.core.util.TimeUtil;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -115,5 +117,29 @@ public class ChildServiceApi extends HttpServiceApi {
                 .add("coid", courseId)
                 .add("sid", courseSkuId);
         return executeReturnList(MomiaHttpRequestBuilder.POST(url("/child/comment"), builder.build()), Long.class);
+    }
+
+    public List<JSONObject> formatChildrenDetail(List<Child> children) {
+        List<JSONObject> feedChildren = new ArrayList<JSONObject>();
+        for (int i = 0; i < Math.min(2, children.size()); i++) {
+            Child child = children.get(i);
+            JSONObject feedChild = new JSONObject();
+            feedChild.put("sex", child.getSex());
+            feedChild.put("name", child.getName());
+            feedChild.put("age", TimeUtil.formatAge(child.getBirthday()));
+
+            feedChildren.add(feedChild);
+        }
+
+        return feedChildren;
+    }
+
+    public List<String> formatChildren(List<JSONObject> childrenDetail) {
+        List<String> formatedChildren = new ArrayList<String>();
+        for (JSONObject child : childrenDetail) {
+            formatedChildren.add(child.getString("sex") + "孩" + child.getString("age"));
+        }
+
+        return formatedChildren;
     }
 }

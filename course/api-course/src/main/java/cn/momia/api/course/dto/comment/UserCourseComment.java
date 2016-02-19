@@ -1,5 +1,7 @@
 package cn.momia.api.course.dto.comment;
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.util.List;
 
 public class UserCourseComment {
@@ -11,7 +13,7 @@ public class UserCourseComment {
     private long userId;
     private String nickName;
     private String avatar;
-    private List<CourseCommentChild> childrenDetail;
+    private List<JSONObject> childrenDetail;
     private List<String> children;
 
     private String addTime;
@@ -68,11 +70,11 @@ public class UserCourseComment {
         this.avatar = avatar;
     }
 
-    public List<CourseCommentChild> getChildrenDetail() {
+    public List<JSONObject> getChildrenDetail() {
         return childrenDetail;
     }
 
-    public void setChildrenDetail(List<CourseCommentChild> childrenDetail) {
+    public void setChildrenDetail(List<JSONObject> childrenDetail) {
         this.childrenDetail = childrenDetail;
     }
 

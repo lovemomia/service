@@ -2,11 +2,10 @@ package cn.momia.service.course.web.ctrl;
 
 import cn.momia.api.course.dto.course.BookedCourse;
 import cn.momia.api.course.dto.course.Course;
-import cn.momia.api.course.dto.comment.CourseCommentChild;
 import cn.momia.api.course.dto.comment.TimelineUnit;
 import cn.momia.api.course.dto.comment.UserCourseComment;
+import cn.momia.api.user.ChildServiceApi;
 import cn.momia.api.user.UserServiceApi;
-import cn.momia.api.user.dto.Child;
 import cn.momia.api.user.dto.User;
 import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.http.MomiaHttpResponse;
@@ -15,6 +14,7 @@ import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.service.course.comment.CourseComment;
 import cn.momia.service.course.comment.CourseCommentService;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +37,7 @@ public class CommentController extends BaseController {
     @Autowired private CourseCommentService courseCommentService;
 
     @Autowired private UserServiceApi userServiceApi;
+    @Autowired private ChildServiceApi childServiceApi;
 
     @RequestMapping(value = "/course/comment", method = RequestMethod.POST, consumes = "application/json")
     public MomiaHttpResponse comment(@RequestBody CourseComment comment) {
@@ -88,8 +89,8 @@ public class CommentController extends BaseController {
         userCourseComment.setNickName(user.getNickName());
         userCourseComment.setAvatar(user.getAvatar());
 
-        List<CourseCommentChild> childrenDetail = formatChildrenDetail(user.getChildren());
-        List<String> children = formatChildren(childrenDetail);
+        List<JSONObject> childrenDetail = childServiceApi.formatChildrenDetail(user.getChildren());
+        List<String> children = childServiceApi.formatChildren(childrenDetail);
         userCourseComment.setChildrenDetail(childrenDetail);
         userCourseComment.setChildren(children);
 
@@ -99,30 +100,6 @@ public class CommentController extends BaseController {
         userCourseComment.setImgs(comment.getImgs());
 
         return userCourseComment;
-    }
-
-    private List<CourseCommentChild> formatChildrenDetail(List<Child> children) {
-        List<CourseCommentChild> commentChildren = new ArrayList<CourseCommentChild>();
-        for (int i = 0; i < Math.min(2, children.size()); i++) {
-            Child child = children.get(i);
-            CourseCommentChild commentChild = new CourseCommentChild();
-            commentChild.setSex(child.getSex());
-            commentChild.setName(child.getName());
-            commentChild.setAge(TimeUtil.formatAge(child.getBirthday()));
-
-            commentChildren.add(commentChild);
-        }
-
-        return commentChildren;
-    }
-
-    private List<String> formatChildren(List<CourseCommentChild> childrenDetail) {
-        List<String> formatedChildren = new ArrayList<String>();
-        for (CourseCommentChild child : childrenDetail) {
-            formatedChildren.add(child.getSex() + "孩" + child.getAge());
-        }
-
-        return formatedChildren;
     }
 
     @RequestMapping(value = "/course/comment/img", method = RequestMethod.GET)
