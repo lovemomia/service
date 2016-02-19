@@ -290,7 +290,7 @@ public class CourseServiceApi extends HttpServiceApi {
         return executeReturnPagedList(request, UserCourseComment.class);
     }
 
-    public List<String> getLatestImgs(long userId) {
+    public List<String> getLatestCommentImgs(long userId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
         HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/comment/img"), builder.build());
 
