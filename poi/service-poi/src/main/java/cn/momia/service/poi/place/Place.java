@@ -1,7 +1,5 @@
 package cn.momia.service.poi.place;
 
-import java.util.List;
-
 public class Place {
     public static final Place NOT_EXIST_PLACE = new Place();
 
@@ -11,12 +9,9 @@ public class Place {
     private String name;
     private String address;
     private String desc;
-    private String cover;
     private double lng;
     private double lat;
     private String route;
-
-    private List<String> imgs;
 
     public int getId() {
         return id;
@@ -66,14 +61,6 @@ public class Place {
         this.desc = desc;
     }
 
-    public String getCover() {
-        return cover;
-    }
-
-    public void setCover(String cover) {
-        this.cover = cover;
-    }
-
     public double getLng() {
         return lng;
     }
@@ -96,14 +83,6 @@ public class Place {
 
     public void setRoute(String route) {
         this.route = route;
-    }
-
-    public List<String> getImgs() {
-        return imgs;
-    }
-
-    public void setImgs(List<String> imgs) {
-        this.imgs = imgs;
     }
 
     public boolean exists() {
