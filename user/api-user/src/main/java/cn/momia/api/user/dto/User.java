@@ -182,17 +182,17 @@ public class User {
 
     @JSONField(serialize = false)
     public boolean isNormal() {
-        return role == Role.NORMAL;
+        return role != null && role == Role.NORMAL;
     }
 
     @JSONField(serialize = false)
     public boolean isTeacher() {
-        return role == Role.TEACHER;
+        return role != null && role == Role.TEACHER;
     }
 
     @JSONField(serialize = false)
     public boolean isAdmin() {
-        return role == Role.ADMIN;
+        return role != null && role == Role.ADMIN;
     }
 
     public boolean hasChild(long childId) {

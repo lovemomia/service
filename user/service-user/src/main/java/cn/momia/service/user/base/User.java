@@ -34,7 +34,7 @@ public class User {
     private Integer cityId;
     private Integer regionId;
     private String address;
-    private Integer payed;
+    private Boolean payed;
     private String inviteCode;
 
     private String token;
@@ -131,11 +131,11 @@ public class User {
         this.address = address;
     }
 
-    public Integer getPayed() {
+    public Boolean isPayed() {
         return payed;
     }
 
-    public void setPayed(Integer payed) {
+    public void setPayed(Boolean payed) {
         this.payed = payed;
     }
 
@@ -183,31 +183,16 @@ public class User {
         return id > 0;
     }
 
-    public boolean isPayed() {
-        if (payed == null) return true; // 默认按true处理
-        return payed == 1;
-    }
-
     public boolean isNormal() {
-        return role == Role.NORMAL;
+        return role != null && role == Role.NORMAL;
     }
 
     public boolean isTeacher() {
-        return role == Role.TEACHER;
+        return role != null && role == Role.TEACHER;
     }
 
     public boolean isAdmin() {
-        return role == Role.ADMIN;
-    }
-
-    public boolean hasChild(long childId) {
-        if (children == null || children.isEmpty()) return false;
-
-        for (Child child : children) {
-            if (child.getId() == childId) return true;
-        }
-
-        return false;
+        return role != null && role == Role.ADMIN;
     }
 
     public static class Contact {
@@ -259,7 +244,7 @@ public class User {
             setCityId(user.getCityId());
             setRegionId(user.getRegionId());
             setAddress(user.getAddress());
-            setPayed(user.getPayed());
+            setPayed(user.isPayed());
             setInviteCode(user.getInviteCode());
             if (showToken) {
                 setToken(user.getToken());
