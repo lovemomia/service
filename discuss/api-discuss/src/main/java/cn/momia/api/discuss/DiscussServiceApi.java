@@ -6,6 +6,7 @@ import cn.momia.common.core.api.HttpServiceApi;
 import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.http.MomiaHttpParamBuilder;
 import cn.momia.common.core.http.MomiaHttpRequestBuilder;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -40,7 +41,7 @@ public class DiscussServiceApi extends HttpServiceApi {
     public List<Long> filterNotStaredReplyIds(long userId, Collection<Long> replyIds) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
-                .add("replyids", replyIds);
+                .add("replyids", StringUtils.join(replyIds, ","));
         return executeReturnList(MomiaHttpRequestBuilder.GET(url("/discuss/reply/filter/notstared"), builder.build()), Long.class);
     }
 
