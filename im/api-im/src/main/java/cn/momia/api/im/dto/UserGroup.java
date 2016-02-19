@@ -1,10 +1,24 @@
 package cn.momia.api.im.dto;
 
-public class Group {
+import com.alibaba.fastjson.annotation.JSONField;
+
+import java.util.Date;
+
+public class UserGroup {
+    private long userId;
     private long groupId;
     private String groupName;
     private long courseId;
     private long courseSkuId;
+    private Date addTime;
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
 
     public long getGroupId() {
         return groupId;
@@ -36,5 +50,14 @@ public class Group {
 
     public void setCourseSkuId(long courseSkuId) {
         this.courseSkuId = courseSkuId;
+    }
+
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    public Date getAddTime() {
+        return addTime;
+    }
+
+    public void setAddTime(Date addTime) {
+        this.addTime = addTime;
     }
 }

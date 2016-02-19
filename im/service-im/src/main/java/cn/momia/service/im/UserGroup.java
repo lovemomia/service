@@ -1,10 +1,22 @@
-package cn.momia.api.im.dto;
+package cn.momia.service.im;
 
-public class Group {
+import java.util.Date;
+
+public class UserGroup {
+    private long userId;
     private long groupId;
     private String groupName;
     private long courseId;
     private long courseSkuId;
+    private Date addTime;
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
 
     public long getGroupId() {
         return groupId;
@@ -36,5 +48,13 @@ public class Group {
 
     public void setCourseSkuId(long courseSkuId) {
         this.courseSkuId = courseSkuId;
+    }
+
+    public Date getAddTime() {
+        return addTime;
+    }
+
+    public void setAddTime(Date addTime) {
+        this.addTime = addTime;
     }
 }

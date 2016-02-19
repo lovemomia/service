@@ -4,6 +4,7 @@ import cn.momia.common.service.AbstractService;
 import cn.momia.service.im.Group;
 import cn.momia.service.im.GroupMember;
 import cn.momia.service.im.ImService;
+import cn.momia.service.im.UserGroup;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -19,6 +20,44 @@ import java.util.Set;
 
 public abstract class AbstractImService extends AbstractService implements ImService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractImService.class);
+
+    @Override
+    public List<UserGroup> listUserGroups(long userId) {
+        String sql = "SELECT A.GroupId FROM SG_ImGroupMember A INNER JOIN SG_ImGroup B ON A.GroupId=B.GroupId WHERE A.UserId=? AND A.Status=1 AND B.Status=1 GROUP BY A.GroupId ORDER BY B.GroupName ASC";
+        List<Long> groupIds = queryLongList(sql, new Object[] { userId });
+        List<Group> groups = listGroups(groupIds);
+        Map<Long, Date> joinTimes = queryJoinTimes(userId, groupIds);
+
+        List<UserGroup> userGroups = new ArrayList<UserGroup>();
+        for (Group group : groups) {
+            Date joinTime = joinTimes.get(group.getGroupId());
+            if (joinTime == null) continue;
+
+            UserGroup userGroup = new UserGroup();
+            userGroup.setUserId(userId);
+            userGroup.setGroupId(group.getGroupId());
+            userGroup.setGroupName(group.getGroupName());
+            userGroup.setCourseId(group.getCourseId());
+            userGroup.setCourseSkuId(group.getCourseSkuId());
+            userGroup.setAddTime(joinTime);
+
+            userGroups.add(userGroup);
+        }
+
+        return userGroups;
+    }
+
+    private List<Group> listGroups(Collection<Long> groupIds) {
+        String sql = "SELECT GroupId, GroupName, CourseId, CourseSkuId FROM SG_ImGroup WHERE GroupId IN (%s) AND Status=1";
+        return listByIds(sql, groupIds, Long.class, Group.class);
+    }
+
+    public Map<Long, Date> queryJoinTimes(long userId, Collection<Long> groupIds) {
+        if (groupIds.isEmpty()) return new HashMap<Long, Date>();
+
+        String sql = String.format("SELECT GroupId, AddTime FROM SG_ImGroupMember WHERE UserId=? AND GroupId IN (%s)", StringUtils.join(groupIds, ","));
+        return queryMap(sql, new Object[] { userId }, Long.class, Date.class);
+    }
 
     @Override
     public boolean createGroup(long courseId, long courseSkuId, Collection<Long> teacherUserIds, String groupName) {
@@ -81,7 +120,7 @@ public abstract class AbstractImService extends AbstractService implements ImSer
     }
 
     @Override
-    public boolean updateGroupName(long courseId, long courseSkuId, String groupName) {
+    public boolean updateGroup(long courseId, long courseSkuId, String groupName) {
         long groupId = courseSkuId;
         if (doUpdateGroupName(groupId, groupName)) {
             return updateGroupNameLog(groupId, groupName, courseId, courseSkuId);
@@ -124,12 +163,6 @@ public abstract class AbstractImService extends AbstractService implements ImSer
     public Group getGroup(long groupId) {
         List<Group> groups = listGroups(Sets.newHashSet(groupId));
         return groups.isEmpty() ? Group.NOT_EXIST_GROUP : groups.get(0);
-    }
-
-    @Override
-    public List<Group> listGroups(Collection<Long> groupIds) {
-        String sql = "SELECT GroupId, GroupName, CourseId, CourseSkuId FROM SG_ImGroup WHERE GroupId IN (%s) AND Status=1";
-        return listByIds(sql, groupIds, Long.class, Group.class);
     }
 
     @Override
@@ -189,21 +222,5 @@ public abstract class AbstractImService extends AbstractService implements ImSer
             args.add(new Object[] { groupId, userId });
         }
         batchUpdate(sql, args);
-    }
-
-    @Override
-    public List<Group> listUserGroups(long userId) {
-        String sql = "SELECT A.GroupId FROM SG_ImGroupMember A INNER JOIN SG_ImGroup B ON A.GroupId=B.GroupId WHERE A.UserId=? AND A.Status=1 AND B.Status=1 GROUP BY A.GroupId ORDER BY B.GroupName ASC";
-        List<Long> groupIds = queryLongList(sql, new Object[] { userId });
-
-        return listGroups(groupIds);
-    }
-
-    @Override
-    public Map<Long, Date> queryJoinTimes(long userId, Collection<Long> groupIds) {
-        if (groupIds.isEmpty()) return new HashMap<Long, Date>();
-
-        String sql = String.format("SELECT GroupId, AddTime FROM SG_ImGroupMember WHERE UserId=? AND GroupId IN (%s)", StringUtils.join(groupIds, ","));
-        return queryMap(sql, new Object[] { userId }, Long.class, Date.class);
     }
 }

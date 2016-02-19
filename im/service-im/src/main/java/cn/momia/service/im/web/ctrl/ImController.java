@@ -20,7 +20,7 @@ public class ImController extends BaseController {
     @Autowired private ImService imService;
     @Autowired private PushService pushService;
 
-    @RequestMapping(value = "/token", method = RequestMethod.POST)
+    @RequestMapping(value = "/user/token", method = RequestMethod.POST)
     public MomiaHttpResponse generateImToken(@RequestParam(value = "uid") long userId,
                                              @RequestParam(value = "nickname") String nickName,
                                              @RequestParam String avatar) {
@@ -37,6 +37,11 @@ public class ImController extends BaseController {
         return MomiaHttpResponse.SUCCESS(imService.updateAvatar(userId, avatar));
     }
 
+    @RequestMapping(value = "/user/group", method = RequestMethod.GET)
+    public MomiaHttpResponse listUserGroup(@RequestParam(value = "uid") long userId) {
+        return MomiaHttpResponse.SUCCESS(imService.listUserGroups(userId));
+    }
+
     @RequestMapping(value = "/group", method = RequestMethod.POST)
     public MomiaHttpResponse createGroup(@RequestParam(value = "coid") long courseId,
                                          @RequestParam(value = "sid") long courseSkuId,
@@ -46,10 +51,10 @@ public class ImController extends BaseController {
     }
 
     @RequestMapping(value = "/group", method = RequestMethod.PUT)
-    public MomiaHttpResponse updateGroupName(@RequestParam(value = "coid") long courseId,
-                                             @RequestParam(value = "sid") long courseSkuId,
-                                             @RequestParam(value = "name") String groupName) {
-        return MomiaHttpResponse.SUCCESS(imService.updateGroupName(courseId, courseSkuId, groupName));
+    public MomiaHttpResponse updateGroup(@RequestParam(value = "coid") long courseId,
+                                         @RequestParam(value = "sid") long courseSkuId,
+                                         @RequestParam(value = "name") String groupName) {
+        return MomiaHttpResponse.SUCCESS(imService.updateGroup(courseId, courseSkuId, groupName));
     }
 
     @RequestMapping(value = "/group/{gid}", method = RequestMethod.DELETE)
@@ -63,13 +68,8 @@ public class ImController extends BaseController {
         return group.exists() ? MomiaHttpResponse.SUCCESS(group) : MomiaHttpResponse.FAILED("群组不存在");
     }
 
-    @RequestMapping(value = "/group/list", method = RequestMethod.GET)
-    public MomiaHttpResponse listGroups(@RequestParam String gids) {
-        return MomiaHttpResponse.SUCCESS(imService.listGroups(MomiaUtil.splitDistinctLongs(gids)));
-    }
-
-    @RequestMapping(value = "/group/{id}/member", method = RequestMethod.GET)
-    public MomiaHttpResponse listGroupMembers(@RequestParam(value = "uid") long userId, @PathVariable(value = "id") long groupId) {
+    @RequestMapping(value = "/group/{gid}/member", method = RequestMethod.GET)
+    public MomiaHttpResponse listGroupMembers(@RequestParam(value = "uid") long userId, @PathVariable(value = "gid") long groupId) {
         if (!imService.isInGroup(userId, groupId)) return MomiaHttpResponse.FAILED("您不在该群组中，无权查看群组成员");
         return MomiaHttpResponse.SUCCESS(imService.listGroupMembers(groupId));
     }
@@ -87,16 +87,6 @@ public class ImController extends BaseController {
                                         @RequestParam(value = "coid") long courseId,
                                         @RequestParam(value = "sid") long courseSkuId) {
         return MomiaHttpResponse.SUCCESS(imService.leaveGroup(userId, courseId, courseSkuId));
-    }
-
-    @RequestMapping(value = "/user/group", method = RequestMethod.GET)
-    public MomiaHttpResponse listUserGroup(@RequestParam(value = "uid") long userId) {
-        return MomiaHttpResponse.SUCCESS(imService.listUserGroups(userId));
-    }
-
-    @RequestMapping(value = "/user/group/jointime", method = RequestMethod.GET)
-    public MomiaHttpResponse queryJoinTimes(@RequestParam(value = "uid") long userId, @RequestParam String gids) {
-        return MomiaHttpResponse.SUCCESS(imService.queryJoinTimes(userId, MomiaUtil.splitDistinctLongs(gids)));
     }
 
     @RequestMapping(value = "/push", method = RequestMethod.POST)
