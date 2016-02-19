@@ -5,5 +5,4 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean class="cn.momia.service.operate.config.impl.ConfigServiceImpl" parent="dbAccessService" />
-    <bean class="cn.momia.service.operate.feedback.impl.FeedbackServiceImpl" parent="dbAccessService" />
 </beans>
