@@ -64,20 +64,26 @@ public class DiscussServiceImpl extends AbstractService implements DiscussServic
     }
 
     @Override
-    public boolean star(long userId, int replyId) {
+    public boolean exists(long replyId) {
+        String sql = "SELECT COUNT(1) FROM SG_DiscussReply WHERE Id=? AND Status=1";
+        return queryInt(sql, new Object[] { replyId }) > 0;
+    }
+
+    @Override
+    public boolean star(long userId, long replyId) {
         if (isStared(userId, replyId)) return false;
 
         String sql = "INSERT INTO SG_DiscussReplyStar (ReplyId, UserId, AddTime) VALUES (?, ?, NOW())";
         return update(sql, new Object[] { replyId, userId });
     }
 
-    private boolean isStared(long userId, int replyId) {
+    private boolean isStared(long userId, long replyId) {
         String sql = "SELECT COUNT(1) FROM SG_DiscussReplyStar WHERE ReplyId=? AND UserId=? AND Status=1";
         return queryInt(sql, new Object[] { replyId, userId }) > 0;
     }
 
     @Override
-    public boolean unstar(long userId, int replyId) {
+    public boolean unstar(long userId, long replyId) {
         if (!isStared(userId, replyId)) return false;
 
         String sql = "UPDATE SG_DiscussReplyStar SET Status=0 WHERE ReplyId=? AND UserId=?";

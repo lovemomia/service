@@ -16,7 +16,8 @@ public interface DiscussService {
 
     List<Long> filterNotStaredReplyIds(long userId, Collection<Long> replyIds);
 
-    boolean star(long userId, int replyId);
-    boolean unstar(long userId, int replyId);
+    boolean exists(long replyId);
+    boolean star(long userId, long replyId);
+    boolean unstar(long userId, long replyId);
 
 }

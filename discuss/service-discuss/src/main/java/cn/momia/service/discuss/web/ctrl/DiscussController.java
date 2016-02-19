@@ -66,12 +66,14 @@ public class DiscussController extends BaseController {
     }
 
     @RequestMapping(value = "/reply/{replyid}/star", method = RequestMethod.POST)
-    public MomiaHttpResponse star(@RequestParam(value = "uid") long userId, @PathVariable(value = "replyid") int replyId) {
+    public MomiaHttpResponse star(@RequestParam(value = "uid") long userId, @PathVariable(value = "replyid") long replyId) {
+        if (!discussService.exists(replyId)) return MomiaHttpResponse.FAILED("无效的回复，不能点赞");
         return MomiaHttpResponse.SUCCESS(discussService.star(userId, replyId));
     }
 
     @RequestMapping(value = "/reply/{replyid}/unstar", method = RequestMethod.POST)
-    public MomiaHttpResponse unstar(@RequestParam(value = "uid") long userId, @PathVariable(value = "replyid") int replyId) {
+    public MomiaHttpResponse unstar(@RequestParam(value = "uid") long userId, @PathVariable(value = "replyid") long replyId) {
+        if (!discussService.exists(replyId)) return MomiaHttpResponse.FAILED("无效的回复，不能取消赞");
         return MomiaHttpResponse.SUCCESS(discussService.unstar(userId, replyId));
     }
 }
