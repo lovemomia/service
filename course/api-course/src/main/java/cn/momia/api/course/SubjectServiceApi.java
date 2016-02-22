@@ -56,18 +56,4 @@ public class SubjectServiceApi extends HttpServiceApi {
 
         return executeReturnList(request, UserCourseComment.class);
     }
-
-    public boolean favor(long userId, long subjectId) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/subject/%d/favor", subjectId), builder.build());
-
-        return executeReturnObject(request, Boolean.class);
-    }
-
-    public boolean unfavor(long userId, long subjectId) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/subject/%d/unfavor", subjectId), builder.build());
-
-        return executeReturnObject(request, Boolean.class);
-    }
 }

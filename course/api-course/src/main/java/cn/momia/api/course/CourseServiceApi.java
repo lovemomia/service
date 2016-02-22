@@ -296,27 +296,6 @@ public class CourseServiceApi extends HttpServiceApi {
         return executeReturnList(request, String.class);
     }
 
-    public boolean isFavored(long userId, long courseId) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/%d/favored", courseId), builder.build());
-
-        return executeReturnObject(request, Boolean.class);
-    }
-
-    public boolean favor(long userId, long courseId) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/course/%d/favor", courseId), builder.build());
-
-        return executeReturnObject(request, Boolean.class);
-    }
-
-    public boolean unfavor(long userId, long courseId) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("uid", userId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/course/%d/unfavor", courseId), builder.build());
-
-        return executeReturnObject(request, Boolean.class);
-    }
-
     public PagedList<TimelineUnit> timelineOfUser(long userId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
