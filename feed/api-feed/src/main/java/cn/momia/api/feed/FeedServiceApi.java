@@ -14,11 +14,11 @@ import java.util.Collection;
 import java.util.List;
 
 public class FeedServiceApi extends HttpServiceApi {
-    public void follow(long userId, long followedId) {
+    public boolean follow(long userId, long followedId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
                 .add("fuid", followedId);
-        execute(MomiaHttpRequestBuilder.POST(url("/feed/follow"), builder.build()));
+        return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/feed/follow"), builder.build()), Boolean.class);
     }
 
     public PagedList<Feed> list(long userId, int start, int count) {
@@ -117,10 +117,10 @@ public class FeedServiceApi extends HttpServiceApi {
         execute(MomiaHttpRequestBuilder.POST(url("/feed/%d/unstar", feedId), builder.build()));
     }
 
-    public List<Long> queryStaredFeedIds(long userId, Collection<Long> feedIds) {
+    public List<Long> filterNotStaredFeedIds(long userId, Collection<Long> feedIds) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
                 .add("fids", StringUtils.join(feedIds, ","));
-        return executeReturnList(MomiaHttpRequestBuilder.GET(url("/feed/star"), builder.build()), Long.class);
+        return executeReturnList(MomiaHttpRequestBuilder.GET(url("/feed/filter/notstared"), builder.build()), Long.class);
     }
 }

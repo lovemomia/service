@@ -48,8 +48,8 @@ public class FeedStarController extends BaseController {
         return MomiaHttpResponse.SUCCESS;
     }
 
-    @RequestMapping(value = "/star", method = RequestMethod.GET)
-    public MomiaHttpResponse queryStaredFeedIds(@RequestParam(value = "uid") long userId, @RequestParam String fids) {
+    @RequestMapping(value = "/filter/notstared", method = RequestMethod.GET)
+    public MomiaHttpResponse filterNotStaredFeedIds(@RequestParam(value = "uid") long userId, @RequestParam String fids) {
         return MomiaHttpResponse.SUCCESS(feedStarService.filterNotStaredFeedIds(userId, MomiaUtil.splitDistinctLongs(fids)));
     }
 }

@@ -29,8 +29,7 @@ public class FeedController extends BaseController {
 
     @RequestMapping(value = "/follow", method = RequestMethod.POST)
     public MomiaHttpResponse follow(@RequestParam(value = "uid") long userId, @RequestParam(value = "fuid") long followedId) {
-        if (!feedService.isFollowed(userId, followedId) && !feedService.follow(userId, followedId)) return MomiaHttpResponse.FAILED("关注失败");
-        return MomiaHttpResponse.SUCCESS;
+        return MomiaHttpResponse.SUCCESS(feedService.isFollowed(userId, followedId) || feedService.follow(userId, followedId));
     }
 
     @RequestMapping(method = RequestMethod.GET)
