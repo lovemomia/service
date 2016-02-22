@@ -7,39 +7,31 @@ import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.http.MomiaHttpParamBuilder;
 import cn.momia.common.core.http.MomiaHttpRequestBuilder;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.List;
 
 public class OrderServiceApi extends HttpServiceApi {
     public SubjectOrder placeOrder(JSONObject orderJson) {
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/order"), orderJson.toString());
-        return executeReturnObject(request, SubjectOrder.class);
+        return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/order"), orderJson.toString()), SubjectOrder.class);
     }
 
     public boolean deleteOrder(String utoken, long orderId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("oid", orderId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.DELETE(url("/order"), builder.build());
-
-        return executeReturnObject(request, Boolean.class);
+        return executeReturnObject(MomiaHttpRequestBuilder.DELETE(url("/order"), builder.build()), Boolean.class);
     }
 
     public boolean refundOrder(String utoken, long orderId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("oid", orderId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/order/refund"), builder.build());
-
-        return executeReturnObject(request, Boolean.class);
+        return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/order/refund"), builder.build()), Boolean.class);
     }
 
     public SubjectOrder get(String utoken, long orderId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/order/%d", orderId), builder.build());
-
-        return executeReturnObject(request, SubjectOrder.class);
+        return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/order/%d", orderId), builder.build()), SubjectOrder.class);
     }
 
     public PagedList<SubjectPackage> listBookable(String utoken, long orderId, int start, int count) {
@@ -48,9 +40,7 @@ public class OrderServiceApi extends HttpServiceApi {
                 .add("oid", orderId)
                 .add("start", start)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/order/bookable"), builder.build());
-
-        return executeReturnPagedList(request, SubjectPackage.class);
+        return executeReturnPagedList(MomiaHttpRequestBuilder.GET(url("/order/bookable"), builder.build()), SubjectPackage.class);
     }
 
     public PagedList<SubjectOrder> listOrders(String utoken, int status, int start, int count) {
@@ -59,23 +49,17 @@ public class OrderServiceApi extends HttpServiceApi {
                 .add("status", status)
                 .add("start", start)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/order/list"), builder.build());
-
-        return executeReturnPagedList(request, SubjectOrder.class);
+        return executeReturnPagedList(MomiaHttpRequestBuilder.GET(url("/order/list"), builder.build()), SubjectOrder.class);
     }
 
     public boolean sendGift(String utoken, long orderId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/order/%d/gift/send", orderId), builder.build());
-
-        return executeReturnObject(request, Boolean.class);
+        return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/order/%d/gift/send", orderId), builder.build()), Boolean.class);
     }
 
     public int giftStatus(String utoken, long orderId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/order/%d/gift/status", orderId), builder.build());
-
-        return executeReturnObject(request, Integer.class);
+        return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/order/%d/gift/status", orderId), builder.build()), Integer.class);
     }
 
     public boolean receiveGift(String utoken, long orderId, long expired, String giftsign) {
@@ -83,29 +67,22 @@ public class OrderServiceApi extends HttpServiceApi {
                 .add("utoken", utoken)
                 .add("expired", expired)
                 .add("giftsign", giftsign);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/order/%d/gift/receive", orderId), builder.build());
-
-        return executeReturnObject(request, Boolean.class);
+        return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/order/%d/gift/receive", orderId), builder.build()), Boolean.class);
     }
 
     public boolean extendPackageTime(long packageId, int time) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("pid", packageId)
                 .add("time", time);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/order/package/time/extend"), builder.build());
-
-        return executeReturnObject(request, Boolean.class);
+        return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/order/package/time/extend"), builder.build()), Boolean.class);
     }
 
     public List<Long> queryBookableUserIds() {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/order/bookable/user"));
-        return executeReturnList(request, Long.class);
+        return executeReturnList(MomiaHttpRequestBuilder.GET(url("/order/bookable/user")), Long.class);
     }
 
     public List<Long> queryUserIdsOfPackagesToExpired(int days) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("days", days);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/order/package/expired/user"), builder.build());
-
-        return executeReturnList(request, Long.class);
+        return executeReturnList(MomiaHttpRequestBuilder.GET(url("/order/package/expired/user"), builder.build()), Long.class);
     }
 }
