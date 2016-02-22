@@ -3,7 +3,6 @@ package cn.momia.api.course;
 import cn.momia.api.course.dto.subject.Subject;
 import cn.momia.api.course.dto.subject.SubjectSku;
 import cn.momia.api.course.dto.comment.UserCourseComment;
-import cn.momia.api.course.dto.favorite.Favorite;
 import cn.momia.common.core.api.HttpServiceApi;
 import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.http.MomiaHttpParamBuilder;
@@ -70,15 +69,5 @@ public class SubjectServiceApi extends HttpServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/subject/%d/unfavor", subjectId), builder.build());
 
         return executeReturnObject(request, Boolean.class);
-    }
-
-    public PagedList<Favorite> listFavorites(long userId, int start, int count) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("uid", userId)
-                .add("start", start)
-                .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/subject/favorite"), builder.build());
-
-        return executeReturnPagedList(request, Favorite.class);
     }
 }

@@ -10,7 +10,6 @@ import cn.momia.api.course.dto.comment.TimelineUnit;
 import cn.momia.api.course.dto.comment.UserCourseComment;
 import cn.momia.api.course.dto.course.CourseDetail;
 import cn.momia.api.course.dto.course.DatedCourseSkus;
-import cn.momia.api.course.dto.favorite.Favorite;
 import cn.momia.common.core.api.HttpServiceApi;
 import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.http.MomiaHttpParamBuilder;
@@ -316,16 +315,6 @@ public class CourseServiceApi extends HttpServiceApi {
         HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/course/%d/unfavor", courseId), builder.build());
 
         return executeReturnObject(request, Boolean.class);
-    }
-
-    public PagedList<Favorite> listFavorites(long userId, int start, int count) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("uid", userId)
-                .add("start", start)
-                .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/course/favorite"), builder.build());
-
-        return executeReturnPagedList(request, Favorite.class);
     }
 
     public PagedList<TimelineUnit> timelineOfUser(long userId, int start, int count) {
