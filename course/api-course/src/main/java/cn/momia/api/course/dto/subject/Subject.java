@@ -28,7 +28,6 @@ public class Subject {
     private String title;
     private String subTitle;
     private String cover;
-    private String vCover;
     private String tags;
     private String intro;
     private String notice;
@@ -94,14 +93,6 @@ public class Subject {
 
     public void setCover(String cover) {
         this.cover = cover;
-    }
-
-    public String getVCover() {
-        return vCover;
-    }
-
-    public void setVCover(String vCover) {
-        this.vCover = vCover;
     }
 
     public String getTags() {
@@ -253,7 +244,6 @@ public class Subject {
             setTitle(subject.getTitle());
             setSubTitle(subject.getSubTitle());
             setCover(subject.getCover());
-            setVCover(subject.getVCover());
             setTags(subject.getTags());
             setPrice(subject.getPrice());
             setOriginalPrice(subject.getOriginalPrice());

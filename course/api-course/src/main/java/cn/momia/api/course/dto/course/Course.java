@@ -35,7 +35,6 @@ public class Course implements Cloneable {
     private String title;
     private String keyWord;
     private String cover;
-    private String vCover;
     @JSONField(serialize = false) private int minAge;
     @JSONField(serialize = false) private int maxAge;
     private boolean insurance;
@@ -126,14 +125,6 @@ public class Course implements Cloneable {
 
     public void setCover(String cover) {
         this.cover = cover;
-    }
-
-    public String getVCover() {
-        return vCover;
-    }
-
-    public void setVCover(String vCover) {
-        this.vCover = vCover;
     }
 
     public int getMinAge() {
@@ -379,7 +370,6 @@ public class Course implements Cloneable {
             setTitle(course.getTitle());
             setKeyWord(course.getKeyWord());
             setCover(course.getCover());
-            setVCover(course.getVCover());
             setAge(course.getAge());
             setInsurance(course.isInsurance());
             setJoined(course.getJoined());
