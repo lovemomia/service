@@ -526,6 +526,13 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
+    public CourseSku getTrialSku(long skuId) {
+        String sql = "SELECT Id FROM SG_SubjectSku WHERE ParentId=? AND Status<>0";
+        long trialSkuId = queryLong(sql, new Object[] { skuId });
+        return getSku(trialSkuId);
+    }
+
+    @Override
     public CourseSku getBookedSku(long userId, long bookingId) {
         String sql = "SELECT CourseSkuId FROM SG_BookedCourse WHERE UserId=? AND Id=? AND Status<>0";
         List<Long> skuIds = queryLongList(sql, new Object[] { userId, bookingId });
@@ -544,6 +551,12 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     public boolean unlockSku(long skuId) {
         String sql = "UPDATE SG_CourseSku SET UnlockedStock=UnlockedStock+1, LockedStock=LockedStock-1 WHERE Id=? AND Status=1 AND LockedStock>=1";
         return update(sql, new Object[] { skuId });
+    }
+
+    @Override
+    public boolean cancelSku(long skuId) {
+        String sql = "UPDATE SG_CourseSku SET Status=3 WHERE Id=? OR ParentId=?";
+        return update(sql, new Object[] { skuId, skuId });
     }
 
     @Override
@@ -799,7 +812,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public Map<Long, Long> queryBookedPackageUsers(Collection<Long> userIds, long courseId, long courseSkuId) {
-        String sql = userIds.isEmpty() ?
+        String sql = (userIds == null || userIds.isEmpty()) ?
                 "SELECT PackageId, UserId FROM SG_BookedCourse WHERE CourseId=? AND CourseSkuId=? AND Status<>0" :
                 "SELECT PackageId, UserId FROM SG_BookedCourse WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND CourseId=? AND CourseSkuId=? AND Status<>0";
         return queryMap(sql, new Object[] { courseId, courseSkuId }, Long.class, Long.class);

@@ -715,6 +715,47 @@ public class CourseController extends BaseController {
         }
     }
 
+    @RequestMapping(value = "/sku/cancel", method = RequestMethod.POST)
+    public MomiaHttpResponse skuCancel(@RequestParam(value = "coid") long courseId, @RequestParam(value = "sid") long skuId) {
+        if (!courseService.cancelSku(skuId)) return MomiaHttpResponse.FAILED("下线场次失败");
+
+        Map<Long, Long> successfulPackageUsers = new HashMap<Long, Long>();
+
+        Set<Long> failedIncreaseCountPackageIds = new HashSet<Long>();
+        Set<Long> failedUnlockSkuPackageIds = new HashSet<Long>();
+
+        CourseSku sku = courseService.getSku(skuId);
+        Map<Long, Long> packageUsers = courseService.queryBookedPackageUsers(null, courseId, skuId);
+        if (!packageUsers.isEmpty()) {
+            courseService.batchCancel(packageUsers.values(), courseId, skuId);
+            for (long packageId : packageUsers.keySet()) {
+                returnBookableCount(packageId, failedIncreaseCountPackageIds);
+                unlockSku(packageId, skuId, failedUnlockSkuPackageIds);
+                decreaseJoinCount(packageId, courseId, sku.getJoinCount());
+
+                if (!failedIncreaseCountPackageIds.contains(packageId)) successfulPackageUsers.put(packageId, packageUsers.get(packageId));
+            }
+        }
+
+        CourseSku trialSku = courseService.getTrialSku(skuId);
+        Map<Long, Long> trialPackageUsers = courseService.queryBookedPackageUsers(null, trialSku.getCourseId(), trialSku.getId());
+        if (!trialPackageUsers.isEmpty()) {
+            courseService.batchCancel(trialPackageUsers.values(), trialSku.getCourseId(), trialSku.getId());
+            for (long packageId : trialPackageUsers.keySet()) {
+                returnBookableCount(packageId, failedIncreaseCountPackageIds);
+                unlockSku(packageId, trialSku.getId(), failedUnlockSkuPackageIds);
+                decreaseJoinCount(packageId, trialSku.getCourseId(), trialSku.getJoinCount());
+
+                if (!failedIncreaseCountPackageIds.contains(packageId)) successfulPackageUsers.put(packageId, trialPackageUsers.get(packageId));
+            }
+        }
+
+        if (failedIncreaseCountPackageIds.size() > 0) LOGGER.error("fail to increase bookable count of packages: {}", failedIncreaseCountPackageIds);
+        if (failedUnlockSkuPackageIds.size() > 0) LOGGER.error("fail to unlock skus of packages: {}", failedUnlockSkuPackageIds);
+
+        return MomiaHttpResponse.SUCCESS(successfulPackageUsers);
+    }
+
     @RequestMapping(value = "/checkin", method = RequestMethod.POST)
     public MomiaHttpResponse checkin(@RequestParam String utoken,
                                      @RequestParam(value = "uid") long userId,

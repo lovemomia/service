@@ -225,6 +225,20 @@ public class CourseServiceApi extends HttpServiceApi {
         return result;
     }
 
+    public Map<Long, Long> skuCancel(long courseId, long skuId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("coid", courseId)
+                .add("sid", skuId);
+        Map<String, Object> data = executeReturnObject(MomiaHttpRequestBuilder.POST(url("/course/sku/cancel"), builder.build()), Map.class);
+
+        Map<Long, Long> result = new HashMap<Long, Long>();
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            result.put(Long.valueOf(entry.getKey()), ((Number) (entry.getValue())).longValue());
+        }
+
+        return result;
+    }
+
     public boolean comment(JSONObject commentJson) {
         return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/course/comment"), commentJson.toString()), Boolean.class);
     }
