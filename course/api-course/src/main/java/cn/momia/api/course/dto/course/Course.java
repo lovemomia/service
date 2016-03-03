@@ -64,6 +64,8 @@ public class Course implements Cloneable {
     private JSONObject book;
     private CourseSkuPlace place;
 
+    private Date addTime;
+
     public long getId() {
         return id;
     }
@@ -312,6 +314,15 @@ public class Course implements Cloneable {
         this.place = place;
     }
 
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    public Date getAddTime() {
+        return addTime;
+    }
+
+    public void setAddTime(Date addTime) {
+        this.addTime = addTime;
+    }
+
     @Override
     public Course clone() {
         try {
@@ -388,6 +399,7 @@ public class Course implements Cloneable {
             setStatus(course.getStatus());
             setBuyable(course.isBuyable());
             setGoal(course.getGoal());
+            setAddTime(course.getAddTime());
         }
     }
 }
