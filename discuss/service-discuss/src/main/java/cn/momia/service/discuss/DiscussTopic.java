@@ -7,6 +7,7 @@ public class DiscussTopic {
     private int cityId;
     private String cover;
     private String title;
+    private String subTitle;
     private String content;
 
     private long joined;
@@ -41,6 +42,14 @@ public class DiscussTopic {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getSubTitle() {
+        return subTitle;
+    }
+
+    public void setSubTitle(String subTitle) {
+        this.subTitle = subTitle;
     }
 
     public String getContent() {

@@ -27,7 +27,7 @@ public class DiscussServiceImpl extends AbstractService implements DiscussServic
     }
 
     private List<DiscussTopic> listTopics(Collection<Integer> topicIds) {
-        String sql = "SELECT A.Id, A.CityId, A.Cover, A.Title, A.Content, COUNT(DISTINCT B.UserId) AS Joined FROM SG_DiscussTopic A LEFT JOIN SG_DiscussReply B ON A.Id=B.TopicId AND B.Status=1 WHERE A.Id IN (%s) AND A.Status=1 GROUP BY A.Id";
+        String sql = "SELECT A.Id, A.CityId, A.Cover, A.Title, A.SubTitle, A.Content, COUNT(DISTINCT B.UserId) AS Joined FROM SG_DiscussTopic A LEFT JOIN SG_DiscussReply B ON A.Id=B.TopicId AND B.Status=1 WHERE A.Id IN (%s) AND A.Status=1 GROUP BY A.Id";
         return listByIds(sql, topicIds, Integer.class, DiscussTopic.class);
     }
 
