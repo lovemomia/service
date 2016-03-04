@@ -549,7 +549,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public boolean unlockSku(long skuId) {
-        String sql = "UPDATE SG_CourseSku SET UnlockedStock=UnlockedStock+1, LockedStock=LockedStock-1 WHERE Id=? AND Status=1 AND LockedStock>=1";
+        String sql = "UPDATE SG_CourseSku SET UnlockedStock=UnlockedStock+1, LockedStock=LockedStock-1 WHERE Id=? AND Status<>0 AND LockedStock>=1";
         return update(sql, new Object[] { skuId });
     }
 
