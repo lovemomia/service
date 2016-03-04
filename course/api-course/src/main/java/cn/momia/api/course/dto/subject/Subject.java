@@ -236,6 +236,18 @@ public class Subject {
         return SubjectSku.NOT_EXIST_SUBJECT_SKU;
     }
 
+    public SubjectSku getCheapestSku() {
+        if (skus == null || skus.isEmpty()) return null;
+
+        SubjectSku cheapestSku = null;
+        for (SubjectSku sku : skus) {
+            if (sku.getCourseId() > 0) continue;
+            if (cheapestSku == null || sku.getPrice().compareTo(cheapestSku.getPrice()) < 0) cheapestSku = sku;
+        }
+
+        return cheapestSku;
+    }
+
     public static class Base extends Subject {
         public Base(Subject subject) {
             super();

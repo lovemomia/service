@@ -12,8 +12,8 @@ public class SubjectSku implements Cloneable {
     private String desc;
     private BigDecimal price = new BigDecimal(0);
     @JSONField(serialize = false) private BigDecimal originalPrice = new BigDecimal(0);
-    @JSONField(serialize = false) private int adult;
-    @JSONField(serialize = false) private int child;
+    private int adult;
+    private int child;
     @JSONField(serialize = false) private int courseCount;
     @JSONField(serialize = false) private int time;
     @JSONField(serialize = false) private int timeUnit;
