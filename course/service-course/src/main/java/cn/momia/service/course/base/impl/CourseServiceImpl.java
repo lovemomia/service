@@ -527,7 +527,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public CourseSku getTrialSku(long skuId) {
-        String sql = "SELECT Id FROM SG_SubjectSku WHERE ParentId=? AND Status<>0";
+        String sql = "SELECT Id FROM SG_CourseSku WHERE ParentId=? AND Status<>0";
         long trialSkuId = queryLong(sql, new Object[] { skuId });
         return getSku(trialSkuId);
     }
