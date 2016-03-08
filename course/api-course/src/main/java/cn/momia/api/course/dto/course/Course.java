@@ -1,5 +1,7 @@
 package cn.momia.api.course.dto.course;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 
@@ -275,8 +277,8 @@ public class Course implements Cloneable {
         this.notice = notice;
     }
 
-    public String getSubjectNotice() {
-        return subjectNotice;
+    public JSONArray getSubjectNotice() {
+        return JSON.parseArray(subjectNotice);
     }
 
     public void setSubjectNotice(String subjectNotice) {
