@@ -427,7 +427,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     public long queryCountBySubject(long subjectId, Collection<Long> exclusions, int minAge, int maxAge, int queryType) {
         String query = "1=1";
         if (queryType == Course.QueryType.BOOKABLE) {
-            query = "B.Deadline>NOW() AND B.UnlockedStock>0";
+            query = "B.StartTime>NOW() AND B.EndTime>NOW() AND B.Deadline>NOW() AND B.UnlockedStock>0";
         } else if (queryType == Course.QueryType.NOT_END) {
             query = "DATE_ADD(DATE(B.EndTime), INTERVAL 1 DAY)>NOW()";
         }
@@ -450,7 +450,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     public List<Course> queryBySubject(long subjectId, int start, int count, Collection<Long> exclusions, int minAge, int maxAge, int sortTypeId, int queryType) {
         String query = "1=1";
         if (queryType == Course.QueryType.BOOKABLE) {
-            query = "B.Deadline>NOW() AND B.UnlockedStock>0";
+            query = "B.StartTime>NOW() AND B.EndTime>NOW() AND B.Deadline>NOW() AND B.UnlockedStock>0";
         } else if (queryType == Course.QueryType.NOT_END) {
             query = "DATE_ADD(DATE(B.EndTime), INTERVAL 1 DAY)>NOW()";
         }
