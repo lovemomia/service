@@ -104,7 +104,7 @@ public class Teacher {
     }
 
     public String getExperience() {
-        return StringUtils.isBlank(experience) ? StringUtils.join(experiences, "\n") : experience;
+        return StringUtils.isBlank(experience) ? (experiences != null && experiences.size() > 0 ? StringUtils.join(experiences, "\n") : "") : experience;
     }
 
     public void setExperience(String experience) {
