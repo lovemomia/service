@@ -40,6 +40,7 @@ public class Course implements Cloneable {
     private boolean insurance;
     private int joined;
     private BigDecimal price;
+    private BigDecimal originalPrice;
     @JSONField(serialize = false) private int stock;
     private int status;
     private boolean buyable;
@@ -168,6 +169,14 @@ public class Course implements Cloneable {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public BigDecimal getOriginalPrice() {
+        return originalPrice;
+    }
+
+    public void setOriginalPrice(BigDecimal originalPrice) {
+        this.originalPrice = originalPrice;
     }
 
     public int getStock() {
