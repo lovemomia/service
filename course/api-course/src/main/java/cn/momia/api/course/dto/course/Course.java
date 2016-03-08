@@ -403,6 +403,7 @@ public class Course implements Cloneable {
             setInsurance(course.isInsurance());
             setJoined(course.getJoined());
             setPrice(course.getPrice());
+            setOriginalPrice(course.getOriginalPrice());
             setScheduler(course.getScheduler());
             setRegion(course.getRegion());
             setStatus(course.getStatus());
