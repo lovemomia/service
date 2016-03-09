@@ -47,6 +47,8 @@ public class Subject {
 
     private List<Course> courses;
 
+    private SubjectSku cheapestSku;
+
     public long getId() {
         return id;
     }
@@ -224,6 +226,24 @@ public class Subject {
         this.courses = courses;
     }
 
+    public SubjectSku getCheapestSku() {
+        if (cheapestSku != null) return cheapestSku;
+
+        if (skus == null || skus.isEmpty()) return null;
+
+        SubjectSku cheapestSku = null;
+        for (SubjectSku sku : skus) {
+            if (sku.getCourseId() > 0) continue;
+            if (cheapestSku == null || sku.getPrice().compareTo(cheapestSku.getPrice()) < 0) cheapestSku = sku;
+        }
+
+        return cheapestSku;
+    }
+
+    public void setCheapestSku(SubjectSku cheapestSku) {
+        this.cheapestSku = cheapestSku;
+    }
+
     public boolean exists() {
         return id > 0;
     }
@@ -234,18 +254,6 @@ public class Subject {
         }
 
         return SubjectSku.NOT_EXIST_SUBJECT_SKU;
-    }
-
-    public SubjectSku getCheapestSku() {
-        if (skus == null || skus.isEmpty()) return null;
-
-        SubjectSku cheapestSku = null;
-        for (SubjectSku sku : skus) {
-            if (sku.getCourseId() > 0) continue;
-            if (cheapestSku == null || sku.getPrice().compareTo(cheapestSku.getPrice()) < 0) cheapestSku = sku;
-        }
-
-        return cheapestSku;
     }
 
     public static class Base extends Subject {
