@@ -437,6 +437,9 @@ public class OrderController extends BaseController {
             case TimeUtil.TimeUnit.YEAR:
                 newTime = originTime * 12 + time;
                 break;
+            case TimeUtil.TimeUnit.HALF_YEAR:
+                newTime = originTime * 6 + time;
+                break;
             default: throw new MomiaErrorException("无效的课程包");
         }
 
