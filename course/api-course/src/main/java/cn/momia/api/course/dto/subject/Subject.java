@@ -6,7 +6,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Subject {
@@ -34,7 +33,6 @@ public class Subject {
     @JSONField(serialize = false) private int stock;
     private List<String> imgs;
     @JSONField(serialize = false) private List<SubjectSku> skus;
-    private List<String> skusDesc;
 
     private int status;
 
@@ -143,23 +141,6 @@ public class Subject {
 
     public void setSkus(List<SubjectSku> skus) {
         this.skus = skus;
-    }
-
-    public List<String> getSkusDesc() {
-        if (skusDesc != null) return skusDesc;
-
-        if (skus == null || skus.isEmpty()) return new ArrayList<String>();
-
-        List<String> skusDesc = new ArrayList<String>();
-        for (SubjectSku sku : skus) {
-            skusDesc.add(sku.toString());
-        }
-
-        return skusDesc;
-    }
-
-    public void setSkusDesc(List<String> skusDesc) {
-        this.skusDesc = skusDesc;
     }
 
     public int getStatus() {
