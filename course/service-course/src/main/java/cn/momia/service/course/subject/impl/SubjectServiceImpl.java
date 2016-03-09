@@ -52,7 +52,9 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
         Map<Long, List<String>> imgs = queryImgs(subjectIds);
         Map<Long, List<SubjectSku>> skus = querySkus(subjectIds);
         for (Subject subject : subjects) {
-            subject.setImgs(imgs.get(subject.getId()));
+            List<String> subjectImgs = imgs.get(subject.getId());
+            if (subjectImgs.size() > 1) subjectImgs = subjectImgs.subList(0, 1);
+            subject.setImgs(subjectImgs);
             subject.setSkus(skus.get(subject.getId()));
         }
 
