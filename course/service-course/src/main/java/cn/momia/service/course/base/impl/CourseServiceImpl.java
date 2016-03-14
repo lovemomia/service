@@ -203,7 +203,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     private Map<Long, List<String>> queryImgs(Collection<Long> courseIds) {
         if (courseIds.isEmpty()) return new HashMap<Long, List<String>>();
 
-        String sql = "SELECT CourseId, Url FROM SG_CourseImg WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Status<>0";
+        String sql = "SELECT CourseId, Url FROM SG_CourseImg WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Status<>0 ORDER BY SortValue ASC";
         Map<Long, List<String>> imgsMap = queryListMap(sql, Long.class, String.class);
 
         for (long courseId : courseIds) {
