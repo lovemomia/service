@@ -26,6 +26,8 @@ public class YiMeiSmsSender implements SmsSender {
     @Override
     public boolean send(String mobile, String message) {
         try {
+            LOGGER.info("trying to send message...");
+
             HttpPost httpPost = new HttpPost(Configuration.getString("Sms.Yimei.Service"));
 
             List<NameValuePair> params = new ArrayList<NameValuePair>();
