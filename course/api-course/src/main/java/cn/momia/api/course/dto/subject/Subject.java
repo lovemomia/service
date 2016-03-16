@@ -214,7 +214,7 @@ public class Subject {
 
         SubjectSku cheapestSku = null;
         for (SubjectSku sku : skus) {
-            if (sku.getCourseId() > 0) continue;
+            if (sku.getCourseId() > 0 || sku.getStatus() != 1) continue;
             if (cheapestSku == null || sku.getPrice().compareTo(cheapestSku.getPrice()) < 0) cheapestSku = sku;
         }
 

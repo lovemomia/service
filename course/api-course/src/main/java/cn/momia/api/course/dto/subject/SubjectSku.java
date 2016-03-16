@@ -111,6 +111,10 @@ public class SubjectSku implements Cloneable {
         this.limit = limit;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
     public void setStatus(int status) {
         this.status = status;
     }
