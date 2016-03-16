@@ -90,6 +90,7 @@ public class OrderController extends BaseController {
         }
 
         String code = order.getCouponCode();
+        order.setCouponCode("");
         CouponCode couponCode = couponService.getCouponCode(code);
         boolean couponCodeUsed = !couponCode.exists();
         List<OrderPackage> orderPackages = order.getPackages();
@@ -102,6 +103,7 @@ public class OrderController extends BaseController {
             BigDecimal skuPrice = sku.getPrice();
             if (!couponCodeUsed && skuPrice.compareTo(couponCode.getConsumption()) >= 0) {
                 couponCodeUsed = true;
+                order.setCouponCode(code);
                 skuPrice = skuPrice.subtract(couponCode.getDiscount());
             }
             orderPackage.setPrice(skuPrice);
@@ -109,7 +111,6 @@ public class OrderController extends BaseController {
             orderPackage.setTime(sku.getTime());
             orderPackage.setTimeUnit(sku.getTimeUnit());
         }
-        if (!couponCodeUsed) order.setCouponCode("");
 
         return true;
     }
