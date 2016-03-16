@@ -109,6 +109,7 @@ public class OrderController extends BaseController {
             orderPackage.setTime(sku.getTime());
             orderPackage.setTimeUnit(sku.getTimeUnit());
         }
+        if (!couponCodeUsed) order.setCouponCode("");
 
         return true;
     }
