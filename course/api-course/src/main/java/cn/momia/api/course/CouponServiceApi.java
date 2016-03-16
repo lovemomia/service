@@ -1,5 +1,6 @@
 package cn.momia.api.course;
 
+import cn.momia.api.course.dto.coupon.CouponCode;
 import cn.momia.api.course.dto.coupon.UserCoupon;
 import cn.momia.common.core.api.HttpServiceApi;
 import cn.momia.common.core.dto.PagedList;
@@ -44,5 +45,9 @@ public class CouponServiceApi extends HttpServiceApi {
     public List<UserCoupon> queryUserCouponsToExpired(int days) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("days", days);
         return executeReturnList(MomiaHttpRequestBuilder.GET(url("/coupon/expired"), builder.build()), UserCoupon.class);
+    }
+
+    public CouponCode couponCode(String code) {
+        return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/coupon/code/%s", code)), CouponCode.class);
     }
 }

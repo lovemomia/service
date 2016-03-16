@@ -1,4 +1,4 @@
-package cn.momia.service.course.coupon;
+package cn.momia.api.course.dto.coupon;
 
 import java.math.BigDecimal;
 

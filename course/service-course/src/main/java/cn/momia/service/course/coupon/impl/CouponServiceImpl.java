@@ -4,7 +4,7 @@ import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.common.core.util.TimeUtil;
 import cn.momia.service.course.coupon.Coupon;
-import cn.momia.service.course.coupon.CouponCode;
+import cn.momia.api.course.dto.coupon.CouponCode;
 import cn.momia.service.course.coupon.CouponService;
 import cn.momia.service.course.coupon.InviteCoupon;
 import cn.momia.api.course.dto.coupon.UserCoupon;

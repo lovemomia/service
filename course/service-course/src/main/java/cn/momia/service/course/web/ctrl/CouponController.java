@@ -86,4 +86,9 @@ public class CouponController extends BaseController {
     public MomiaHttpResponse queryUserCouponsToExpired(@RequestParam int days) {
         return MomiaHttpResponse.SUCCESS(couponService.queryUserCouponsToExpired(days));
     }
+
+    @RequestMapping(value = "/code", method = RequestMethod.GET)
+    public MomiaHttpResponse couponCode(@RequestParam String code) {
+        return MomiaHttpResponse.SUCCESS(couponService.getCouponCode(code));
+    }
 }

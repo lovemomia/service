@@ -14,7 +14,7 @@ import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.api.course.dto.coupon.UserCoupon;
 import cn.momia.api.course.dto.subject.Subject;
-import cn.momia.service.course.coupon.CouponCode;
+import cn.momia.api.course.dto.coupon.CouponCode;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.api.course.dto.subject.SubjectSku;
 import cn.momia.service.course.coupon.CouponService;
