@@ -14,6 +14,7 @@ import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.api.course.dto.coupon.UserCoupon;
 import cn.momia.api.course.dto.subject.Subject;
+import cn.momia.service.course.coupon.CouponCode;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.api.course.dto.subject.SubjectSku;
 import cn.momia.service.course.coupon.CouponService;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -87,14 +89,22 @@ public class OrderController extends BaseController {
             skusMap.put(sku.getId(), sku);
         }
 
+        String code = order.getCouponCode();
+        CouponCode couponCode = couponService.getCouponCode(code);
+        boolean couponCodeUsed = !couponCode.exists();
         List<OrderPackage> orderPackages = order.getPackages();
         for (OrderPackage orderPackage : orderPackages) {
             SubjectSku sku = skusMap.get(orderPackage.getSkuId());
-            if (sku == null) return  false;
+            if (sku == null) return false;
 
             if (sku.getLimit() > 0) checkLimit(order.getUserId(), sku.getId(), sku.getLimit());
 
-            orderPackage.setPrice(sku.getPrice());
+            BigDecimal skuPrice = sku.getPrice();
+            if (!couponCodeUsed && skuPrice.compareTo(couponCode.getConsumption()) >= 0) {
+                couponCodeUsed = true;
+                skuPrice = skuPrice.subtract(couponCode.getDiscount());
+            }
+            orderPackage.setPrice(skuPrice);
             orderPackage.setBookableCount(sku.getCourseCount());
             orderPackage.setTime(sku.getTime());
             orderPackage.setTimeUnit(sku.getTimeUnit());

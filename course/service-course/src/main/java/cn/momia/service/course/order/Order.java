@@ -25,6 +25,7 @@ public class Order {
     private String contact;
     private String mobile;
     private String inviteCode = "";
+    private String couponCode = "";
 
     private int status;
     private Date addTime;
@@ -83,6 +84,14 @@ public class Order {
 
     public void setInviteCode(String inviteCode) {
         this.inviteCode = inviteCode;
+    }
+
+    public String getCouponCode() {
+        return couponCode;
+    }
+
+    public void setCouponCode(String couponCode) {
+        this.couponCode = couponCode;
     }
 
     public int getStatus() {
