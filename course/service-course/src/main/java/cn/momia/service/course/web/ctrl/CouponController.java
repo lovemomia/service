@@ -13,6 +13,7 @@ import cn.momia.api.course.dto.coupon.UserCoupon;
 import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -87,8 +88,8 @@ public class CouponController extends BaseController {
         return MomiaHttpResponse.SUCCESS(couponService.queryUserCouponsToExpired(days));
     }
 
-    @RequestMapping(value = "/code", method = RequestMethod.GET)
-    public MomiaHttpResponse couponCode(@RequestParam String code) {
+    @RequestMapping(value = "/code/{code}", method = RequestMethod.GET)
+    public MomiaHttpResponse couponCode(@PathVariable String code) {
         return MomiaHttpResponse.SUCCESS(couponService.getCouponCode(code));
     }
 }
