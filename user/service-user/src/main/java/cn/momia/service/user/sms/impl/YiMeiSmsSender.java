@@ -1,6 +1,6 @@
 package cn.momia.service.user.sms.impl;
 
-import cn.momia.common.core.util.XmlUtil;
+import cn.momia.common.core.util.MomiaUtil;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.service.user.sms.SmsSender;
 import org.apache.http.HttpEntity;
@@ -26,6 +26,8 @@ public class YiMeiSmsSender implements SmsSender {
     @Override
     public boolean send(String mobile, String message) {
         try {
+            LOGGER.info("trying to send message...");
+
             HttpPost httpPost = new HttpPost(Configuration.getString("Sms.Yimei.Service"));
 
             List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -44,7 +46,7 @@ public class YiMeiSmsSender implements SmsSender {
             }
 
             String responseEntity = EntityUtils.toString(response.getEntity());
-            Map<String, String> responseXml = XmlUtil.xmlToMap(responseEntity);
+            Map<String, String> responseXml = MomiaUtil.xmlToMap(responseEntity);
 
             int error = Integer.valueOf(responseXml.get("error"));
             if (error == 0) return true;

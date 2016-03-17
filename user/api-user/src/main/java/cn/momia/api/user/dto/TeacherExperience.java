@@ -1,11 +1,6 @@
 package cn.momia.api.user.dto;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import org.apache.commons.lang3.StringUtils;
-
 public class TeacherExperience {
-    public static final TeacherExperience NOT_EXIST_TEACHER_EXPERIENCE = new TeacherExperience();
-
     private int id;
     private long userId;
     private String school;
@@ -59,15 +54,6 @@ public class TeacherExperience {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public boolean exists() {
-        return id > 0;
-    }
-
-    @JSONField(serialize = false)
-    public boolean isInvalid() {
-        return StringUtils.isBlank(school) || StringUtils.isBlank(post) || StringUtils.isBlank(time) || StringUtils.isBlank(content);
     }
 
     @Override

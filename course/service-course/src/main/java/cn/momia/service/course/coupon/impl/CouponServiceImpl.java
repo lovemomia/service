@@ -4,6 +4,7 @@ import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.common.core.util.TimeUtil;
 import cn.momia.service.course.coupon.Coupon;
+import cn.momia.api.course.dto.coupon.CouponCode;
 import cn.momia.service.course.coupon.CouponService;
 import cn.momia.service.course.coupon.InviteCoupon;
 import cn.momia.api.course.dto.coupon.UserCoupon;
@@ -283,5 +284,12 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
         List<Long> userCouponIds = queryLongList(sql, new Object[] { UserCoupon.Status.NOT_USED, lower, upper });
 
         return listUserCoupons(userCouponIds);
+    }
+
+    @Override
+    public CouponCode getCouponCode(String code) {
+        String sql = "SELECT Id, Code, Discount, Consumption FROM SG_CouponCode WHERE Code=? AND OnlineTime<=NOW() AND OfflineTime>NOW() AND Status=1";
+        List<CouponCode> couponCodes = queryObjectList(sql, new Object[] { code }, CouponCode.class);
+        return couponCodes.isEmpty() ? CouponCode.NOT_EXIST_COUPON_CODE : couponCodes.get(0);
     }
 }

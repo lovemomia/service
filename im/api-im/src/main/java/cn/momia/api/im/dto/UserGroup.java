@@ -9,9 +9,8 @@ public class UserGroup {
     private long groupId;
     private String groupName;
     private long courseId;
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss") private Date addTime;
-
-    private String tips;
+    private long courseSkuId;
+    private Date addTime;
 
     public long getUserId() {
         return userId;
@@ -37,14 +36,6 @@ public class UserGroup {
         this.groupName = groupName;
     }
 
-    public Date getAddTime() {
-        return addTime;
-    }
-
-    public void setAddTime(Date addTime) {
-        this.addTime = addTime;
-    }
-
     public long getCourseId() {
         return courseId;
     }
@@ -53,11 +44,20 @@ public class UserGroup {
         this.courseId = courseId;
     }
 
-    public String getTips() {
-        return tips;
+    public long getCourseSkuId() {
+        return courseSkuId;
     }
 
-    public void setTips(String tips) {
-        this.tips = tips;
+    public void setCourseSkuId(long courseSkuId) {
+        this.courseSkuId = courseSkuId;
+    }
+
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    public Date getAddTime() {
+        return addTime;
+    }
+
+    public void setAddTime(Date addTime) {
+        this.addTime = addTime;
     }
 }

@@ -1,5 +1,6 @@
 package cn.momia.api.course.dto.subject;
 
+import cn.momia.api.course.dto.course.Course;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -24,6 +25,7 @@ public class Subject {
     private int type;
     @JSONField(serialize = false) private int cityId;
     private String title;
+    private String subTitle;
     private String cover;
     private String tags;
     private String intro;
@@ -40,6 +42,10 @@ public class Subject {
     private int joined;
     private String scheduler;
     private String region;
+
+    private List<Course> courses;
+
+    private SubjectSku cheapestSku;
 
     public long getId() {
         return id;
@@ -71,6 +77,14 @@ public class Subject {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getSubTitle() {
+        return subTitle;
+    }
+
+    public void setSubTitle(String subTitle) {
+        this.subTitle = subTitle;
     }
 
     public String getCover() {
@@ -185,6 +199,32 @@ public class Subject {
         this.region = region;
     }
 
+    public List<Course> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(List<Course> courses) {
+        this.courses = courses;
+    }
+
+    public SubjectSku getCheapestSku() {
+        if (cheapestSku != null) return cheapestSku;
+
+        if (skus == null || skus.isEmpty()) return null;
+
+        SubjectSku cheapestSku = null;
+        for (SubjectSku sku : skus) {
+            if (sku.getCourseId() > 0 || sku.getStatus() != 1) continue;
+            if (cheapestSku == null || sku.getPrice().compareTo(cheapestSku.getPrice()) < 0) cheapestSku = sku;
+        }
+
+        return cheapestSku;
+    }
+
+    public void setCheapestSku(SubjectSku cheapestSku) {
+        this.cheapestSku = cheapestSku;
+    }
+
     public boolean exists() {
         return id > 0;
     }
@@ -203,6 +243,7 @@ public class Subject {
             setId(subject.getId());
             setType(subject.getType());
             setTitle(subject.getTitle());
+            setSubTitle(subject.getSubTitle());
             setCover(subject.getCover());
             setTags(subject.getTags());
             setPrice(subject.getPrice());
@@ -212,6 +253,7 @@ public class Subject {
             setScheduler(subject.getScheduler());
             setRegion(subject.getRegion());
             setStatus(subject.getStatus());
+            setCourses(subject.getCourses());
         }
     }
 }

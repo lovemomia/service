@@ -4,8 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 public class Feed {
-    public static final Feed NOT_EXIST_FEED = new Feed();
-
     private long id;
     private int type;
     private long userId;
@@ -150,13 +148,5 @@ public class Feed {
 
     public void setImgs(List<String> imgs) {
         this.imgs = imgs;
-    }
-
-    public boolean exists() {
-        return id > 0;
-    }
-
-    public boolean isInvalid() {
-        return type < 0 || userId <= 0;
     }
 }

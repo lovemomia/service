@@ -1,14 +1,11 @@
 package cn.momia.api.user.dto;
 
-import cn.momia.common.core.util.MobileUtil;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
 import java.util.List;
 
 public class User {
-    public static final User NOT_EXIST_USER = new User();
-
     public static class Type {
         public static final int MINI = 1;
         public static final int BASE = 2;
@@ -29,11 +26,11 @@ public class User {
     private String cover;
     private String name;
     private String sex;
-    @JSONField(format = "yyyy-MM-dd") private Date birthday;
+    private Date birthday;
     private Integer cityId;
     private Integer regionId;
     private String address;
-    private Integer payed;
+    private Boolean payed;
     private String inviteCode;
 
     private String token;
@@ -98,6 +95,7 @@ public class User {
         this.sex = sex;
     }
 
+    @JSONField(format = "yyyy-MM-dd")
     public Date getBirthday() {
         return birthday;
     }
@@ -130,11 +128,11 @@ public class User {
         this.address = address;
     }
 
-    public Integer getPayed() {
+    public Boolean isPayed() {
         return payed;
     }
 
-    public void setPayed(Integer payed) {
+    public void setPayed(Boolean payed) {
         this.payed = payed;
     }
 
@@ -183,24 +181,18 @@ public class User {
     }
 
     @JSONField(serialize = false)
-    public boolean isPayed() {
-        if (payed == null) return true; // 默认按true处理
-        return payed == 1;
-    }
-
-    @JSONField(serialize = false)
     public boolean isNormal() {
-        return role == Role.NORMAL;
+        return role != null && role == Role.NORMAL;
     }
 
     @JSONField(serialize = false)
     public boolean isTeacher() {
-        return role == Role.TEACHER;
+        return role != null && role == Role.TEACHER;
     }
 
     @JSONField(serialize = false)
     public boolean isAdmin() {
-        return role == Role.ADMIN;
+        return role != null && role == Role.ADMIN;
     }
 
     public boolean hasChild(long childId) {
@@ -211,49 +203,5 @@ public class User {
         }
 
         return false;
-    }
-
-    public static class Mini extends User {
-        public Mini(User user) {
-            setId(user.getId());
-            setNickName(user.getNickName());
-            setAvatar(user.getAvatar());
-        }
-    }
-
-    public static class Base extends Mini {
-        public Base(User user) {
-            this(user, true);
-        }
-
-        public Base(User user, boolean showToken) {
-            super(user);
-            setMobile(MobileUtil.encrypt(user.getMobile()));
-            setCover(user.getCover());
-            setName(user.getName());
-            setSex(user.getSex());
-            setBirthday(user.getBirthday());
-            setCityId(user.getCityId());
-            setRegionId(user.getRegionId());
-            setAddress(user.getAddress());
-            setPayed(user.getPayed());
-            setInviteCode(user.getInviteCode());
-            if (showToken) {
-                setToken(user.getToken());
-                setImToken(user.getImToken());
-            }
-            setRole(user.getRole());
-        }
-    }
-
-    public static class Full extends Base {
-        public Full(User user) {
-            this(user, true);
-        }
-
-        public Full(User user, boolean showToken) {
-            super(user, showToken);
-            setChildren(user.getChildren());
-        }
     }
 }

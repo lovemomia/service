@@ -1,8 +1,8 @@
 package cn.momia.service.user.web.ctrl;
 
-import cn.momia.api.user.dto.User;
 import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
+import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
 import cn.momia.service.user.sms.SmsService;
 import org.springframework.beans.factory.annotation.Autowired;

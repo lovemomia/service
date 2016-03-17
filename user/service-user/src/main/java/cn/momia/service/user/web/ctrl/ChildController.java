@@ -1,17 +1,17 @@
 package cn.momia.service.user.web.ctrl;
 
-import cn.momia.api.user.dto.Child;
-import cn.momia.api.user.dto.ChildComment;
-import cn.momia.api.user.dto.ChildRecord;
-import cn.momia.api.user.dto.User;
 import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.core.util.CastUtil;
+import cn.momia.common.core.util.MomiaUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
+import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
+import cn.momia.service.user.child.Child;
+import cn.momia.service.user.child.ChildComment;
+import cn.momia.service.user.child.ChildRecord;
 import cn.momia.service.user.child.ChildService;
 import com.alibaba.fastjson.JSON;
-import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -22,9 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/child")
@@ -64,19 +62,12 @@ public class ChildController extends BaseController {
     @RequestMapping(method = RequestMethod.GET)
     public MomiaHttpResponse listUserChildren(@RequestParam String utoken) {
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
-
-        return MomiaHttpResponse.SUCCESS(user.getChildren());
+        return user.exists() ? MomiaHttpResponse.SUCCESS(user.getChildren()) : MomiaHttpResponse.TOKEN_EXPIRED;
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public MomiaHttpResponse listChildren(@RequestParam String cids) {
-        Set<Long> childrenIds = new HashSet<Long>();
-        for (String childId : Splitter.on(",").trimResults().omitEmptyStrings().split(cids)) {
-            childrenIds.add(Long.valueOf(childId));
-        }
-
-        return MomiaHttpResponse.SUCCESS(childService.list(childrenIds));
+        return MomiaHttpResponse.SUCCESS(childService.list(MomiaUtil.splitDistinctLongs(cids)));
     }
 
     @RequestMapping(value = "/{cid}/avatar",method = RequestMethod.PUT)

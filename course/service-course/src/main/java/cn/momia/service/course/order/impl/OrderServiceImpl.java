@@ -41,13 +41,14 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
         KeyHolder keyHolder = insert(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO SG_SubjectOrder(UserId, SubjectId, Contact, Mobile, InviteCode, AddTime) VALUES(?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO SG_SubjectOrder(UserId, SubjectId, Contact, Mobile, InviteCode, CouponCode, AddTime) VALUES(?, ?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setLong(1, order.getUserId());
                 ps.setLong(2, order.getSubjectId());
                 ps.setString(3, order.getContact());
                 ps.setString(4, order.getMobile());
                 ps.setString(5, order.getInviteCode());
+                ps.setString(6, order.getCouponCode());
 
                 return ps;
             }
@@ -56,12 +57,12 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
         long orderId = keyHolder.getKey().longValue();
         if (orderId < 0) throw new MomiaErrorException("下单失败");
 
-        addOrderSkus(orderId, order);
+        addOrderPackages(orderId, order);
 
         return orderId;
     }
 
-    private void addOrderSkus(long orderId, Order order) {
+    private void addOrderPackages(long orderId, Order order) {
         String sql = "INSERT INTO SG_SubjectOrderPackage (UserId, OrderId, SkuId, Price, CourseCount, BookableCount, Time, TimeUnit, AddTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
         List<Object[]> args = new ArrayList<Object[]>();
         for (OrderPackage orderPackage : order.getPackages()) {

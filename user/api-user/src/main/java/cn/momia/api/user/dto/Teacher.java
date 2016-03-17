@@ -1,6 +1,5 @@
 package cn.momia.api.user.dto;
 
-import cn.momia.common.core.util.SexUtil;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.lang3.StringUtils;
 
@@ -8,15 +7,13 @@ import java.util.Date;
 import java.util.List;
 
 public class Teacher {
-    public static final Teacher NOT_EXIST_TEACHER = new Teacher();
-
     private int id;
     private long userId;
     private String pic = "";
     private String name = "";
     private String idNo = "";
     private String sex = "";
-    @JSONField(format = "yyyy-MM-dd") private Date birthday;
+    private Date birthday;
     private String address = "";
 
     private List<TeacherExperience> experiences;
@@ -74,6 +71,7 @@ public class Teacher {
         this.sex = sex;
     }
 
+    @JSONField(format = "yyyy-MM-dd")
     public Date getBirthday() {
         return birthday;
     }
@@ -107,7 +105,7 @@ public class Teacher {
     }
 
     public String getExperience() {
-        return StringUtils.isBlank(experience) ? StringUtils.join(experiences, "\n") : experience;
+        return StringUtils.isBlank(experience) ? (experiences != null && experiences.size() > 0 ? StringUtils.join(experiences, "\n") : "") : experience;
     }
 
     public void setExperience(String experience) {
@@ -122,39 +120,7 @@ public class Teacher {
         this.education = education;
     }
 
-    public boolean exists() {
-        return id > 0;
-    }
-
-    @JSONField(serialize = false)
-    public boolean isInvalid() {
-        return userId <= 0 ||
-                StringUtils.isBlank(pic) ||
-                StringUtils.isBlank(name) ||
-                StringUtils.isBlank(idNo) ||
-                SexUtil.isInvalid(sex) ||
-                birthday == null ||
-                StringUtils.isBlank(address);
-    }
-
-    @JSONField(serialize = false)
-    public boolean isCompleted() {
-        return !(isInvalid() || experiences == null | experiences.isEmpty() || educations == null || educations.isEmpty());
-    }
-
     public String getAvatar() {
         return pic;
-    }
-
-    public static class Base extends Teacher {
-        public Base(Teacher teacher) {
-            super();
-            setId(teacher.getId());
-            setPic(teacher.getPic());
-            setName(teacher.getName());
-
-            setExperience(teacher.getExperience());
-            setEducation(teacher.getEducation());
-        }
     }
 }

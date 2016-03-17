@@ -1,12 +1,11 @@
 package cn.momia.service.user.web.ctrl;
 
-import cn.momia.api.user.dto.Contact;
-import cn.momia.api.user.dto.User;
 import cn.momia.common.core.http.MomiaHttpResponse;
+import cn.momia.common.core.util.MomiaUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
+import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
 import cn.momia.service.user.sms.SmsService;
-import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,10 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/user")
@@ -31,36 +29,27 @@ public class UserController extends BaseController {
     @RequestMapping(method = RequestMethod.GET)
     public MomiaHttpResponse get(@RequestParam String utoken) {
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
-
-        return MomiaHttpResponse.SUCCESS(new User.Full(user));
+        return user.exists() ? MomiaHttpResponse.SUCCESS(new User.Full(user)) : MomiaHttpResponse.TOKEN_EXPIRED;
     }
 
     @RequestMapping(value = "/{uid}", method = RequestMethod.GET)
     public MomiaHttpResponse get(@PathVariable(value = "uid") long userId) {
-        User user = userService.get(userId);
-        return MomiaHttpResponse.SUCCESS(new User.Full(user, false));
+        return MomiaHttpResponse.SUCCESS(new User.Full(userService.get(userId), false));
     }
 
     @RequestMapping(value = "/mobile", method = RequestMethod.GET)
     public MomiaHttpResponse getByMobile(@RequestParam String mobile) {
-        User user = userService.getByMobile(mobile);
-        return MomiaHttpResponse.SUCCESS(new User.Full(user, false));
+        return MomiaHttpResponse.SUCCESS(new User.Full(userService.getByMobile(mobile), false));
     }
 
     @RequestMapping(value = "/invite", method = RequestMethod.GET)
     public MomiaHttpResponse getByInviteCode(@RequestParam(value = "invite") String inviteCode) {
-        User user = userService.getByInviteCode(inviteCode);
-        return MomiaHttpResponse.SUCCESS(new User.Full(user, false));
+        return MomiaHttpResponse.SUCCESS(new User.Full(userService.getByInviteCode(inviteCode), false));
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public MomiaHttpResponse list(@RequestParam String uids, @RequestParam(defaultValue = "" + User.Type.BASE) int type) {
-        List<Long> userIds = new ArrayList<Long>();
-        for (String userId : Splitter.on(",").trimResults().omitEmptyStrings().split(uids)) {
-            userIds.add(Long.valueOf(userId));
-        }
-
+        Collection<Long> userIds = MomiaUtil.splitDistinctLongs(uids);
         List<User> users = userService.list(userIds);
         switch (type) {
             case User.Type.MINI:
@@ -210,9 +199,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/contact", method = RequestMethod.GET)
     public MomiaHttpResponse getContact(@RequestParam String utoken) {
         User user = userService.getByToken(utoken);
-        if (!user.exists()) return MomiaHttpResponse.TOKEN_EXPIRED;
-
-        return MomiaHttpResponse.SUCCESS(new Contact(user));
+        return user.exists() ? MomiaHttpResponse.SUCCESS(new User.Contact(user)) : MomiaHttpResponse.TOKEN_EXPIRED;
     }
 
     @RequestMapping(value = "/{uid}/payed", method = RequestMethod.POST)
@@ -222,10 +209,7 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/notify/batch", method = RequestMethod.POST)
     public MomiaHttpResponse notifyBatch(@RequestParam String uids, @RequestParam String message) {
-        Set<Long> userIds = new HashSet<Long>();
-        for (String userId : Splitter.on(",").omitEmptyStrings().trimResults().split(uids)) {
-            userIds.add(Long.valueOf(userId));
-        }
+        Collection<Long> userIds = MomiaUtil.splitDistinctLongs(uids);
 
         List<String> mobiles = userService.listMobiles(userIds);
         if (!mobiles.isEmpty()) smsService.notify(mobiles, message);

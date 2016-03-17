@@ -1,20 +1,16 @@
 package cn.momia.api.user.dto;
 
-import cn.momia.common.core.util.SexUtil;
 import com.alibaba.fastjson.annotation.JSONField;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
 public class Child {
-    public static final Child NOT_EXIST_USER_CHILD = new Child();
-
     private long id;
     private long userId;
     private String avatar;
     private String name;
     private String sex;
-    @JSONField(format = "yyyy-MM-dd") private Date birthday;
+    private Date birthday;
 
     public long getId() {
         return id;
@@ -56,6 +52,7 @@ public class Child {
         this.sex = sex;
     }
 
+    @JSONField(format = "yyyy-MM-dd")
     public Date getBirthday() {
         return birthday;
     }
@@ -66,10 +63,5 @@ public class Child {
 
     public boolean exists() {
         return id > 0;
-    }
-
-    @JSONField(serialize = false)
-    public boolean isInvalid() {
-        return userId <= 0 || StringUtils.isBlank(name) || SexUtil.isInvalid(sex) || birthday == null;
     }
 }

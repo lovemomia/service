@@ -1,7 +1,5 @@
 package cn.momia.api.user.dto;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class Contact {
     private String name;
     private String mobile;
@@ -20,12 +18,5 @@ public class Contact {
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
-    }
-
-    public Contact() {}
-
-    public Contact(User user) {
-        this.name = StringUtils.isBlank(user.getName()) ? user.getNickName() : user.getName();
-        this.mobile = user.getMobile();
     }
 }

@@ -1,7 +1,5 @@
 package cn.momia.service.feed.comment;
 
-import cn.momia.api.feed.dto.FeedComment;
-
 import java.util.List;
 
 public interface FeedCommentService {

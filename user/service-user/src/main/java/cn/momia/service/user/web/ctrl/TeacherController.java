@@ -1,17 +1,17 @@
 package cn.momia.service.user.web.ctrl;
 
-import cn.momia.api.user.dto.Teacher;
-import cn.momia.api.user.dto.TeacherEducation;
-import cn.momia.api.user.dto.TeacherExperience;
-import cn.momia.api.user.dto.TeacherStatus;
-import cn.momia.api.user.dto.User;
 import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.core.util.CastUtil;
+import cn.momia.common.core.util.MomiaUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
+import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
+import cn.momia.service.user.teacher.Teacher;
+import cn.momia.service.user.teacher.TeacherEducation;
+import cn.momia.service.user.teacher.TeacherExperience;
 import cn.momia.service.user.teacher.TeacherService;
+import cn.momia.service.user.teacher.TeacherStatus;
 import com.alibaba.fastjson.JSON;
-import com.google.common.base.Splitter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,9 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/teacher")
@@ -32,8 +30,7 @@ public class TeacherController extends BaseController {
 
     @RequestMapping(value = "/status", method = RequestMethod.GET)
     public MomiaHttpResponse status(@RequestParam String utoken) {
-        User user = userService.getByToken(utoken);
-        return MomiaHttpResponse.SUCCESS(teacherService.status(user.getId()));
+        return MomiaHttpResponse.SUCCESS(teacherService.status(userService.getByToken(utoken).getId()));
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -45,12 +42,7 @@ public class TeacherController extends BaseController {
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public MomiaHttpResponse list(@RequestParam String tids) {
-        Set<Integer> teacherIds = new HashSet<Integer>();
-        for (String teacherId : Splitter.on(",").trimResults().omitEmptyStrings().split(tids)) {
-            teacherIds.add(Integer.valueOf(teacherId));
-        }
-
-        return MomiaHttpResponse.SUCCESS(toBaseInfoList(teacherService.list(teacherIds)));
+        return MomiaHttpResponse.SUCCESS(toBaseInfoList(teacherService.list(MomiaUtil.splitDistinctIntegers(tids))));
     }
 
     private List<Teacher> toBaseInfoList(List<Teacher> teachers) {
@@ -64,12 +56,7 @@ public class TeacherController extends BaseController {
 
     @RequestMapping(value = "/list/user", method = RequestMethod.GET)
     public MomiaHttpResponse listByUserIds(@RequestParam String uids) {
-        Set<Long> teacherUserIds = new HashSet<Long>();
-        for (String teacherUserId : Splitter.on(",").trimResults().omitEmptyStrings().split(uids)) {
-            teacherUserIds.add(Long.valueOf(teacherUserId));
-        }
-
-        return MomiaHttpResponse.SUCCESS(toBaseInfoList(teacherService.listByUser(teacherUserIds)));
+        return MomiaHttpResponse.SUCCESS(toBaseInfoList(teacherService.listByUser(MomiaUtil.splitDistinctLongs(uids))));
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -112,8 +99,7 @@ public class TeacherController extends BaseController {
 
     @RequestMapping(value = "/experience/{expid}", method = RequestMethod.DELETE)
     public MomiaHttpResponse addExperience(@RequestParam String utoken, @PathVariable(value = "expid") int experienceId) {
-        User user = userService.getByToken(utoken);
-        return MomiaHttpResponse.SUCCESS(teacherService.deleteExperience(user.getId(), experienceId));
+        return MomiaHttpResponse.SUCCESS(teacherService.deleteExperience(userService.getByToken(utoken).getId(), experienceId));
     }
 
     @RequestMapping(value = "/education", method = RequestMethod.POST)
@@ -140,7 +126,6 @@ public class TeacherController extends BaseController {
 
     @RequestMapping(value = "/education/{eduid}", method = RequestMethod.DELETE)
     public MomiaHttpResponse addEducation(@RequestParam String utoken, @PathVariable(value = "eduid") int educationId) {
-        User user = userService.getByToken(utoken);
-        return MomiaHttpResponse.SUCCESS(teacherService.deleteEducation(user.getId(), educationId));
+        return MomiaHttpResponse.SUCCESS(teacherService.deleteEducation(userService.getByToken(utoken).getId(), educationId));
     }
 }

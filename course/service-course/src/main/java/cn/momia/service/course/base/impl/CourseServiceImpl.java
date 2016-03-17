@@ -119,7 +119,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     public List<Course> list(Collection<Long> courseIds) {
         if (courseIds.isEmpty()) return new ArrayList<Course>();
 
-        String sql = "SELECT A.Id, A.Type, A.ParentId, A.SubjectId, A.Title, A.KeyWord, A.Cover, A.MinAge, A.MaxAge, A.Insurance, A.Joined, A.Price, A.Goal, A.Flow, A.Tips, A.Notice, A.InstitutionId, A.Status, B.Title AS Subject, B.Stock FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Id IN (" + StringUtils.join(courseIds, ",") + ") AND A.Status<>0 AND B.Status<>0";
+        String sql = "SELECT A.Id, A.Type, A.ParentId, A.SubjectId, A.Title, A.KeyWord, A.Feature, A.Cover, A.MinAge, A.MaxAge, A.Insurance, A.Joined, A.Price, A.Price AS OriginalPrice, A.Goal, A.Flow, A.Tips, A.Notice, B.Notice AS SubjectNotice, A.InstitutionId, A.Status, B.Title AS Subject, B.Stock, A.AddTime FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Id IN (" + StringUtils.join(courseIds, ",") + ") AND A.Status<>0 AND B.Status<>0";
         List<Course> courses = queryObjectList(sql, Course.class);
 
         Set<Integer> institutionIds = new HashSet<Integer>();
@@ -203,7 +203,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     private Map<Long, List<String>> queryImgs(Collection<Long> courseIds) {
         if (courseIds.isEmpty()) return new HashMap<Long, List<String>>();
 
-        String sql = "SELECT CourseId, Url FROM SG_CourseImg WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Status<>0";
+        String sql = "SELECT CourseId, Url FROM SG_CourseImg WHERE CourseId IN (" + StringUtils.join(courseIds, ",") + ") AND Status<>0 ORDER BY SortValue ASC";
         Map<Long, List<String>> imgsMap = queryListMap(sql, Long.class, String.class);
 
         for (long courseId : courseIds) {
@@ -427,7 +427,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     public long queryCountBySubject(long subjectId, Collection<Long> exclusions, int minAge, int maxAge, int queryType) {
         String query = "1=1";
         if (queryType == Course.QueryType.BOOKABLE) {
-            query = "B.Deadline>NOW() AND B.UnlockedStock>0";
+            query = "B.StartTime>NOW() AND B.EndTime>NOW() AND B.Deadline>NOW() AND B.UnlockedStock>0";
         } else if (queryType == Course.QueryType.NOT_END) {
             query = "DATE_ADD(DATE(B.EndTime), INTERVAL 1 DAY)>NOW()";
         }
@@ -450,7 +450,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     public List<Course> queryBySubject(long subjectId, int start, int count, Collection<Long> exclusions, int minAge, int maxAge, int sortTypeId, int queryType) {
         String query = "1=1";
         if (queryType == Course.QueryType.BOOKABLE) {
-            query = "B.Deadline>NOW() AND B.UnlockedStock>0";
+            query = "B.StartTime>NOW() AND B.EndTime>NOW() AND B.Deadline>NOW() AND B.UnlockedStock>0";
         } else if (queryType == Course.QueryType.NOT_END) {
             query = "DATE_ADD(DATE(B.EndTime), INTERVAL 1 DAY)>NOW()";
         }
@@ -526,6 +526,13 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
+    public CourseSku getTrialSku(long skuId) {
+        String sql = "SELECT Id FROM SG_CourseSku WHERE ParentId=? AND Status<>0";
+        long trialSkuId = queryLong(sql, new Object[] { skuId });
+        return getSku(trialSkuId);
+    }
+
+    @Override
     public CourseSku getBookedSku(long userId, long bookingId) {
         String sql = "SELECT CourseSkuId FROM SG_BookedCourse WHERE UserId=? AND Id=? AND Status<>0";
         List<Long> skuIds = queryLongList(sql, new Object[] { userId, bookingId });
@@ -542,8 +549,14 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public boolean unlockSku(long skuId) {
-        String sql = "UPDATE SG_CourseSku SET UnlockedStock=UnlockedStock+1, LockedStock=LockedStock-1 WHERE Id=? AND Status=1 AND LockedStock>=1";
+        String sql = "UPDATE SG_CourseSku SET UnlockedStock=UnlockedStock+1, LockedStock=LockedStock-1 WHERE Id=? AND Status<>0 AND LockedStock>=1";
         return update(sql, new Object[] { skuId });
+    }
+
+    @Override
+    public boolean cancelSku(long skuId) {
+        String sql = "UPDATE SG_CourseSku SET Status=3 WHERE Id=? OR ParentId=?";
+        return update(sql, new Object[] { skuId, skuId });
     }
 
     @Override
@@ -799,7 +812,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public Map<Long, Long> queryBookedPackageUsers(Collection<Long> userIds, long courseId, long courseSkuId) {
-        String sql = userIds.isEmpty() ?
+        String sql = (userIds == null || userIds.isEmpty()) ?
                 "SELECT PackageId, UserId FROM SG_BookedCourse WHERE CourseId=? AND CourseSkuId=? AND Status<>0" :
                 "SELECT PackageId, UserId FROM SG_BookedCourse WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND CourseId=? AND CourseSkuId=? AND Status<>0";
         return queryMap(sql, new Object[] { courseId, courseSkuId }, Long.class, Long.class);

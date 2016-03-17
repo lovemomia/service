@@ -1,8 +1,6 @@
 package cn.momia.api.feed.dto;
 
 public class FeedTag {
-    public static final FeedTag NOT_EXISTS_FEED_TAG = new FeedTag();
-
     private long id;
     private String name;
 
@@ -20,9 +18,5 @@ public class FeedTag {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public boolean exists() {
-        return id > 0;
     }
 }

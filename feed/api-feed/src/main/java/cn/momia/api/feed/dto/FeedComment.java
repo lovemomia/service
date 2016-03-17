@@ -48,8 +48,4 @@ public class FeedComment {
     public void setAddTime(Date addTime) {
         this.addTime = addTime;
     }
-
-    public boolean exists() {
-        return id > 0;
-    }
 }

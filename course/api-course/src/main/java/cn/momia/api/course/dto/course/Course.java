@@ -1,5 +1,7 @@
 package cn.momia.api.course.dto.course;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 
@@ -34,12 +36,14 @@ public class Course implements Cloneable {
     private String subject;
     private String title;
     private String keyWord;
+    private String feature;
     private String cover;
     @JSONField(serialize = false) private int minAge;
     @JSONField(serialize = false) private int maxAge;
     private boolean insurance;
     private int joined;
     private BigDecimal price;
+    private BigDecimal originalPrice;
     @JSONField(serialize = false) private int stock;
     private int status;
     private boolean buyable;
@@ -56,12 +60,15 @@ public class Course implements Cloneable {
     private String flow;
     private String tips;
     private String notice;
+    private String subjectNotice;
     @JSONField(serialize = false) private int institutionId;
     private String institution;
 
     private List<String> imgs;
     private JSONObject book;
     private CourseSkuPlace place;
+
+    private Date addTime;
 
     public long getId() {
         return id;
@@ -119,6 +126,14 @@ public class Course implements Cloneable {
         this.keyWord = keyWord;
     }
 
+    public String getFeature() {
+        return feature;
+    }
+
+    public void setFeature(String feature) {
+        this.feature = feature;
+    }
+
     public String getCover() {
         return cover;
     }
@@ -165,6 +180,14 @@ public class Course implements Cloneable {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public BigDecimal getOriginalPrice() {
+        return originalPrice;
+    }
+
+    public void setOriginalPrice(BigDecimal originalPrice) {
+        this.originalPrice = originalPrice;
     }
 
     public int getStock() {
@@ -263,6 +286,14 @@ public class Course implements Cloneable {
         this.notice = notice;
     }
 
+    public JSONArray getSubjectNotice() {
+        return JSON.parseArray(subjectNotice);
+    }
+
+    public void setSubjectNotice(String subjectNotice) {
+        this.subjectNotice = subjectNotice;
+    }
+
     public int getInstitutionId() {
         return institutionId;
     }
@@ -301,6 +332,15 @@ public class Course implements Cloneable {
 
     public void setPlace(CourseSkuPlace place) {
         this.place = place;
+    }
+
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    public Date getAddTime() {
+        return addTime;
+    }
+
+    public void setAddTime(Date addTime) {
+        this.addTime = addTime;
     }
 
     @Override
@@ -369,15 +409,19 @@ public class Course implements Cloneable {
             setSubject(course.getSubject());
             setTitle(course.getTitle());
             setKeyWord(course.getKeyWord());
+            setFeature(course.getFeature());
             setCover(course.getCover());
             setAge(course.getAge());
             setInsurance(course.isInsurance());
             setJoined(course.getJoined());
             setPrice(course.getPrice());
+            setOriginalPrice(course.getOriginalPrice());
             setScheduler(course.getScheduler());
             setRegion(course.getRegion());
             setStatus(course.getStatus());
             setBuyable(course.isBuyable());
+            setGoal(course.getGoal());
+            setAddTime(course.getAddTime());
         }
     }
 }

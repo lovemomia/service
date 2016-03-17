@@ -14,9 +14,9 @@
 
     <Service>
         <Course>http://localhost:7070</Course>
+        <Discuss>http://localhost:7070</Discuss>
         <Feed>http://localhost:7070</Feed>
         <IM>http://localhost:7070</IM>
-        <Operate>http://localhost:7070</Operate>
         <Poi>http://localhost:7070</Poi>
         <User>http://localhost:7070</User>
     </Service>

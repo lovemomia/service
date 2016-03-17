@@ -47,7 +47,12 @@ public class SubjectController extends BaseController {
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public MomiaHttpResponse list(@RequestParam(value = "city") int cityId) {
-        return MomiaHttpResponse.SUCCESS(subjectService.list(cityId));
+        List<Subject> subjects = new ArrayList<Subject>();
+        for (Subject subject : subjectService.list(cityId)) {
+            subjects.add(new Subject.Base(subject));
+        }
+
+        return MomiaHttpResponse.SUCCESS(subjects);
     }
 
     @RequestMapping(value = "/{suid}/sku", method = RequestMethod.GET)

@@ -37,10 +37,13 @@ public interface CourseService {
 
     List<CourseSku> querySkus(long courseId, String start, String end);
     CourseSku getSku(long skuId);
+    CourseSku getTrialSku(long skuId);
     CourseSku getBookedSku(long userId, long bookingId);
 
     boolean lockSku(long skuId);
     boolean unlockSku(long skuId);
+
+    boolean cancelSku(long skuId);
 
     BookedCourse getBookedCourse(long bookingId);
 

@@ -1,11 +1,11 @@
 package cn.momia.service.user.child.impl;
 
-import cn.momia.api.user.dto.Child;
-import cn.momia.api.user.dto.ChildComment;
-import cn.momia.api.user.dto.ChildRecord;
-import cn.momia.api.user.dto.ChildTag;
 import cn.momia.common.service.AbstractService;
+import cn.momia.service.user.child.Child;
+import cn.momia.service.user.child.ChildComment;
+import cn.momia.service.user.child.ChildRecord;
 import cn.momia.service.user.child.ChildService;
+import cn.momia.service.user.child.ChildTag;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
@@ -24,14 +24,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class ChildServiceImpl extends AbstractService implements ChildService {
     private List<ChildTag> tagsCache = new ArrayList<ChildTag>();
 
     @Override
     protected void doReload() {
-        String sql = "SELECT Id, Name FROM SG_ChildTag WHERE Status<>0";
+        String sql = "SELECT Id, Name FROM SG_ChildTag WHERE Status=1";
         tagsCache = queryObjectList(sql, ChildTag.class);
     }
 
@@ -57,31 +56,14 @@ public class ChildServiceImpl extends AbstractService implements ChildService {
 
     @Override
     public Child get(long childId) {
-        Set<Long> childIds = Sets.newHashSet(childId);
-        List<Child> children = list(childIds);
-
+        List<Child> children = list(Sets.newHashSet(childId));
         return children.isEmpty() ? Child.NOT_EXIST_USER_CHILD : children.get(0);
     }
 
     @Override
     public List<Child> list(Collection<Long> childrenIds) {
-        if (childrenIds.isEmpty()) return new ArrayList<Child>();
-
-        String sql = "SELECT Id, UserId, Avatar, Name, Sex, Birthday FROM SG_Child WHERE Id IN (" + StringUtils.join(childrenIds, ",") + ") AND Status<>0";
-        List<Child> children = queryObjectList(sql, Child.class);
-
-        Map<Long, Child> childrenMap = new HashMap<Long, Child>();
-        for (Child child : children) {
-            childrenMap.put(child.getId(), child);
-        }
-
-        List<Child> result = new ArrayList<Child>();
-        for (long childId : childrenIds) {
-            Child child = childrenMap.get(childId);
-            if (child != null) result.add(child);
-        }
-
-        return result;
+        String sql = "SELECT Id, UserId, Avatar, Name, Sex, Birthday FROM SG_Child WHERE Id IN (" + StringUtils.join(childrenIds, ",") + ") AND Status=1";
+        return listByIds(sql, childrenIds, Long.class, Child.class);
     }
 
     @Override
@@ -93,7 +75,7 @@ public class ChildServiceImpl extends AbstractService implements ChildService {
             childrenMap.put(userId, new ArrayList<Child>());
         }
 
-        String sql = "SELECT Id FROM SG_Child WHERE UserId IN (" + StringUtils.join(userIds, ",") + ") AND Status<>0";
+        String sql = String.format("SELECT Id FROM SG_Child WHERE UserId IN (%s) AND Status=1", StringUtils.join(userIds, ","));
         List<Long> childIds = queryLongList(sql);
         List<Child> children = list(childIds);
 
@@ -143,7 +125,7 @@ public class ChildServiceImpl extends AbstractService implements ChildService {
     @Override
     public ChildRecord getRecord(long teacherUerId, long childId, long courseId, long courseSkuId) {
         final List<ChildRecord> records = new ArrayList<ChildRecord>();
-        String sql = "SELECT Tags, Content FROM SG_ChildRecord WHERE TeacherUserId=? AND ChildId=? AND CourseId=? AND CourseSkuId=? AND Status<>0 LIMIT 1";
+        String sql = "SELECT Tags, Content FROM SG_ChildRecord WHERE TeacherUserId=? AND ChildId=? AND CourseId=? AND CourseSkuId=? AND Status=1 LIMIT 1";
         query(sql, new Object[] { teacherUerId, childId, courseId, courseSkuId }, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
@@ -181,13 +163,13 @@ public class ChildServiceImpl extends AbstractService implements ChildService {
 
     @Override
     public long queryCommentsCount(long childId) {
-        String sql = "SELECT COUNT(1) FROM SG_ChildComment WHERE ChildId=? AND Status<>0";
+        String sql = "SELECT COUNT(1) FROM SG_ChildComment WHERE ChildId=? AND Status=1";
         return queryLong(sql, new Object[] { childId });
     }
 
     @Override
     public List<ChildComment> queryComments(long childId, int start, int count) {
-        String sql = "SELECT Id, TeacherUserId, ChildId, CourseId, CourseSkuId, Content FROM SG_ChildComment WHERE ChildId=? AND Status<>0 ORDER BY AddTime DESC LIMIT ?,?";
+        String sql = "SELECT Id, TeacherUserId, ChildId, CourseId, CourseSkuId, Content FROM SG_ChildComment WHERE ChildId=? AND Status=1 ORDER BY AddTime DESC LIMIT ?,?";
         return queryObjectList(sql, new Object[] { childId, start, count }, ChildComment.class);
     }
 
@@ -210,7 +192,7 @@ public class ChildServiceImpl extends AbstractService implements ChildService {
 
     @Override
     public List<Long> queryCommentedChildIds(long courseId, long courseSkuId) {
-        String sql = "SELECT ChildId FROM SG_ChildComment WHERE CourseId=? AND CourseSkuId=? AND Status<>0";
+        String sql = "SELECT ChildId FROM SG_ChildComment WHERE CourseId=? AND CourseSkuId=? AND Status=1";
         return queryLongList(sql, new Object[] { courseId, courseSkuId });
     }
 }

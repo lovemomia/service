@@ -1,8 +1,6 @@
 package cn.momia.api.im.dto;
 
 public class Group {
-    public static final Group NOT_EXIST_GROUP = new Group();
-
     private long groupId;
     private String groupName;
     private long courseId;
@@ -38,9 +36,5 @@ public class Group {
 
     public void setCourseSkuId(long courseSkuId) {
         this.courseSkuId = courseSkuId;
-    }
-
-    public boolean exists() {
-        return groupId > 0;
     }
 }

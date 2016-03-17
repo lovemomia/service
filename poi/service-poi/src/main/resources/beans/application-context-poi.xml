@@ -5,12 +5,12 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="cityService" class="cn.momia.common.service.CachedService" parent="dbAccessService">
-        <property name="type" value="cn.momia.api.poi.dto.City" />
+        <property name="type" value="cn.momia.service.poi.city.City" />
         <property name="sql" value="SELECT Id, Name FROM SG_City WHERE Status=1" />
     </bean>
 
     <bean id="regionService" class="cn.momia.common.service.CachedService" parent="dbAccessService">
-        <property name="type" value="cn.momia.api.poi.dto.Region" />
+        <property name="type" value="cn.momia.service.poi.region.Region" />
         <property name="sql" value="SELECT Id, CityId, Name, ParentId FROM SG_Region WHERE Status=1" />
     </bean>
 

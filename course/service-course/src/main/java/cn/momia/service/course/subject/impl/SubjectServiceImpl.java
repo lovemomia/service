@@ -46,13 +46,15 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
     public List<Subject> list(Collection<Long> subjectIds) {
         if (subjectIds.isEmpty()) return new ArrayList<Subject>();
 
-        String sql = "SELECT Id, `Type`, CityId, Title, Cover, Tags, Intro, Notice, Stock, Status FROM SG_Subject WHERE Id IN (" + StringUtils.join(subjectIds, ",") + ") AND Status<>0";
+        String sql = "SELECT Id, `Type`, CityId, Title, SubTitle, Cover, Tags, Intro, Notice, Stock, Status FROM SG_Subject WHERE Id IN (" + StringUtils.join(subjectIds, ",") + ") AND Status<>0";
         List<Subject> subjects = queryObjectList(sql, Subject.class);
 
         Map<Long, List<String>> imgs = queryImgs(subjectIds);
         Map<Long, List<SubjectSku>> skus = querySkus(subjectIds);
         for (Subject subject : subjects) {
-            subject.setImgs(imgs.get(subject.getId()));
+            List<String> subjectImgs = imgs.get(subject.getId());
+            if (subjectImgs.size() > 1) subjectImgs = subjectImgs.subList(0, 1);
+            subject.setImgs(subjectImgs);
             subject.setSkus(skus.get(subject.getId()));
         }
 
@@ -76,6 +78,7 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
                 subject.setJoined(getJoined(courses));
                 subject.setScheduler(getScheduler(courses));
                 subject.setRegion(getRegion(courses));
+                subject.setCourses(buildBaseCourses(courses));
 
                 if (subject.getType() == Subject.Type.NORMAL) {
                     subject.setStatus(Subject.Status.OK);
@@ -90,6 +93,15 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
         }
 
         return result;
+    }
+
+    private List<Course> buildBaseCourses(List<Course> courses) {
+        List<Course> baseCourses = new ArrayList<Course>();
+        for (Course course : courses) {
+            baseCourses.add(new Course.Base(course));
+        }
+
+        return baseCourses;
     }
 
     private Map<Long, List<String>> queryImgs(Collection<Long> subjectIds) {

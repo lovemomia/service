@@ -13,7 +13,7 @@ import cn.momia.api.user.dto.User;
 import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.core.http.MomiaHttpResponse;
-import cn.momia.common.core.util.PoiUtil;
+import cn.momia.common.core.util.MomiaUtil;
 import cn.momia.common.core.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.api.course.dto.course.BookedCourse;
@@ -162,8 +162,8 @@ public class CourseController extends BaseController {
                         if (place1HasNoPosition) return 1;
                         if (place2HasNoPosition) return -1;
 
-                        int distance1 = PoiUtil.distance(place1.getLng(), place1.getLat(), lng, lat);
-                        int distance2 = PoiUtil.distance(place2.getLng(), place2.getLat(), lng, lat);
+                        int distance1 = MomiaUtil.distance(place1.getLng(), place1.getLat(), lng, lat);
+                        int distance2 = MomiaUtil.distance(place2.getLng(), place2.getLat(), lng, lat);
 
                         return distance1 - distance2;
                     }
@@ -713,6 +713,47 @@ public class CourseController extends BaseController {
         } catch (Exception e) {
             LOGGER.error("exception when decreasing join count of package: {}", packageId, e);
         }
+    }
+
+    @RequestMapping(value = "/sku/cancel", method = RequestMethod.POST)
+    public MomiaHttpResponse skuCancel(@RequestParam(value = "coid") long courseId, @RequestParam(value = "sid") long skuId) {
+        if (!courseService.cancelSku(skuId)) return MomiaHttpResponse.FAILED("下线场次失败");
+
+        Map<Long, Long> successfulPackageUsers = new HashMap<Long, Long>();
+
+        Set<Long> failedIncreaseCountPackageIds = new HashSet<Long>();
+        Set<Long> failedUnlockSkuPackageIds = new HashSet<Long>();
+
+        CourseSku sku = courseService.getSku(skuId);
+        Map<Long, Long> packageUsers = courseService.queryBookedPackageUsers(null, courseId, skuId);
+        if (!packageUsers.isEmpty()) {
+            courseService.batchCancel(packageUsers.values(), courseId, skuId);
+            for (long packageId : packageUsers.keySet()) {
+                returnBookableCount(packageId, failedIncreaseCountPackageIds);
+                unlockSku(packageId, skuId, failedUnlockSkuPackageIds);
+                decreaseJoinCount(packageId, courseId, sku.getJoinCount());
+
+                if (!failedIncreaseCountPackageIds.contains(packageId)) successfulPackageUsers.put(packageId, packageUsers.get(packageId));
+            }
+        }
+
+        CourseSku trialSku = courseService.getTrialSku(skuId);
+        Map<Long, Long> trialPackageUsers = courseService.queryBookedPackageUsers(null, trialSku.getCourseId(), trialSku.getId());
+        if (!trialPackageUsers.isEmpty()) {
+            courseService.batchCancel(trialPackageUsers.values(), trialSku.getCourseId(), trialSku.getId());
+            for (long packageId : trialPackageUsers.keySet()) {
+                returnBookableCount(packageId, failedIncreaseCountPackageIds);
+                unlockSku(packageId, trialSku.getId(), failedUnlockSkuPackageIds);
+                decreaseJoinCount(packageId, trialSku.getCourseId(), trialSku.getJoinCount());
+
+                if (!failedIncreaseCountPackageIds.contains(packageId)) successfulPackageUsers.put(packageId, trialPackageUsers.get(packageId));
+            }
+        }
+
+        if (failedIncreaseCountPackageIds.size() > 0) LOGGER.error("fail to increase bookable count of packages: {}", failedIncreaseCountPackageIds);
+        if (failedUnlockSkuPackageIds.size() > 0) LOGGER.error("fail to unlock skus of packages: {}", failedUnlockSkuPackageIds);
+
+        return MomiaHttpResponse.SUCCESS(successfulPackageUsers);
     }
 
     @RequestMapping(value = "/checkin", method = RequestMethod.POST)

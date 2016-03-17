@@ -12,11 +12,11 @@ public class SubjectSku implements Cloneable {
     private String desc;
     private BigDecimal price = new BigDecimal(0);
     @JSONField(serialize = false) private BigDecimal originalPrice = new BigDecimal(0);
-    @JSONField(serialize = false) private int adult;
-    @JSONField(serialize = false) private int child;
-    @JSONField(serialize = false) private int courseCount;
-    @JSONField(serialize = false) private int time;
-    @JSONField(serialize = false) private int timeUnit;
+    private int adult;
+    private int child;
+    private int courseCount;
+    private int time;
+    private int timeUnit;
     private int limit;
     private int status;
 
@@ -111,6 +111,10 @@ public class SubjectSku implements Cloneable {
         this.limit = limit;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
     public void setStatus(int status) {
         this.status = status;
     }
@@ -152,5 +156,10 @@ public class SubjectSku implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public String toString() {
+        return price.intValue() + "元 " + desc;
     }
 }

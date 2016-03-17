@@ -10,9 +10,10 @@ import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.http.MomiaHttpParamBuilder;
 import cn.momia.common.core.http.MomiaHttpRequestBuilder;
 import cn.momia.common.core.util.TimeUtil;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.methods.HttpUriRequest;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -22,78 +23,59 @@ public class ChildServiceApi extends HttpServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("children", children);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/child"), builder.build());
-
-        return executeReturnObject(request, User.class);
+        return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/child"), builder.build()), User.class);
     }
 
     public Child get(String utoken, long childId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/child/%d", childId), builder.build());
-
-        return executeReturnObject(request, Child.class);
+        return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/child/%d", childId), builder.build()), Child.class);
     }
 
     public List<Child> list(String utoken) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/child"), builder.build());
-
-        return executeReturnList(request, Child.class);
+        return executeReturnList(MomiaHttpRequestBuilder.GET(url("/child"), builder.build()), Child.class);
     }
 
     public List<Child> list(Collection<Long> childrenIds) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("cids", StringUtils.join(childrenIds, ","));
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/child/list"), builder.build());
-
-        return executeReturnList(request, Child.class);
+        return executeReturnList(MomiaHttpRequestBuilder.GET(url("/child/list"), builder.build()), Child.class);
     }
 
     public User updateAvatar(String utoken, long childId, String avatar) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("avatar", avatar);
-        HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/child/%d/avatar", childId), builder.build());
-
-        return executeReturnObject(request, User.class);
+        return executeReturnObject(MomiaHttpRequestBuilder.PUT(url("/child/%d/avatar", childId), builder.build()), User.class);
     }
 
     public User updateName(String utoken, long childId, String name) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("name", name);
-        HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/child/%d/name", childId), builder.build());
-
-        return executeReturnObject(request, User.class);
+        return executeReturnObject(MomiaHttpRequestBuilder.PUT(url("/child/%d/name", childId), builder.build()), User.class);
     }
 
     public User updateSex(String utoken, long childId, String sex) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("sex", sex);
-        HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/child/%d/sex", childId), builder.build());
-
-        return executeReturnObject(request, User.class);
+        return executeReturnObject(MomiaHttpRequestBuilder.PUT(url("/child/%d/sex", childId), builder.build()), User.class);
     }
 
     public User updateBirthday(String utoken, long childId, Date birthday) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("birthday", TimeUtil.SHORT_DATE_FORMAT.format(birthday));
-        HttpUriRequest request = MomiaHttpRequestBuilder.PUT(url("/child/%d/birthday", childId), builder.build());
-
-        return executeReturnObject(request, User.class);
+        return executeReturnObject(MomiaHttpRequestBuilder.PUT(url("/child/%d/birthday", childId), builder.build()), User.class);
     }
 
     public User delete(String utoken, long childId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
-        HttpUriRequest request = MomiaHttpRequestBuilder.DELETE(url("/child/%d", childId), builder.build());
-
-        return executeReturnObject(request, User.class);
+        return executeReturnObject(MomiaHttpRequestBuilder.DELETE(url("/child/%d", childId), builder.build()), User.class);
     }
 
     public List<ChildTag> listAllTags() {
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/child/tag"));
-        return executeReturnList(request, ChildTag.class);
+        return executeReturnList(MomiaHttpRequestBuilder.GET(url("/child/tag")), ChildTag.class);
     }
 
     public ChildRecord getRecord(String utoken, long childId, long courseId, long courseSkuId) {
@@ -101,9 +83,7 @@ public class ChildServiceApi extends HttpServiceApi {
                 .add("utoken", utoken)
                 .add("coid", courseId)
                 .add("sid", courseSkuId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/child/%d/record", childId), builder.build());
-
-        return executeReturnObject(request, ChildRecord.class);
+        return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/child/%d/record", childId), builder.build()), ChildRecord.class);
     }
 
     public boolean record(String utoken, long childId, long courseId, long courseSkuId, String record) {
@@ -112,9 +92,7 @@ public class ChildServiceApi extends HttpServiceApi {
                 .add("coid", courseId)
                 .add("sid", courseSkuId)
                 .add("record", record);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/child/%d/record", childId), builder.build());
-
-        return executeReturnObject(request, Boolean.class);
+        return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/child/%d/record", childId), builder.build()), Boolean.class);
     }
 
     public PagedList<ChildComment> listComments(String utoken, long childId, int start, int count) {
@@ -122,9 +100,7 @@ public class ChildServiceApi extends HttpServiceApi {
                 .add("utoken", utoken)
                 .add("start", start)
                 .add("count", count);
-        HttpUriRequest request = MomiaHttpRequestBuilder.GET(url("/child/%d/comment", childId), builder.build());
-
-        return executeReturnPagedList(request, ChildComment.class);
+        return executeReturnPagedList(MomiaHttpRequestBuilder.GET(url("/child/%d/comment", childId), builder.build()), ChildComment.class);
     }
 
     public boolean comment(String utoken, long childId, long courseId, long courseSkuId, String comment) {
@@ -133,17 +109,37 @@ public class ChildServiceApi extends HttpServiceApi {
                 .add("coid", courseId)
                 .add("sid", courseSkuId)
                 .add("comment", comment);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/child/%d/comment", childId), builder.build());
-
-        return executeReturnObject(request, Boolean.class);
+        return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/child/%d/comment", childId), builder.build()), Boolean.class);
     }
 
     public List<Long> queryCommentedChildIds(long courseId, long courseSkuId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("coid", courseId)
                 .add("sid", courseSkuId);
-        HttpUriRequest request = MomiaHttpRequestBuilder.POST(url("/child/comment"), builder.build());
+        return executeReturnList(MomiaHttpRequestBuilder.POST(url("/child/comment"), builder.build()), Long.class);
+    }
 
-        return executeReturnList(request, Long.class);
+    public List<JSONObject> formatChildrenDetail(List<Child> children) {
+        List<JSONObject> feedChildren = new ArrayList<JSONObject>();
+        for (int i = 0; i < Math.min(2, children.size()); i++) {
+            Child child = children.get(i);
+            JSONObject feedChild = new JSONObject();
+            feedChild.put("sex", child.getSex());
+            feedChild.put("name", child.getName());
+            feedChild.put("age", TimeUtil.formatAge(child.getBirthday()));
+
+            feedChildren.add(feedChild);
+        }
+
+        return feedChildren;
+    }
+
+    public List<String> formatChildren(List<JSONObject> childrenDetail) {
+        List<String> formatedChildren = new ArrayList<String>();
+        for (JSONObject child : childrenDetail) {
+            formatedChildren.add(child.getString("sex") + "孩" + child.getString("age"));
+        }
+
+        return formatedChildren;
     }
 }

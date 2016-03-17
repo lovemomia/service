@@ -19,8 +19,4 @@ public class City {
     public void setName(String name) {
         this.name = name;
     }
-
-    public boolean exists() {
-        return id > 0;
-    }
 }

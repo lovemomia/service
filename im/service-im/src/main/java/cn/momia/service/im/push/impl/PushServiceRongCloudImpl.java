@@ -1,6 +1,7 @@
 package cn.momia.service.im.push.impl;
 
 import cn.momia.common.webapp.config.Configuration;
+import cn.momia.service.im.Consts;
 import cn.momia.service.im.push.PushMsg;
 import cn.momia.service.im.rongcloud.RongCloudUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -34,7 +35,7 @@ public class PushServiceRongCloudImpl extends AbstractPushService {
                     HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.SystemPush"));
 
                     List<NameValuePair> params = new ArrayList<NameValuePair>();
-                    params.add(new BasicNameValuePair("fromUserId", String.valueOf(SYSTEM_PUSH_USERID)));
+                    params.add(new BasicNameValuePair("fromUserId", String.valueOf(Consts.SYSTEM_USERID)));
                     for (long subUserId : subUserIds) {
                         params.add(new BasicNameValuePair("toUserId", String.valueOf(subUserId)));
                     }
@@ -66,7 +67,7 @@ public class PushServiceRongCloudImpl extends AbstractPushService {
             HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.GroupPush"));
 
             List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair("fromUserId", String.valueOf(SYSTEM_PUSH_USERID)));
+            params.add(new BasicNameValuePair("fromUserId", String.valueOf(Consts.SYSTEM_USERID)));
             params.add(new BasicNameValuePair("toGroupId", String.valueOf(groupId)));
             params.add(new BasicNameValuePair("objectName", "RC:TxtMsg"));
             params.add(new BasicNameValuePair("content", msg.toString()));

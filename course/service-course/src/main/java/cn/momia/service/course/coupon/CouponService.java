@@ -1,5 +1,6 @@
 package cn.momia.service.course.coupon;
 
+import cn.momia.api.course.dto.coupon.CouponCode;
 import cn.momia.api.course.dto.coupon.UserCoupon;
 
 import java.math.BigDecimal;
@@ -28,4 +29,6 @@ public interface CouponService {
     UserCoupon distributeFirstPayUserCoupon(long userId);
 
     List<UserCoupon> queryUserCouponsToExpired(int days);
+
+    CouponCode getCouponCode(String code);
 }

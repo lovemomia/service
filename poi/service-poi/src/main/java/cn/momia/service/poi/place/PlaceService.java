@@ -1,7 +1,5 @@
 package cn.momia.service.poi.place;
 
-import cn.momia.api.poi.dto.Place;
-
 import java.util.Collection;
 import java.util.List;
 

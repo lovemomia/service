@@ -1,8 +1,6 @@
 package cn.momia.api.poi.dto;
 
 public class Institution {
-    public static final Institution NOT_EXIST_INSTITUTION = new Institution();
-
     private int id;
     private String name;
     private String cover;
@@ -38,9 +36,5 @@ public class Institution {
 
     public void setIntro(String intro) {
         this.intro = intro;
-    }
-
-    public boolean exists() {
-        return id > 0;
     }
 }
