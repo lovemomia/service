@@ -138,7 +138,7 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
     private SubjectSku getMinPriceSku(Subject subject) {
         SubjectSku minPriceSubjectSku = SubjectSku.NOT_EXIST_SUBJECT_SKU;
         for (SubjectSku sku : subject.getSkus()) {
-            if ((subject.getType() == Subject.Type.NORMAL && sku.getCourseId() > 0) ||
+            if ((subject.getType() == Subject.Type.NORMAL && (sku.getCourseId() > 0 || sku.getStatus() != 1)) ||
                     (subject.getType() == Subject.Type.TRIAL && sku.getCourseId() <= 0)) continue;
 
             if (!minPriceSubjectSku.exists()) {
