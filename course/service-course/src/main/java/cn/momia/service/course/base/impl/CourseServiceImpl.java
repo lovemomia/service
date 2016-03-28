@@ -645,7 +645,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public List<TeacherCourse> queryOngoingByTeacher(long userId) {
-        String sql = "SELECT A.Id FROM SG_CourseTeacher A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status<>0 AND B.StartTime<=NOW() AND B.EndTime>NOW() AND B.Status<>0 ORDER BY B.StartTime ASC";
+        String sql = "SELECT A.Id FROM SG_CourseTeacher A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status<>0 AND DATE_SUB(B.StartTime, INTERVAL 10 MINUTE)<=NOW() AND DATE_ADD(B.EndTime, INTERVAL 10 MINUTE)>NOW() AND B.Status<>0 ORDER BY B.StartTime ASC";
         List<Long> teacherCourseIds = queryLongList(sql, new Object[] { userId });
 
         return listTeacherCourses(teacherCourseIds);
@@ -653,13 +653,13 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public long queryNotFinishedCountByTeacher(long userId) {
-        String sql = "SELECT COUNT(1) FROM SG_CourseTeacher A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status<>0 AND B.StartTime>NOW() AND B.Status<>0";
+        String sql = "SELECT COUNT(1) FROM SG_CourseTeacher A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status<>0 AND DATE_SUB(B.StartTime, INTERVAL 10 MINUTE)>NOW() AND B.Status<>0";
         return queryLong(sql, new Object[] { userId });
     }
 
     @Override
     public List<TeacherCourse> queryNotFinishedByTeacher(long userId, int start, int count) {
-        String sql = "SELECT A.Id FROM SG_CourseTeacher A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status<>0 AND B.StartTime>NOW() AND B.Status<>0 ORDER BY B.StartTime ASC LIMIT ?,?";
+        String sql = "SELECT A.Id FROM SG_CourseTeacher A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status<>0 AND DATE_SUB(B.StartTime, INTERVAL 10 MINUTE)>NOW() AND B.Status<>0 ORDER BY B.StartTime ASC LIMIT ?,?";
         List<Long> teacherCourseIds = queryLongList(sql, new Object[] { userId, start, count });
 
         return listTeacherCourses(teacherCourseIds);
@@ -687,13 +687,13 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public long queryFinishedCountByTeacher(long userId) {
-        String sql = "SELECT COUNT(1) FROM SG_CourseTeacher A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status<>0 AND B.EndTime<=NOW() AND B.Status<>0";
+        String sql = "SELECT COUNT(1) FROM SG_CourseTeacher A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status<>0 AND DATE_ADD(B.EndTime, INTERVAL 10 MINUTE)<=NOW() AND B.Status<>0";
         return queryLong(sql, new Object[] { userId });
     }
 
     @Override
     public List<TeacherCourse> queryFinishedByTeacher(long userId, int start, int count) {
-        String sql = "SELECT A.Id FROM SG_CourseTeacher A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status<>0 AND B.EndTime<=NOW() AND B.Status<>0 ORDER BY B.StartTime DESC LIMIT ?,?";
+        String sql = "SELECT A.Id FROM SG_CourseTeacher A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.UserId=? AND A.Status<>0 AND DATE_ADD(B.EndTime, INTERVAL 10 MINUTE)<=NOW() AND B.Status<>0 ORDER BY B.StartTime DESC LIMIT ?,?";
         List<Long> teacherCourseIds = queryLongList(sql, new Object[] { userId, start, count });
 
         return listTeacherCourses(teacherCourseIds);
