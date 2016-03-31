@@ -86,7 +86,7 @@ public class PaymentController extends BaseController {
         PrepayParam prepayParam = new PrepayParam();
 
         prepayParam.setPlatform(extractClientType(request, payType));
-        prepayParam.setOrderId(order.getId());
+        prepayParam.setOutTradeNo("sub" + order.getId());
         prepayParam.setProductId(subject.getId());
         prepayParam.setProductTitle(subject.getTitle());
         prepayParam.setProductUrl(Configuration.getString("Wap.ProductUrl") + order.getSubjectId());

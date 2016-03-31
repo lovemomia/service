@@ -82,7 +82,7 @@ public class ActivityController extends BaseController {
         PrepayParam prepayParam = new PrepayParam();
 
         prepayParam.setPlatform(extractClientType(request, payType));
-        prepayParam.setOrderId(activityEntry.getId());
+        prepayParam.setOutTradeNo("act" + activityEntry.getId());
         prepayParam.setProductId(activity.getId());
         prepayParam.setProductTitle(activity.getTitle());
         prepayParam.setProductUrl(Configuration.getString("Wap.ActivityUrl") + activity.getId());
