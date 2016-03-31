@@ -21,7 +21,7 @@ public class ActivityServiceImpl extends AbstractService implements ActivityServ
 
     @Override
     public Activity getActivity(int activityId) {
-        String sql = "SELECT Id, Cover, Title, Desc, NeedPay, Price, StartTime, EndTime FROM SG_Activity WHERE Id=? AND OnlineTime<=NOW() AND OfflineTime>NOW() AND Status=1";
+        String sql = "SELECT Id, Cover, Title, `Desc`, NeedPay, Price, StartTime, EndTime FROM SG_Activity WHERE Id=? AND OnlineTime<=NOW() AND OfflineTime>NOW() AND Status=1";
         return queryObject(sql, new Object[] { activityId }, Activity.class, Activity.NOT_EXIST_ACTIVITY);
     }
 
