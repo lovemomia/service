@@ -1,5 +1,7 @@
 package cn.momia.service.course.activity;
 
+import cn.momia.api.course.activity.Activity;
+
 public interface ActivityService {
     Activity getActivity(int activityId);
     ActivityEntry getActivityEntry(long entryId);

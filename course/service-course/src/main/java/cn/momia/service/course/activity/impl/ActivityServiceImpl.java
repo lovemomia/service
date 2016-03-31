@@ -1,7 +1,7 @@
 package cn.momia.service.course.activity.impl;
 
 import cn.momia.common.service.AbstractService;
-import cn.momia.service.course.activity.Activity;
+import cn.momia.api.course.activity.Activity;
 import cn.momia.service.course.activity.ActivityEntry;
 import cn.momia.service.course.activity.ActivityService;
 import cn.momia.service.course.activity.Payment;
@@ -21,7 +21,7 @@ public class ActivityServiceImpl extends AbstractService implements ActivityServ
 
     @Override
     public Activity getActivity(int activityId) {
-        String sql = "SELECT Id, Title, NeedPay, Price, StartTime, EndTime FROM SG_Activity WHERE Id=? AND OnlineTime<=NOW() AND OfflineTime>NOW() AND Status=1";
+        String sql = "SELECT Id, Cover, Title, Desc, NeedPay, Price, StartTime, EndTime FROM SG_Activity WHERE Id=? AND OnlineTime<=NOW() AND OfflineTime>NOW() AND Status=1";
         return queryObject(sql, new Object[] { activityId }, Activity.class, Activity.NOT_EXIST_ACTIVITY);
     }
 

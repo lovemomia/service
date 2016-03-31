@@ -14,7 +14,7 @@ import cn.momia.common.deal.gateway.factory.PaymentGatewayFactory;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.webapp.util.RequestUtil;
-import cn.momia.service.course.activity.Activity;
+import cn.momia.api.course.activity.Activity;
 import cn.momia.service.course.activity.ActivityEntry;
 import cn.momia.service.course.activity.ActivityService;
 import cn.momia.service.course.activity.Payment;
@@ -33,6 +33,13 @@ import java.math.BigDecimal;
 @RequestMapping(value = "/activity")
 public class ActivityController extends BaseController {
     @Autowired private ActivityService activityService;
+
+    @RequestMapping(value = "/{aid}", method = RequestMethod.GET)
+    public MomiaHttpResponse join(@PathVariable(value = "aid") int activityId) {
+        Activity activity = activityService.getActivity(activityId);
+        if (!activity.exists()) return MomiaHttpResponse.FAILED("无效的活动");
+        return MomiaHttpResponse.SUCCESS(activity);
+    }
 
     @RequestMapping(value = "/{aid}/join", method = RequestMethod.POST)
     public MomiaHttpResponse join(@PathVariable(value = "aid") int activityId,

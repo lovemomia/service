@@ -1,4 +1,4 @@
-package cn.momia.service.course.activity;
+package cn.momia.api.course.activity;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -7,7 +7,9 @@ public class Activity {
     public static final Activity NOT_EXIST_ACTIVITY = new Activity();
 
     private int id;
+    private String cover;
     private String title;
+    private String desc;
     private boolean needPay;
     private BigDecimal price;
     private Date startTime;
@@ -21,12 +23,28 @@ public class Activity {
         this.id = id;
     }
 
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
+
     public String getTitle() {
         return title;
     }
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 
     public boolean isNeedPay() {
