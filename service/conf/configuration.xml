@@ -59,7 +59,7 @@
         <Domain>m.momia.cn</Domain>
         <ProductUrl>http://m.momia.cn/subjectdetail?id=</ProductUrl>
         <PaymentResultUrl>http://m.momia.cn/payment/result?oid=</PaymentResultUrl>
-        <ActivityUrl>http://m.momia.cn/activity/</ActivityUrl>
+        <ActivityUrl>http://m.momia.cn/activity/detail/</ActivityUrl>
         <ActivityPaymentResultUrl>http://m.momia.cn/activity/result?eid=</ActivityPaymentResultUrl>
     </Wap>
 
