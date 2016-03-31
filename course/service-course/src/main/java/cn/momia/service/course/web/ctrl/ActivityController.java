@@ -20,6 +20,7 @@ import cn.momia.service.course.activity.ActivityService;
 import cn.momia.service.course.activity.Payment;
 import com.google.common.base.Function;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,11 +30,24 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 
 @RestController
-@RequestMapping(value = "/activity/payment")
+@RequestMapping(value = "/activity")
 public class ActivityController extends BaseController {
     @Autowired private ActivityService activityService;
 
-    @RequestMapping(value = "/prepay/alipay", method = RequestMethod.POST)
+    @RequestMapping(value = "/{aid}/join", method = RequestMethod.POST)
+    public MomiaHttpResponse join(@PathVariable(value = "aid") int activityId,
+                                  @RequestParam String mobile,
+                                  @RequestParam(value = "cname") String childName) {
+        if (activityService.joined(activityId, mobile, childName)) return MomiaHttpResponse.FAILED("您已为 " + childName + " 报过名，无需重复报名");
+
+        Activity activity = activityService.getActivity(activityId);
+        if (!activity.exists()) return MomiaHttpResponse.FAILED("活动不存在");
+
+        long entryId = activityService.join(activityId, mobile, childName, activity.isNeedPay() ? ActivityEntry.Status.NOT_PAYED : ActivityEntry.Status.PAYED);
+        return MomiaHttpResponse.SUCCESS(activity.isNeedPay() ? entryId : 0);
+    }
+
+    @RequestMapping(value = "/payment/prepay/alipay", method = RequestMethod.POST)
     public MomiaHttpResponse prepayAlipay(HttpServletRequest request) {
         return prepay(request, PayType.ALIPAY);
     }
@@ -99,12 +113,12 @@ public class ActivityController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/prepay/weixin", method = RequestMethod.POST)
+    @RequestMapping(value = "/payment/prepay/weixin", method = RequestMethod.POST)
     public MomiaHttpResponse prepayWeixin(HttpServletRequest request) {
         return prepay(request, PayType.WEIXIN);
     }
 
-    @RequestMapping(value = "/callback/alipay", method = RequestMethod.POST)
+    @RequestMapping(value = "/payment/callback/alipay", method = RequestMethod.POST)
     public MomiaHttpResponse alipayCallback(HttpServletRequest request) {
         return callback(request, PayType.ALIPAY);
     }
@@ -159,12 +173,12 @@ public class ActivityController extends BaseController {
         return activityService.pay(payment);
     }
 
-    @RequestMapping(value = "/callback/weixin", method = RequestMethod.POST)
+    @RequestMapping(value = "/payment/callback/weixin", method = RequestMethod.POST)
     public MomiaHttpResponse wechatpayCallback(HttpServletRequest request) {
         return callback(request, PayType.WEIXIN);
     }
 
-    @RequestMapping(value = "/check", method = RequestMethod.POST)
+    @RequestMapping(value = "/payment/check", method = RequestMethod.POST)
     public MomiaHttpResponse check(@RequestParam(value = "eid") long entryId) {
         ActivityEntry activityEntry = activityService.getActivityEntry(entryId);
         return MomiaHttpResponse.SUCCESS(activityEntry.exists() && activityEntry.isPayed());

@@ -7,8 +7,14 @@ import cn.momia.service.course.activity.ActivityService;
 import cn.momia.service.course.activity.Payment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class ActivityServiceImpl extends AbstractService implements ActivityService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ActivityServiceImpl.class);
@@ -23,6 +29,29 @@ public class ActivityServiceImpl extends AbstractService implements ActivityServ
     public ActivityEntry getActivityEntry(long entryId) {
         String sql = "SELECT Id, ActivityId, Mobile, ChildName, Status FROM SG_ActivityEntry WHERE Id=?";
         return queryObject(sql, new Object[] { entryId }, ActivityEntry.class, ActivityEntry.NOT_EXIST_ACTIVITY_ENTRY);
+    }
+
+    @Override
+    public boolean joined(int activityId, String mobile, String childName) {
+        String sql = "SELECT COUNT(1) FROM SG_ActivityEntry WHERE ActivityId=? AND Mobile=? AND ChildName=? AND Status<>0";
+        return queryInt(sql, new Object[] { activityId, mobile, childName }) > 0;
+    }
+
+    @Override
+    public long join(final int activityId, final String mobile, final String childName, final int status) {
+        return insert(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                String sql = "INSERT INTO SG_ActivityEntry (ActivityId, Mobile, ChildName, Status, AddTime) VALUES (?, ?, ?, ?, NOW())";
+                PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ps.setInt(1, activityId);
+                ps.setString(2, mobile);
+                ps.setString(3, childName);
+                ps.setInt(4, status);
+
+                return ps;
+            }
+        }).getKey().longValue();
     }
 
     @Override

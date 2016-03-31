@@ -8,6 +8,13 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Map;
 
 public class ActivityServiceApi extends HttpServiceApi {
+    public long join(int activityId, String mobile, String childName) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("mobile", mobile)
+                .add("cname", childName);
+        return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/activity/%d/join", activityId), builder.build()), Number.class).longValue();
+    }
+
     public Object prepayAlipay(long entryId, String type) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("eid", entryId)
