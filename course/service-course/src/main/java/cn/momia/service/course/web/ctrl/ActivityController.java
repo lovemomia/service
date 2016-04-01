@@ -1,5 +1,6 @@
 package cn.momia.service.course.web.ctrl;
 
+import cn.momia.api.user.SmsServiceApi;
 import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.core.platform.Platform;
@@ -19,6 +20,8 @@ import cn.momia.api.course.activity.ActivityEntry;
 import cn.momia.service.course.activity.ActivityService;
 import cn.momia.service.course.activity.Payment;
 import com.google.common.base.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +35,9 @@ import java.math.BigDecimal;
 @RestController
 @RequestMapping(value = "/activity")
 public class ActivityController extends BaseController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActivityController.class);
+
+    @Autowired private SmsServiceApi smsServiceApi;
     @Autowired private ActivityService activityService;
 
     @RequestMapping(value = "/{aid}", method = RequestMethod.GET)
@@ -168,6 +174,8 @@ public class ActivityController extends BaseController {
 
         if (!finishPayment(createPayment(callbackParam))) return false;
 
+        notifyUser(callbackParam.getOrderId());
+
         return true;
     }
 
@@ -185,6 +193,19 @@ public class ActivityController extends BaseController {
 
     private boolean finishPayment(Payment payment) {
         return activityService.pay(payment);
+    }
+
+    private void notifyUser(long entryId) {
+        try {
+            ActivityEntry activityEntry = activityService.getActivityEntry(entryId);
+            if (!activityEntry.exists()) return;
+            Activity activity = activityService.getActivity(activityEntry.getActivityId());
+            if (!activity.exists()) return;
+
+            smsServiceApi.notify(activityEntry.getMobile(), activity.getMessage());
+        } catch (Exception e) {
+            LOGGER.error("fail to notify for activity entry: {}", entryId, e);
+        }
     }
 
     @RequestMapping(value = "/payment/callback/weixin", method = RequestMethod.POST)
