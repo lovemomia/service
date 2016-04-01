@@ -10,6 +10,7 @@ public class Activity {
     private String cover;
     private String title;
     private String desc;
+    private String message;
     private boolean needPay;
     private BigDecimal price;
     private Date startTime;
@@ -45,6 +46,14 @@ public class Activity {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public boolean isNeedPay() {

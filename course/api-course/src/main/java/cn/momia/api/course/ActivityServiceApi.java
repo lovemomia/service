@@ -1,6 +1,7 @@
 package cn.momia.api.course;
 
 import cn.momia.api.course.activity.Activity;
+import cn.momia.api.course.activity.ActivityEntry;
 import cn.momia.common.core.api.HttpServiceApi;
 import cn.momia.common.core.http.MomiaHttpParamBuilder;
 import cn.momia.common.core.http.MomiaHttpRequestBuilder;
@@ -11,6 +12,10 @@ import java.util.Map;
 public class ActivityServiceApi extends HttpServiceApi {
     public Activity get(int activityId) {
         return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/activity/%d", activityId)), Activity.class);
+    }
+
+    public ActivityEntry getEntry(long entryId) {
+        return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/activity/entry/%d", entryId)), ActivityEntry.class);
     }
 
     public long join(int activityId, String mobile, String childName) {

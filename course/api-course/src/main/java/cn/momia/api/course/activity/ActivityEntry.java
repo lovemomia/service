@@ -1,4 +1,4 @@
-package cn.momia.service.course.activity;
+package cn.momia.api.course.activity;
 
 public class ActivityEntry {
     public static class Status {

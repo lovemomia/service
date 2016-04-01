@@ -15,7 +15,7 @@ import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.webapp.util.RequestUtil;
 import cn.momia.api.course.activity.Activity;
-import cn.momia.service.course.activity.ActivityEntry;
+import cn.momia.api.course.activity.ActivityEntry;
 import cn.momia.service.course.activity.ActivityService;
 import cn.momia.service.course.activity.Payment;
 import com.google.common.base.Function;
@@ -35,10 +35,17 @@ public class ActivityController extends BaseController {
     @Autowired private ActivityService activityService;
 
     @RequestMapping(value = "/{aid}", method = RequestMethod.GET)
-    public MomiaHttpResponse join(@PathVariable(value = "aid") int activityId) {
+    public MomiaHttpResponse get(@PathVariable(value = "aid") int activityId) {
         Activity activity = activityService.getActivity(activityId);
         if (!activity.exists()) return MomiaHttpResponse.FAILED("无效的活动");
         return MomiaHttpResponse.SUCCESS(activity);
+    }
+
+    @RequestMapping(value = "/entry/{eid}", method = RequestMethod.GET)
+    public MomiaHttpResponse getEntry(@PathVariable(value = "eid") long entryId) {
+        ActivityEntry activityEntry = activityService.getActivityEntry(entryId);
+        if (!activityEntry.exists()) return MomiaHttpResponse.FAILED("无效的报名信息");
+        return MomiaHttpResponse.SUCCESS(activityEntry);
     }
 
     @RequestMapping(value = "/{aid}/join", method = RequestMethod.POST)
