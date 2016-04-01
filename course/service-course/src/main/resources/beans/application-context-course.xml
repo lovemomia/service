@@ -4,6 +4,7 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <bean class="cn.momia.service.course.activity.impl.ActivityServiceImpl" parent="dbAccessService" />
     <bean id="courseService" class="cn.momia.service.course.base.impl.CourseServiceImpl" parent="dbAccessService">
         <property name="poiServiceApi" ref="poiServiceApi" />
     </bean>
