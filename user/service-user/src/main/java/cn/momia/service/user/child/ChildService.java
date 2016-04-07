@@ -13,6 +13,7 @@ public interface ChildService {
 
     Map<Long, List<Child>> queryByUsers(Collection<Long> userIds);
 
+    boolean update(long userId, long childId, String avatar, String name, String sex, Date birthday);
     boolean updateAvatar(long userId, long childId, String avatar);
     boolean updateName(long userId, long childId, String name);
     boolean updateSex(long userId, long childId, String sex);
