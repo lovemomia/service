@@ -42,7 +42,15 @@ public class ChildController extends BaseController {
         }
 
         for (Child child : children) {
-            childService.add(child);
+            if (child.getId() <= 0) childService.add(child);
+            else {
+                long userId = user.getId();
+                long childId = child.getId();
+                childService.updateAvatar(userId, childId, child.getAvatar());
+                childService.updateName(userId, childId, child.getName());
+                childService.updateSex(userId, childId, child.getSex());
+                childService.updateBirthday(userId, childId, child.getBirthday());
+            }
         }
 
         return MomiaHttpResponse.SUCCESS(new User.Full(userService.get(user.getId())));
