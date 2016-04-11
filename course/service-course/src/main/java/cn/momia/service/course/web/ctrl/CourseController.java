@@ -272,14 +272,6 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(courseDetail);
     }
 
-    @RequestMapping(value = "/{coid}/institution", method = RequestMethod.GET)
-    public MomiaHttpResponse institution(@PathVariable(value = "coid") long courseId) {
-        int institutionId = courseService.getInstitutionId(courseId);
-        if (institutionId <= 0) return MomiaHttpResponse.FAILED("机构不存在");
-
-        return MomiaHttpResponse.SUCCESS(institutionId);
-    }
-
     @RequestMapping(value = "/{coid}/book", method = RequestMethod.GET)
     public MomiaHttpResponse book(@PathVariable(value = "coid") long courseId, @RequestParam int start, @RequestParam int count) {
         if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);

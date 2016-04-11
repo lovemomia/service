@@ -12,6 +12,8 @@ import java.util.Collection;
 import java.util.List;
 
 public class ImServiceApi extends HttpServiceApi {
+    /** 用户相关操作 **/
+
     public String generateImToken(long userId, String nickName, String avatar) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uid", userId)
@@ -39,27 +41,6 @@ public class ImServiceApi extends HttpServiceApi {
         return executeReturnList(MomiaHttpRequestBuilder.GET(url("/im/user/group"), builder.build()), UserGroup.class);
     }
 
-    public boolean createGroup(long courseId, long courseSkuId, Collection<Long> teacherUserIds, String groupName) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("coid", courseId)
-                .add("sid", courseSkuId)
-                .add("tids", StringUtils.join(teacherUserIds, ","))
-                .add("name", groupName);
-        return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/im/group"), builder.build()), Boolean.class);
-    }
-
-    public boolean updateGroup(long courseId, long courseSkuId, String groupName) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("coid", courseId)
-                .add("sid", courseSkuId)
-                .add("name", groupName);
-        return executeReturnObject(MomiaHttpRequestBuilder.PUT(url("/im/group"), builder.build()), Boolean.class);
-    }
-
-    public boolean dismissGroup(long groupId) {
-        return executeReturnObject(MomiaHttpRequestBuilder.DELETE(url("/im/group/%d", groupId)), Boolean.class);
-    }
-
     public Group getGroup(long groupId) {
         return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/im/group/%d", groupId)), Group.class);
     }
@@ -84,6 +65,29 @@ public class ImServiceApi extends HttpServiceApi {
                 .add("coid", courseId)
                 .add("sid", courseSkuId);
         return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/im/group/leave"), builder.build()), Boolean.class);
+    }
+
+    /** 系统相关操作 **/
+
+    public boolean createGroup(long courseId, long courseSkuId, Collection<Long> teacherUserIds, String groupName) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("coid", courseId)
+                .add("sid", courseSkuId)
+                .add("tids", StringUtils.join(teacherUserIds, ","))
+                .add("name", groupName);
+        return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/im/group"), builder.build()), Boolean.class);
+    }
+
+    public boolean updateGroup(long courseId, long courseSkuId, String groupName) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("coid", courseId)
+                .add("sid", courseSkuId)
+                .add("name", groupName);
+        return executeReturnObject(MomiaHttpRequestBuilder.PUT(url("/im/group"), builder.build()), Boolean.class);
+    }
+
+    public boolean dismissGroup(long groupId) {
+        return executeReturnObject(MomiaHttpRequestBuilder.DELETE(url("/im/group/%d", groupId)), Boolean.class);
     }
 
     public boolean push(long userId, String content, String extra) {

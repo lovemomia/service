@@ -9,10 +9,6 @@ public interface ImService {
     boolean updateAvatar(long userId, String avatar);
     List<UserGroup> listUserGroups(long userId);
 
-    boolean createGroup(long courseId, long courseSkuId, Collection<Long> teacherUserIds, String groupName);
-    boolean updateGroup(long courseId, long courseSkuId, String groupName);
-    boolean dismissGroup(long groupId);
-
     Group getGroup(long groupId);
 
     boolean isInGroup(long userId, long groupId);
@@ -20,4 +16,8 @@ public interface ImService {
 
     boolean joinGroup(long userId, long courseId, long courseSkuId, boolean teacher);
     boolean leaveGroup(long userId, long courseId, long courseSkuId);
+
+    boolean createGroup(long courseId, long courseSkuId, Collection<Long> teacherUserIds, String groupName);
+    boolean updateGroup(long courseId, long courseSkuId, String groupName);
+    boolean dismissGroup(long groupId);
 }

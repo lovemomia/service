@@ -81,7 +81,6 @@ public interface CourseService {
     Map<Long,Long> queryBookedPackageUsers(Collection<Long> userIds, long courseId, long courseSkuId);
 
     CourseDetail getDetail(long courseId);
-    int getInstitutionId(long courseId);
 
     long querySubjectId(long courseId);
 

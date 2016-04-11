@@ -127,10 +127,6 @@ public class CourseServiceApi extends HttpServiceApi {
         return executeReturnPagedList(MomiaHttpRequestBuilder.GET(url("/course/%d/teacher", courseId), builder.build()), Integer.class);
     }
 
-    public int getInstitutionId(long courseId) {
-        return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/course/%d/institution", courseId)), Integer.class);
-    }
-
     public Map<Long, String> queryTips(Set<Long> courseIds) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("coids", StringUtils.join(courseIds, ","));
         return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/course/tips"), builder.build()), Map.class);

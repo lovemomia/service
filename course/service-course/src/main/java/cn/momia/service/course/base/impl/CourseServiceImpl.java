@@ -2,7 +2,6 @@ package cn.momia.service.course.base.impl;
 
 import cn.momia.api.course.dto.course.Student;
 import cn.momia.api.poi.MetaUtil;
-import cn.momia.api.poi.dto.Institution;
 import cn.momia.api.poi.dto.Region;
 import cn.momia.api.course.dto.course.Course;
 import cn.momia.api.course.dto.course.CourseDetail;
@@ -119,25 +118,19 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     public List<Course> list(Collection<Long> courseIds) {
         if (courseIds.isEmpty()) return new ArrayList<Course>();
 
-        String sql = "SELECT A.Id, A.Type, A.ParentId, A.SubjectId, A.Title, A.KeyWord, A.Feature, A.Cover, A.MinAge, A.MaxAge, A.Insurance, A.Joined, A.Price, A.Price AS OriginalPrice, A.Goal, A.Flow, A.Tips, A.Notice, B.Notice AS SubjectNotice, A.InstitutionId, A.Status, B.Title AS Subject, B.Stock, A.AddTime FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Id IN (" + StringUtils.join(courseIds, ",") + ") AND A.Status<>0 AND B.Status<>0";
+        String sql = "SELECT A.Id, A.Type, A.ParentId, A.SubjectId, A.Title, A.KeyWord, A.Feature, A.Cover, A.MinAge, A.MaxAge, A.Insurance, A.Joined, A.Price, A.Price AS OriginalPrice, A.Goal, A.Flow, A.Tips, A.Notice, B.Notice AS SubjectNotice, A.Status, B.Title AS Subject, B.Stock, A.AddTime FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Id IN (" + StringUtils.join(courseIds, ",") + ") AND A.Status<>0 AND B.Status<>0";
         List<Course> courses = queryObjectList(sql, Course.class);
 
-        Set<Integer> institutionIds = new HashSet<Integer>();
         Set<Long> courseAndParentIds = Sets.newHashSet(courseIds);
         for (Course course : courses) {
-            institutionIds.add(course.getInstitutionId());
             if (course.getParentId() > 0) courseAndParentIds.add(course.getParentId());
         }
-        Map<Integer, Institution> institutionsMap = queryInstitutions(institutionIds);
         Map<Long, List<String>> imgsMap = queryImgs(courseAndParentIds);
         Map<Long, List<String>> bookImgsMap = queryBookImgs(courseAndParentIds);
         Map<Long, List<CourseSku>> skusMap = querySkus(courseIds);
         Map<Long, BigDecimal> buyablesMap = queryBuyables(courseIds);
 
         for (Course course : courses) {
-            Institution institution = institutionsMap.get(course.getInstitutionId());
-            if (institution != null) course.setInstitution(institution.getIntro());
-
             course.setImgs(imgsMap.get(course.getId()));
             List<String> bookImgs = bookImgsMap.get(course.getId());
 
@@ -185,19 +178,6 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         }
 
         return result;
-    }
-
-    private Map<Integer, Institution> queryInstitutions(Collection<Integer> institutionIds) {
-        if (institutionIds.isEmpty()) return new HashMap<Integer, Institution>();
-
-        List<Institution> institutions = poiServiceApi.listInstitutions(institutionIds);
-
-        Map<Integer, Institution> institutionsMap = new HashMap<Integer, Institution>();
-        for (Institution institution : institutions) {
-            institutionsMap.put(institution.getId(), institution);
-        }
-
-        return institutionsMap;
     }
 
     private Map<Long, List<String>> queryImgs(Collection<Long> courseIds) {
@@ -838,12 +818,6 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         }
 
         return details.get(0);
-    }
-
-    @Override
-    public int getInstitutionId(long courseId) {
-        String sql = "SELECT InstitutionId FROM SG_Course WHERE Id=? AND Status<>0";
-        return queryInt(sql, new Object[] { courseId });
     }
 
     @Override

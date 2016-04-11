@@ -61,8 +61,6 @@ public class Course implements Cloneable {
     private String tips;
     private String notice;
     private String subjectNotice;
-    @JSONField(serialize = false) private int institutionId;
-    private String institution;
 
     private List<String> imgs;
     private JSONObject book;
@@ -292,22 +290,6 @@ public class Course implements Cloneable {
 
     public void setSubjectNotice(String subjectNotice) {
         this.subjectNotice = subjectNotice;
-    }
-
-    public int getInstitutionId() {
-        return institutionId;
-    }
-
-    public void setInstitutionId(int institutionId) {
-        this.institutionId = institutionId;
-    }
-
-    public String getInstitution() {
-        return institution;
-    }
-
-    public void setInstitution(String institution) {
-        this.institution = institution;
     }
 
     public List<String> getImgs() {
