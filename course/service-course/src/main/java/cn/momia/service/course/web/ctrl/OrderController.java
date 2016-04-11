@@ -265,7 +265,13 @@ public class OrderController extends BaseController {
             subjectPackage.setPackageId(orderPackage.getId());
             subjectPackage.setSubjectId(order.getSubjectId());
             subjectPackage.setTitle(subject.getTitle());
-            subjectPackage.setCover(subject.getCover());
+            List<Long> orderCourseIds = order.getCourseIds();
+            if (orderCourseIds.size() >= 1) {
+                Course course = courseService.get(orderCourseIds.get(0));
+                subjectPackage.setCover(course.getCover());
+            } else {
+                subjectPackage.setCover(subject.getCover());
+            }
             subjectPackage.setBookableCourseCount(orderPackage.getBookableCount());
 
             Date startTime = startTimes.get(orderPackage.getId());
