@@ -1,6 +1,5 @@
 package cn.momia.service.course.web.ctrl;
 
-import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.api.course.dto.subject.Subject;
@@ -20,23 +19,6 @@ import java.util.List;
 @RequestMapping("/subject")
 public class SubjectController extends BaseController {
     @Autowired private SubjectService subjectService;
-
-    @RequestMapping(value = "/trial", method = RequestMethod.GET)
-    public MomiaHttpResponse listTrial(@RequestParam(value = "city") long cityId, @RequestParam int start, @RequestParam int count) {
-        if (isInvalidLimit(start, count)) return MomiaHttpResponse.SUCCESS(PagedList.EMPTY);
-
-        long totalCount = subjectService.queryTrialCount(cityId);
-        List<Subject> subjects = subjectService.queryTrial(cityId, start, count);
-
-        List<Subject> baseSubjects = new ArrayList<Subject>();
-        for (Subject subject : subjects) {
-            baseSubjects.add(new Subject.Base(subject));
-        }
-        PagedList<Subject> pagedSubjects = new PagedList<Subject>(totalCount, start, count);
-        pagedSubjects.setList(baseSubjects);
-
-        return MomiaHttpResponse.SUCCESS(pagedSubjects);
-    }
 
     @RequestMapping(value = "/{suid}", method = RequestMethod.GET)
     public MomiaHttpResponse get(@PathVariable(value = "suid") long subjectId) {

@@ -17,9 +17,6 @@ public interface SubjectService {
 
     boolean isTrial(long subjectId);
 
-    long queryTrialCount(long cityId);
-    List<Subject> queryTrial(long cityId, int start, int count);
-
     boolean increaseStock(long subjectId, int count);
     boolean decreaseStock(long subjectId, int count);
 }

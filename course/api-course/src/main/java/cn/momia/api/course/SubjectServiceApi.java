@@ -11,14 +11,6 @@ import cn.momia.common.core.http.MomiaHttpRequestBuilder;
 import java.util.List;
 
 public class SubjectServiceApi extends HttpServiceApi {
-    public PagedList<Subject> listTrial(int cityId, int start, int count) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
-                .add("city", cityId)
-                .add("start", start)
-                .add("count", count);
-        return executeReturnPagedList(MomiaHttpRequestBuilder.GET(url("/subject/trial"), builder.build()), Subject.class);
-    }
-
     public Subject get(long subjectId) {
         return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/subject/%d", subjectId)), Subject.class);
     }
