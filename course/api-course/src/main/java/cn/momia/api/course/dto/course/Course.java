@@ -48,7 +48,8 @@ public class Course implements Cloneable {
     private int status;
     private boolean buyable;
 
-    private List<CourseSku> skus = new ArrayList<CourseSku>();
+    @JSONField(serialize = false) private List<CourseSku> skus = new ArrayList<CourseSku>();
+    private Long skuId;
 
     // 非数据库字段
     private String age;
@@ -218,6 +219,14 @@ public class Course implements Cloneable {
 
     public void setSkus(List<CourseSku> skus) {
         this.skus = skus;
+    }
+
+    public Long getSkuId() {
+        return skuId;
+    }
+
+    public void setSkuId(Long skuId) {
+        this.skuId = skuId;
     }
 
     public String getAge() {
@@ -404,6 +413,7 @@ public class Course implements Cloneable {
             setBuyable(course.isBuyable());
             setGoal(course.getGoal());
             setAddTime(course.getAddTime());
+            setSkuId(course.getSkuId());
         }
     }
 }

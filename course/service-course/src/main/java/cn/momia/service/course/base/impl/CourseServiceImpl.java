@@ -502,7 +502,9 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
             if (course == null) continue;
 
             Course baseCourse = new Course.Base(course);
-            baseCourse.setSkus(Lists.newArrayList(sku));
+            baseCourse.setScheduler(sku.getScheduler());
+            baseCourse.setRegion(MetaUtil.getRegionName(sku.getPlace().getRegionId()));
+            baseCourse.setSkuId(sku.getId());
 
             results.add(baseCourse);
         }
