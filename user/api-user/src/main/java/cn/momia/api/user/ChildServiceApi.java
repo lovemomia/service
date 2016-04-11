@@ -36,11 +36,6 @@ public class ChildServiceApi extends HttpServiceApi {
         return executeReturnList(MomiaHttpRequestBuilder.GET(url("/child"), builder.build()), Child.class);
     }
 
-    public List<Child> list(Collection<Long> childrenIds) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("cids", StringUtils.join(childrenIds, ","));
-        return executeReturnList(MomiaHttpRequestBuilder.GET(url("/child/list"), builder.build()), Child.class);
-    }
-
     public User updateAvatar(String utoken, long childId, String avatar) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -72,6 +67,11 @@ public class ChildServiceApi extends HttpServiceApi {
     public User delete(String utoken, long childId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         return executeReturnObject(MomiaHttpRequestBuilder.DELETE(url("/child/%d", childId), builder.build()), User.class);
+    }
+
+    public List<Child> list(Collection<Long> childrenIds) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("cids", StringUtils.join(childrenIds, ","));
+        return executeReturnList(MomiaHttpRequestBuilder.GET(url("/child/list"), builder.build()), Child.class);
     }
 
     public List<ChildTag> listAllTags() {

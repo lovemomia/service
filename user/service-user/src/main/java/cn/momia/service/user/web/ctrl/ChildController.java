@@ -61,14 +61,9 @@ public class ChildController extends BaseController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public MomiaHttpResponse listUserChildren(@RequestParam String utoken) {
+    public MomiaHttpResponse listChildren(@RequestParam String utoken) {
         User user = userService.getByToken(utoken);
         return user.exists() ? MomiaHttpResponse.SUCCESS(user.getChildren()) : MomiaHttpResponse.TOKEN_EXPIRED;
-    }
-
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public MomiaHttpResponse listChildren(@RequestParam String cids) {
-        return MomiaHttpResponse.SUCCESS(childService.list(MomiaUtil.splitDistinctLongs(cids)));
     }
 
     @RequestMapping(value = "/{cid}/avatar",method = RequestMethod.PUT)
@@ -127,6 +122,13 @@ public class ChildController extends BaseController {
         if (!childService.delete(user.getId(), childId)) return MomiaHttpResponse.FAILED("删除孩子信息失败");
 
         return MomiaHttpResponse.SUCCESS(new User.Full(userService.get(user.getId())));
+    }
+
+    /** 老师相关 **/
+
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public MomiaHttpResponse listByIds(@RequestParam String cids) {
+        return MomiaHttpResponse.SUCCESS(childService.list(MomiaUtil.splitDistinctLongs(cids)));
     }
 
     @RequestMapping(value = "/tag", method = RequestMethod.GET)
