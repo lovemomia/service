@@ -16,6 +16,7 @@ import cn.momia.api.course.dto.course.BookedCourse;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.api.course.dto.course.CourseSku;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -31,6 +32,7 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -464,7 +466,48 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public List<Course> queryRecentCoursesBySubject(long subjectId) {
-        return null;
+        Calendar calendar = Calendar.getInstance();
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        if (dayOfWeek > 1) {
+            calendar.add(Calendar.DATE, 2 - dayOfWeek);
+        } else {
+            calendar.add(Calendar.DATE, -6);
+        }
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        Date startTime = calendar.getTime();
+        Date endTime = new Date(startTime.getTime() + 7L * 24 * 60 * 60 * 1000);
+
+        String sql = "SELECT B.Id FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND B.StartTime>=? AND B.StartTime<? AND A.Status=1 AND B.Status=1 ORDER BY B.StartTime ASC";
+        List<Long> sukuIds = queryLongList(sql, new Object[] { subjectId, startTime, endTime });
+        List<CourseSku> skus = listSkus(sukuIds);
+
+        Set<Long> courseIds = new HashSet<Long>();
+        for (CourseSku sku : skus) {
+            courseIds.add(sku.getCourseId());
+        }
+
+        List<Course> courses = list(courseIds);
+        Map<Long, Course> coursesMap = new HashMap<Long, Course>();
+        for (Course course : courses) {
+            coursesMap.put(course.getId(), course);
+        }
+
+        List<Course> results = new ArrayList<Course>();
+        for (CourseSku sku : skus) {
+            Course course = coursesMap.get(sku.getCourseId());
+            if (course == null) continue;
+
+            Course baseCourse = new Course.Base(course);
+            baseCourse.setSkus(Lists.newArrayList(sku));
+
+            results.add(baseCourse);
+        }
+
+        return results;
     }
 
     @Override

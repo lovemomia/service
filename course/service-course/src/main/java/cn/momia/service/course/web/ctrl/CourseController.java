@@ -197,7 +197,7 @@ public class CourseController extends BaseController {
     }
 
     @RequestMapping(value = "/list/subject/recent", method = RequestMethod.GET)
-    public MomiaHttpResponse listNewCoursesBySubject(@RequestParam(value = "suid") long subjectId) {
+    public MomiaHttpResponse listRecentCoursesBySubject(@RequestParam(value = "suid") long subjectId) {
         List<Course> recentCourses = courseService.queryRecentCoursesBySubject(subjectId);
         Map<Long, Course> coursesMap = new HashMap<Long, Course>();
         for (Course course : recentCourses) {
