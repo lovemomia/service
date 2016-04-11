@@ -494,7 +494,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     public Map<Long, List<Course>> queryAllBySubjects(Collection<Long> subjectIds) {
         if (subjectIds.isEmpty()) return new HashMap<Long, List<Course>>();
 
-        String sql = "SELECT Id FROM SG_Course WHERE SubjectId IN (" + StringUtils.join(subjectIds, ",") + ") AND Status=1 ORDER BY AddTime DESC";
+        String sql = "SELECT Id FROM SG_Course WHERE SubjectId IN (" + StringUtils.join(subjectIds, ",") + ") AND Status=1 ORDER BY Order ASC, AddTime DESC";
         List<Long> courseIds = queryLongList(sql);
         List<Course> courses = list(courseIds);
 

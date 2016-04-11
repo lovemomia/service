@@ -196,6 +196,11 @@ public class CourseController extends BaseController {
         return earliestSku == null ? "" : earliestSku.getScheduler();
     }
 
+    @RequestMapping(value = "/list/subject", method = RequestMethod.GET)
+    public MomiaHttpResponse listBySubject(@RequestParam(value = "suid") long subjectId) {
+        return MomiaHttpResponse.SUCCESS(buildBaseCourses(courseService.queryAllBySubject(subjectId)));
+    }
+
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public MomiaHttpResponse listCourses(@RequestParam String coids) {
         Set<Long> courseIds = new HashSet<Long>();
