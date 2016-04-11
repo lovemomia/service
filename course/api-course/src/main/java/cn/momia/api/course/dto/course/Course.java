@@ -48,7 +48,7 @@ public class Course implements Cloneable {
     private int status;
     private boolean buyable;
 
-    @JSONField(serialize = false) private List<CourseSku> skus = new ArrayList<CourseSku>();
+    private List<CourseSku> skus = new ArrayList<CourseSku>();
 
     // 非数据库字段
     private String age;

@@ -483,6 +483,11 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
+    public List<Course> queryRecentCoursesBySubject(long subjectId) {
+        return null;
+    }
+
+    @Override
     public List<Course> queryAllBySubject(long subjectId) {
         Set<Long> subjectIds = Sets.newHashSet(subjectId);
         Map<Long, List<Course>> coursesMap = queryAllBySubjects(subjectIds);

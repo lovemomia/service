@@ -196,6 +196,26 @@ public class CourseController extends BaseController {
         return earliestSku == null ? "" : earliestSku.getScheduler();
     }
 
+    @RequestMapping(value = "/list/subject/recent", method = RequestMethod.GET)
+    public MomiaHttpResponse listNewCoursesBySubject(@RequestParam(value = "suid") long subjectId) {
+        List<Course> recentCourses = courseService.queryRecentCoursesBySubject(subjectId);
+        Map<Long, Course> coursesMap = new HashMap<Long, Course>();
+        for (Course course : recentCourses) {
+            coursesMap.put(course.getId(), course);
+        }
+        List<Course> baseCourses = buildBaseCourses(recentCourses);
+        for (Course baseCourse : baseCourses) {
+            Course course = coursesMap.get(baseCourse.getId());
+            if (course != null && course.getSkus() != null && !course.getSkus().isEmpty()) {
+                baseCourse.setSkus(course.getSkus().subList(0, 1));
+            } else {
+                baseCourse.setSkus(new ArrayList<CourseSku>());
+            }
+        }
+
+        return MomiaHttpResponse.SUCCESS(baseCourses);
+    }
+
     @RequestMapping(value = "/list/subject", method = RequestMethod.GET)
     public MomiaHttpResponse listBySubject(@RequestParam(value = "suid") long subjectId) {
         return MomiaHttpResponse.SUCCESS(buildBaseCourses(courseService.queryAllBySubject(subjectId)));

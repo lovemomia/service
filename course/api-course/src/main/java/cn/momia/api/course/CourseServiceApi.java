@@ -79,6 +79,11 @@ public class CourseServiceApi extends HttpServiceApi {
         return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/course/booked/sku"), builder.build()), CourseSku.class);
     }
 
+    public List<Course> listRecentCoursesBySubject(long subjectId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("suid", subjectId);
+        return executeReturnList(MomiaHttpRequestBuilder.GET(url("/course/list/subject/recent"), builder.build()), Course.class);
+    }
+
     public List<Course> listBySubject(long subjectId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("suid", subjectId);
         return executeReturnList(MomiaHttpRequestBuilder.GET(url("/course/list/subject"), builder.build()), Course.class);
