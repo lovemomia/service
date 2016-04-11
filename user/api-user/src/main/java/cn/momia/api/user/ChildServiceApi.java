@@ -120,18 +120,18 @@ public class ChildServiceApi extends HttpServiceApi {
     }
 
     public List<JSONObject> formatChildrenDetail(List<Child> children) {
-        List<JSONObject> feedChildren = new ArrayList<JSONObject>();
+        List<JSONObject> childrenDetail = new ArrayList<JSONObject>();
         for (int i = 0; i < Math.min(2, children.size()); i++) {
             Child child = children.get(i);
-            JSONObject feedChild = new JSONObject();
-            feedChild.put("sex", child.getSex());
-            feedChild.put("name", child.getName());
-            feedChild.put("age", TimeUtil.formatAge(child.getBirthday()));
+            JSONObject childJson = new JSONObject();
+            childJson.put("sex", child.getSex());
+            childJson.put("name", child.getName());
+            childJson.put("age", TimeUtil.formatAge(child.getBirthday()));
 
-            feedChildren.add(feedChild);
+            childrenDetail.add(childJson);
         }
 
-        return feedChildren;
+        return childrenDetail;
     }
 
     public List<String> formatChildren(List<JSONObject> childrenDetail) {

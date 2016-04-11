@@ -26,11 +26,6 @@
         </dependency>
         <dependency>
             <groupId>cn.momia</groupId>
-            <artifactId>duola-service-feed</artifactId>
-            <version>1.2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.momia</groupId>
             <artifactId>duola-service-im</artifactId>
             <version>1.2.0</version>
         </dependency>
