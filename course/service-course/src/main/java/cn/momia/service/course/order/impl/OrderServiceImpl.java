@@ -321,18 +321,24 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
 
     @Override
     public long bookablePackageId(long userId, long courseId) {
-        // 先查找试听课程体系Id，有可能没有试听，或本身就是试听
-        String sql = "SELECT SubjectId FROM SG_Course WHERE ParentId=? AND Status<>0";
-        Long trialSubjectId = queryLong(sql, new Object[] { courseId });
+        String sql = "SELECT Id FROM SG_Course WHERE ParentId=? AND Status<>0";
+        long trialCourseId = queryLong(sql, new Object[] { courseId });
 
-        if (trialSubjectId > 0) {
+        sql = "SELECT SubjectId FROM SG_Course WHERE ParentId=? AND Status<>0";
+        long trialSubjectId = queryLong(sql, new Object[] { courseId });
+
+        sql = "SELECT COUNT(1) FROM SG_CourseSku WHERE (CourseId=? OR CourseId=?) AND Deadline>NOW() AND UnlockedStock>0 AND Status=1";
+        if (queryLong(sql, new Object[] { courseId, trialCourseId }) <= 0) return 0;
+
+        if (trialCourseId > 0 && trialSubjectId > 0) {
+            // TODO 判断过期
             sql = "SELECT B.Id FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.SubjectId=? AND A.Status=? AND B.Status=1 AND B.BookableCount>0";
             long trialPackageId = queryLong(sql, new Object[] { userId, trialSubjectId, Order.Status.PAYED });
             if (trialPackageId > 0) return trialPackageId;
         }
 
         sql = "SELECT SubjectId FROM SG_Course WHERE Id=? AND Status<>0";
-        Long subjectId = queryLong(sql, new Object[] { courseId });
+        long subjectId = queryLong(sql, new Object[] { courseId });
 
         sql = "SELECT B.Id, C.CourseId FROM SG_SubjectOrder A " +
                 "INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId " +
