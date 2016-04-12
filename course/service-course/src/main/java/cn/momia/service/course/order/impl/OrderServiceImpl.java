@@ -334,13 +334,27 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
         sql = "SELECT SubjectId FROM SG_Course WHERE Id=? AND Status<>0";
         Long subjectId = queryLong(sql, new Object[] { courseId });
 
-        sql = "SELECT B.Id FROM SG_SubjectOrder A " +
+        sql = "SELECT B.Id, C.CourseId FROM SG_SubjectOrder A " +
                 "INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId " +
                 "INNER JOIN SG_BookedCourse C ON B.Id=C.PackageId " +
                 "INNER JOIN SG_CourseSku D ON C.CourseSkuId=D.Id " +
                 "WHERE A.UserId=? AND A.SubjectId=? AND A.Status=? AND B.Status=1 AND B.BookableCount>0 " +
                 "ORDER BY D.StartTime ASC";
-        return queryLong(sql, new Object[] { userId, subjectId, Order.Status.PAYED });
+        Map<Long, List<Long>> map = queryListMap(sql, new Object[] { userId, subjectId, Order.Status.PAYED }, Long.class, Long.class);
+
+        for (Map.Entry<Long, List<Long>> entry : map.entrySet()) {
+            long packageId = entry.getKey();
+            List<Long> courseIds = entry.getValue();
+            if (!courseIds.contains(courseId)) return packageId;
+        }
+
+        sql = "SELECT B.Id FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.SubjectId=? AND A.Status=? AND B.Status=1 AND B.BookableCount>0";
+        List<Long> packageIds = queryLongList(sql, new Object[] { userId, subjectId, Order.Status.PAYED });
+        for (long packageId : packageIds) {
+            if (!map.containsKey(packageId)) return packageId;
+        }
+
+        return 0;
     }
 
     @Override
