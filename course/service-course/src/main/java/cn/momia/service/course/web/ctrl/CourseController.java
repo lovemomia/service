@@ -281,16 +281,6 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(pagedTeacherIds);
     }
 
-    @RequestMapping(value = "/{coid}/bookable", method = RequestMethod.GET)
-    public MomiaHttpResponse bookable(@RequestParam String utoken, @PathVariable(value = "coid") long courseId) {
-        try {
-            User user = userServiceApi.get(utoken);
-            return MomiaHttpResponse.SUCCESS(courseService.bookable(user.getId(), courseId));
-        } catch (Exception e) {
-            return MomiaHttpResponse.SUCCESS(false);
-        }
-    }
-
     @RequestMapping(value = "/tips", method = RequestMethod.GET)
     public MomiaHttpResponse queryTips(@RequestParam String coids) {
         Set<Long> courseIds = new HashSet<Long>();

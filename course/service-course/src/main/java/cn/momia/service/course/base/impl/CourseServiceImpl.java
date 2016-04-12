@@ -15,7 +15,6 @@ import cn.momia.common.core.util.TimeUtil;
 import cn.momia.api.course.dto.course.BookedCourse;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.api.course.dto.course.CourseSku;
-import cn.momia.service.course.order.Order;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
@@ -869,15 +868,6 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     public long querySubjectId(long courseId) {
         String sql = "SELECT SubjectId FROM SG_Course WHERE Id=?";
         return queryInt(sql, new Object[] { courseId });
-    }
-
-    @Override
-    public boolean bookable(long userId, long courseId) {
-        String sql = "SELECT SubjectId FROM SG_Course WHERE Id=?";
-        Long subjectId = queryLong(sql, new Object[] { courseId });
-
-        sql = "SELECT COUNT(1) FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.SubjectId=? AND A.Status=? AND B.Status=1 AND B.BookableCount>0";
-        return queryInt(sql, new Object[] { userId, subjectId, Order.Status.PAYED }) > 0;
     }
 
     @Override

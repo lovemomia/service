@@ -375,6 +375,17 @@ public class OrderController extends BaseController {
         return pagedSubjectOrders;
     }
 
+
+    @RequestMapping(value = "/bookable/package", method = RequestMethod.GET)
+    public MomiaHttpResponse bookable(@RequestParam String utoken, @RequestParam(value = "coid") long courseId) {
+        try {
+            User user = userServiceApi.get(utoken);
+            return MomiaHttpResponse.SUCCESS(orderService.bookablePackageId(user.getId(), courseId));
+        } catch (Exception e) {
+            return MomiaHttpResponse.SUCCESS(0L);
+        }
+    }
+
     @RequestMapping(value = "/{oid}/gift/send", method = RequestMethod.POST)
     public MomiaHttpResponse sendGift(@RequestParam String utoken, @PathVariable(value = "oid") long orderId) {
         User user = userServiceApi.get(utoken);

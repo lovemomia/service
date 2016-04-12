@@ -27,6 +27,8 @@ public interface OrderService {
     Set<Integer> getOrderPackageTypes(long orderId);
     List<OrderPackage> getOrderPackages(long orderId);
 
+    long bookablePackageId(long userId, long courseId);
+
     boolean isUsed(long packageId);
     boolean isGift(long fromUserId, long packageId);
     boolean isGift(long fromUserId, long toUserId, long packageId);

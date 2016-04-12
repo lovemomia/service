@@ -320,6 +320,30 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     }
 
     @Override
+    public long bookablePackageId(long userId, long courseId) {
+        // 先查找试听课程体系Id，有可能没有试听，或本身就是试听
+        String sql = "SELECT SubjectId FROM SG_Course WHERE ParentId=? AND Status<>0";
+        Long trialSubjectId = queryLong(sql, new Object[] { courseId });
+
+        if (trialSubjectId > 0) {
+            sql = "SELECT B.Id FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.SubjectId=? AND A.Status=? AND B.Status=1 AND B.BookableCount>0";
+            long trialPackageId = queryLong(sql, new Object[] { userId, trialSubjectId, Order.Status.PAYED });
+            if (trialPackageId > 0) return trialPackageId;
+        }
+
+        sql = "SELECT SubjectId FROM SG_Course WHERE Id=? AND Status<>0";
+        Long subjectId = queryLong(sql, new Object[] { courseId });
+
+        sql = "SELECT B.Id FROM SG_SubjectOrder A " +
+                "INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId " +
+                "INNER JOIN SG_BookedCourse C ON B.Id=C.PackageId " +
+                "INNER JOIN SG_CourseSku D ON C.CourseSkuId=D.Id " +
+                "WHERE A.UserId=? AND A.SubjectId=? AND A.Status=? AND B.Status=1 AND B.BookableCount>0 " +
+                "ORDER BY D.StartTime ASC";
+        return queryLong(sql, new Object[] { userId, subjectId, Order.Status.PAYED });
+    }
+
+    @Override
     public boolean isUsed(long packageId) {
         String sql = "SELECT COUNT(1) FROM SG_BookedCourse WHERE PackageId=? AND Status<>0";
         return queryInt(sql, new Object[] { packageId }) > 0;

@@ -84,8 +84,6 @@ public interface CourseService {
 
     long querySubjectId(long courseId);
 
-    boolean bookable(long userId, long courseId);
-
     Map<Long, String> queryTips(Collection<Long> courseIds);
 
     boolean matched(long subjectId, long courseId);
