@@ -56,7 +56,7 @@ public class OrderServiceApi extends HttpServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
                 .add("coid", courseId);
-        return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/order/bookable/package", courseId), builder.build()), Long.class);
+        return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/order/bookable/package", courseId), builder.build()), Number.class).longValue();
     }
 
     public boolean sendGift(String utoken, long orderId) {
