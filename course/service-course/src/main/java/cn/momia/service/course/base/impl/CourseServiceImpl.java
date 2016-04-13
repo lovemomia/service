@@ -1028,6 +1028,6 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     @Override
     public boolean hasNoAvaliableSkus(long courseId) {
         String sql = "SELECT COUNT(1) FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE (A.Id=? OR A.ParentId=?) AND A.Status<>0 AND B.Status=1 AND B.Deadline>NOW()";
-        return queryLong(sql, new Object[] { courseId }) <= 0;
+        return queryLong(sql, new Object[] { courseId, courseId }) <= 0;
     }
 }
