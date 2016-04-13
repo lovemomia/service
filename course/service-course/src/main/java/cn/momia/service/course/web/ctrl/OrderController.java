@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -380,9 +381,110 @@ public class OrderController extends BaseController {
     public MomiaHttpResponse bookable(@RequestParam String utoken, @RequestParam(value = "coid") long courseId) {
         try {
             User user = userServiceApi.get(utoken);
-            return MomiaHttpResponse.SUCCESS(orderService.bookablePackageId(user.getId(), courseId));
+
+            long trialSubjectId = courseService.queryTrialSubjectId(courseId);
+            List<SubjectSku> trialSubjectSkus = subjectService.querySkus(trialSubjectId);
+            Set<Long> trialSubjectSkuIds = new HashSet<Long>();
+            for (SubjectSku subjectSku : trialSubjectSkus) {
+                trialSubjectSkuIds.add(subjectSku.getId());
+            }
+            long subjectId = courseService.querySubjectId(courseId);
+            List<SubjectSku> normalSubjectSkus = subjectService.querySkus(subjectId);
+            Set<Long> normalSubjectSkuIds = new HashSet<Long>();
+            for (SubjectSku subjectSku : normalSubjectSkus) {
+                normalSubjectSkuIds.add(subjectSku.getId());
+            }
+
+            List<Long> excludedPackageIds = courseService.queryBookedPackageIds(user.getId(), courseId);
+            List<OrderPackage> packages = orderService.queryAllBookableByUser(user.getId());
+            Set<Long> packageIds = new HashSet<Long>();
+            for (OrderPackage orderPackage : packages) {
+                if (excludedPackageIds.contains(orderPackage.getId()) ||
+                        (!trialSubjectSkuIds.contains(orderPackage.getSkuId()) && !normalSubjectSkuIds.contains(orderPackage.getSkuId()))) continue;
+                packageIds.add(orderPackage.getId());
+            }
+
+            Map<Long, Date> startTimes = orderService.queryStartTimesOfPackages(packageIds);
+
+            List<PackageTime> trialPackageTimes = new ArrayList<PackageTime>();
+            List<PackageTime> normalPackageTimes = new ArrayList<PackageTime>();
+            for (OrderPackage orderPackage : packages) {
+                if (excludedPackageIds.contains(orderPackage.getId())) continue;
+
+                PackageTime packageTime = new PackageTime();
+                packageTime.setId(orderPackage.getId());
+                Date startTime = startTimes.get(orderPackage.getId());
+                if (startTime == null) packageTime.setExpireTime(null);
+                else packageTime.setExpireTime(TimeUtil.add(startTime, orderPackage.getTime(), orderPackage.getTimeUnit()));
+
+                if (trialSubjectSkuIds.contains(orderPackage.getSkuId())) trialPackageTimes.add(packageTime);
+                else normalPackageTimes.add(packageTime);
+            }
+
+            if (!trialPackageTimes.isEmpty()) {
+                Collections.sort(trialPackageTimes);
+                return MomiaHttpResponse.SUCCESS(trialPackageTimes.get(0).getId());
+            } else {
+                Collections.sort(normalPackageTimes);
+                return MomiaHttpResponse.SUCCESS(normalPackageTimes.get(0).getId());
+            }
         } catch (Exception e) {
             return MomiaHttpResponse.SUCCESS(0L);
+        }
+    }
+
+    private static class PackageTime implements Comparable {
+        private long id;
+        private Date expireTime;
+
+        public long getId() {
+            return id;
+        }
+
+        public void setId(long id) {
+            this.id = id;
+        }
+
+        public Date getExpireTime() {
+            return expireTime;
+        }
+
+        public void setExpireTime(Date expireTime) {
+            this.expireTime = expireTime;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof PackageTime)) return false;
+
+            PackageTime that = (PackageTime) o;
+
+            if (getId() != that.getId()) return false;
+            return !(getExpireTime() != null ? !getExpireTime().equals(that.getExpireTime()) : that.getExpireTime() != null);
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = (int) (getId() ^ (getId() >>> 32));
+            result = 31 * result + (getExpireTime() != null ? getExpireTime().hashCode() : 0);
+            return result;
+        }
+
+        @Override
+        public int compareTo(Object o) {
+            if (this == o) return 0;
+            if (!(o instanceof PackageTime)) return -1;
+
+            PackageTime that = (PackageTime) o;
+            Date thisTime = expireTime;
+            Date thatTime = that.getExpireTime();
+
+            if (thatTime == null) return -1;
+            if (thisTime == null) return 1;
+
+            return thisTime.after(thatTime) ? 1 : -1;
         }
     }
 

@@ -20,14 +20,13 @@ public interface OrderService {
     List<OrderPackage> queryBookableByUserAndOrder(long userId, long orderId, int start, int count);
     long queryBookableCountByUser(long userId);
     List<OrderPackage> queryBookableByUser(long userId, int start, int count);
+    List<OrderPackage> queryAllBookableByUser(long userId);
 
     Map<Long,Long> queryBookablePackageIds(Set<Long> userIds, long subjectId);
 
     OrderPackage getOrderPackage(long packageId);
     Set<Integer> getOrderPackageTypes(long orderId);
     List<OrderPackage> getOrderPackages(long orderId);
-
-    long bookablePackageId(long userId, long courseId);
 
     boolean isUsed(long packageId);
     boolean isGift(long fromUserId, long packageId);

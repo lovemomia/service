@@ -225,6 +225,14 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     }
 
     @Override
+    public List<OrderPackage> queryAllBookableByUser(long userId) {
+        String sql = "SELECT DISTINCT A.Id FROM SG_SubjectOrderPackage A LEFT JOIN SG_SubjectOrderPackageGift B ON A.Id=B.PackageId AND B.Status<>0 WHERE A.UserId=? AND A.Status=1 AND A.BookableCount>0 AND (B.Id IS NULL OR (B.ToUserId=0 AND B.Deadline<=NOW()) OR B.ToUserId=?) ORDER BY A.AddTime ASC";
+        List<Long> packageIds = queryLongList(sql, new Object[] { userId, userId });
+
+        return listOrderPackages(packageIds);
+    }
+
+    @Override
     public Map<Long, Long> queryBookablePackageIds(Set<Long> userIds, long subjectId) {
         if (userIds.isEmpty()) return new HashMap<Long, Long>();
 
@@ -317,50 +325,6 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
         List<Long> packageIds = queryLongList(sql, new Object[] { orderId });
 
         return listOrderPackages(packageIds);
-    }
-
-    @Override
-    public long bookablePackageId(long userId, long courseId) {
-        String sql = "SELECT Id FROM SG_Course WHERE ParentId=? AND Status<>0";
-        long trialCourseId = queryLong(sql, new Object[] { courseId });
-
-        sql = "SELECT SubjectId FROM SG_Course WHERE ParentId=? AND Status<>0";
-        long trialSubjectId = queryLong(sql, new Object[] { courseId });
-
-        sql = "SELECT COUNT(1) FROM SG_CourseSku WHERE (CourseId=? OR CourseId=?) AND Deadline>NOW() AND UnlockedStock>0 AND Status=1";
-        if (queryLong(sql, new Object[] { courseId, trialCourseId }) <= 0) return 0;
-
-        if (trialCourseId > 0 && trialSubjectId > 0) {
-            // TODO 判断过期
-            sql = "SELECT B.Id FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.SubjectId=? AND A.Status=? AND B.Status=1 AND B.BookableCount>0";
-            long trialPackageId = queryLong(sql, new Object[] { userId, trialSubjectId, Order.Status.PAYED });
-            if (trialPackageId > 0) return trialPackageId;
-        }
-
-        sql = "SELECT SubjectId FROM SG_Course WHERE Id=? AND Status<>0";
-        long subjectId = queryLong(sql, new Object[] { courseId });
-
-        sql = "SELECT B.Id, C.CourseId FROM SG_SubjectOrder A " +
-                "INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId " +
-                "INNER JOIN SG_BookedCourse C ON B.Id=C.PackageId " +
-                "INNER JOIN SG_CourseSku D ON C.CourseSkuId=D.Id " +
-                "WHERE A.UserId=? AND A.SubjectId=? AND A.Status=? AND B.Status=1 AND B.BookableCount>0 " +
-                "ORDER BY D.StartTime ASC";
-        Map<Long, List<Long>> map = queryListMap(sql, new Object[] { userId, subjectId, Order.Status.PAYED }, Long.class, Long.class);
-
-        for (Map.Entry<Long, List<Long>> entry : map.entrySet()) {
-            long packageId = entry.getKey();
-            List<Long> courseIds = entry.getValue();
-            if (!courseIds.contains(courseId)) return packageId;
-        }
-
-        sql = "SELECT B.Id FROM SG_SubjectOrder A INNER JOIN SG_SubjectOrderPackage B ON A.Id=B.OrderId WHERE A.UserId=? AND A.SubjectId=? AND A.Status=? AND B.Status=1 AND B.BookableCount>0";
-        List<Long> packageIds = queryLongList(sql, new Object[] { userId, subjectId, Order.Status.PAYED });
-        for (long packageId : packageIds) {
-            if (!map.containsKey(packageId)) return packageId;
-        }
-
-        return 0;
     }
 
     @Override

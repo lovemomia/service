@@ -19,6 +19,8 @@ public interface CourseService {
     long queryTrialCount(long cityId);
     List<Course> queryTrial(long cityId, int start, int count);
 
+    List<Long> queryTrialSubjectSkuIds(long courseId);
+
     Course get(long courseId);
     List<Course> list(Collection<Long> courseIds);
     List<CourseSku> listSkus(Collection<Long> skuIds);
@@ -76,6 +78,7 @@ public interface CourseService {
     boolean cancel(long userId, long bookingId);
     void decreaseJoined(long courseId, int joinCount);
 
+    List<Long> queryBookedPackageIds(long userId, long courseId);
     List<Long> queryBookedPackageIds(Collection<Long> userIds, long courseId, long courseSkuId);
     void batchCancel(Collection<Long> userIds, long courseId, long courseSkuId);
     Map<Long,Long> queryBookedPackageUsers(Collection<Long> userIds, long courseId, long courseSkuId);
@@ -83,6 +86,7 @@ public interface CourseService {
     CourseDetail getDetail(long courseId);
 
     long querySubjectId(long courseId);
+    long queryTrialSubjectId(long courseId);
 
     Map<Long, String> queryTips(Collection<Long> courseIds);
 

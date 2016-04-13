@@ -108,6 +108,11 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
+    public List<Long> queryTrialSubjectSkuIds(long courseId) {
+        return null;
+    }
+
+    @Override
     public Course get(long courseId) {
         Collection<Long> courseIds = Sets.newHashSet(courseId);
         List<Course> courses = list(courseIds);
@@ -824,6 +829,12 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
+    public List<Long> queryBookedPackageIds(long userId, long courseId) {
+        String sql = "SELECT PackageId FROM SG_BookedCourse WHERE UserId=? AND CourseId=? AND Status<>0";
+        return queryLongList(sql, new Object[] { userId, courseId });
+    }
+
+    @Override
     public List<Long> queryBookedPackageIds(Collection<Long> userIds, long courseId, long courseSkuId) {
         if (userIds.isEmpty()) return new ArrayList<Long>();
 
@@ -866,7 +877,13 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
     @Override
     public long querySubjectId(long courseId) {
-        String sql = "SELECT SubjectId FROM SG_Course WHERE Id=?";
+        String sql = "SELECT SubjectId FROM SG_Course WHERE Id=? AND Status<>0";
+        return queryInt(sql, new Object[] { courseId });
+    }
+
+    @Override
+    public long queryTrialSubjectId(long courseId) {
+        String sql = "SELECT SubjectId FROM SG_Course WHERE ParentId=? AND Status<>0";
         return queryInt(sql, new Object[] { courseId });
     }
 
