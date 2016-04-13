@@ -108,4 +108,6 @@ public interface CourseService {
     List<String> queryHotNewCourses();
     List<CourseSku> queryCourseSkusClosedToday();
     List<Long> queryBookedUserIds(long courseSkuId);
+
+    boolean hasNoAvaliableSkus(long courseId);
 }

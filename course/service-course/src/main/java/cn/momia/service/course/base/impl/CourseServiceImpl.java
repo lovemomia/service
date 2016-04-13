@@ -1024,4 +1024,10 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         String sql = "SELECT DISTINCT A.UserId FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.Status<>0 AND B.Status<>0 AND (B.Id=? OR B.ParentId=?)";
         return queryLongList(sql, new Object[] { courseSkuId, courseSkuId });
     }
+
+    @Override
+    public boolean hasNoAvaliableSkus(long courseId) {
+        String sql = "SELECT COUNT(1) FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE (A.Id=? OR A.ParentId=?) AND A.Status<>0 AND B.Status=1 AND B.Deadline>NOW()";
+        return queryLong(sql, new Object[] { courseId }) <= 0;
+    }
 }

@@ -381,6 +381,8 @@ public class OrderController extends BaseController {
         try {
             User user = userServiceApi.get(utoken);
 
+            if (courseService.hasNoAvaliableSkus(courseId)) return MomiaHttpResponse.SUCCESS(0);
+
             long trialSubjectId = courseService.queryTrialSubjectId(courseId);
             List<SubjectSku> trialSubjectSkus = subjectService.querySkus(trialSubjectId);
             Set<Long> trialSubjectSkuIds = new HashSet<Long>();
