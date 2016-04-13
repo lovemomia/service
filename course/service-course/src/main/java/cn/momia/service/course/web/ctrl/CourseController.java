@@ -308,7 +308,7 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(sku);
     }
 
-    @RequestMapping(value = "/{coid}/sku/{sid}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{coid}/sku", method = RequestMethod.GET)
     public MomiaHttpResponse listSkus(@PathVariable(value = "coid") long courseId) {
         return MomiaHttpResponse.SUCCESS(buildDatedCourseSkus(filterNotEndedSkus(courseService.listSkus(courseId))));
     }
