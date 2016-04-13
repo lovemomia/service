@@ -230,65 +230,6 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         return skusMap;
     }
 
-    @Override
-    public List<CourseSku> listSkus(Collection<Long> skuIds) {
-        if (skuIds.isEmpty()) return new ArrayList<CourseSku>();
-
-        String sql = "SELECT Id, ParentId, CourseId, StartTime, EndTime, Deadline, UnlockedStock, LockedStock AS Booked, MinBooked, PlaceId, Adult, Child, Status FROM SG_CourseSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status<>0";
-        List<CourseSku> skus = queryObjectList(sql, CourseSku.class);
-
-        Map<Long, CourseSku> skusMap = new HashMap<Long, CourseSku>();
-        for (CourseSku sku : skus) {
-            skusMap.put(sku.getId(), sku);
-        }
-
-        List<CourseSku> result = new ArrayList<CourseSku>();
-        for (long skuId : skuIds) {
-            CourseSku sku = skusMap.get(skuId);
-            if (sku != null) result.add(sku);
-        }
-
-        return completeSkus(result);
-    }
-
-    private List<CourseSku> completeSkus(List<CourseSku> skus) {
-        Set<Integer> placeIds = new HashSet<Integer>();
-        for (CourseSku sku : skus) {
-            placeIds.add(sku.getPlaceId());
-        }
-
-        List<Place> places = poiServiceApi.listPlaces(placeIds);
-        Map<Integer, Place> placesMap = new HashMap<Integer, Place>();
-        for (Place place : places) {
-            placesMap.put(place.getId(), place);
-        }
-
-        List<CourseSku> completedSkus = new ArrayList<CourseSku>();
-        for (CourseSku sku : skus) {
-            Place place = placesMap.get(sku.getPlaceId());
-            if (place == null) continue;
-
-            sku.setPlace(buildCourseSkuPlace(place));
-            completedSkus.add(sku);
-        }
-
-        return completedSkus;
-    }
-
-    private CourseSkuPlace buildCourseSkuPlace(Place place) {
-        CourseSkuPlace courseSkuPlace = new CourseSkuPlace();
-        courseSkuPlace.setId(place.getId());
-        courseSkuPlace.setCityId(place.getCityId());
-        courseSkuPlace.setRegionId(place.getRegionId());
-        courseSkuPlace.setName(place.getName());
-        courseSkuPlace.setAddress(place.getAddress());
-        courseSkuPlace.setLng(place.getLng());
-        courseSkuPlace.setLat(place.getLat());
-        courseSkuPlace.setRoute(place.getRoute());
-
-        return courseSkuPlace;
-    }
-
     private Map<Long, BigDecimal> queryBuyables(Collection<Long> courseIds) {
         if (courseIds.isEmpty()) return new HashMap<Long, BigDecimal>();
 
@@ -362,6 +303,72 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
         if (regionIds.isEmpty()) return 0;
         return regionIds.size() > 1 ? Region.MULTI_REGION_ID : regionIds.get(0);
+    }
+
+    @Override
+    public List<CourseSku> listSkus(Collection<Long> skuIds) {
+        if (skuIds.isEmpty()) return new ArrayList<CourseSku>();
+
+        String sql = "SELECT Id, ParentId, CourseId, StartTime, EndTime, Deadline, UnlockedStock, LockedStock AS Booked, MinBooked, PlaceId, Adult, Child, Status FROM SG_CourseSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status<>0";
+        List<CourseSku> skus = queryObjectList(sql, CourseSku.class);
+
+        Map<Long, CourseSku> skusMap = new HashMap<Long, CourseSku>();
+        for (CourseSku sku : skus) {
+            skusMap.put(sku.getId(), sku);
+        }
+
+        List<CourseSku> result = new ArrayList<CourseSku>();
+        for (long skuId : skuIds) {
+            CourseSku sku = skusMap.get(skuId);
+            if (sku != null) result.add(sku);
+        }
+
+        return completeSkus(result);
+    }
+
+    private List<CourseSku> completeSkus(List<CourseSku> skus) {
+        Set<Integer> placeIds = new HashSet<Integer>();
+        for (CourseSku sku : skus) {
+            placeIds.add(sku.getPlaceId());
+        }
+
+        List<Place> places = poiServiceApi.listPlaces(placeIds);
+        Map<Integer, Place> placesMap = new HashMap<Integer, Place>();
+        for (Place place : places) {
+            placesMap.put(place.getId(), place);
+        }
+
+        List<CourseSku> completedSkus = new ArrayList<CourseSku>();
+        for (CourseSku sku : skus) {
+            Place place = placesMap.get(sku.getPlaceId());
+            if (place == null) continue;
+
+            sku.setPlace(buildCourseSkuPlace(place));
+            completedSkus.add(sku);
+        }
+
+        return completedSkus;
+    }
+
+    private CourseSkuPlace buildCourseSkuPlace(Place place) {
+        CourseSkuPlace courseSkuPlace = new CourseSkuPlace();
+        courseSkuPlace.setId(place.getId());
+        courseSkuPlace.setCityId(place.getCityId());
+        courseSkuPlace.setRegionId(place.getRegionId());
+        courseSkuPlace.setName(place.getName());
+        courseSkuPlace.setAddress(place.getAddress());
+        courseSkuPlace.setLng(place.getLng());
+        courseSkuPlace.setLat(place.getLat());
+        courseSkuPlace.setRoute(place.getRoute());
+
+        return courseSkuPlace;
+    }
+
+    @Override
+    public List<CourseSku> listSkus(long courseId) {
+        String sql = "SELECT Id FROM SG_CourseSku WHERE CourseId=? AND Status<>0";
+        List<Long> skuIds = queryLongList(sql, new Object[] { courseId });
+        return listSkus(skuIds);
     }
 
     @Override

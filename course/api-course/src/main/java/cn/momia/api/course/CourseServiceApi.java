@@ -141,6 +141,10 @@ public class CourseServiceApi extends HttpServiceApi {
         return executeReturnList(MomiaHttpRequestBuilder.GET(url("/course/sku/list"), builder.build()), CourseSku.class);
     }
 
+    public List<DatedCourseSkus> listSkus(long courseId) {
+        return executeReturnList(MomiaHttpRequestBuilder.GET(url("/course/%d/sku", courseId)), DatedCourseSkus.class);
+    }
+
     public List<DatedCourseSkus> listWeekSkus(long courseId) {
         return executeReturnList(MomiaHttpRequestBuilder.GET(url("/course/%d/sku/week", courseId)), DatedCourseSkus.class);
     }

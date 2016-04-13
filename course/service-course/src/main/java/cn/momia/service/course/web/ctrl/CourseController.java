@@ -308,6 +308,11 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(sku);
     }
 
+    @RequestMapping(value = "/{coid}/sku/{sid}", method = RequestMethod.GET)
+    public MomiaHttpResponse listSkus(@PathVariable(value = "coid") long courseId) {
+        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkus(filterNotEndedSkus(courseService.listSkus(courseId))));
+    }
+
     @RequestMapping(value = "/{coid}/sku/week", method = RequestMethod.GET)
     public MomiaHttpResponse listWeekSkus(@PathVariable(value = "coid") long courseId) {
         Date now = new Date();
@@ -353,7 +358,7 @@ public class CourseController extends BaseController {
     }
 
     @RequestMapping(value = "/{coid}/sku/month", method = RequestMethod.GET)
-    public MomiaHttpResponse listWeekSkus(@PathVariable(value = "coid") long courseId, @RequestParam int month) {
+    public MomiaHttpResponse listMonthSkus(@PathVariable(value = "coid") long courseId, @RequestParam int month) {
         String start = formatCurrentMonth(month);
         String end = formatNextMonth(month);
         List<CourseSku> skus = courseService.querySkus(courseId, start, end);

@@ -376,7 +376,6 @@ public class OrderController extends BaseController {
         return pagedSubjectOrders;
     }
 
-
     @RequestMapping(value = "/bookable/package", method = RequestMethod.GET)
     public MomiaHttpResponse bookable(@RequestParam String utoken, @RequestParam(value = "coid") long courseId) {
         try {

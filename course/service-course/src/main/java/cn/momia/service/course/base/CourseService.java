@@ -24,6 +24,7 @@ public interface CourseService {
     Course get(long courseId);
     List<Course> list(Collection<Long> courseIds);
     List<CourseSku> listSkus(Collection<Long> skuIds);
+    List<CourseSku> listSkus(long courseId);
 
     long queryBookImgCount(long courseId);
     List<String> queryBookImgs(long courseId, int start, int count);
