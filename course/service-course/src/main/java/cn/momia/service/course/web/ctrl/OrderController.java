@@ -383,11 +383,13 @@ public class OrderController extends BaseController {
 
             if (courseService.hasNoAvaliableSkus(courseId)) return MomiaHttpResponse.SUCCESS(0);
 
-            long trialSubjectId = courseService.queryTrialSubjectId(courseId);
-            List<SubjectSku> trialSubjectSkus = subjectService.querySkus(trialSubjectId);
+            List<Long> trialSubjectIds = courseService.queryTrialSubjectId(courseId);
+            Map<Long, List<SubjectSku>> trialSubjectSkusMap = subjectService.querySkus(trialSubjectIds);
             Set<Long> trialSubjectSkuIds = new HashSet<Long>();
-            for (SubjectSku subjectSku : trialSubjectSkus) {
-                trialSubjectSkuIds.add(subjectSku.getId());
+            for (List<SubjectSku> trialSubjectSkus : trialSubjectSkusMap.values()) {
+                for (SubjectSku subjectSku : trialSubjectSkus) {
+                    trialSubjectSkuIds.add(subjectSku.getId());
+                }
             }
             long subjectId = courseService.querySubjectId(courseId);
             List<SubjectSku> normalSubjectSkus = subjectService.querySkus(subjectId);

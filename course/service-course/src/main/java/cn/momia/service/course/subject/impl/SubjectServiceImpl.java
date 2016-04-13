@@ -73,24 +73,6 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
         return imgsMap;
     }
 
-    private Map<Long, List<SubjectSku>> querySkus(Collection<Long> subjectIds) {
-        if (subjectIds.isEmpty()) return new HashMap<Long, List<SubjectSku>>();
-
-        String sql = "SELECT Id FROM SG_SubjectSku WHERE SubjectId IN (" + StringUtils.join(subjectIds, ",") + ") AND Status<>0";
-        List<Long> skuIds = queryLongList(sql);
-        List<SubjectSku> skus = listSkus(skuIds);
-
-        Map<Long, List<SubjectSku>> skusMap = new HashMap<Long, List<SubjectSku>>();
-        for (long subjectId : subjectIds) {
-            skusMap.put(subjectId, new ArrayList<SubjectSku>());
-        }
-        for (SubjectSku sku : skus) {
-            skusMap.get(sku.getSubjectId()).add(sku);
-        }
-
-        return skusMap;
-    }
-
     private SubjectSku getMinPriceSku(Subject subject) {
         SubjectSku minPriceSubjectSku = SubjectSku.NOT_EXIST_SUBJECT_SKU;
         for (SubjectSku sku : subject.getSkus()) {
@@ -150,6 +132,25 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
         Map<Long, List<SubjectSku>> skus = querySkus(subjectIds);
 
         return skus.get(subjectId);
+    }
+
+    @Override
+    public Map<Long, List<SubjectSku>> querySkus(Collection<Long> subjectIds) {
+        if (subjectIds.isEmpty()) return new HashMap<Long, List<SubjectSku>>();
+
+        String sql = "SELECT Id FROM SG_SubjectSku WHERE SubjectId IN (" + StringUtils.join(subjectIds, ",") + ") AND Status<>0";
+        List<Long> skuIds = queryLongList(sql);
+        List<SubjectSku> skus = listSkus(skuIds);
+
+        Map<Long, List<SubjectSku>> skusMap = new HashMap<Long, List<SubjectSku>>();
+        for (long subjectId : subjectIds) {
+            skusMap.put(subjectId, new ArrayList<SubjectSku>());
+        }
+        for (SubjectSku sku : skus) {
+            skusMap.get(sku.getSubjectId()).add(sku);
+        }
+
+        return skusMap;
     }
 
     @Override

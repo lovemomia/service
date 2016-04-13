@@ -87,7 +87,7 @@ public interface CourseService {
     CourseDetail getDetail(long courseId);
 
     long querySubjectId(long courseId);
-    long queryTrialSubjectId(long courseId);
+    List<Long> queryTrialSubjectId(long courseId);
 
     Map<Long, String> queryTips(Collection<Long> courseIds);
 

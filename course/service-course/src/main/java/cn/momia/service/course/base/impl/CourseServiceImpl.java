@@ -885,13 +885,13 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     @Override
     public long querySubjectId(long courseId) {
         String sql = "SELECT SubjectId FROM SG_Course WHERE Id=? AND Status<>0";
-        return queryInt(sql, new Object[] { courseId });
+        return queryLong(sql, new Object[] { courseId });
     }
 
     @Override
-    public long queryTrialSubjectId(long courseId) {
+    public List<Long> queryTrialSubjectId(long courseId) {
         String sql = "SELECT SubjectId FROM SG_Course WHERE ParentId=? AND Status<>0";
-        return queryInt(sql, new Object[] { courseId });
+        return queryLongList(sql, new Object[] { courseId });
     }
 
     @Override

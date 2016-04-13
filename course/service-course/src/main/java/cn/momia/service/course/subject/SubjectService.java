@@ -5,6 +5,7 @@ import cn.momia.api.course.dto.subject.SubjectSku;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public interface SubjectService {
     Subject get(long subjectId);
@@ -14,6 +15,7 @@ public interface SubjectService {
     SubjectSku getSku(long skuId);
     List<SubjectSku> listSkus(Collection<Long> skuIds);
     List<SubjectSku> querySkus(long subjectId);
+    Map<Long, List<SubjectSku>> querySkus(Collection<Long> subjectIds);
 
     boolean isTrial(long subjectId);
 
