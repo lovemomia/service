@@ -57,7 +57,7 @@ public abstract class AbstractImService extends AbstractService implements ImSer
     public Map<Long, Date> queryJoinTimes(long userId, Collection<Long> groupIds) {
         if (groupIds.isEmpty()) return new HashMap<Long, Date>();
 
-        String sql = String.format("SELECT GroupId, AddTime FROM SG_ImGroupMember WHERE UserId=? AND GroupId IN (%s)", StringUtils.join(groupIds, ","));
+        String sql = String.format("SELECT GroupId, AddTime FROM SG_ImGroupMember WHERE UserId=? AND GroupId IN (%s) AND Status=1", StringUtils.join(groupIds, ","));
         return queryMap(sql, new Object[] { userId }, Long.class, Date.class);
     }
 

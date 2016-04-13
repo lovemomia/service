@@ -1,7 +1,7 @@
 package cn.momia.service.course.base.impl;
 
 import cn.momia.api.course.dto.course.Student;
-import cn.momia.api.poi.MetaUtil;
+import cn.momia.api.poi.PoiUtil;
 import cn.momia.api.poi.dto.Region;
 import cn.momia.api.course.dto.course.Course;
 import cn.momia.api.course.dto.course.CourseDetail;
@@ -169,7 +169,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
             course.setScheduler(formatScheduler(course));
             int regionId = getRegionId(course);
             course.setRegionId(regionId);
-            course.setRegion(MetaUtil.getRegionName(regionId));
+            course.setRegion(PoiUtil.getRegionName(regionId));
         }
 
         Map<Long, Course> coursesMap = new HashMap<Long, Course>();
@@ -514,7 +514,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
             Course baseCourse = new Course.Base(course);
             baseCourse.setScheduler(sku.getScheduler());
-            baseCourse.setRegion(MetaUtil.getRegionName(sku.getPlace().getRegionId()));
+            baseCourse.setRegion(PoiUtil.getRegionName(sku.getPlace().getRegionId()));
             baseCourse.setSkuId(sku.getId());
 
             results.add(baseCourse);
