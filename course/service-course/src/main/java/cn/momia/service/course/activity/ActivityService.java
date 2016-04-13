@@ -8,7 +8,7 @@ public interface ActivityService {
     ActivityEntry getActivityEntry(long entryId);
 
     boolean joined(int activityId, String mobile, String childName);
-    long join(int activityId, String mobile, String childName, int status);
+    long join(int activityId, String mobile, String childName, String relation, int status);
 
     boolean prepay(long entryId);
     boolean pay(Payment payment);
