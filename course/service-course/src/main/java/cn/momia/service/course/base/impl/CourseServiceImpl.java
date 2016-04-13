@@ -889,7 +889,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
-    public List<Long> queryTrialSubjectId(long courseId) {
+    public List<Long> queryTrialSubjectIds(long courseId) {
         String sql = "SELECT SubjectId FROM SG_Course WHERE ParentId=? AND Status<>0";
         return queryLongList(sql, new Object[] { courseId });
     }
