@@ -27,8 +27,15 @@ public class ActivityServiceImpl extends AbstractService implements ActivityServ
 
     @Override
     public ActivityEntry getActivityEntry(long entryId) {
-        String sql = "SELECT Id, ActivityId, Mobile, ChildName, Status FROM SG_ActivityEntry WHERE Id=?";
+        String sql = "SELECT Id, ActivityId, Mobile, ChildName, RelationShip, ExtraMessage, Status FROM SG_ActivityEntry WHERE Id=?";
         return queryObject(sql, new Object[] { entryId }, ActivityEntry.class, ActivityEntry.NOT_EXIST_ACTIVITY_ENTRY);
+    }
+
+    @Override
+    public ActivityEntry getActivityEntry(int activityId, String mobile, String childName) {
+        String sql = "SELECT Id FROM SG_ActivityEntry WHERE ActivityId=? AND Mobile=? AND ChildName=? AND Status=?";
+        long entryId = queryLong(sql, new Object[] { activityId, mobile, childName, ActivityEntry.Status.PAYED });
+        return getActivityEntry(entryId);
     }
 
     @Override

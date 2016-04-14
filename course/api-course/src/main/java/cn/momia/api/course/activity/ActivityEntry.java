@@ -17,6 +17,8 @@ public class ActivityEntry {
     private int activityId;
     private String mobile;
     private String childName;
+    private String relationShip;
+    private String extraMessage;
     private int status;
 
     public long getId() {
@@ -49,6 +51,22 @@ public class ActivityEntry {
 
     public void setChildName(String childName) {
         this.childName = childName;
+    }
+
+    public String getRelationShip() {
+        return relationShip;
+    }
+
+    public void setRelationShip(String relationShip) {
+        this.relationShip = relationShip;
+    }
+
+    public String getExtraMessage() {
+        return extraMessage;
+    }
+
+    public void setExtraMessage(String extraMessage) {
+        this.extraMessage = extraMessage;
     }
 
     public int getStatus() {

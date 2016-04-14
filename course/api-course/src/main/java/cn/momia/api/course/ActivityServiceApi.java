@@ -18,6 +18,13 @@ public class ActivityServiceApi extends HttpServiceApi {
         return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/activity/entry/%d", entryId)), ActivityEntry.class);
     }
 
+    public ActivityEntry getEntry(int activityId, String mobile, String childName) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("mobile", mobile)
+                .add("cname", childName);
+        return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/activity/%d/entry", activityId), builder.build()), ActivityEntry.class);
+    }
+
     public long join(int activityId, String mobile, String childName, String relation) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("mobile", mobile)

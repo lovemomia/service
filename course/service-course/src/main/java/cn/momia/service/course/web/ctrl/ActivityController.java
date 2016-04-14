@@ -54,6 +54,13 @@ public class ActivityController extends BaseController {
         return MomiaHttpResponse.SUCCESS(activityEntry);
     }
 
+    @RequestMapping(value = "/{aid}/entry", method = RequestMethod.GET)
+    public MomiaHttpResponse getEntry(@PathVariable(value = "aid") int activityId, @RequestParam String mobile, @RequestParam(value = "cname") String childName) {
+        ActivityEntry activityEntry = activityService.getActivityEntry(activityId, mobile, childName);
+        if (!activityEntry.exists()) return MomiaHttpResponse.FAILED("无效的报名信息");
+        return MomiaHttpResponse.SUCCESS(activityEntry);
+    }
+
     @RequestMapping(value = "/{aid}/join", method = RequestMethod.POST)
     public MomiaHttpResponse join(@PathVariable(value = "aid") int activityId,
                                   @RequestParam String mobile,
@@ -203,7 +210,7 @@ public class ActivityController extends BaseController {
             Activity activity = activityService.getActivity(activityEntry.getActivityId());
             if (!activity.exists()) return;
 
-            smsServiceApi.notify(activityEntry.getMobile(), activity.getMessage());
+            smsServiceApi.notify(activityEntry.getMobile(), activity.getMessage() + activityEntry.getExtraMessage());
         } catch (Exception e) {
             LOGGER.error("fail to notify for activity entry: {}", entryId, e);
         }
