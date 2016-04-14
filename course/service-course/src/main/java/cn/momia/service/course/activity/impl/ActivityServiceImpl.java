@@ -45,17 +45,18 @@ public class ActivityServiceImpl extends AbstractService implements ActivityServ
     }
 
     @Override
-    public long join(final int activityId, final String mobile, final String childName, final String relation, final int status) {
+    public long join(final int activityId, final String mobile, final String childName, final String relation, final String extra, final int status) {
         return insert(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO SG_ActivityEntry (ActivityId, Mobile, ChildName, RelationShip, Status, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO SG_ActivityEntry (ActivityId, Mobile, ChildName, RelationShip, Status, AddTime) VALUES (?, ?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setInt(1, activityId);
                 ps.setString(2, mobile);
                 ps.setString(3, childName);
                 ps.setString(4, relation);
-                ps.setInt(5, status);
+                ps.setString(5, extra);
+                ps.setInt(6, status);
 
                 return ps;
             }

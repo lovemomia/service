@@ -65,13 +65,14 @@ public class ActivityController extends BaseController {
     public MomiaHttpResponse join(@PathVariable(value = "aid") int activityId,
                                   @RequestParam String mobile,
                                   @RequestParam(value = "cname") String childName,
-                                  @RequestParam String relation) {
+                                  @RequestParam String relation,
+                                  @RequestParam String extra) {
         if (activityService.joined(activityId, mobile, childName)) return MomiaHttpResponse.FAILED("您已为 " + childName + " 报过名，无需重复报名");
 
         Activity activity = activityService.getActivity(activityId);
         if (!activity.exists()) return MomiaHttpResponse.FAILED("活动不存在");
 
-        long entryId = activityService.join(activityId, mobile, childName, relation, activity.isNeedPay() ? ActivityEntry.Status.NOT_PAYED : ActivityEntry.Status.PAYED);
+        long entryId = activityService.join(activityId, mobile, childName, relation, extra, activity.isNeedPay() ? ActivityEntry.Status.NOT_PAYED : ActivityEntry.Status.PAYED);
         return MomiaHttpResponse.SUCCESS(activity.isNeedPay() ? entryId : 0);
     }
 

@@ -25,11 +25,12 @@ public class ActivityServiceApi extends HttpServiceApi {
         return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/activity/%d/entry", activityId), builder.build()), ActivityEntry.class);
     }
 
-    public long join(int activityId, String mobile, String childName, String relation) {
+    public long join(int activityId, String mobile, String childName, String relation, String extra) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("mobile", mobile)
                 .add("cname", childName)
-                .add("relation", relation);
+                .add("relation", relation)
+                .add("extra", extra);
         return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/activity/%d/join", activityId), builder.build()), Number.class).longValue();
     }
 
