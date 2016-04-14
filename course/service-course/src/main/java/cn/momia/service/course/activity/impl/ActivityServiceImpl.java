@@ -49,7 +49,7 @@ public class ActivityServiceImpl extends AbstractService implements ActivityServ
         return insert(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO SG_ActivityEntry (ActivityId, Mobile, ChildName, RelationShip, Status, AddTime) VALUES (?, ?, ?, ?, ?, ?, NOW())";
+                String sql = "INSERT INTO SG_ActivityEntry (ActivityId, Mobile, ChildName, RelationShip, ExtraMessage, Status, AddTime) VALUES (?, ?, ?, ?, ?, ?, NOW())";
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setInt(1, activityId);
                 ps.setString(2, mobile);
