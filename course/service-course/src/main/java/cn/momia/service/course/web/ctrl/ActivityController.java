@@ -1,6 +1,10 @@
 package cn.momia.service.course.web.ctrl;
 
+import cn.momia.api.course.dto.coupon.Coupon;
+import cn.momia.api.course.dto.coupon.UserCoupon;
 import cn.momia.api.user.SmsServiceApi;
+import cn.momia.api.user.UserServiceApi;
+import cn.momia.api.user.dto.User;
 import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.core.platform.Platform;
@@ -19,6 +23,7 @@ import cn.momia.api.course.activity.Activity;
 import cn.momia.api.course.activity.ActivityEntry;
 import cn.momia.service.course.activity.ActivityService;
 import cn.momia.service.course.activity.Payment;
+import cn.momia.service.course.coupon.CouponService;
 import com.google.common.base.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +43,9 @@ public class ActivityController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ActivityController.class);
 
     @Autowired private SmsServiceApi smsServiceApi;
+    @Autowired private UserServiceApi userServiceApi;
     @Autowired private ActivityService activityService;
+    @Autowired private CouponService couponService;
 
     @RequestMapping(value = "/{aid}", method = RequestMethod.GET)
     public MomiaHttpResponse get(@PathVariable(value = "aid") int activityId) {
@@ -226,5 +233,54 @@ public class ActivityController extends BaseController {
     public MomiaHttpResponse check(@RequestParam(value = "eid") long entryId) {
         ActivityEntry activityEntry = activityService.getActivityEntry(entryId);
         return MomiaHttpResponse.SUCCESS(activityEntry.exists() && activityEntry.isPayed());
+    }
+
+    @RequestMapping(value = "/coupon", method = RequestMethod.POST)
+    public MomiaHttpResponse getCoupon(@RequestParam String utoken, @RequestParam(value = "coupon") int couponId) {
+        User user = userServiceApi.get(utoken);
+        if (couponService.hasActivityCoupon(user.getId())) return MomiaHttpResponse.SUCCESS(new ActivityCouponInfo(ActivityCouponInfo.Status.DUP));
+
+        Coupon coupon = couponService.getCoupon(couponId);
+        if (coupon.getSrc() != Coupon.Src.ACTIVITY) return MomiaHttpResponse.FAILED("无效的红包类型");
+
+        long userCouponId = couponService.distributeActivityCoupon(user.getId(), coupon);
+        if (userCouponId > 0) {
+            ActivityCouponInfo info = new ActivityCouponInfo(ActivityCouponInfo.Status.SUCCESS);
+            info.setUserCoupon(couponService.get(userCouponId));
+            return MomiaHttpResponse.SUCCESS(info);
+        } else {
+            return MomiaHttpResponse.SUCCESS(new ActivityCouponInfo(ActivityCouponInfo.Status.FAILED));
+        }
+    }
+
+    private static class ActivityCouponInfo {
+        public static class Status {
+            public static final int FAILED = 0;
+            public static final int SUCCESS = 1;
+            public static final int DUP = 2;
+        }
+
+        private int status;
+        private UserCoupon userCoupon;
+
+        public ActivityCouponInfo(int status) {
+            this.status = status;
+        }
+
+        public int getStatus() {
+            return status;
+        }
+
+        public void setStatus(int status) {
+            this.status = status;
+        }
+
+        public UserCoupon getUserCoupon() {
+            return userCoupon;
+        }
+
+        public void setUserCoupon(UserCoupon userCoupon) {
+            this.userCoupon = userCoupon;
+        }
     }
 }

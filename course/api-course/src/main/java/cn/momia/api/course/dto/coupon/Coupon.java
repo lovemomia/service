@@ -4,9 +4,16 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class Coupon {
+    public static class Src {
+        public static final int INVITE = 1;
+        public static final int FIRST_PAY = 2;
+        public static final int ACTIVITY = 3;
+    }
+
     public static final Coupon NOT_EXISTS_COUPON = new Coupon();
 
     private int id;
+    private int src;
     private int count;
     private BigDecimal discount;
     private int timeType;
@@ -21,6 +28,14 @@ public class Coupon {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getSrc() {
+        return src;
+    }
+
+    public void setSrc(int src) {
+        this.src = src;
     }
 
     public int getCount() {

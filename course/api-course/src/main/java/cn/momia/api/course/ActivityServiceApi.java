@@ -61,4 +61,11 @@ public class ActivityServiceApi extends HttpServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("eid", entryId);
         return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/activity/payment/check"), builder.build()), Boolean.class);
     }
+
+    public Object getCoupon(String utoken, int couponId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("utoken", utoken)
+                .add("coupon", couponId);
+        return executeReturnObject(MomiaHttpRequestBuilder.POST("/activity/coupon", builder.build()), Object.class);
+    }
 }

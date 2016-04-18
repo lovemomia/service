@@ -14,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -32,9 +34,6 @@ import java.util.Set;
 public class CouponServiceImpl extends AbstractService implements CouponService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CouponServiceImpl.class);
 
-    private static final int COUPON_SRC_INVITE = 1;
-    private static final int COUPON_SRC_FIRST_PAY = 2;
-
     private static final int NOT_USED_STATUS = 1;
     private static final int USED_STATUS = 2;
     private static final int EXPIRED_STATUS = 3;
@@ -48,7 +47,7 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
     private List<Coupon> listCoupons(Collection<Integer> couponIds) {
         if (couponIds.isEmpty()) return new ArrayList<Coupon>();
 
-        String sql = "SELECT Id, Count, Discount, TimeType, Time, TimeUnit, StartTime, EndTime FROM SG_Coupon WHERE Id IN(" + StringUtils.join(couponIds, ",") + ") AND OnlineTime<=NOW() AND OfflineTime>NOW() AND Status<>0";
+        String sql = "SELECT Id, Src, Count, Discount, TimeType, Time, TimeUnit, StartTime, EndTime FROM SG_Coupon WHERE Id IN(" + StringUtils.join(couponIds, ",") + ") AND OnlineTime<=NOW() AND OfflineTime>NOW() AND Status<>0";
         List<Coupon> coupons = queryObjectList(sql, Coupon.class);
 
         Map<Integer, Coupon> couponsMap = new HashMap<Integer, Coupon>();
@@ -186,7 +185,7 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
     @Override
     public boolean addInviteCoupon(String mobile, String inviteCode) {
         String sql = "SELECT Id FROM SG_Coupon WHERE Src=? AND OnlineTime<=NOW() AND OfflineTime>NOW() AND Status<>0 ORDER BY AddTime DESC LIMIT 1";
-        List<Integer> couponIds = queryIntList(sql, new Object[] { COUPON_SRC_INVITE });
+        List<Integer> couponIds = queryIntList(sql, new Object[] { Coupon.Src.INVITE });
 
         List<Coupon> coupons = listCoupons(couponIds);
         if (!coupons.isEmpty()) return addInviteCoupon(mobile, inviteCode, coupons.get(0));
@@ -275,7 +274,7 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
 
     private List<Coupon> listFirstPayCoupons() {
         String sql = "SELECT Id FROM SG_Coupon WHERE Src=? AND OnlineTime<=NOW() AND OfflineTime>NOW() AND Status<>0 ORDER BY AddTime DESC LIMIT 1";
-        List<Integer> couponIds = queryIntList(sql, new Object[] { COUPON_SRC_FIRST_PAY });
+        List<Integer> couponIds = queryIntList(sql, new Object[] { Coupon.Src.FIRST_PAY });
 
         return listCoupons(couponIds);
     }
@@ -297,5 +296,49 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
         String sql = "SELECT Id, Code, Discount, Consumption FROM SG_CouponCode WHERE Code=? AND OnlineTime<=NOW() AND OfflineTime>NOW() AND Status=1";
         List<CouponCode> couponCodes = queryObjectList(sql, new Object[] { code }, CouponCode.class);
         return couponCodes.isEmpty() ? CouponCode.NOT_EXIST_COUPON_CODE : couponCodes.get(0);
+    }
+
+    @Override
+    public boolean hasActivityCoupon(long userId) {
+        String sql = "SELECT COUNT(1) FROM SG_ActivityCoupon WHERE UserId=? AND Status=1";
+        return queryInt(sql, new Object[] { userId }) > 0;
+    }
+
+    @Override
+    public long distributeActivityCoupon(final long userId, final Coupon coupon) {
+        String sql = "INSERT INTO SG_ActivityCoupon (UserId, AddTime) VALUES (?, NOW())";
+        if (!update(sql, new Object[] { userId })) {
+            LOGGER.error("fail to insert into SG_ActivityCoupon for user: {}", userId);
+            return 0;
+        }
+
+        KeyHolder keyHolder = insert(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                String sql = "INSERT INTO SG_UserCoupon (UserId, CouponId, StartTime, EndTime, InviteCode, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
+                PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ps.setLong(1, userId);
+                ps.setInt(2, coupon.getId());
+
+                int timeType = coupon.getTimeType();
+                Date startTime;
+                Date endTime;
+                if (timeType == 1) {
+                    startTime = new Date();
+                    endTime = TimeUtil.add(startTime, coupon.getTime(), coupon.getTimeUnit());
+                } else {
+                    startTime = coupon.getStartTime();
+                    endTime = coupon.getEndTime();
+                }
+                ps.setTimestamp(3, new Timestamp(startTime.getTime()));
+                ps.setTimestamp(4, new Timestamp(endTime.getTime()));
+
+                ps.setString(5, "");
+
+                return ps;
+            }
+        });
+
+         return keyHolder.getKey().longValue();
     }
 }

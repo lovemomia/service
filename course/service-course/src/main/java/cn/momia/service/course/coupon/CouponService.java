@@ -34,4 +34,7 @@ public interface CouponService {
     List<UserCoupon> queryUserCouponsToExpired(int days);
 
     CouponCode getCouponCode(String code);
+
+    boolean hasActivityCoupon(long userId);
+    long distributeActivityCoupon(long userId, Coupon coupon);
 }
