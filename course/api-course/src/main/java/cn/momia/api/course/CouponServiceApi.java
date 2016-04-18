@@ -13,7 +13,7 @@ import java.util.List;
 
 public class CouponServiceApi extends HttpServiceApi {
     public Coupon get(int couponId) {
-        return null;
+        return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/coupon/%d", couponId)), Coupon.class);
     }
 
     public BigDecimal coupon(String utoken, long orderId, long userCouponId) {
