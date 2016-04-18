@@ -1,5 +1,6 @@
 package cn.momia.service.course.coupon;
 
+import cn.momia.api.course.dto.coupon.Coupon;
 import cn.momia.api.course.dto.coupon.CouponCode;
 import cn.momia.api.course.dto.coupon.UserCoupon;
 
@@ -7,6 +8,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface CouponService {
+    Coupon getCoupon(int couponId);
+
     UserCoupon get(long userCouponId);
     BigDecimal calcTotalFee(BigDecimal totalFee, UserCoupon userCoupon);
 

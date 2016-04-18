@@ -1,5 +1,6 @@
 package cn.momia.api.course;
 
+import cn.momia.api.course.dto.coupon.Coupon;
 import cn.momia.api.course.dto.coupon.CouponCode;
 import cn.momia.api.course.dto.coupon.UserCoupon;
 import cn.momia.common.core.api.HttpServiceApi;
@@ -11,6 +12,10 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class CouponServiceApi extends HttpServiceApi {
+    public Coupon get(int couponId) {
+        return null;
+    }
+
     public BigDecimal coupon(String utoken, long orderId, long userCouponId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)

@@ -30,6 +30,11 @@ public class CouponController extends BaseController {
     @Autowired private ImServiceApi imServiceApi;
     @Autowired private UserServiceApi userServiceApi;
 
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public MomiaHttpResponse get(@PathVariable(value = "id") int couponId) {
+        return MomiaHttpResponse.SUCCESS(couponService.getCoupon(couponId));
+    }
+
     @RequestMapping(method = RequestMethod.GET)
     public MomiaHttpResponse coupon(@RequestParam String utoken,
                                     @RequestParam(value = "oid") long orderId,

@@ -1,10 +1,14 @@
-package cn.momia.service.course.coupon;
+package cn.momia.api.course.dto.coupon;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class Coupon {
-    private int Id;
+    public static final Coupon NOT_EXISTS_COUPON = new Coupon();
+
+    private int id;
     private int count;
+    private BigDecimal discount;
     private int timeType;
     private int time;
     private int timeUnit;
@@ -12,11 +16,11 @@ public class Coupon {
     private Date endTime;
 
     public int getId() {
-        return Id;
+        return id;
     }
 
     public void setId(int id) {
-        Id = id;
+        this.id = id;
     }
 
     public int getCount() {
@@ -25,6 +29,14 @@ public class Coupon {
 
     public void setCount(int count) {
         this.count = count;
+    }
+
+    public BigDecimal getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(BigDecimal discount) {
+        this.discount = discount;
     }
 
     public int getTimeType() {
@@ -65,5 +77,9 @@ public class Coupon {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public boolean exists() {
+        return id > 0;
     }
 }

@@ -3,7 +3,7 @@ package cn.momia.service.course.coupon.impl;
 import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.common.core.util.TimeUtil;
-import cn.momia.service.course.coupon.Coupon;
+import cn.momia.api.course.dto.coupon.Coupon;
 import cn.momia.api.course.dto.coupon.CouponCode;
 import cn.momia.service.course.coupon.CouponService;
 import cn.momia.service.course.coupon.InviteCoupon;
@@ -38,6 +38,32 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
     private static final int NOT_USED_STATUS = 1;
     private static final int USED_STATUS = 2;
     private static final int EXPIRED_STATUS = 3;
+
+    @Override
+    public Coupon getCoupon(int couponId) {
+        List<Coupon> coupons = listCoupons(Sets.newHashSet(couponId));
+        return coupons.isEmpty() ? Coupon.NOT_EXISTS_COUPON : coupons.get(0);
+    }
+
+    private List<Coupon> listCoupons(Collection<Integer> couponIds) {
+        if (couponIds.isEmpty()) return new ArrayList<Coupon>();
+
+        String sql = "SELECT Id, Count, Discount, TimeType, Time, TimeUnit, StartTime, EndTime FROM SG_Coupon WHERE Id IN(" + StringUtils.join(couponIds, ",") + ") AND OnlineTime<=NOW() AND OfflineTime>NOW() AND Status<>0";
+        List<Coupon> coupons = queryObjectList(sql, Coupon.class);
+
+        Map<Integer, Coupon> couponsMap = new HashMap<Integer, Coupon>();
+        for (Coupon coupon : coupons) {
+            couponsMap.put(coupon.getId(), coupon);
+        }
+
+        List<Coupon> result = new ArrayList<Coupon>();
+        for (int couponId : couponIds) {
+            Coupon coupon = couponsMap.get(couponId);
+            if (coupon != null) result.add(coupon);
+        }
+
+        return result;
+    }
 
     @Override
     public UserCoupon get(long userCouponId) {
@@ -166,26 +192,6 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
         if (!coupons.isEmpty()) return addInviteCoupon(mobile, inviteCode, coupons.get(0));
 
         throw new MomiaErrorException("不能再领取了，活动已经结束了哦");
-    }
-
-    private List<Coupon> listCoupons(Collection<Integer> couponIds) {
-        if (couponIds.isEmpty()) return new ArrayList<Coupon>();
-
-        String sql = "SELECT Id, Count, TimeType, Time, TimeUnit, StartTime, EndTime FROM SG_Coupon WHERE Id IN(" + StringUtils.join(couponIds, ",") + ") AND OnlineTime<=NOW() AND OfflineTime>NOW() AND Status<>0";
-        List<Coupon> coupons = queryObjectList(sql, Coupon.class);
-
-        Map<Integer, Coupon> couponsMap = new HashMap<Integer, Coupon>();
-        for (Coupon coupon : coupons) {
-            couponsMap.put(coupon.getId(), coupon);
-        }
-
-        List<Coupon> result = new ArrayList<Coupon>();
-        for (int couponId : couponIds) {
-            Coupon coupon = couponsMap.get(couponId);
-            if (coupon != null) result.add(coupon);
-        }
-
-        return result;
     }
 
     private boolean addInviteCoupon(String mobile, String inviteCode, Coupon coupon) {
