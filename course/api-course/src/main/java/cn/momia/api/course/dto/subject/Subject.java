@@ -37,7 +37,7 @@ public class Subject {
 
     private BigDecimal price;
     private BigDecimal originalPrice;
-    private String age;
+    private String age = "";
     private int joined;
     private String scheduler;
     private String region;
