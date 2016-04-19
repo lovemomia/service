@@ -87,6 +87,12 @@ public class ChildServiceImpl extends AbstractService implements ChildService {
     }
 
     @Override
+    public boolean update(long userId, long childId, String avatar, String name, String sex, Date birthday) {
+        String sql = "UPDATE SG_Child SET Avatar=?, Name=?, Sex=?, Birthday=? WHERE UserId=? AND Id=?";
+        return update(sql, new Object[] { avatar, name, sex, birthday, userId, childId });
+    }
+
+    @Override
     public boolean updateAvatar(long userId, long childId, String avatar) {
         String sql = "UPDATE SG_Child SET Avatar=? WHERE UserId=? AND Id=?";
         return update(sql, new Object[] { avatar, userId, childId });

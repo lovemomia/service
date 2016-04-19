@@ -196,6 +196,16 @@ public class CourseController extends BaseController {
         return earliestSku == null ? "" : earliestSku.getScheduler();
     }
 
+    @RequestMapping(value = "/list/subject/recent", method = RequestMethod.GET)
+    public MomiaHttpResponse listRecentCoursesBySubject(@RequestParam(value = "suid") long subjectId) {
+        return MomiaHttpResponse.SUCCESS(courseService.queryRecentCoursesBySubject(subjectId));
+    }
+
+    @RequestMapping(value = "/list/subject", method = RequestMethod.GET)
+    public MomiaHttpResponse listBySubject(@RequestParam(value = "suid") long subjectId) {
+        return MomiaHttpResponse.SUCCESS(buildBaseCourses(courseService.queryAllBySubject(subjectId)));
+    }
+
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public MomiaHttpResponse listCourses(@RequestParam String coids) {
         Set<Long> courseIds = new HashSet<Long>();
@@ -245,14 +255,6 @@ public class CourseController extends BaseController {
         if (!courseDetail.exists()) return MomiaHttpResponse.FAILED("课程详情不存在");
 
         return MomiaHttpResponse.SUCCESS(courseDetail);
-    }
-
-    @RequestMapping(value = "/{coid}/institution", method = RequestMethod.GET)
-    public MomiaHttpResponse institution(@PathVariable(value = "coid") long courseId) {
-        int institutionId = courseService.getInstitutionId(courseId);
-        if (institutionId <= 0) return MomiaHttpResponse.FAILED("机构不存在");
-
-        return MomiaHttpResponse.SUCCESS(institutionId);
     }
 
     @RequestMapping(value = "/{coid}/book", method = RequestMethod.GET)
@@ -306,6 +308,11 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(sku);
     }
 
+    @RequestMapping(value = "/{coid}/sku", method = RequestMethod.GET)
+    public MomiaHttpResponse listSkus(@PathVariable(value = "coid") long courseId) {
+        return MomiaHttpResponse.SUCCESS(buildDatedCourseSkus(filterNotEndedSkus(courseService.listSkus(courseId))));
+    }
+
     @RequestMapping(value = "/{coid}/sku/week", method = RequestMethod.GET)
     public MomiaHttpResponse listWeekSkus(@PathVariable(value = "coid") long courseId) {
         Date now = new Date();
@@ -351,7 +358,7 @@ public class CourseController extends BaseController {
     }
 
     @RequestMapping(value = "/{coid}/sku/month", method = RequestMethod.GET)
-    public MomiaHttpResponse listWeekSkus(@PathVariable(value = "coid") long courseId, @RequestParam int month) {
+    public MomiaHttpResponse listMonthSkus(@PathVariable(value = "coid") long courseId, @RequestParam int month) {
         String start = formatCurrentMonth(month);
         String end = formatNextMonth(month);
         List<CourseSku> skus = courseService.querySkus(courseId, start, end);

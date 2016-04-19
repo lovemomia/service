@@ -1,7 +1,6 @@
 package cn.momia.api.poi;
 
 import cn.momia.api.poi.dto.City;
-import cn.momia.api.poi.dto.Institution;
 import cn.momia.api.poi.dto.Place;
 import cn.momia.api.poi.dto.Region;
 import cn.momia.common.core.api.HttpServiceApi;
@@ -28,14 +27,5 @@ public class PoiServiceApi extends HttpServiceApi {
     public List<Place> listPlaces(Collection<Integer> placeIds) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("plids", StringUtils.join(placeIds, ","));
         return executeReturnList(MomiaHttpRequestBuilder.GET(url("/poi/place/list"), builder.build()), Place.class);
-    }
-
-    public Institution getInstitution(int InstitutionId) {
-        return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/poi/inst/%d", InstitutionId)), Institution.class);
-    }
-
-    public List<Institution> listInstitutions(Collection<Integer> InstitutionIds) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("instids", StringUtils.join(InstitutionIds, ","));
-        return executeReturnList(MomiaHttpRequestBuilder.GET(url("/poi/inst/list"), builder.build()), Institution.class);
     }
 }

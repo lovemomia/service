@@ -36,11 +36,6 @@ public class ChildServiceApi extends HttpServiceApi {
         return executeReturnList(MomiaHttpRequestBuilder.GET(url("/child"), builder.build()), Child.class);
     }
 
-    public List<Child> list(Collection<Long> childrenIds) {
-        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("cids", StringUtils.join(childrenIds, ","));
-        return executeReturnList(MomiaHttpRequestBuilder.GET(url("/child/list"), builder.build()), Child.class);
-    }
-
     public User updateAvatar(String utoken, long childId, String avatar) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
@@ -72,6 +67,11 @@ public class ChildServiceApi extends HttpServiceApi {
     public User delete(String utoken, long childId) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("utoken", utoken);
         return executeReturnObject(MomiaHttpRequestBuilder.DELETE(url("/child/%d", childId), builder.build()), User.class);
+    }
+
+    public List<Child> list(Collection<Long> childrenIds) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("cids", StringUtils.join(childrenIds, ","));
+        return executeReturnList(MomiaHttpRequestBuilder.GET(url("/child/list"), builder.build()), Child.class);
     }
 
     public List<ChildTag> listAllTags() {
@@ -120,18 +120,18 @@ public class ChildServiceApi extends HttpServiceApi {
     }
 
     public List<JSONObject> formatChildrenDetail(List<Child> children) {
-        List<JSONObject> feedChildren = new ArrayList<JSONObject>();
+        List<JSONObject> childrenDetail = new ArrayList<JSONObject>();
         for (int i = 0; i < Math.min(2, children.size()); i++) {
             Child child = children.get(i);
-            JSONObject feedChild = new JSONObject();
-            feedChild.put("sex", child.getSex());
-            feedChild.put("name", child.getName());
-            feedChild.put("age", TimeUtil.formatAge(child.getBirthday()));
+            JSONObject childJson = new JSONObject();
+            childJson.put("sex", child.getSex());
+            childJson.put("name", child.getName());
+            childJson.put("age", TimeUtil.formatAge(child.getBirthday()));
 
-            feedChildren.add(feedChild);
+            childrenDetail.add(childJson);
         }
 
-        return feedChildren;
+        return childrenDetail;
     }
 
     public List<String> formatChildren(List<JSONObject> childrenDetail) {

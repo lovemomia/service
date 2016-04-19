@@ -70,6 +70,45 @@ public class ImServiceRongCloudImpl extends AbstractImService {
     }
 
     @Override
+    protected boolean doJoinGroup(long userId, long groupId, String groupName) {
+        try {
+            HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.JoinGroup"));
+
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("userId", String.valueOf(userId)));
+            params.add(new BasicNameValuePair("groupId", String.valueOf(groupId)));
+            params.add(new BasicNameValuePair("groupName", groupName));
+            HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
+            httpPost.setEntity(entity);
+
+            JSONObject responseJson = RongCloudUtil.executeRequest(httpPost);
+
+            return responseJson.getInteger("code") == 200;
+        } catch (Exception e) {
+            throw new MomiaErrorException("fail to join group " + groupId + "/" + userId, e);
+        }
+    }
+
+    @Override
+    protected boolean doLeaveGroup(long userId, long groupId) {
+        try {
+            HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.LeaveGroup"));
+
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("userId", String.valueOf(userId)));
+            params.add(new BasicNameValuePair("groupId", String.valueOf(groupId)));
+            HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
+            httpPost.setEntity(entity);
+
+            JSONObject responseJson = RongCloudUtil.executeRequest(httpPost);
+
+            return responseJson.getInteger("code") == 200;
+        } catch (Exception e) {
+            throw new MomiaErrorException("fail to leave group " + groupId + "/" + userId, e);
+        }
+    }
+
+    @Override
     protected boolean doCreateGroup(long groupId, String groupName, Collection<Long> userIds) {
         try {
             HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.CreateGroup"));
@@ -126,45 +165,6 @@ public class ImServiceRongCloudImpl extends AbstractImService {
             return responseJson.getInteger("code") == 200;
         } catch (Exception e) {
             throw new MomiaErrorException("fail to dismiss group " + groupId, e);
-        }
-    }
-
-    @Override
-    protected boolean doJoinGroup(long userId, long groupId, String groupName) {
-        try {
-            HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.JoinGroup"));
-
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair("userId", String.valueOf(userId)));
-            params.add(new BasicNameValuePair("groupId", String.valueOf(groupId)));
-            params.add(new BasicNameValuePair("groupName", groupName));
-            HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
-            httpPost.setEntity(entity);
-
-            JSONObject responseJson = RongCloudUtil.executeRequest(httpPost);
-
-            return responseJson.getInteger("code") == 200;
-        } catch (Exception e) {
-            throw new MomiaErrorException("fail to join group " + groupId + "/" + userId, e);
-        }
-    }
-
-    @Override
-    protected boolean doLeaveGroup(long userId, long groupId) {
-        try {
-            HttpPost httpPost = RongCloudUtil.createHttpPost(Configuration.getString("Im.RongCloud.Service.LeaveGroup"));
-
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair("userId", String.valueOf(userId)));
-            params.add(new BasicNameValuePair("groupId", String.valueOf(groupId)));
-            HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
-            httpPost.setEntity(entity);
-
-            JSONObject responseJson = RongCloudUtil.executeRequest(httpPost);
-
-            return responseJson.getInteger("code") == 200;
-        } catch (Exception e) {
-            throw new MomiaErrorException("fail to leave group " + groupId + "/" + userId, e);
         }
     }
 }

@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MetaUtil {
+public class PoiUtil {
     private static PoiServiceApi poiServiceApi;
 
     private static Date lastReloadTime = null;
@@ -16,7 +16,7 @@ public class MetaUtil {
     private static Map<Integer, Region> regionsMap = new HashMap<Integer, Region>();
 
     public void setPoiServiceApi(PoiServiceApi poiServiceApi) {
-        MetaUtil.poiServiceApi = poiServiceApi;
+        PoiUtil.poiServiceApi = poiServiceApi;
     }
 
     private synchronized static void reload() {

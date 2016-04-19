@@ -24,7 +24,7 @@ public class CourseSku {
     @JSONField(serialize = false) private int unlockedStock;
     private int booked;
     private int minBooked;
-    @JSONField(serialize = false) private int placeId;
+    private int placeId;
     @JSONField(serialize = false) private int adult;
     @JSONField(serialize = false) private int child;
     private int status;

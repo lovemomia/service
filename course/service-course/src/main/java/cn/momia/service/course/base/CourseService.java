@@ -19,9 +19,12 @@ public interface CourseService {
     long queryTrialCount(long cityId);
     List<Course> queryTrial(long cityId, int start, int count);
 
+    List<Long> queryTrialSubjectSkuIds(long courseId);
+
     Course get(long courseId);
     List<Course> list(Collection<Long> courseIds);
     List<CourseSku> listSkus(Collection<Long> skuIds);
+    List<CourseSku> listSkus(long courseId);
 
     long queryBookImgCount(long courseId);
     List<String> queryBookImgs(long courseId, int start, int count);
@@ -31,6 +34,8 @@ public interface CourseService {
 
     long queryCountBySubject(long subjectId, Collection<Long> exclusions, int minAge, int maxAge, int queryType);
     List<Course> queryBySubject(long subjectId, int start, int count, Collection<Long> exclusions, int minAge, int maxAge, int sortTypeId, int queryType);
+
+    List<Course> queryRecentCoursesBySubject(long subjectId);
 
     List<Course> queryAllBySubject(long subjectId);
     Map<Long, List<Course>> queryAllBySubjects(Collection<Long> subjectIds);
@@ -74,14 +79,15 @@ public interface CourseService {
     boolean cancel(long userId, long bookingId);
     void decreaseJoined(long courseId, int joinCount);
 
+    List<Long> queryBookedPackageIds(long userId, long courseId);
     List<Long> queryBookedPackageIds(Collection<Long> userIds, long courseId, long courseSkuId);
     void batchCancel(Collection<Long> userIds, long courseId, long courseSkuId);
     Map<Long,Long> queryBookedPackageUsers(Collection<Long> userIds, long courseId, long courseSkuId);
 
     CourseDetail getDetail(long courseId);
-    int getInstitutionId(long courseId);
 
     long querySubjectId(long courseId);
+    List<Long> queryTrialSubjectIds(long courseId);
 
     Map<Long, String> queryTips(Collection<Long> courseIds);
 
@@ -102,4 +108,6 @@ public interface CourseService {
     List<String> queryHotNewCourses();
     List<CourseSku> queryCourseSkusClosedToday();
     List<Long> queryBookedUserIds(long courseSkuId);
+
+    boolean hasNoAvaliableSkus(long courseId);
 }

@@ -1,6 +1,5 @@
 package cn.momia.api.course.dto.subject;
 
-import cn.momia.api.course.dto.course.Course;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -42,8 +41,6 @@ public class Subject {
     private int joined;
     private String scheduler;
     private String region;
-
-    private List<Course> courses;
 
     private SubjectSku cheapestSku;
 
@@ -199,14 +196,6 @@ public class Subject {
         this.region = region;
     }
 
-    public List<Course> getCourses() {
-        return courses;
-    }
-
-    public void setCourses(List<Course> courses) {
-        this.courses = courses;
-    }
-
     public SubjectSku getCheapestSku() {
         if (cheapestSku != null) return cheapestSku;
 
@@ -253,7 +242,6 @@ public class Subject {
             setScheduler(subject.getScheduler());
             setRegion(subject.getRegion());
             setStatus(subject.getStatus());
-            setCourses(subject.getCourses());
         }
     }
 }

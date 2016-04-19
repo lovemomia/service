@@ -225,6 +225,14 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     }
 
     @Override
+    public List<OrderPackage> queryAllBookableByUser(long userId) {
+        String sql = "SELECT DISTINCT A.Id FROM SG_SubjectOrderPackage A LEFT JOIN SG_SubjectOrderPackageGift B ON A.Id=B.PackageId AND B.Status<>0 WHERE A.UserId=? AND A.Status=1 AND A.BookableCount>0 AND (B.Id IS NULL OR (B.ToUserId=0 AND B.Deadline<=NOW()) OR B.ToUserId=?) ORDER BY A.AddTime ASC";
+        List<Long> packageIds = queryLongList(sql, new Object[] { userId, userId });
+
+        return listOrderPackages(packageIds);
+    }
+
+    @Override
     public Map<Long, Long> queryBookablePackageIds(Set<Long> userIds, long subjectId) {
         if (userIds.isEmpty()) return new HashMap<Long, Long>();
 

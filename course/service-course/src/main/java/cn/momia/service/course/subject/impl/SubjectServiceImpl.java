@@ -1,39 +1,20 @@
 package cn.momia.service.course.subject.impl;
 
-import cn.momia.api.poi.MetaUtil;
-import cn.momia.api.poi.dto.Region;
-import cn.momia.api.course.dto.course.Course;
-import cn.momia.api.course.dto.course.CourseSku;
-import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
-import cn.momia.common.core.util.TimeUtil;
-import cn.momia.service.course.base.CourseService;
 import cn.momia.api.course.dto.subject.Subject;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.api.course.dto.subject.SubjectSku;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class SubjectServiceImpl extends AbstractService implements SubjectService {
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("M月d日");
-
-    private CourseService courseService;
-
-    public void setCourseService(CourseService courseService) {
-        this.courseService = courseService;
-    }
-
     @Override
     public Subject get(long subjectId) {
         Set<Long> subjectIds = Sets.newHashSet(subjectId);
@@ -63,7 +44,6 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
             subjectsMap.put(subject.getId(), subject);
         }
 
-        Map<Long, List<Course>> coursesMap = courseService.queryAllBySubjects(subjectIds);
         List<Subject> result = new ArrayList<Subject>();
         for (long subjectId : subjectIds) {
             Subject subject = subjectsMap.get(subjectId);
@@ -71,37 +51,13 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
                 SubjectSku minPriceSku = getMinPriceSku(subject);
                 subject.setPrice(minPriceSku.getPrice());
                 subject.setOriginalPrice(minPriceSku.getOriginalPrice());
-
-                List<Course> courses = coursesMap.get(subjectId);
-                if (subject.getType() == Subject.Type.TRIAL && !courses.isEmpty()) subject.setCover(courses.get(0).getCover());
-                subject.setAge(getAgeRange(courses));
-                subject.setJoined(getJoined(courses));
-                subject.setScheduler(getScheduler(courses));
-                subject.setRegion(getRegion(courses));
-                subject.setCourses(buildBaseCourses(courses));
-
-                if (subject.getType() == Subject.Type.NORMAL) {
-                    subject.setStatus(Subject.Status.OK);
-                } else {
-                    int stock = subject.getStock();
-                    int avaliableCourseCount = getAvaliableCourseCount(courses);
-                    subject.setStatus(stock > 0 ? (avaliableCourseCount > 0 ? Subject.Status.OK : Subject.Status.SOLD_OUT) : Subject.Status.SOLD_OUT);
-                }
+                subject.setStatus(Subject.Status.OK);
 
                 result.add(subject);
             }
         }
 
         return result;
-    }
-
-    private List<Course> buildBaseCourses(List<Course> courses) {
-        List<Course> baseCourses = new ArrayList<Course>();
-        for (Course course : courses) {
-            baseCourses.add(new Course.Base(course));
-        }
-
-        return baseCourses;
     }
 
     private Map<Long, List<String>> queryImgs(Collection<Long> subjectIds) {
@@ -115,24 +71,6 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
         }
 
         return imgsMap;
-    }
-
-    private Map<Long, List<SubjectSku>> querySkus(Collection<Long> subjectIds) {
-        if (subjectIds.isEmpty()) return new HashMap<Long, List<SubjectSku>>();
-
-        String sql = "SELECT Id FROM SG_SubjectSku WHERE SubjectId IN (" + StringUtils.join(subjectIds, ",") + ") AND Status<>0";
-        List<Long> skuIds = queryLongList(sql);
-        List<SubjectSku> skus = listSkus(skuIds);
-
-        Map<Long, List<SubjectSku>> skusMap = new HashMap<Long, List<SubjectSku>>();
-        for (long subjectId : subjectIds) {
-            skusMap.put(subjectId, new ArrayList<SubjectSku>());
-        }
-        for (SubjectSku sku : skus) {
-            skusMap.get(sku.getSubjectId()).add(sku);
-        }
-
-        return skusMap;
     }
 
     private SubjectSku getMinPriceSku(Subject subject) {
@@ -149,92 +87,6 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
         }
 
         return minPriceSubjectSku;
-    }
-
-    private String getAgeRange(List<Course> courses) {
-        if (courses.isEmpty()) return "";
-
-        int minAge = Integer.MAX_VALUE;
-        int maxAge = 0;
-
-        for (Course course : courses) {
-            minAge = Math.min(minAge, course.getMinAge());
-            maxAge = Math.max(maxAge, course.getMaxAge());
-        }
-
-        if (minAge <= 0 && maxAge <= 0) throw new MomiaErrorException("invalid age of subject sku");
-        if (minAge <= 0) return maxAge + "岁";
-        if (maxAge <= 0) return minAge + "岁";
-        if (minAge == maxAge) return minAge + "岁";
-        return minAge + "-" + maxAge + "岁";
-    }
-
-    private int getJoined(List<Course> courses) {
-        int joined = 0;
-        for (Course course : courses) {
-            joined += course.getJoined();
-        }
-
-        return joined;
-    }
-
-    private String getScheduler(List<Course> courses) {
-        if (courses.isEmpty()) return "";
-
-        List<Date> times = new ArrayList<Date>();
-        for (Course course : courses) {
-            Date startTime = course.getStartTime();
-            Date endTime = course.getEndTime();
-            if (startTime != null) times.add(startTime);
-            if (endTime != null) times.add(endTime);
-        }
-        Collections.sort(times);
-
-        return format(times);
-    }
-
-    private String format(List<Date> times) {
-        if (times.isEmpty()) return "";
-        if (times.size() == 1) {
-            Date start = times.get(0);
-            return DATE_FORMAT.format(start) + " " + TimeUtil.getWeekDay(start);
-        } else {
-            Date start = times.get(0);
-            Date end = times.get(times.size() - 1);
-            if (TimeUtil.isSameDay(start, end)) {
-                return DATE_FORMAT.format(start) + " " + TimeUtil.getWeekDay(start);
-            } else {
-                return DATE_FORMAT.format(start) + "-" + DATE_FORMAT.format(end);
-            }
-        }
-    }
-
-    private String getRegion(List<Course> courses) {
-        if (courses.isEmpty()) return "";
-
-        List<Integer> regionIds = new ArrayList<Integer>();
-        for (Course course : courses) {
-            int regionId = course.getRegionId();
-            if (!regionIds.contains(regionId)) regionIds.add(regionId);
-        }
-
-        return MetaUtil.getRegionName(regionIds.size() > 1 ? Region.MULTI_REGION_ID : regionIds.get(0));
-    }
-
-    private int getAvaliableCourseCount(List<Course> courses) {
-        int count = 0;
-        Date now = new Date();
-        for (Course course : courses) {
-            List<CourseSku> skus = course.getSkus();
-            for (CourseSku sku : skus) {
-                if (sku.isBookable(now)) {
-                    count++;
-                    break;
-                }
-            }
-        }
-
-        return count;
     }
 
     @Override
@@ -283,32 +135,28 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
     }
 
     @Override
+    public Map<Long, List<SubjectSku>> querySkus(Collection<Long> subjectIds) {
+        if (subjectIds.isEmpty()) return new HashMap<Long, List<SubjectSku>>();
+
+        String sql = "SELECT Id FROM SG_SubjectSku WHERE SubjectId IN (" + StringUtils.join(subjectIds, ",") + ") AND Status<>0";
+        List<Long> skuIds = queryLongList(sql);
+        List<SubjectSku> skus = listSkus(skuIds);
+
+        Map<Long, List<SubjectSku>> skusMap = new HashMap<Long, List<SubjectSku>>();
+        for (long subjectId : subjectIds) {
+            skusMap.put(subjectId, new ArrayList<SubjectSku>());
+        }
+        for (SubjectSku sku : skus) {
+            skusMap.get(sku.getSubjectId()).add(sku);
+        }
+
+        return skusMap;
+    }
+
+    @Override
     public boolean isTrial(long subjectId) {
         String sql = "SELECT Type FROM SG_Subject WHERE Id=?";
         return queryInt(sql, new Object[] { subjectId }) == Subject.Type.TRIAL;
-    }
-
-    @Override
-    public long queryTrialCount(long cityId) {
-        String sql = "SELECT COUNT(DISTINCT A.Id) " +
-                "FROM SG_Subject A " +
-                "INNER JOIN SG_Course B ON A.Id=B.SubjectId " +
-                "INNER JOIN SG_CourseSku C ON B.Id=C.CourseId " +
-                "WHERE A.Type=? AND A.CityId=? AND A.Status=1 AND B.Status=1 AND C.Status=1 AND DATE_ADD(DATE(C.EndTime), INTERVAL 1 DAY)>NOW()";
-        return queryLong(sql, new Object[] { Subject.Type.TRIAL, cityId });
-    }
-
-    @Override
-    public List<Subject> queryTrial(long cityId, int start, int count) {
-        String sql = "SELECT DISTINCT A.Id " +
-                "FROM SG_Subject A " +
-                "INNER JOIN SG_Course B ON A.Id=B.SubjectId " +
-                "INNER JOIN SG_CourseSku C ON B.Id=C.CourseId " +
-                "WHERE A.Type=? AND A.CityId=? AND A.Status=1 AND B.Status=1 AND C.Status=1 AND DATE_ADD(DATE(C.EndTime), INTERVAL 1 DAY)>NOW() " +
-                "ORDER BY A.Stock DESC, A.AddTime DESC LIMIT ?,?";
-        List<Long> subjectIds = queryLongList(sql, new Object[] { Subject.Type.TRIAL, cityId, start, count });
-
-        return list(subjectIds);
     }
 
     @Override

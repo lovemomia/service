@@ -79,6 +79,16 @@ public class CourseServiceApi extends HttpServiceApi {
         return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/course/booked/sku"), builder.build()), CourseSku.class);
     }
 
+    public List<Course> listRecentCoursesBySubject(long subjectId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("suid", subjectId);
+        return executeReturnList(MomiaHttpRequestBuilder.GET(url("/course/list/subject/recent"), builder.build()), Course.class);
+    }
+
+    public List<Course> listBySubject(long subjectId) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("suid", subjectId);
+        return executeReturnList(MomiaHttpRequestBuilder.GET(url("/course/list/subject"), builder.build()), Course.class);
+    }
+
     public PagedList<Course> query(long subjectId, int start, int count) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("suid", subjectId)
@@ -117,10 +127,6 @@ public class CourseServiceApi extends HttpServiceApi {
         return executeReturnPagedList(MomiaHttpRequestBuilder.GET(url("/course/%d/teacher", courseId), builder.build()), Integer.class);
     }
 
-    public int getInstitutionId(long courseId) {
-        return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/course/%d/institution", courseId)), Integer.class);
-    }
-
     public Map<Long, String> queryTips(Set<Long> courseIds) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("coids", StringUtils.join(courseIds, ","));
         return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/course/tips"), builder.build()), Map.class);
@@ -133,6 +139,10 @@ public class CourseServiceApi extends HttpServiceApi {
     public List<CourseSku> listSkus(Collection<Long> courseSkuIds) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("sids", StringUtils.join(courseSkuIds, ","));
         return executeReturnList(MomiaHttpRequestBuilder.GET(url("/course/sku/list"), builder.build()), CourseSku.class);
+    }
+
+    public List<DatedCourseSkus> listSkus(long courseId) {
+        return executeReturnList(MomiaHttpRequestBuilder.GET(url("/course/%d/sku", courseId)), DatedCourseSkus.class);
     }
 
     public List<DatedCourseSkus> listWeekSkus(long courseId) {

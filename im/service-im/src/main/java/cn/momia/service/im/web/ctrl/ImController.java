@@ -42,26 +42,6 @@ public class ImController extends BaseController {
         return MomiaHttpResponse.SUCCESS(imService.listUserGroups(userId));
     }
 
-    @RequestMapping(value = "/group", method = RequestMethod.POST)
-    public MomiaHttpResponse createGroup(@RequestParam(value = "coid") long courseId,
-                                         @RequestParam(value = "sid") long courseSkuId,
-                                         @RequestParam(value = "tids") String teachers,
-                                         @RequestParam(value = "name") String groupName) {
-        return MomiaHttpResponse.SUCCESS(imService.createGroup(courseId, courseSkuId, MomiaUtil.splitDistinctLongs(teachers), groupName));
-    }
-
-    @RequestMapping(value = "/group", method = RequestMethod.PUT)
-    public MomiaHttpResponse updateGroup(@RequestParam(value = "coid") long courseId,
-                                         @RequestParam(value = "sid") long courseSkuId,
-                                         @RequestParam(value = "name") String groupName) {
-        return MomiaHttpResponse.SUCCESS(imService.updateGroup(courseId, courseSkuId, groupName));
-    }
-
-    @RequestMapping(value = "/group/{gid}", method = RequestMethod.DELETE)
-    public MomiaHttpResponse deleteGroup(@PathVariable(value = "gid") long groupId) {
-        return MomiaHttpResponse.SUCCESS(imService.dismissGroup(groupId));
-    }
-
     @RequestMapping(value = "/group/{gid}", method = RequestMethod.GET)
     public MomiaHttpResponse getGroup(@PathVariable(value = "gid") long groupId) {
         Group group = imService.getGroup(groupId);
@@ -87,6 +67,26 @@ public class ImController extends BaseController {
                                         @RequestParam(value = "coid") long courseId,
                                         @RequestParam(value = "sid") long courseSkuId) {
         return MomiaHttpResponse.SUCCESS(imService.leaveGroup(userId, courseId, courseSkuId));
+    }
+
+    @RequestMapping(value = "/group", method = RequestMethod.POST)
+    public MomiaHttpResponse createGroup(@RequestParam(value = "coid") long courseId,
+                                         @RequestParam(value = "sid") long courseSkuId,
+                                         @RequestParam(value = "tids") String teachers,
+                                         @RequestParam(value = "name") String groupName) {
+        return MomiaHttpResponse.SUCCESS(imService.createGroup(courseId, courseSkuId, MomiaUtil.splitDistinctLongs(teachers), groupName));
+    }
+
+    @RequestMapping(value = "/group", method = RequestMethod.PUT)
+    public MomiaHttpResponse updateGroup(@RequestParam(value = "coid") long courseId,
+                                         @RequestParam(value = "sid") long courseSkuId,
+                                         @RequestParam(value = "name") String groupName) {
+        return MomiaHttpResponse.SUCCESS(imService.updateGroup(courseId, courseSkuId, groupName));
+    }
+
+    @RequestMapping(value = "/group/{gid}", method = RequestMethod.DELETE)
+    public MomiaHttpResponse dismissGroup(@PathVariable(value = "gid") long groupId) {
+        return MomiaHttpResponse.SUCCESS(imService.dismissGroup(groupId));
     }
 
     @RequestMapping(value = "/push", method = RequestMethod.POST)

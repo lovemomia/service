@@ -1,8 +1,7 @@
 package cn.momia.service.course.base.impl;
 
 import cn.momia.api.course.dto.course.Student;
-import cn.momia.api.poi.MetaUtil;
-import cn.momia.api.poi.dto.Institution;
+import cn.momia.api.poi.PoiUtil;
 import cn.momia.api.poi.dto.Region;
 import cn.momia.api.course.dto.course.Course;
 import cn.momia.api.course.dto.course.CourseDetail;
@@ -32,6 +31,7 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -108,6 +108,11 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
+    public List<Long> queryTrialSubjectSkuIds(long courseId) {
+        return null;
+    }
+
+    @Override
     public Course get(long courseId) {
         Collection<Long> courseIds = Sets.newHashSet(courseId);
         List<Course> courses = list(courseIds);
@@ -119,25 +124,19 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     public List<Course> list(Collection<Long> courseIds) {
         if (courseIds.isEmpty()) return new ArrayList<Course>();
 
-        String sql = "SELECT A.Id, A.Type, A.ParentId, A.SubjectId, A.Title, A.KeyWord, A.Feature, A.Cover, A.MinAge, A.MaxAge, A.Insurance, A.Joined, A.Price, A.Price AS OriginalPrice, A.Goal, A.Flow, A.Tips, A.Notice, B.Notice AS SubjectNotice, A.InstitutionId, A.Status, B.Title AS Subject, B.Stock, A.AddTime FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Id IN (" + StringUtils.join(courseIds, ",") + ") AND A.Status<>0 AND B.Status<>0";
+        String sql = "SELECT A.Id, A.Type, A.ParentId, A.SubjectId, A.Title, A.KeyWord, A.Feature, A.Cover, A.MinAge, A.MaxAge, A.Insurance, A.Joined, A.Price, A.Price AS OriginalPrice, A.Goal, A.Flow, A.Tips, A.Notice, B.Notice AS SubjectNotice, A.Status, B.Title AS Subject, B.Stock, A.AddTime FROM SG_Course A INNER JOIN SG_Subject B ON A.SubjectId=B.Id WHERE A.Id IN (" + StringUtils.join(courseIds, ",") + ") AND A.Status<>0 AND B.Status<>0";
         List<Course> courses = queryObjectList(sql, Course.class);
 
-        Set<Integer> institutionIds = new HashSet<Integer>();
         Set<Long> courseAndParentIds = Sets.newHashSet(courseIds);
         for (Course course : courses) {
-            institutionIds.add(course.getInstitutionId());
             if (course.getParentId() > 0) courseAndParentIds.add(course.getParentId());
         }
-        Map<Integer, Institution> institutionsMap = queryInstitutions(institutionIds);
         Map<Long, List<String>> imgsMap = queryImgs(courseAndParentIds);
         Map<Long, List<String>> bookImgsMap = queryBookImgs(courseAndParentIds);
         Map<Long, List<CourseSku>> skusMap = querySkus(courseIds);
         Map<Long, BigDecimal> buyablesMap = queryBuyables(courseIds);
 
         for (Course course : courses) {
-            Institution institution = institutionsMap.get(course.getInstitutionId());
-            if (institution != null) course.setInstitution(institution.getIntro());
-
             course.setImgs(imgsMap.get(course.getId()));
             List<String> bookImgs = bookImgsMap.get(course.getId());
 
@@ -170,7 +169,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
             course.setScheduler(formatScheduler(course));
             int regionId = getRegionId(course);
             course.setRegionId(regionId);
-            course.setRegion(MetaUtil.getRegionName(regionId));
+            course.setRegion(PoiUtil.getRegionName(regionId));
         }
 
         Map<Long, Course> coursesMap = new HashMap<Long, Course>();
@@ -185,19 +184,6 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         }
 
         return result;
-    }
-
-    private Map<Integer, Institution> queryInstitutions(Collection<Integer> institutionIds) {
-        if (institutionIds.isEmpty()) return new HashMap<Integer, Institution>();
-
-        List<Institution> institutions = poiServiceApi.listInstitutions(institutionIds);
-
-        Map<Integer, Institution> institutionsMap = new HashMap<Integer, Institution>();
-        for (Institution institution : institutions) {
-            institutionsMap.put(institution.getId(), institution);
-        }
-
-        return institutionsMap;
     }
 
     private Map<Long, List<String>> queryImgs(Collection<Long> courseIds) {
@@ -242,65 +228,6 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         }
 
         return skusMap;
-    }
-
-    @Override
-    public List<CourseSku> listSkus(Collection<Long> skuIds) {
-        if (skuIds.isEmpty()) return new ArrayList<CourseSku>();
-
-        String sql = "SELECT Id, ParentId, CourseId, StartTime, EndTime, Deadline, UnlockedStock, LockedStock AS Booked, MinBooked, PlaceId, Adult, Child, Status FROM SG_CourseSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status<>0";
-        List<CourseSku> skus = queryObjectList(sql, CourseSku.class);
-
-        Map<Long, CourseSku> skusMap = new HashMap<Long, CourseSku>();
-        for (CourseSku sku : skus) {
-            skusMap.put(sku.getId(), sku);
-        }
-
-        List<CourseSku> result = new ArrayList<CourseSku>();
-        for (long skuId : skuIds) {
-            CourseSku sku = skusMap.get(skuId);
-            if (sku != null) result.add(sku);
-        }
-
-        return completeSkus(result);
-    }
-
-    private List<CourseSku> completeSkus(List<CourseSku> skus) {
-        Set<Integer> placeIds = new HashSet<Integer>();
-        for (CourseSku sku : skus) {
-            placeIds.add(sku.getPlaceId());
-        }
-
-        List<Place> places = poiServiceApi.listPlaces(placeIds);
-        Map<Integer, Place> placesMap = new HashMap<Integer, Place>();
-        for (Place place : places) {
-            placesMap.put(place.getId(), place);
-        }
-
-        List<CourseSku> completedSkus = new ArrayList<CourseSku>();
-        for (CourseSku sku : skus) {
-            Place place = placesMap.get(sku.getPlaceId());
-            if (place == null) continue;
-
-            sku.setPlace(buildCourseSkuPlace(place));
-            completedSkus.add(sku);
-        }
-
-        return completedSkus;
-    }
-
-    private CourseSkuPlace buildCourseSkuPlace(Place place) {
-        CourseSkuPlace courseSkuPlace = new CourseSkuPlace();
-        courseSkuPlace.setId(place.getId());
-        courseSkuPlace.setCityId(place.getCityId());
-        courseSkuPlace.setRegionId(place.getRegionId());
-        courseSkuPlace.setName(place.getName());
-        courseSkuPlace.setAddress(place.getAddress());
-        courseSkuPlace.setLng(place.getLng());
-        courseSkuPlace.setLat(place.getLat());
-        courseSkuPlace.setRoute(place.getRoute());
-
-        return courseSkuPlace;
     }
 
     private Map<Long, BigDecimal> queryBuyables(Collection<Long> courseIds) {
@@ -376,6 +303,72 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
 
         if (regionIds.isEmpty()) return 0;
         return regionIds.size() > 1 ? Region.MULTI_REGION_ID : regionIds.get(0);
+    }
+
+    @Override
+    public List<CourseSku> listSkus(Collection<Long> skuIds) {
+        if (skuIds.isEmpty()) return new ArrayList<CourseSku>();
+
+        String sql = "SELECT Id, ParentId, CourseId, StartTime, EndTime, Deadline, UnlockedStock, LockedStock AS Booked, MinBooked, PlaceId, Adult, Child, Status FROM SG_CourseSku WHERE Id IN (" + StringUtils.join(skuIds, ",") + ") AND Status<>0";
+        List<CourseSku> skus = queryObjectList(sql, CourseSku.class);
+
+        Map<Long, CourseSku> skusMap = new HashMap<Long, CourseSku>();
+        for (CourseSku sku : skus) {
+            skusMap.put(sku.getId(), sku);
+        }
+
+        List<CourseSku> result = new ArrayList<CourseSku>();
+        for (long skuId : skuIds) {
+            CourseSku sku = skusMap.get(skuId);
+            if (sku != null) result.add(sku);
+        }
+
+        return completeSkus(result);
+    }
+
+    private List<CourseSku> completeSkus(List<CourseSku> skus) {
+        Set<Integer> placeIds = new HashSet<Integer>();
+        for (CourseSku sku : skus) {
+            placeIds.add(sku.getPlaceId());
+        }
+
+        List<Place> places = poiServiceApi.listPlaces(placeIds);
+        Map<Integer, Place> placesMap = new HashMap<Integer, Place>();
+        for (Place place : places) {
+            placesMap.put(place.getId(), place);
+        }
+
+        List<CourseSku> completedSkus = new ArrayList<CourseSku>();
+        for (CourseSku sku : skus) {
+            Place place = placesMap.get(sku.getPlaceId());
+            if (place == null) continue;
+
+            sku.setPlace(buildCourseSkuPlace(place));
+            completedSkus.add(sku);
+        }
+
+        return completedSkus;
+    }
+
+    private CourseSkuPlace buildCourseSkuPlace(Place place) {
+        CourseSkuPlace courseSkuPlace = new CourseSkuPlace();
+        courseSkuPlace.setId(place.getId());
+        courseSkuPlace.setCityId(place.getCityId());
+        courseSkuPlace.setRegionId(place.getRegionId());
+        courseSkuPlace.setName(place.getName());
+        courseSkuPlace.setAddress(place.getAddress());
+        courseSkuPlace.setLng(place.getLng());
+        courseSkuPlace.setLat(place.getLat());
+        courseSkuPlace.setRoute(place.getRoute());
+
+        return courseSkuPlace;
+    }
+
+    @Override
+    public List<CourseSku> listSkus(long courseId) {
+        String sql = "SELECT Id FROM SG_CourseSku WHERE CourseId=? AND Status<>0";
+        List<Long> skuIds = queryLongList(sql, new Object[] { courseId });
+        return listSkus(skuIds);
     }
 
     @Override
@@ -483,6 +476,54 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
+    public List<Course> queryRecentCoursesBySubject(long subjectId) {
+        Calendar calendar = Calendar.getInstance();
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        if (dayOfWeek > 1) {
+            calendar.add(Calendar.DATE, 2 - dayOfWeek);
+        } else {
+            calendar.add(Calendar.DATE, -6);
+        }
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        Date startTime = calendar.getTime();
+        Date endTime = new Date(startTime.getTime() + 7L * 24 * 60 * 60 * 1000);
+
+        String sql = "SELECT B.Id FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND B.StartTime>=? AND B.StartTime<? AND A.Status=1 AND B.Status=1 ORDER BY B.StartTime ASC";
+        List<Long> sukuIds = queryLongList(sql, new Object[] { subjectId, startTime, endTime });
+        List<CourseSku> skus = listSkus(sukuIds);
+
+        Set<Long> courseIds = new HashSet<Long>();
+        for (CourseSku sku : skus) {
+            courseIds.add(sku.getCourseId());
+        }
+
+        List<Course> courses = list(courseIds);
+        Map<Long, Course> coursesMap = new HashMap<Long, Course>();
+        for (Course course : courses) {
+            coursesMap.put(course.getId(), course);
+        }
+
+        List<Course> results = new ArrayList<Course>();
+        for (CourseSku sku : skus) {
+            Course course = coursesMap.get(sku.getCourseId());
+            if (course == null) continue;
+
+            Course baseCourse = new Course.Base(course);
+            baseCourse.setScheduler(sku.getScheduler());
+            baseCourse.setRegion(PoiUtil.getRegionName(sku.getPlace().getRegionId()));
+            baseCourse.setSkuId(sku.getId());
+
+            results.add(baseCourse);
+        }
+
+        return results;
+    }
+
+    @Override
     public List<Course> queryAllBySubject(long subjectId) {
         Set<Long> subjectIds = Sets.newHashSet(subjectId);
         Map<Long, List<Course>> coursesMap = queryAllBySubjects(subjectIds);
@@ -494,7 +535,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     public Map<Long, List<Course>> queryAllBySubjects(Collection<Long> subjectIds) {
         if (subjectIds.isEmpty()) return new HashMap<Long, List<Course>>();
 
-        String sql = "SELECT Id FROM SG_Course WHERE SubjectId IN (" + StringUtils.join(subjectIds, ",") + ") AND Status=1 ORDER BY AddTime DESC";
+        String sql = "SELECT Id FROM SG_Course WHERE SubjectId IN (" + StringUtils.join(subjectIds, ",") + ") AND Status=1 ORDER BY `Order` ASC, AddTime DESC";
         List<Long> courseIds = queryLongList(sql);
         List<Course> courses = list(courseIds);
 
@@ -795,6 +836,12 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
+    public List<Long> queryBookedPackageIds(long userId, long courseId) {
+        String sql = "SELECT PackageId FROM SG_BookedCourse WHERE UserId=? AND CourseId=? AND Status<>0";
+        return queryLongList(sql, new Object[] { userId, courseId });
+    }
+
+    @Override
     public List<Long> queryBookedPackageIds(Collection<Long> userIds, long courseId, long courseSkuId) {
         if (userIds.isEmpty()) return new ArrayList<Long>();
 
@@ -836,15 +883,15 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
-    public int getInstitutionId(long courseId) {
-        String sql = "SELECT InstitutionId FROM SG_Course WHERE Id=? AND Status<>0";
-        return queryInt(sql, new Object[] { courseId });
+    public long querySubjectId(long courseId) {
+        String sql = "SELECT SubjectId FROM SG_Course WHERE Id=? AND Status<>0";
+        return queryLong(sql, new Object[] { courseId });
     }
 
     @Override
-    public long querySubjectId(long courseId) {
-        String sql = "SELECT SubjectId FROM SG_Course WHERE Id=?";
-        return queryInt(sql, new Object[] { courseId });
+    public List<Long> queryTrialSubjectIds(long courseId) {
+        String sql = "SELECT SubjectId FROM SG_Course WHERE ParentId=? AND Status<>0";
+        return queryLongList(sql, new Object[] { courseId });
     }
 
     @Override
@@ -976,5 +1023,11 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     public List<Long> queryBookedUserIds(long courseSkuId) {
         String sql = "SELECT DISTINCT A.UserId FROM SG_BookedCourse A INNER JOIN SG_CourseSku B ON A.CourseSkuId=B.Id WHERE A.Status<>0 AND B.Status<>0 AND (B.Id=? OR B.ParentId=?)";
         return queryLongList(sql, new Object[] { courseSkuId, courseSkuId });
+    }
+
+    @Override
+    public boolean hasNoAvaliableSkus(long courseId) {
+        String sql = "SELECT COUNT(1) FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE (A.Id=? OR A.ParentId=?) AND A.Status<>0 AND B.Status=1 AND B.Deadline>NOW()";
+        return queryLong(sql, new Object[] { courseId, courseId }) <= 0;
     }
 }
