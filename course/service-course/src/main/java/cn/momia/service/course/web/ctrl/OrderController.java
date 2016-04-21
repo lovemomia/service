@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -479,7 +478,7 @@ public class OrderController extends BaseController {
         User user = userServiceApi.get(utoken);
 
         Order order = orderService.get(orderId);
-        if (!order.exists() || !order.isPayed() || order.getUserId() != user.getId()) return MomiaHttpResponse.FAILED("无效的订单");
+        if (!order.exists() || !order.isPayed() || order.isCanceled() || order.getUserId() != user.getId()) return MomiaHttpResponse.FAILED("无效的订单");
 
         List<OrderPackage> orderPackages = orderService.getOrderPackages(orderId);
         if (orderPackages.isEmpty() || orderPackages.size() > 1) return MomiaHttpResponse.FAILED("无效的礼包，该订单下有多个课程包");
@@ -494,7 +493,7 @@ public class OrderController extends BaseController {
     @RequestMapping(value = "/{oid}/gift/status", method = RequestMethod.GET)
     public MomiaHttpResponse giftStatus(@RequestParam String utoken, @PathVariable(value = "oid") long orderId) {
         Order order = orderService.get(orderId);
-        if (!order.exists() || !order.isPayed()) return MomiaHttpResponse.FAILED("无效的订单");
+        if (!order.exists() || !order.isPayed() || order.isCanceled()) return MomiaHttpResponse.FAILED("无效的订单");
 
         List<OrderPackage> orderPackages = orderService.getOrderPackages(orderId);
         if (orderPackages.isEmpty() || orderPackages.size() > 1) return MomiaHttpResponse.FAILED("无效的礼包");
@@ -515,7 +514,7 @@ public class OrderController extends BaseController {
                                          @RequestParam long expired,
                                          @RequestParam String giftsign) {
         Order order = orderService.get(orderId);
-        if (!order.exists() || !order.isPayed()) return MomiaHttpResponse.FAILED("无效的订单");
+        if (!order.exists() || !order.isPayed() || order.isCanceled()) return MomiaHttpResponse.FAILED("无效的订单");
 
         if (new Date().getTime() >= expired) return MomiaHttpResponse.FAILED("来晚了，礼包已经过期了~");
 

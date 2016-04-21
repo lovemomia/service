@@ -11,7 +11,7 @@ public class Order {
         public static final int NOT_PAYED = 1; // 已下单未付款
         public static final int PRE_PAYED = 2; // 准备付款
         public static final int PAYED = 3;     // 已付款
-        public static final int FINISHED = 4;  // 已完成
+        public static final int FINISHED = 4;  // 已完成 这个状态已经废弃
         public static final int TO_REFUND = 5; // 申请退款
         public static final int REFUNDED = 6;  // 已退款
     }
@@ -151,6 +151,10 @@ public class Order {
 
     public boolean isPayed() {
         return status >= Status.PAYED;
+    }
+
+    public boolean isCanceled() {
+        return status >= Status.TO_REFUND;
     }
 
     public List<Long> getCourseIds() {
