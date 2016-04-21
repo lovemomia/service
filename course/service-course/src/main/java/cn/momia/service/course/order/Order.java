@@ -154,7 +154,7 @@ public class Order {
     }
 
     public boolean isCanceled() {
-        return status >= Status.TO_REFUND;
+        return status >= Status.TO_REFUND && status <= Status.REFUNDED;
     }
 
     public List<Long> getCourseIds() {
