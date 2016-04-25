@@ -18,6 +18,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -158,9 +159,26 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     }
 
     @Override
-    public boolean applyRefund(long userId, long orderId, String message) {
-        String sql = "UPDATE SG_SubjectOrder SET Status=?, RefundMessage=? WHERE UserId=? AND Id=? AND Status=?";
-        return update(sql, new Object[] { Order.Status.TO_REFUND, message, userId, orderId, Order.Status.PAYED });
+    public boolean applyRefund(final long userId, final BigDecimal fee, final String message, final Payment payment) {
+        try {
+            execute(new TransactionCallback() {
+                @Override
+                public Object doInTransaction(TransactionStatus status) {
+                    String sql = "UPDATE SG_SubjectOrder SET Status=?, RefundMessage=? WHERE UserId=? AND Id=? AND Status=?";
+                    if (update(sql, new Object[] { Order.Status.TO_REFUND, message, userId, payment.getOrderId(), Order.Status.PAYED })) {
+                        sql = "INSERT INTO SG_Refund(OrderId, PaymentId, PayType, RefundFee, ApplyTime, AddTime) VALUES (?, ?, ?, NOW(), NOW())";
+                        update(sql, new Object[] { payment.getOrderId(), payment.getId(), payment.getPayType(), fee });
+                    }
+
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            LOGGER.error("fail to apply refund for order: {}", payment.getOrderId(), e);
+            return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -542,5 +560,11 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
         } catch (ParseException e) {
             return new ArrayList<Long>();
         }
+    }
+
+    @Override
+    public Payment getPayment(long orderId) {
+        String sql = "SELECT Id, OrderId, Payer, FinishTime, PayType, TradeNo, Fee FROM SG_SubjectPayment WHERE OrderId=? AND Status=1";
+        return queryObject(sql, new Object[] { orderId }, Payment.class, Payment.NOT_EXIST_PAYMENT);
     }
 }

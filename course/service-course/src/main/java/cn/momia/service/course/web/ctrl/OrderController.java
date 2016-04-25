@@ -15,6 +15,7 @@ import cn.momia.service.course.base.CourseService;
 import cn.momia.api.course.dto.coupon.UserCoupon;
 import cn.momia.api.course.dto.subject.Subject;
 import cn.momia.api.course.dto.coupon.CouponCode;
+import cn.momia.service.course.order.Payment;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.api.course.dto.subject.SubjectSku;
 import cn.momia.service.course.coupon.CouponService;
@@ -138,14 +139,30 @@ public class OrderController extends BaseController {
         return MomiaHttpResponse.SUCCESS(orderService.delete(user.getId(), orderId));
     }
 
-    @RequestMapping(value = "/refund", method = RequestMethod.POST)
+    @RequestMapping(value = "/{oid}/refund", method = RequestMethod.POST)
     public MomiaHttpResponse refund(@RequestParam String utoken,
-                                    @RequestParam(value = "oid") long orderId,
+                                    @PathVariable(value = "oid") long orderId,
+                                    @RequestParam BigDecimal fee,
                                     @RequestParam String message) {
         if (courseService.queryBookedCourseCounts(Sets.newHashSet(orderId)).get(orderId) > 0) return MomiaHttpResponse.FAILED("已经选过课的订单不能申请退款");
 
+        Payment payment = orderService.getPayment(orderId);
+        if (!payment.exists()) return MomiaHttpResponse.FAILED("未付款的订单不能退款");
+        if (payment.getFee().compareTo(fee) < 0) return MomiaHttpResponse.FAILED("退款金额超过了付款金额");
+
         User user = userServiceApi.get(utoken);
-        return MomiaHttpResponse.SUCCESS(orderService.applyRefund(user.getId(), orderId, message));
+        return MomiaHttpResponse.SUCCESS(orderService.applyRefund(user.getId(), fee, message, payment));
+    }
+
+    @RequestMapping(value = "/{oid}/refund/check", method = RequestMethod.POST)
+    public MomiaHttpResponse refundCheck(@PathVariable(value = "oid") long orderId) {
+        Order order = orderService.get(orderId);
+        if (order.getStatus() != Order.Status.TO_REFUND) return MomiaHttpResponse.FAILED("该订单并未申请退款");
+
+        if (courseService.queryBookedCourseCounts(Sets.newHashSet(orderId)).get(orderId) > 0) return MomiaHttpResponse.FAILED("已经选过课的订单不能退款");
+
+        // TODO
+        return null;
     }
 
     @RequestMapping(value = "/{oid}", method = RequestMethod.GET)

@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class Payment {
+    public static final Payment NOT_EXIST_PAYMENT = new Payment();
+
     private long id;
     private long orderId;
     private String payer;
@@ -66,5 +68,9 @@ public class Payment {
 
     public void setFee(BigDecimal fee) {
         this.fee = fee;
+    }
+
+    public boolean exists() {
+        return id > 0;
     }
 }
