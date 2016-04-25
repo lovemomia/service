@@ -22,10 +22,11 @@ public class OrderServiceApi extends HttpServiceApi {
         return executeReturnObject(MomiaHttpRequestBuilder.DELETE(url("/order"), builder.build()), Boolean.class);
     }
 
-    public boolean refundOrder(String utoken, long orderId) {
+    public boolean applyRefundOrder(String utoken, long orderId, String message) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
-                .add("oid", orderId);
+                .add("oid", orderId)
+                .add("message", message);
         return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/order/refund"), builder.build()), Boolean.class);
     }
 

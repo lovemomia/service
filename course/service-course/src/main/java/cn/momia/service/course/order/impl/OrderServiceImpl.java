@@ -158,9 +158,9 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     }
 
     @Override
-    public boolean refund(long userId, long orderId) {
-        String sql = "UPDATE SG_SubjectOrder SET Status=? WHERE UserId=? AND Id=? AND Status=?";
-        return update(sql, new Object[] { Order.Status.TO_REFUND, userId, orderId, Order.Status.PAYED });
+    public boolean applyRefund(long userId, long orderId, String message) {
+        String sql = "UPDATE SG_SubjectOrder SET Status=?, RefundMessage=? WHERE UserId=? AND Id=? AND Status=?";
+        return update(sql, new Object[] { Order.Status.TO_REFUND, message, userId, orderId, Order.Status.PAYED });
     }
 
     @Override

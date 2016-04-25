@@ -14,6 +14,7 @@ public class Order {
         public static final int FINISHED = 4;  // 已完成 这个状态已经废弃
         public static final int TO_REFUND = 5; // 申请退款
         public static final int REFUNDED = 6;  // 已退款
+        public static final int REFUND_CHECKED = 7;  // 退款申请已通过
     }
 
     public static final Order NOT_EXIST_ORDER = new Order();
@@ -154,7 +155,7 @@ public class Order {
     }
 
     public boolean isCanceled() {
-        return status >= Status.TO_REFUND && status <= Status.REFUNDED;
+        return status >= Status.TO_REFUND && status <= Status.REFUND_CHECKED;
     }
 
     public List<Long> getCourseIds() {

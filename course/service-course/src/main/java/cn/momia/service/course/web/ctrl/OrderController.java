@@ -139,11 +139,13 @@ public class OrderController extends BaseController {
     }
 
     @RequestMapping(value = "/refund", method = RequestMethod.POST)
-    public MomiaHttpResponse refund(@RequestParam String utoken, @RequestParam(value = "oid") long orderId) {
+    public MomiaHttpResponse refund(@RequestParam String utoken,
+                                    @RequestParam(value = "oid") long orderId,
+                                    @RequestParam String message) {
         if (courseService.queryBookedCourseCounts(Sets.newHashSet(orderId)).get(orderId) > 0) return MomiaHttpResponse.FAILED("已经选过课的订单不能申请退款");
 
         User user = userServiceApi.get(utoken);
-        return MomiaHttpResponse.SUCCESS(orderService.refund(user.getId(), orderId));
+        return MomiaHttpResponse.SUCCESS(orderService.applyRefund(user.getId(), orderId, message));
     }
 
     @RequestMapping(value = "/{oid}", method = RequestMethod.GET)
