@@ -68,7 +68,7 @@
             <PrivateKey></PrivateKey>
             <AppService>mobile.securitypay.pay</AppService>
             <WapService>alipay.wap.create.direct.pay.by.user</WapService>
-            <RefundService>refund_fastpay_by_platform_pwd</RefundService>
+            <RefundService>refund_fastpay_by_platform_nopwd</RefundService>
             <Partner>2088911944697039</Partner>
             <RefundUrl>https://mapi.alipay.com/gateway.do</RefundUrl>
             <NotifyUrl>https://i.momia.cn/payment/callback/alipay</NotifyUrl>
