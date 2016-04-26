@@ -55,6 +55,8 @@ public interface OrderService {
     List<Long> queryUserIdsOfPackagesToExpired(int days);
 
     Payment getPayment(long orderId);
+    Refund getRefund(long refundId);
     Refund queryRefund(long orderId, long paymentId);
     void refundChecked(long orderId);
+    boolean finishRefund(Refund refund);
 }

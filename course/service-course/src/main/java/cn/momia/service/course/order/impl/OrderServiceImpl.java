@@ -570,6 +570,12 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     }
 
     @Override
+    public Refund getRefund(long refundId) {
+        String sql = "SELECT Id, OrderId, PaymentId, PayType, RefundFee, ApplyTyime, FinishTime, Status FROM SG_Refund WHERE Id=? AND Status<>0";
+        return queryObject(sql, new Object[] { refundId }, Refund.class, Refund.NOT_EXIST_REFUND);
+    }
+
+    @Override
     public Refund queryRefund(long orderId, long paymentId) {
         String sql = "SELECT Id, OrderId, PaymentId, PayType, RefundFee, ApplyTyime, FinishTime, Status FROM SG_Refund WHERE OrderId=? AND PaymentId=? AND Status<>0";
         return queryObject(sql, new Object[] { orderId, paymentId }, Refund.class, Refund.NOT_EXIST_REFUND);
@@ -579,5 +585,28 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     public void refundChecked(long orderId) {
         String sql = "UPDATE SG_SubjectOrder SET Status=? WHERE Id=? AND Status=?";
         update(sql, new Object[] { Order.Status.TO_REFUND, orderId, Order.Status.REFUND_CHECKED });
+    }
+
+    @Override
+    public boolean finishRefund(final Refund refund) {
+        try {
+            execute(new TransactionCallback() {
+                @Override
+                public Object doInTransaction(TransactionStatus status) {
+                    String sql = "UPDATE SG_SubjectOrder SET Status=? WHERE Id=? AND Status=?";
+                    update(sql, new Object[] { Order.Status.REFUNDED, refund.getOrderId(), Order.Status.REFUND_CHECKED });
+
+                    sql = "UPDATE SG_Refund SET FinishTime=NOW(), Status=? WHERE Id=?";
+                    update(sql, new Object[] { Refund.Status.FINISHED, refund.getId() });
+
+                    return null;
+                }
+            });
+            return true;
+        } catch (Exception e) {
+            LOGGER.error("fail to finish refund: {}", refund.getId(), e);
+        }
+
+        return false;
     }
 }
