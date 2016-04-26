@@ -27,6 +27,7 @@ public class Order {
     private String mobile;
     private String inviteCode = "";
     private String couponCode = "";
+    private String refundMessage = "";
 
     private int status;
     private Date addTime;
@@ -93,6 +94,14 @@ public class Order {
 
     public void setCouponCode(String couponCode) {
         this.couponCode = couponCode;
+    }
+
+    public String getRefundMessage() {
+        return refundMessage;
+    }
+
+    public void setRefundMessage(String refundMessage) {
+        this.refundMessage = refundMessage;
     }
 
     public int getStatus() {

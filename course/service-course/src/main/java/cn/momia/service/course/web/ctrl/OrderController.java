@@ -9,6 +9,9 @@ import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.core.util.TimeUtil;
+import cn.momia.common.deal.gateway.PaymentGateway;
+import cn.momia.common.deal.gateway.RefundParam;
+import cn.momia.common.deal.gateway.factory.PaymentGatewayFactory;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.CourseService;
@@ -16,6 +19,7 @@ import cn.momia.api.course.dto.coupon.UserCoupon;
 import cn.momia.api.course.dto.subject.Subject;
 import cn.momia.api.course.dto.coupon.CouponCode;
 import cn.momia.service.course.order.Payment;
+import cn.momia.service.course.order.Refund;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.api.course.dto.subject.SubjectSku;
 import cn.momia.service.course.coupon.CouponService;
@@ -159,10 +163,25 @@ public class OrderController extends BaseController {
         Order order = orderService.get(orderId);
         if (order.getStatus() != Order.Status.TO_REFUND) return MomiaHttpResponse.FAILED("该订单并未申请退款");
 
+        Payment payment = orderService.getPayment(orderId);
+        if (!payment.exists()) return MomiaHttpResponse.FAILED("未付款的订单不能退款");
+
+        Refund refund = orderService.queryRefund(orderId, payment.getId());
+        if (!refund.exists()) return MomiaHttpResponse.FAILED("无效的退款申请");
+
         if (courseService.queryBookedCourseCounts(Sets.newHashSet(orderId)).get(orderId) > 0) return MomiaHttpResponse.FAILED("已经选过课的订单不能退款");
 
-        // TODO
-        return null;
+        RefundParam refundParam = new RefundParam();
+        refundParam.setRefundId(refund.getId());
+        refundParam.setRefundTime(new Date());
+        refundParam.setTradeNo(payment.getTradeNo());
+        refundParam.setTotalFee(payment.getFee());
+        refundParam.setRefundFee(refund.getRefundFee());
+        refundParam.setRefundMessage(order.getRefundMessage());
+        PaymentGateway gateway = PaymentGatewayFactory.create(payment.getPayType());
+        if (gateway.refund(refundParam)) orderService.refundChecked(orderId);
+
+        return MomiaHttpResponse.SUCCESS;
     }
 
     @RequestMapping(value = "/{oid}", method = RequestMethod.GET)

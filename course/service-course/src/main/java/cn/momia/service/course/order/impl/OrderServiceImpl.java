@@ -8,6 +8,7 @@ import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderService;
 import cn.momia.service.course.order.OrderPackage;
 import cn.momia.service.course.order.Payment;
+import cn.momia.service.course.order.Refund;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -84,7 +85,7 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     public List<Order> list(Collection<Long> orderIds) {
         if (orderIds.isEmpty()) return new ArrayList<Order>();
 
-        String sql = "SELECT Id, UserId, SubjectId, Contact, Mobile, Status, AddTime FROM SG_SubjectOrder WHERE Id IN (" + StringUtils.join(orderIds, ",") + ") AND Status<>0";
+        String sql = "SELECT Id, UserId, SubjectId, Contact, Mobile, RefundMessage, Status, AddTime FROM SG_SubjectOrder WHERE Id IN (" + StringUtils.join(orderIds, ",") + ") AND Status<>0";
         List<Order> orders = queryObjectList(sql, Order.class);
 
         Map<Long, List<OrderPackage>> packagesMap = queryOrderPackages(orderIds);
@@ -566,5 +567,17 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     public Payment getPayment(long orderId) {
         String sql = "SELECT Id, OrderId, Payer, FinishTime, PayType, TradeNo, Fee FROM SG_SubjectPayment WHERE OrderId=? AND Status=1";
         return queryObject(sql, new Object[] { orderId }, Payment.class, Payment.NOT_EXIST_PAYMENT);
+    }
+
+    @Override
+    public Refund queryRefund(long orderId, long paymentId) {
+        String sql = "SELECT Id, OrderId, PaymentId, PayType, RefundFee, ApplyTyime, FinishTime, Status FROM SG_Refund WHERE OrderId=? AND PaymentId=? AND Status<>0";
+        return queryObject(sql, new Object[] { orderId, paymentId }, Refund.class, Refund.NOT_EXIST_REFUND);
+    }
+
+    @Override
+    public void refundChecked(long orderId) {
+        String sql = "UPDATE SG_SubjectOrder SET Status=? WHERE Id=? AND Status=?";
+        update(sql, new Object[] { Order.Status.TO_REFUND, orderId, Order.Status.REFUND_CHECKED });
     }
 }
