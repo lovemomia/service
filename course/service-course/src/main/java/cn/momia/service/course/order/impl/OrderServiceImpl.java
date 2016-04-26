@@ -167,7 +167,7 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
                 public Object doInTransaction(TransactionStatus status) {
                     String sql = "UPDATE SG_SubjectOrder SET Status=?, RefundMessage=? WHERE UserId=? AND Id=? AND Status=?";
                     if (update(sql, new Object[] { Order.Status.TO_REFUND, message, userId, payment.getOrderId(), Order.Status.PAYED })) {
-                        sql = "INSERT INTO SG_Refund(OrderId, PaymentId, PayType, RefundFee, ApplyTime, AddTime) VALUES (?, ?, ?, NOW(), NOW())";
+                        sql = "INSERT INTO SG_Refund(OrderId, PaymentId, PayType, RefundFee, ApplyTime, AddTime) VALUES (?, ?, ?, ?, NOW(), NOW())";
                         update(sql, new Object[] { payment.getOrderId(), payment.getId(), payment.getPayType(), fee });
                     }
 
