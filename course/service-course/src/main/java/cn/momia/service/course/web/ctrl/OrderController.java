@@ -181,7 +181,7 @@ public class OrderController extends BaseController {
         PaymentGateway gateway = PaymentGatewayFactory.create(payment.getPayType());
         if (gateway.refund(refundParam)) orderService.refundChecked(orderId);
 
-        return MomiaHttpResponse.SUCCESS;
+        return MomiaHttpResponse.SUCCESS(true);
     }
 
     @RequestMapping(value = "/{oid}", method = RequestMethod.GET)

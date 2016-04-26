@@ -571,13 +571,13 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
 
     @Override
     public Refund getRefund(long refundId) {
-        String sql = "SELECT Id, OrderId, PaymentId, PayType, RefundFee, ApplyTyime, FinishTime, Status FROM SG_Refund WHERE Id=? AND Status<>0";
+        String sql = "SELECT Id, OrderId, PaymentId, PayType, RefundFee, ApplyTime, FinishTime, Status FROM SG_Refund WHERE Id=? AND Status<>0";
         return queryObject(sql, new Object[] { refundId }, Refund.class, Refund.NOT_EXIST_REFUND);
     }
 
     @Override
     public Refund queryRefund(long orderId, long paymentId) {
-        String sql = "SELECT Id, OrderId, PaymentId, PayType, RefundFee, ApplyTyime, FinishTime, Status FROM SG_Refund WHERE OrderId=? AND PaymentId=? AND Status<>0";
+        String sql = "SELECT Id, OrderId, PaymentId, PayType, RefundFee, ApplyTime, FinishTime, Status FROM SG_Refund WHERE OrderId=? AND PaymentId=? AND Status<>0";
         return queryObject(sql, new Object[] { orderId, paymentId }, Refund.class, Refund.NOT_EXIST_REFUND);
     }
 
