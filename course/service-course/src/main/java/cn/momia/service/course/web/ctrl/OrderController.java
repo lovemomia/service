@@ -230,7 +230,7 @@ public class OrderController extends BaseController {
             payType = (payType == PayType.WEIXIN_APP || payType == PayType.WEIXIN_JSAPI) ? PayType.WEIXIN : payType;
             subjectOrder.setPayType(payType);
 
-            subjectOrder.setCanRefund(courseService.queryBookedCourseCounts(Sets.newHashSet(order.getId())).get(order.getId()) <= 0);
+            subjectOrder.setCanRefund(!order.isCanceled() && courseService.queryBookedCourseCounts(Sets.newHashSet(order.getId())).get(order.getId()) <= 0);
         }
 
         return subjectOrder;
