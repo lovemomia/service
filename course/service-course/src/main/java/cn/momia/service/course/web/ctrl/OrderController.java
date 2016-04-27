@@ -9,6 +9,7 @@ import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.core.util.TimeUtil;
+import cn.momia.common.deal.gateway.PayType;
 import cn.momia.common.deal.gateway.PaymentGateway;
 import cn.momia.common.deal.gateway.RefundParam;
 import cn.momia.common.deal.gateway.factory.PaymentGatewayFactory;
@@ -221,6 +222,15 @@ public class OrderController extends BaseController {
                 subjectOrder.setDiscount(userCoupon.getDiscount());
                 subjectOrder.setCouponDesc(userCoupon.getDiscount() + "元红包"); // TODO 更多类型
             }
+
+            Payment payment = orderService.getPayment(order.getId());
+            if (!payment.exists()) throw new MomiaErrorException("无效的订单");
+            subjectOrder.setPayedFee(payment.getFee());
+            int payType = payment.getPayType();
+            payType = (payType == PayType.WEIXIN_APP || payType == PayType.WEIXIN_JSAPI) ? PayType.WEIXIN : payType;
+            subjectOrder.setPayType(payType);
+
+            subjectOrder.setCanRefund(courseService.queryBookedCourseCounts(Sets.newHashSet(order.getId())).get(order.getId()) <= 0);
         }
 
         return subjectOrder;
