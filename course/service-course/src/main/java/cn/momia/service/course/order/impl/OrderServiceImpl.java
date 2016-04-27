@@ -584,7 +584,7 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     @Override
     public void refundChecked(long orderId) {
         String sql = "UPDATE SG_SubjectOrder SET Status=? WHERE Id=? AND Status=?";
-        update(sql, new Object[] { Order.Status.TO_REFUND, orderId, Order.Status.REFUND_CHECKED });
+        update(sql, new Object[] { Order.Status.REFUND_CHECKED, orderId, Order.Status.TO_REFUND });
     }
 
     @Override
