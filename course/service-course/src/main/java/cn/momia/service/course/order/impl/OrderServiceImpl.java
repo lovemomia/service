@@ -593,8 +593,8 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
             execute(new TransactionCallback() {
                 @Override
                 public Object doInTransaction(TransactionStatus status) {
-                    String sql = "UPDATE SG_SubjectOrder SET Status=? WHERE Id=? AND Status=?";
-                    update(sql, new Object[] { Order.Status.REFUNDED, refund.getOrderId(), Order.Status.REFUND_CHECKED });
+                    String sql = "UPDATE SG_SubjectOrder SET Status=? WHERE Id=? AND (Status=? OR Status=?)";
+                    update(sql, new Object[] { Order.Status.REFUNDED, refund.getOrderId(), Order.Status.TO_REFUND, Order.Status.REFUND_CHECKED });
 
                     sql = "UPDATE SG_Refund SET FinishTime=NOW(), Status=? WHERE Id=?";
                     update(sql, new Object[] { Refund.Status.FINISHED, refund.getId() });
