@@ -79,6 +79,7 @@
             <AccessTokenService>https://api.weixin.qq.com/sns/oauth2/access_token</AccessTokenService>
             <PrepayService>https://api.mch.weixin.qq.com/pay/unifiedorder</PrepayService>
             <RefundService>https://api.mch.weixin.qq.com/secapi/pay/refund</RefundService>
+            <RefundQueryService>https://api.mch.weixin.qq.com/pay/refundquery</RefundQueryService>
             <AppAppId>wx50b2ac03c88ad6e7</AppAppId>
             <AppMchId>1264856501</AppMchId>
             <AppKey></AppKey>

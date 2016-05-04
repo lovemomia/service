@@ -12,6 +12,7 @@ import cn.momia.common.core.util.TimeUtil;
 import cn.momia.common.deal.gateway.PayType;
 import cn.momia.common.deal.gateway.PaymentGateway;
 import cn.momia.common.deal.gateway.RefundParam;
+import cn.momia.common.deal.gateway.RefundQueryParam;
 import cn.momia.common.deal.gateway.factory.PaymentGatewayFactory;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.webapp.ctrl.BaseController;
@@ -29,6 +30,8 @@ import cn.momia.service.course.order.OrderService;
 import cn.momia.service.course.order.OrderPackage;
 import com.google.common.collect.Sets;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,6 +52,8 @@ import java.util.Set;
 @RestController
 @RequestMapping(value = "/order")
 public class OrderController extends BaseController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
+
     @Autowired private CourseService courseService;
     @Autowired private SubjectService subjectService;
     @Autowired private OrderService orderService;
@@ -206,6 +211,12 @@ public class OrderController extends BaseController {
         Map<Long, Integer> finishedCourceCounts = courseService.queryFinishedCourseCounts(Sets.newHashSet(orderId));
         SubjectOrder detailOrder = buildFullSubjectOrder(order, title, cover, finishedCourceCounts.get(orderId), courseIds);
 
+        if (order.getStatus() == Order.Status.REFUND_CHECKED) {
+            Payment payment = orderService.getPayment(orderId);
+            Refund refund = orderService.queryRefund(orderId, payment.getId());
+            if (payment.exists() && PayType.isWeixinPay(payment.getPayType()) && refund.exists()) queryRefund(detailOrder, payment, refund);
+        }
+
         return MomiaHttpResponse.SUCCESS(detailOrder);
     }
 
@@ -250,6 +261,20 @@ public class OrderController extends BaseController {
         subjectOrder.setCover(cover);
 
         return subjectOrder;
+    }
+
+    private void queryRefund(SubjectOrder subjectOrder, Payment payment, Refund refund) {
+        try {
+            RefundQueryParam refundQueryParam = new RefundQueryParam();
+            refundQueryParam.setTradeNo(payment.getTradeNo());
+            PaymentGateway gateway = PaymentGatewayFactory.create(payment.getPayType());
+            if (gateway.refundQuery(refundQueryParam)) {
+                orderService.finishRefund(refund);
+                subjectOrder.setStatus(Order.Status.REFUNDED);
+            }
+        } catch (Exception e) {
+            LOGGER.error("fail to query refund for order: {}", subjectOrder.getId(), e);
+        }
     }
 
     @RequestMapping(value = "/bookable", method = RequestMethod.GET)
