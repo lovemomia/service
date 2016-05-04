@@ -13,6 +13,9 @@ import cn.momia.common.deal.gateway.PayType;
 import cn.momia.common.deal.gateway.PaymentGateway;
 import cn.momia.common.deal.gateway.PrepayParam;
 import cn.momia.common.deal.gateway.PrepayResult;
+import cn.momia.common.deal.gateway.RefundNotifyParam;
+import cn.momia.common.deal.gateway.alipay.AlipayRefundField;
+import cn.momia.common.deal.gateway.alipay.AlipayRefundNotifyParam;
 import cn.momia.common.deal.gateway.factory.CallbackParamFactory;
 import cn.momia.common.deal.gateway.factory.PaymentGatewayFactory;
 import cn.momia.common.webapp.config.Configuration;
@@ -20,6 +23,7 @@ import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.common.webapp.util.RequestUtil;
 import cn.momia.service.course.order.OrderPackage;
 import cn.momia.api.course.dto.subject.Subject;
+import cn.momia.service.course.order.Refund;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.service.course.coupon.CouponService;
 import cn.momia.api.course.dto.coupon.UserCoupon;
@@ -37,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -230,6 +235,32 @@ public class PaymentController extends BaseController {
 
     private boolean finishPayment(Payment payment) {
         return orderService.pay(payment);
+    }
+
+    @RequestMapping(value = "/callback/alipay/refund", method = RequestMethod.POST)
+    public MomiaHttpResponse alipayCallbackRefund(HttpServletRequest request) {
+        Map<String, String> params = extractParams(request);
+        AlipayRefundNotifyParam refundNotifyParam = new AlipayRefundNotifyParam();
+        refundNotifyParam.addAll(params);
+        refundNotifyParam.setRefundId(Long.valueOf(params.get(AlipayRefundField.BATCH_NO).substring(8)));
+        refundNotifyParam.setSuccessNum(Integer.valueOf(params.get(AlipayRefundField.SUCCESS_NUM)));
+
+        PaymentGateway gateway = PaymentGatewayFactory.create(PayType.ALIPAY);
+        if (gateway.refundNotify(refundNotifyParam, new Function<RefundNotifyParam, Boolean>() {
+            @Override
+            public Boolean apply(RefundNotifyParam param) {
+                AlipayRefundNotifyParam alipayRefundNotifyParam = (AlipayRefundNotifyParam) param;
+                if (alipayRefundNotifyParam.isSuccessful()) {
+                    Refund refund = orderService.getRefund(alipayRefundNotifyParam.getRefundId());
+                    if (!refund.exists()) return true;
+
+                    return orderService.finishRefund(refund);
+                }
+
+                return false;
+            }
+        })) return MomiaHttpResponse.SUCCESS("OK");
+        return MomiaHttpResponse.SUCCESS("FAIL");
     }
 
     @RequestMapping(value = "/callback/weixin", method = RequestMethod.POST)

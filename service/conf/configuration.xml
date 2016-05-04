@@ -68,13 +68,18 @@
             <PrivateKey></PrivateKey>
             <AppService>mobile.securitypay.pay</AppService>
             <WapService>alipay.wap.create.direct.pay.by.user</WapService>
+            <RefundService>refund_fastpay_by_platform_nopwd</RefundService>
             <Partner>2088911944697039</Partner>
+            <RefundUrl>https://mapi.alipay.com/gateway.do</RefundUrl>
             <NotifyUrl>https://i.momia.cn/payment/callback/alipay</NotifyUrl>
+            <RefundNotifyUrl>https://i.momia.cn/payment/callback/alipay/refund</RefundNotifyUrl>
             <VerifyUrl><![CDATA[https://mapi.alipay.com/gateway.do?service=notify_verify&]]></VerifyUrl>
         </Ali>
         <Wechat>
             <AccessTokenService>https://api.weixin.qq.com/sns/oauth2/access_token</AccessTokenService>
             <PrepayService>https://api.mch.weixin.qq.com/pay/unifiedorder</PrepayService>
+            <RefundService>https://api.mch.weixin.qq.com/secapi/pay/refund</RefundService>
+            <RefundQueryService>https://api.mch.weixin.qq.com/pay/refundquery</RefundQueryService>
             <AppAppId>wx50b2ac03c88ad6e7</AppAppId>
             <AppMchId>1264856501</AppMchId>
             <AppKey></AppKey>

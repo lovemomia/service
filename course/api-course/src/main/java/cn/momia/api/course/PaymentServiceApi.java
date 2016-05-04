@@ -32,6 +32,10 @@ public class PaymentServiceApi extends HttpServiceApi {
         return "OK".equalsIgnoreCase(executeReturnObject(MomiaHttpRequestBuilder.POST(url("/payment/callback/alipay"), params), String.class));
     }
 
+    public boolean callbackAlipayRefund(Map<String, String> params) {
+        return "OK".equalsIgnoreCase(executeReturnObject(MomiaHttpRequestBuilder.POST(url("/payment/callback/alipay/refund"), params), String.class));
+    }
+
     public boolean callbackWeixin(Map<String, String> params) {
         return "OK".equalsIgnoreCase(executeReturnObject(MomiaHttpRequestBuilder.POST(url("/payment/callback/weixin"), params), String.class));
     }

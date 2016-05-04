@@ -9,6 +9,7 @@ public class ActivityEntry {
         public static final int FINISHED = 4;  // 已完成
         public static final int TO_REFUND = 5; // 申请退款
         public static final int REFUNDED = 6;  // 已退款
+        public static final int REFUND_CHECKED = 7;  // 退款申请已通过
     }
 
     public static final ActivityEntry NOT_EXIST_ACTIVITY_ENTRY = new ActivityEntry();

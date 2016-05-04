@@ -9,12 +9,19 @@ import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.core.util.TimeUtil;
+import cn.momia.common.deal.gateway.PayType;
+import cn.momia.common.deal.gateway.PaymentGateway;
+import cn.momia.common.deal.gateway.RefundParam;
+import cn.momia.common.deal.gateway.RefundQueryParam;
+import cn.momia.common.deal.gateway.factory.PaymentGatewayFactory;
 import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.api.course.dto.coupon.UserCoupon;
 import cn.momia.api.course.dto.subject.Subject;
 import cn.momia.api.course.dto.coupon.CouponCode;
+import cn.momia.service.course.order.Payment;
+import cn.momia.service.course.order.Refund;
 import cn.momia.service.course.subject.SubjectService;
 import cn.momia.api.course.dto.subject.SubjectSku;
 import cn.momia.service.course.coupon.CouponService;
@@ -23,6 +30,8 @@ import cn.momia.service.course.order.OrderService;
 import cn.momia.service.course.order.OrderPackage;
 import com.google.common.collect.Sets;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,7 +42,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,6 +52,8 @@ import java.util.Set;
 @RestController
 @RequestMapping(value = "/order")
 public class OrderController extends BaseController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
+
     @Autowired private CourseService courseService;
     @Autowired private SubjectService subjectService;
     @Autowired private OrderService orderService;
@@ -139,12 +149,45 @@ public class OrderController extends BaseController {
         return MomiaHttpResponse.SUCCESS(orderService.delete(user.getId(), orderId));
     }
 
-    @RequestMapping(value = "/refund", method = RequestMethod.POST)
-    public MomiaHttpResponse refund(@RequestParam String utoken, @RequestParam(value = "oid") long orderId) {
+    @RequestMapping(value = "/{oid}/refund", method = RequestMethod.POST)
+    public MomiaHttpResponse refund(@RequestParam String utoken,
+                                    @PathVariable(value = "oid") long orderId,
+                                    @RequestParam BigDecimal fee,
+                                    @RequestParam String message) {
         if (courseService.queryBookedCourseCounts(Sets.newHashSet(orderId)).get(orderId) > 0) return MomiaHttpResponse.FAILED("已经选过课的订单不能申请退款");
 
+        Payment payment = orderService.getPayment(orderId);
+        if (!payment.exists()) return MomiaHttpResponse.FAILED("未付款的订单不能退款");
+        if (payment.getFee().compareTo(fee) < 0) return MomiaHttpResponse.FAILED("退款金额超过了付款金额");
+
         User user = userServiceApi.get(utoken);
-        return MomiaHttpResponse.SUCCESS(orderService.refund(user.getId(), orderId));
+        return MomiaHttpResponse.SUCCESS(orderService.applyRefund(user.getId(), fee, message, payment));
+    }
+
+    @RequestMapping(value = "/{oid}/refund/check", method = RequestMethod.POST)
+    public MomiaHttpResponse refundCheck(@PathVariable(value = "oid") long orderId) {
+        Order order = orderService.get(orderId);
+        if (order.getStatus() != Order.Status.TO_REFUND) return MomiaHttpResponse.FAILED("该订单并未申请退款");
+
+        Payment payment = orderService.getPayment(orderId);
+        if (!payment.exists()) return MomiaHttpResponse.FAILED("未付款的订单不能退款");
+
+        Refund refund = orderService.queryRefund(orderId, payment.getId());
+        if (!refund.exists()) return MomiaHttpResponse.FAILED("无效的退款申请");
+
+        if (courseService.queryBookedCourseCounts(Sets.newHashSet(orderId)).get(orderId) > 0) return MomiaHttpResponse.FAILED("已经选过课的订单不能退款");
+
+        RefundParam refundParam = new RefundParam();
+        refundParam.setRefundId(refund.getId());
+        refundParam.setRefundTime(new Date());
+        refundParam.setTradeNo(payment.getTradeNo());
+        refundParam.setTotalFee(payment.getFee());
+        refundParam.setRefundFee(refund.getRefundFee());
+        refundParam.setRefundMessage(order.getRefundMessage());
+        PaymentGateway gateway = PaymentGatewayFactory.create(payment.getPayType());
+        if (gateway.refund(refundParam)) orderService.refundChecked(orderId);
+
+        return MomiaHttpResponse.SUCCESS(true);
     }
 
     @RequestMapping(value = "/{oid}", method = RequestMethod.GET)
@@ -168,6 +211,12 @@ public class OrderController extends BaseController {
         Map<Long, Integer> finishedCourceCounts = courseService.queryFinishedCourseCounts(Sets.newHashSet(orderId));
         SubjectOrder detailOrder = buildFullSubjectOrder(order, title, cover, finishedCourceCounts.get(orderId), courseIds);
 
+        if (order.getStatus() == Order.Status.REFUND_CHECKED) {
+            Payment payment = orderService.getPayment(orderId);
+            Refund refund = orderService.queryRefund(orderId, payment.getId());
+            if (payment.exists() && PayType.isWeixinPay(payment.getPayType()) && refund.exists()) queryRefund(detailOrder, payment, refund);
+        }
+
         return MomiaHttpResponse.SUCCESS(detailOrder);
     }
 
@@ -184,6 +233,15 @@ public class OrderController extends BaseController {
                 subjectOrder.setDiscount(userCoupon.getDiscount());
                 subjectOrder.setCouponDesc(userCoupon.getDiscount() + "元红包"); // TODO 更多类型
             }
+
+            Payment payment = orderService.getPayment(order.getId());
+            if (!payment.exists()) throw new MomiaErrorException("无效的订单");
+            subjectOrder.setPayedFee(payment.getFee());
+            int payType = payment.getPayType();
+            payType = (payType == PayType.WEIXIN_APP || payType == PayType.WEIXIN_JSAPI) ? PayType.WEIXIN : payType;
+            subjectOrder.setPayType(payType);
+
+            subjectOrder.setCanRefund(!order.isCanceled() && courseService.queryBookedCourseCounts(Sets.newHashSet(order.getId())).get(order.getId()) <= 0);
         }
 
         return subjectOrder;
@@ -203,6 +261,20 @@ public class OrderController extends BaseController {
         subjectOrder.setCover(cover);
 
         return subjectOrder;
+    }
+
+    private void queryRefund(SubjectOrder subjectOrder, Payment payment, Refund refund) {
+        try {
+            RefundQueryParam refundQueryParam = new RefundQueryParam();
+            refundQueryParam.setTradeNo(payment.getTradeNo());
+            PaymentGateway gateway = PaymentGatewayFactory.create(payment.getPayType());
+            if (gateway.refundQuery(refundQueryParam)) {
+                orderService.finishRefund(refund);
+                subjectOrder.setStatus(Order.Status.REFUNDED);
+            }
+        } catch (Exception e) {
+            LOGGER.error("fail to query refund for order: {}", subjectOrder.getId(), e);
+        }
     }
 
     @RequestMapping(value = "/bookable", method = RequestMethod.GET)
@@ -479,7 +551,7 @@ public class OrderController extends BaseController {
         User user = userServiceApi.get(utoken);
 
         Order order = orderService.get(orderId);
-        if (!order.exists() || !order.isPayed() || order.getUserId() != user.getId()) return MomiaHttpResponse.FAILED("无效的订单");
+        if (!order.exists() || !order.isPayed() || order.isCanceled() || order.getUserId() != user.getId()) return MomiaHttpResponse.FAILED("无效的订单");
 
         List<OrderPackage> orderPackages = orderService.getOrderPackages(orderId);
         if (orderPackages.isEmpty() || orderPackages.size() > 1) return MomiaHttpResponse.FAILED("无效的礼包，该订单下有多个课程包");
@@ -494,7 +566,7 @@ public class OrderController extends BaseController {
     @RequestMapping(value = "/{oid}/gift/status", method = RequestMethod.GET)
     public MomiaHttpResponse giftStatus(@RequestParam String utoken, @PathVariable(value = "oid") long orderId) {
         Order order = orderService.get(orderId);
-        if (!order.exists() || !order.isPayed()) return MomiaHttpResponse.FAILED("无效的订单");
+        if (!order.exists() || !order.isPayed() || order.isCanceled()) return MomiaHttpResponse.FAILED("无效的订单");
 
         List<OrderPackage> orderPackages = orderService.getOrderPackages(orderId);
         if (orderPackages.isEmpty() || orderPackages.size() > 1) return MomiaHttpResponse.FAILED("无效的礼包");
@@ -515,7 +587,7 @@ public class OrderController extends BaseController {
                                          @RequestParam long expired,
                                          @RequestParam String giftsign) {
         Order order = orderService.get(orderId);
-        if (!order.exists() || !order.isPayed()) return MomiaHttpResponse.FAILED("无效的订单");
+        if (!order.exists() || !order.isPayed() || order.isCanceled()) return MomiaHttpResponse.FAILED("无效的订单");
 
         if (new Date().getTime() >= expired) return MomiaHttpResponse.FAILED("来晚了，礼包已经过期了~");
 

@@ -8,6 +8,7 @@ import cn.momia.common.core.http.MomiaHttpParamBuilder;
 import cn.momia.common.core.http.MomiaHttpRequestBuilder;
 import com.alibaba.fastjson.JSONObject;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class OrderServiceApi extends HttpServiceApi {
@@ -22,11 +23,16 @@ public class OrderServiceApi extends HttpServiceApi {
         return executeReturnObject(MomiaHttpRequestBuilder.DELETE(url("/order"), builder.build()), Boolean.class);
     }
 
-    public boolean refundOrder(String utoken, long orderId) {
+    public boolean applyRefundOrder(String utoken, long orderId, BigDecimal fee, String message) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("utoken", utoken)
-                .add("oid", orderId);
-        return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/order/refund"), builder.build()), Boolean.class);
+                .add("fee", fee)
+                .add("message", message);
+        return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/order/%d/refund", orderId), builder.build()), Boolean.class);
+    }
+
+    public boolean checkRefundOrder(long orderId) {
+        return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/order/%d/refund/check", orderId)), Boolean.class);
     }
 
     public SubjectOrder get(String utoken, long orderId) {

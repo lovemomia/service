@@ -11,9 +11,10 @@ public class Order {
         public static final int NOT_PAYED = 1; // 已下单未付款
         public static final int PRE_PAYED = 2; // 准备付款
         public static final int PAYED = 3;     // 已付款
-        public static final int FINISHED = 4;  // 已完成
+        public static final int FINISHED = 4;  // 已完成 这个状态已经废弃
         public static final int TO_REFUND = 5; // 申请退款
         public static final int REFUNDED = 6;  // 已退款
+        public static final int REFUND_CHECKED = 7;  // 退款申请已通过
     }
 
     public static final Order NOT_EXIST_ORDER = new Order();
@@ -26,6 +27,7 @@ public class Order {
     private String mobile;
     private String inviteCode = "";
     private String couponCode = "";
+    private String refundMessage = "";
 
     private int status;
     private Date addTime;
@@ -94,6 +96,14 @@ public class Order {
         this.couponCode = couponCode;
     }
 
+    public String getRefundMessage() {
+        return refundMessage;
+    }
+
+    public void setRefundMessage(String refundMessage) {
+        this.refundMessage = refundMessage;
+    }
+
     public int getStatus() {
         return status;
     }
@@ -151,6 +161,10 @@ public class Order {
 
     public boolean isPayed() {
         return status >= Status.PAYED;
+    }
+
+    public boolean isCanceled() {
+        return status >= Status.TO_REFUND && status <= Status.REFUND_CHECKED;
     }
 
     public List<Long> getCourseIds() {

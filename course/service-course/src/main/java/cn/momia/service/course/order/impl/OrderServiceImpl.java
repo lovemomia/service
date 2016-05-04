@@ -8,6 +8,7 @@ import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderService;
 import cn.momia.service.course.order.OrderPackage;
 import cn.momia.service.course.order.Payment;
+import cn.momia.service.course.order.Refund;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -83,7 +85,7 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     public List<Order> list(Collection<Long> orderIds) {
         if (orderIds.isEmpty()) return new ArrayList<Order>();
 
-        String sql = "SELECT Id, UserId, SubjectId, Contact, Mobile, Status, AddTime FROM SG_SubjectOrder WHERE Id IN (" + StringUtils.join(orderIds, ",") + ") AND Status<>0";
+        String sql = "SELECT Id, UserId, SubjectId, Contact, Mobile, RefundMessage, Status, AddTime FROM SG_SubjectOrder WHERE Id IN (" + StringUtils.join(orderIds, ",") + ") AND Status<>0";
         List<Order> orders = queryObjectList(sql, Order.class);
 
         Map<Long, List<OrderPackage>> packagesMap = queryOrderPackages(orderIds);
@@ -158,9 +160,26 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     }
 
     @Override
-    public boolean refund(long userId, long orderId) {
-        String sql = "UPDATE SG_SubjectOrder SET Status=? WHERE UserId=? AND Id=? AND Status=?";
-        return update(sql, new Object[] { Order.Status.TO_REFUND, userId, orderId, Order.Status.PAYED });
+    public boolean applyRefund(final long userId, final BigDecimal fee, final String message, final Payment payment) {
+        try {
+            execute(new TransactionCallback() {
+                @Override
+                public Object doInTransaction(TransactionStatus status) {
+                    String sql = "UPDATE SG_SubjectOrder SET Status=?, RefundMessage=? WHERE UserId=? AND Id=? AND Status=?";
+                    if (update(sql, new Object[] { Order.Status.TO_REFUND, message, userId, payment.getOrderId(), Order.Status.PAYED })) {
+                        sql = "INSERT INTO SG_Refund(OrderId, PaymentId, PayType, RefundFee, ApplyTime, AddTime) VALUES (?, ?, ?, ?, NOW(), NOW())";
+                        update(sql, new Object[] { payment.getOrderId(), payment.getId(), payment.getPayType(), fee });
+                    }
+
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            LOGGER.error("fail to apply refund for order: {}", payment.getOrderId(), e);
+            return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -542,5 +561,52 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
         } catch (ParseException e) {
             return new ArrayList<Long>();
         }
+    }
+
+    @Override
+    public Payment getPayment(long orderId) {
+        String sql = "SELECT Id, OrderId, Payer, FinishTime, PayType, TradeNo, Fee FROM SG_SubjectPayment WHERE OrderId=? AND Status=1";
+        return queryObject(sql, new Object[] { orderId }, Payment.class, Payment.NOT_EXIST_PAYMENT);
+    }
+
+    @Override
+    public Refund getRefund(long refundId) {
+        String sql = "SELECT Id, OrderId, PaymentId, PayType, RefundFee, ApplyTime, FinishTime, Status FROM SG_Refund WHERE Id=? AND Status<>0";
+        return queryObject(sql, new Object[] { refundId }, Refund.class, Refund.NOT_EXIST_REFUND);
+    }
+
+    @Override
+    public Refund queryRefund(long orderId, long paymentId) {
+        String sql = "SELECT Id, OrderId, PaymentId, PayType, RefundFee, ApplyTime, FinishTime, Status FROM SG_Refund WHERE OrderId=? AND PaymentId=? AND Status<>0";
+        return queryObject(sql, new Object[] { orderId, paymentId }, Refund.class, Refund.NOT_EXIST_REFUND);
+    }
+
+    @Override
+    public void refundChecked(long orderId) {
+        String sql = "UPDATE SG_SubjectOrder SET Status=? WHERE Id=? AND Status=?";
+        update(sql, new Object[] { Order.Status.REFUND_CHECKED, orderId, Order.Status.TO_REFUND });
+    }
+
+    @Override
+    public boolean finishRefund(final Refund refund) {
+        try {
+            execute(new TransactionCallback() {
+                @Override
+                public Object doInTransaction(TransactionStatus status) {
+                    String sql = "UPDATE SG_SubjectOrder SET Status=? WHERE Id=? AND (Status=? OR Status=?)";
+                    update(sql, new Object[] { Order.Status.REFUNDED, refund.getOrderId(), Order.Status.TO_REFUND, Order.Status.REFUND_CHECKED });
+
+                    sql = "UPDATE SG_Refund SET FinishTime=NOW(), Status=? WHERE Id=?";
+                    update(sql, new Object[] { Refund.Status.FINISHED, refund.getId() });
+
+                    return null;
+                }
+            });
+            return true;
+        } catch (Exception e) {
+            LOGGER.error("fail to finish refund: {}", refund.getId(), e);
+        }
+
+        return false;
     }
 }

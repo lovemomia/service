@@ -1,5 +1,6 @@
 package cn.momia.service.course.order;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -11,7 +12,7 @@ public interface OrderService {
     Order get(long orderId);
     List<Order> list(Collection<Long> orderIds);
     boolean delete(long userId, long orderId);
-    boolean refund(long userId, long orderId);
+    boolean applyRefund(long userId, BigDecimal fee, String message, Payment payment);
 
     long queryCountByUser(long userId, int status);
     List<Order> queryByUser(long userId, int status, int start, int count);
@@ -52,4 +53,10 @@ public interface OrderService {
     Map<Long, Date> queryStartTimesOfPackages(Collection<Long> packageIds);
     List<Long> queryBookableUserIds();
     List<Long> queryUserIdsOfPackagesToExpired(int days);
+
+    Payment getPayment(long orderId);
+    Refund getRefund(long refundId);
+    Refund queryRefund(long orderId, long paymentId);
+    void refundChecked(long orderId);
+    boolean finishRefund(Refund refund);
 }
