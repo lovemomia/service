@@ -14,7 +14,6 @@ import cn.momia.common.deal.gateway.PaymentGateway;
 import cn.momia.common.deal.gateway.RefundParam;
 import cn.momia.common.deal.gateway.RefundQueryParam;
 import cn.momia.common.deal.gateway.factory.PaymentGatewayFactory;
-import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.api.course.dto.coupon.UserCoupon;
@@ -29,7 +28,6 @@ import cn.momia.service.course.order.Order;
 import cn.momia.service.course.order.OrderService;
 import cn.momia.service.course.order.OrderPackage;
 import com.google.common.collect.Sets;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -545,67 +543,6 @@ public class OrderController extends BaseController {
 //            return thisTime.after(thatTime) ? 1 : -1;
 //        }
 //    }
-
-    @RequestMapping(value = "/{oid}/gift/send", method = RequestMethod.POST)
-    public MomiaHttpResponse sendGift(@RequestParam String utoken, @PathVariable(value = "oid") long orderId) {
-        User user = userServiceApi.get(utoken);
-
-        Order order = orderService.get(orderId);
-        if (!order.exists() || !order.isPayed() || order.isCanceled() || order.getUserId() != user.getId()) return MomiaHttpResponse.FAILED("无效的订单");
-
-        List<OrderPackage> orderPackages = orderService.getOrderPackages(orderId);
-        if (orderPackages.isEmpty() || orderPackages.size() > 1) return MomiaHttpResponse.FAILED("无效的礼包，该订单下有多个课程包");
-
-        OrderPackage orderPackage = orderPackages.get(0);
-        if (orderService.isUsed(orderPackage.getId()) || orderService.isGift(user.getId(), orderPackage.getId()))
-            return MomiaHttpResponse.FAILED("该课程包已使用或已送人");
-
-        return MomiaHttpResponse.SUCCESS(orderService.sendGift(user.getId(), orderPackage.getId()));
-    }
-
-    @RequestMapping(value = "/{oid}/gift/status", method = RequestMethod.GET)
-    public MomiaHttpResponse giftStatus(@RequestParam String utoken, @PathVariable(value = "oid") long orderId) {
-        Order order = orderService.get(orderId);
-        if (!order.exists() || !order.isPayed() || order.isCanceled()) return MomiaHttpResponse.FAILED("无效的订单");
-
-        List<OrderPackage> orderPackages = orderService.getOrderPackages(orderId);
-        if (orderPackages.isEmpty() || orderPackages.size() > 1) return MomiaHttpResponse.FAILED("无效的礼包");
-
-        User user = userServiceApi.get(utoken);
-        OrderPackage orderPackage = orderPackages.get(0);
-
-        if (orderService.isGiftFrom(user.getId(), orderPackage.getId())) return MomiaHttpResponse.SUCCESS(1);
-        if (orderService.isGiftTo(user.getId(), orderPackage.getId())) return MomiaHttpResponse.SUCCESS(2);
-        if (orderService.isGiftReceived(orderPackage.getId())) return MomiaHttpResponse.SUCCESS(3);
-        if (orderService.isGiftExpired(orderPackage.getId())) return MomiaHttpResponse.SUCCESS(4);
-        return MomiaHttpResponse.SUCCESS(5);
-    }
-
-    @RequestMapping(value = "/{oid}/gift/receive", method = RequestMethod.POST)
-    public MomiaHttpResponse receiveGift(@RequestParam String utoken,
-                                         @PathVariable(value = "oid") long orderId,
-                                         @RequestParam long expired,
-                                         @RequestParam String giftsign) {
-        Order order = orderService.get(orderId);
-        if (!order.exists() || !order.isPayed() || order.isCanceled()) return MomiaHttpResponse.FAILED("无效的订单");
-
-        if (new Date().getTime() >= expired) return MomiaHttpResponse.FAILED("来晚了，礼包已经过期了~");
-
-        if (!giftsign.equals(DigestUtils.md5Hex(order.getUserId() + "|" + orderId + "|" + expired + "|" + Configuration.getString("Validation.WapKey"))))
-            return MomiaHttpResponse.FAILED("无效的礼包");
-
-        List<OrderPackage> orderPackages = orderService.getOrderPackages(orderId);
-        if (orderPackages.isEmpty() || orderPackages.size() > 1) return MomiaHttpResponse.FAILED("无效的礼包");
-
-        User user = userServiceApi.get(utoken);
-        if (user.getId() == order.getUserId()) return MomiaHttpResponse.FAILED("不能自己领取自己的礼包哦~");
-
-        OrderPackage orderPackage = orderPackages.get(0);
-        if (!orderService.receiveGift(order.getUserId(), user.getId(), orderPackage.getId()))
-            return MomiaHttpResponse.FAILED("手慢了，礼包已经过期或被别人领走了");
-
-        return MomiaHttpResponse.SUCCESS(true);
-    }
 
     @RequestMapping(value = "/package/time/extend", method = RequestMethod.POST)
     public MomiaHttpResponse extendPackageTime(@RequestParam(value = "pid") long packageId, @RequestParam int time) {

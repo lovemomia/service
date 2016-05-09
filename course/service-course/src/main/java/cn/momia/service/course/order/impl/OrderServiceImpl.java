@@ -217,36 +217,36 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
 
     @Override
     public long queryBookableCountByUserAndOrder(long userId, long orderId) {
-        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_SubjectOrderPackage A LEFT JOIN SG_SubjectOrderPackageGift B ON A.Id=B.PackageId AND B.Status<>0 WHERE A.UserId=? AND A.OrderId=? AND A.Status=1 AND A.BookableCount>0 AND (B.Id IS NULL OR (B.ToUserId=0 AND B.Deadline<=NOW()) OR B.ToUserId=?)";
-        return queryLong(sql, new Object[] { userId, orderId, userId });
+        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_SubjectOrderPackage A WHERE A.UserId=? AND A.OrderId=? AND A.Status=1 AND A.BookableCount>0";
+        return queryLong(sql, new Object[] { userId, orderId });
     }
 
     @Override
     public List<OrderPackage> queryBookableByUserAndOrder(long userId, long orderId, int start, int count) {
-        String sql = "SELECT DISTINCT A.Id FROM SG_SubjectOrderPackage A LEFT JOIN SG_SubjectOrderPackageGift B ON A.Id=B.PackageId AND B.Status<>0 WHERE A.UserId=? AND A.OrderId=? AND A.Status=1 AND A.BookableCount>0 AND (B.Id IS NULL OR (B.ToUserId=0 AND B.Deadline<=NOW()) OR B.ToUserId=?) ORDER BY A.AddTime ASC LIMIT ?,?";
-        List<Long> packageIds = queryLongList(sql, new Object[] { userId, orderId, userId, start, count });
+        String sql = "SELECT DISTINCT A.Id FROM SG_SubjectOrderPackage A WHERE A.UserId=? AND A.OrderId=? AND A.Status=1 AND A.BookableCount>0 ORDER BY A.AddTime ASC LIMIT ?,?";
+        List<Long> packageIds = queryLongList(sql, new Object[] { userId, orderId, start, count });
 
         return listOrderPackages(packageIds);
     }
 
     @Override
     public long queryBookableCountByUser(long userId) {
-        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_SubjectOrderPackage A LEFT JOIN SG_SubjectOrderPackageGift B ON A.Id=B.PackageId AND B.Status<>0 WHERE A.UserId=? AND A.Status=1 AND A.BookableCount>0 AND (B.Id IS NULL OR (B.ToUserId=0 AND B.Deadline<=NOW()) OR B.ToUserId=?)";
-        return queryLong(sql, new Object[] { userId, userId });
+        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_SubjectOrderPackage A WHERE A.UserId=? AND A.Status=1 AND A.BookableCount>0";
+        return queryLong(sql, new Object[] { userId });
     }
 
     @Override
     public List<OrderPackage> queryBookableByUser(long userId, int start, int count) {
-        String sql = "SELECT DISTINCT A.Id FROM SG_SubjectOrderPackage A LEFT JOIN SG_SubjectOrderPackageGift B ON A.Id=B.PackageId AND B.Status<>0 WHERE A.UserId=? AND A.Status=1 AND A.BookableCount>0 AND (B.Id IS NULL OR (B.ToUserId=0 AND B.Deadline<=NOW()) OR B.ToUserId=?) ORDER BY A.AddTime ASC LIMIT ?,?";
-        List<Long> packageIds = queryLongList(sql, new Object[] { userId, userId, start, count });
+        String sql = "SELECT DISTINCT A.Id FROM SG_SubjectOrderPackage A WHERE A.UserId=? AND A.Status=1 AND A.BookableCount>0 ORDER BY A.AddTime ASC LIMIT ?,?";
+        List<Long> packageIds = queryLongList(sql, new Object[] { userId, start, count });
 
         return listOrderPackages(packageIds);
     }
 
     @Override
     public List<OrderPackage> queryAllBookableByUser(long userId) {
-        String sql = "SELECT DISTINCT A.Id FROM SG_SubjectOrderPackage A LEFT JOIN SG_SubjectOrderPackageGift B ON A.Id=B.PackageId AND B.Status<>0 WHERE A.UserId=? AND A.Status=1 AND A.BookableCount>0 AND (B.Id IS NULL OR (B.ToUserId=0 AND B.Deadline<=NOW()) OR B.ToUserId=?) ORDER BY A.AddTime ASC";
-        List<Long> packageIds = queryLongList(sql, new Object[] { userId, userId });
+        String sql = "SELECT DISTINCT A.Id FROM SG_SubjectOrderPackage A WHERE A.UserId=? AND A.Status=1 AND A.BookableCount>0 ORDER BY A.AddTime ASC";
+        List<Long> packageIds = queryLongList(sql, new Object[] { userId });
 
         return listOrderPackages(packageIds);
     }
@@ -301,7 +301,7 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
             public void processRow(ResultSet rs) throws SQLException {
                 long userId = rs.getLong("userId");
                 long packageId = rs.getLong("packageId");
-                if (!isGift(userId, packageId) && !packageIdsMap.containsKey(userId)) packageIdsMap.put(userId, packageId);
+                if (!packageIdsMap.containsKey(userId)) packageIdsMap.put(userId, packageId);
             }
         });
 
@@ -344,65 +344,6 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
         List<Long> packageIds = queryLongList(sql, new Object[] { orderId });
 
         return listOrderPackages(packageIds);
-    }
-
-    @Override
-    public boolean isUsed(long packageId) {
-        String sql = "SELECT COUNT(1) FROM SG_BookedCourse WHERE PackageId=? AND Status<>0";
-        return queryInt(sql, new Object[] { packageId }) > 0;
-    }
-
-    @Override
-    public boolean isGift(long fromUserId, long packageId) {
-        String sql = "SELECT COUNT(1) FROM SG_SubjectOrderPackageGift WHERE FromUserId=? AND PackageId=? AND ((ToUserId=0 && Deadline>NOW()) OR (ToUserId<>0 AND ToUserId<>?)) AND Status=1";
-        return queryInt(sql, new Object[] { fromUserId, packageId, fromUserId }) > 0;
-    }
-
-    @Override
-    public boolean isGift(long fromUserId, long toUserId, long packageId) {
-        String sql = "SELECT COUNT(1) FROM SG_SubjectOrderPackageGift WHERE FromUserId=? AND ToUserId=? AND PackageId=? AND Status=1";
-        return queryInt(sql, new Object[] { fromUserId, toUserId, packageId }) > 0;
-    }
-
-    @Override
-    public boolean sendGift(long fromUserId, long packageId) {
-        Date deadline = new Date(new Date().getTime() + 10L * 24 * 60 * 60 * 1000);
-        String sql = "INSERT INTO SG_SubjectOrderPackageGift (FromUserId, ToUserId, PackageId, Deadline, AddTime) VALUES (?, 0, ?, ?, NOW())";
-
-        return update(sql, new Object[] { fromUserId, packageId, deadline });
-    }
-
-    @Override
-    public boolean isGiftFrom(long fromUserId, long packageId) {
-        String sql = "SELECT COUNT(1) FROM SG_SubjectOrderPackageGift WHERE FromUserId=? AND PackageId=? AND Status=1";
-        return queryInt(sql, new Object[] { fromUserId, packageId }) > 0;
-    }
-
-    @Override
-    public boolean isGiftTo(long toUserId, long packageId) {
-        String sql = "SELECT COUNT(1) FROM SG_SubjectOrderPackageGift WHERE ToUserId=? AND PackageId=? AND Status=1";
-        return queryInt(sql, new Object[] { toUserId, packageId }) > 0;
-    }
-
-    @Override
-    public boolean isGiftReceived(long packageId) {
-        String sql = "SELECT COUNT(1) FROM SG_SubjectOrderPackageGift WHERE ToUserId>0 AND PackageId=? AND Status=1";
-        return queryInt(sql, new Object[] { packageId }) > 0;
-    }
-
-    @Override
-    public boolean isGiftExpired(long packageId) {
-        String sql = "SELECT COUNT(1) FROM SG_SubjectOrderPackageGift WHERE PackageId=? AND Deadline<=NOW() AND Status=1";
-        return queryInt(sql, new Object[] { packageId }) > 0;
-    }
-
-    @Override
-    public boolean receiveGift(long fromUserId, long toUserId, long packageId) {
-        String sql = "UPDATE SG_SubjectOrderPackageGift SET ToUserId=? WHERE FromUserId=? AND ToUserId=0 AND PackageId=? AND Deadline>NOW() AND Status<>0";
-        if (!update(sql, new Object[] { toUserId, fromUserId, packageId })) return false;
-
-        sql = "UPDATE SG_SubjectOrderPackage SET UserId=? WHERE Id=? AND UserId=? AND Status=1";
-        return update(sql, new Object[] { toUserId, packageId, fromUserId });
     }
 
     @Override

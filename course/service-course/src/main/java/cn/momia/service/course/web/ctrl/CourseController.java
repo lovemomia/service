@@ -550,10 +550,8 @@ public class CourseController extends BaseController {
         OrderPackage orderPackage = orderService.getOrderPackage(packageId);
         if (!orderPackage.exists() || orderPackage.getUserId() != user.getId()) throw new MomiaErrorException("预约失败，无效的课程包");
 
-        if (orderService.isGift(user.getId(), packageId)) throw new MomiaErrorException("您已将该课程包作为礼物送人了哦~");
-
         Order order = orderService.get(orderPackage.getOrderId());
-        if (!order.exists() || !order.isPayed() || order.isCanceled() || (order.getUserId() != orderPackage.getUserId() && !isGift(order.getUserId(), orderPackage.getUserId(), packageId))) throw new MomiaErrorException("预约失败，无效的订单");
+        if (!order.exists() || !order.isPayed() || order.isCanceled() || (order.getUserId() != orderPackage.getUserId())) throw new MomiaErrorException("预约失败，无效的订单");
 
         CourseSku sku = courseService.getSku(skuId);
         if (!sku.exists() || !sku.isBookable(new Date())) throw new MomiaErrorException("预约失败，无效的课程场次或本场次已截止选课");
@@ -592,10 +590,6 @@ public class CourseController extends BaseController {
         if (completedBookedCourses.isEmpty()) throw new MomiaErrorException("选课失败");
 
         return completedBookedCourses.get(0);
-    }
-
-    private boolean isGift(long fromUserId, long toUserId, long packageId) {
-        return orderService.isGift(fromUserId, toUserId, packageId);
     }
 
     private long getChildId(User user) {
