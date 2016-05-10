@@ -32,8 +32,8 @@ public class SubjectOrder {
     private String couponDesc;
 
     private BigDecimal payedFee;
-    private int payType;
-    private boolean canRefund;
+    private Integer payType;
+    private Boolean canRefund;
 
     public long getId() {
         return id;
@@ -163,19 +163,19 @@ public class SubjectOrder {
         this.payedFee = payedFee;
     }
 
-    public int getPayType() {
+    public Integer getPayType() {
         return payType;
     }
 
-    public void setPayType(int payType) {
+    public void setPayType(Integer payType) {
         this.payType = payType;
     }
 
-    public boolean isCanRefund() {
+    public Boolean getCanRefund() {
         return canRefund;
     }
 
-    public void setCanRefund(boolean canRefund) {
+    public void setCanRefund(Boolean canRefund) {
         this.canRefund = canRefund;
     }
 }
