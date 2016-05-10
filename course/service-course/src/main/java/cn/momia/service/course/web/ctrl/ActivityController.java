@@ -79,6 +79,8 @@ public class ActivityController extends BaseController {
         Activity activity = activityService.getActivity(activityId);
         if (!activity.exists()) return MomiaHttpResponse.FAILED("活动不存在");
 
+        if (activity.isForNewUser() && userServiceApi.isPayed(mobile)) return MomiaHttpResponse.FAILED("本活动/课程只限新用户购买哦~");
+
         long entryId = activityService.join(activityId, mobile, childName, relation, extra, activity.isNeedPay() ? ActivityEntry.Status.NOT_PAYED : ActivityEntry.Status.PAYED);
         return MomiaHttpResponse.SUCCESS(activity.isNeedPay() ? entryId : 0);
     }

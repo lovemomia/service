@@ -118,6 +118,11 @@ public class UserServiceApi extends HttpServiceApi {
         return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/user/%d/payed", userId)), Boolean.class);
     }
 
+    public boolean isPayed(String mobile) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("mobile", mobile);
+        return executeReturnObject(MomiaHttpRequestBuilder.GET(url("/user/payed"), builder.build()), Boolean.class);
+    }
+
     public void notifyBatch(List<Long> userIds, String message) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("uids", StringUtils.join(userIds, ","))
