@@ -302,7 +302,6 @@ public class OrderController extends BaseController {
             if (orderPackage.getCourseId() > 0) courseIds.add(orderPackage.getCourseId());
         }
 
-        Map<Long, Date> startTimes = orderService.queryStartTimesOfPackages(packageIds);
         List<Course> courses = courseService.list(courseIds);
         Map<Long, Course> coursesMap = new HashMap<Long, Course>();
         for (Course course : courses) {
@@ -345,13 +344,7 @@ public class OrderController extends BaseController {
             }
             subjectPackage.setBookableCourseCount(orderPackage.getBookableCount());
 
-            Date startTime = startTimes.get(orderPackage.getId());
-            if (startTime == null) {
-                subjectPackage.setExpireTime("购买日期: " + TimeUtil.SHORT_DATE_FORMAT.format(order.getAddTime()));
-            } else {
-                Date endTime = TimeUtil.add(startTime, orderPackage.getTime(), orderPackage.getTimeUnit());
-                subjectPackage.setExpireTime("有效期至: " + TimeUtil.SHORT_DATE_FORMAT.format(endTime));
-            }
+            subjectPackage.setExpireTime("购买日期: " + TimeUtil.SHORT_DATE_FORMAT.format(order.getAddTime()));
 
             subjectPackage.setCourseId(orderPackage.getCourseId());
             Course course = coursesMap.get(orderPackage.getCourseId());

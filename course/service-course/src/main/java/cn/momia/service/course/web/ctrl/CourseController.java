@@ -14,7 +14,6 @@ import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.core.util.MomiaUtil;
-import cn.momia.common.core.util.TimeUtil;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.api.course.dto.course.BookedCourse;
 import cn.momia.service.course.base.CourseService;
@@ -556,13 +555,6 @@ public class CourseController extends BaseController {
         CourseSku sku = courseService.getSku(skuId);
         if (!sku.exists() || !sku.isBookable(new Date())) throw new MomiaErrorException("预约失败，无效的课程场次或本场次已截止选课");
         if (orderPackage.getCourseId() > 0 && orderPackage.getCourseId() != sku.getCourseId()) throw new MomiaErrorException("预约失败，课程与购买的包不匹配");
-
-        Map<Long, Date> startTimes = orderService.queryStartTimesOfPackages(Sets.newHashSet(packageId));
-        Date startTime = startTimes.get(packageId);
-        if (startTime != null) {
-            Date endTime = TimeUtil.add(startTime, orderPackage.getTime(), orderPackage.getTimeUnit());
-            if (endTime.before(sku.getStartTime())) throw new MomiaErrorException("预约失败，该课程的时间超出了课程包的有效期");
-        }
 
         if (courseService.booked(packageId, sku.getCourseId())) throw new MomiaErrorException("一门课程在一个课程包内只能约一次");
         if (!courseService.matched(order.getSubjectId(), sku.getCourseId())) throw new MomiaErrorException("课程不匹配");
