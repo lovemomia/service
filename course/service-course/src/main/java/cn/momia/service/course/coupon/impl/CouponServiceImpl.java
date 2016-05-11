@@ -226,6 +226,11 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
     }
 
     private UserCoupon addUserCoupon(final long userId, final String inviteCode, final Coupon coupon) {
+        long userCouponId = doAddUserCoupon(userId, inviteCode, coupon);
+        return userCouponId > 0 ? getUserCoupon(userCouponId) : UserCoupon.NOT_EXIST_USER_COUPON;
+    }
+
+    private long doAddUserCoupon(final long userId, final String inviteCode, final Coupon coupon) {
         KeyHolder keyHolder = insert(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
@@ -253,8 +258,7 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
             }
         });
 
-        long userCouponId = keyHolder.getKey().longValue();
-        return userCouponId > 0 ? getUserCoupon(userCouponId) : UserCoupon.NOT_EXIST_USER_COUPON;
+        return keyHolder.getKey().longValue();
     }
 
     private UserCoupon getUserCoupon(long userCouponId) {
@@ -312,33 +316,41 @@ public class CouponServiceImpl extends AbstractService implements CouponService 
             return 0;
         }
 
-        KeyHolder keyHolder = insert(new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO SG_UserCoupon (UserId, CouponId, StartTime, EndTime, InviteCode, AddTime) VALUES (?, ?, ?, ?, ?, NOW())";
-                PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                ps.setLong(1, userId);
-                ps.setInt(2, coupon.getId());
+        return doAddUserCoupon(userId, "", coupon);
+    }
 
-                int timeType = coupon.getTimeType();
-                Date startTime;
-                Date endTime;
-                if (timeType == 1) {
-                    startTime = new Date();
-                    endTime = TimeUtil.add(startTime, coupon.getTime(), coupon.getTimeUnit());
-                } else {
-                    startTime = coupon.getStartTime();
-                    endTime = coupon.getEndTime();
+    @Override
+    public List<Coupon> getCouponsBySrc(int src) {
+        String sql = "SELECT Id FROM SG_Coupon WHERE Src=? AND Status=1";
+        return listCoupons(queryIntList(sql, new Object[] { src }));
+    }
+
+    @Override
+    public boolean distributeActivityCoupons(final long userId, final List<Coupon> coupons) {
+        try {
+            execute(new TransactionCallback() {
+                @Override
+                public Object doInTransaction(TransactionStatus status) {
+                    String sql = "INSERT INTO SG_ActivityCoupon (UserId, AddTime) VALUES (?, NOW())";
+                    if (!update(sql, new Object[] { userId })) {
+                        LOGGER.error("fail to insert into SG_ActivityCoupon for user: {}", userId);
+                        throw new MomiaErrorException("分发红包失败");
+                    }
+
+                    for (Coupon coupon : coupons) {
+                        for (int i = 0; i < coupon.getCount(); i++) {
+                            doAddUserCoupon(userId, "", coupon);
+                        }
+                    }
+
+                    return null;
                 }
-                ps.setTimestamp(3, new Timestamp(startTime.getTime()));
-                ps.setTimestamp(4, new Timestamp(endTime.getTime()));
+            });
+            return true;
+        } catch (Exception e) {
+            LOGGER.error("分发红包失败，用户ID: {}", userId, e);
+        }
 
-                ps.setString(5, "");
-
-                return ps;
-            }
-        });
-
-         return keyHolder.getKey().longValue();
+        return false;
     }
 }

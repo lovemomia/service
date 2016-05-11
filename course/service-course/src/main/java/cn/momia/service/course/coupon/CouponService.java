@@ -37,4 +37,7 @@ public interface CouponService {
 
     boolean hasActivityCoupon(long userId);
     long distributeActivityCoupon(long userId, Coupon coupon);
+
+    List<Coupon> getCouponsBySrc(int src);
+    boolean distributeActivityCoupons(long userId, List<Coupon> coupons);
 }
