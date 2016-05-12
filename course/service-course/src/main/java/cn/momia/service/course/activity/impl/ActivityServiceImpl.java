@@ -48,22 +48,27 @@ public class ActivityServiceImpl extends AbstractService implements ActivityServ
     @Override
     public long join(final int activityId, final String mobile, final String childName, final String relation, final String extra, final int status) {
         try {
-            if (!lockStock(activityId)) throw new MomiaErrorException("报名失败，名额已满");
-            return insert(new PreparedStatementCreator() {
+            return (Long) execute(new TransactionCallback() {
                 @Override
-                public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                    String sql = "INSERT INTO SG_ActivityEntry (ActivityId, Mobile, ChildName, RelationShip, ExtraMessage, Status, AddTime) VALUES (?, ?, ?, ?, ?, ?, NOW())";
-                    PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                    ps.setInt(1, activityId);
-                    ps.setString(2, mobile);
-                    ps.setString(3, childName);
-                    ps.setString(4, relation);
-                    ps.setString(5, extra);
-                    ps.setInt(6, status);
+                public Object doInTransaction(TransactionStatus ts) {
+                    if (!lockStock(activityId)) throw new MomiaErrorException("报名失败，名额已满");
+                    return insert(new PreparedStatementCreator() {
+                        @Override
+                        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                            String sql = "INSERT INTO SG_ActivityEntry (ActivityId, Mobile, ChildName, RelationShip, ExtraMessage, Status, AddTime) VALUES (?, ?, ?, ?, ?, ?, NOW())";
+                            PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                            ps.setInt(1, activityId);
+                            ps.setString(2, mobile);
+                            ps.setString(3, childName);
+                            ps.setString(4, relation);
+                            ps.setString(5, extra);
+                            ps.setInt(6, status);
 
-                    return ps;
+                            return ps;
+                        }
+                    }).getKey().longValue();
                 }
-            }).getKey().longValue();
+            });
         } catch (Exception e) {
             LOGGER.error("join activity exception: {}/{}", activityId, mobile, e);
             throw new RuntimeException(e);
