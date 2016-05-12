@@ -8,6 +8,7 @@ public class Coupon {
         public static final int INVITE = 1;
         public static final int FIRST_PAY = 2;
         public static final int ACTIVITY = 3;
+        public static final int ACTIVITY_MULTI = 4;
     }
 
     public static final Coupon NOT_EXISTS_COUPON = new Coupon();

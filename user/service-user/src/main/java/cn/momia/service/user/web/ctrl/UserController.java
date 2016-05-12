@@ -207,6 +207,12 @@ public class UserController extends BaseController {
         return MomiaHttpResponse.SUCCESS(userService.setPayed(userId));
     }
 
+    @RequestMapping(value = "/payed", method = RequestMethod.GET)
+    public MomiaHttpResponse isPayed(@RequestParam String mobile) {
+        User user = userService.getByMobile(mobile);
+        return MomiaHttpResponse.SUCCESS(user.exists() && user.isPayed());
+    }
+
     @RequestMapping(value = "/notify/batch", method = RequestMethod.POST)
     public MomiaHttpResponse notifyBatch(@RequestParam String uids, @RequestParam String message) {
         Collection<Long> userIds = MomiaUtil.splitDistinctLongs(uids);

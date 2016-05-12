@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/activity")
@@ -78,6 +79,8 @@ public class ActivityController extends BaseController {
 
         Activity activity = activityService.getActivity(activityId);
         if (!activity.exists()) return MomiaHttpResponse.FAILED("活动不存在");
+
+        if (activity.isForNewUser() && userServiceApi.isPayed(mobile)) return MomiaHttpResponse.FAILED("本活动/课程只限新用户购买哦~");
 
         long entryId = activityService.join(activityId, mobile, childName, relation, extra, activity.isNeedPay() ? ActivityEntry.Status.NOT_PAYED : ActivityEntry.Status.PAYED);
         return MomiaHttpResponse.SUCCESS(activity.isNeedPay() ? entryId : 0);
@@ -281,6 +284,70 @@ public class ActivityController extends BaseController {
 
         public void setUserCoupon(UserCoupon userCoupon) {
             this.userCoupon = userCoupon;
+        }
+    }
+
+    @RequestMapping(value = "/coupons", method = RequestMethod.POST)
+    public MomiaHttpResponse getCoupons(@RequestParam String utoken) {
+        User user = userServiceApi.get(utoken);
+        if (couponService.hasActivityCoupon(user.getId())) return MomiaHttpResponse.SUCCESS(new ActivityCouponsInfo(ActivityCouponInfo.Status.DUP));
+
+        List<Coupon> coupons = couponService.getCouponsBySrc(Coupon.Src.ACTIVITY_MULTI);
+        if (coupons.isEmpty()) return MomiaHttpResponse.FAILED("红包已经全部领完了哦~");
+
+        if (couponService.distributeActivityCoupons(user.getId(), coupons)) {
+            ActivityCouponsInfo info = new ActivityCouponsInfo(ActivityCouponInfo.Status.SUCCESS);
+            int count = 0;
+            BigDecimal discount = new BigDecimal(0);
+            for (Coupon coupon : coupons) {
+                count += coupon.getCount();
+                discount = discount.add(coupon.getDiscount().multiply(new BigDecimal(coupon.getCount())));
+            }
+            info.setCount(count);
+            info.setDiscount(discount);
+            return MomiaHttpResponse.SUCCESS(info);
+        } else {
+            return MomiaHttpResponse.SUCCESS(new ActivityCouponsInfo(ActivityCouponInfo.Status.FAILED));
+        }
+    }
+
+    private static class ActivityCouponsInfo {
+        public static class Status {
+            public static final int FAILED = 0;
+            public static final int SUCCESS = 1;
+            public static final int DUP = 2;
+        }
+
+        private int status;
+        private int count;
+        private BigDecimal discount;
+
+        public ActivityCouponsInfo(int status) {
+            this.status = status;
+        }
+
+        public int getStatus() {
+            return status;
+        }
+
+        public void setStatus(int status) {
+            this.status = status;
+        }
+
+        public int getCount() {
+            return count;
+        }
+
+        public void setCount(int count) {
+            this.count = count;
+        }
+
+        public BigDecimal getDiscount() {
+            return discount;
+        }
+
+        public void setDiscount(BigDecimal discount) {
+            this.discount = discount;
         }
     }
 }

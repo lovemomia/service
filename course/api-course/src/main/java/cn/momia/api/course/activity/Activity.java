@@ -16,6 +16,8 @@ public class Activity {
     private Date startTime;
     private Date endTime;
 
+    private boolean forNewUser;
+
     public int getId() {
         return id;
     }
@@ -86,6 +88,14 @@ public class Activity {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public boolean isForNewUser() {
+        return forNewUser;
+    }
+
+    public void setForNewUser(boolean forNewUser) {
+        this.forNewUser = forNewUser;
     }
 
     public boolean exists() {
