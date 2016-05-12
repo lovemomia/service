@@ -18,6 +18,11 @@ public class Activity {
 
     private boolean forNewUser;
 
+    private String detail;
+
+    private int totalStock;
+    private int unlockedStock;
+
     public int getId() {
         return id;
     }
@@ -96,6 +101,30 @@ public class Activity {
 
     public void setForNewUser(boolean forNewUser) {
         this.forNewUser = forNewUser;
+    }
+
+    public String getDetail() {
+        return detail;
+    }
+
+    public void setDetail(String detail) {
+        this.detail = detail;
+    }
+
+    public int getTotalStock() {
+        return totalStock;
+    }
+
+    public void setTotalStock(int totalStock) {
+        this.totalStock = totalStock;
+    }
+
+    public int getUnlockedStock() {
+        return unlockedStock;
+    }
+
+    public void setUnlockedStock(int unlockedStock) {
+        this.unlockedStock = unlockedStock;
     }
 
     public boolean exists() {
