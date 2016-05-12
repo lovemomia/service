@@ -69,6 +69,8 @@ public class ActivityServiceImpl extends AbstractService implements ActivityServ
                     }).getKey().longValue();
                 }
             });
+        } catch (MomiaErrorException e) {
+            throw e;
         } catch (Exception e) {
             LOGGER.error("join activity exception: {}/{}", activityId, mobile, e);
             throw new RuntimeException(e);
