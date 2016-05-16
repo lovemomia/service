@@ -110,4 +110,7 @@ public interface CourseService {
     List<Long> queryBookedUserIds(long courseSkuId);
 
     boolean hasNoAvaliableSkus(long courseId);
+
+    long queryBookableCount(List<Long> exclusions);
+    List<Course> queryBookable(int start, int count, List<Long> exclusions);
 }

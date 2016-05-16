@@ -248,6 +248,15 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(buildPagedCourses(courses, totalCount, start, count));
     }
 
+    @RequestMapping(value = "/bookable/query", method = RequestMethod.GET)
+    public MomiaHttpResponse queryBookable(@RequestParam(value = "pid") long packageId, @RequestParam int start, @RequestParam int count) {
+        List<Long> courseIds = courseService.queryBookedCourseIds(packageId);
+        long totalCount = courseService.queryBookableCount(courseIds);
+        List<Course> courses = courseService.queryBookable(start, count, courseIds);
+
+        return MomiaHttpResponse.SUCCESS(buildPagedCourses(courses, totalCount, start, count));
+    }
+
     @RequestMapping(value = "/{coid}/detail", method = RequestMethod.GET)
     public MomiaHttpResponse detail(@PathVariable(value = "coid") long courseId) {
         CourseDetail courseDetail = courseService.getDetail(courseId);
@@ -557,8 +566,8 @@ public class CourseController extends BaseController {
         if (orderPackage.getCourseId() > 0 && orderPackage.getCourseId() != sku.getCourseId()) throw new MomiaErrorException("预约失败，课程与购买的包不匹配");
 
         if (courseService.booked(packageId, sku.getCourseId())) throw new MomiaErrorException("一门课程在一个课程包内只能约一次");
-        if (!courseService.matched(order.getSubjectId(), sku.getCourseId())) throw new MomiaErrorException("课程不匹配");
 
+        // TODO 使用事务
         if (!courseService.lockSku(skuId)) throw new MomiaErrorException("库存不足");
         LOGGER.info("course sku locked: {}/{}/{}", new Object[] { user.getId(), packageId, skuId });
 
@@ -599,8 +608,7 @@ public class CourseController extends BaseController {
             userIds.add(Long.valueOf(userId));
         }
 
-        long subjectId = courseService.querySubjectId(courseId);
-        Map<Long, Long> packageIds = orderService.queryBookablePackageIds(userIds, subjectId);
+        Map<Long, Long> packageIds = orderService.queryBookablePackageIds(userIds);
 
         List<User> users = userServiceApi.list(userIds, User.Type.FULL);
         Map<Long, User> usersMap = new HashMap<Long, User>();

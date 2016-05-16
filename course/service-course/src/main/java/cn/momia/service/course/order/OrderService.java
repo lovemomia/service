@@ -23,7 +23,7 @@ public interface OrderService {
     List<OrderPackage> queryBookableByUser(long userId, int start, int count);
     List<OrderPackage> queryAllBookableByUser(long userId);
 
-    Map<Long,Long> queryBookablePackageIds(Set<Long> userIds, long subjectId);
+    Map<Long,Long> queryBookablePackageIds(Set<Long> userIds);
 
     OrderPackage getOrderPackage(long packageId);
     Set<Integer> getOrderPackageTypes(long orderId);
