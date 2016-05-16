@@ -559,7 +559,7 @@ public class CourseController extends BaseController {
         if (!orderPackage.exists() || orderPackage.getUserId() != user.getId()) throw new MomiaErrorException("预约失败，无效的课程包");
 
         Order order = orderService.get(orderPackage.getOrderId());
-        if (!order.exists() || !order.isPayed() || order.isCanceled() || (order.getUserId() != orderPackage.getUserId())) throw new MomiaErrorException("预约失败，无效的订单");
+        if (!order.exists() || !order.isPayed() || order.isCanceled() || (order.getUserId() != orderPackage.getUserId())) throw new MomiaErrorException("预约失败，无效的订单或该订单您已申请退款");
 
         CourseSku sku = courseService.getSku(skuId);
         if (!sku.exists() || !sku.isBookable(new Date())) throw new MomiaErrorException("预约失败，无效的课程场次或本场次已截止选课");
