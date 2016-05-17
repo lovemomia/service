@@ -123,7 +123,7 @@
     </PushMsg>
 
     <Package>
-        <MultiTitle></MultiTitle>
+        <MultiTitle>多个课程包</MultiTitle>
         <MultiCover></MultiCover>
     </Package>
 </Configuration>
