@@ -14,6 +14,7 @@ import cn.momia.common.deal.gateway.PaymentGateway;
 import cn.momia.common.deal.gateway.RefundParam;
 import cn.momia.common.deal.gateway.RefundQueryParam;
 import cn.momia.common.deal.gateway.factory.PaymentGatewayFactory;
+import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.course.base.CourseService;
 import cn.momia.api.course.dto.coupon.UserCoupon;
@@ -202,9 +203,17 @@ public class OrderController extends BaseController {
             title = course.getTitle();
             cover = course.getCover();
         } else {
-            Subject subject = subjectService.get(order.getSubjectId());
-            title = subject.getTitle();
-            cover = subject.getCover();
+            List<OrderPackage> orderPackages = order.getPackages();
+            if (orderPackages.isEmpty()) throw new MomiaErrorException("无效的订单");
+
+            if (orderPackages.size() == 1) {
+                OrderPackage orderPackage = orderPackages.get(0);
+                title = orderPackage.getTitle();
+                cover = orderPackage.getCover();
+            } else {
+                title = Configuration.getString("Package.MultiTitle");
+                cover = Configuration.getString("Package.MultiCover");
+            }
         }
         Map<Long, Integer> finishedCourceCounts = courseService.queryFinishedCourseCounts(Sets.newHashSet(orderId));
         SubjectOrder detailOrder = buildFullSubjectOrder(order, title, cover, finishedCourceCounts.get(orderId), courseIds);
@@ -418,8 +427,17 @@ public class OrderController extends BaseController {
                 Subject subject = subjectsMap.get(order.getSubjectId());
                 if (subject == null) continue;
 
-                title = subject.getTitle();
-                cover = subject.getCover();
+                List<OrderPackage> orderPackages = order.getPackages();
+                if (orderPackages.isEmpty()) continue;
+
+                if (orderPackages.size() == 1) {
+                    OrderPackage orderPackage = orderPackages.get(0);
+                    title = orderPackage.getTitle();
+                    cover = orderPackage.getCover();
+                } else {
+                    title = Configuration.getString("Package.MultiTitle");
+                    cover = Configuration.getString("Package.MultiCover");
+                }
             } else {
                 Course course = coursesMap.get(courseId);
                 if (course == null) continue;

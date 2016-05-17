@@ -121,4 +121,9 @@
     <PushMsg>
         <Coupon>您已获得%s元红包一枚，有效期至：%s，每个订单只可以使用一个红包，记得在有效期内使用哦~</Coupon>
     </PushMsg>
+
+    <Package>
+        <MultiTitle></MultiTitle>
+        <MultiCover></MultiCover>
+    </Package>
 </Configuration>
