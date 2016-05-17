@@ -343,14 +343,8 @@ public class OrderController extends BaseController {
             SubjectPackage subjectPackage = new SubjectPackage();
             subjectPackage.setPackageId(orderPackage.getId());
             subjectPackage.setSubjectId(order.getSubjectId());
-            subjectPackage.setTitle(subject.getTitle());
-            List<Long> orderCourseIds = order.getCourseIds();
-            if (orderCourseIds.size() >= 1) {
-                Course course = courseService.get(orderCourseIds.get(0));
-                subjectPackage.setCover(course.getCover());
-            } else {
-                subjectPackage.setCover(subject.getCover());
-            }
+            subjectPackage.setTitle(orderPackage.getTitle());
+            subjectPackage.setCover(orderPackage.getCover());
             subjectPackage.setBookableCourseCount(orderPackage.getBookableCount());
 
             subjectPackage.setExpireTime("购买日期: " + TimeUtil.SHORT_DATE_FORMAT.format(order.getAddTime()));
