@@ -240,13 +240,6 @@ public class OrderController extends BaseController {
                 subjectOrder.setDiscount(userCoupon.getDiscount());
                 subjectOrder.setCouponDesc(userCoupon.getDiscount() + "元红包"); // TODO 更多类型
             }
-
-            Payment payment = orderService.getPayment(order.getId());
-            if (!payment.exists()) throw new MomiaErrorException("无效的订单");
-            subjectOrder.setPayedFee(payment.getFee());
-            int payType = payment.getPayType();
-            payType = (payType == PayType.WEIXIN_APP || payType == PayType.WEIXIN_JSAPI) ? PayType.WEIXIN : payType;
-            subjectOrder.setPayType(payType);
         }
 
         return subjectOrder;
@@ -266,6 +259,15 @@ public class OrderController extends BaseController {
         subjectOrder.setCover(cover);
 
         subjectOrder.setCanRefund(!order.isCanceled() && courseService.queryBookedCourseCounts(Sets.newHashSet(order.getId())).get(order.getId()) <= 0);
+
+        if (order.isPayed()) {
+            Payment payment = orderService.getPayment(order.getId());
+            if (!payment.exists()) throw new MomiaErrorException("无效的订单");
+            subjectOrder.setPayedFee(payment.getFee());
+            int payType = payment.getPayType();
+            payType = (payType == PayType.WEIXIN_APP || payType == PayType.WEIXIN_JSAPI) ? PayType.WEIXIN : payType;
+            subjectOrder.setPayType(payType);
+        }
 
         return subjectOrder;
     }
