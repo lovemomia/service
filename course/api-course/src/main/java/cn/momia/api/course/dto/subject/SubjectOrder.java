@@ -23,6 +23,9 @@ public class SubjectOrder {
     private String title;
     private String cover;
 
+    private BigDecimal payedFee;
+    private Integer payType;
+
     // FULL
     // 使用的红包/优惠券
     private Long userCouponId;
@@ -31,8 +34,6 @@ public class SubjectOrder {
     private BigDecimal discount;
     private String couponDesc;
 
-    private BigDecimal payedFee;
-    private Integer payType;
     private Boolean canRefund;
 
     public long getId() {
@@ -115,6 +116,22 @@ public class SubjectOrder {
         this.cover = cover;
     }
 
+    public BigDecimal getPayedFee() {
+        return payedFee;
+    }
+
+    public void setPayedFee(BigDecimal payedFee) {
+        this.payedFee = payedFee;
+    }
+
+    public Integer getPayType() {
+        return payType;
+    }
+
+    public void setPayType(Integer payType) {
+        this.payType = payType;
+    }
+
     public Long getUserCouponId() {
         return userCouponId;
     }
@@ -153,22 +170,6 @@ public class SubjectOrder {
 
     public void setCouponDesc(String couponDesc) {
         this.couponDesc = couponDesc;
-    }
-
-    public BigDecimal getPayedFee() {
-        return payedFee;
-    }
-
-    public void setPayedFee(BigDecimal payedFee) {
-        this.payedFee = payedFee;
-    }
-
-    public Integer getPayType() {
-        return payType;
-    }
-
-    public void setPayType(Integer payType) {
-        this.payType = payType;
     }
 
     public Boolean getCanRefund() {
