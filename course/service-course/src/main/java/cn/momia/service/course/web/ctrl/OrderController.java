@@ -180,8 +180,19 @@ public class OrderController extends BaseController {
         refundParam.setRefundId(refund.getId());
         refundParam.setRefundTime(new Date());
         refundParam.setTradeNo(payment.getTradeNo());
-        refundParam.setTotalFee(payment.getFee());
-        refundParam.setRefundFee(refund.getRefundFee());
+        switch (payment.getPayType()) {
+            case PayType.ALIPAY:
+                refundParam.setTotalFee(payment.getFee());
+                refundParam.setRefundFee(refund.getRefundFee());
+                break;
+            case PayType.WEIXIN:
+            case PayType.WEIXIN_APP:
+            case PayType.WEIXIN_JSAPI:
+                refundParam.setTotalFee(new BigDecimal(payment.getFee().multiply(new BigDecimal(100)).intValue()));
+                refundParam.setRefundFee(new BigDecimal(refund.getRefundFee().multiply(new BigDecimal(100)).intValue()));
+                break;
+            default: throw new MomiaErrorException("无效的支付类型: " + payment.getPayType());
+        }
         refundParam.setRefundMessage(order.getRefundMessage());
         PaymentGateway gateway = PaymentGatewayFactory.create(payment.getPayType());
         if (gateway.refund(refundParam)) orderService.refundChecked(orderId);
