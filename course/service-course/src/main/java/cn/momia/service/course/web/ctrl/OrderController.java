@@ -177,6 +177,7 @@ public class OrderController extends BaseController {
         if (courseService.queryBookedCourseCounts(Sets.newHashSet(orderId)).get(orderId) > 0) return MomiaHttpResponse.FAILED("已经选过课的订单不能退款");
 
         RefundParam refundParam = new RefundParam();
+        refundParam.setPayType(payment.getPayType());
         refundParam.setRefundId(refund.getId());
         refundParam.setRefundTime(new Date());
         refundParam.setTradeNo(payment.getTradeNo());
