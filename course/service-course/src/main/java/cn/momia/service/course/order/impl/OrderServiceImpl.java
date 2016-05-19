@@ -136,7 +136,7 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     private List<OrderPackage> listOrderPackages(Collection<Long> packageIds) {
         if (packageIds.isEmpty()) return new ArrayList<OrderPackage>();
 
-        String sql = "SELECT A.Id, A.UserId, A.OrderId, A.SkuId, A.Price, A.CourseCount, A.BookableCount, A.Time, A.TimeUnit, B.CourseId FROM SG_SubjectOrderPackage A INNER JOIN SG_SubjectSku B ON A.SkuId=B.Id WHERE A.Id IN (" + StringUtils.join(packageIds, ",") + ") AND A.Status<>0 AND B.Status<>0";
+        String sql = "SELECT A.Id, A.UserId, A.OrderId, A.SkuId, A.Price, A.CourseCount, A.BookableCount, A.Time, A.TimeUnit, B.CourseId, B.Cover, B.Title FROM SG_SubjectOrderPackage A INNER JOIN SG_SubjectSku B ON A.SkuId=B.Id WHERE A.Id IN (" + StringUtils.join(packageIds, ",") + ") AND A.Status<>0 AND B.Status<>0";
         List<OrderPackage> packages = queryObjectList(sql, OrderPackage.class);
 
         Map<Long, OrderPackage> packagesMap = new HashMap<Long, OrderPackage>();
@@ -252,32 +252,32 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
     }
 
     @Override
-    public Map<Long, Long> queryBookablePackageIds(Set<Long> userIds, long subjectId) {
+    public Map<Long, Long> queryBookablePackageIds(Set<Long> userIds) {
         if (userIds.isEmpty()) return new HashMap<Long, Long>();
 
-        Map<Long, Long> packageIdsMap = queryBookedBookablePackageIds(userIds, subjectId);
+        Map<Long, Long> packageIdsMap = queryBookedBookablePackageIds(userIds);
 
         Set<Long> notBookedUserIds = new HashSet<Long>();
         for (long userId : userIds) {
             if (!packageIdsMap.containsKey(userId)) notBookedUserIds.add(userId);
         }
         if (!notBookedUserIds.isEmpty()) {
-            packageIdsMap.putAll(queryNotBookedBookablePackageIds(notBookedUserIds, subjectId));
+            packageIdsMap.putAll(queryNotBookedBookablePackageIds(notBookedUserIds));
         }
 
         return packageIdsMap;
     }
 
-    private Map<Long, Long> queryBookedBookablePackageIds(Collection<Long> userIds, long subjectId) {
+    private Map<Long, Long> queryBookedBookablePackageIds(Collection<Long> userIds) {
         final Map<Long, Long> packageIdsMap = new HashMap<Long, Long>();
         String sql = "SELECT A.UserId, A.Id AS PackageId " +
                 "FROM SG_SubjectOrderPackage A " +
                 "INNER JOIN SG_SubjectSku B ON A.SkuId=B.Id " +
                 "INNER JOIN SG_BookedCourse C ON A.Id=C.PackageId " +
                 "INNER JOIN SG_CourseSku D ON C.CourseSkuId=D.Id " +
-                "WHERE A.UserId IN (" + StringUtils.join(userIds, ",") + ") AND A.BookableCount>0 AND A.Status=1 AND B.SubjectId=? AND B.Status<>0 AND C.Status<>0 AND D.Status<>0 " +
+                "WHERE A.UserId IN (" + StringUtils.join(userIds, ",") + ") AND A.BookableCount>0 AND A.Status=1 AND B.Status<>0 AND C.Status<>0 AND D.Status<>0 " +
                 "ORDER BY D.StartTime ASC";
-        query(sql, new Object[] { subjectId }, new RowCallbackHandler() {
+        query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 long userId = rs.getLong("userId");
@@ -289,14 +289,14 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
         return packageIdsMap;
     }
 
-    private Map<Long, Long> queryNotBookedBookablePackageIds(Collection<Long> userIds, long subjectId) {
+    private Map<Long, Long> queryNotBookedBookablePackageIds(Collection<Long> userIds) {
         final Map<Long, Long> packageIdsMap = new HashMap<Long, Long>();
         String sql = "SELECT A.UserId, A.Id AS PackageId " +
                 "FROM SG_SubjectOrderPackage A " +
                 "INNER JOIN SG_SubjectSku B ON A.SkuId=B.Id " +
                 "LEFT JOIN SG_BookedCourse C ON A.Id=C.PackageId AND C.Status<>0 " +
-                "WHERE A.UserId IN (" + StringUtils.join(userIds, ",") + ") AND A.BookableCount>0 AND A.Status=1 AND B.SubjectId=? AND B.Status<>0 AND C.Id IS NULL";
-        query(sql, new Object[] { subjectId }, new RowCallbackHandler() {
+                "WHERE A.UserId IN (" + StringUtils.join(userIds, ",") + ") AND A.BookableCount>0 AND A.Status=1 AND B.Status<>0 AND C.Id IS NULL";
+        query(sql, new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 long userId = rs.getLong("userId");

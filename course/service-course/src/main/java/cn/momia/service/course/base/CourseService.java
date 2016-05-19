@@ -35,7 +35,7 @@ public interface CourseService {
     long queryCountBySubject(long subjectId, Collection<Long> exclusions, int minAge, int maxAge, int queryType);
     List<Course> queryBySubject(long subjectId, int start, int count, Collection<Long> exclusions, int minAge, int maxAge, int sortTypeId, int queryType);
 
-    List<Course> queryRecentCoursesBySubject(long subjectId);
+    List<Course> queryRecentCoursesBySubject(long subjectId, long days);
 
     List<Course> queryAllBySubject(long subjectId);
     Map<Long, List<Course>> queryAllBySubjects(Collection<Long> subjectIds);
@@ -110,4 +110,7 @@ public interface CourseService {
     List<Long> queryBookedUserIds(long courseSkuId);
 
     boolean hasNoAvaliableSkus(long courseId);
+
+    long queryBookableCount(List<Long> exclusions);
+    List<Course> queryBookable(int start, int count, List<Long> exclusions);
 }

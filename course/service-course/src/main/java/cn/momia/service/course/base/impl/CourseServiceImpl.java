@@ -476,7 +476,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     }
 
     @Override
-    public List<Course> queryRecentCoursesBySubject(long subjectId) {
+    public List<Course> queryRecentCoursesBySubject(long subjectId, long days) {
         Calendar calendar = Calendar.getInstance();
         int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
         if (dayOfWeek > 1) {
@@ -490,7 +490,7 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         calendar.set(Calendar.MILLISECOND, 0);
 
         Date startTime = calendar.getTime();
-        Date endTime = new Date(startTime.getTime() + 7L * 24 * 60 * 60 * 1000);
+        Date endTime = new Date(startTime.getTime() + days * 24 * 60 * 60 * 1000);
 
         String sql = "SELECT B.Id FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE A.SubjectId=? AND B.StartTime>=? AND B.StartTime<? AND A.Status=1 AND B.Status=1 ORDER BY B.StartTime ASC";
         List<Long> sukuIds = queryLongList(sql, new Object[] { subjectId, startTime, endTime });
@@ -1029,5 +1029,43 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
     public boolean hasNoAvaliableSkus(long courseId) {
         String sql = "SELECT COUNT(1) FROM SG_Course A INNER JOIN SG_CourseSku B ON A.Id=B.CourseId WHERE (A.Id=? OR A.ParentId=?) AND A.Status<>0 AND B.Status=1 AND B.Deadline>NOW()";
         return queryLong(sql, new Object[] { courseId, courseId }) <= 0;
+    }
+
+    @Override
+    public long queryBookableCount(List<Long> exclusions) {
+        String sql = exclusions.isEmpty() ?
+                "SELECT COUNT(DISTINCT A.Id) " +
+                        "FROM SG_Course A " +
+                        "INNER JOIN SG_CourseSku B ON A.Id=B.CourseId " +
+                        "WHERE A.ParentId=0 AND A.Status=1 " +
+                        "AND B.StartTime>NOW() AND B.EndTime>NOW() AND B.Deadline>NOW() AND B.UnlockedStock>0 AND B.Status=1" :
+                "SELECT COUNT(DISTINCT A.Id) " +
+                        "FROM SG_Course A " +
+                        "INNER JOIN SG_CourseSku B ON A.Id=B.CourseId " +
+                        "WHERE A.ParentId=0 AND A.Id NOT IN (" + StringUtils.join(exclusions, ",") + ") AND A.Status=1 " +
+                        "AND B.StartTime>NOW() AND B.EndTime>NOW() AND B.Deadline>NOW() AND B.UnlockedStock>0 AND B.Status=1";
+        return queryLong(sql);
+    }
+
+    @Override
+    public List<Course> queryBookable(int start, int count, List<Long> exclusions) {
+        String sql = exclusions.isEmpty() ?
+                "SELECT A.Id " +
+                        "FROM SG_Course A " +
+                        "INNER JOIN SG_CourseSku B ON A.Id=B.CourseId " +
+                        "WHERE A.ParentId=0 AND A.Status=1 " +
+                        "AND B.StartTime>NOW() AND B.EndTime>NOW() AND B.Deadline>NOW() AND B.UnlockedStock>0 AND B.Status=1 " +
+                        "GROUP BY A.Id " +
+                        "ORDER BY MIN(B.StartTime) ASC LIMIT ?,?" :
+                "SELECT A.Id " +
+                        "FROM SG_Course A " +
+                        "INNER JOIN SG_CourseSku B ON A.Id=B.CourseId " +
+                        "WHERE A.ParentId=0 AND A.Id NOT IN (" + StringUtils.join(exclusions, ",") + ") AND A.Status=1 " +
+                        "AND B.StartTime>NOW() AND B.EndTime>NOW() AND B.Deadline>NOW() AND B.UnlockedStock>0 AND B.Status=1 " +
+                        "GROUP BY A.Id " +
+                        "ORDER BY MIN(B.StartTime) ASC LIMIT ?,?";
+        List<Long> courseIds = queryLongList(sql, new Object[] { start, count });
+
+        return list(courseIds);
     }
 }

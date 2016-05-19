@@ -14,6 +14,7 @@ import cn.momia.common.core.dto.PagedList;
 import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.core.util.MomiaUtil;
+import cn.momia.common.webapp.config.Configuration;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.api.course.dto.course.BookedCourse;
 import cn.momia.service.course.base.CourseService;
@@ -197,7 +198,7 @@ public class CourseController extends BaseController {
 
     @RequestMapping(value = "/list/subject/recent", method = RequestMethod.GET)
     public MomiaHttpResponse listRecentCoursesBySubject(@RequestParam(value = "suid") long subjectId) {
-        return MomiaHttpResponse.SUCCESS(courseService.queryRecentCoursesBySubject(subjectId));
+        return MomiaHttpResponse.SUCCESS(courseService.queryRecentCoursesBySubject(subjectId, Configuration.getLong("Subject.Days")));
     }
 
     @RequestMapping(value = "/list/subject", method = RequestMethod.GET)
@@ -244,6 +245,15 @@ public class CourseController extends BaseController {
         List<Long> courseIds = courseService.queryBookedCourseIds(packageId);
         long totalCount = courseService.queryCountBySubject(subjectId, courseIds, minAge, maxAge, (packageId > 0 ? Course.QueryType.BOOKABLE : Course.QueryType.NOT_END));
         List<Course> courses = courseService.queryBySubject(subjectId, start, count, courseIds, minAge, maxAge, sortTypeId, (packageId > 0 ? Course.QueryType.BOOKABLE : Course.QueryType.NOT_END));
+
+        return MomiaHttpResponse.SUCCESS(buildPagedCourses(courses, totalCount, start, count));
+    }
+
+    @RequestMapping(value = "/bookable/query", method = RequestMethod.GET)
+    public MomiaHttpResponse queryBookable(@RequestParam(value = "pid") long packageId, @RequestParam int start, @RequestParam int count) {
+        List<Long> courseIds = courseService.queryBookedCourseIds(packageId);
+        long totalCount = courseService.queryBookableCount(courseIds);
+        List<Course> courses = courseService.queryBookable(start, count, courseIds);
 
         return MomiaHttpResponse.SUCCESS(buildPagedCourses(courses, totalCount, start, count));
     }
@@ -550,15 +560,15 @@ public class CourseController extends BaseController {
         if (!orderPackage.exists() || orderPackage.getUserId() != user.getId()) throw new MomiaErrorException("预约失败，无效的课程包");
 
         Order order = orderService.get(orderPackage.getOrderId());
-        if (!order.exists() || !order.isPayed() || order.isCanceled() || (order.getUserId() != orderPackage.getUserId())) throw new MomiaErrorException("预约失败，无效的订单");
+        if (!order.exists() || !order.isPayed() || order.isCanceled() || (order.getUserId() != orderPackage.getUserId())) throw new MomiaErrorException("预约失败，无效的订单或该订单您已申请退款");
 
         CourseSku sku = courseService.getSku(skuId);
         if (!sku.exists() || !sku.isBookable(new Date())) throw new MomiaErrorException("预约失败，无效的课程场次或本场次已截止选课");
         if (orderPackage.getCourseId() > 0 && orderPackage.getCourseId() != sku.getCourseId()) throw new MomiaErrorException("预约失败，课程与购买的包不匹配");
 
         if (courseService.booked(packageId, sku.getCourseId())) throw new MomiaErrorException("一门课程在一个课程包内只能约一次");
-        if (!courseService.matched(order.getSubjectId(), sku.getCourseId())) throw new MomiaErrorException("课程不匹配");
 
+        // TODO 使用事务
         if (!courseService.lockSku(skuId)) throw new MomiaErrorException("库存不足");
         LOGGER.info("course sku locked: {}/{}/{}", new Object[] { user.getId(), packageId, skuId });
 
@@ -599,8 +609,7 @@ public class CourseController extends BaseController {
             userIds.add(Long.valueOf(userId));
         }
 
-        long subjectId = courseService.querySubjectId(courseId);
-        Map<Long, Long> packageIds = orderService.queryBookablePackageIds(userIds, subjectId);
+        Map<Long, Long> packageIds = orderService.queryBookablePackageIds(userIds);
 
         List<User> users = userServiceApi.list(userIds, User.Type.FULL);
         Map<Long, User> usersMap = new HashMap<Long, User>();

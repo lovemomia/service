@@ -1,5 +1,6 @@
 package cn.momia.service.course.activity.impl;
 
+import cn.momia.common.core.exception.MomiaErrorException;
 import cn.momia.common.service.AbstractService;
 import cn.momia.api.course.activity.Activity;
 import cn.momia.api.course.activity.ActivityEntry;
@@ -21,7 +22,7 @@ public class ActivityServiceImpl extends AbstractService implements ActivityServ
 
     @Override
     public Activity getActivity(int activityId) {
-        String sql = "SELECT Id, Cover, Title, `Desc`, Message, NeedPay, Price, StartTime, EndTime, ForNewUser FROM SG_Activity WHERE Id=? AND OnlineTime<=NOW() AND OfflineTime>NOW() AND Status=1";
+        String sql = "SELECT Id, Cover, Title, `Desc`, Message, NeedPay, Price, StartTime, EndTime, ForNewUser, Detail, Stock AS TotalStock, UnlockedStock FROM SG_Activity WHERE Id=? AND OnlineTime<=NOW() AND OfflineTime>NOW() AND Status=1";
         return queryObject(sql, new Object[] { activityId }, Activity.class, Activity.NOT_EXIST_ACTIVITY);
     }
 
@@ -46,21 +47,42 @@ public class ActivityServiceImpl extends AbstractService implements ActivityServ
 
     @Override
     public long join(final int activityId, final String mobile, final String childName, final String relation, final String extra, final int status) {
-        return insert(new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO SG_ActivityEntry (ActivityId, Mobile, ChildName, RelationShip, ExtraMessage, Status, AddTime) VALUES (?, ?, ?, ?, ?, ?, NOW())";
-                PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                ps.setInt(1, activityId);
-                ps.setString(2, mobile);
-                ps.setString(3, childName);
-                ps.setString(4, relation);
-                ps.setString(5, extra);
-                ps.setInt(6, status);
+        try {
+            return (Long) execute(new TransactionCallback() {
+                @Override
+                public Object doInTransaction(TransactionStatus ts) {
+                    if (!lockStock(activityId)) throw new MomiaErrorException("报名失败，名额已满");
+                    return insert(new PreparedStatementCreator() {
+                        @Override
+                        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                            String sql = "INSERT INTO SG_ActivityEntry (ActivityId, Mobile, ChildName, RelationShip, ExtraMessage, Status, AddTime) VALUES (?, ?, ?, ?, ?, ?, NOW())";
+                            PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                            ps.setInt(1, activityId);
+                            ps.setString(2, mobile);
+                            ps.setString(3, childName);
+                            ps.setString(4, relation);
+                            ps.setString(5, extra);
+                            ps.setInt(6, status);
 
-                return ps;
-            }
-        }).getKey().longValue();
+                            return ps;
+                        }
+                    }).getKey().longValue();
+                }
+            });
+        } catch (MomiaErrorException e) {
+            throw e;
+        } catch (Exception e) {
+            LOGGER.error("join activity exception: {}/{}", activityId, mobile, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private boolean lockStock(int activityId) {
+        String sql = "SELECT Stock FROM SG_Activity WHERE Id=? AND Status=1";
+        if (queryInt(sql, new Object[] { activityId }) <= 0) return true; // 没有库存限制
+
+        sql = "UPDATE SG_Activity SET UnlockedStock=UnlockedStock-1, LockedStock=LockedStock+1 WHERE Id=? AND UnlockedStock>0 AND Status=1";
+        return update(sql, new Object[] { activityId });
     }
 
     @Override

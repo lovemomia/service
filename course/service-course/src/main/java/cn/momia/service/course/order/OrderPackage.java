@@ -22,6 +22,8 @@ public class OrderPackage {
     private int timeUnit;
 
     private long courseId;
+    private String cover;
+    private String title;
 
     public long getId() {
         return id;
@@ -101,6 +103,22 @@ public class OrderPackage {
 
     public void setCourseId(long courseId) {
         this.courseId = courseId;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public boolean exists() {

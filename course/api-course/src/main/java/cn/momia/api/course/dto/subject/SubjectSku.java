@@ -8,6 +8,8 @@ public class SubjectSku implements Cloneable {
     public static final SubjectSku NOT_EXIST_SUBJECT_SKU = new SubjectSku();
 
     private long id;
+    private String cover;
+    private String title;
     private long subjectId;
     private String desc;
     private BigDecimal price = new BigDecimal(0);
@@ -29,6 +31,22 @@ public class SubjectSku implements Cloneable {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public long getSubjectId() {
