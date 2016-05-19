@@ -287,6 +287,7 @@ public class OrderController extends BaseController {
     private void queryRefund(SubjectOrder subjectOrder, Payment payment, Refund refund) {
         try {
             RefundQueryParam refundQueryParam = new RefundQueryParam();
+            refundQueryParam.setPayType(payment.getPayType());
             refundQueryParam.setTradeNo(payment.getTradeNo());
             PaymentGateway gateway = PaymentGatewayFactory.create(payment.getPayType());
             if (gateway.refundQuery(refundQueryParam)) {
