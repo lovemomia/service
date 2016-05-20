@@ -217,28 +217,28 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
 
     @Override
     public long queryBookableCountByUserAndOrder(long userId, long orderId) {
-        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_SubjectOrderPackage A WHERE A.UserId=? AND A.OrderId=? AND A.Status=1 AND A.BookableCount>0";
-        return queryLong(sql, new Object[] { userId, orderId });
+        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_SubjectOrderPackage A INNER JOIN SG_SubjectOrder B ON A.OrderId=B.Id WHERE A.UserId=? AND A.OrderId=? AND A.Status=1 AND A.BookableCount>0 AND B.Status=?";
+        return queryLong(sql, new Object[] { userId, orderId, Order.Status.PAYED });
     }
 
     @Override
     public List<OrderPackage> queryBookableByUserAndOrder(long userId, long orderId, int start, int count) {
-        String sql = "SELECT DISTINCT A.Id FROM SG_SubjectOrderPackage A WHERE A.UserId=? AND A.OrderId=? AND A.Status=1 AND A.BookableCount>0 ORDER BY A.AddTime ASC LIMIT ?,?";
-        List<Long> packageIds = queryLongList(sql, new Object[] { userId, orderId, start, count });
+        String sql = "SELECT DISTINCT A.Id FROM SG_SubjectOrderPackage A INNER JOIN SG_SubjectOrder B ON A.OrderId=B.Id WHERE A.UserId=? AND A.OrderId=? AND A.Status=1 AND A.BookableCount>0 AND B.Status=? ORDER BY A.AddTime ASC LIMIT ?,?";
+        List<Long> packageIds = queryLongList(sql, new Object[] { userId, orderId, Order.Status.PAYED, start, count });
 
         return listOrderPackages(packageIds);
     }
 
     @Override
     public long queryBookableCountByUser(long userId) {
-        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_SubjectOrderPackage A WHERE A.UserId=? AND A.Status=1 AND A.BookableCount>0";
-        return queryLong(sql, new Object[] { userId });
+        String sql = "SELECT COUNT(DISTINCT A.Id) FROM SG_SubjectOrderPackage A INNER JOIN SG_SubjectOrder B ON A.OrderId=B.Id WHERE A.UserId=? AND A.Status=1 AND A.BookableCount>0 AND B.Status=?";
+        return queryLong(sql, new Object[] { userId, Order.Status.PAYED });
     }
 
     @Override
     public List<OrderPackage> queryBookableByUser(long userId, int start, int count) {
-        String sql = "SELECT DISTINCT A.Id FROM SG_SubjectOrderPackage A WHERE A.UserId=? AND A.Status=1 AND A.BookableCount>0 ORDER BY A.AddTime ASC LIMIT ?,?";
-        List<Long> packageIds = queryLongList(sql, new Object[] { userId, start, count });
+        String sql = "SELECT DISTINCT A.Id FROM SG_SubjectOrderPackage A INNER JOIN SG_SubjectOrder B ON A.OrderId=B.Id WHERE A.UserId=? AND A.Status=1 AND A.BookableCount>0 AND B.Status=? ORDER BY A.AddTime ASC LIMIT ?,?";
+        List<Long> packageIds = queryLongList(sql, new Object[] { userId, Order.Status.PAYED, start, count });
 
         return listOrderPackages(packageIds);
     }
