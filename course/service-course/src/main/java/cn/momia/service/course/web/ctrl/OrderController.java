@@ -274,11 +274,12 @@ public class OrderController extends BaseController {
 
         if (order.isPayed()) {
             Payment payment = orderService.getPayment(order.getId());
-            if (!payment.exists()) throw new MomiaErrorException("无效的订单");
-            subjectOrder.setPayedFee(payment.getFee());
-            int payType = payment.getPayType();
-            payType = (payType == PayType.WEIXIN_APP || payType == PayType.WEIXIN_JSAPI) ? PayType.WEIXIN : payType;
-            subjectOrder.setPayType(payType);
+            if (payment.exists()) {
+                subjectOrder.setPayedFee(payment.getFee());
+                int payType = payment.getPayType();
+                payType = (payType == PayType.WEIXIN_APP || payType == PayType.WEIXIN_JSAPI) ? PayType.WEIXIN : payType;
+                subjectOrder.setPayType(payType);
+            }
         }
 
         return subjectOrder;
