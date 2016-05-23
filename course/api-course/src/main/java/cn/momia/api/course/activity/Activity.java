@@ -7,6 +7,7 @@ public class Activity {
     public static final Activity NOT_EXIST_ACTIVITY = new Activity();
 
     private int id;
+    private String icon;
     private String cover;
     private String title;
     private String desc;
@@ -29,6 +30,14 @@ public class Activity {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 
     public String getCover() {
