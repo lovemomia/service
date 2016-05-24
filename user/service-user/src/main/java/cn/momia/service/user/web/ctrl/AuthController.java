@@ -41,6 +41,16 @@ public class AuthController extends BaseController {
         return MomiaHttpResponse.SUCCESS(new User.Full(user));
     }
 
+    @RequestMapping(value = "/login/code", method = RequestMethod.POST)
+    public MomiaHttpResponse loginByCode(@RequestParam String mobile, @RequestParam String code) {
+        if (!smsService.verifyCode(mobile, code)) return MomiaHttpResponse.FAILED("验证码不正确");
+
+        User user = userService.getByMobile(mobile);
+        if (!user.exists()) return MomiaHttpResponse.FAILED("用户不存在，请先注册");
+
+        return MomiaHttpResponse.SUCCESS(new User.Full(user));
+    }
+
     @RequestMapping(value = "/password", method = RequestMethod.PUT)
     public MomiaHttpResponse updatePassword(@RequestParam String mobile, @RequestParam String password, @RequestParam String code) {
         if (!smsService.verifyCode(mobile, code)) return MomiaHttpResponse.FAILED("验证码不正确");
