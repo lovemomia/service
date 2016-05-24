@@ -25,6 +25,7 @@ public interface UserService {
     boolean updateAddress(long userId, String address);
     boolean updateImToken(long userId, String imToken);
 
+    boolean hasPassword(String mobile);
     boolean validatePassword(String mobile, String password);
     boolean updatePassword(long userId, String mobile, String password);
 

@@ -192,6 +192,12 @@ public class UserServiceImpl extends AbstractService implements UserService {
     }
 
     @Override
+    public boolean hasPassword(String mobile) {
+        String sql = "SELECT Password FROM SG_User WHERE Mobile=?";
+        return !StringUtils.isBlank(queryString(sql, new Object[] { mobile }));
+    }
+
+    @Override
     public boolean validatePassword(String mobile, String password) {
         String sql = "SELECT COUNT(1) FROM SG_User WHERE Mobile=? AND Password=?";
         return queryInt(sql, new Object[] { mobile, encryptPassword(mobile, password, Configuration.getString("SecretKey.Password")) }) == 1;

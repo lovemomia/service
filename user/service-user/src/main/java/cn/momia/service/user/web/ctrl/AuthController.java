@@ -36,6 +36,7 @@ public class AuthController extends BaseController {
     public MomiaHttpResponse login(@RequestParam String mobile, @RequestParam String password) {
         User user = userService.getByMobile(mobile);
         if (!user.exists()) return MomiaHttpResponse.FAILED("用户不存在，请先注册");
+        if (!userService.hasPassword(mobile)) return MomiaHttpResponse.FAILED("您没有设置密码，请使用验证码登录");
         if (!userService.validatePassword(mobile, password)) return MomiaHttpResponse.FAILED("登录失败，密码不正确");
 
         return MomiaHttpResponse.SUCCESS(new User.Full(user));
