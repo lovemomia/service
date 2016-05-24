@@ -33,6 +33,8 @@ public interface OrderService {
 
     boolean prepay(long orderId);
     boolean pay(Payment payment);
+    void payOrder(long orderId);
+    void enablePackage(long orderId);
 
     boolean decreaseBookableCount(long packageId);
     boolean increaseBookableCount(long packageId);

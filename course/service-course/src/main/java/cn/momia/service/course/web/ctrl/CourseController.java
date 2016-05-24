@@ -831,8 +831,12 @@ public class CourseController extends BaseController {
         return MomiaHttpResponse.SUCCESS(courseService.queryBookedUserIds(courseSkuId));
     }
 
-    @RequestMapping(value = "/sku/vipcard/register", method = RequestMethod.POST)
-    public MomiaHttpResponse registerVipCard(@RequestParam(value = "uid") long userId, @RequestParam String card, @RequestParam String password) {
+    @RequestMapping(value = "/vipcard/register", method = RequestMethod.POST)
+    public MomiaHttpResponse registerVipCard(@RequestParam(value = "uid") long userId,
+                                             @RequestParam String name,
+                                             @RequestParam String mobile,
+                                             @RequestParam String card,
+                                             @RequestParam String password) {
         if (!courseService.registerVipCard(userId, card, password)) return MomiaHttpResponse.FAILED("无效的卡号或密码");
 
         User user = userServiceApi.get(userId);
@@ -843,8 +847,8 @@ public class CourseController extends BaseController {
         Order order = new Order();
         order.setUserId(userId);
         order.setSubjectId(vipCard.getSubjectId());
-        order.setContact(user.getNickName());
-        order.setMobile(user.getMobile());
+        order.setContact(name);
+        order.setMobile(mobile);
 
         OrderPackage orderPackage = new OrderPackage();
         orderPackage.setSkuId(vipCard.getSkuId());
@@ -856,7 +860,12 @@ public class CourseController extends BaseController {
 
         order.setPackages(Lists.newArrayList(orderPackage));
 
-        if (orderService.add(order) <= 0) return MomiaHttpResponse.FAILED;
-        return MomiaHttpResponse.SUCCESS;
+        long orderId = orderService.add(order);
+        if (orderId > 0) {
+            orderService.payOrder(orderId);
+            orderService.enablePackage(orderId);
+        }
+
+        return MomiaHttpResponse.SUCCESS(orderId > 0);
     }
 }

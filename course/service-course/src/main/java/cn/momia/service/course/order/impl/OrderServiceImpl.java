@@ -381,14 +381,16 @@ public class OrderServiceImpl extends AbstractService implements OrderService {
         return true;
     }
 
-    private void payOrder(long orderId) {
+    @Override
+    public void payOrder(long orderId) {
         String sql = "UPDATE SG_SubjectOrder SET Status=? WHERE Id=? AND Status=?";
         int updateCount = singleUpdate(sql, new Object[] { Order.Status.PAYED, orderId, Order.Status.PRE_PAYED });
 
         if (updateCount != 1) throw new RuntimeException("fail to pay order: " + orderId);
     }
 
-    private void enablePackage(long orderId) {
+    @Override
+    public void enablePackage(long orderId) {
         String sql = "UPDATE SG_SubjectOrderPackage SET Status=1 WHERE OrderId=?";
         int updateCount = singleUpdate(sql, new Object[] { orderId });
 
