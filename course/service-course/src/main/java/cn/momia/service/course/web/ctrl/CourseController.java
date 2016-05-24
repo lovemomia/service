@@ -862,6 +862,7 @@ public class CourseController extends BaseController {
 
         long orderId = orderService.add(order);
         if (orderId > 0) {
+            orderService.prepay(orderId);
             orderService.payOrder(orderId);
             orderService.enablePackage(orderId);
         }
