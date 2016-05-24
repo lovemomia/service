@@ -6,6 +6,7 @@ import cn.momia.api.course.dto.course.CourseSkuPlace;
 import cn.momia.api.course.dto.course.DatedCourseSkus;
 import cn.momia.api.course.dto.course.Student;
 import cn.momia.api.course.dto.course.TeacherCourse;
+import cn.momia.api.course.dto.vipcard.VipCard;
 import cn.momia.api.user.ChildServiceApi;
 import cn.momia.api.user.UserServiceApi;
 import cn.momia.api.user.dto.Child;
@@ -828,5 +829,34 @@ public class CourseController extends BaseController {
     @RequestMapping(value = "/sku/booked/user", method = RequestMethod.GET)
     public MomiaHttpResponse queryBookedUserIds(@RequestParam(value = "sid") long courseSkuId) {
         return MomiaHttpResponse.SUCCESS(courseService.queryBookedUserIds(courseSkuId));
+    }
+
+    @RequestMapping(value = "/sku/vipcard/register", method = RequestMethod.POST)
+    public MomiaHttpResponse registerVipCard(@RequestParam(value = "uid") long userId, @RequestParam String card, @RequestParam String password) {
+        if (!courseService.registerVipCard(userId, card, password)) return MomiaHttpResponse.FAILED("无效的卡号或密码");
+
+        User user = userServiceApi.get(userId);
+
+        VipCard vipCard = courseService.getVipCard(userId, card);
+        if (!vipCard.exists()) return MomiaHttpResponse.FAILED("无效的卡号或密码");
+
+        Order order = new Order();
+        order.setUserId(userId);
+        order.setSubjectId(vipCard.getSubjectId());
+        order.setContact(user.getNickName());
+        order.setMobile(user.getMobile());
+
+        OrderPackage orderPackage = new OrderPackage();
+        orderPackage.setSkuId(vipCard.getSkuId());
+        orderPackage.setPrice(vipCard.getPrice());
+        orderPackage.setCourseCount(vipCard.getCourseCount());
+        orderPackage.setBookableCount(vipCard.getCourseCount());
+        orderPackage.setTime(vipCard.getTime());
+        orderPackage.setTimeUnit(vipCard.getTimeUnit());
+
+        order.setPackages(Lists.newArrayList(orderPackage));
+
+        if (orderService.add(order) <= 0) return MomiaHttpResponse.FAILED;
+        return MomiaHttpResponse.SUCCESS;
     }
 }

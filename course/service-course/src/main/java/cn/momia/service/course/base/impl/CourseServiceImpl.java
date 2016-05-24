@@ -1,6 +1,7 @@
 package cn.momia.service.course.base.impl;
 
 import cn.momia.api.course.dto.course.Student;
+import cn.momia.api.course.dto.vipcard.VipCard;
 import cn.momia.api.poi.PoiUtil;
 import cn.momia.api.poi.dto.Region;
 import cn.momia.api.course.dto.course.Course;
@@ -1067,5 +1068,17 @@ public class CourseServiceImpl extends AbstractService implements CourseService 
         List<Long> courseIds = queryLongList(sql, new Object[] { start, count });
 
         return list(courseIds);
+    }
+
+    @Override
+    public boolean registerVipCard(long userId, String card, String password) {
+        String sql = "UPDATE SG_VipCard SET UserId=? WHERE No=? AND Password=? AND UserId=0 AND Status=1";
+        return update(sql, new Object[] { userId, card, password });
+    }
+
+    @Override
+    public VipCard getVipCard(long userId, String card) {
+        String sql = "SELECT Id, UserId, No, Password, SubjectId, SkuId, Price, CourseCount, Time, TimeUnit FROM SG_VipCard WHERE UserId=? AND No=? AND Status=1";
+        return queryObject(sql, new Object[] { userId, card }, VipCard.class, VipCard.NOT_EXIST_VIP_CARD);
     }
 }

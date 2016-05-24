@@ -6,6 +6,7 @@ import cn.momia.api.course.dto.course.CourseDetail;
 import cn.momia.api.course.dto.course.CourseSku;
 import cn.momia.api.course.dto.course.Student;
 import cn.momia.api.course.dto.course.TeacherCourse;
+import cn.momia.api.course.dto.vipcard.VipCard;
 
 import java.util.Collection;
 import java.util.List;
@@ -113,4 +114,7 @@ public interface CourseService {
 
     long queryBookableCount(List<Long> exclusions);
     List<Course> queryBookable(int start, int count, List<Long> exclusions);
+
+    boolean registerVipCard(long userId, String card, String password);
+    VipCard getVipCard(long userId, String card);
 }

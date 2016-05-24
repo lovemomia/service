@@ -352,4 +352,12 @@ public class CourseServiceApi extends HttpServiceApi {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder().add("sid", courseSkuId);
         return executeReturnList(MomiaHttpRequestBuilder.GET(url("/course/sku/booked/user"), builder.build()), Long.class);
     }
+
+    public boolean registerVipCard(long userId, String card, String password) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("uid", userId)
+                .add("card", card)
+                .add("password", password);
+        return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/course/vipcard/register"), builder.build()), Boolean.class);
+    }
 }
