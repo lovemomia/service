@@ -8,6 +8,8 @@ public interface ActivityService {
     ActivityEntry getActivityEntry(long entryId);
     ActivityEntry getActivityEntry(int activityId, String mobile, String childName);
 
+    boolean isNewUser(String mobile);
+
     boolean joined(int activityId, String mobile, String childName);
     long join(int activityId, String mobile, String childName, String relation, String extra, int status);
 

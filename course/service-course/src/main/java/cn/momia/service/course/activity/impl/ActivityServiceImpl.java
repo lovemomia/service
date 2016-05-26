@@ -40,6 +40,12 @@ public class ActivityServiceImpl extends AbstractService implements ActivityServ
     }
 
     @Override
+    public boolean isNewUser(String mobile) {
+        String sql = "SELECT COUNT(1) FROM SG_ActivityEntry WHERE Mobile=? AND Status<>0";
+        return queryInt(sql, new Object[] { mobile }) <= 0;
+    }
+
+    @Override
     public boolean joined(int activityId, String mobile, String childName) {
         String sql = "SELECT COUNT(1) FROM SG_ActivityEntry WHERE ActivityId=? AND Mobile=? AND ChildName=? AND Status=?";
         return queryInt(sql, new Object[] { activityId, mobile, childName, ActivityEntry.Status.PAYED }) > 0;
