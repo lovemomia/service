@@ -4,6 +4,8 @@ import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
+import cn.momia.service.user.sale.SaleService;
+import cn.momia.service.user.sale.SaleUserCountService;
 import cn.momia.service.user.sms.SmsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController extends BaseController {
     @Autowired private SmsService smsService;
     @Autowired private UserService userService;
+    @Autowired private SaleService saleService;
+    @Autowired private SaleUserCountService saleUserCountService;
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public MomiaHttpResponse register(@RequestParam(value = "nickname") String nickName,
@@ -29,6 +33,23 @@ public class AuthController extends BaseController {
         long userId = userService.add(nickName, mobile, password);
         if (userId <= 0) return MomiaHttpResponse.FAILED("注册失败");
 
+        return MomiaHttpResponse.SUCCESS(new User.Full(userService.get(userId)));
+    }
+
+    @RequestMapping(value = "/register/sale", method = RequestMethod.POST)
+    public MomiaHttpResponse registerBySaleCode(@RequestParam String mobile,
+                                                @RequestParam String saleCode,
+                                                @RequestParam String code){
+        if (userService.exists("mobile", mobile)) return MomiaHttpResponse.FAILED("手机号已经注册过");
+        if (!smsService.verifyCode(mobile, code)) return MomiaHttpResponse.FAILED("验证码不正确");
+        if (!saleService.verifySaleCode(saleCode)) return MomiaHttpResponse.FAILED("销售人员的标识符不正确");
+
+        String nickName = "sg" + mobile;
+        String password = "";
+
+        long userId = userService.add(nickName, mobile, password);
+        if (userId <= 0) return MomiaHttpResponse.FAILED("注册失败");
+        saleUserCountService.add(userId, saleService.getBySaleCode(saleCode).getId());
         return MomiaHttpResponse.SUCCESS(new User.Full(userService.get(userId)));
     }
 
