@@ -21,7 +21,7 @@ import java.util.List;
  * Created by Administrator on 2016/7/8.
  */
 public class SaleServiceImpl extends AbstractService implements SaleService{
-    private static final Logger LOGGER = LoggerFactory.getLogger(SaleServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(SaleServiceImpl.class);
 
     @Override
     public long add(final Sale sale) {
@@ -43,7 +43,7 @@ public class SaleServiceImpl extends AbstractService implements SaleService{
     @Override
     public Sale getBySaleId(long  id) {
         List<Sale> sales = list(Sets.newHashSet(id));
-        return sales.isEmpty() ? Sale.NOT_EXIST_Sale : sales.get(0);
+        return sales.isEmpty() ? new Sale() : sales.get(0);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class SaleServiceImpl extends AbstractService implements SaleService{
         List<Long> saleIds = queryLongList(sql, new Object[] { saleCode });
         List<Sale> users = list(saleIds);
 
-        return users.isEmpty() ? Sale.NOT_EXIST_Sale : users.get(0);
+        return users.size() > 0 ?  users.get(0) : new Sale();
     }
 
     @Override
@@ -64,19 +64,30 @@ public class SaleServiceImpl extends AbstractService implements SaleService{
     }
 
     @Override
-    public boolean verifySaleCode(String saleCode) {
+    public Sale getSaleByCode(String saleCode) {
         int length = saleCode.length();
         switch (length){
             case 1:
                 saleCode = "sg0000" + saleCode;
+                break;
             case 2:
                 saleCode = "sg000" + saleCode;
-            case  3:
+                break;
+            case 3:
                 saleCode = "sg00" + saleCode;
+                break;
+            case 4:
+                saleCode = "sg0" + saleCode;
+                break;
+            case 5:
+                saleCode = "sg" + saleCode;
+                break;
         }
-        String sql = "select count(1) from SG_Sale where SaleCode = ? and Status = 1 ";
-        boolean successful = queryInt(sql, new Object[] { saleCode }) > 0;
-        return successful;
+        log.info("saleCode>>>>>:"+saleCode);
+        String sql = "select Id,SaleCode,Mobile,Address,AddTime from SG_Sale where SaleCode = ? and Status = 1 ";
+        Sale sale = queryObject(sql, new Object[]{saleCode}, Sale.class, new Sale());
+        log.info("sale id>>>>>:"+sale.getId());
+        return sale;
     }
 
 }

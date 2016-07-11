@@ -1,21 +1,27 @@
 package cn.momia.service.user.sale;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
+import java.util.Date;
+
 /**
  * Created by Administrator on 2016/7/8.
  */
 public class SaleUserCount {
+
     static final SaleUserCount NOT_EXIST_SaleUserCount = new SaleUserCount();
-    private long id;
+
+    private int id;
     private int userId;
     private int saleId;
     private int status;
-    private String AddTime;
+    private Date AddTime;
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -43,11 +49,12 @@ public class SaleUserCount {
         this.status = status;
     }
 
-    public String getAddTime() {
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    public Date getAddTime() {
         return AddTime;
     }
 
-    public void setAddTime(String addTime) {
+    public void setAddTime(Date addTime) {
         AddTime = addTime;
     }
 }

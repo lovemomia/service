@@ -9,7 +9,7 @@ import java.util.List;
 public interface SaleService {
     long add(Sale sale);
     Sale getBySaleId(long id);
-    public Sale getBySaleCode(String saleCode);
+    Sale getBySaleCode(String saleCode);
     List<Sale> list(Collection<Long> saleIds);
-    boolean verifySaleCode(String saleCode);
+    Sale getSaleByCode(String saleCode);
 }

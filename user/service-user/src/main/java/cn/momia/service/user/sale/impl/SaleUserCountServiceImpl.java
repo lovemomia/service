@@ -25,18 +25,10 @@ public class SaleUserCountServiceImpl extends AbstractService implements SaleUse
     }
 
     @Override
-    public long add(final long userId, final long saleId) {
-        KeyHolder keyHolder = insert(new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                String sql = "INSERT INTO SG_SaleUserCount(UserId, SaleId, AddTime) VALUES (?, ?, NOW())";
-                PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                ps.setLong(1, userId);
-                ps.setLong(2, saleId);
-                return ps;
-            }
-        });
+    public void add(int userId, int saleId) {
+        String sql = "INSERT INTO SG_SaleUserCount(UserId, SaleId, AddTime) VALUES (?, ?, NOW())";
+        int updateCount = singleUpdate(sql, new Object[] { userId, saleId });
 
-        return keyHolder.getKey().longValue();
+        if (updateCount != 1) throw new RuntimeException("fail to insert sale user count for user id: " + userId + "and sale id:"+saleId);
     }
 }

@@ -5,5 +5,5 @@ package cn.momia.service.user.sale;
  */
 public interface SaleUserCountService {
     int getUserCountBySaleCode(String saleCodes);
-    long add(final long userId, final long saleId);
+    void add(int userId, int saleId);
 }
