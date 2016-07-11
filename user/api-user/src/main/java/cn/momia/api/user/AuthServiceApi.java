@@ -15,6 +15,14 @@ public class AuthServiceApi extends HttpServiceApi {
         return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/auth/register"), builder.build()), User.class);
     }
 
+    public User registerBySale(String mobile, String saleCode, String code) {
+        MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
+                .add("mobile", mobile)
+                .add("saleCode", saleCode)
+                .add("code", code);
+        return executeReturnObject(MomiaHttpRequestBuilder.POST(url("/auth/register/sale"), builder.build()), User.class);
+    }
+
     public User login(String mobile, String password) {
         MomiaHttpParamBuilder builder = new MomiaHttpParamBuilder()
                 .add("mobile", mobile)
