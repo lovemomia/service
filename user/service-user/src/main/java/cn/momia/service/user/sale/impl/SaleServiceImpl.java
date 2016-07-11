@@ -74,7 +74,7 @@ public class SaleServiceImpl extends AbstractService implements SaleService{
             case  3:
                 saleCode = "sg00" + saleCode;
         }
-        String sql = "select count(1) from SG_Sale where SaleCode = ? ane Status = 1 ";
+        String sql = "select count(1) from SG_Sale where SaleCode = ? and Status = 1 ";
         boolean successful = queryInt(sql, new Object[] { saleCode }) > 0;
         return successful;
     }
