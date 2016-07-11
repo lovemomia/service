@@ -13,4 +13,5 @@
     <bean class="cn.momia.api.course.CouponServiceApi" parent="abstractCourseApi" />
     <bean class="cn.momia.api.course.OrderServiceApi" parent="abstractCourseApi" />
     <bean class="cn.momia.api.course.PaymentServiceApi" parent="abstractCourseApi" />
+    <bean class="cn.momia.api.course.ExpertServiceApi" parent="abstractCourseApi" />
 </beans>

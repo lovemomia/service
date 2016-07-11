@@ -13,4 +13,5 @@
     <bean class="cn.momia.service.course.order.impl.OrderServiceImpl" parent="dbAccessService" />
     <bean class="cn.momia.service.course.coupon.impl.CouponServiceImpl" parent="dbAccessService" />
     <bean class="cn.momia.service.course.material.impl.CourseMaterialServiceImpl" parent="dbAccessService" />
+    <bean class="cn.momia.service.course.expert.impl.ExpertServiceImpl" parent="dbAccessService" />
 </beans>
