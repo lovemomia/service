@@ -64,19 +64,27 @@ public class SaleServiceImpl extends AbstractService implements SaleService{
     }
 
     @Override
-    public boolean verifySaleCode(String saleCode) {
-        int length = saleCode.length();
+    public Sale verifySaleCode(String saleCode) {
+        int length = saleCode.trim().length();
         switch (length){
             case 1:
                 saleCode = "sg0000" + saleCode;
+                break;
             case 2:
                 saleCode = "sg000" + saleCode;
+                break;
             case  3:
                 saleCode = "sg00" + saleCode;
+                break;
+            case  4:
+                saleCode = "sg0" + saleCode;
+                break;
+            case  5:
+                saleCode = "sg" + saleCode;
+                break;
+            default:break;
         }
-        String sql = "select count(1) from SG_Sale where SaleCode = ? ane Status = 1 ";
-        boolean successful = queryInt(sql, new Object[] { saleCode }) > 0;
-        return successful;
+        return queryObject("select * from SG_Sale where SaleCode = ? and Status = 1 ", new Object[] { saleCode }, Sale.class, new Sale());
     }
 
 }

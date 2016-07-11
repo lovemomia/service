@@ -4,6 +4,7 @@ import cn.momia.common.core.http.MomiaHttpResponse;
 import cn.momia.common.webapp.ctrl.BaseController;
 import cn.momia.service.user.base.User;
 import cn.momia.service.user.base.UserService;
+import cn.momia.service.user.sale.Sale;
 import cn.momia.service.user.sale.SaleService;
 import cn.momia.service.user.sale.SaleUserCountService;
 import cn.momia.service.user.sms.SmsService;
@@ -42,14 +43,15 @@ public class AuthController extends BaseController {
                                                 @RequestParam String code){
         if (userService.exists("mobile", mobile)) return MomiaHttpResponse.FAILED("手机号已经注册过");
         if (!smsService.verifyCode(mobile, code)) return MomiaHttpResponse.FAILED("验证码不正确");
-        if (!saleService.verifySaleCode(saleCode)) return MomiaHttpResponse.FAILED("销售人员的标识符不正确");
+        Sale sale = saleService.verifySaleCode(saleCode);
+        if (!sale.exits()) return MomiaHttpResponse.FAILED("销售人员的标识符不正确");
 
         String nickName = "sg" + mobile;
         String password = "";
 
         long userId = userService.add(nickName, mobile, password);
         if (userId <= 0) return MomiaHttpResponse.FAILED("注册失败");
-        saleUserCountService.add(userId, saleService.getBySaleCode(saleCode).getId());
+        saleUserCountService.add(userId, sale.getId());
         return MomiaHttpResponse.SUCCESS(new User.Full(userService.get(userId)));
     }
 

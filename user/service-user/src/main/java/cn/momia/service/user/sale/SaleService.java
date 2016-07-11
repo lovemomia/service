@@ -11,5 +11,5 @@ public interface SaleService {
     Sale getBySaleId(long id);
     public Sale getBySaleCode(String saleCode);
     List<Sale> list(Collection<Long> saleIds);
-    boolean verifySaleCode(String saleCode);
+    Sale verifySaleCode(String saleCode);
 }

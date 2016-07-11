@@ -59,4 +59,8 @@ public class Sale {
     public void setAddTime(String addTime) {
         this.addTime = addTime;
     }
+
+    public boolean exits(){
+        return id > 0;
+    }
 }
